@@ -19,12 +19,28 @@ import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link ServiceAssembly} implementation which lazily creates its part. The Classloader and {@link ServiceProvider} won't
+ * actually be created until actually needed.
+ * <p>
+ * Instances are only to be created through the {@link #builder()} method.
+ *
+ * @since 4.2
+ */
 public class LazyServiceAssembly implements ServiceAssembly {
 
+  /**
+   * @return a new {@link Builder}
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * A non-reusable builder to create {@link LazyServiceAssembly} instances
+   *
+   * @since 4.2
+   */
   public static class Builder {
 
     private String name;
@@ -32,28 +48,57 @@ public class LazyServiceAssembly implements ServiceAssembly {
     private Supplier<ServiceProvider> serviceProviderSupplier;
     private String contractClassName;
 
-    private Builder() {}
+    private Builder() {
+    }
 
+    /**
+     * Allows to set the new of the assembled {@link Service}
+     *
+     * @param name the {@link Service} name
+     * @return {@code this} builder
+     */
     public Builder withName(String name) {
       this.name = name;
       return this;
     }
 
+    /**
+     * Provides a {@link Supplier} to lazily create the service's {@link ClassLoader}.
+     *
+     * @param artifactClassLoader A {@link Supplier} to lazily create the service's {@link ClassLoader}
+     * @return {@code this} builder
+     */
     public Builder withClassLoader(Supplier<ClassLoader> artifactClassLoader) {
       this.artifactClassLoader = artifactClassLoader;
       return this;
     }
 
+    /**
+     * Provides a {@link Supplier} to lazily create the service's {@link ServiceProvider}.
+     *
+     * @param serviceProviderSupplier A {@link Supplier} to lazily create the service's {@link ServiceProvider}
+     * @return {@code this} builder
+     */
     public Builder withServiceProvider(CheckedSupplier<ServiceProvider> serviceProviderSupplier) {
       this.serviceProviderSupplier = serviceProviderSupplier;
       return this;
     }
 
+    /**
+     * Sets the classname of the {@link Service} contract that will be satisfied by the assembly
+     *
+     * @param contractClassName the {@link Service} classname
+     * @return {@code this} builder
+     */
     public Builder forContract(String contractClassName) {
       this.contractClassName = contractClassName;
       return this;
     }
 
+    /**
+     * @return a new {@link LazyServiceAssembly} instance
+     * @throws ServiceResolutionError if the assembly couldn't be created
+     */
     public ServiceAssembly build() throws ServiceResolutionError {
       try {
         return new LazyServiceAssembly(name, artifactClassLoader, serviceProviderSupplier, resolveContract());
@@ -70,6 +115,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
       }
     }
   }
+
 
   private final String name;
   private final LazyValue<ClassLoader> classLoader;

@@ -43,10 +43,18 @@ public class ServiceDescriptor extends ArtifactDescriptor {
     super(name, properties);
   }
 
+  /**
+   * @return the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
+   */
   public List<MuleServiceContractModel> getContractModels() {
     return contractModels;
   }
 
+  /**
+   * Sets the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
+   *
+   * @param contractModels the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
+   */
   public void setContractModels(List<MuleServiceContractModel> contractModels) {
     checkArgument(!isEmpty(contractModels), "contractModels cannot be empty");
     this.contractModels = contractModels;

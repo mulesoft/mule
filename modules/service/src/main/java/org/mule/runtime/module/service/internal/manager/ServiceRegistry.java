@@ -20,11 +20,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Qualifier;
 
+/**
+ * Keeps track of {@link Service} implementations and is capable of injecting them into {@link ServiceProvider} instances
+ * with fields annotated with {@link Inject}. Method injection as {@link Qualifier} and {@link Named} annotations are not
+ * supported.
+ *
+ * @since 4.2
+ */
 public class ServiceRegistry {
 
   private final Map<Class<? extends Service>, Service> services = new HashMap<>();
 
+  /**
+   * Injects the tracked {@link Service services} into the given {@code serviceProvider}
+   *
+   * @param serviceProvider the injection target
+   * @throws ServiceResolutionError if a dependency could not be injected
+   */
   public void inject(ServiceProvider serviceProvider) throws ServiceResolutionError {
     for (Field field : getAllFields(serviceProvider.getClass(), withAnnotation(Inject.class))) {
       final Object dependency = lookup(field.getType());
@@ -44,6 +59,12 @@ public class ServiceRegistry {
     }
   }
 
+  /**
+   * Tracks the given {@code service}
+   *
+   * @param service  the {@link Service} to be tracked
+   * @param assembly the {@code service}'s {@link ServiceAssembly}
+   */
   public void register(Service service, ServiceAssembly assembly) {
     services.put(assembly.getServiceContract(), service);
   }

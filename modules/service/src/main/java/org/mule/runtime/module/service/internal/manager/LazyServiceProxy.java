@@ -28,6 +28,7 @@ import org.mule.runtime.core.internal.util.MethodInvoker;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -35,6 +36,14 @@ import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 
+/**
+ * A {@link Service} proxy which allows to defer the actual load and creation of the service until the first invokation of
+ * one of its contract methods. Lifecycle will also be applied lazily.
+ * <p>
+ * Use in tandem with the {@link LazyServiceAssembly} for a truly lazy effect.
+ *
+ * @since 4.2
+ */
 public class LazyServiceProxy implements InvocationHandler {
 
   private static final Logger LOGGER = getLogger(LazyServiceProxy.class);
@@ -47,6 +56,13 @@ public class LazyServiceProxy implements InvocationHandler {
   private boolean stopped = false;
   private MethodInvoker methodInvoker = new DefaultMethodInvoker();
 
+  /**
+   * Creates a new proxy based on the given {@code assembly} and {@code serviceRegistry}
+   *
+   * @param assembly the {@link ServiceAssembly}
+   * @param serviceRegistry the {@link ServiceRegistry}
+   * @return a new {@link Service} proxy
+   */
   public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
     final Class<? extends Service> contract = assembly.getServiceContract();
     return (Service) newProxyInstance(contract.getClassLoader(),

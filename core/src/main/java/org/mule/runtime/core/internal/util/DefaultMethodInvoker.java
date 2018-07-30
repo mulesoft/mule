@@ -8,8 +8,17 @@ package org.mule.runtime.core.internal.util;
 
 import java.lang.reflect.Method;
 
+/**
+ * Default implementation of {@link MethodInvoker} which simply invokes the method using the supplied
+ * target and arguments.
+ *
+ * @since 4.2
+ */
 public class DefaultMethodInvoker implements MethodInvoker {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Object invoke(Object object, Method method, Object[] args) throws Throwable {
     return method.invoke(object, args);

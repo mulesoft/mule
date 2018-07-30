@@ -6,8 +6,18 @@
  */
 package org.mule.runtime.core.internal.util;
 
+/**
+ * A class on which a {@link MethodInvoker} can be configured
+ *
+ * @since 4.2
+ */
 public interface HasMethodInvoker {
 
+  /**
+   * Sets the given {@code methodInvoker}
+   *
+   * @param methodInvoker a {@link MethodInvokerServiceRegistry}
+   */
   void setMethodInvoker(MethodInvoker methodInvoker);
 
 }

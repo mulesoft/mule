@@ -109,7 +109,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     serviceDescriptor.deleteOnExit();
     MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder()
         .setName(getArtifactId())
-        .setMinMuleVersion("4.0.0")
+        .setMinMuleVersion("4.2.0")
         .setRequiredProduct(MULE)
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
         .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))

@@ -12,9 +12,11 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
+import org.mule.runtime.core.internal.util.MethodInvoker;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -26,6 +28,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+/**
+ * A {@link MethodInvoker} to automatically reroute {@link Service} method invokations to {@link Inject} annotated overloads,
+ * similar to {@link InjectParamsFromContextServiceProxy}
+ *
+ * @since 4.2
+ */
 public class InjectParamsFromContextServiceMethodExecutor extends DefaultMethodInvoker {
 
   public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
