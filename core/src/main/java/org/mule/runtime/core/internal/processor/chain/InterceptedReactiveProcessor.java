@@ -12,6 +12,9 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import org.reactivestreams.Publisher;
 
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
+
 /**
  * Allows to apply processing strategy to processor + previous interceptors while using the processing type of the processor
  * itself.
@@ -32,7 +35,10 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
-    return next.apply(eventPublisher);
+    return from(eventPublisher)
+            .doOnNext(event -> {})
+            .transform(publisher -> next.apply(publisher))
+            .doOnNext(event -> {});
   }
 
   @Override

@@ -229,7 +229,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
-      interceptors.add((processor, next) -> processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next)));
+      interceptors.add((processor, next) -> stream -> from(stream)
+              .doOnNext(event -> {})
+              .transform(processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next)))
+              .doOnNext(event -> {})
+      );
     }
 
     // Apply processor interceptors around processor and other core logic
