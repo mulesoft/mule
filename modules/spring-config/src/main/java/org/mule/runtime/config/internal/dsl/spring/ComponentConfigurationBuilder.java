@@ -183,6 +183,14 @@ class ComponentConfigurationBuilder<T> {
     }
 
     @Override
+    public void onReferenceConfigurationParameter(String parameterName, Object defaultValue,
+                                                  Optional<TypeConverter> typeConverter) {
+      ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
+      valueExtractor.onConfigurationParameter(parameterName, defaultValue, typeConverter);
+      valueConsumer.accept(valueExtractor.getValue());
+    }
+
+    @Override
     public void onUndefinedSimpleParameters() {
       ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
       valueExtractor.onUndefinedSimpleParameters();
@@ -296,6 +304,12 @@ class ComponentConfigurationBuilder<T> {
         parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
       }
       this.value = parameterValue;
+    }
+
+    @Override
+    public void onReferenceConfigurationParameter(String parameterName, Object defaultValue,
+                                                  Optional<TypeConverter> typeConverter) {
+      onConfigurationParameter(parameterName, defaultValue, typeConverter);
     }
 
     @Override

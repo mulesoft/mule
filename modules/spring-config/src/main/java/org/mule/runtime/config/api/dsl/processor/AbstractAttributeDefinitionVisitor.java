@@ -51,6 +51,11 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
     doOnOperation("onConfigurationParameter");
   }
 
+  public void onReferenceConfigurationParameter(String parameterName, Object defaultValue,
+                                                Optional<TypeConverter> typeConverter) {
+    doOnOperation("onReferenceConfigurationParameter");
+  }
+
   @Override
   public void onUndefinedSimpleParameters() {
     doOnOperation("onUndefinedSimpleParameters");
