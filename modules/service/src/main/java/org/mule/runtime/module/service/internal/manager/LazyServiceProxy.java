@@ -187,7 +187,7 @@ public class LazyServiceProxy implements InvocationHandler {
     if (obj != null && isProxyClass(obj.getClass())) {
       return this == getInvocationHandler(obj);
     }
-    
+
     return false;
   }
 }

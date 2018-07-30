@@ -67,7 +67,6 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
 
         for (MuleServiceContractModel contract : serviceModel.getContracts()) {
           ServiceProvider serviceProvider = instantiateServiceProvider(classLoader, contract.getServiceProviderClassName());
-          // TODO MULE-12254 - Remove null which is needed in order to avoid class cast exceptions
           locators.add(new ImmutableServiceAssembly(serviceModel.getName(), serviceProvider, classLoader,
                                                     loadClass(contract.getContractClassName(), getClass().getClassLoader())));
         }

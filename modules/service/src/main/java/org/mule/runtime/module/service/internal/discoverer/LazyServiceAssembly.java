@@ -48,8 +48,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
     private Supplier<ServiceProvider> serviceProviderSupplier;
     private String contractClassName;
 
-    private Builder() {
-    }
+    private Builder() {}
 
     /**
      * Allows to set the new of the assembled {@link Service}
