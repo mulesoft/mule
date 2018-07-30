@@ -34,7 +34,7 @@ import javax.inject.Named;
  *
  * @since 4.2
  */
-public class InjectParamsFromContextServiceMethodExecutor extends DefaultMethodInvoker {
+public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodInvoker {
 
   public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
       "More than one invocation candidate for for method '%s' in service '%s'";
@@ -48,7 +48,7 @@ public class InjectParamsFromContextServiceMethodExecutor extends DefaultMethodI
    *
    * @param registry the {@link Registry} to use for resolving injectable parameters. Non null.
    */
-  public InjectParamsFromContextServiceMethodExecutor(Registry registry) {
+  public InjectParamsFromContextServiceMethodInvoker(Registry registry) {
     checkArgument(registry != null, "context cannot be null");
     this.registry = registry;
   }

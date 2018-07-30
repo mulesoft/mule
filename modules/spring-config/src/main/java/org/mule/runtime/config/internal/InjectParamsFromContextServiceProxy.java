@@ -14,11 +14,9 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.internal.MetadataInvocationHandler;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 
@@ -50,7 +48,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
    * Creates a new proxy for the provided service instance.
    *
    * @param service service instance to wrap. Non null.
-   * @param context the {@link MuleContext} to use for resolving injectable parameters. Non null.
+   * @param registry the {@link Registry} to use for resolving injectable parameters. Non null.
    */
   public InjectParamsFromContextServiceProxy(Service service, Registry registry) {
     super(service);

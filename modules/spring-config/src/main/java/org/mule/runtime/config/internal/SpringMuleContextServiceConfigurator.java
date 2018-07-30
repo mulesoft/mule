@@ -324,7 +324,7 @@ class SpringMuleContextServiceConfigurator {
       Object servImpl = customServiceImpl.get();
       if (servImpl instanceof Service) {
         if (servImpl instanceof HasMethodInvoker) {
-          ((HasMethodInvoker) servImpl).setMethodInvoker(new InjectParamsFromContextServiceMethodExecutor(serviceLocator));
+          ((HasMethodInvoker) servImpl).setMethodInvoker(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
           beanDefinition = getConstantObjectBeanDefinition(servImpl);
         } else {
           beanDefinition =

@@ -7,6 +7,8 @@
 package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.String.format;
+import static java.lang.reflect.Proxy.getInvocationHandler;
+import static java.lang.reflect.Proxy.isProxyClass;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -178,5 +180,14 @@ public class LazyServiceProxy implements InvocationHandler {
 
   private <T> T withServiceClassLoader(Callable<T> callable) {
     return withContextClassLoader(assembly.getClassLoader(), callable);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj != null && isProxyClass(obj.getClass())) {
+      return this == getInvocationHandler(obj);
+    }
+    
+    return false;
   }
 }
