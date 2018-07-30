@@ -8,6 +8,7 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
@@ -42,6 +43,7 @@ import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
@@ -363,8 +365,10 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     metaInfFolder.delete();
     metaInfFolder.mkdir();
     File descriptor = new File(metaInfFolder, MULE_ARTIFACT_JSON_DESCRIPTOR);
-    MuleServiceModel muleServiceModel = new MuleServiceModelBuilder().setName("Foo").setMinMuleVersion("4.0.0")
-        .withServiceProviderClassName("org.foo.ServiceProvider")
+    MuleServiceModel muleServiceModel = new MuleServiceModelBuilder()
+        .setName("Foo")
+        .setMinMuleVersion("4.2.0")
+        .withContracts(asList(new MuleServiceContractModel("org.foo.ServiceProvider", "FooService")))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
         .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
         .build();

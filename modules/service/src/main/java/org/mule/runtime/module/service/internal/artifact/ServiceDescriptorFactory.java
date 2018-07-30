@@ -56,7 +56,7 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
 
   @Override
   protected void doDescriptorConfig(MuleServiceModel artifactModel, ServiceDescriptor descriptor, File artifactLocation) {
-    descriptor.setServiceProviderClassName(artifactModel.getServiceProviderClassName());
+    descriptor.setContractModels(artifactModel.getContracts());
   }
 
   @Override

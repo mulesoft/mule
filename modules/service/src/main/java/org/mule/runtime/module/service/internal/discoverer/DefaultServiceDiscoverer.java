@@ -10,12 +10,11 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   private final ServiceProviderDiscoverer serviceProviderDiscoverer;
 
   public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer) {
-    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper()));
+    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ServiceRegistry()));
   }
 
   /**
@@ -45,8 +44,14 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   }
 
   @Override
-  public List<Pair<ArtifactClassLoader, Service>> discoverServices() throws ServiceResolutionError {
-    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = serviceProviderDiscoverer.discover();
-    return serviceResolver.resolveServices(serviceProviders);
+  public List<Service> discoverServices() throws ServiceResolutionError {
+    try {
+      final List<ServiceAssembly> assemblies = serviceProviderDiscoverer.discover();
+      return serviceResolver.resolveServices(assemblies);
+    } catch (ServiceResolutionError e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ServiceResolutionError(e.getMessage(), e);
+    }
   }
 }

@@ -19,18 +19,20 @@ import org.mule.runtime.core.internal.util.splash.SplashScreen;
  */
 final class ServiceSplashScreen extends SplashScreen {
 
-  private final Service service;
+  private final String serviceDescription;
+  private final String splash;
 
-  ServiceSplashScreen(Service service) {
-    this.service = service;
+  public ServiceSplashScreen(String serviceDescription, String splash) {
+    this.serviceDescription = serviceDescription;
+    this.splash = splash;
     doHeader();
   }
 
   private void doHeader() {
-    header.add("Started " + service.toString());
+    header.add("Started " + serviceDescription);
     header.add("");
 
-    for (String splashMessageLine : service.getSplashMessage().split(lineSeparator())) {
+    for (String splashMessageLine : splash.split(lineSeparator())) {
       header.add(splashMessageLine);
     }
   }

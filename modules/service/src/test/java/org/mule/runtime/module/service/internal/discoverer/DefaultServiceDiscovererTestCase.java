@@ -12,9 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -33,12 +31,13 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversServices() throws Exception {
-    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
+    final List<ServiceAssembly> serviceProviders = new ArrayList<>();
     when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
-    final List<Pair<ArtifactClassLoader, Service>> expectedServices = new ArrayList<>();
+
+    final List<Service> expectedServices = new ArrayList<>();
     when(serviceResolver.resolveServices(serviceProviders)).thenReturn(expectedServices);
 
-    final List<Pair<ArtifactClassLoader, Service>> services = serviceDiscoverer.discoverServices();
+    final List<Service> services = serviceDiscoverer.discoverServices();
 
     assertThat(services, is(expectedServices));
   }
@@ -52,9 +51,9 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test(expected = ServiceResolutionError.class)
   public void propagatesServiceResolutionErrors() throws Exception {
-    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
+    final List<ServiceAssembly> serviceProviders = new ArrayList<>();
     when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
-    when(serviceResolver.resolveServices(serviceProviders)).thenThrow(new ServiceResolutionError("Error"));
+    when(serviceResolver.resolveServices(serviceProviders)).thenThrow(new RuntimeException(new ServiceResolutionError("Error")));
 
     serviceDiscoverer.discoverServices();
   }

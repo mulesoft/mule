@@ -7,23 +7,23 @@
 
 package org.mule.runtime.module.service.internal.artifact;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static java.util.Collections.emptyList;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
-import java.util.Optional;
-import java.util.Properties;
-
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Describes how to create a {@link Service} instance.
  */
 public class ServiceDescriptor extends ArtifactDescriptor {
 
-  public static final String SERVICE_PROPERTIES = "service.properties";
-
-  private String serviceProviderClassName;
+  private List<MuleServiceContractModel> contractModels = emptyList();
 
   /**
    * Creates a new service descriptor
@@ -43,13 +43,20 @@ public class ServiceDescriptor extends ArtifactDescriptor {
     super(name, properties);
   }
 
-  public String getServiceProviderClassName() {
-    return serviceProviderClassName;
+  /**
+   * @return the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
+   */
+  public List<MuleServiceContractModel> getContractModels() {
+    return contractModels;
   }
 
-  public void setServiceProviderClassName(String serviceProviderClassName) {
-    checkArgument(!isEmpty(serviceProviderClassName), "serviceProviderClassName cannot be empty");
-
-    this.serviceProviderClassName = serviceProviderClassName;
+  /**
+   * Sets the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
+   *
+   * @param contractModels the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
+   */
+  public void setContractModels(List<MuleServiceContractModel> contractModels) {
+    checkArgument(!isEmpty(contractModels), "contractModels cannot be empty");
+    this.contractModels = contractModels;
   }
 }

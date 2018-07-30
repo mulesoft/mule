@@ -333,9 +333,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
           .setMinMuleVersion(MIN_MULE_VERSION)
           .setName(BAR_POLICY_NAME)
           .setRequiredProduct(MULE)
-          .withBundleDescriptorLoader(createBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+          .withBundleDescriptorLoader(
+                                      createBundleDescriptorLoader(BAR_POLICY_NAME,
+                                                                   MULE_POLICY_CLASSIFIER,
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-          .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+          .withClassLoaderModelDescriptorLoader(
+                                                new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
   protected final PolicyFileBuilder policyUsingAppPluginFileBuilder =
@@ -343,9 +346,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
           .setMinMuleVersion(MIN_MULE_VERSION)
           .setName(BAR_POLICY_NAME)
           .setRequiredProduct(MULE)
-          .withBundleDescriptorLoader(createBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+          .withBundleDescriptorLoader(
+                                      createBundleDescriptorLoader(BAR_POLICY_NAME,
+                                                                   MULE_POLICY_CLASSIFIER,
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-          .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+          .withClassLoaderModelDescriptorLoader(
+                                                new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
   protected final PolicyFileBuilder policyIncludingPluginFileBuilder =
@@ -511,16 +517,22 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void installFooService() throws IOException {
-    installService("fooService", "org.mule.service.foo.FooServiceProvider", defaultFooServiceJarFile);
+    installService("fooService", "org.mule.runtime.service.test.api.FooService", "org.mule.service.foo.FooServiceProvider",
+                   defaultFooServiceJarFile);
   }
 
   protected void installEchoService() throws IOException {
-    installService("echoService", "org.mule.echo.EchoServiceProvider", defaulServiceEchoJarFile);
+    installService("echoService", "org.mule.runtime.service.test.api.EchoService", "org.mule.echo.EchoServiceProvider",
+                   defaulServiceEchoJarFile);
   }
 
-  private void installService(String serviceName, String serviceProviderClassName, File serviceJarFile) throws IOException {
+  private void installService(String serviceName, String satisfiedServiceClassName, String serviceProviderClassName,
+                              File serviceJarFile)
+      throws IOException {
     final File echoService =
-        new ServiceFileBuilder(serviceName).withServiceProviderClass(serviceProviderClassName)
+        new ServiceFileBuilder(serviceName)
+            .forContract(satisfiedServiceClassName)
+            .withServiceProviderClass(serviceProviderClassName)
             .usingLibrary(serviceJarFile.getAbsolutePath())
             .unpack(true)
             .getArtifactFile();
@@ -1314,9 +1326,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .setMinMuleVersion(MIN_MULE_VERSION)
         .setName(EXCEPTION_POLICY_NAME)
         .setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(EXCEPTION_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+        .withBundleDescriptorLoader(
+                                    createBundleDescriptorLoader(EXCEPTION_POLICY_NAME,
+                                                                 MULE_POLICY_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .withClassLoaderModelDescriptorLoader(
+                                              new MuleArtifactLoaderDescriptor(MULE_LOADER_ID,
+                                                                               emptyMap()))
         .build())
         .dependingOn(exceptionThrowingPlugin);
   }
@@ -1354,7 +1370,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID).build());
+        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID)
+        .build());
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
 
     return new ArtifactPluginFileBuilder(extensionName)
@@ -1376,7 +1393,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                  "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID)
-        .addProperty(EXPORTED_RESOURCES, asList("/META-INF/mule-exception.xsd", "/META-INF/mule.schemas"))
+        .addProperty(EXPORTED_RESOURCES,
+                     asList("/META-INF/mule-exception.xsd",
+                            "/META-INF/mule.schemas"))
         .build());
 
     File exceptionTestClassFile = null;
@@ -1468,6 +1487,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     }
   }
 
+
   protected static class TestComponentOnRedeploy implements Initialisable {
 
     static boolean initialised = false;
@@ -1518,7 +1538,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
    * Updates a file's last modified time to be greater than the original timestamp
    *
    * @param timestamp time value in milliseconds of the original file's last modified time
-   * @param file file to update
+   * @param file      file to update
    */
   protected void updateFileModifiedTime(long timestamp, File file) {
     do {
@@ -1554,6 +1574,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     }
   }
+
 
   private static class TestDomainArchiveDeployer extends DomainArchiveDeployer {
 

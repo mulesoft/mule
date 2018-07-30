@@ -7,14 +7,11 @@
 
 package org.mule.runtime.module.service.internal.discoverer;
 
-import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -27,23 +24,22 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
+import org.mule.runtime.module.service.internal.discoverer.ServiceRegistryTestCase.FooService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import java.io.File;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,15 +47,19 @@ import org.junit.Test;
 
 public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTestCase {
 
-  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactory.class);
   @Rule
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
+
+  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactory.class);
   private ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
   private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
   private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
 
   @Before
   public void setUp() throws Exception {
+    FooServiceProvider.INVOKED = false;
+    BarServiceProvider.INVOKED = false;
+
     final File servicesFolder = getServicesFolder();
     assertThat(servicesFolder.mkdir(), is(true));
     when(containerClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
@@ -79,8 +79,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
                                                 builder());
 
-    final List<Pair<ArtifactClassLoader, ServiceProvider>> discover = serviceProviderDiscoverer.discover();
-
+    final List<ServiceAssembly> discover = serviceProviderDiscoverer.discover();
     assertThat(discover, is(empty()));
   }
 
@@ -98,43 +97,29 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
                                                 builder());
 
-    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProvidersPairs = serviceProviderDiscoverer.discover();
+    final List<ServiceAssembly> assemblies = serviceProviderDiscoverer.discover();
 
-    List<ServiceProvider> serviceProviders = serviceProvidersPairs.stream().map(Pair::getSecond).collect(Collectors.toList());
+    assertThat(assemblies.size(), equalTo(2));
 
-    assertThat(serviceProviders.size(), equalTo(2));
-    assertThat(serviceProviders, hasItem(instanceOf(FooServiceProvider.class)));
-    assertThat(serviceProviders, hasItem(instanceOf(BarServiceProvider.class)));
-  }
+    assertThat(FooServiceProvider.INVOKED, is(false));
+    assertThat(BarServiceProvider.INVOKED, is(false));
 
-  @Test(expected = ServiceResolutionError.class)
-  public void detectsCorruptServiceFile() throws Exception {
-    installCorruptedService("fooService", FooServiceProvider.class);
+    assemblies.forEach(l -> l.getServiceProvider().getServiceDefinition());
 
-    ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
-    when(serviceClassLoaderFactory.create(argThat(any(String.class)),
-                                          argThat(any(ServiceDescriptor.class)), argThat(any(ClassLoader.class)), argThat(any(
-                                                                                                                              ClassLoaderLookupPolicy.class))))
-                                                                                                                                  .thenReturn(serviceClassLoader);
-    final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
-        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
-                                                builder());
-
-    serviceProviderDiscoverer.discover();
+    assertThat(FooServiceProvider.INVOKED, is(true));
+    assertThat(BarServiceProvider.INVOKED, is(true));
   }
 
   private void installService(String serviceName, Class<? extends ServiceProvider> providerClass) throws Exception {
     installService(serviceName, providerClass, false);
   }
 
-  private void installCorruptedService(String serviceName, Class<? extends ServiceProvider> providerClass) throws Exception {
-    installService(serviceName, providerClass, true);
-  }
-
   private void installService(String serviceName, Class<? extends ServiceProvider> providerClass, boolean corrupted)
       throws Exception {
     final ServiceFileBuilder fooService =
-        new ServiceFileBuilder(serviceName).withServiceProviderClass(providerClass.getName()).unpack(true);
+        new ServiceFileBuilder(serviceName)
+            .forContract(FooService.class.getName())
+            .withServiceProviderClass(providerClass.getName()).unpack(true);
     if (corrupted) {
       fooService.corrupted();
     }
@@ -146,17 +131,23 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
 
   public static class FooServiceProvider implements ServiceProvider {
 
+    private static boolean INVOKED = false;
+
     @Override
-    public List<ServiceDefinition> providedServices() {
-      return emptyList();
+    public ServiceDefinition getServiceDefinition() {
+      INVOKED = true;
+      return null;
     }
   }
 
   public static class BarServiceProvider implements ServiceProvider {
 
+    private static boolean INVOKED = false;
+
     @Override
-    public List<ServiceDefinition> providedServices() {
-      return emptyList();
+    public ServiceDefinition getServiceDefinition() {
+      INVOKED = true;
+      return null;
     }
   }
 }

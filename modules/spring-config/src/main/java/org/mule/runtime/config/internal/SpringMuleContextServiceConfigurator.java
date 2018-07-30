@@ -124,6 +124,7 @@ import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
+import org.mule.runtime.core.internal.util.HasMethodInvoker;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
@@ -320,11 +321,17 @@ class SpringMuleContextServiceConfigurator {
     if (customServiceClass.isPresent()) {
       beanDefinition = getBeanDefinitionBuilder(customServiceClass.get()).getBeanDefinition();
     } else if (customServiceImpl.isPresent()) {
-      if (customServiceImpl.get() instanceof Service) {
-        beanDefinition = getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) customServiceImpl.get(),
-                                                                                                serviceLocator));
+      Object servImpl = customServiceImpl.get();
+      if (servImpl instanceof Service) {
+        if (servImpl instanceof HasMethodInvoker) {
+          ((HasMethodInvoker) servImpl).setMethodInvoker(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
+          beanDefinition = getConstantObjectBeanDefinition(servImpl);
+        } else {
+          beanDefinition =
+              getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
+        }
       } else {
-        beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
+        beanDefinition = getConstantObjectBeanDefinition(servImpl);
       }
     } else {
       throw new IllegalStateException("A custom service must define a service class or instance");

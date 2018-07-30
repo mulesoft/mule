@@ -43,9 +43,9 @@ public abstract class SplashScreen {
 
   protected static final String VALUE_FORMAT = " - %s";
   private static final String KEY_VALUE_FORMAT = VALUE_FORMAT + " = %s";
-  protected List<String> header = new ArrayList<String>();
-  protected List<String> body = new ArrayList<String>();
-  protected List<String> footer = new ArrayList<String>();
+  protected List<String> header = new ArrayList<>();
+  protected List<String> body = new ArrayList<>();
+  protected List<String> footer = new ArrayList<>();
 
   /**
    * Setting the header clears body and footer assuming a new splash-screen is built.
@@ -101,7 +101,7 @@ public abstract class SplashScreen {
   }
 
   public String toString() {
-    List<String> boilerPlate = new ArrayList<String>(header);
+    List<String> boilerPlate = new ArrayList<>(header);
     boilerPlate.addAll(body);
     boilerPlate.addAll(footer);
     return StringMessageUtils.getBoilerPlate(boilerPlate, '*', 70);

@@ -19,8 +19,8 @@ public class MockHttpServiceProvider implements ServiceProvider {
   private final HttpService service = new MockHttpService();
 
   @Override
-  public List<ServiceDefinition> providedServices() {
-    return singletonList(new ServiceDefinition(HttpService.class, service));
+  public ServiceDefinition getServiceDefinition() {
+    return new ServiceDefinition(HttpService.class, service);
   }
 
 }

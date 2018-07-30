@@ -16,6 +16,7 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationDescr
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,6 +38,7 @@ import java.util.List;
 public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileBuilder> {
 
   private String serviceProviderClassName;
+  private String contractClassName = null;
   private boolean unpack = false;
 
   /**
@@ -45,15 +48,6 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
    */
   public ServiceFileBuilder(String artifactId) {
     super(artifactId);
-  }
-
-  /**
-   * Creates a new builder from another instance.
-   *
-   * @param source instance used as template to build the new one. Non null.
-   */
-  public ServiceFileBuilder(ServiceFileBuilder source) {
-    super(source);
   }
 
   @Override
@@ -76,6 +70,14 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     checkImmutable();
     checkArgument(!isBlank(className), "Property value cannot be blank");
     serviceProviderClassName = className;
+
+    return this;
+  }
+
+  public ServiceFileBuilder forContract(String contractClassName) {
+    checkImmutable();
+    checkArgument(!isBlank(contractClassName), "Property value cannot be blank");
+    this.contractClassName = contractClassName;
 
     return this;
   }
@@ -105,11 +107,14 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
   private File createServiceJsonDescriptorFile() {
     File serviceDescriptor = new File(getTempFolder(), getArtifactId() + "service.json");
     serviceDescriptor.deleteOnExit();
-    MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder();
-    serviceModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0").setRequiredProduct(MULE);
-    serviceModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    serviceModelBuilder.withServiceProviderClassName(serviceProviderClassName);
+    MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder()
+        .setName(getArtifactId())
+        .setMinMuleVersion("4.2.0")
+        .setRequiredProduct(MULE)
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .withContracts(Arrays.asList(new MuleServiceContractModel(serviceProviderClassName, contractClassName)));
+
     String serviceDescriptorContent = new MuleServiceModelJsonSerializer().serialize(serviceModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(serviceDescriptor)) {
       fileWriter.write(serviceDescriptorContent);

@@ -10,6 +10,7 @@ package org.mule.runtime.module.service.internal.artifact;
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -21,6 +22,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
@@ -40,6 +42,7 @@ import org.junit.rules.TemporaryFolder;
 public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String SERVICE_NAME = "testService";
+  private static final String SERVICE_API_CLASS_NAME = "org.foo.FooServiceProvider";
   private static final String PROVIDER_CLASS_NAME = "org.foo.FooServiceProvider";
 
   private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
@@ -69,12 +72,20 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(servicesFolder.mkdirs(), is(true));
 
     final ServiceFileBuilder fooService =
-        new ServiceFileBuilder(SERVICE_NAME).withServiceProviderClass(PROVIDER_CLASS_NAME);
+        new ServiceFileBuilder(SERVICE_NAME)
+            .withServiceProviderClass(PROVIDER_CLASS_NAME)
+            .forContract(SERVICE_API_CLASS_NAME);
+
     unzip(fooService.getArtifactFile(), getServiceFolder(SERVICE_NAME));
 
     ServiceDescriptor descriptor = serviceDescriptorFactory.create(getServiceFolder(SERVICE_NAME), empty());
     assertThat(descriptor.getName(), equalTo(SERVICE_NAME));
-    assertThat(descriptor.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
     assertThat(descriptor.getRootFolder(), equalTo(getServiceFolder(SERVICE_NAME)));
+
+    assertThat(descriptor.getContractModels(), hasSize(1));
+    MuleServiceContractModel contractModel = descriptor.getContractModels().get(0);
+
+    assertThat(contractModel.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
+    assertThat(contractModel.getContractClassName(), equalTo(SERVICE_API_CLASS_NAME));
   }
 }
