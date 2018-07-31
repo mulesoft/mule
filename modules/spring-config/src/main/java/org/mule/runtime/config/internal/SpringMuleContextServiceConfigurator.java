@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -88,10 +89,10 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.internal.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
-import org.mule.runtime.config.internal.factories.TypeSupplierConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
+import org.mule.runtime.config.internal.factories.TypeSupplierConstantFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -126,18 +127,20 @@ import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
-import org.mule.runtime.core.internal.util.HasMethodInvoker;
 import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -327,12 +330,16 @@ class SpringMuleContextServiceConfigurator {
       Object servImpl = customServiceImpl.get();
       if (servImpl instanceof Service) {
         if (isProxyClass(servImpl.getClass())) {
-          if (servImpl instanceof HasMethodInvoker) {
-            ((HasMethodInvoker) servImpl).setMethodInvoker(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
+          InvocationHandler handler = getInvocationHandler(servImpl);
+          if (handler instanceof LazyServiceProxy) {
+            servImpl = ((LazyServiceProxy) handler)
+                .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator, muleContext));
           }
 
-          beanDefinition = servImpl instanceof TypeSupplier ? getConstantProxyBeanDefinition(servImpl)
+          beanDefinition = servImpl instanceof TypeSupplier
+              ? getConstantProxyBeanDefinition(servImpl)
               : getConstantObjectBeanDefinition(servImpl);
+
         } else {
           beanDefinition =
               getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
