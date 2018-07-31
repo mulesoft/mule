@@ -11,9 +11,9 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
@@ -63,7 +63,7 @@ public class MuleServiceManager implements ServiceManager {
 
   private void startServices() throws MuleException {
     for (Service service : services) {
-      ((Startable) service).start();
+      startIfNeeded(service);
     }
   }
 
@@ -71,7 +71,7 @@ public class MuleServiceManager implements ServiceManager {
   public void stop() throws MuleException {
     for (Service service : services) {
       try {
-        ((Stoppable) service).stop();
+        stopIfNeeded(service);
       } catch (Exception e) {
         LOGGER.warn(format("Failed to stop service '%s': %s", service.getName(), e.getMessage()), e);
       }

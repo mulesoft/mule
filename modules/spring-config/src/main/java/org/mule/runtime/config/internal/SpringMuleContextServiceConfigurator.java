@@ -92,7 +92,7 @@ import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
-import org.mule.runtime.config.internal.factories.TypeSupplierConstantFactoryBean;
+import org.mule.runtime.config.internal.factories.FixedTypeConstantFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -140,7 +140,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -333,11 +332,11 @@ class SpringMuleContextServiceConfigurator {
           InvocationHandler handler = getInvocationHandler(servImpl);
           if (handler instanceof LazyServiceProxy) {
             servImpl = ((LazyServiceProxy) handler)
-                .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator, muleContext));
+                .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
           }
 
           beanDefinition = servImpl instanceof TypeSupplier
-              ? getConstantProxyBeanDefinition(servImpl)
+              ? getFixedTypeConstantObjectBeanDefinition(servImpl, (Class<?>) ((TypeSupplier) servImpl).getType())
               : getConstantObjectBeanDefinition(servImpl);
 
         } else {
@@ -467,8 +466,11 @@ class SpringMuleContextServiceConfigurator {
     return getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgValue(impl).getBeanDefinition();
   }
 
-  private static BeanDefinition getConstantProxyBeanDefinition(Object object) {
-    return getBeanDefinitionBuilder(TypeSupplierConstantFactoryBean.class).addConstructorArgValue(object).getBeanDefinition();
+  private static BeanDefinition getFixedTypeConstantObjectBeanDefinition(Object object, Class<?> type) {
+    return getBeanDefinitionBuilder(FixedTypeConstantFactoryBean.class)
+        .addConstructorArgValue(object)
+        .addConstructorArgValue(type)
+        .getBeanDefinition();
   }
 
   private static BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType) {

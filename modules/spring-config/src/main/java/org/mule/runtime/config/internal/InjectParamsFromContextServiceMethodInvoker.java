@@ -13,7 +13,6 @@ import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
@@ -43,20 +42,16 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
       "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
 
   private final Registry registry;
-  private final MuleContext muleContext;
 
   /**
    * Creates a new instance
    *
    * @param registry    the {@link Registry} to use for resolving injectable parameters. Non null.
-   * @param muleContext the application's {@link MuleContext}
    */
-  public InjectParamsFromContextServiceMethodInvoker(Registry registry, MuleContext muleContext) {
+  public InjectParamsFromContextServiceMethodInvoker(Registry registry) {
     checkArgument(registry != null, "registry cannot be null");
-    checkArgument(muleContext != null, "context cannot be null");
 
     this.registry = registry;
-    this.muleContext = muleContext;
   }
 
   @Override
@@ -65,34 +60,40 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
 
     if (injectable == null) {
       return super.invoke(target, method, args);
-    } else {
-      final List<Object> augmentedArgs = args == null ? new ArrayList<>() : new ArrayList<>(asList(args));
-
-      for (int i = method.getParameters().length; i < injectable.getParameters().length; ++i) {
-        final Parameter parameter = injectable.getParameters()[i];
-        Object arg;
-        Named named = parameter.getAnnotation(Named.class);
-        if (named != null) {
-          arg = registry.lookupByName(named.value())
-              .orElseThrow(() -> new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
-                                                                                parameter.getName(), injectable.getName(),
-                                                                                target.toString())));
-        } else {
-          final Collection<?> lookupObjects = registry.lookupAllByType(parameter.getType());
-          arg = new PreferredObjectSelector().select(lookupObjects.iterator());
-        }
-        augmentedArgs.add(arg);
-      }
-
-      return super.invoke(target, injectable, augmentedArgs.toArray());
     }
+
+    final List<Object> augmentedArgs;
+    try {
+      augmentedArgs = calculateAugmentedArgs(target, method, args, injectable);
+    } catch (NullPointerException e) {
+      // registry is not initialised yet, call original method
+      return super.invoke(target, method, args);
+    }
+
+    return super.invoke(target, injectable, augmentedArgs.toArray());
+  }
+
+  private List<Object> calculateAugmentedArgs(Object target, Method method, Object[] args, Method injectable) {
+    final List<Object> augmentedArgs = args == null ? new ArrayList<>() : new ArrayList<>(asList(args));
+    for (int i = method.getParameters().length; i < injectable.getParameters().length; ++i) {
+      final Parameter parameter = injectable.getParameters()[i];
+      Object arg;
+      Named named = parameter.getAnnotation(Named.class);
+      if (named != null) {
+        arg = registry.lookupByName(named.value())
+            .orElseThrow(() -> new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
+                                                                              parameter.getName(), injectable.getName(),
+                                                                              target.toString())));
+      } else {
+        final Collection<?> lookupObjects = registry.lookupAllByType(parameter.getType());
+        arg = new PreferredObjectSelector().select(lookupObjects.iterator());
+      }
+      augmentedArgs.add(arg);
+    }
+    return augmentedArgs;
   }
 
   private Method resolveInjectableMethod(Object target, Method method) {
-    if (!muleContext.isInitialised()) {
-      return null;
-    }
-
     Method candidate = null;
 
     for (Method serviceImplMethod : getImplementationDeclaredMethods(target)) {
