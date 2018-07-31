@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.context.thread.notification;
 
+import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -110,7 +111,8 @@ public class ThreadNotificationLoggerTestCase {
 
   @Test
   public void withSubscribeOnThreadSwitch() {
-    reactor.core.scheduler.Scheduler subscribeOnScheduler = fromExecutorService(scheduler2);
+    reactor.core.scheduler.Scheduler subscribeOnScheduler =
+        fromExecutorService(new ThreadLoggingExecutorServiceDecorator(of(logger), scheduler2, event));
 
     List<ThreadNotificationService.ThreadNotificationElement> notifications = new ArrayList<>();
     doAnswer(invocationOnMock -> {
@@ -119,10 +121,9 @@ public class ThreadNotificationLoggerTestCase {
     }).when(service).addThreadNotificationElement(any());
 
     just(event)
-        .doOnNext(coreEvent -> logger.setStartingThread(event))
-        .transform(p -> from(p)
-            .subscribeOn(subscribeOnScheduler)
-            .map(coreEvent -> coreEvent))
+        .map(e -> e)
+        .subscribeOn(subscribeOnScheduler)
+        .map(coreEvent -> coreEvent)
         .doOnNext(e -> logger.setFinishThread(e))
         .subscribe();
 
