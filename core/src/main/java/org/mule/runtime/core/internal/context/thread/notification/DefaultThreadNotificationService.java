@@ -61,6 +61,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   }
 
   private void logStats() {
+    REPORT_LOGGER.error("HEEELOOOOOOOO");
     for (Pair<String, String> transition : stats.getPossibleTransitions()) {
       String count = formattedNumber(stats.getCount(transition));
       String mean = formattedNumber(stats.getMean(transition));
@@ -77,7 +78,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
       // We set this to warn logging level because the entire pipeline is already created, so even if the
       // logging level changes, the pipeline should be defined using a system property (the ThreadNotificationLogger
       // needs to know whether to add logging phases or not).
-      REPORT_LOGGER.warn(msg);
+      REPORT_LOGGER.error(msg);
     }
   }
 

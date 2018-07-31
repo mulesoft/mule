@@ -26,15 +26,19 @@ import static reactor.retry.Retry.onlyIf;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
+import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
 
@@ -180,9 +184,14 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
                                                    reactor.core.scheduler.Scheduler eventLoopScheduler,
                                                    Scheduler processorScheduler, CoreEvent event) {
+      Reference<Optional<ThreadNotificationLogger>> logger = new Reference<>();
       return just(event)
-          .transform(processor)
-          .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)))
+              .subscriberContext(context -> {
+                logger.set(context.getOrEmpty(ThreadNotificationLogger.class.getName()));
+                return context;
+              })
+              .flatMap(e -> just(e).subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(logger.get(), decorateScheduler(processorScheduler), e))))
+              .transform(processor)
           .publishOn(eventLoopScheduler)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .doOnError(RejectedExecutionException.class,

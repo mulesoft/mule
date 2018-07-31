@@ -30,7 +30,14 @@ public class ThreadNotificationLogger {
   }
 
   public void setStartingThread(CoreEvent event) {
+    setStartingThread(event, false);
+  }
+
+  public void setStartingThread(CoreEvent event, boolean avoidIfSetted) {
     if (!isEnabled()) {
+      return;
+    }
+    if (avoidIfSetted && threadNotificationBuilders.containsKey(event.getContext().getId())) {
       return;
     }
     sameThread.set(true);
