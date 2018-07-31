@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import java.lang.reflect.Type;
+
 /**
- * A class on which a {@link MethodInvoker} can be configured
+ * A supplier which returns a {@link Type}
  *
  * @since 4.2
  */
-public interface HasMethodInvoker {
+@FunctionalInterface
+public interface TypeSupplier {
 
   /**
-   * Sets the given {@code methodInvoker}
-   *
-   * @param methodInvoker a {@link MethodInvoker}
+   * @return A {@link Type}
    */
-  void setMethodInvoker(MethodInvoker methodInvoker);
-
+  Type getType();
 }

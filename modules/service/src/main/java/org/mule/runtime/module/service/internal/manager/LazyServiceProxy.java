@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
 import org.mule.runtime.core.internal.util.HasMethodInvoker;
 import org.mule.runtime.core.internal.util.MethodInvoker;
+import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
@@ -68,7 +69,8 @@ public class LazyServiceProxy implements InvocationHandler {
   public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
     final Class<? extends Service> contract = assembly.getServiceContract();
     return (Service) newProxyInstance(contract.getClassLoader(),
-                                      new Class[] {contract, Startable.class, Stoppable.class, HasMethodInvoker.class},
+                                      new Class[] {contract, Startable.class, Stoppable.class, HasMethodInvoker.class,
+                                          TypeSupplier.class},
                                       new LazyServiceProxy(assembly, serviceRegistry));
   }
 
@@ -92,6 +94,8 @@ public class LazyServiceProxy implements InvocationHandler {
       return handleStart();
     } else if (methodClass == Stoppable.class) {
       return handleStop();
+    } else if (methodClass == TypeSupplier.class) {
+      return assembly.getServiceContract();
     } else {
       return methodInvoker.invoke(service.get(), method, args);
     }

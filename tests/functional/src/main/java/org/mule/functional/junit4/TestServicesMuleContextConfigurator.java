@@ -7,16 +7,21 @@
 
 package org.mule.functional.junit4;
 
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.util.ClassUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Register services implementations.
@@ -35,8 +40,20 @@ public class TestServicesMuleContextConfigurator implements ServiceConfigurator 
     checkArgument(serviceRepository != null, "serviceRepository cannot be null");
     this.serviceRepository = serviceRepository;
 
-    testServices =
-        new SpiServiceRegistry().lookupProviders(Service.class, TestServicesMuleContextConfigurator.class.getClassLoader());
+    Set<Class> currentContracts = getRegisteredServiceContracts();
+    testServices = new ArrayList<>(
+                                   new SpiServiceRegistry()
+                                       .lookupProviders(Service.class,
+                                                        TestServicesMuleContextConfigurator.class.getClassLoader()));
+
+    testServices.removeIf(s -> currentContracts.stream().anyMatch(c -> c.isInstance(s)));
+  }
+
+  private Set<Class> getRegisteredServiceContracts() {
+    return serviceRepository.getServices().stream()
+        .flatMap(s -> Arrays.stream(ClassUtils.findImplementedInterfaces(s.getClass()))
+            .filter(type -> Service.class.isAssignableFrom(type)))
+        .collect(toSet());
   }
 
   @Override
