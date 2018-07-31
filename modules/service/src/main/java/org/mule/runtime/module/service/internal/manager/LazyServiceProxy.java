@@ -25,7 +25,6 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
-import org.mule.runtime.core.internal.util.HasMethodInvoker;
 import org.mule.runtime.core.internal.util.MethodInvoker;
 import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
@@ -62,31 +61,50 @@ public class LazyServiceProxy implements InvocationHandler {
   /**
    * Creates a new proxy based on the given {@code assembly} and {@code serviceRegistry}
    *
-   * @param assembly the {@link ServiceAssembly}
+   * @param assembly        the {@link ServiceAssembly}
    * @param serviceRegistry the {@link ServiceRegistry}
    * @return a new {@link Service} proxy
    */
   public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
-    final Class<? extends Service> contract = assembly.getServiceContract();
-    return (Service) newProxyInstance(contract.getClassLoader(),
-                                      new Class[] {contract, Startable.class, Stoppable.class, HasMethodInvoker.class,
-                                          TypeSupplier.class},
-                                      new LazyServiceProxy(assembly, serviceRegistry));
+    return proxy(assembly, new LazyServiceProxy(assembly, serviceRegistry));
   }
 
-  private LazyServiceProxy(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
+  private static Service proxy(ServiceAssembly assembly, InvocationHandler handler) {
+    final Class<? extends Service> contract = assembly.getServiceContract();
+    return (Service) newProxyInstance(contract.getClassLoader(),
+                                      new Class[] {contract, Startable.class, Stoppable.class, TypeSupplier.class},
+                                      handler);
+  }
+
+  protected LazyServiceProxy(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
     this.assembly = assembly;
     this.serviceRegistry = serviceRegistry;
-    service = new LazyValue<>(createService());
+    this.service = new LazyValue<>(createService());
+  }
+
+  protected LazyServiceProxy(ServiceAssembly assembly,
+                             ServiceRegistry serviceRegistry,
+                             LazyValue<Service> service) {
+    this.assembly = assembly;
+    this.serviceRegistry = serviceRegistry;
+    this.service = service;
+  }
+
+  /**
+   * Creates a new proxy {@link Service} equivalent to this one, but to be used in the context of a deployed
+   * application.
+   *
+   * @param methodInvoker The {@link MethodInvoker} to use
+   * @return a new application specific proxy
+   */
+  public Service forApplication(MethodInvoker methodInvoker) {
+    return proxy(assembly, new LazyServiceProxyApplicationDecorator(assembly, serviceRegistry, service, methodInvoker));
   }
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     final Class<?> methodClass = method.getDeclaringClass();
-    if (methodClass == HasMethodInvoker.class) {
-      setMethodInvoker((MethodInvoker) args[0]);
-      return null;
-    } else if (methodClass == Object.class && !method.getName().equals("toString")) {
+    if (methodClass == Object.class && !method.getName().equals("toString")) {
       return method.invoke(this, args);
     } else if (methodClass == NamedObject.class) {
       return assembly.getName();
@@ -101,7 +119,7 @@ public class LazyServiceProxy implements InvocationHandler {
     }
   }
 
-  public void setMethodInvoker(MethodInvoker methodInvoker) {
+  protected void setMethodInvoker(MethodInvoker methodInvoker) {
     this.methodInvoker = methodInvoker;
   }
 
@@ -125,7 +143,7 @@ public class LazyServiceProxy implements InvocationHandler {
     return service;
   }
 
-  private Object handleStart() {
+  protected Object handleStart() {
     stopped = false;
     if (!started) {
       started = true;
@@ -136,7 +154,7 @@ public class LazyServiceProxy implements InvocationHandler {
     return null;
   }
 
-  private Object handleStop() {
+  protected Object handleStop() {
     started = false;
     if (!stopped) {
       stopped = true;

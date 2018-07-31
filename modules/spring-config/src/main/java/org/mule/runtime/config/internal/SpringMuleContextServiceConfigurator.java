@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -329,7 +330,7 @@ class SpringMuleContextServiceConfigurator {
       Object servImpl = customServiceImpl.get();
       if (servImpl instanceof Service) {
         if (isProxyClass(servImpl.getClass())) {
-          InvocationHandler handler = Proxy.getInvocationHandler(servImpl);
+          InvocationHandler handler = getInvocationHandler(servImpl);
           if (handler instanceof LazyServiceProxy) {
             servImpl = ((LazyServiceProxy) handler)
                 .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator, muleContext));
