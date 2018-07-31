@@ -120,8 +120,10 @@ public class ThreadNotificationLoggerTestCase {
 
     just(event)
         .doOnNext(coreEvent -> logger.setStartingThread(event))
-        .transform(p -> from(p).subscribeOn(subscribeOnScheduler).map(coreEvent -> coreEvent)
-            .doOnNext(e -> logger.setFinishThread(e)))
+        .transform(p -> from(p)
+            .subscribeOn(subscribeOnScheduler)
+            .map(coreEvent -> coreEvent))
+        .doOnNext(e -> logger.setFinishThread(e))
         .subscribe();
 
     new PollingProber().check(new JUnitLambdaProbe(() -> {

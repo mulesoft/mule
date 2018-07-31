@@ -43,7 +43,7 @@ public class ThreadNotificationLogger {
     if (!isEnabled()) {
       return;
     }
-    if (sameThread.get()) {
+    if (sameThread.get() != null && sameThread.get()) {
       sameThread.set(false);
       return;
     }
