@@ -1,4 +1,19 @@
 {
+  "4.1.4": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor::onReferenceConfigurationParameter(java.lang.String, java.lang.Object, java.util.Optional<org.mule.runtime.dsl.api.component.TypeConverter>)",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "AbstractAttributeDefinitionVisitor",
+          "methodName": "onReferenceConfigurationParameter",
+          "elementKind": "method",
+          "justification": "MULE-15441: Failure to lazy initialize file:list operation with reference to global matcher"
+        }
+      ]
+    }
+  },
   "4.1.2": {
     "revapi": {
       "ignore": [
