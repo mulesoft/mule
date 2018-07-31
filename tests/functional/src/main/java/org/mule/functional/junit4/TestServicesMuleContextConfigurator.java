@@ -7,17 +7,17 @@
 
 package org.mule.functional.junit4;
 
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class TestServicesMuleContextConfigurator implements ServiceConfigurator 
 
   private Set<Class> getRegisteredServiceContracts() {
     return serviceRepository.getServices().stream()
-        .flatMap(s -> Arrays.stream(ClassUtils.findImplementedInterfaces(s.getClass()))
+        .flatMap(s -> stream(findImplementedInterfaces(s.getClass()))
             .filter(type -> Service.class.isAssignableFrom(type)))
         .collect(toSet());
   }
