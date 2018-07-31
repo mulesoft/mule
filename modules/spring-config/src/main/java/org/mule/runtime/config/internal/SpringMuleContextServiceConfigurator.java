@@ -328,7 +328,8 @@ class SpringMuleContextServiceConfigurator {
       if (servImpl instanceof Service) {
         if (isProxyClass(servImpl.getClass())) {
           if (servImpl instanceof HasMethodInvoker) {
-            ((HasMethodInvoker) servImpl).setMethodInvoker(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
+            ((HasMethodInvoker) servImpl)
+                .setMethodInvoker(new InjectParamsFromContextServiceMethodInvoker(serviceLocator, muleContext));
           }
 
           beanDefinition = servImpl instanceof TypeSupplier ? getConstantProxyBeanDefinition(servImpl)

@@ -13,6 +13,7 @@ import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
@@ -42,15 +43,20 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
       "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
 
   private final Registry registry;
+  private final MuleContext muleContext;
 
   /**
    * Creates a new instance
    *
-   * @param registry the {@link Registry} to use for resolving injectable parameters. Non null.
+   * @param registry    the {@link Registry} to use for resolving injectable parameters. Non null.
+   * @param muleContext the application's {@link MuleContext}
    */
-  public InjectParamsFromContextServiceMethodInvoker(Registry registry) {
-    checkArgument(registry != null, "context cannot be null");
+  public InjectParamsFromContextServiceMethodInvoker(Registry registry, MuleContext muleContext) {
+    checkArgument(registry != null, "registry cannot be null");
+    checkArgument(muleContext != null, "context cannot be null");
+
     this.registry = registry;
+    this.muleContext = muleContext;
   }
 
   @Override
@@ -83,6 +89,10 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
   }
 
   private Method resolveInjectableMethod(Object target, Method method) {
+    if (!muleContext.isInitialised()) {
+      return null;
+    }
+
     Method candidate = null;
 
     for (Method serviceImplMethod : getImplementationDeclaredMethods(target)) {
