@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -20,9 +21,14 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,11 +80,18 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       if (maxConcurrency > subscribers) {
-        return publisher -> from(publisher)
-            .flatMap(event -> just(event).transform(pipeline)
-                .subscribeOn(fromExecutorService(decorateScheduler(blockingScheduler)))
-                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, blockingScheduler)),
-                     maxConcurrency);
+        if (THREAD_LOGGING) {
+          return publisher -> from(publisher).flatMap(event -> Mono.subscriberContext()
+              .flatMap(ctx -> Mono.just(event).transform(pipeline)
+                  .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
+                      .getOrEmpty(ThreadNotificationLogger.class.getName()), decorateScheduler(blockingScheduler), event)))));
+        } else {
+          return publisher -> from(publisher)
+              .flatMap(event -> just(event).transform(pipeline)
+                  .subscribeOn(fromExecutorService(decorateScheduler(blockingScheduler)))
+                  .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, blockingScheduler)),
+                       maxConcurrency);
+        }
       } else {
         return super.onPipeline(pipeline);
       }

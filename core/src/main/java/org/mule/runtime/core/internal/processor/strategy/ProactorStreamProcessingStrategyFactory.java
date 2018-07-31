@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -26,7 +27,6 @@ import static reactor.retry.Retry.onlyIf;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -38,10 +38,11 @@ import org.mule.runtime.core.internal.context.thread.notification.ThreadNotifica
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.retry.BackoffDelay;
 
 /**
@@ -184,14 +185,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
                                                    reactor.core.scheduler.Scheduler eventLoopScheduler,
                                                    Scheduler processorScheduler, CoreEvent event) {
-      Reference<Optional<ThreadNotificationLogger>> logger = new Reference<>();
-      return just(event)
-              .subscriberContext(context -> {
-                logger.set(context.getOrEmpty(ThreadNotificationLogger.class.getName()));
-                return context;
-              })
-              .flatMap(e -> just(e).subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(logger.get(), decorateScheduler(processorScheduler), e))))
-              .transform(processor)
+      return scheduleWithLogging(processor, processorScheduler, event)
           .publishOn(eventLoopScheduler)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .doOnError(RejectedExecutionException.class,
@@ -201,6 +195,20 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
           .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
               .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), ZERO, ZERO))
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
+    }
+
+    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+      if (THREAD_LOGGING) {
+        return just(event)
+            .flatMap(e -> Mono.subscriberContext()
+                .flatMap(ctx -> Mono.just(e).transform(processor)
+                    .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
+                        .getOrEmpty(ThreadNotificationLogger.class), decorateScheduler(processorScheduler), e)))));
+      } else {
+        return just(event)
+            .transform(processor)
+            .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)));
+      }
     }
 
   }

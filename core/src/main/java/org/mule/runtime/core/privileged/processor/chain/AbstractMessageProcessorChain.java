@@ -236,8 +236,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
       interceptors.add((processor, next) -> stream -> from(stream)
-              .subscriberContext(context -> context.put(ThreadNotificationLogger.class.getName(), threadNotificationLogger))
-              .doOnNext(event -> threadNotificationLogger.setStartingThread(event, true))
+          .subscriberContext(context -> context.put(ThreadNotificationLogger.class.getName(), threadNotificationLogger))
+          .doOnNext(event -> threadNotificationLogger.setStartingThread(event, true))
           .transform(processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
           .doOnNext(event -> threadNotificationLogger.setFinishThread(event)));
     }

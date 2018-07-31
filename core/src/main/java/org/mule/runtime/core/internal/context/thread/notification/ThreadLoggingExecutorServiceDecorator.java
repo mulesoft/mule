@@ -30,7 +30,8 @@ public class ThreadLoggingExecutorServiceDecorator implements ExecutorService {
   private Optional<ThreadNotificationLogger> threadNotificationLogger;
   private CoreEvent event;
 
-  public ThreadLoggingExecutorServiceDecorator(Optional<ThreadNotificationLogger> logger, ExecutorService delegate, CoreEvent event) {
+  public ThreadLoggingExecutorServiceDecorator(Optional<ThreadNotificationLogger> logger, ExecutorService delegate,
+                                               CoreEvent event) {
     this.delegate = delegate;
     this.threadNotificationLogger = logger;
     this.event = event;
