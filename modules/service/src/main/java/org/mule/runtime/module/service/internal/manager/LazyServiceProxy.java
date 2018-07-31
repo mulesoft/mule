@@ -35,6 +35,7 @@ import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
@@ -54,8 +55,8 @@ public class LazyServiceProxy implements InvocationHandler {
   private final ServiceRegistry serviceRegistry;
   private final LazyValue<Service> service;
 
-  private boolean started = false;
-  private boolean stopped = false;
+  private AtomicBoolean started = new AtomicBoolean(false);
+  private AtomicBoolean stopped = new AtomicBoolean(false);
   private MethodInvoker methodInvoker = new DefaultMethodInvoker();
 
   /**
@@ -126,11 +127,10 @@ public class LazyServiceProxy implements InvocationHandler {
   private CheckedSupplier<Service> createService() {
     return () -> {
       Service service = withServiceClassLoader(() -> instantiateService());
-
-      if (started) {
+      if (started.compareAndSet(false, true)) {
         doStart(service);
+        stopped.set(false);
       }
-
       return service;
     };
   }
@@ -143,29 +143,24 @@ public class LazyServiceProxy implements InvocationHandler {
     return service;
   }
 
-  protected Object handleStart() {
-    stopped = false;
-    if (!started) {
-      started = true;
-      if (service.isComputed()) {
-        doStart(service.get());
-      }
+  protected synchronized Object handleStart() {
+    if (service.isComputed() && started.compareAndSet(false, true)) {
+      doStart(service.get());
+      stopped.set(false);
     }
     return null;
   }
 
   protected Object handleStop() {
-    started = false;
-    if (!stopped) {
-      stopped = true;
-      if (service.isComputed()) {
-        doStop();
-      }
+    if (stopped.compareAndSet(false, true) && service.isComputed()) {
+      doStop();
+      started.set(false);
     }
+
     return null;
   }
 
-  private void doStart(Service service) {
+  private synchronized void doStart(Service service) {
     withServiceClassLoader(() -> {
       startIfNeeded(service);
       String splash = service.getSplashMessage();
@@ -175,7 +170,7 @@ public class LazyServiceProxy implements InvocationHandler {
     });
   }
 
-  private void doStop() {
+  private synchronized void doStop() {
     withServiceClassLoader(() -> {
       try {
         stopIfNeeded(service.get());
