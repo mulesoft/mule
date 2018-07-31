@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.reflect.Proxy.isProxyClass;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -87,6 +88,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.internal.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
+import org.mule.runtime.config.internal.factories.TypeSupplierConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
@@ -125,6 +127,7 @@ import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.HasMethodInvoker;
+import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
@@ -323,9 +326,13 @@ class SpringMuleContextServiceConfigurator {
     } else if (customServiceImpl.isPresent()) {
       Object servImpl = customServiceImpl.get();
       if (servImpl instanceof Service) {
-        if (servImpl instanceof HasMethodInvoker) {
-          ((HasMethodInvoker) servImpl).setMethodInvoker(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
-          beanDefinition = getConstantObjectBeanDefinition(servImpl);
+        if (isProxyClass(servImpl.getClass())) {
+          if (servImpl instanceof HasMethodInvoker) {
+            ((HasMethodInvoker) servImpl).setMethodInvoker(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
+          }
+
+          beanDefinition = servImpl instanceof TypeSupplier ? getConstantProxyBeanDefinition(servImpl)
+              : getConstantObjectBeanDefinition(servImpl);
         } else {
           beanDefinition =
               getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
@@ -451,6 +458,10 @@ class SpringMuleContextServiceConfigurator {
 
   private static BeanDefinition getConstantObjectBeanDefinition(Object impl) {
     return getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgValue(impl).getBeanDefinition();
+  }
+
+  private static BeanDefinition getConstantProxyBeanDefinition(Object object) {
+    return getBeanDefinitionBuilder(TypeSupplierConstantFactoryBean.class).addConstructorArgValue(object).getBeanDefinition();
   }
 
   private static BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType) {
