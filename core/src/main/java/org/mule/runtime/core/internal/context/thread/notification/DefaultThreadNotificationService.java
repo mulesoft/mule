@@ -90,7 +90,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
       // We set this to warn logging level because the entire pipeline is already created, so even if the
       // logging level changes, the pipeline should be defined using a system property (the ThreadNotificationLogger
       // needs to know whether to add logging phases or not).
-      REPORT_LOGGER.error(getNotificationFor(transition));
+      REPORT_LOGGER.warn(getNotificationFor(transition));
     }
   }
 
