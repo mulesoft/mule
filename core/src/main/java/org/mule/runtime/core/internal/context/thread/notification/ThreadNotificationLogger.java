@@ -15,8 +15,9 @@ import static org.mule.runtime.core.internal.context.thread.notification.ThreadN
 
 public class ThreadNotificationLogger {
 
-  private Map<String, DefaultThreadNotificationElement.Builder> threadNotificationBuilders = new ConcurrentHashMap<>();
+  public static final String THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY = "mule.nb.ThreadNotificationLogger";
 
+  private Map<String, DefaultThreadNotificationElement.Builder> threadNotificationBuilders = new ConcurrentHashMap<>();
   private ThreadNotificationService threadNotificationService;
   private ThreadLocal<Boolean> sameThread = new ThreadLocal<>();
 

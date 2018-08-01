@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -236,7 +237,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
       interceptors.add((processor, next) -> stream -> from(stream)
-          .subscriberContext(context -> context.put(ThreadNotificationLogger.class.getName(), threadNotificationLogger))
+          .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
           .doOnNext(event -> threadNotificationLogger.setStartingThread(event, true))
           .transform(processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
           .doOnNext(event -> threadNotificationLogger.setFinishThread(event)));

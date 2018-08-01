@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -84,7 +85,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
           return publisher -> from(publisher).flatMap(event -> Mono.subscriberContext()
               .flatMap(ctx -> Mono.just(event).transform(pipeline)
                   .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
-                      .getOrEmpty(ThreadNotificationLogger.class.getName()), decorateScheduler(blockingScheduler), event)))));
+                      .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(blockingScheduler), event)))));
         } else {
           return publisher -> from(publisher)
               .flatMap(event -> just(event).transform(pipeline)
