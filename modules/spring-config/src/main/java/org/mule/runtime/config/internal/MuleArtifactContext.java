@@ -235,6 +235,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         : extensionManager.getExtensions());
   }
 
+  public ArtifactType getArtifactType() {
+    return artifactType;
+  }
+
+  public boolean hasConfigResources() {
+    return artifactConfigResources != null && artifactConfigResources.length > 0;
+  }
+
   private XmlApplicationParser createApplicationParser() {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
     return XmlApplicationParser.createFromExtensionModels(extensionManager.getExtensions());
@@ -273,19 +281,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
     applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
 
-    List<Pair<String, Supplier<InputStream>>> initialConfigFiles = new ArrayList<>();
-    for (ConfigResource artifactConfigResource : artifactConfigResources) {
-      initialConfigFiles.add(new Pair<>(artifactConfigResource.getResourceName(), () -> {
-        try {
-          return artifactConfigResource.getInputStream();
-        } catch (IOException e) {
-          throw new MuleRuntimeException(e);
-        }
-      }));
-    }
+    if (artifactConfigResources != null && artifactConfigResources.length > 0) {
+      List<Pair<String, Supplier<InputStream>>> initialConfigFiles = new ArrayList<>();
+      for (ConfigResource artifactConfigResource : artifactConfigResources) {
+        initialConfigFiles.add(new Pair<>(artifactConfigResource.getResourceName(), () -> {
+          try {
+            return artifactConfigResource.getInputStream();
+          } catch (IOException e) {
+            throw new MuleRuntimeException(e);
+          }
+        }));
+      }
 
-    List<ConfigFile> configFiles = new ArrayList<>();
-    recursivelyResolveConfigFiles(initialConfigFiles, configFiles).forEach(applicationConfigBuilder::addConfigFile);
+      List<ConfigFile> configFiles = new ArrayList<>();
+      recursivelyResolveConfigFiles(initialConfigFiles, configFiles).forEach(applicationConfigBuilder::addConfigFile);
+    }
 
     applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
     return applicationConfigBuilder.build();

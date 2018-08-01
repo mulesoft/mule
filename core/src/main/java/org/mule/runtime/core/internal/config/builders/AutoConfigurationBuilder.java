@@ -63,13 +63,13 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
   }
 
   protected void autoConfigure(MuleContext muleContext, ConfigResource[] resources) throws ConfigurationException {
-    Map<String, List<ConfigResource>> configsMap = new LinkedHashMap<String, List<ConfigResource>>();
+    Map<String, List<ConfigResource>> configsMap = new LinkedHashMap<>();
 
     for (ConfigResource resource : resources) {
       String configExtension = substringAfterLast(resource.getUrl().getPath(), ".");
       List<ConfigResource> configs = configsMap.get(configExtension);
       if (configs == null) {
-        configs = new ArrayList<ConfigResource>();
+        configs = new ArrayList<>();
         configsMap.put(configExtension, configs);
       }
       configs.add(resource);
