@@ -28,6 +28,8 @@ public interface ThreadNotificationService {
 
   void addThreadNotificationElements(Collection<ThreadNotificationElement> notifications);
 
+  String getNotification();
+
   void clear();
 
   interface ThreadNotificationElement {

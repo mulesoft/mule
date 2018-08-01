@@ -56,29 +56,41 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   }
 
   @Override
+  public String getNotification() {
+    String msg = "";
+    for (Pair<String, String> transition : stats.getPossibleTransitions()) {
+      msg += getNotificationFor(transition);
+    }
+    return msg;
+  }
+
+  private String getNotificationFor(Pair<String, String> transition) {
+    String count = formattedNumber(stats.getCount(transition));
+    String mean = formattedNumber(stats.getMean(transition));
+    String std = formattedNumber(stats.getStdDeviation(transition));
+    String percentile = formattedNumber(stats.percentile(transition, 0.9));
+
+    Function<String, String> pad = getPad(count, mean, std, percentile);
+
+    String msg = newLine + "Stats for transition " + transition.getFirst() + " - " + transition.getSecond() + newLine;
+    msg += " Transitions count: " + pad.apply(count) + newLine;
+    msg += "              Mean: " + pad.apply(mean) + " nSecs" + newLine;
+    msg += "Standard Deviation: " + pad.apply(std) + " nSecs" + newLine;
+    msg += "    Percentile 90%: " + pad.apply(percentile) + " nSecs" + newLine;
+    return msg;
+  }
+
+  @Override
   public void clear() {
     stats.clear();
   }
 
   private void logStats() {
-    REPORT_LOGGER.error("HEEELOOOOOOOO");
     for (Pair<String, String> transition : stats.getPossibleTransitions()) {
-      String count = formattedNumber(stats.getCount(transition));
-      String mean = formattedNumber(stats.getMean(transition));
-      String std = formattedNumber(stats.getStdDeviation(transition));
-      String percentile = formattedNumber(stats.percentile(transition, 0.9));
-
-      Function<String, String> pad = getPad(count, mean, std, percentile);
-
-      String msg = newLine + "Stats for transition " + transition.getFirst() + " - " + transition.getSecond() + newLine;
-      msg += " Transitions count: " + pad.apply(count) + newLine;
-      msg += "              Mean: " + pad.apply(mean) + " nSecs" + newLine;
-      msg += "Standard Deviation: " + pad.apply(std) + " nSecs" + newLine;
-      msg += "    Percentile 90%: " + pad.apply(percentile) + " nSecs" + newLine;
       // We set this to warn logging level because the entire pipeline is already created, so even if the
       // logging level changes, the pipeline should be defined using a system property (the ThreadNotificationLogger
       // needs to know whether to add logging phases or not).
-      REPORT_LOGGER.error(msg);
+      REPORT_LOGGER.error(getNotificationFor(transition));
     }
   }
 
