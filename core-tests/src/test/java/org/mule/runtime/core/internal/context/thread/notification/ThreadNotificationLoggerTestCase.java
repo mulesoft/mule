@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,9 +122,7 @@ public class ThreadNotificationLoggerTestCase {
     }).when(service).addThreadNotificationElement(any());
 
     just(event)
-        .map(e -> e)
-        .subscribeOn(subscribeOnScheduler)
-        .map(coreEvent -> coreEvent)
+        .flatMap(coreEvent -> Mono.just(coreEvent).map(e -> e).subscribeOn(subscribeOnScheduler))
         .doOnNext(e -> logger.setFinishThread(e))
         .subscribe();
 
