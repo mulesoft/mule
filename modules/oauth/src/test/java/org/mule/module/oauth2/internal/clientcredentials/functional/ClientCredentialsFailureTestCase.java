@@ -12,13 +12,21 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.isA;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import java.io.IOException;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mule.api.MuleContext;
+import org.mule.construct.Flow;
 import org.mule.module.oauth2.internal.TokenNotFoundException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -28,10 +36,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
 {
 
@@ -39,6 +43,9 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
     private static final String TOKEN_PATH_PROPERTY_NAME = "token.url";
 
     private DynamicPort dynamicPort = new DynamicPort("port");
+
+    @Rule
+    public DynamicPort oauthServerPort = new DynamicPort("oauth.server.port");
 
     @Rule
     public SystemProperty clientId = new SystemProperty("client.id", "ndli93xdws2qoe6ms1d389vl6bxquv3e");
@@ -58,8 +65,10 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
             public void run() throws Exception
             {
                 ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
+                MuleContext muleContext = applicationContextBuilder.build();
+                
                 expectedException.expectCause(isA(IOException.class));
-                applicationContextBuilder.build();
+                ((Flow)(muleContext.getRegistry().lookupFlowConstruct("testFlow"))).process(MuleTestUtils.getTestEvent("", muleContext));
             }
         });
     }
@@ -76,8 +85,16 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
             public void run() throws Exception
             {
                 ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
-                expectedException.expectCause(isA(TokenNotFoundException.class));
-                applicationContextBuilder.build();
+                MuleContext muleContext = applicationContextBuilder.build();
+
+                try
+                {
+                    ((Flow)(muleContext.getRegistry().lookupFlowConstruct("testFlow"))).process(MuleTestUtils.getTestEvent("", muleContext));
+                    fail();
+                }
+                catch (Exception e) {
+                    assertThat(e.getCause().getCause(), instanceOf(TokenNotFoundException.class));
+                }
             }
         });
     }
