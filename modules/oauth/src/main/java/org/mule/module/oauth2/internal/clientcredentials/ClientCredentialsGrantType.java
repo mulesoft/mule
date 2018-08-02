@@ -8,6 +8,8 @@ package org.mule.module.oauth2.internal.clientcredentials;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -31,6 +33,8 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
 
     private ClientCredentialsTokenRequestHandler tokenRequestHandler;
     private MuleContext muleContext;
+    
+    private boolean accessTokenRefreshedOnStart = false;
 
     public void setTokenRequestHandler(final ClientCredentialsTokenRequestHandler tokenRequestHandler)
     {
@@ -40,7 +44,14 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     @Override
     public void start() throws MuleException
     {
-        tokenRequestHandler.refreshAccessToken();
+        try {
+            tokenRequestHandler.refreshAccessToken();
+            accessTokenRefreshedOnStart = true;
+        }
+        catch (MessagingException | DefaultMuleException e)
+        {
+            // Nothing to do, accessTokenRefreshedOnStart remains false and this is called later
+        }
     }
 
     @Override
@@ -81,6 +92,11 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     @Override
     public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException
     {
+        if(!accessTokenRefreshedOnStart) {
+            accessTokenRefreshedOnStart = true;
+            refreshAccessToken();
+        }
+
         final String accessToken = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
         if (accessToken == null)
         {
