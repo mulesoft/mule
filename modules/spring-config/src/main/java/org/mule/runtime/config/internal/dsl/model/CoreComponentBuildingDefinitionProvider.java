@@ -1116,7 +1116,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                 .build())
         .withConstructorParameterDefinition(
                                             fromSimpleParameter("bufferUnit", value -> DataUnit.valueOf((String) value))
-                                                .withDefaultValue(DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT).build())
+                                                .withDefaultValue(DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT.name()).build())
         .build());
 
     buildingDefinitions.add(baseDefinition
