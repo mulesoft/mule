@@ -290,7 +290,10 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISING));
         getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
-        listeners.forEach(l -> l.onInitialization(this, getApiRegistry()));
+        final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
+        listeners.forEach(l -> {
+          l.onInitialization(this, apiRegistry);
+        });
 
 
         initialiseIfNeeded(getExceptionListener(), true, this);
