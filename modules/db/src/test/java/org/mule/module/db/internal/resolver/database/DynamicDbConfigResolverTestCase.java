@@ -11,8 +11,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.sql.DataSource;
+import javax.xml.namespace.QName;
+
+import org.junit.Test;
 import org.mule.api.MuleEvent;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
@@ -23,14 +34,7 @@ import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.database.DbConfigFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.sql.DataSource;
-import javax.xml.namespace.QName;
-
-import org.junit.Test;
+import com.mchange.v2.c3p0.PooledDataSource;
 
 public class DynamicDbConfigResolverTestCase extends AbstractMuleTestCase
 {
@@ -130,5 +134,18 @@ public class DynamicDbConfigResolverTestCase extends AbstractMuleTestCase
         dataSourceConfig.setDriverClassName("driver");
 
         return dataSourceConfig;
+    }
+    
+    @Test
+    public void disposesDisposableDbConfig() throws Exception
+    {
+        DbConfig expectedDbConfig = mock(DbConfig.class);
+        PooledDataSource dataSource = mock(PooledDataSource.class);
+        when(expectedDbConfig.getDataSource()).thenReturn(dataSource);
+        MuleEvent muleEvent = mock(MuleEvent.class);
+        DynamicDbConfigResolver dbConfigResolver = createDbConfigFactory(expectedDbConfig);
+        dbConfigResolver.resolve(muleEvent);
+        dbConfigResolver.dispose();
+        verify(dataSource).close(false);
     }
 }
