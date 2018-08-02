@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createCompositeErrorTypeRepository;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -385,7 +386,8 @@ public class ArtifactContextBuilder {
         builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         if (extensionManagerFactory == null) {
-          if (parentArtifact == null) {
+          MuleContext parentMuleContext = ArtifactFactoryUtils.getMuleContext(parentArtifact).orElse(null);
+          if (parentMuleContext == null) {
             extensionManagerFactory =
                 new ArtifactExtensionManagerFactory(artifactPlugins, extensionModelLoaderRepository,
                                                     new DefaultExtensionManagerFactory());
@@ -428,10 +430,8 @@ public class ArtifactContextBuilder {
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators);
-            if (parentArtifact != null) {
-              artifactContextConfigurationBuilder
-                  .setParentContext(parentArtifact.getRegistry().lookupByType(MuleContext.class).get());
-            }
+
+            withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
             ((DefaultMuleConfiguration) muleContext.getConfiguration()).setDataFolderName(dataFolderName);
@@ -461,9 +461,9 @@ public class ArtifactContextBuilder {
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
 
-          muleContextBuilder.setErrorTypeRepository(createCompositeErrorTypeRepository(parentArtifact.getRegistry()
-              .lookupByType(MuleContext.class).get()
-              .getErrorTypeRepository()));
+          withArtifactMuleContext(parentArtifact, parentContext -> muleContextBuilder.setErrorTypeRepository(
+                                                                                                             createCompositeErrorTypeRepository(parentContext
+                                                                                                                 .getErrorTypeRepository())));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
         }
