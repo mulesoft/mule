@@ -10,8 +10,7 @@ package org.mule.module.db.internal.resolver.database;
 import static com.mchange.v2.c3p0.DataSources.destroy;
 import static org.mule.common.Result.Status.FAILURE;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.Disposable;
@@ -25,6 +24,7 @@ import org.mule.module.db.internal.domain.database.DataSourceConfig;
 import org.mule.module.db.internal.domain.database.DataSourceFactory;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.database.DbConfigFactory;
+import org.slf4j.Logger;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import javax.sql.DataSource;
  */
 public class DynamicDbConfigResolver extends AbstractAnnotatedObject implements DbConfigResolver, Disposable
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    private static final Logger LOGGER = getLogger(DynamicDbConfigResolver.class);
 
     public static final String TEST_CONNECTION_ERROR = "Cannot test connection on a dynamic DB config";
     public static final String NO_METADATA_OBTAINED = "No metadata obtained";
@@ -128,8 +128,7 @@ public class DynamicDbConfigResolver extends AbstractAnnotatedObject implements 
         Collection<DbConfig> configs = cache.values();
         for (DbConfig config : configs)
         {
-            DataSource dataSource = config.getDataSource();
-            destroyResolvedDataSource(dataSource);
+            destroyResolvedDataSource(config.getDataSource());
         }
     }
 
@@ -141,7 +140,7 @@ public class DynamicDbConfigResolver extends AbstractAnnotatedObject implements 
         }
         catch (SQLException e)
         {
-            logger.warn("Error destroying datasource: " + e.getMessage());
+            LOGGER.warn("Error destroying datasource: " + e.getMessage());
         }
     }
     
