@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,7 +24,6 @@ import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
-import org.mule.runtime.core.internal.registry.NullRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Collection;
@@ -45,6 +43,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 
 public class SpringRegistry extends AbstractRegistry implements Injector {
 
@@ -90,20 +89,17 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
 
   @Override
   protected void doInitialise() throws InitialisationException {
-    MuleArtifactContext artifactContext = (MuleArtifactContext) applicationContext;
-    if (!artifactContext.hasConfigResources()) {
-      return;
-    }
-
-    artifactContext.addBeanFactoryPostProcessor(createBeforeInitialisationRegisteredObjectsPostProcessor());
+    ((AbstractApplicationContext) applicationContext)
+        .addBeanFactoryPostProcessor(createBeforeInitialisationRegisteredObjectsPostProcessor());
 
     // This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the
     // application context
     springContextInitialised.set(true);
 
     if (!readOnly) {
-      artifactContext.refresh();
+      ((ConfigurableApplicationContext) applicationContext).refresh();
     }
+
   }
 
   private BeanDefinitionRegistryPostProcessor createBeforeInitialisationRegisteredObjectsPostProcessor() {
@@ -188,11 +184,6 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
           logger.debug(e.getMessage(), e);
         }
         return null;
-      } catch (IllegalStateException e) {
-        if (OBJECT_REGISTRY.equals(key)) {
-          return NullRegistry.getInstance();
-        }
-        throw e;
       }
       applyLifecycleIfPrototype(object, key, applyLifecycle);
       return object;
