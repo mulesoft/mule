@@ -7,6 +7,8 @@
 package org.mule.tck.junit4;
 
 import static java.lang.Thread.currentThread;
+import static java.lang.reflect.Proxy.getInvocationHandler;
+import static java.lang.reflect.Proxy.isProxyClass;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -400,6 +402,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected static void verifyAndStopSchedulers() throws MuleException {
     final SchedulerService serviceImpl = muleContext.getSchedulerService();
 
+    if (isProxyClass(serviceImpl.getClass()) &&
+        getInvocationHandler(serviceImpl).getClass().getSimpleName().contains("LazyServiceProxy")) {
+      return;
+    }
+
     Set<String> schedulersOnInitNames = schedulersOnInit.stream().map(s -> s.getName()).collect(toSet());
     schedulersOnInit = emptyList();
     try {
@@ -410,7 +417,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         stopIfNeeded(serviceImpl);
       }
     }
-
   }
 
   /**
