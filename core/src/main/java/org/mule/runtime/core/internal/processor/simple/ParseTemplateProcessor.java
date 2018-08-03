@@ -8,11 +8,16 @@ package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.MediaType.BINARY;
+import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
+
+import javax.activation.MimetypesFileTypeMap;
 
 
 /**
@@ -20,7 +25,10 @@ import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
  */
 public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
+  private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+
   private String content;
+  private MediaType contentMediaType;
   private String target;
   private String location;
   private String targetValue;
@@ -41,8 +49,14 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       if (location == null) {
         throw new IllegalArgumentException("Location cannot be null");
       }
-      content = IOUtils.getResourceAsString(location, this.getClass());
-
+      content = getResourceAsString(location, this.getClass());
+      if (contentMediaType == null) {
+        MediaType fromLocationMediaType = parse(mimetypesFileTypeMap.getContentType(location));
+        //This is because BINARY is the default value returned if nothing can be resolved. We should not force the value.
+        if (!BINARY.equals(fromLocationMediaType)) {
+          contentMediaType = fromLocationMediaType;
+        }
+      }
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
@@ -62,7 +76,11 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
     Object result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
-    Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
+    Message.Builder mesageBuilder = Message.builder(event.getMessage()).value(result).nullAttributesValue();
+    if (contentMediaType != null) {
+      mesageBuilder.mediaType(contentMediaType);
+    }
+    Message resultMessage = mesageBuilder.build();
     if (target == null) {
       return CoreEvent.builder(event).message(resultMessage).build();
     } else {
@@ -95,4 +113,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
     this.targetValue = targetValue;
   }
 
+  public void setContentMediaType(MediaType contentMediaType) {
+    this.contentMediaType = contentMediaType;
+  }
 }
