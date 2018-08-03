@@ -114,6 +114,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   public void releaseConnection() {
     if (connection != null) {
       sourceCallback.getSourceConnectionManager().release(connection);
+      connection = null;
     }
   }
 

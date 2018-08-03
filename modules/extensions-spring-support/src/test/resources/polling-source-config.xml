@@ -7,6 +7,13 @@
                 http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
+    <petstore:config name="pooled-config" cashierName="Lola">
+        <petstore:pooled-connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="turtle"/>
+        </petstore:pets>
+    </petstore:config>
+
     <flow name="vanilla" initialState="stopped">
         <petstore:pet-adoption-source>
             <scheduling-strategy>
@@ -69,6 +76,15 @@
             </scheduling-strategy>
         </petstore:pet-adoption-source>
         <test:processor throwException="true"/>
+    </flow>
+
+    <flow name="watermarkWithPooledConnection" initialState="stopped">
+        <petstore:connected-pet-adoption-source config-ref="pooled-config" watermark="true" idempotent="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="500"/>
+            </scheduling-strategy>
+        </petstore:connected-pet-adoption-source>
+        <flow-ref name="adopt"/>
     </flow>
 
 

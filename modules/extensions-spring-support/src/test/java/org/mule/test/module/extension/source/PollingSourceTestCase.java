@@ -7,15 +7,14 @@
 package org.mule.test.module.extension.source;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBERS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -27,6 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
+import org.mule.test.petstore.extension.PetStoreConnectionProvider;
+import org.mule.test.petstore.extension.PooledPetStoreConnectionProvider;
 
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -42,6 +43,12 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       }
       return event;
     }
+  }
+
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    PetStoreConnectionProvider.connections.clear();
+    super.doSetUpBeforeMuleContextCreation();
   }
 
   @Override
@@ -113,6 +120,15 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   public void multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarksPoll() throws Exception {
     startFlow("multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarks");
     assertAllNumbersAdoptedExactlyOnce();
+  }
+
+  @Test
+  public void watermarkedItemsReleaseConnectionsTestCase() throws Exception {
+    startFlow("watermarkWithPooledConnection");
+    List<PetStoreConnectionProvider> petStoreConnectionProviders = PetStoreConnectionProvider.connections.keySet().stream()
+        .filter(x -> x instanceof PooledPetStoreConnectionProvider).collect(toList());
+    assertThat(petStoreConnectionProviders, hasSize(1));
+    checkNot(10000, 1000, () -> PetStoreConnectionProvider.connections.get(petStoreConnectionProviders.get(0)) > 10);
   }
 
   private void assertIdempotentAdoptions() {

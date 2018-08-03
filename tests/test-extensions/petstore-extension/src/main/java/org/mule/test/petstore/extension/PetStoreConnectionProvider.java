@@ -24,7 +24,10 @@ import org.mule.runtime.extension.api.annotation.param.display.Password;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class PetStoreConnectionProvider<T extends PetStoreClient> implements ConnectionProvider<T>, Lifecycle {
 
@@ -59,10 +62,14 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
   @Parameter
   protected List<LocalDateTime> discountDates;
 
-  private int initialise, start, stop, dispose = 0;
+  private int initialise, start, stop, dispose, timesConnected = 0;
+
+  public static Map<PetStoreConnectionProvider, Integer> connections = new HashMap<>();
 
   @Override
   public T connect() throws ConnectionException {
+    timesConnected++;
+    updateTimedConnected();
     if (!username.equals(USERNAME)) {
       throw new ConnectionException("We only know john");
     }
@@ -143,5 +150,36 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
 
   public Date getOpeningDate() {
     return openingDate;
+  }
+
+  public int getTimesConnected() {
+    return timesConnected;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    PetStoreConnectionProvider<?> that = (PetStoreConnectionProvider<?>) o;
+    return initialise == that.initialise &&
+        start == that.start &&
+        stop == that.stop &&
+        dispose == that.dispose &&
+        timesConnected == that.timesConnected &&
+        Objects.equals(muleContext, that.muleContext) &&
+        Objects.equals(configName, that.configName) &&
+        Objects.equals(username, that.username) &&
+        Objects.equals(password, that.password);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(muleContext, configName, username, password);
+  }
+
+  public void updateTimedConnected() {
+    connections.put(this, timesConnected);
   }
 }

@@ -33,15 +33,15 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
   public static int FAILED_ADOPTION_COUNT;
   public static int COMPLETED_POLLS;
   public static int REJECTED_ADOPTIONS;
-  private List<String> pets;
+  protected List<String> pets;
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
-  private boolean watermark;
+  protected boolean watermark;
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
-  private boolean idempotent;
+  protected boolean idempotent;
 
   @Override
   protected void doStart() throws MuleException {
