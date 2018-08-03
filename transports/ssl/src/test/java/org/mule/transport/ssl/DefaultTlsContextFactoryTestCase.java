@@ -9,6 +9,7 @@ package org.mule.transport.ssl;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.tls.TlsConfiguration;
@@ -19,6 +20,10 @@ import org.mule.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -81,6 +86,13 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
 
         assertThat(tlsContextFactory.getEnabledCipherSuites(), is(StringUtils.splitAndTrim(getFileEnabledCipherSuites(), ",")));
         assertThat(tlsContextFactory.getEnabledProtocols(), is(StringUtils.splitAndTrim(getFileEnabledProtocols(), ",")));
+    }
+    
+    @Test
+    public void trustStoreAlgorithmInTlsContextIsDefaultTrustManagerAlgorithm()
+    {
+        DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+        assertThat(tlsContextFactory.getTrustManagerAlgorithm(), equalTo(TrustManagerFactory.getDefaultAlgorithm()));
     }
 
     @Test
