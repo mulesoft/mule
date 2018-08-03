@@ -9,14 +9,19 @@ package org.mule.runtime.core.internal.context.thread.notification;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -26,23 +31,25 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @since 4.2
  */
-public class DefaultThreadNotificationService implements ThreadNotificationService, Runnable, Lifecycle {
+public class DefaultThreadNotificationService implements ThreadNotificationService, Lifecycle {
 
   private static final int DEFAULT_INTERVAL = 5;
   private static final String newLine = System.getProperty("line.separator").toString();
   private ThreadsStatistics stats = new ThreadsStatistics();
   private int interval;
-  private boolean stopped = false;
+
+  @Inject
+  private SchedulerService schedulerService;
+
+  private Scheduler scheduler;
 
   public DefaultThreadNotificationService() {
     this(DEFAULT_INTERVAL);
   }
 
   public DefaultThreadNotificationService(int interval) {
+    REPORT_LOGGER.error("Holis");
     this.interval = interval;
-    if (THREAD_LOGGING) {
-      new Thread(this).start();
-    }
   }
 
   @Override
@@ -86,11 +93,12 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   }
 
   private void logStats() {
+    REPORT_LOGGER.error("LOGGING IN THE SUNSHINE " + stats.getPossibleTransitions().size());
     for (Pair<String, String> transition : stats.getPossibleTransitions()) {
       // We set this to warn logging level because the entire pipeline is already created, so even if the
       // logging level changes, the pipeline should be defined using a system property (the ThreadNotificationLogger
       // needs to know whether to add logging phases or not).
-      REPORT_LOGGER.warn(getNotificationFor(transition));
+      REPORT_LOGGER.error(getNotificationFor(transition));
     }
   }
 
@@ -101,18 +109,6 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
 
   private String formattedNumber(double nanos) {
     return format("%,d", new Double(nanos).intValue());
-  }
-
-  @Override
-  public void run() {
-    while (!Thread.interrupted() && !stopped) {
-      try {
-        Thread.sleep(interval * 1000);
-      } catch (InterruptedException e) {
-        break;
-      }
-      logStats();
-    }
   }
 
   @Override
@@ -127,11 +123,18 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
 
   @Override
   public void start() throws MuleException {
-
+    REPORT_LOGGER.error("SARLANGA ? ", schedulerService != null);
+    if (THREAD_LOGGING && scheduler != null) {
+      REPORT_LOGGER.error("HEEEEELLOOOOOO");
+      scheduler = schedulerService.cpuLightScheduler();
+      scheduler.scheduleAtFixedRate(() -> logStats(), interval, interval, SECONDS);
+    }
   }
 
   @Override
   public void stop() throws MuleException {
-    stopped = true;
+    if (scheduler != null) {
+      scheduler.stop();
+    }
   }
 }
