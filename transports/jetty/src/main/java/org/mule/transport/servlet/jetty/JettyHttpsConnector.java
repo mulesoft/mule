@@ -291,7 +291,7 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         }
         if (tls.getTrustManagerAlgorithm() != null)
         {
-            sslContextFactory.setSslKeyManagerFactoryAlgorithm(tls.getTrustManagerAlgorithm());
+            sslContextFactory.setTrustManagerFactoryAlgorithm(tls.getTrustManagerAlgorithm());
         }
         sslContextFactory.setNeedClientAuth(tls.isRequireClientAuthentication());
 
