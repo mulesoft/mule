@@ -1,0 +1,52 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:https="http://www.mulesoft.org/schema/mule/https"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+		http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd">
+	
+	<tls:context name="serverTlsContext" >
+		<tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+		<tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit" />
+	</tls:context>
+	
+	 <https:connector name="httpsConnector">
+        <https:tls-client path="ssltest-keystore.jks" storePassword="changeit"/>
+        <https:tls-key-store path="ssltest-keystore.jks" keyPassword="changeit" storePassword="changeit"/>
+        <https:tls-server path="ssltest-cacerts.jks" storePassword="changeit"/>
+    </https:connector>
+	
+	<http:listener-config name="listener"
+		host="0.0.0.0" port="${port}" />
+	
+	<http:request-config name="default" protocol="HTTPS" host="localhost" port="${portSsl}" />
+	
+	<http:request-config name="custom" protocol="HTTPS" host="localhost" port="${portSsl}">
+		<tls:context>
+			<tls:trust-store path="ssltest-cacerts.jks" password="changeit" type="jks"/>
+		</tls:context>
+	</http:request-config>
+	
+	<flow name="flow-default">
+		<http:listener config-ref="listener"
+			path="/default" />
+		<http:request config-ref="default"
+			path="/" method="GET"  />
+	</flow>
+	
+	<flow name="flow-custom">
+		<http:listener config-ref="listener"
+			path="/custom" />
+		<http:request config-ref="custom"
+			path="/" method="GET" />
+	</flow>
+	
+	<flow name="flow-ssl">
+		<inbound-endpoint address="https://localhost:${portSsl}/" connector-ref="httpsConnector"/>
+		<set-payload value="test" />
+	</flow>
+
+</mule>
