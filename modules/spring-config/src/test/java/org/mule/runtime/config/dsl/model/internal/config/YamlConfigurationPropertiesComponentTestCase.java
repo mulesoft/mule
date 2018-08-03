@@ -7,6 +7,7 @@
 package org.mule.runtime.config.dsl.model.internal.config;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
@@ -24,6 +25,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.yaml.snakeyaml.parser.ParserException;
 
 @Feature(CONFIGURATION_PROPERTIES)
 @Story(COMPONENT_CONFIGURATION_YAML_STORY)
@@ -94,7 +96,17 @@ public class YamlConfigurationPropertiesComponentTestCase {
         .expectMessage("YAML configuration properties must have space after ':' character. Offending line is: prop1:\"v1\" prop2:\"v2\"");
     expectedException.expect(ConfigurationPropertiesException.class);
     configurationComponent.initialise();
+  }
 
+  @Description("YAML config files need to have correct number of quotes")
+  @Test
+  public void quotesRequired() throws InitialisationException {
+    configurationComponent = new DefaultConfigurationPropertiesProvider("quotes.yaml", externalResourceProvider);
+    expectedException
+        .expectMessage("Error while parsing YAML configuration file. Check that all quotes are correctly closed.");
+    expectedException.expect(ConfigurationPropertiesException.class);
+    expectedException.expectCause(instanceOf(ParserException.class));
+    configurationComponent.initialise();
   }
 
 }
