@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import java.util.List;
@@ -109,6 +111,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
+    if (isEmpty(artifactConfigResources)) {
+      ((DefaultMuleContext) muleContext).setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
+      return;
+    }
+
     muleArtifactContext = createApplicationContext(muleContext);
     createSpringRegistry(muleContext, muleArtifactContext);
   }

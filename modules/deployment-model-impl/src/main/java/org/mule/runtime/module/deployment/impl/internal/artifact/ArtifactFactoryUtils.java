@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.license.api.LicenseValidator;
@@ -16,6 +20,7 @@ import org.mule.runtime.module.license.api.PluginLicenseValidationRequest;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Utility class providing useful methods when creating {@link Artifact}s.
@@ -45,7 +50,7 @@ public class ArtifactFactoryUtils {
 
   /**
    * Validates plugin licenses within the artifact.
-   * 
+   *
    * @param artifactClassLoader the classloader of the artifact
    * @param artifactPlugins the list of plugins
    * @param licenseValidator the license validator to use for validating the license
@@ -71,4 +76,26 @@ public class ArtifactFactoryUtils {
     });
   }
 
+  /**
+   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it
+   * with the given {@code consumer}
+   *
+   * @param artifact an artifact
+   * @param consumer a {@link MuleContext} {@link CheckedConsumer}
+   * @since 4.2
+   */
+  public static void withArtifactMuleContext(DeployableArtifact artifact, CheckedConsumer<MuleContext> consumer) {
+    getMuleContext(artifact).ifPresent(consumer::accept);
+  }
+
+  /**
+   * Optionally returns the {@link MuleContext} associated to the given {@code artifact} (if any)
+   *
+   * @param artifact an artifact
+   * @return an {@link Optional} {@link MuleContext}
+   * @since 4.2
+   */
+  public static Optional<MuleContext> getMuleContext(DeployableArtifact artifact) {
+    return artifact != null ? artifact.getRegistry().lookupByType(MuleContext.class) : empty();
+  }
 }

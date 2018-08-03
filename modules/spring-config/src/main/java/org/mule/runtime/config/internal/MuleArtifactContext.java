@@ -15,6 +15,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -273,19 +274,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
     applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
 
-    List<Pair<String, Supplier<InputStream>>> initialConfigFiles = new ArrayList<>();
-    for (ConfigResource artifactConfigResource : artifactConfigResources) {
-      initialConfigFiles.add(new Pair<>(artifactConfigResource.getResourceName(), () -> {
-        try {
-          return artifactConfigResource.getInputStream();
-        } catch (IOException e) {
-          throw new MuleRuntimeException(e);
-        }
-      }));
-    }
+    if (!isEmpty(artifactConfigResources)) {
+      List<Pair<String, Supplier<InputStream>>> initialConfigFiles = new ArrayList<>();
+      for (ConfigResource artifactConfigResource : artifactConfigResources) {
+        initialConfigFiles.add(new Pair<>(artifactConfigResource.getResourceName(), () -> {
+          try {
+            return artifactConfigResource.getInputStream();
+          } catch (IOException e) {
+            throw new MuleRuntimeException(e);
+          }
+        }));
+      }
 
-    List<ConfigFile> configFiles = new ArrayList<>();
-    recursivelyResolveConfigFiles(initialConfigFiles, configFiles).forEach(applicationConfigBuilder::addConfigFile);
+      List<ConfigFile> configFiles = new ArrayList<>();
+      recursivelyResolveConfigFiles(initialConfigFiles, configFiles).forEach(applicationConfigBuilder::addConfigFile);
+    }
 
     applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
     return applicationConfigBuilder.build();

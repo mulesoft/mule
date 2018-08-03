@@ -23,7 +23,8 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createCompositeErrorTypeRepository;
-
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -138,7 +139,7 @@ public class ArtifactContextBuilder {
   /**
    * The {@code ArtifactType} defines the set of services that will be available in the {@code MuleContext}. For instance
    * {@code ArtifactType.DOMAIN} does not have any service required to execute flows.
-   *
+   * <p>
    * By default {@code ArtifactType.APP} will be used, making all services available.
    *
    * @param artifactType artifact type for which a {@code MuleContext} must be created.
@@ -267,7 +268,7 @@ public class ArtifactContextBuilder {
    * {@code MuleContext} to be created. It may also be that the configuration files make use of this extensions.
    *
    * @param artifactPlugins collection of artifact extensions that define resources as part of the {@code MuleContext} to be
-   *        created.
+   *                        created.
    * @return the builder
    */
   public ArtifactContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins) {
@@ -309,10 +310,10 @@ public class ArtifactContextBuilder {
    * Allows to lazily create the artifact resources.
    *
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
-   *        components from the configuration will be created on demand when requested. For instance, when using
-   *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
-   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
-   *        test connectivity, if it was not already created. when false, the application will be created completely at startup.
+   *                       components from the configuration will be created on demand when requested. For instance, when using
+   *                       {@link ArtifactContext#getConnectivityTestingService()} and then invoking
+   *                       {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
+   *                       test connectivity, if it was not already created. when false, the application will be created completely at startup.
    * @return the builder
    */
   public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {
@@ -371,7 +372,7 @@ public class ArtifactContextBuilder {
 
   /**
    * @return the {@code MuleContext} created with the provided configuration
-   * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
+   * @throws ConfigurationException  when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
    */
   public ArtifactContext build() throws InitialisationException, ConfigurationException {
@@ -385,7 +386,8 @@ public class ArtifactContextBuilder {
         builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         if (extensionManagerFactory == null) {
-          if (parentArtifact == null) {
+          MuleContext parentMuleContext = getMuleContext(parentArtifact).orElse(null);
+          if (parentMuleContext == null) {
             extensionManagerFactory =
                 new ArtifactExtensionManagerFactory(artifactPlugins, extensionModelLoaderRepository,
                                                     new DefaultExtensionManagerFactory());
@@ -428,10 +430,8 @@ public class ArtifactContextBuilder {
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators);
-            if (parentArtifact != null) {
-              artifactContextConfigurationBuilder
-                  .setParentContext(parentArtifact.getRegistry().lookupByType(MuleContext.class).get());
-            }
+
+            withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
             ((DefaultMuleConfiguration) muleContext.getConfiguration()).setDataFolderName(dataFolderName);
@@ -461,9 +461,8 @@ public class ArtifactContextBuilder {
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
 
-          muleContextBuilder.setErrorTypeRepository(createCompositeErrorTypeRepository(parentArtifact.getRegistry()
-              .lookupByType(MuleContext.class).get()
-              .getErrorTypeRepository()));
+          withArtifactMuleContext(parentArtifact, parentContext -> muleContextBuilder
+              .setErrorTypeRepository(createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository())));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
         }

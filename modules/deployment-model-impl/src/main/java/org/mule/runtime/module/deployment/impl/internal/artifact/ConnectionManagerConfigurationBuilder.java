@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -34,9 +35,8 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
   ConnectionManagerConfigurationBuilder(DeployableArtifact parentArtifact) {
     checkNotNull(parentArtifact, "'parentArtifact' can't be null");
 
-    muleContextConfigurer = muleContext -> {
-      ConnectionManagerAdapter parentConnectionManager =
-          lookupObject(parentArtifact.getRegistry().lookupByType(MuleContext.class).get(), OBJECT_CONNECTION_MANAGER);
+    muleContextConfigurer = muleContext -> withArtifactMuleContext(parentArtifact, parentContext -> {
+      ConnectionManagerAdapter parentConnectionManager = lookupObject(parentContext, OBJECT_CONNECTION_MANAGER);
       if (parentConnectionManager != null) {
         ConnectionManager connectionManager =
             new CompositeConnectionManager(new DelegateConnectionManagerAdapter(muleContext), parentConnectionManager);
@@ -44,13 +44,11 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
       } else {
         registerDefaultConnectionManager(muleContext);
       }
-    };
+    });
   }
 
   ConnectionManagerConfigurationBuilder() {
-    muleContextConfigurer = muleContext -> {
-      registerDefaultConnectionManager(muleContext);
-    };
+    muleContextConfigurer = this::registerDefaultConnectionManager;
   }
 
   @Override
