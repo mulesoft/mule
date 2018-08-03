@@ -21,13 +21,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetAdoptionSource;
+import org.mule.test.petstore.extension.PetStoreConnectionProvider;
+import org.mule.test.petstore.extension.PooledPetStoreConnectionProvider;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.mule.test.petstore.extension.PetStoreConnectionProvider;
-import org.mule.test.petstore.extension.PooledPetStoreConnectionProvider;
 
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
