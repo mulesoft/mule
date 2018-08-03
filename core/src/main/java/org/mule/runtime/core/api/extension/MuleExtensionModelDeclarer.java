@@ -384,6 +384,18 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The location of the template. The order in which the processor will attempt to load the file is: from the file system, from a URL, then from the classpath.");
+
+    parseTemplate.onDefaultParameterGroup()
+        .withOptionalParameter("outputEncoding")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The encoding to be assigned to the result generated when parsing the template.");
+
+    parseTemplate.onDefaultParameterGroup()
+        .withOptionalParameter("outputMimeType")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The mime typeto be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
   }
 
   private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
