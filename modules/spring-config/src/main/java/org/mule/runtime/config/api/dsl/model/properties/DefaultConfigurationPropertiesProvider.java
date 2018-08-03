@@ -150,6 +150,17 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
                                                                               parentPath, yamlObject)),
                                                    this);
       }
+      if (parentPath == null) {
+        if (((String) yamlObject).matches(".*:[^ ].*")) {
+          throw new ConfigurationPropertiesException(createStaticMessage(format("YAML configuration properties must have space after ':' character. Offending line is: %s",
+                                                                                yamlObject)),
+                                                     this);
+        } else {
+          throw new ConfigurationPropertiesException(createStaticMessage(format("YAML configuration property key must not be null. Offending line is %s",
+                                                                                yamlObject)),
+                                                     this);
+        }
+      }
       String resultObject = createValue(parentPath, (String) yamlObject);
       configurationAttributes.put(parentPath, new DefaultConfigurationProperty(this, parentPath, resultObject));
     }
