@@ -7,8 +7,6 @@
 package org.mule.test.module.extension.source;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBERS;
@@ -21,8 +19,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetAdoptionSource;
-import org.mule.test.petstore.extension.PetStoreConnectionProvider;
-import org.mule.test.petstore.extension.PooledPetStoreConnectionProvider;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,12 +39,6 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       }
       return event;
     }
-  }
-
-  @Override
-  protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    PetStoreConnectionProvider.connections.clear();
-    super.doSetUpBeforeMuleContextCreation();
   }
 
   @Override
@@ -120,15 +110,6 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   public void multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarksPoll() throws Exception {
     startFlow("multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarks");
     assertAllNumbersAdoptedExactlyOnce();
-  }
-
-  @Test
-  public void watermarkedItemsReleaseConnectionsTestCase() throws Exception {
-    startFlow("watermarkWithPooledConnection");
-    List<PetStoreConnectionProvider> petStoreConnectionProviders = PetStoreConnectionProvider.connections.keySet().stream()
-        .filter(x -> x instanceof PooledPetStoreConnectionProvider).collect(toList());
-    assertThat(petStoreConnectionProviders, hasSize(1));
-    checkNot(10000, 1000, () -> PetStoreConnectionProvider.connections.get(petStoreConnectionProviders.get(0)) > 10);
   }
 
   private void assertIdempotentAdoptions() {

@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
@@ -16,4 +17,11 @@ import org.mule.test.petstore.extension.stereotype.CustomPetstoreConnectionStere
 public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient>
     implements PoolingConnectionProvider<PetStoreClient> {
 
+    public static int TIMES_CONNECTED = 0;
+
+    @Override
+    public PetStoreClient connect() throws ConnectionException {
+        TIMES_CONNECTED++;
+        return super.connect();
+    }
 }
