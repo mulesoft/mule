@@ -6,16 +6,22 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.create;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -26,22 +32,32 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 
 @SmallTest
 public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   private static final String LOCATION = "error.html";
+  private static final MediaType LOCATION_MEDIA_TYPE = create("text","html");
   private static final String INVALID_LOCATION = "wrong_error.html";
+
+  private static final String UNKNOWN_MEDIATYPE_LOCATION = "template.lrmextension";
 
   private ParseTemplateProcessor parseTemplateProcessor;
   private CoreEvent event;
   private InternalMessage mockMuleMessage = mock(InternalMessage.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setUp() throws MuleException {
@@ -106,6 +122,66 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals("Parsed", response.getMessage().getPayload().getValue());
+  }
+
+  @Test
+  public void parseTemplateFromLocationWithKnownMediatype() throws Exception {
+    parseTemplateProcessor.setLocation(LOCATION);
+    parseTemplateProcessor.initialise();
+    String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
+    CoreEvent response = parseTemplateProcessor.process(event);
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType(),is(equalTo(LOCATION_MEDIA_TYPE)));
+  }
+
+  @Test
+  public void parseTemplateFromLocationWithUnkownMediaType() throws Exception {
+    parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
+    parseTemplateProcessor.initialise();
+    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
+    CoreEvent response = parseTemplateProcessor.process(event);
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType(),is(equalTo(ANY)));
+  }
+
+  @Test
+  public void parseTemplateWithOverridenDataType() throws Exception {
+    String customEncoding = "UTF-16";
+    MediaType customMediaType = create("application", "lrmextension");
+    parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
+    parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
+    parseTemplateProcessor.setOutputEncoding(customEncoding);
+    parseTemplateProcessor.initialise();
+    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
+    CoreEvent response = parseTemplateProcessor.process(event);
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),is(equalTo(customMediaType.getPrimaryType())));
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().getSubType(),is(equalTo(customMediaType.getSubType())));
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().getCharset().get().toString(),is(equalTo(customEncoding)));
+  }
+
+  @Test
+  public void parseTemplateWithOverridenOutputEncoding() throws Exception {
+    MediaType customMediaType = create("application", "lrmextension");
+    parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
+    parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
+    parseTemplateProcessor.initialise();
+    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
+    CoreEvent response = parseTemplateProcessor.process(event);
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType(),is(equalTo(customMediaType)));
+  }
+
+  @Test
+  public void unsupportedEncodingThrowsException() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    parseTemplateProcessor.setOutputEncoding("invalidEncoding");
+  }
+
+  @Test
+  public void invalidMimeTypeStringThrowsException() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    parseTemplateProcessor.setOutputMimeType("primaryType-wrongDelimiter-subType");
   }
 
   @Test

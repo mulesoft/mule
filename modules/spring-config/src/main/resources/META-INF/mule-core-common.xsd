@@ -1825,6 +1825,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="outputMimeType" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            MimeType to enforce to the result of the parsed template if the one guessed is not the expected one
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="outputEncoding" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Encoding to enforce to the result of the parsed template if required
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="target" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
