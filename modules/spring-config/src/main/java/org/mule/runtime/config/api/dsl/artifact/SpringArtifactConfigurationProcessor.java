@@ -14,7 +14,7 @@ import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStra
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
-import org.mule.runtime.deployment.model.internal.artifact.SimpleArtifactContext;
+import org.mule.runtime.deployment.model.internal.artifact.ImmutableArtifactContext;
 
 /**
  * Spring implementation of {@link ArtifactConfigurationProcessor} that parses the XML configuration files and generates the
@@ -32,7 +32,7 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
     if (isEmpty(configResources)) {
       ((DefaultMuleContext) artifactContextConfiguration.getMuleContext())
           .setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
-      return new SimpleArtifactContext(artifactContextConfiguration.getMuleContext());
+      return new ImmutableArtifactContext(artifactContextConfiguration.getMuleContext());
     }
 
     SpringXmlConfigurationBuilder springXmlConfigurationBuilder =

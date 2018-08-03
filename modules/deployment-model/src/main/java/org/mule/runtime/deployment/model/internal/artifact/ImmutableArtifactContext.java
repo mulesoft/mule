@@ -11,12 +11,17 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
-public class SimpleArtifactContext implements ArtifactContext {
+/**
+ * Simple implementation of {@link ArtifactContext}
+ *
+ * @since 4.2
+ */
+public class ImmutableArtifactContext implements ArtifactContext {
 
   private final MuleContext muleContext;
   private final Registry registry;
 
-  public SimpleArtifactContext(MuleContext muleContext) {
+  public ImmutableArtifactContext(MuleContext muleContext) {
     this.muleContext = muleContext;
     registry = new DefaultRegistry(muleContext);
   }

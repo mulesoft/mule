@@ -76,10 +76,25 @@ public class ArtifactFactoryUtils {
     });
   }
 
+  /**
+   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it
+   * with the given {@code consumer}
+   *
+   * @param artifact an artifact
+   * @param consumer a {@link MuleContext} {@link CheckedConsumer}
+   * @since 4.2
+   */
   public static void withArtifactMuleContext(DeployableArtifact artifact, CheckedConsumer<MuleContext> consumer) {
     getMuleContext(artifact).ifPresent(consumer::accept);
   }
 
+  /**
+   * Optionally returns the {@link MuleContext} associated to the given {@code artifact} (if any)
+   *
+   * @param artifact an artifact
+   * @return an {@link Optional} {@link MuleContext}
+   * @since 4.2
+   */
   public static Optional<MuleContext> getMuleContext(DeployableArtifact artifact) {
     return artifact != null ? artifact.getRegistry().lookupByType(MuleContext.class) : empty();
   }

@@ -15,6 +15,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -235,14 +236,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         : extensionManager.getExtensions());
   }
 
-  public ArtifactType getArtifactType() {
-    return artifactType;
-  }
-
-  public boolean hasConfigResources() {
-    return artifactConfigResources != null && artifactConfigResources.length > 0;
-  }
-
   private XmlApplicationParser createApplicationParser() {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
     return XmlApplicationParser.createFromExtensionModels(extensionManager.getExtensions());
@@ -281,7 +274,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
     applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
 
-    if (artifactConfigResources != null && artifactConfigResources.length > 0) {
+    if (!isEmpty(artifactConfigResources)) {
       List<Pair<String, Supplier<InputStream>>> initialConfigFiles = new ArrayList<>();
       for (ConfigResource artifactConfigResource : artifactConfigResources) {
         initialConfigFiles.add(new Pair<>(artifactConfigResource.getResourceName(), () -> {

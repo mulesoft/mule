@@ -79,7 +79,6 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.context.MuleContextException;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -335,16 +334,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       overrideClusterConfiguration();
       startMessageSources();
     }
-
-    @Override
-    public void stop(Stoppable stoppable) throws MuleContextException {
-
-    }
-
-    @Override
-    public void dispose(Disposable disposable) {
-
-    }
   }
 
   @Override
@@ -412,6 +401,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_STOPPING));
       getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
+
+      lifecycleStrategy.stop(this);
+
       fireNotification(new MuleContextNotification(this, CONTEXT_STOPPED));
 
       final org.mule.runtime.api.artifact.Registry apiRegistry = getApiRegistry();
@@ -435,6 +427,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       getLifecycleManager().checkPhase(Disposable.PHASE_NAME);
 
       fireNotification(new MuleContextNotification(this, CONTEXT_DISPOSING));
+
+      lifecycleStrategy.dispose(this);
 
       disposeIfNeeded(getExceptionListener(), LOGGER);
 
