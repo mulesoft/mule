@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.runtime.api.tls.DynamicTlsProvider;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.Collection;
  *
  * @since 4.0
  */
-public interface HttpServer {
+public interface HttpServer extends DynamicTlsProvider {
 
   /**
    * Binds the ServerSocket to the network interface and starts listening for requests.
