@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.String.format;
+import static org.apache.commons.lang3.reflect.MethodUtils.invokeStaticMethod;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
@@ -223,7 +224,6 @@ public class MuleContainer {
     if (registerShutdownHook) {
       registerShutdownHook();
     }
-    showSplashScreen();
     try {
       doResourceInitialization();
 
@@ -236,16 +236,28 @@ public class MuleContainer {
       coreExtensionManager.setArtifactClassLoaderManager(artifactResourcesRegistry.getArtifactClassLoaderManager());
       coreExtensionManager.setToolingService(toolingService);
       coreExtensionManager.setServiceRepository(serviceManager);
+
+      validateLicense();
+      showSplashScreen();
+
       coreExtensionManager.initialise();
       coreExtensionManager.start();
-
       toolingService.initialise();
 
       extensionModelLoaderManager.start();
-
       deploymentService.start();
     } catch (Throwable e) {
       shutdown(e);
+    }
+  }
+
+  private void validateLicense() {
+    try {
+      invokeStaticMethod(MuleContainerBootstrap.class, "awaitLicenseValidation");
+    } catch (NoSuchMethodException e) {
+      return;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
     }
   }
 
