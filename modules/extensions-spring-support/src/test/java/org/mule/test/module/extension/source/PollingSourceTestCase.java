@@ -7,15 +7,12 @@
 package org.mule.test.module.extension.source;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBERS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
