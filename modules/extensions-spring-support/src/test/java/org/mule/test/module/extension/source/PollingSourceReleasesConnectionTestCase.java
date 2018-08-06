@@ -22,6 +22,11 @@ public class PollingSourceReleasesConnectionTestCase extends AbstractExtensionFu
     return "polling-source-releases-connection-config.xml";
   }
 
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    PooledPetStoreConnectionProvider.TIMES_CONNECTED = 0;
+  }
+
   @Test
   public void watermarkedItemsReleaseConnectionsTestCase() throws Exception {
     startFlow("watermarkWithPooledConnection");
