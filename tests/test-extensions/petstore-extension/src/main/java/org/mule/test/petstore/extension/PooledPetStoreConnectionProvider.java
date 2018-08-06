@@ -17,11 +17,11 @@ import org.mule.test.petstore.extension.stereotype.CustomPetstoreConnectionStere
 public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient>
     implements PoolingConnectionProvider<PetStoreClient> {
 
-    public static int TIMES_CONNECTED = 0;
+  public static int TIMES_CONNECTED = 0;
 
-    @Override
-    public PetStoreClient connect() throws ConnectionException {
-        TIMES_CONNECTED++;
-        return super.connect();
-    }
+  @Override
+  public PetStoreClient connect() throws ConnectionException {
+    TIMES_CONNECTED++;
+    return super.connect();
+  }
 }
