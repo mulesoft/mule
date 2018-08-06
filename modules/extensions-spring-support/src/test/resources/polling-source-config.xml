@@ -71,7 +71,6 @@
         <test:processor throwException="true"/>
     </flow>
 
-
     <flow name="adopt">
         <test:processor class="org.mule.test.module.extension.source.PollingSourceTestCase$AdoptionProcessor"/>
     </flow>

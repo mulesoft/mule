@@ -40,6 +40,7 @@ import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 
 import java.io.Serializable;
@@ -228,7 +229,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       }
 
       if (status != ACCEPTED) {
-        release(pollItem.getResult(), callbackContext);
+        rejectItem(pollItem.getResult(), callbackContext);
       }
 
       return status;
@@ -432,11 +433,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     }
   }
 
-  private void release(Result<T, A> result, SourceCallbackContext context) {
+  private void rejectItem(Result<T, A> result, SourceCallbackContext context) {
     try {
       delegate.onRejectedItem(result, context);
     } finally {
       release(context);
+      if (context instanceof SourceCallbackContextAdapter) {
+        ((SourceCallbackContextAdapter) context).releaseConnection();
+      }
     }
   }
 

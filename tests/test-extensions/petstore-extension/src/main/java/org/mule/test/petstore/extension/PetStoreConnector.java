@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+
 import java.util.List;
 
 @Extension(name = "petstore")
@@ -26,7 +27,8 @@ import java.util.List;
     PooledPetStoreConnectionProviderWithValidConnection.class})
 @ErrorTypes(PetstoreErrorTypeDefinition.class)
 @Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class,
-    PetStoreStreamSource.class, PartialPetAdoptionSource.class, NumberPetAdoptionSource.class})
+    PetStoreStreamSource.class, PartialPetAdoptionSource.class, NumberPetAdoptionSource.class,
+    ConnectedPetAdoptionSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
 public class PetStoreConnector {
 
