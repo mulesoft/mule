@@ -9,16 +9,14 @@ package org.mule.runtime.core.internal.processor.simple;
 import static java.nio.charset.Charset.forName;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.DataType.builder;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 
@@ -40,6 +38,9 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   private String target;
   private String location;
   private String targetValue;
+
+  private String configuredOutputMimeType;
+  private String configuredOutputEncoding;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -80,7 +81,24 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   }
 
-  private MediaType getConfiguredMediaType() {
+  private String evaluatingExpression(String expression, CoreEvent event) {
+    if (muleContext.getExpressionManager().isExpression(expression)) {
+      return (String) muleContext.getExpressionManager().evaluate(expression, STRING, NULL_BINDING_CONTEXT, event)
+          .getValue();
+    }
+    return expression;
+  }
+
+  private void evaluateMediaTypeExpressions(CoreEvent event) {
+    if (configuredOutputMimeType != null) {
+      outputMimeType = parse(evaluatingExpression(configuredOutputMimeType, event));
+    }
+    if (configuredOutputEncoding != null) {
+      outputEncoding = forName(evaluatingExpression(configuredOutputEncoding, event));
+    }
+  }
+
+  private MediaType buildMediaType() {
     if (outputMimeType != null) {
       if (outputEncoding != null) {
         return create(outputMimeType.getPrimaryType(), outputMimeType.getSubType(), outputEncoding);
@@ -93,9 +111,10 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   @Override
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
+    evaluateMediaTypeExpressions(event);
     String result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
     Message.Builder messageBuilder = Message.builder(event.getMessage()).value(result).nullAttributesValue();
-    MediaType configuredMediaType = getConfiguredMediaType();
+    MediaType configuredMediaType = buildMediaType();
     if (configuredMediaType != null) {
       messageBuilder.mediaType(configuredMediaType);
     }
@@ -133,10 +152,12 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   }
 
   public void setOutputMimeType(String outputMimeType) {
-    this.outputMimeType = parse(outputMimeType);
+    //Need to save this to be evaluated with an event context present in case this is an expression.
+    configuredOutputMimeType = outputMimeType;
   }
 
   public void setOutputEncoding(String encoding) {
-    this.outputEncoding = forName(encoding);
+    //Need to save this to be evaluated with an event context present in case this is an expression.
+    configuredOutputEncoding = encoding;
   }
 }

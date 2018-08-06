@@ -15,12 +15,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.create;
+import static org.mule.runtime.api.metadata.TypedValue.of;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -108,8 +112,8 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
     String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
 
-    when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of("Parsed"));
-    when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
+    when(mockMuleMessage.getPayload()).thenReturn(of("Parsed"));
+    when(mockMuleMessage.getAttributes()).thenReturn(of(new HashMap<>()));
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
 
     CoreEvent response = parseTemplateProcessor.process(event);
@@ -151,6 +155,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setOutputEncoding(customEncoding);
     parseTemplateProcessor.initialise();
     String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    when(mockExpressionManager.isExpression(any())).thenReturn(false);
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
     CoreEvent response = parseTemplateProcessor.process(event);
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),
@@ -163,24 +168,50 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void unsupportedEncodingThrowsException() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
     parseTemplateProcessor.setOutputEncoding("invalidEncoding");
+    expectedException.expect(IllegalArgumentException.class);
+    parseTemplateProcessor.process(event);
   }
 
   @Test
   public void invalidMimeTypeStringThrowsException() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
     parseTemplateProcessor.setOutputMimeType("primaryType-wrongDelimiter-subType");
+    expectedException.expect(IllegalArgumentException.class);
+    parseTemplateProcessor.process(event);
   }
 
   @Test
-  public void testParseTemplateFromContent() throws InitialisationException {
+  public void parseTemplateWithOverriddenDataTypeAsExpression() throws Exception {
+    String customEncoding = "UTF-16";
+    MediaType customMediaType = create("application", "lrmextension");
+    parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
+    parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
+    parseTemplateProcessor.setOutputEncoding(customEncoding);
+    when(mockExpressionManager.isExpression(customMediaType.toRfcString())).thenReturn(true);
+    when(mockExpressionManager.isExpression(customEncoding)).thenReturn(true);
+    when(mockExpressionManager.evaluate(customMediaType.toRfcString(), STRING, NULL_BINDING_CONTEXT, event))
+        .thenReturn(of(customMediaType.toRfcString()));
+    when(mockExpressionManager.evaluate(customEncoding, STRING, NULL_BINDING_CONTEXT, event)).thenReturn(of(customEncoding));
+    parseTemplateProcessor.initialise();
+    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
+    CoreEvent response = parseTemplateProcessor.process(event);
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),
+               is(equalTo(customMediaType.getPrimaryType())));
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().getSubType(),
+               is(equalTo(customMediaType.getSubType())));
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().getCharset().get().toString(),
+               is(equalTo(customEncoding)));
+  }
+
+  @Test
+  public void parseTemplateFromContent() throws InitialisationException {
     String template = "This is a template";
     parseTemplateProcessor.setContent(template);
     parseTemplateProcessor.initialise();
 
-    when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of(template));
-    when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
+    when(mockMuleMessage.getPayload()).thenReturn(of(template));
+    when(mockMuleMessage.getAttributes()).thenReturn(of(new HashMap<>()));
     when(mockExpressionManager.parseLogTemplate(eq(template), eq(event), any(), any())).thenReturn(template);
 
     CoreEvent response = parseTemplateProcessor.process(event);
@@ -194,15 +225,15 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testParseTemplateToTarget() throws InitialisationException {
+  public void parseTemplateToTarget() throws InitialisationException {
     String payload = "Payload";
     String template = "Template";
     parseTemplateProcessor.setContent(template);
     parseTemplateProcessor.setTarget("some_target_variable");
     parseTemplateProcessor.initialise();
 
-    when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of(payload));
-    when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
+    when(mockMuleMessage.getPayload()).thenReturn(of(payload));
+    when(mockMuleMessage.getAttributes()).thenReturn(of(new HashMap<>()));
     when(mockExpressionManager.parseLogTemplate(any(), any(), any(), any())).thenReturn("Parsed");
 
     CoreEvent response = parseTemplateProcessor.process(event);
