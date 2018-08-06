@@ -162,18 +162,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void parseTemplateWithOverriddenOutputEncoding() throws Exception {
-    MediaType customMediaType = create("application", "lrmextension");
-    parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
-    parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
-    parseTemplateProcessor.initialise();
-    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
-    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
-    CoreEvent response = parseTemplateProcessor.process(event);
-    assertThat(response.getMessage().getPayload().getDataType().getMediaType(), is(equalTo(customMediaType)));
-  }
-
-  @Test
   public void unsupportedEncodingThrowsException() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
     parseTemplateProcessor.setOutputEncoding("invalidEncoding");

@@ -395,7 +395,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("outputMimeType")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The mime typeto be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
+        .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
   }
 
   private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

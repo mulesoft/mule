@@ -11,6 +11,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
+import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import org.mule.runtime.api.message.Message;
@@ -79,23 +80,26 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   }
 
-  private TypedValue getPayload(Object value) {
-    DataTypeBuilder dataTypeBuilder = builder();
+  private MediaType getConfiguredMediaType() {
     if (outputMimeType != null) {
-      dataTypeBuilder.mediaType(outputMimeType);
+      if (outputEncoding != null) {
+        return create(outputMimeType.getPrimaryType(), outputMimeType.getSubType(), outputEncoding);
+      }
+      return outputMimeType;
     }
-    if (outputEncoding != null) {
-      dataTypeBuilder.charset(outputEncoding);
-    }
-    return new TypedValue<>(value, dataTypeBuilder.type(value.getClass()).build());
+    return null;
   }
 
   @Override
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
     Object result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
-    Message.Builder mesageBuilder = Message.builder(event.getMessage()).payload(getPayload(result)).nullAttributesValue();
-    Message resultMessage = mesageBuilder.build();
+    Message.Builder messageBuilder = Message.builder(event.getMessage()).value(result).nullAttributesValue();
+    MediaType configuredMediaType = getConfiguredMediaType();
+    if (configuredMediaType != null) {
+      messageBuilder.mediaType(configuredMediaType);
+    }
+    Message resultMessage = messageBuilder.build();
     if (target == null) {
       return CoreEvent.builder(event).message(resultMessage).build();
     } else {
