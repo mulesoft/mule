@@ -93,7 +93,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   @Override
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
-    Object result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
+    String result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
     Message.Builder messageBuilder = Message.builder(event.getMessage()).value(result).nullAttributesValue();
     MediaType configuredMediaType = getConfiguredMediaType();
     if (configuredMediaType != null) {
