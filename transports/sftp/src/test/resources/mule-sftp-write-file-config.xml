@@ -18,7 +18,10 @@
     <sftp:connector name="sftpAppendConnector" duplicateHandling="append" tempDirInbound="archive" useTempFileTimestampSuffix="true" />
     <sftp:connector name="sftpAppendConnectorWithTempDirOutbound" duplicateHandling="append" tempDirInbound="archive" useTempFileTimestampSuffix="true" tempDirOutbound="tempFolder" />
     <sftp:connector name="sftpOverwriteConnector" duplicateHandling="overwrite" tempDirInbound="archive" useTempFileTimestampSuffix="true" />
-    
+    <sftp:connector name="sftpOverwriteConnectorWithTempDirOutbound" duplicateHandling="overwrite" tempDirInbound="archive" tempDirOutbound="tempFolder" useTempFileTimestampSuffix="true" />
+    <sftp:connector name="sftpAddSeqNo" duplicateHandling="addSeqNo" tempDirInbound="archive" useTempFileTimestampSuffix="true" />
+    <sftp:connector name="sftpAddSeqNoWithTempDirOutbound" duplicateHandling="addSeqNo" tempDirInbound="archive" useTempFileTimestampSuffix="true" tempDirOutbound="tempFolder" />
+
     <flow name="testAppend">
         <vm:inbound-endpoint path="append" exchange-pattern="request-response" />
         <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="append.txt" connector-ref="sftpAppendConnector" />
@@ -29,9 +32,24 @@
         <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="append.txt" connector-ref="sftpAppendConnectorWithTempDirOutbound" />
     </flow>
 
+    <flow name="testAddSeqNo">
+        <vm:inbound-endpoint path="add-seq-no" exchange-pattern="request-response" />
+        <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="append.txt" connector-ref="sftpAddSeqNo" />
+    </flow>
+
+    <flow name="testAddSeqNoWithTempDirOutbound">
+        <vm:inbound-endpoint path="add-seq-no-with-temp-dir-outbound" exchange-pattern="request-response" />
+        <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="append.txt" connector-ref="sftpAddSeqNoWithTempDirOutbound" />
+    </flow>
+
     <flow name="testDefault">
         <vm:inbound-endpoint path="overwrite" exchange-pattern="request-response" />
         <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="overwrite.txt" connector-ref="sftpOverwriteConnector" />
+    </flow>
+
+    <flow name="testDefaultWithTempDirOutbound">
+        <vm:inbound-endpoint path="overwrite-with-temp-dir-outbound" exchange-pattern="request-response" />
+        <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="overwrite.txt" connector-ref="sftpOverwriteConnectorWithTempDirOutbound" />
     </flow>
 
 </mule>

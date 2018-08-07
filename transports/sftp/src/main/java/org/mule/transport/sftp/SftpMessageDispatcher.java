@@ -16,6 +16,9 @@
 
 package org.mule.transport.sftp;
 
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.getTempDirectory;
+import static org.mule.util.FileUtils.copyStreamToFile;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -26,6 +29,8 @@ import org.mule.transport.NullPayload;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -74,8 +79,8 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
         try
         {
             String serviceName = (event.getFlowConstruct() == null)
-                                 ? "UNKNOWN SERVICE"
-                                 : event.getFlowConstruct().getName();
+                ? "UNKNOWN SERVICE"
+                : event.getFlowConstruct().getName();
             SftpNotifier notifier = new SftpNotifier(connector, event.getMessage(), endpoint, serviceName);
             client = connector.createSftpClient(endpoint, notifier);
             String destDir = endpoint.getEndpointURI().getPath();
@@ -89,33 +94,57 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             filename = client.duplicateHandling(destDir, filename, sftpUtil.getDuplicateHandling());
             transferFilename = filename;
 
-            boolean appendMode = sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND);
             useTempDir = sftpUtil.isUseTempDirOutbound();
             if (useTempDir)
             {
-                if (appendMode)
-                {
-                    logger.warn("Using file append mode to write, tempDirOutbound will be ignored as it is not supported on this mode.");
-                }
-                else
-                {
-                    // TODO move to a init-method like doConnect?
-                    // cd to tempDir and create it if it doesn't already exist
-                    sftpUtil.cwdToTempDirOnOutbound(client, destDir);
+                // TODO move to a init-method like doConnect?
+                // cd to tempDir and create it if it doesn't already exist
+                sftpUtil.cwdToTempDirOnOutbound(client, destDir);
 
-                    // Add unique file-name (if configured) for use during transfer to
-                    // temp-dir
-                    boolean addUniqueSuffix = sftpUtil.isUseTempFileTimestampSuffix();
-                    if (addUniqueSuffix) {
-                        transferFilename = sftpUtil.createUniqueSuffix(transferFilename);
-                    }
+                // Add unique file-name (if configured) for use during transfer to
+                // temp-dir
+                boolean addUniqueSuffix = sftpUtil.isUseTempFileTimestampSuffix();
+                if (addUniqueSuffix)
+                {
+                    transferFilename = sftpUtil.createUniqueSuffix(transferFilename);
                 }
             }
 
+            String targetAbsolutePath = client.getAbsolutePath(destDir + "/" + filename);
+
             // send file over sftp
             // choose appropriate writing mode
+            boolean appendMode = sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND);
+            long targetFileSize = 0;
+            try
+            {
+                targetFileSize = client.getSize(targetAbsolutePath);
+            }
+            catch (IOException e)
+            {
+                // file doesn't exist on remote server
+            }
+
             if (appendMode)
             {
+                if (useTempDir)
+                {
+                    if (targetFileSize > 0) {
+
+                        File tempLocalCopyFile = new File(getTempDirectory(), transferFilename);
+                        try
+                        {
+                            copyStreamToFile(client.retrieveFile(targetAbsolutePath), tempLocalCopyFile);
+
+                            client.storeFile(tempLocalCopyFile.getAbsolutePath(), transferFilename);
+                        }
+                        finally
+                        {
+                            deleteQuietly(tempLocalCopyFile);
+                        }
+                    }
+                }
+
                 if (event.getMessage().getPayload() instanceof OutputHandler)
                 {
                     client.storeFile(transferFilename, event, (OutputHandler) event.getMessage().getPayload(), SftpClient.WriteMode.APPEND);
@@ -139,10 +168,14 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            if (useTempDir && !appendMode)
+            if (useTempDir)
             {
+                if (targetFileSize > 0)
+                {
+                    client.deleteFile(targetAbsolutePath);
+                }
                 // Move the file to its final destination
-                client.rename(transferFilename, destDir + "/" + filename);
+                client.rename(transferFilename, targetAbsolutePath);
             }
 
             logger.info("Successfully wrote file '" + filename + "' to " + endpoint.getEndpointURI());
@@ -211,7 +244,7 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
         else
         {
             throw new IllegalArgumentException(
-                    "Unexpected message type: java.io.InputStream, byte[], or String expected. Got "
+                "Unexpected message type: java.io.InputStream, byte[], or String expected. Got "
                     + data.getClass().getName());
         }
         return inputStream;

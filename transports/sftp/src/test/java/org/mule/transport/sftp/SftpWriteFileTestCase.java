@@ -31,6 +31,30 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
     }
 
     @Test
+    public void addSeqNo() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.send("vm://add-seq-no", "hello", null);
+        client.send("vm://add-seq-no", " world", null);
+        MuleMessage message = client.request("file://testdir/append.txt", RECEIVE_TIMEOUT);
+        assertEquals("hello", message.getPayloadAsString());
+        message = client.request("file://testdir/append_1.txt", RECEIVE_TIMEOUT);
+        assertEquals(" world", message.getPayloadAsString());
+    }
+
+    @Test
+    public void addSeqNoUsingTempDirOutbound() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.send("vm://add-seq-no-with-temp-dir-outbound", "hello", null);
+        client.send("vm://add-seq-no-with-temp-dir-outbound", " world", null);
+        MuleMessage message = client.request("file://testdir/append.txt", RECEIVE_TIMEOUT);
+        assertEquals("hello", message.getPayloadAsString());
+        message = client.request("file://testdir/append_1.txt", RECEIVE_TIMEOUT);
+        assertEquals(" world", message.getPayloadAsString());
+    }
+
+    @Test
     public void appendFileUsingTempDirOutbound() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -46,6 +70,16 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
         MuleClient client = muleContext.getClient();
         client.send("vm://overwrite", "hello", null);
         client.send("vm://overwrite", "world", null);
+        MuleMessage message = client.request("file://testdir/overwrite.txt", RECEIVE_TIMEOUT);
+        assertEquals("world", message.getPayloadAsString());
+    }
+
+    @Test
+    public void overwriteFileUsingTempDirOutbound() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.send("vm://overwrite-with-temp-dir-outbound", "hello", null);
+        client.send("vm://overwrite-with-temp-dir-outbound", "world", null);
         MuleMessage message = client.request("file://testdir/overwrite.txt", RECEIVE_TIMEOUT);
         assertEquals("world", message.getPayloadAsString());
     }
