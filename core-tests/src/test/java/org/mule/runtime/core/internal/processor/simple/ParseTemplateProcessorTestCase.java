@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 
 @SmallTest
@@ -162,7 +163,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void unsupportedEncodingThrowsException() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expect(UnsupportedCharsetException.class);
     expectedException.expectMessage("invalidEncoding");
     parseTemplateProcessor.setOutputEncoding("invalidEncoding");
   }
