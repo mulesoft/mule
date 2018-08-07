@@ -891,6 +891,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("parse-template")
         .withTypeDefinition(fromType(ParseTemplateProcessor.class))
         .withSetterParameterDefinition("content", fromChildConfiguration(String.class).withIdentifier("content").build())
+        .withSetterParameterDefinition("outputMimeType", fromSimpleParameter("outputMimeType").build())
+        .withSetterParameterDefinition("outputEncoding", fromSimpleParameter("outputEncoding").build())
         .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
         .withSetterParameterDefinition("location", fromSimpleParameter("location").build())
         .withSetterParameterDefinition("targetValue", fromSimpleParameter("targetValue").build())
