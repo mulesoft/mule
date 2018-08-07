@@ -12,6 +12,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,11 +23,10 @@ import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -67,16 +67,11 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     parseTemplateProcessor = new ParseTemplateProcessor();
     parseTemplateProcessor.setMuleContext(mockMuleContext);
+    when(mockExpressionManager.isExpression(anyString())).thenReturn(false);
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testParseTemplateNullTemplate() throws InitialisationException {
-    parseTemplateProcessor.setLocation(LOCATION);
-    parseTemplateProcessor.process(event);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = InitialisationException.class)
   public void testParseTemplateNullLocation() throws InitialisationException {
     parseTemplateProcessor.setLocation(null);
     parseTemplateProcessor.initialise();
@@ -88,7 +83,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setLocation(INVALID_LOCATION);
     addMockComponentLocation(parseTemplateProcessor);
     parseTemplateProcessor.initialise();
-    parseTemplateProcessor.process(event);
   }
 
   @Test(expected = InitialisationException.class)
@@ -99,7 +93,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.initialise();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = InitialisationException.class)
   public void testParseTemplateNullContent() throws InitialisationException {
     parseTemplateProcessor.initialise();
     parseTemplateProcessor.process(event);
@@ -155,7 +149,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setOutputEncoding(customEncoding);
     parseTemplateProcessor.initialise();
     String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
-    when(mockExpressionManager.isExpression(any())).thenReturn(false);
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
     CoreEvent response = parseTemplateProcessor.process(event);
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),
@@ -168,16 +161,14 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void unsupportedEncodingThrowsException() throws Exception {
-    parseTemplateProcessor.setOutputEncoding("invalidEncoding");
     expectedException.expect(IllegalArgumentException.class);
-    parseTemplateProcessor.process(event);
+    parseTemplateProcessor.setOutputEncoding("invalidEncoding");
   }
 
   @Test
   public void invalidMimeTypeStringThrowsException() throws Exception {
-    parseTemplateProcessor.setOutputMimeType("primaryType-wrongDelimiter-subType");
     expectedException.expect(IllegalArgumentException.class);
-    parseTemplateProcessor.process(event);
+    parseTemplateProcessor.setOutputMimeType("primaryType-wrongDelimiter-subType");
   }
 
   @Test

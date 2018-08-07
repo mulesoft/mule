@@ -9,12 +9,10 @@ package org.mule.runtime.core.internal.processor.simple;
 import static java.nio.charset.Charset.forName;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MediaType;
@@ -43,9 +41,6 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   private String location;
   private String targetValue;
 
-  private String configuredOutputMimeType;
-  private String configuredOutputEncoding;
-
   @Override
   public void initialise() throws InitialisationException {
     //Check if both content and location are defined. If so, raise exception due to ambiguity.
@@ -56,52 +51,42 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       throw new InitialisationException(createStaticMessage("One of 'location' or 'content' should be defined but they are both null"),
                                         this);
     }
+    if (location != null) {
+      loadContentFromLocation();
+      if (outputMimeType == null) {
+        guessMimeType();
+      }
+    }
+  }
+
+  private void loadContentFromLocation() throws InitialisationException {
+    InputStream contentStream;
+    try {
+      contentStream = getResourceAsStream(location, getClass());
+    } catch (IOException e) {
+      throw new InitialisationException(createStaticMessage("Error loading template from location"), this);
+    }
+    if (contentStream == null) {
+      throw new InitialisationException(createStaticMessage("Template location: " + location + " not found"), this);
+    }
+    if (outputEncoding != null) {
+      content = IOUtils.toString(contentStream, outputEncoding);
+    } else {
+      content = IOUtils.toString(contentStream);
+    }
+  }
+
+  private void guessMimeType() {
+    MediaType fromLocationMediaType = parse(mimetypesFileTypeMap.getContentType(location));
+    //This is because BINARY is the default value returned if nothing can be resolved. We should not force the value.
+    if (!BINARY.equals(fromLocationMediaType)) {
+      outputMimeType = fromLocationMediaType;
+    }
   }
 
   private void evaluateCorrectArguments() {
     if (targetValue != null && target == null) {
       throw new IllegalArgumentException("Can't define a targetValue with no target");
-    }
-
-  }
-
-  private void loadContentFromLocation() {
-    try {
-      InputStream contentStream = getResourceAsStream(location, getClass());
-      if (contentStream == null) {
-        throw new IllegalArgumentException("Template location: " + location + " not found");
-      }
-      if (outputEncoding != null) {
-        content = IOUtils.toString(contentStream, outputEncoding);
-      } else {
-        content = IOUtils.toString(contentStream);
-      }
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Error loading template from location", e);
-    }
-  }
-
-  private String evaluatingExpression(String expression, CoreEvent event) {
-    if (muleContext.getExpressionManager().isExpression(expression)) {
-      return (String) muleContext.getExpressionManager().evaluate(expression, STRING, NULL_BINDING_CONTEXT, event).getValue();
-    }
-    return expression;
-  }
-
-  private void resolveMediaTypeValues(CoreEvent event) {
-    if (configuredOutputMimeType != null) {
-      outputMimeType = parse(evaluatingExpression(configuredOutputMimeType, event));
-    } else {
-      if (location != null) {
-        MediaType fromLocationMediaType = parse(mimetypesFileTypeMap.getContentType(location));
-        //This is because BINARY is the default value returned if nothing can be resolved. We should not force the value.
-        if (!BINARY.equals(fromLocationMediaType)) {
-          outputMimeType = fromLocationMediaType;
-        }
-      }
-    }
-    if (configuredOutputEncoding != null) {
-      outputEncoding = forName(evaluatingExpression(configuredOutputEncoding, event));
     }
   }
 
@@ -118,10 +103,6 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   @Override
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
-    resolveMediaTypeValues(event);
-    if (location != null) {
-      loadContentFromLocation();
-    }
     String result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
     Message.Builder messageBuilder = Message.builder(event.getMessage()).value(result).nullAttributesValue();
     MediaType configuredMediaType = buildMediaType();
@@ -161,12 +142,10 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   }
 
   public void setOutputMimeType(String outputMimeType) {
-    //Need to save this to be evaluated with an event context present in case this is an expression.
-    configuredOutputMimeType = outputMimeType;
+    this.outputMimeType = parse(outputMimeType);
   }
 
   public void setOutputEncoding(String encoding) {
-    //Need to save this to be evaluated with an event context present in case this is an expression.
-    configuredOutputEncoding = encoding;
+    this.outputEncoding = forName(encoding);
   }
 }

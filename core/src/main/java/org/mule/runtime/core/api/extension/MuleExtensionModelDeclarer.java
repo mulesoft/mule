@@ -388,13 +388,13 @@ class MuleExtensionModelDeclarer {
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("outputEncoding")
         .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(SUPPORTED)
+        .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The encoding to be assigned to the result generated when parsing the template.");
 
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("outputMimeType")
         .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(SUPPORTED)
+        .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
   }
 
