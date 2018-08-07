@@ -45,6 +45,8 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
           ConnectionManager connectionManager =
               new CompositeConnectionManager(new DelegateConnectionManagerAdapter(muleContext), parentConnectionManager);
           registerConnectionManager(muleContext, connectionManager);
+        } else {
+          registerDefaultConnectionManager(muleContext);
         }
       }
     });
