@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createCompositeErrorTypeRepository;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -385,9 +386,10 @@ public class ArtifactContextBuilder {
         List<ConfigurationBuilder> builders = new LinkedList<>();
         builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
+        boolean hasEmptyParentDomain = isConfigLess(parentArtifact);
         if (extensionManagerFactory == null) {
           MuleContext parentMuleContext = getMuleContext(parentArtifact).orElse(null);
-          if (parentMuleContext == null) {
+          if (parentMuleContext == null || hasEmptyParentDomain) {
             extensionManagerFactory =
                 new ArtifactExtensionManagerFactory(artifactPlugins, extensionModelLoaderRepository,
                                                     new DefaultExtensionManagerFactory());
