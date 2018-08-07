@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -21,6 +22,10 @@ public class DefaultMethodInvoker implements MethodInvoker {
    */
   @Override
   public Object invoke(Object object, Method method, Object[] args) throws Throwable {
-    return method.invoke(object, args);
+    try {
+      return method.invoke(object, args);
+    } catch (InvocationTargetException e) {
+      throw e.getCause();
+    }
   }
 }
