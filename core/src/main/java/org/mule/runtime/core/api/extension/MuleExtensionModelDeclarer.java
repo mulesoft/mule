@@ -369,7 +369,7 @@ class MuleExtensionModelDeclarer {
     OperationDeclarer parseTemplate = extensionDeclarer.withOperation("parseTemplate")
         .describedAs("Parses a template defined inline.");
 
-    parseTemplate.withOutput().ofType(typeLoader.load(String.class));
+    parseTemplate.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
     parseTemplate.withOutputAttributes().ofType(typeLoader.load(void.class));
 
     parseTemplate.onDefaultParameterGroup()
@@ -388,13 +388,13 @@ class MuleExtensionModelDeclarer {
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("outputEncoding")
         .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(NOT_SUPPORTED)
+        .withExpressionSupport(SUPPORTED)
         .describedAs("The encoding to be assigned to the result generated when parsing the template.");
 
     parseTemplate.onDefaultParameterGroup()
         .withOptionalParameter("outputMimeType")
         .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(NOT_SUPPORTED)
+        .withExpressionSupport(SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
   }
 
