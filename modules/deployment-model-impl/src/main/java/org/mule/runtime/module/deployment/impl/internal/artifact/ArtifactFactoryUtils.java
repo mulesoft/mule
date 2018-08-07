@@ -98,4 +98,12 @@ public class ArtifactFactoryUtils {
   public static Optional<MuleContext> getMuleContext(DeployableArtifact artifact) {
     return artifact != null ? artifact.getRegistry().lookupByType(MuleContext.class) : empty();
   }
+
+  /**
+   * @param artifact a {@link DeployableArtifact}
+   * @return Whether the given {@code artifact} doesn't specify any config resources.
+   */
+  public static boolean isConfigLess(DeployableArtifact artifact) {
+    return artifact != null && artifact.getDescriptor().getConfigResources().isEmpty();
+  }
 }
