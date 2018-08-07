@@ -79,7 +79,7 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
 
   @Test
   public void lookupTransformersOnRegistries() {
-    List<Transformer> transformers = muleRegistryHelper.lookupTransformers(APPLE_DATA_TYPE ,DataType.STRING);
+    List<Transformer> transformers = muleRegistryHelper.lookupTransformers(APPLE_DATA_TYPE, DataType.STRING);
 
     Mockito.verify(registry, times(1)).lookupObjects(Transformer.class);
     assertEquals(1, transformers.size());
