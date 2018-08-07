@@ -32,7 +32,9 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Registers services instances into the {@link MuleRegistry} of a {@link MuleContext}.
@@ -50,8 +52,11 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   private static int cachedExprLanguageFactoryCounter = 0;
 
   private final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+
   private boolean mockHttpService;
   private boolean mockExpressionExecutor;
+
+  private Map<String, Object> additionalMockedServices = new HashMap<>();
 
   public TestServicesConfigurationBuilder() {
     this(true, true);
@@ -106,6 +111,8 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     if (mockHttpService) {
       registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
     }
+
+    registry.registerObjects(additionalMockedServices);
   }
 
   public void stopServices() throws MuleException {
@@ -115,6 +122,10 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     } finally {
       schedulerService.stop();
     }
+  }
+
+  public void registerAdditionalService(String name, Object service) {
+    this.additionalMockedServices.put(name, service);
   }
 
   @Override
