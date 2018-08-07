@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -19,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@SmallTest
 public class DefaultMethodInvokerTestCase extends AbstractMuleTestCase {
 
   private static final String MESSAGE = "someMessage";
