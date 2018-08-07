@@ -12,18 +12,14 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
@@ -70,36 +66,42 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
   }
 
-  @Test(expected = InitialisationException.class)
-  public void testParseTemplateNullLocation() throws InitialisationException {
+  @Test
+  public void parseTemplateNullLocation() throws InitialisationException {
     parseTemplateProcessor.setLocation(null);
+    expectedException.expect(InitialisationException.class);
+    expectedException.expectMessage("should be defined but they are both null");
     parseTemplateProcessor.initialise();
-    parseTemplateProcessor.process(event);
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void testParseTemplateInvalidLocation() throws InitialisationException {
-    parseTemplateProcessor.setLocation(INVALID_LOCATION);
-    addMockComponentLocation(parseTemplateProcessor);
-    parseTemplateProcessor.initialise();
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void testParseTemplateWithBothLocationAndContentDefined() throws InitialisationException {
-    parseTemplateProcessor.setLocation(LOCATION);
-    parseTemplateProcessor.setContent("SOME CONTENT");
-    addMockComponentLocation(parseTemplateProcessor);
-    parseTemplateProcessor.initialise();
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void testParseTemplateNullContent() throws InitialisationException {
-    parseTemplateProcessor.initialise();
-    parseTemplateProcessor.process(event);
   }
 
   @Test
-  public void testParseTemplateFromLocation() throws InitialisationException, IOException {
+  public void parseTemplateInvalidLocation() throws InitialisationException {
+    parseTemplateProcessor.setLocation(INVALID_LOCATION);
+    addMockComponentLocation(parseTemplateProcessor);
+    expectedException.expect(InitialisationException.class);
+    expectedException.expectMessage("not found");
+    parseTemplateProcessor.initialise();
+  }
+
+  @Test
+  public void parseTemplateWithBothLocationAndContentDefined() throws InitialisationException {
+    parseTemplateProcessor.setLocation(LOCATION);
+    parseTemplateProcessor.setContent("SOME CONTENT");
+    addMockComponentLocation(parseTemplateProcessor);
+    expectedException.expect(InitialisationException.class);
+    expectedException.expectMessage("both location and content at the same time");
+    parseTemplateProcessor.initialise();
+  }
+
+  @Test
+  public void parseTemplateNullContent() throws InitialisationException {
+    expectedException.expect(InitialisationException.class);
+    expectedException.expectMessage("should be defined but they are both null");
+    parseTemplateProcessor.initialise();
+  }
+
+  @Test
+  public void parseTemplateFromLocation() throws InitialisationException, IOException {
     parseTemplateProcessor.setLocation(LOCATION);
     parseTemplateProcessor.initialise();
     when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
@@ -161,12 +163,14 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   @Test
   public void unsupportedEncodingThrowsException() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("invalidEncoding");
     parseTemplateProcessor.setOutputEncoding("invalidEncoding");
   }
 
   @Test
   public void invalidMimeTypeStringThrowsException() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("MediaType cannot be parsed");
     parseTemplateProcessor.setOutputMimeType("primaryType-wrongDelimiter-subType");
   }
 
