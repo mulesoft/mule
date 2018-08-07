@@ -67,7 +67,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     parseTemplateProcessor = new ParseTemplateProcessor();
     parseTemplateProcessor.setMuleContext(mockMuleContext);
-    when(mockExpressionManager.isExpression(anyString())).thenReturn(false);
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
   }
 
@@ -178,11 +177,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
     parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
     parseTemplateProcessor.setOutputEncoding(customEncoding);
-    when(mockExpressionManager.isExpression(customMediaType.toRfcString())).thenReturn(true);
-    when(mockExpressionManager.isExpression(customEncoding)).thenReturn(true);
-    when(mockExpressionManager.evaluate(customMediaType.toRfcString(), STRING, NULL_BINDING_CONTEXT, event))
-        .thenReturn(of(customMediaType.toRfcString()));
-    when(mockExpressionManager.evaluate(customEncoding, STRING, NULL_BINDING_CONTEXT, event)).thenReturn(of(customEncoding));
     parseTemplateProcessor.initialise();
     String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
