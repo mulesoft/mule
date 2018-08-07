@@ -59,17 +59,10 @@ public class MuleContainerBootstrap {
   }
 
   private static void prepareBootstrapPhase(CommandLine commandLine) throws Exception {
-    boolean production = commandLine.hasOption("production");
     prepareBootstrapPhase();
   }
 
   private static void prepareBootstrapPhase() throws Exception {
-    File muleHome = lookupMuleHome();
-    File muleBase = lookupMuleBase();
-    if (muleBase == null) {
-      muleBase = muleHome;
-    }
-
     setSystemMuleVersion();
   }
 
