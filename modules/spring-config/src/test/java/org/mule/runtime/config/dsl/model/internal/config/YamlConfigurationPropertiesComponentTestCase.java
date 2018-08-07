@@ -76,4 +76,15 @@ public class YamlConfigurationPropertiesComponentTestCase {
     configurationComponent.initialise();
   }
 
+
+  @Description("YAML config files need spaces after key definition")
+  @Test
+  public void spacesRequired() throws InitialisationException {
+    configurationComponent = new DefaultConfigurationPropertiesProvider("spaces.yaml", externalResourceProvider);
+    expectedException
+        .expectMessage("YAML configuration properties must have space after ':' character. Offending line is: prop1:\"v1\" prop2:\"v2\"");
+    expectedException.expect(ConfigurationPropertiesException.class);
+    configurationComponent.initialise();
+
+  }
 }
