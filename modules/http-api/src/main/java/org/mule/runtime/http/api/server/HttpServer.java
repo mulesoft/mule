@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
 
 import java.io.IOException;
@@ -62,6 +63,19 @@ public interface HttpServer {
    * @return true if the server is stopped, false otherwise.
    */
   boolean isStopped();
+
+  /**
+   * Enable TLS dynamically on this server using the supplied TLS context factory
+   *
+   * @param tlsContextFactory The TLS context factory to be used when dynamically enabled TLS at this server
+   */
+  void enableTls(TlsContextFactory tlsContextFactory);
+
+  /**
+   * Disable TLS dynamically. It should work for when the TLS was dynamically enabled or even when the TLS
+   * was statically configured in the listener configuration section of the application.
+   */
+  void disableTls();
 
   /**
    * Adds a {@link RequestHandler} on the given path and for the given methods.
