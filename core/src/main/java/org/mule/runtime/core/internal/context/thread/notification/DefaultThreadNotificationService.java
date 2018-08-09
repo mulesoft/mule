@@ -34,7 +34,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class DefaultThreadNotificationService implements ThreadNotificationService, Lifecycle {
 
   private static final int DEFAULT_INTERVAL = 5;
-  private static final String newLine = System.getProperty("line.separator").toString();
+  private static final String newLine = System.getProperty("line.separator");
   private ThreadsStatistics stats = new ThreadsStatistics();
   private int interval;
 
@@ -48,7 +48,6 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   }
 
   public DefaultThreadNotificationService(int interval) {
-    REPORT_LOGGER.error("Holis");
     this.interval = interval;
   }
 
@@ -93,12 +92,11 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   }
 
   private void logStats() {
-    REPORT_LOGGER.error("LOGGING IN THE SUNSHINE " + stats.getPossibleTransitions().size());
     for (Pair<String, String> transition : stats.getPossibleTransitions()) {
       // We set this to warn logging level because the entire pipeline is already created, so even if the
       // logging level changes, the pipeline should be defined using a system property (the ThreadNotificationLogger
       // needs to know whether to add logging phases or not).
-      REPORT_LOGGER.error(getNotificationFor(transition));
+      REPORT_LOGGER.warn(getNotificationFor(transition));
     }
   }
 
@@ -123,9 +121,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
 
   @Override
   public void start() throws MuleException {
-    REPORT_LOGGER.error("SARLANGA ? ", schedulerService != null);
-    if (THREAD_LOGGING && scheduler != null) {
-      REPORT_LOGGER.error("HEEEEELLOOOOOO");
+    if (THREAD_LOGGING && schedulerService != null) {
       scheduler = schedulerService.cpuLightScheduler();
       scheduler.scheduleAtFixedRate(() -> logStats(), interval, interval, SECONDS);
     }
