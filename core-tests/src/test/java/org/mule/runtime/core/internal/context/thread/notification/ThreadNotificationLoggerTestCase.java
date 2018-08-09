@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.junit.Before;
