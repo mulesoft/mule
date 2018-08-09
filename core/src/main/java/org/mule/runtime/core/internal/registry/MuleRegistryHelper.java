@@ -217,11 +217,27 @@ public class MuleRegistryHelper implements MuleRegistry {
       readLock.unlock();
     }
 
+    if (results.isEmpty()) {
+      results = lookupTransformersOnRegistries(source, result);
+    }
+
     List<Transformer> concurrentlyAddedTransformers = transformerListCache.putIfAbsent(dataTypePairHash, results);
     if (concurrentlyAddedTransformers != null) {
       return concurrentlyAddedTransformers;
     }
 
+    return results;
+  }
+
+  private List<Transformer> lookupTransformersOnRegistries(DataType source, DataType result) {
+    List<Transformer> results = new ArrayList<>(2);
+
+    Collection<Transformer> transformers = lookupObjects(Transformer.class);
+    for (Transformer transformer : transformers) {
+      if (result.isCompatibleWith(transformer.getReturnDataType()) && transformer.isSourceDataTypeSupported(source)) {
+        results.add(transformer);
+      }
+    }
     return results;
   }
 

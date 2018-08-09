@@ -19,8 +19,11 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -31,15 +34,20 @@ import org.mockito.Mockito;
 public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTestCase {
 
   private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
+  private static final DataType APPLE_DATA_TYPE = DataType.fromType(Apple.class);
 
   private final Registry registry = mock(Registry.class);
   private final MuleContext muleContext = mock(MuleContext.class);
   private final MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
   private final Converter stringToOrange = new MockConverterBuilder().from(DataType.STRING).to(ORANGE_DATA_TYPE).build();
   private final Converter orangeToString = new MockConverterBuilder().from(ORANGE_DATA_TYPE).to(DataType.STRING).build();
+  private final Converter appleToString = new MockConverterBuilder().from(APPLE_DATA_TYPE).to(DataType.STRING).build();
 
   @Before
   public void setUp() throws Exception {
+    Collection transformers = Collections.singletonList(appleToString);
+    when(registry.lookupObjects(Transformer.class)).thenReturn(transformers);
+
     TransformerResolver transformerResolver = mock(TransformerResolver.class);
     when(transformerResolver.resolve(DataType.STRING, ORANGE_DATA_TYPE)).thenReturn(stringToOrange);
     when(transformerResolver.resolve(ORANGE_DATA_TYPE, DataType.STRING)).thenReturn(orangeToString);
@@ -67,5 +75,15 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
     Mockito.verify(registry, times(0)).lookupObjects(Transformer.class);
     assertEquals(1, transformers.size());
     assertEquals(stringToOrange, transformers.get(0));
+  }
+
+  @Test
+  public void lookupTransformersOnRegistries() {
+    List<Transformer> transformers = muleRegistryHelper.lookupTransformers(APPLE_DATA_TYPE, DataType.STRING);
+
+    Mockito.verify(registry, times(1)).lookupObjects(Transformer.class);
+    assertEquals(1, transformers.size());
+    assertEquals(appleToString, transformers.get(0));
+
   }
 }
