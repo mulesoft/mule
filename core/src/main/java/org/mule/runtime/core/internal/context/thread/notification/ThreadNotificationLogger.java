@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.internal.context.thread.notification;
 
+import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
+
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 
 public class ThreadNotificationLogger {
 

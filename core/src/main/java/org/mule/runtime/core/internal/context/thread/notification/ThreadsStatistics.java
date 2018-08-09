@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.internal.context.thread.notification;
 
-import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService.ThreadNotificationElement;
+import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.ThreadNotificationElement;
+
 import org.apache.commons.math3.stat.StatUtils;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.Pair;

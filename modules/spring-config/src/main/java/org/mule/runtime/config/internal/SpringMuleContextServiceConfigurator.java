@@ -112,7 +112,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultNotificationDi
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
 import org.mule.runtime.core.internal.context.thread.notification.DefaultThreadNotificationService;
-import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService;
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.event.DefaultEventContextService;
 import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;

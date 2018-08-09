@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.rule.SystemProperty;

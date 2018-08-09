@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.context.thread.notification;
 
-import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService.ThreadNotificationElement;
+import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.ThreadNotificationElement;
+
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 
 /**
  * Implementation of {@link ThreadNotificationElement}

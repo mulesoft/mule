@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.context.thread.notification;
+package org.mule.runtime.core.api.context.thread.notification;
 
 import org.slf4j.Logger;
 

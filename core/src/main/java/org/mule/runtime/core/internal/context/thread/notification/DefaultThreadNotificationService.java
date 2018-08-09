@@ -12,18 +12,16 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
-import org.slf4j.Logger;
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Implementation for {@link ThreadNotificationService}. It collects {@link ThreadNotificationElement}' and
