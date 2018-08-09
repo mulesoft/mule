@@ -119,9 +119,24 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
   @Test
   public void failToStart() throws Exception {
-    MuleException e = new DefaultMuleException(new Exception());
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
     expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
+    expectedException.expectCause(is(connectionException));
+
+    messageSource.initialise();
+    messageSource.start();
+  }
+
+  @Test
+  public void failToStartAndStopFails() throws Exception {
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    MuleException e = new DefaultMuleException(connectionException);
+    doThrow(e).when(source).onStart(any());
+    doThrow(new NullPointerException()).when(source).onStop();
+    expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
+    expectedException.expectCause(is(connectionException));
 
     messageSource.initialise();
     messageSource.start();
