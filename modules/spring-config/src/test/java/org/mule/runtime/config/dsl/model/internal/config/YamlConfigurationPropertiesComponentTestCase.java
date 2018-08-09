@@ -96,5 +96,5 @@ public class YamlConfigurationPropertiesComponentTestCase {
     configurationComponent.initialise();
 
   }
-  
+
 }
