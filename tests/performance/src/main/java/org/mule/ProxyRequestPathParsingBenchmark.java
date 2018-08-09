@@ -190,11 +190,11 @@ public class ProxyRequestPathParsingBenchmark extends AbstractBenchmark {
     byte[] requestPathBytes = requestPath.getBytes();
     int listenerPathIndex = 0;
     int requestPathIndex = 0;
-    while (listenerPathBytes[listenerPathIndex] != '*') {
+    while (listenerPathIndex < listenerPathBytes.length - 1) {
       listenerPathIndex = iterateUriParameter(listenerPathBytes, listenerPathIndex);
       requestPathIndex = iterateUriParameter(requestPathBytes, requestPathIndex);
     }
-    return new String(copyOfRange(requestPathBytes, requestPathIndex - 1, requestPathBytes.length));
+    return requestPath.substring(requestPathIndex - 1);
   }
 
   private int iterateUriParameter(byte[] bytes, int position) {
