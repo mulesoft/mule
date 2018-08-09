@@ -31,6 +31,7 @@ import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPro
 import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.parser.ParserException;
 
 /**
  * Artifact attributes configuration. This class represents a single configuration-attributes element from the configuration.
@@ -121,9 +122,14 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
     } else {
       Yaml yaml = new Yaml();
       Iterable<Object> yamlObjects = yaml.loadAll(is);
-      yamlObjects.forEach(yamlObject -> {
-        createAttributesFromYamlObject(null, null, yamlObject);
-      });
+      try {
+        yamlObjects.forEach(yamlObject -> {
+          createAttributesFromYamlObject(null, null, yamlObject);
+        });
+      } catch (ParserException e) {
+        throw new ConfigurationPropertiesException(createStaticMessage("Error while parsing YAML configuration file. Check that all quotes are correctly closed."),
+                                                   this, e);
+      }
     }
   }
 
