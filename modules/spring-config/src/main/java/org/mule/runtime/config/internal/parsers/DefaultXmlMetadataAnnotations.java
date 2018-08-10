@@ -6,16 +6,22 @@
  */
 package org.mule.runtime.config.internal.parsers;
 
+import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 /**
  * Stores the metadata annotations from the XML parser so they are available when building the actual objects of the application.
  */
 public class DefaultXmlMetadataAnnotations implements XmlMetadataAnnotations {
 
+  /**
+   * compact whitespaces and line breaks
+   */
+  private static final Pattern COMPACT_PATTERN = compile(">\\s+<+");
   public static final String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
 
   private StringBuilder xmlContent = new StringBuilder();
@@ -64,9 +70,7 @@ public class DefaultXmlMetadataAnnotations implements XmlMetadataAnnotations {
    */
   @Override
   public String getElementString() {
-    return xmlContent.toString()
-        .replaceAll(">\\s+<+", ">" + LINE_SEPARATOR + "<") /* compact whitespaces and line breaks */
-        .trim();
+    return COMPACT_PATTERN.matcher(xmlContent.toString().trim()).replaceAll(">" + LINE_SEPARATOR + "<");
   }
 
   /**
