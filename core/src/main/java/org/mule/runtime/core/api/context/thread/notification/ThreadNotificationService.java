@@ -24,7 +24,7 @@ public interface ThreadNotificationService {
   String REGISTRY_KEY = "_muleThreadNotificationService";
   boolean THREAD_LOGGING = Boolean.getBoolean(MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT);
   // Set system property to -1 to avoid logging, but gather statistics
-  int DEFAULT_LOGGING_INTERVAL = Integer.getInteger(MULE_DEFAULT_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, 5);
+  int DEFAULT_LOGGING_INTERVAL = Integer.getInteger(MULE_DEFAULT_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, -1);
   Logger REPORT_LOGGER = getLogger(ThreadNotificationService.class);
 
   /**
