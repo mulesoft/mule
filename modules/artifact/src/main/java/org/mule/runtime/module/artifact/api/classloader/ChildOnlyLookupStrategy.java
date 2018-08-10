@@ -12,8 +12,8 @@ import static java.util.Collections.singletonList;
 import java.util.List;
 
 /**
- * Defines a {@link LookupStrategy} that given a classloader, will search on that classloader without
- * searching on the parent classloader.
+ * Defines a {@link LookupStrategy} that given a classloader, will search on that classloader without searching on the parent
+ * classloader.
  */
 public class ChildOnlyLookupStrategy implements LookupStrategy {
 

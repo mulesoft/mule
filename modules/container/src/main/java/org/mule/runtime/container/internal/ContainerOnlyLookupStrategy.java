@@ -7,15 +7,17 @@
 
 package org.mule.runtime.container.internal;
 
-import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import static org.mule.runtime.module.artifact.internal.util.ClassLoaderUtil.getPlatformClassLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+
 /**
- * Defines a {@link LookupStrategy} that will search on the container's classloader only, without searching
- * on the given classloader.
+ * Defines a {@link LookupStrategy} that will search on the container's classloader only, without searching on the given
+ * classloader.
  */
 public class ContainerOnlyLookupStrategy implements LookupStrategy {
 
@@ -28,8 +30,9 @@ public class ContainerOnlyLookupStrategy implements LookupStrategy {
    */
   public ContainerOnlyLookupStrategy(ClassLoader containerClassLoader) {
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-
-    classLoaders = singletonList(containerClassLoader);
+    classLoaders = new ArrayList<>();
+    classLoaders.add(containerClassLoader);
+    getPlatformClassLoader().map(classLoaders::add);
   }
 
   @Override

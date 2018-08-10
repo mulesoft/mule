@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.module.artifact.internal.util.ClassLoaderUtil.getPlatformClassLoader;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ public class ParentOnlyLookupStrategy implements LookupStrategy {
   @Override
   public List<ClassLoader> getClassLoaders(ClassLoader classLoader) {
     List<ClassLoader> classLoaders = new ArrayList<>(1);
+    getPlatformClassLoader().map(classLoaders::add);
     if (classLoader.getParent() != null) {
       classLoaders.add(classLoader.getParent());
     }
