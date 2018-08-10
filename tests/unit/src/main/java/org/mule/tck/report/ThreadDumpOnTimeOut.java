@@ -17,9 +17,7 @@ import org.slf4j.Logger;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Rule that generates a heap dump on failure.
- * <p>
- * Useful for troubleshooting failures in memory leak prevention tests.
+ * Rule that generates a thread dump on failure.
  *
  * @since 4.1
  */
@@ -33,7 +31,9 @@ public class ThreadDumpOnTimeOut extends TestWatcher {
 
     if (e instanceof TestTimedOutException || e instanceof TimeoutException) {
       LOGGER.error("test timed out. Maybe due to a deadlock?");
-      logThreadDump();
+      if (LOGGER.isTraceEnabled()) {
+        logThreadDump();
+      }
     }
   }
 }
