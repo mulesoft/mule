@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
-import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
-
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.util.List;
@@ -29,6 +29,7 @@ public final class CompositeClassNotFoundException extends ClassNotFoundExceptio
   private final String className;
   private final LookupStrategy lookupStrategy;
   private final List<ClassNotFoundException> exceptions;
+  private final LazyValue<String> message;
 
   /**
    * Builds the exception.
@@ -39,12 +40,14 @@ public final class CompositeClassNotFoundException extends ClassNotFoundExceptio
    */
   public CompositeClassNotFoundException(String className, LookupStrategy lookupStrategy,
                                          List<ClassNotFoundException> exceptions) {
-    super(format("Cannot load class '%s': %s", className,
-                 exceptions.stream().map((e) -> lineSeparator() + "\t" + e.getMessage()).collect(toList())),
-          exceptions.get(0));
+    super(null, exceptions.get(0));
+    message = new LazyValue<>(() -> format("Cannot load class '%s': %s", className,
+                                           exceptions.stream()
+                                               .map((e) -> lineSeparator() + "\t" + e.getMessage())
+                                               .collect(toList())));
     this.className = className;
     this.lookupStrategy = lookupStrategy;
-    this.exceptions = copyOf(exceptions);
+    this.exceptions = unmodifiableList(exceptions);
   }
 
   /**
@@ -66,6 +69,11 @@ public final class CompositeClassNotFoundException extends ClassNotFoundExceptio
    */
   public List<ClassNotFoundException> getExceptions() {
     return exceptions;
+  }
+
+  @Override
+  public String getMessage() {
+    return message.get();
   }
 
   @Override
