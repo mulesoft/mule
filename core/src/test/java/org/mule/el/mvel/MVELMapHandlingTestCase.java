@@ -85,6 +85,17 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase
         runExpressionAndExpect(String.format("#[payload['%s']]", key), expectedValue, event);
         runExpressionAndExpect(String.format("#[payload.'%s']", key), expectedValue, event);
     }
+    
+    @Test
+    public void map() throws Exception
+    {
+        Map<String, String> payload = new HashMap<String, String>();
+        MuleEvent event = getTestEvent(payload);
+        Map result = (Map) el.evaluate("#[{\"a\" : {\"b\" : \"c\"}, \"d\" : [\"e\"]}]", event);
+        Map result2 = (Map) el.evaluate("#[{\"d\" : [\"e\"], \"a\" : {\"b\" : \"c\"}}]", event);
+        assertThat((String) result.get("d"), equalTo("e"));
+        assertThat((String) result2.get("d"), equalTo("e"));
+    }
 
     private void runExpressionAndExpect(String expression, Object expectedValue, MuleEvent event)
     {
