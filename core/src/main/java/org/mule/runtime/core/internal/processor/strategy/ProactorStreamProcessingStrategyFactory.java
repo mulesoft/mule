@@ -203,7 +203,8 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
             .flatMap(e -> Mono.subscriberContext()
                 .flatMap(ctx -> Mono.just(e).transform(processor)
                     .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
-                        .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler), e)))));
+                        .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
+                                                                                               e.getContext().getId())))));
       } else {
         return just(event)
             .transform(processor)

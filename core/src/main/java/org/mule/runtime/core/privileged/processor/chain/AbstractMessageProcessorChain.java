@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.createFrom;
+import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -236,11 +237,17 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
-      interceptors.add((processor, next) -> stream -> from(stream)
-          .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
-          .doOnNext(event -> threadNotificationLogger.setStartingThread(event, true))
-          .transform(processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
-          .doOnNext(event -> threadNotificationLogger.setFinishThread(event)));
+      if (THREAD_LOGGING) {
+        interceptors.add((processor, next) -> stream -> from(stream)
+            .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
+            .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId(), true))
+            .transform(processingStrategy
+                .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
+            .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId())));
+      } else {
+        interceptors.add((processor, next) -> processingStrategy
+            .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)));
+      }
     }
 
     // Apply processor interceptors around processor and other core logic

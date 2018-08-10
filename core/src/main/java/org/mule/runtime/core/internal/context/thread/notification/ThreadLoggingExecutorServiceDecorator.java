@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.context.thread.notification;
 
-import org.mule.runtime.core.api.event.CoreEvent;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -28,13 +26,13 @@ public class ThreadLoggingExecutorServiceDecorator implements ExecutorService {
 
   private ExecutorService delegate;
   private Optional<ThreadNotificationLogger> threadNotificationLogger;
-  private CoreEvent event;
+  private String eventId;
 
   public ThreadLoggingExecutorServiceDecorator(Optional<ThreadNotificationLogger> logger, ExecutorService delegate,
-                                               CoreEvent event) {
+                                               String eventId) {
     this.delegate = delegate;
     this.threadNotificationLogger = logger;
-    this.event = event;
+    this.eventId = eventId;
   }
 
   @Override
@@ -64,51 +62,51 @@ public class ThreadLoggingExecutorServiceDecorator implements ExecutorService {
 
   @Override
   public <T> Future<T> submit(Callable<T> task) {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     return delegate.submit(task);
   }
 
   @Override
   public <T> Future<T> submit(Runnable task, T result) {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     return delegate.submit(task, result);
   }
 
   @Override
   public Future<?> submit(Runnable task) {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     return delegate.submit(task);
   }
 
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     return delegate.invokeAll(tasks);
   }
 
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     return delegate.invokeAll(tasks, timeout, unit);
   }
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     return delegate.invokeAny(tasks);
   }
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     return delegate.invokeAny(tasks, timeout, unit);
   }
 
   @Override
   public void execute(Runnable command) {
-    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(event));
+    threadNotificationLogger.ifPresent(logger -> logger.setStartingThread(eventId));
     delegate.execute(command);
   }
 }

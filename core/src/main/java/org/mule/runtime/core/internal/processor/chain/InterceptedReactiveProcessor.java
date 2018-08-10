@@ -39,9 +39,9 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
     return from(eventPublisher)
-        .doOnNext(event -> threadNotificationLogger.setFinishThread(event))
+        .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId()))
         .transform(publisher -> next.apply(publisher))
-        .doOnNext(event -> threadNotificationLogger.setStartingThread(event));
+        .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId()));
   }
 
   @Override

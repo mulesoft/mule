@@ -59,8 +59,8 @@ public class ThreadNotificationLoggerTestCase {
   private ThreadNotificationService service = mock(ThreadNotificationService.class);
   private CoreEvent event = mock(CoreEvent.class);
   private EventContext context = mock(EventContext.class);
-  private Scheduler scheduler = new TestScheduler(2, "test", IO);
-  private Scheduler scheduler2 = new TestScheduler(2, "test", CPU_LIGHT);
+  private Scheduler ioScheduler = new TestScheduler(2, "test", IO);
+  private Scheduler cpuLightScheduler = new TestScheduler(2, "test", CPU_LIGHT);
 
   @Before
   public void setup() {
@@ -73,9 +73,9 @@ public class ThreadNotificationLoggerTestCase {
   public void withoutThreadSwitch() {
     Reference<Boolean> checked = new Reference<>(false);
     just(event)
-        .doOnNext(coreEvent -> logger.setStartingThread(event))
+        .doOnNext(coreEvent -> logger.setStartingThread(event.getContext().getId()))
         .map(coreEvent -> coreEvent)
-        .doOnNext(coreEvent -> logger.setFinishThread(event))
+        .doOnNext(coreEvent -> logger.setFinishThread(event.getContext().getId()))
         .doOnNext(coreEvent -> {
           verify(service, never()).addThreadNotificationElement(any());
           checked.set(true);
@@ -86,7 +86,7 @@ public class ThreadNotificationLoggerTestCase {
 
   @Test
   public void withPublishOnThreadSwitch() {
-    reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(scheduler);
+    reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(ioScheduler);
 
     List<ThreadNotificationService.ThreadNotificationElement> notifications = new ArrayList<>();
     doAnswer(invocationOnMock -> {
@@ -95,10 +95,10 @@ public class ThreadNotificationLoggerTestCase {
     }).when(service).addThreadNotificationElement(any());
 
     just(event)
-        .doOnNext(coreEvent -> logger.setStartingThread(event))
+        .doOnNext(coreEvent -> logger.setStartingThread(event.getContext().getId()))
         .publishOn(publishOnScheduler)
         .map(coreEvent -> coreEvent)
-        .doOnNext(coreEvent -> logger.setFinishThread(event))
+        .doOnNext(coreEvent -> logger.setFinishThread(event.getContext().getId()))
         .subscribe();
 
     new PollingProber().check(new JUnitLambdaProbe(() -> {
@@ -113,7 +113,7 @@ public class ThreadNotificationLoggerTestCase {
   @Test
   public void withSubscribeOnThreadSwitch() {
     reactor.core.scheduler.Scheduler subscribeOnScheduler =
-        fromExecutorService(new ThreadLoggingExecutorServiceDecorator(of(logger), scheduler2, event));
+        fromExecutorService(new ThreadLoggingExecutorServiceDecorator(of(logger), cpuLightScheduler, event.getContext().getId()));
 
     List<ThreadNotificationService.ThreadNotificationElement> notifications = new ArrayList<>();
     doAnswer(invocationOnMock -> {
@@ -123,7 +123,7 @@ public class ThreadNotificationLoggerTestCase {
 
     just(event)
         .flatMap(coreEvent -> Mono.just(coreEvent).map(e -> e).subscribeOn(subscribeOnScheduler))
-        .doOnNext(e -> logger.setFinishThread(e))
+        .doOnNext(e -> logger.setFinishThread(e.getContext().getId()))
         .subscribe();
 
     new PollingProber().check(new JUnitLambdaProbe(() -> {

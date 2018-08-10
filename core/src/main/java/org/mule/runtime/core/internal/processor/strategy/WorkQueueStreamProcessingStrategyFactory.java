@@ -82,7 +82,8 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
           return publisher -> from(publisher).flatMap(event -> Mono.subscriberContext()
               .flatMap(ctx -> Mono.just(event).transform(pipeline)
                   .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
-                      .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(blockingScheduler), event)))));
+                      .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(blockingScheduler),
+                                                                                             event.getContext().getId())))));
         } else {
           return publisher -> from(publisher)
               .flatMap(event -> just(event).transform(pipeline)

@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.context.thread.notification;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationS
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -29,12 +30,12 @@ import static org.apache.commons.lang3.StringUtils.leftPad;
  *
  * @since 4.2
  */
-public class DefaultThreadNotificationService implements ThreadNotificationService, Lifecycle {
+public class DefaultThreadNotificationService implements ThreadNotificationService, Startable, Stoppable {
 
-  private static final int DEFAULT_INTERVAL = 5;
   private static final String newLine = System.getProperty("line.separator");
   private ThreadsStatistics stats = new ThreadsStatistics();
   private int interval;
+  private ScheduledFuture fixedRate;
 
   @Inject
   private SchedulerService schedulerService;
@@ -42,7 +43,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   private Scheduler scheduler;
 
   public DefaultThreadNotificationService() {
-    this(DEFAULT_INTERVAL);
+    this(DEFAULT_LOGGING_INTERVAL);
   }
 
   public DefaultThreadNotificationService(int interval) {
@@ -108,26 +109,17 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   }
 
   @Override
-  public void dispose() {
-
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-
-  }
-
-  @Override
   public void start() throws MuleException {
-    if (THREAD_LOGGING && schedulerService != null) {
+    if (THREAD_LOGGING && interval > 0 && schedulerService != null) {
       scheduler = schedulerService.cpuLightScheduler();
-      scheduler.scheduleAtFixedRate(() -> logStats(), interval, interval, SECONDS);
+      fixedRate = scheduler.scheduleAtFixedRate(() -> logStats(), interval, interval, SECONDS);
     }
   }
 
   @Override
   public void stop() throws MuleException {
-    if (scheduler != null) {
+    if (fixedRate != null) {
+      fixedRate.cancel(true);
       scheduler.stop();
     }
   }

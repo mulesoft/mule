@@ -31,24 +31,24 @@ public class ThreadNotificationLogger {
     return THREAD_LOGGING;
   }
 
-  public void setStartingThread(CoreEvent event) {
-    setStartingThread(event, false);
+  public void setStartingThread(String eventId) {
+    setStartingThread(eventId, false);
   }
 
-  public void setStartingThread(CoreEvent event, boolean avoidIfSetted) {
+  public void setStartingThread(String eventId, boolean avoidIfSet) {
     if (!isEnabled()) {
       return;
     }
-    if (avoidIfSetted && threadNotificationBuilders.containsKey(event.getContext().getId())) {
+    if (avoidIfSet && threadNotificationBuilders.containsKey(eventId)) {
       return;
     }
     sameThread.set(true);
     DefaultThreadNotificationElement.Builder builder = new DefaultThreadNotificationElement.Builder();
     builder.fromThread(Thread.currentThread());
-    threadNotificationBuilders.put(event.getContext().getId(), builder);
+    threadNotificationBuilders.put(eventId, builder);
   }
 
-  public void setFinishThread(CoreEvent event) {
+  public void setFinishThread(String eventId) {
     if (!isEnabled()) {
       return;
     }
@@ -56,7 +56,7 @@ public class ThreadNotificationLogger {
       sameThread.set(false);
       return;
     }
-    DefaultThreadNotificationElement.Builder builder = threadNotificationBuilders.remove(event.getContext().getId());
+    DefaultThreadNotificationElement.Builder builder = threadNotificationBuilders.remove(eventId);
     builder.toThread(Thread.currentThread());
     threadNotificationService.addThreadNotificationElement(builder.build());
   }
