@@ -1003,7 +1003,8 @@
                   }
                 ]
               },
-              "parameterName": "Web Service Configuration"
+              "parameterName": "Web Service Configuration",
+              "categoryName": "SoapInvoke"
             }
           },
           "kind": "operation"

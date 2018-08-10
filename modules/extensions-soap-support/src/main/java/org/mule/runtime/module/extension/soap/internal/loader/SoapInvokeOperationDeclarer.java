@@ -81,6 +81,7 @@ public class SoapInvokeOperationDeclarer {
   public static final String TRANSPORT_HEADERS_PARAM = "transportHeaders";
 
   private static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
+  public static final String SOAP_INVOKE_METADATA_CATEGORY = "SoapInvoke";
 
   /**
    * Declares the invoke operation.
@@ -117,7 +118,8 @@ public class SoapInvokeOperationDeclarer {
                                                                                 InvokeOutputTypeResolver::new,
                                                                                 NullMetadataResolver::new);
     operation.withModelProperty(new MetadataResolverFactoryModelProperty(() -> factory));
-    operation.withModelProperty(new MetadataKeyIdModelProperty(loader.load(WebServiceTypeKey.class), KEYS_GROUP));
+    operation.withModelProperty(new MetadataKeyIdModelProperty(loader.load(WebServiceTypeKey.class), KEYS_GROUP,
+                                                               SOAP_INVOKE_METADATA_CATEGORY));
   }
 
   private void declareOutput(OperationDeclarer operation, ClassTypeLoader loader) {

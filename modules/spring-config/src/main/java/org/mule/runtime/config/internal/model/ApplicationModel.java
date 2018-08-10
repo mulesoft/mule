@@ -1040,29 +1040,28 @@ public class ApplicationModel {
   private void validateSingleElementExistence(ComponentIdentifier componentIdentifier) {
     Map<String, Map<ComponentIdentifier, ComponentModel>> existingComponentsPerFile = new HashMap<>();
 
-    executeOnEveryMuleComponentTree(componentModel -> {
-      String configFileName = componentModel.getConfigFileName().get();
-      ComponentIdentifier identifier = componentModel.getIdentifier();
+    executeOnEveryMuleComponentTree(componentModel -> componentModel
+        .getConfigFileName().ifPresent(configFileName -> {
+          ComponentIdentifier identifier = componentModel.getIdentifier();
 
-      if (componentIdentifier.getNamespace().equals(identifier.getNamespace())
-          && componentIdentifier.getName().equals(identifier.getName())) {
+          if (componentIdentifier.getNamespace().equals(identifier.getNamespace())
+              && componentIdentifier.getName().equals(identifier.getName())) {
 
-        if (existingComponentsPerFile.containsKey(configFileName)
-            && existingComponentsPerFile.get(configFileName).containsKey(identifier)) {
-          throw new MuleRuntimeException(createStaticMessage(
-                                                             "Two configuration elements %s have been defined. Element [%s] must be unique. Clashing components are %s and %s",
-                                                             identifier.getNamespace() + ":" + identifier.getName(),
-                                                             identifier.getNamespace() + ":" + identifier.getName(),
-                                                             componentModel.getNameAttribute(),
-                                                             existingComponentsPerFile.get(configFileName).get(identifier)
-                                                                 .getNameAttribute()));
-        }
-        Map<ComponentIdentifier, ComponentModel> existingComponentWithName = new HashMap<>();
-        existingComponentWithName.put(identifier, componentModel);
-        existingComponentsPerFile.put(configFileName, existingComponentWithName);
-      }
-
-    });
+            if (existingComponentsPerFile.containsKey(configFileName)
+                && existingComponentsPerFile.get(configFileName).containsKey(identifier)) {
+              throw new MuleRuntimeException(createStaticMessage(
+                                                                 "Two configuration elements %s have been defined. Element [%s] must be unique. Clashing components are %s and %s",
+                                                                 identifier.getNamespace() + ":" + identifier.getName(),
+                                                                 identifier.getNamespace() + ":" + identifier.getName(),
+                                                                 componentModel.getNameAttribute(),
+                                                                 existingComponentsPerFile.get(configFileName).get(identifier)
+                                                                     .getNameAttribute()));
+            }
+            Map<ComponentIdentifier, ComponentModel> existingComponentWithName = new HashMap<>();
+            existingComponentWithName.put(identifier, componentModel);
+            existingComponentsPerFile.put(configFileName, existingComponentWithName);
+          }
+        }));
   }
 
   /**
