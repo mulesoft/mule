@@ -9,7 +9,12 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.registry.CompositeMuleRegistryHelper;
+import org.mule.runtime.core.internal.registry.DefaultRegistryBroker;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 
 import java.util.Map;
 
@@ -20,11 +25,14 @@ public class ApplicationMuleContextBuilder extends SupportsPropertiesMuleContext
 
   private final String appName;
   private final String defaultEncoding;
+  private final MuleContext parentContext;
 
-  public ApplicationMuleContextBuilder(String appName, Map<String, String> appProperties, String defaultEncoding) {
+  public ApplicationMuleContextBuilder(String appName, Map<String, String> appProperties, String defaultEncoding,
+                                       MuleContext parentContext) {
     super(APP, appProperties);
     this.appName = appName;
     this.defaultEncoding = defaultEncoding;
+    this.parentContext = parentContext;
   }
 
   @Override
@@ -37,5 +45,17 @@ public class ApplicationMuleContextBuilder extends SupportsPropertiesMuleContext
       configuration.setDefaultEncoding(encoding);
     }
     return configuration;
+  }
+
+  @Override
+  protected MuleRegistryHelper getMuleRegistry(DefaultMuleContext muleContext) {
+    if (parentContext != null && ((DefaultMuleContext) parentContext).getRegistry() instanceof MuleRegistryHelper) {
+      DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext, muleContext.getLifecycleInterceptor());
+      muleContext.setRegistryBroker(registryBroker);
+
+      return new CompositeMuleRegistryHelper(registryBroker, muleContext, ((DefaultMuleContext) parentContext).getRegistry());
+    } else {
+      return super.getMuleRegistry(muleContext);
+    }
   }
 }

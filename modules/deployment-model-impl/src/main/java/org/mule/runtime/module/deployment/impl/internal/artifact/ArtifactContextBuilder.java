@@ -447,7 +447,13 @@ public class ArtifactContextBuilder {
           muleContextFactory.addListener(muleContextListener);
         }
         if (APP.equals(artifactType)) {
-          muleContextBuilder = new ApplicationMuleContextBuilder(artifactName, artifactProperties, defaultEncoding);
+          MuleContext parentContext = null;
+          if (parentArtifact != null) {
+            parentContext = parentArtifact.getRegistry().lookupByType(MuleContext.class).get();
+          }
+
+          muleContextBuilder =
+              new ApplicationMuleContextBuilder(artifactName, artifactProperties, defaultEncoding, parentContext);
         } else if (POLICY.equals(artifactType)) {
           muleContextBuilder = new PolicyMuleContextBuilder(artifactName, artifactProperties, defaultEncoding);
         } else {
