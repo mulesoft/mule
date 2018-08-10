@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 public final class AttributeEvaluator {
 
   private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
+  private static final Pattern SANITIZE_PATTERN = compile("\r|\t");
   private static final Set<Class<?>> BLACK_LIST_TYPES =
       new HashSet<>(asList(Object.class, InputStream.class, Iterator.class, Serializable.class));
 
@@ -95,7 +96,7 @@ public final class AttributeEvaluator {
 
   private String sanitize(String attributeValue) {
     if (attributeValue != null) {
-      attributeValue = attributeValue.trim().replaceAll("\r", "").replaceAll("\t", "");
+      attributeValue = SANITIZE_PATTERN.matcher(attributeValue.trim()).replaceAll("");
     }
 
     return attributeValue;

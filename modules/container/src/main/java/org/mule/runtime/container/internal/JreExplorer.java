@@ -9,6 +9,7 @@ package org.mule.runtime.container.internal;
 
 import static java.io.File.pathSeparatorChar;
 import static java.lang.String.format;
+import static java.util.regex.Pattern.compile;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -29,6 +31,7 @@ import java.util.zip.ZipFile;
 public final class JreExplorer {
 
   private static final String META_INF_SERVICES_PATH = "META-INF/services/";
+  private static final Pattern SLASH_PATTERN = compile("/");
 
   private JreExplorer() {}
 
@@ -100,7 +103,7 @@ public final class JreExplorer {
         final String name = entry.getName();
         final int lastSlash = name.lastIndexOf('/');
         if (lastSlash != -1 && name.endsWith(".class")) {
-          packages.add(name.substring(0, lastSlash).replaceAll("/", "."));
+          packages.add(SLASH_PATTERN.matcher(name.substring(0, lastSlash)).replaceAll("."));
         } else if (!entry.isDirectory()) {
           if (name.startsWith(META_INF_SERVICES_PATH)) {
             String serviceInterface = name.substring(META_INF_SERVICES_PATH.length());
