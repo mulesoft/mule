@@ -207,7 +207,7 @@
         <disruptorVersion>3.3.7</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <muleMvelVersion>2.1.9-MULE-016</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-017</muleMvelVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <!-- TODO MULE-14667 Upgrade to reactor 3.2.0 -->
         <projectReactorVersion>3.2.0.M1-MULE-002</projectReactorVersion>
