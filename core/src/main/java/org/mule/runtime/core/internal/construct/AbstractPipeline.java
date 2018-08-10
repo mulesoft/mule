@@ -327,6 +327,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     } catch (MuleException e) {
       // If the pipeline couldn't be started we would need to stop the processingStrategy (if possible) in order to avoid leaks
       doStop();
+      doStopProcessingStrategy();
       throw e;
     }
     canProcessMessage = true;
