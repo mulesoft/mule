@@ -12,6 +12,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -93,8 +94,8 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase
         MuleEvent event = getTestEvent(payload);
         Map result = (Map) el.evaluate("#[{\"a\" : {\"b\" : \"c\"}, \"d\" : [\"e\"]}]", event);
         Map result2 = (Map) el.evaluate("#[{\"d\" : [\"e\"], \"a\" : {\"b\" : \"c\"}}]", event);
-        assertThat((String) result.get("d"), equalTo("e"));
-        assertThat((String) result2.get("d"), equalTo("e"));
+        assertThat((String) ((ArrayList) result.get("d")).get(0), equalTo("e"));
+        assertThat((String) ((ArrayList) result2.get("d")).get(0), equalTo("e"));
     }
 
     private void runExpressionAndExpect(String expression, Object expectedValue, MuleEvent event)
