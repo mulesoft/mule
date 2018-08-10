@@ -43,7 +43,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
   private Scheduler scheduler;
 
   public DefaultThreadNotificationService() {
-    this(DEFAULT_LOGGING_INTERVAL);
+    this(LOGGING_INTERVAL);
   }
 
   public DefaultThreadNotificationService(int interval) {

@@ -18,7 +18,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 public class ThreadNotificationLoggerTestCase {
 
   @ClassRule
-  public static SystemProperty logging = new SystemProperty(MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT, "true");
+  public static SystemProperty logging = new SystemProperty(MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, "1");
 
   private static final String IO = "io";
   private static final String CPU_LIGHT = "cpuLight";

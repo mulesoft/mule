@@ -10,8 +10,7 @@ import org.slf4j.Logger;
 
 import java.util.Collection;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -22,9 +21,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 public interface ThreadNotificationService {
 
   String REGISTRY_KEY = "_muleThreadNotificationService";
-  boolean THREAD_LOGGING = Boolean.getBoolean(MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT);
   // Set system property to -1 to avoid logging, but gather statistics
-  int DEFAULT_LOGGING_INTERVAL = Integer.getInteger(MULE_DEFAULT_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, -1);
+  int LOGGING_INTERVAL = Integer.getInteger(MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, -1);
+  boolean THREAD_LOGGING = LOGGING_INTERVAL > 0;
   Logger REPORT_LOGGER = getLogger(ThreadNotificationService.class);
 
   /**
