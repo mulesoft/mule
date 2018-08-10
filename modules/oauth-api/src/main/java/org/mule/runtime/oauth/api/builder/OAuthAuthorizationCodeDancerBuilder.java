@@ -26,6 +26,16 @@ import java.util.function.Supplier;
 public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<AuthorizationCodeOAuthDancer> {
 
   /**
+   * @param encodeClientCredentialsInBody If @{code true}, the client id and client secret will be sent in the request body.
+   *        Otherwise, they will be sent as basic authentication.
+   *
+   * @return this builder
+   */
+  default OAuthAuthorizationCodeDancerBuilder encodeClientCredentialsInBody(boolean encodeClientCredentialsInBody) {
+    return this;
+  }
+
+  /**
    * The produced {@link AuthorizationCodeOAuthDancer} will create an {@link HttpServer} to listen on the provided
    * {@code localCallbackUrl}.
    *

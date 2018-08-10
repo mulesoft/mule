@@ -1,4 +1,19 @@
 {
+  "4.1.4": {
+  	"revapi": {
+  	  "ignore" : [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "methodName": "encodeClientCredentialsInBody",
+          "elementKind": "method",
+          "justification": "Needed to fix an issue in the OAuth module."
+        }
+  	  ]
+  	}
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
