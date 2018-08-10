@@ -117,7 +117,7 @@ public class SoapInvokeOperationDeclarer {
                                                                                 InvokeOutputTypeResolver::new,
                                                                                 NullMetadataResolver::new);
     operation.withModelProperty(new MetadataResolverFactoryModelProperty(() -> factory));
-    operation.withModelProperty(new MetadataKeyIdModelProperty(loader.load(WebServiceTypeKey.class), KEYS_GROUP));
+    operation.withModelProperty(new MetadataKeyIdModelProperty(loader.load(WebServiceTypeKey.class), KEYS_GROUP, "SoapInvoke"));
   }
 
   private void declareOutput(OperationDeclarer operation, ClassTypeLoader loader) {

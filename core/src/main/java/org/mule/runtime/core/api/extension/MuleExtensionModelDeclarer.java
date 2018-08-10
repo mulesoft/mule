@@ -747,6 +747,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("defaultErrorHandler-ref")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
+        .withAllowedStereotypes(singletonList(ERROR_HANDLER))
         .describedAs("The default error handler for every flow. This must be a reference to a global error handler.");
 
     configuration.onDefaultParameterGroup()
