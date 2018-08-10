@@ -8198,16 +8198,8 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "CONNECTED_PET_ADOPTION_SOURCE",
-            "namespace": "PETSTORE",
-            "parent": {
-              "type": "SOURCE",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "SOURCE",
-                "namespace": "MULE"
-              }
-            }
+            "type": "SOURCE",
+            "namespace": "MULE"
           },
           "parameterGroupModels": [
             {
@@ -8223,7 +8215,6 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": "false",
                   "role": "BEHAVIOUR",
@@ -8254,7 +8245,6 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": "false",
                   "role": "BEHAVIOUR",
@@ -8282,7 +8272,6 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "defaultValue": false,
                   "role": "BEHAVIOUR",
@@ -8311,7 +8300,6 @@
                   "hasDynamicType": false,
                   "required": true,
                   "isConfigOverride": false,
-                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -8434,7 +8422,6 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -8588,7 +8575,6 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {

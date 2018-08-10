@@ -279,7 +279,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
         }
       }
 
-      return resolver.getCategoryName();
+      return resolver instanceof NullMetadataResolver ? null : resolver.getCategoryName();
     }
 
   }
