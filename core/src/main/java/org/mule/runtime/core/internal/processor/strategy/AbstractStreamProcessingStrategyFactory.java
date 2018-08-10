@@ -37,6 +37,9 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
@@ -52,6 +55,8 @@ import reactor.core.publisher.WorkQueueProcessor;
  * @since 4.0
  */
 abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStreamProcessingStrategyFactory.class);
 
   protected static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
   protected static final int CORES = getInteger(SYSTEM_PROPERTY_PREFIX + "AVAILABLE_CORES", getRuntime().availableProcessors());
@@ -169,10 +174,15 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
       return new ReactorSink(processor.sink(), () -> {
         long start = currentTimeMillis();
         if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
+          LOGGER.warn("WorkQueueProcessor of PorcessingStrategy for flow '{}' not shutDown in {} ms. Forcing shutdown...",
+                      flowConstruct.getName(), shutdownTimeout);
           processor.forceShutdown();
         }
         try {
-          completionLatch.await(max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS);
+          if (!completionLatch.await(max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
+            LOGGER.warn("Subscribers of PorcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
+                        shutdownTimeout);
+          }
         } catch (InterruptedException e) {
           currentThread().interrupt();
           throw new MuleRuntimeException(e);

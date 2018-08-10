@@ -81,7 +81,9 @@ public class PollingProber implements Prober {
   public void check(Probe probe) {
     if (!poll(probe)) {
       LOGGER.error("test timed out. Maybe due to a deadlock?");
-      logThreadDump();
+      if (LOGGER.isTraceEnabled()) {
+        logThreadDump();
+      }
       throw new AssertionError(probe.describeFailure());
     }
   }
