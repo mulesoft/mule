@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.createFrom;
+import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -19,6 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -39,6 +41,8 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
@@ -113,6 +117,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Inject
   private StreamingManager streamingManager;
+
+  @Inject
+  private ThreadNotificationService threadNotificationService;
+  private ThreadNotificationLogger threadNotificationLogger;
 
   AbstractMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
                                 List<Processor> processors) {
@@ -229,7 +237,17 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
-      interceptors.add((processor, next) -> processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next)));
+      if (THREAD_LOGGING) {
+        interceptors.add((processor, next) -> stream -> from(stream)
+            .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
+            .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId(), true))
+            .transform(processingStrategy
+                .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
+            .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId())));
+      } else {
+        interceptors.add((processor, next) -> processingStrategy
+            .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)));
+      }
     }
 
     // Apply processor interceptors around processor and other core logic
@@ -412,6 +430,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       }
       additionalInterceptors.add(0, reactiveInterceptorAdapter);
     });
+
+    threadNotificationLogger = new ThreadNotificationLogger(threadNotificationService);
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
   }

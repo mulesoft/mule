@@ -195,6 +195,12 @@
             <version>${commonsPool2Version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>${commonsMath3Version}</version>
+        </dependency>
+
         <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>
             <groupId>javax.jms</groupId>

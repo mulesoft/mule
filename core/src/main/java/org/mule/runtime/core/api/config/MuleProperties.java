@@ -217,6 +217,8 @@ public class MuleProperties {
   public static final String MULE_DISABLE_RESPONSE_TIMEOUT = SYSTEM_PROPERTY_PREFIX + "timeout.disable";
   public static final String MULE_ALLOW_JRE_EXTENSION = SYSTEM_PROPERTY_PREFIX + "classloading.jreExtension";
   public static final String MULE_JRE_EXTENSION_PACKAGES = SYSTEM_PROPERTY_PREFIX + "classloading.jreExtension.packages";
+  public static final String MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT =
+      SYSTEM_PROPERTY_PREFIX + "schedulers.latency.report.interval";
 
   private MuleProperties() {}
 }

@@ -111,6 +111,8 @@ import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingSer
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
+import org.mule.runtime.core.internal.context.thread.notification.DefaultThreadNotificationService;
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.event.DefaultEventContextService;
 import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;
@@ -209,6 +211,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_NOTIFICATION_DISPATCHER, getBeanDefinition(DefaultNotificationDispatcher.class))
       .put(NotificationListenerRegistry.REGISTRY_KEY, getBeanDefinition(DefaultNotificationListenerRegistry.class))
       .put(EventContextService.REGISTRY_KEY, getBeanDefinition(DefaultEventContextService.class))
+      .put(ThreadNotificationService.REGISTRY_KEY, getBeanDefinition(DefaultThreadNotificationService.class))
       .put(BASE_IN_MEMORY_OBJECT_STORE_KEY,
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_IN_MEMORY)
                .getBeanDefinition())

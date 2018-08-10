@@ -176,6 +176,7 @@
         <commonsNetVersion>3.6</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
         <commonsPool2Version>2.5.0</commonsPool2Version>
+        <commonsMath3Version>3.6.1</commonsMath3Version>
         <derbyVersion>10.13.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <eaioUuidVersion>3.4.0</eaioUuidVersion>
