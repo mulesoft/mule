@@ -19,6 +19,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,6 +89,16 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
     runExpressionAndExpect(String.format("#[mel:payload.%s]", key), expectedValue, event);
     runExpressionAndExpect(String.format("#[mel:payload['%s']]", key), expectedValue, event);
     runExpressionAndExpect(String.format("#[mel:payload.'%s']", key), expectedValue, event);
+  }
+
+  @Test
+  public void map() throws Exception {
+    Map<String, String> payload = new HashMap<String, String>();
+    CoreEvent event = eventBuilder(muleContext).message(of(payload)).build();
+    Map result = (Map) el.evaluate("#[{\"a\" : {\"b\" : \"c\"}, \"d\" : [\"e\"]}]", event).getValue();
+    Map result2 = (Map) el.evaluate("#[{\"d\" : [\"e\"], \"a\" : {\"b\" : \"c\"}}]", event).getValue();
+    assertThat((String) ((ArrayList<String>) result.get("d")).get(0), equalTo("e"));
+    assertThat((String) ((ArrayList<String>) result2.get("d")).get(0), equalTo("e"));
   }
 
   private void runExpressionAndExpect(String expression, Object expectedValue, CoreEvent event) throws Exception {
