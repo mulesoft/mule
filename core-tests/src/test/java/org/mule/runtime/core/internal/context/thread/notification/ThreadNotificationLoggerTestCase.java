@@ -50,6 +50,9 @@ import java.util.concurrent.TimeUnit;
 
 public class ThreadNotificationLoggerTestCase {
 
+  private static final int TEST_TIMEOUT = 2000;
+  private static final int TEST_POLL_DELAY = 10;
+
   @ClassRule
   public static SystemProperty logging = new SystemProperty(MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, "1");
 
@@ -101,7 +104,7 @@ public class ThreadNotificationLoggerTestCase {
         .doOnNext(coreEvent -> logger.setFinishThread(event.getContext().getId()))
         .subscribe();
 
-    new PollingProber(2000, 10).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
       verify(service, times(1)).addThreadNotificationElement(any());
       assertThat(notifications, hasSize(1));
       assertThat(notifications.get(0).getFromThreadType(), not(is(IO)));
@@ -126,7 +129,7 @@ public class ThreadNotificationLoggerTestCase {
         .doOnNext(e -> logger.setFinishThread(e.getContext().getId()))
         .subscribe();
 
-    new PollingProber(2000, 10).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
       verify(service, times(1)).addThreadNotificationElement(any());
       assertThat(notifications, hasSize(1));
       assertThat(notifications.get(0).getFromThreadType(), not(is(CPU_LIGHT)));
