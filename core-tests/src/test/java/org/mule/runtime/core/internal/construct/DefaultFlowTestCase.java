@@ -320,7 +320,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   }
 
   @Test
-  public void originalExceptionThrownWhenStartAndStopOfProcessorBothFail()  throws Exception {
+  public void originalExceptionThrownWhenStartAndStopOfProcessorBothFail() throws Exception {
     final Exception startException = new IllegalArgumentException();
     final Exception stopException = new IllegalStateException();
 
@@ -344,7 +344,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   }
 
   @Test
-  public void originalExceptionThrownWhenStartAndStopOfSourceBothFail()  throws Exception {
+  public void originalExceptionThrownWhenStartAndStopOfSourceBothFail() throws Exception {
     final Exception startException = new IllegalArgumentException();
     final Exception stopException = new IllegalStateException();
 
@@ -359,7 +359,8 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .build();
 
     flow.initialise();
-    when(muleContext.isStarted()).thenReturn(true);
+    //when(muleContext.isStarted()).thenReturn(true);
+    muleContext.start();
     try {
       flow.start();
       fail("was expecting failure");
@@ -367,5 +368,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
       assertThat(e.getCause(), instanceOf(MuleException.class));
       assertThat(e.getCause().getCause(), sameInstance(startException));
     }
+
   }
 }

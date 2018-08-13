@@ -215,24 +215,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return publisher -> Mono.from(publisher)
         .doOnNext(assertStarted())
         .flatMap(source.getBackPressureStrategy() == WAIT
-                     ? flowWaitMapper(identity(), (result, event) -> result)
-                     : flowFailDropMapper(identity(), (result, event) -> result, overloadErrorType));
+            ? flowWaitMapper(identity(), (result, event) -> result)
+            : flowFailDropMapper(identity(), (result, event) -> result, overloadErrorType));
   }
 
   /**
    * If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
    */
   protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper(
-      Function<CoreEvent, CoreEvent> eventForFlowMapper,
-      BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper);
+                                                                                           Function<CoreEvent, CoreEvent> eventForFlowMapper,
+                                                                                           BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper);
 
   /**
    * If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
    */
   protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper(
-      Function<CoreEvent, CoreEvent> eventForFlowMapper,
-      BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper,
-      ErrorType overloadErrorType);
+                                                                                               Function<CoreEvent, CoreEvent> eventForFlowMapper,
+                                                                                               BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper,
+                                                                                               ErrorType overloadErrorType);
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
@@ -309,7 +309,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         builder.chain((MessageProcessorBuilder) processor);
       } else {
         throw new IllegalArgumentException(
-            "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+                                           "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
       }
     }
   }
@@ -364,8 +364,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       task.run();
     } catch (Exception e) {
       LOGGER.warn(format(
-          "Stopping pipeline '%s' due to error on starting, but another exception was also found while shutting down: %s",
-          getName(), e.getMessage()), e);
+                         "Stopping pipeline '%s' due to error on starting, but another exception was also found while shutting down: %s",
+                         getName(), e.getMessage()),
+                  e);
     }
   }
 
@@ -380,13 +381,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
-    try {
-      stopIfStoppable(source);
-    } finally {
-      canProcessMessage = false;
-    }
+    stopSafely(() -> stopIfStoppable(source));
+    canProcessMessage = false;
 
-    disposeIfDisposable(sink);
+    stopSafely(() -> disposeIfDisposable(sink));
     sink = null;
     stopIfStoppable(pipeline);
     super.doStop();
