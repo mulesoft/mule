@@ -29,6 +29,8 @@ import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfiguration
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
+import org.mule.runtime.core.internal.registry.CompositeMuleRegistryHelper;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import java.util.List;
@@ -188,18 +190,32 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   private void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {
-    if (parentContext != null) {
-      createRegistryWithParentContext(muleContext, applicationContext, parentContext);
-    } else {
-      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver(),
-                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
-    }
-
     // Note: The SpringRegistry must be created before
     // muleArtifactContext.refresh() gets called because
     // some beans may try to look up other beans via the Registry during
     // preInstantiateSingletons().
-    ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+    if (parentContext != null) {
+      createRegistryWithParentContext(muleContext, applicationContext, parentContext);
+
+      if ((parentContext instanceof MuleArtifactContext &&
+          ((MuleArtifactContext) parentContext).getMuleContext().getRegistry() instanceof MuleRegistryHelper)) {
+        MuleRegistryHelper parentMuleRegistryHelper =
+            (MuleRegistryHelper) ((MuleArtifactContext) parentContext).getMuleContext().getRegistry();
+
+        CompositeMuleRegistryHelper compositeMuleRegistryHelper =
+            new CompositeMuleRegistryHelper(registry, muleContext, parentMuleRegistryHelper);
+        ((MuleContextWithRegistry) muleContext).setRegistry(compositeMuleRegistryHelper);
+      } else {
+        ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+      }
+
+    } else {
+      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver(),
+                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
+
+      ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+    }
+
     ((DefaultMuleContext) muleContext).setInjector(registry);
   }
 
