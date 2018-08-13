@@ -9,7 +9,7 @@
           "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
           "methodName": "encodeClientCredentialsInBody",
           "elementKind": "method",
-          "justification": "Needed to fix an issue in the OAuth module."
+          "justification": "Needed to fix an issue in the OAuth module. (MULE-15539)"
         }
   	  ]
   	}
