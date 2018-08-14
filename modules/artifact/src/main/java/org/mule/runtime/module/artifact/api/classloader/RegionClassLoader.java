@@ -322,10 +322,16 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public void dispose() {
-    registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(classLoader -> {
-      disposeClassLoader(classLoader);
-    });
+    registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(this::disposeClassLoader);
     registeredClassLoaders.clear();
+    descriptorMapping.forEach((descriptor, classloader) -> {
+      try {
+        classloader.close();
+      } catch (IOException e) {
+        reportPossibleLeak(e, descriptor.getArtifactId());
+      }
+    });
+    descriptorMapping.clear();
     disposeClassLoader(ownerClassLoader);
 
     super.dispose();
@@ -335,12 +341,16 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     try {
       classLoader.dispose();
     } catch (Exception e) {
-      final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(message, classLoader.getArtifactId(), e);
-      } else {
-        LOGGER.error(message, classLoader.getArtifactId());
-      }
+      reportPossibleLeak(e, classLoader.getArtifactId());
+    }
+  }
+
+  private void reportPossibleLeak(Exception e, String artifactId) {
+    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(message, artifactId, e);
+    } else {
+      LOGGER.error(message, artifactId);
     }
   }
 
