@@ -8,13 +8,14 @@ package org.mule.runtime.module.launcher.log4j2;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.module.launcher.api.log4j2.AsyncLoggerExceptionHandler;
 
-import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
 import org.apache.logging.log4j.core.impl.Log4jContextFactory;
 import org.apache.logging.log4j.core.selector.ContextSelector;
@@ -28,7 +29,7 @@ import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
  * It forces {@link org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector} as the only selector,
  * {@link org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory} as the only available
  * {@link org.apache.logging.log4j.core.config.ConfigurationFactory}, and sets
- * {@link org.mule.runtime.module.launcher.log4j2.AsyncLoggerExceptionHandler} as the {@link com.lmax.disruptor.ExceptionHandler}
+ * {@link AsyncLoggerExceptionHandler} as the {@link com.lmax.disruptor.ExceptionHandler}
  * for failing async loggers.
  * <p/>
  * Other than that, it's pretty much a copy paste of {@link org.apache.logging.log4j.core.impl.Log4jContextFactory}, due to that

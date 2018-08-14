@@ -1,0 +1,16 @@
+{
+  "4.1.4": {
+    "revapi": {
+      "ignore": [
+        {
+        "code": "java.class.added",
+        "new": "class org.mule.runtime.module.launcher.api.log4j2.AsyncLoggerExceptionHandler",
+        "package": "org.mule.runtime.module.launcher.api.log4j2",
+        "classSimpleName": "AsyncLoggerExceptionHandler",
+        "elementKind": "class",
+        "justification": "Bug fix"
+        }
+      ]
+    }
+  }
+}
