@@ -10,6 +10,7 @@ package org.mule.runtime.container.internal;
 import static java.io.File.pathSeparatorChar;
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
+import static org.apache.commons.lang3.SystemUtils.IS_JAVA_1_8;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
@@ -44,9 +45,12 @@ public final class JreExplorer {
    */
   public static void exploreJdk(final Set<String> packages, Set<String> resources, List<ExportedService> services) {
     List<String> jdkPaths = new ArrayList<>();
-    jdkPaths.add(System.getProperty("sun.boot.class.path"));
-    jdkPaths.add(System.getProperty("java.ext.dirs"));
-
+    if (IS_JAVA_1_8) {
+      jdkPaths.add(System.getProperty("sun.boot.class.path"));
+      jdkPaths.add(System.getProperty("java.ext.dirs"));
+    } else {
+      jdkPaths.add(System.getProperty("java.class.path"));
+    }
     explorePaths(jdkPaths, packages, resources, services);
   }
 

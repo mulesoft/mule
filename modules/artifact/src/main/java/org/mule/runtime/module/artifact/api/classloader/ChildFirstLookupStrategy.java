@@ -7,12 +7,13 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.module.artifact.internal.util.ClassLoaderUtil.getPlatformClassLoader;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Defines a {@link LookupStrategy} that given a classloader, will search on that classloader first
- * and then on it's father
+ * Defines a {@link LookupStrategy} that given a classloader, will search on that classloader first and then on it's father
  */
 public class ChildFirstLookupStrategy implements LookupStrategy {
 
@@ -30,6 +31,7 @@ public class ChildFirstLookupStrategy implements LookupStrategy {
     if (classLoader.getParent() != null) {
       classLoaders.add(classLoader.getParent());
     }
+    getPlatformClassLoader().map(classLoaders::add);
     return classLoaders;
   }
 }
