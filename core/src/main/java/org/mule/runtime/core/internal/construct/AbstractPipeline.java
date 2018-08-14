@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.construct;
 
 import static com.google.common.base.Functions.identity;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -20,8 +21,8 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -43,6 +44,7 @@ import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFacto
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -53,8 +55,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
@@ -62,6 +62,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -321,9 +322,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected void doStart() throws MuleException {
     super.doStart();
     sink = processingStrategy.createSink(this, processFlowFunction());
-
-    startIfStartable(pipeline);
-
+    try {
+      startIfStartable(pipeline);
+    } catch (Exception e) {
+      stopOnFailure(e);
+      return;
+    }
     canProcessMessage = true;
     if (getMuleContext().isStarted()) {
       try {
@@ -333,13 +337,34 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       } catch (ConnectException ce) {
         // Let connection exceptions bubble up to trigger the reconnection strategy.
         throw ce;
-      } catch (MuleException e) {
+      } catch (Exception e) {
         // If the source couldn't be started we would need to stop the pipeline (if possible) in order to leave
         // its LifecycleManager also as initialise phase so the flow can be disposed later
-        doStop();
-        doStopProcessingStrategy();
-        throw e;
+        stopOnFailure(e);
       }
+    }
+  }
+
+  private void stopOnFailure(Exception e) throws MuleException {
+    // If the pipeline couldn't be started we would need to stop the processingStrategy (if possible) in order to avoid leaks
+    stopSafely(this::doStop);
+    stopSafely(this::doStopProcessingStrategy);
+
+    if (e instanceof MuleException) {
+      throw (MuleException) e;
+    }
+
+    throw new DefaultMuleException(e);
+  }
+
+  private void stopSafely(CheckedRunnable task) {
+    try {
+      task.run();
+    } catch (Exception e) {
+      LOGGER.warn(format(
+                         "Stopping pipeline '%s' due to error on starting, but another exception was also found while shutting down: %s",
+                         getName(), e.getMessage()),
+                  e);
     }
   }
 
@@ -354,13 +379,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
-    try {
-      stopIfStoppable(source);
-    } finally {
-      canProcessMessage = false;
-    }
+    stopSafely(() -> stopIfStoppable(source));
+    canProcessMessage = false;
 
-    disposeIfDisposable(sink);
+    stopSafely(() -> disposeIfDisposable(sink));
     sink = null;
     stopIfStoppable(pipeline);
     super.doStop();
