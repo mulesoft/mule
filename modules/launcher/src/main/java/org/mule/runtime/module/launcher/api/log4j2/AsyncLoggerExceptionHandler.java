@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.launcher.log4j2;
+package org.mule.runtime.module.launcher.api.log4j2;
 
 import com.lmax.disruptor.ExceptionHandler;
 
@@ -18,20 +18,20 @@ import org.apache.logging.log4j.status.StatusLogger;
  */
 public class AsyncLoggerExceptionHandler implements ExceptionHandler {
 
-  private static final StatusLogger logger = StatusLogger.getLogger();
+  private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
   @Override
   public void handleEventException(Throwable ex, long sequence, Object event) {
-    logger.error("Failed to asynchronously log message: " + event, ex);
+    LOGGER.error("Failed to asynchronously log message: " + event, ex);
   }
 
   @Override
   public void handleOnStartException(Throwable ex) {
-    logger.error("Failed to start asynchronous logger", ex);
+    LOGGER.error("Failed to start asynchronous logger", ex);
   }
 
   @Override
   public void handleOnShutdownException(Throwable ex) {
-    logger.error("Failed to stop asynchronous logger", ex);
+    LOGGER.error("Failed to stop asynchronous logger", ex);
   }
 }
