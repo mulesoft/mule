@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -32,7 +33,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -55,6 +55,11 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiFunction;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,11 +68,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiFunction;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -319,4 +319,54 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   }
 
+  @Test
+  public void originalExceptionThrownWhenStartAndStopOfProcessorBothFail() throws Exception {
+    final Exception startException = new IllegalArgumentException();
+    final Exception stopException = new IllegalStateException();
+
+    Processor processor = mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    doThrow(startException).when((Startable) processor).start();
+    doThrow(stopException).when((Stoppable) processor).stop();
+
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(singletonList(processor))
+        .build();
+
+    flow.initialise();
+    try {
+      flow.start();
+      fail("was expecting failure");
+    } catch (LifecycleException e) {
+      assertThat(e.getCause(), instanceOf(MuleException.class));
+      assertThat(e.getCause().getCause(), sameInstance(startException));
+    }
+  }
+
+  @Test
+  public void originalExceptionThrownWhenStartAndStopOfSourceBothFail() throws Exception {
+    final Exception startException = new IllegalArgumentException();
+    final Exception stopException = new IllegalStateException();
+
+    MessageSource source = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    doThrow(startException).when((Startable) source).start();
+    doThrow(stopException).when((Stoppable) source).stop();
+
+    muleContext = spy(muleContext);
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(source)
+        .processors(singletonList(mock(Processor.class)))
+        .build();
+
+    flow.initialise();
+    muleContext.start();
+    try {
+      flow.start();
+      fail("was expecting failure");
+    } catch (LifecycleException e) {
+      assertThat(e.getCause(), instanceOf(MuleException.class));
+      assertThat(e.getCause().getCause(), sameInstance(startException));
+    }
+
+  }
 }
