@@ -131,6 +131,7 @@ public interface MuleConfiguration {
 
   /**
    * @return whether the Thread Logging Notifications are enabled
+   * @since 4.2
    */
   boolean isThreadLoggingEnabled();
 

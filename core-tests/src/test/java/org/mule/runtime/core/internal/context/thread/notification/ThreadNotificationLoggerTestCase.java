@@ -67,7 +67,7 @@ public class ThreadNotificationLoggerTestCase {
 
   @Before
   public void setup() {
-    logger = new ThreadNotificationLogger(service);
+    logger = new ThreadNotificationLogger(service, true);
     when(event.getContext()).thenReturn(context);
     when(context.getId()).thenReturn("id");
   }
