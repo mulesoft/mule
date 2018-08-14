@@ -359,7 +359,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .build();
 
     flow.initialise();
-    //when(muleContext.isStarted()).thenReturn(true);
     muleContext.start();
     try {
       flow.start();
