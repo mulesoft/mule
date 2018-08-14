@@ -10,6 +10,7 @@ package org.mule.runtime.module.service.internal.artifact;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsArrayContaining.hasItemInArray;
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -21,6 +22,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
+import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,7 +57,9 @@ public class LibFolderClassLoaderModelLoaderTestCase extends AbstractMuleTestCas
   public void addsArtifactFolderToClassLoader() throws Exception {
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(serviceFolder.getRoot(), emptyMap(), SERVICE);
 
-    assertThat(classLoaderModel.getUrls(), hasItemInArray(serviceFolder.getRoot().toURI().toURL()));
+    URL[] urls = classLoaderModel.getUrls();
+    assertThat(urls, arrayWithSize(1));
+    assertThat(urls, hasItemInArray(serviceFolder.getRoot().toURI().toURL()));
   }
 
   @Test
@@ -67,7 +71,9 @@ public class LibFolderClassLoaderModelLoaderTestCase extends AbstractMuleTestCas
 
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(serviceFolder.getRoot(), emptyMap(), SERVICE);
 
-    assertThat(classLoaderModel.getUrls(), hasItemInArray(jarFile.toURI().toURL()));
+    URL[] urls = classLoaderModel.getUrls();
+    assertThat(urls, arrayWithSize(2));
+    assertThat(urls, hasItemInArray(jarFile.toURI().toURL()));
   }
 
   @Test
@@ -79,6 +85,6 @@ public class LibFolderClassLoaderModelLoaderTestCase extends AbstractMuleTestCas
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(serviceFolder.getRoot(), emptyMap(), SERVICE);
 
     // Contains only the service root
-    assertThat(classLoaderModel.getUrls(), hasItemInArray(serviceFolder.getRoot().toURL()));
+    assertThat(classLoaderModel.getUrls(), hasItemInArray(serviceFolder.getRoot().toURI().toURL()));
   }
 }
