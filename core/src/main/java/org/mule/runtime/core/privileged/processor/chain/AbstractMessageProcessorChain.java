@@ -12,7 +12,6 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.createFrom;
-import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -237,7 +236,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
-      if (THREAD_LOGGING) {
+      if (muleContext.getConfiguration().isThreadLoggingEnabled()) {
         interceptors.add((processor, next) -> stream -> from(stream)
             .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
             .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId(), true))
@@ -431,7 +430,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       additionalInterceptors.add(0, reactiveInterceptorAdapter);
     });
 
-    threadNotificationLogger = new ThreadNotificationLogger(threadNotificationService);
+    threadNotificationLogger =
+        new ThreadNotificationLogger(threadNotificationService, muleContext.getConfiguration().isThreadLoggingEnabled());
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
   }

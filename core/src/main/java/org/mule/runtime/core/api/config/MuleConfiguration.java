@@ -129,4 +129,9 @@ public interface MuleConfiguration {
    */
   DynamicConfigExpiration getDynamicConfigExpiration();
 
+  /**
+   * @return whether the Thread Logging Notifications are enabled
+   */
+  boolean isThreadLoggingEnabled();
+
 }

@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.core.internal.context.thread.notification;
 
-import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
-
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
-import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,14 +18,12 @@ public class ThreadNotificationLogger {
   private Map<String, DefaultThreadNotificationElement.Builder> threadNotificationBuilders = new ConcurrentHashMap<>();
   private ThreadNotificationService threadNotificationService;
   private ThreadLocal<Boolean> sameThread = new ThreadLocal<>();
+  private boolean isThreadLoggingEnabled;
 
-  public ThreadNotificationLogger(ThreadNotificationService threadNotificationService) {
+  public ThreadNotificationLogger(ThreadNotificationService threadNotificationService, boolean isThreadLoggingEnabled) {
     this.threadNotificationService = threadNotificationService;
     sameThread.set(false);
-  }
-
-  private boolean isEnabled() {
-    return THREAD_LOGGING;
+    this.isThreadLoggingEnabled = isThreadLoggingEnabled;
   }
 
   public void setStartingThread(String eventId) {
@@ -36,7 +31,7 @@ public class ThreadNotificationLogger {
   }
 
   public void setStartingThread(String eventId, boolean avoidIfSet) {
-    if (!isEnabled()) {
+    if (!isThreadLoggingEnabled) {
       return;
     }
     if (avoidIfSet && threadNotificationBuilders.containsKey(eventId)) {
@@ -49,7 +44,7 @@ public class ThreadNotificationLogger {
   }
 
   public void setFinishThread(String eventId) {
-    if (!isEnabled()) {
+    if (!isThreadLoggingEnabled) {
       return;
     }
     if (sameThread.get() != null && sameThread.get()) {

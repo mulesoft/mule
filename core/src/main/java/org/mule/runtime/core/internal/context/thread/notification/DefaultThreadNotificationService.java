@@ -12,6 +12,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.leftPad;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
 /**
  * Implementation for {@link ThreadNotificationService}. It collects {@link ThreadNotificationElement}' and
@@ -39,11 +41,13 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
 
   @Inject
   private SchedulerService schedulerService;
-
   private Scheduler scheduler;
 
+  @Inject
+  private MuleContext muleContext;
+
   public DefaultThreadNotificationService() {
-    this(LOGGING_INTERVAL);
+    this(Integer.getInteger(MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT, -1));
   }
 
   public DefaultThreadNotificationService(int interval) {
@@ -110,7 +114,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
 
   @Override
   public void start() throws MuleException {
-    if (THREAD_LOGGING && interval > 0 && schedulerService != null) {
+    if (muleContext.getConfiguration().isThreadLoggingEnabled() && interval > 0 && schedulerService != null) {
       scheduler = schedulerService.cpuLightScheduler();
       fixedRate = scheduler.scheduleAtFixedRate(() -> logStats(), interval, interval, SECONDS);
     }
