@@ -46,7 +46,8 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
                                                                  () -> muleContext.getSchedulerService()
                                                                      .ioScheduler(muleContext.getSchedulerBaseConfig()
                                                                          .withName(schedulersNamePrefix + "." + BLOCKING.name())),
-                                                                 getMaxConcurrency());
+                                                                 getMaxConcurrency(),
+                                                                 muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override
@@ -60,8 +61,17 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
                                                                 int subscribers,
                                                                 String waitStrategy,
                                                                 Supplier<Scheduler> blockingSchedulerSupplier,
+                                                                int maxConcurrency, boolean isThreadLoggingEnabled) {
+      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, blockingSchedulerSupplier, maxConcurrency,
+            isThreadLoggingEnabled);
+    }
+
+    protected TransactionAwareWorkQueueStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize,
+                                                                int subscribers,
+                                                                String waitStrategy,
+                                                                Supplier<Scheduler> blockingSchedulerSupplier,
                                                                 int maxConcurrency) {
-      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, blockingSchedulerSupplier, maxConcurrency);
+      this(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, blockingSchedulerSupplier, maxConcurrency, false);
     }
 
     @Override

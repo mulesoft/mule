@@ -52,7 +52,8 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                         .withName(schedulersNamePrefix + "."
                                                                             + CPU_INTENSIVE.name())),
-                                                                getMaxConcurrency());
+                                                                getMaxConcurrency(),
+                                                                muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override
@@ -69,11 +70,25 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                      Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                      Supplier<Scheduler> blockingSchedulerSupplier,
                                                      Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                     int maxConcurrency)
+                                                     int maxConcurrency, boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency, isThreadLoggingEnabled);
+    }
+
+    TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                     int bufferSize,
+                                                     int subscriberCount,
+                                                     String waitStrategy,
+                                                     Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                     Supplier<Scheduler> blockingSchedulerSupplier,
+                                                     Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                     int maxConcurrency)
+
+    {
+      this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, maxConcurrency, false);
     }
 
     @Override

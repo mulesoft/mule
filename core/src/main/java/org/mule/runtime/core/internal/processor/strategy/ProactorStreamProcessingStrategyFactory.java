@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
-import static org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -76,7 +75,8 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                         .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                                 resolveParallelism(),
-                                                getMaxConcurrency());
+                                                getMaxConcurrency(),
+                                                muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override
@@ -115,6 +115,26 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
 
+    private boolean isThreadLoggingEnabled;
+
+    public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                            int bufferSize,
+                                            int subscriberCount,
+                                            String waitStrategy,
+                                            Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                            Supplier<Scheduler> blockingSchedulerSupplier,
+                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                            int parrelism,
+                                            int maxConcurrency, boolean isThreadLoggingEnabled)
+
+    {
+      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parrelism,
+            maxConcurrency);
+      this.blockingSchedulerSupplier = blockingSchedulerSupplier;
+      this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
+      this.isThreadLoggingEnabled = isThreadLoggingEnabled;
+    }
+
     public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                             int bufferSize,
                                             int subscriberCount,
@@ -126,10 +146,8 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             int maxConcurrency)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parrelism,
-            maxConcurrency);
-      this.blockingSchedulerSupplier = blockingSchedulerSupplier;
-      this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
+      this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parrelism, maxConcurrency, false);
     }
 
     @Override
@@ -198,7 +216,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     }
 
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
-      if (THREAD_LOGGING) {
+      if (isThreadLoggingEnabled) {
         return just(event)
             .flatMap(e -> Mono.subscriberContext()
                 .flatMap(ctx -> Mono.just(e).transform(processor)
