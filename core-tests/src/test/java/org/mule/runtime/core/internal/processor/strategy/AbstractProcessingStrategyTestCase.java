@@ -574,9 +574,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
           .check(new JUnitLambdaProbe(() -> {
             LOGGER.info("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
 
-            assertThat(rejected.get() + processed.get(), totalAssertion);
-            assertThat(processed.get(), processedAssertion);
-            assertThat(rejected.get(), rejectedAssertion);
+            assertThat("total", rejected.get() + processed.get(), totalAssertion);
+            assertThat("processed", processed.get(), processedAssertion);
+            assertThat("rejected", rejected.get(), rejectedAssertion);
 
             return true;
           }));
