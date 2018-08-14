@@ -78,9 +78,7 @@ public class LibFolderClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   private List<URL> getServiceUrls(File rootFolder) {
     List<URL> urls = new LinkedList<>();
-    addDirectoryToClassLoader(urls, rootFolder);
     loadJarsFromFolder(urls, new File(rootFolder, LIB_DIR));
-
     return urls;
   }
 
