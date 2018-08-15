@@ -14,6 +14,9 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.internal.el.function.CausedByFunction;
+import org.mule.runtime.core.internal.el.function.LookupFunction;
+import org.mule.runtime.core.internal.el.function.PropertyAccessFunction;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 
 import javax.inject.Inject;

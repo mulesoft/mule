@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el.mvel.function;
+package org.mule.runtime.core.internal.el.function;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -18,6 +18,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
@@ -78,6 +79,10 @@ public class LookupFunction implements ExpressionFunction {
             .error(incomingError)
             .message(message)
             .build();
+
+        // TODO MULE-15560 Make lookup function non-blocking, remove this
+        inLookupFunctionContext.set(true);
+
         return ((ExecutableComponent) component).execute(event).get().getMessage().getPayload();
       } catch (ExecutionException e) {
         ComponentExecutionException componentExecutionException = (ComponentExecutionException) e.getCause();
@@ -89,6 +94,9 @@ public class LookupFunction implements ExpressionFunction {
                                        error.getCause());
       } catch (InterruptedException e) {
         throw new MuleRuntimeException(e);
+      } finally {
+        // TODO MULE-15560 Make lookup function non-blocking, remove this
+        inLookupFunctionContext.remove();
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));
@@ -110,4 +118,11 @@ public class LookupFunction implements ExpressionFunction {
     return context.lookup(binding).map(typedValue -> (T) typedValue.getValue()).orElse(fallback);
   }
 
+  // TODO MULE-15560 Make lookup function non-blocking, remove this
+  private static final ThreadLocal<Boolean> inLookupFunctionContext = new ThreadLocal<>();
+
+  // TODO MULE-15560 Make lookup function non-blocking, remove this
+  public static boolean isInLookupFunctionContext() {
+    return inLookupFunctionContext.get() != null && inLookupFunctionContext.get();
+  }
 }
