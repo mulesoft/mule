@@ -91,10 +91,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
-    DefaultRegistryBroker registryBroker =
-        new DefaultRegistryBroker(muleContext, muleContext.getLifecycleInterceptor());
-    muleContext.setRegistryBroker(registryBroker);
-    MuleRegistryHelper muleRegistry = new MuleRegistryHelper(registryBroker, muleContext);
+    MuleRegistryHelper muleRegistry = getMuleRegistry(muleContext);
     muleContext.setMuleRegistry(muleRegistry);
     muleContext.setInjector(new RegistryDelegatingInjector(muleRegistry));
 
@@ -254,5 +251,12 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   public void setListeners(List<MuleContextListener> listeners) {
     this.listeners = listeners;
+  }
+
+  protected MuleRegistryHelper getMuleRegistry(DefaultMuleContext muleContext) {
+    DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext, muleContext.getLifecycleInterceptor());
+    muleContext.setRegistryBroker(registryBroker);
+
+    return new MuleRegistryHelper(registryBroker, muleContext);
   }
 }
