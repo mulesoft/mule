@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
@@ -16,24 +17,35 @@ import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import org.slf4j.Logger;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
 import sun.misc.CompoundEnumeration;
+
 
 /**
  * Defines a classloader for a Mule artifact composed of other artifacts.
@@ -60,6 +72,9 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   }
 
   private static final Logger LOGGER = getLogger(RegionClassLoader.class);
+  private static final String RESOURCE_PREFIX = "resource::";
+  private static final Pattern GAV_PATTERN = Pattern.compile(RESOURCE_PREFIX + "(\\S+):(\\S+):(\\S+)?:(\\S+)");
+  private static final Set<String> API_CLASSIFIERS = newHashSet("raml", "raml-fragment", "oas");
 
   private final ReadWriteLock innerStateRWLock = new ReentrantReadWriteLock();
   private final Lock innerStateReadLock = innerStateRWLock.readLock();
@@ -68,6 +83,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private final List<RegionMemberClassLoader> registeredClassLoaders = new ArrayList<>();
   private final Map<String, ArtifactClassLoader> packageMapping = new HashMap<>();
   private final Map<String, List<ArtifactClassLoader>> resourceMapping = new HashMap<>();
+  private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
   private ArtifactClassLoader ownerClassLoader;
 
   /**
@@ -217,19 +233,73 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public final URL findResource(final String name) {
-    URL resource = null;
     String normalizedName = normalize(name, true);
+    // Check exported resources and all matching artifacts
     final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
     if (artifactClassLoaders != null) {
       for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
-        resource = artifactClassLoader.findResource(normalizedName);
-        if (resource != null) {
-          break;
+        URL url = artifactClassLoader.findResource(normalizedName);
+        if (url != null) {
+          return url;
+        }
+      }
+    } else if (name.startsWith(RESOURCE_PREFIX)) {
+      Matcher matcher = GAV_PATTERN.matcher(name);
+      // Check for specific artifact requests
+      if (matcher.matches()) {
+        String groupId = matcher.group(1);
+        String artifactId = matcher.group(2);
+        String version = matcher.group(3);
+        String resource = matcher.group(4);
+        LOGGER.debug("Region request for '{}' in group '{}', artifact '{}' and version '{}'.", resource, groupId, artifactId,
+                     version);
+        String normalizedResource = normalize(resource, true);
+
+        // Check whether it's an exported resource from a matching artifact
+        List<ArtifactClassLoader> exportingArtifactClassLoaders = resourceMapping.get(normalizedResource);
+        if (exportingArtifactClassLoaders != null) {
+          for (ArtifactClassLoader artifactClassLoader : exportingArtifactClassLoaders) {
+            BundleDescriptor descriptor = artifactClassLoader.getArtifactDescriptor().getBundleDescriptor();
+            if (isRequestedArtifact(descriptor, groupId, artifactId, version, () -> {
+              LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
+                          version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+              return true;
+            })) {
+              return artifactClassLoader.findResource(normalizedResource);
+            }
+          }
+        }
+
+        // Check whether it's a resource from an API dependency, since all those should be considered exported
+        ClassLoaderModel classLoaderModel = this.getArtifactDescriptor().getClassLoaderModel();
+        for (BundleDependency dependency : classLoaderModel.getDependencies()) {
+          Optional<String> classifier = dependency.getDescriptor().getClassifier();
+          if (classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get())) {
+            BundleDescriptor descriptor = dependency.getDescriptor();
+            if (isRequestedArtifact(descriptor, groupId, artifactId, version, () -> false)) {
+              return descriptorMapping.computeIfAbsent(descriptor, (CheckedFunction<BundleDescriptor, URLClassLoader>) d -> {
+                try {
+                  return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()});
+                } catch (MalformedURLException e) {
+                  throw new MuleRuntimeException(e);
+                }
+              }).findResource(normalizedResource);
+            }
+          }
         }
       }
     }
 
-    return resource;
+    return null;
+  }
+
+  private boolean isRequestedArtifact(BundleDescriptor descriptor, String groupId, String artifactId, String version,
+                                      Supplier<Boolean> onVersionMismatch) {
+    boolean versionResult = true;
+    if (!descriptor.getVersion().equals(version)) {
+      versionResult = onVersionMismatch.get();
+    }
+    return descriptor.getGroupId().equals(groupId) && descriptor.getArtifactId().equals(artifactId) && versionResult;
   }
 
   @Override
@@ -253,10 +323,16 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public void dispose() {
-    registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(classLoader -> {
-      disposeClassLoader(classLoader);
-    });
+    registeredClassLoaders.stream().map(c -> c.unfilteredClassLoader).forEach(this::disposeClassLoader);
     registeredClassLoaders.clear();
+    descriptorMapping.forEach((descriptor, classloader) -> {
+      try {
+        classloader.close();
+      } catch (IOException e) {
+        reportPossibleLeak(e, descriptor.getArtifactId());
+      }
+    });
+    descriptorMapping.clear();
     disposeClassLoader(ownerClassLoader);
 
     super.dispose();
@@ -266,12 +342,16 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     try {
       classLoader.dispose();
     } catch (Exception e) {
-      final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(message, classLoader.getArtifactId(), e);
-      } else {
-        LOGGER.error(message, classLoader.getArtifactId());
-      }
+      reportPossibleLeak(e, classLoader.getArtifactId());
+    }
+  }
+
+  private void reportPossibleLeak(Exception e, String artifactId) {
+    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(message, artifactId, e);
+    } else {
+      LOGGER.error(message, artifactId);
     }
   }
 

@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,8 +32,12 @@ import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.duplicatePackageMappingError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.EnumerationMatcher;
 
@@ -55,12 +61,20 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private static final Class PARENT_LOADED_CLASS = Object.class;
   private static final Class PLUGIN_LOADED_CLASS = String.class;
   private static final String RESOURCE_NAME = "dummy.txt";
+  private static final String NON_EXPORTED_RESOURCE_NAME = "hidden.txt";
   public static final String APP_NAME = "testApp";
   private static final String ARTIFACT_ID = "testAppId";
+  private static final String GROUP_ID = "com.organization";
+  private static final String SPECIFIC_ARTIFACT_ID = "test-artifact";
+  private static final String ARTIFACT_VERSION = "1.0.0";
+  private static final String SPECIFIC_RESOURCE_FORMAT = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID + ":%s:%s";
+  private static final String API_RESOURCE_NAME = "test-api.raml";
 
   private final URL APP_LOADED_RESOURCE;
   private final URL PLUGIN_LOADED_RESOURCE;
   private final URL PARENT_LOADED_RESOURCE;
+  private final URL API_LOCATION;
+  private final URL API_LOADED_RESOURCE;
 
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
   private final ArtifactDescriptor artifactDescriptor;
@@ -74,6 +88,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     PARENT_LOADED_RESOURCE = new URL("file:///parent.txt");
     APP_LOADED_RESOURCE = new URL("file:///app.txt");
     PLUGIN_LOADED_RESOURCE = new URL("file:///plugin.txt");
+    API_LOCATION = ClassUtils.getResource("classloader-test-api.zip", this.getClass());
+    API_LOADED_RESOURCE = new URL("jar:" + API_LOCATION.toString() + "!/" + API_RESOURCE_NAME);
     artifactDescriptor = new ArtifactDescriptor(APP_NAME);
   }
 
@@ -389,6 +405,108 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     URL resource = regionClassLoader.findResource("root/../dummy.txt");
 
     assertThat(resource, notNullValue());
+  }
+
+  @Test
+  public void findsExportedResourceFromSpecificArtifact() {
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, RESOURCE_NAME), PLUGIN_LOADED_RESOURCE);
+  }
+
+  @Test
+  public void findsExportedResourceFromSpecificArtifactWithNoVersion() {
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, "", RESOURCE_NAME), PLUGIN_LOADED_RESOURCE);
+  }
+
+  @Test
+  public void findsExportedResourceFromSpecificArtifactWithWrongVersion() {
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, "1.2.0", RESOURCE_NAME), PLUGIN_LOADED_RESOURCE);
+  }
+
+  @Test
+  public void doesNotFindNonExportedResourceFromSpecificArtifact() {
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, NON_EXPORTED_RESOURCE_NAME), null);
+  }
+
+  @Test
+  public void findsResourceFromRamlApi() throws Exception {
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME),
+                               API_LOADED_RESOURCE);
+  }
+
+  @Test
+  public void findsResourceFromRamlFragment() throws Exception {
+    getResourceFromApiArtifact("raml-fragment", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME),
+                               API_LOADED_RESOURCE);
+  }
+
+  @Test
+  public void findsResourceFromOasApi() throws Exception {
+    getResourceFromApiArtifact("oas", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME), API_LOADED_RESOURCE);
+  }
+
+  @Test
+  public void doesNotFindNonExistentResourceFromApi() throws Exception {
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, RESOURCE_NAME), null);
+  }
+
+  @Test
+  public void doesNotFindResourceFromApiWithNoVersion() throws Exception {
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "", RESOURCE_NAME), null);
+  }
+
+  @Test
+  public void doesNotFindResourceFromApiWithWrongVersion() throws Exception {
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "1.5.6-SNAPSHOT", RESOURCE_NAME), null);
+  }
+
+  private void getResourceFromExportingArtifact(String resource, URL expectedResult) {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    ArtifactClassLoader pluginClassloader = mock(ArtifactClassLoader.class);
+    ArtifactDescriptor pluginDescriptor = mock(ArtifactDescriptor.class);
+
+    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
+    when(pluginClassloader.getArtifactDescriptor()).thenReturn(pluginDescriptor);
+    when(pluginDescriptor.getBundleDescriptor()).thenReturn(new BundleDescriptor.Builder()
+        .setGroupId(GROUP_ID)
+        .setArtifactId(SPECIFIC_ARTIFACT_ID)
+        .setVersion(ARTIFACT_VERSION)
+        .build());
+    when(pluginClassloader.findResource(RESOURCE_NAME)).thenReturn(PLUGIN_LOADED_RESOURCE);
+    when(pluginClassloader.findResource(NON_EXPORTED_RESOURCE_NAME)).thenReturn(PLUGIN_LOADED_RESOURCE);
+
+    regionClassLoader.addClassLoader(pluginClassloader,
+                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME),
+                                                                          singleton("dummy.txt")));
+
+    URL result = regionClassLoader.findResource(resource);
+
+    assertThat(result, is(expectedResult));
+  }
+
+  private void getResourceFromApiArtifact(String apiKind, String resource, URL expectedResult) throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+        .dependingOn(newHashSet(new BundleDependency.Builder()
+            .setBundleUri(API_LOCATION.toURI())
+            .setDescriptor(new BundleDescriptor.Builder()
+                .setGroupId(GROUP_ID)
+                .setArtifactId(SPECIFIC_ARTIFACT_ID)
+                .setVersion(ARTIFACT_VERSION)
+                .setClassifier(apiKind)
+                .build())
+            .build()))
+        .build();
+
+    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+
+    URL result = regionClassLoader.findResource(resource);
+
+    assertThat(result, is(expectedResult));
   }
 
   public static class TestApplicationClassLoader extends TestArtifactClassLoader {
