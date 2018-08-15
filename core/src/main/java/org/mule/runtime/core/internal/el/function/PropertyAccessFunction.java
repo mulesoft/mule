@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el.mvel.function;
+package org.mule.runtime.core.internal.el.function;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
