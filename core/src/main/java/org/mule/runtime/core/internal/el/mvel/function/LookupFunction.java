@@ -56,8 +56,8 @@ import java.util.concurrent.ExecutionException;
 public class LookupFunction implements ExpressionFunction {
 
   private static final Logger LOGGER = getLogger(LookupFunction.class);
-  private static final RunOnce DISCOURAGE_NOTICE =
-      Once.of(() -> LOGGER.warn("Usage of `lookup` is discouraged, and should be replaced with `flow-ref` components ideally."));
+  private static final RunOnce DISCOURAGE_NOTICE = Once.of(() -> LOGGER
+      .warn("Usage of `lookup` is discouraged, and should be replaced with `flow-ref` components featuring a target variable ideally."));
 
   private static final DataType TYPED_VALUE = fromType(TypedValue.class);
 
