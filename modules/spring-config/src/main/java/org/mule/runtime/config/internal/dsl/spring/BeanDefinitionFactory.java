@@ -152,7 +152,7 @@ public class BeanDefinitionFactory {
     });
   }
 
-  private boolean isComponentIgnored(ComponentIdentifier identifier) {
+  public boolean isComponentIgnored(ComponentIdentifier identifier) {
     return ignoredMuleCoreComponentIdentifiers.contains(identifier) ||
         ignoredMuleExtensionComponentIdentifiers.contains(identifier);
   }
