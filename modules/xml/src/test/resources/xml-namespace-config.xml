@@ -47,4 +47,9 @@
     <mulexml:schema-validation-filter name="SchemaValidationWithResourceResolver" 
         schemaLocations="schema/schema1.xsd" resourceResolver-ref="resourceResolver"
         errorHandler-ref="errorHandler" returnResult="false"/>
-</mule>
+    
+	<mulexml:schema-validation-filter name="SchemaValidationWithResourceAndCustomSecurityResolver"
+		schemaLocations="schema/schema1.xsd" resourceResolver-ref="resourceResolver" errorHandler-ref="errorHandler"
+		returnResult="false" acceptExternalEntities="true" expandInternalEntities="true"
+		/>
+	</mule>

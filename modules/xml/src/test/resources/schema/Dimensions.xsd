@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+		targetNamespace="http://www.shipwire.com/warehouse"
+		xmlns:tns="http://www.shipwire.com/warehouse" 
+		elementFormDefault="qualified">
+
+	<complexType name="Dimensions">
+    	<sequence>
+    		<element name="Source" type="tns:SourceType" maxOccurs="1" minOccurs="0" />
+    		<element name="Length" type="string" maxOccurs="1" minOccurs="1" />
+    		<element name="Width" type="string" maxOccurs="1" minOccurs="1" />
+    		<element name="Height" type="string" maxOccurs="1" minOccurs="1" />
+    		<element name="Weight" type="string" maxOccurs="1" minOccurs="0" />
+    		<element name="DistanceUnit" type="tns:DistanceUnitType" maxOccurs="1" minOccurs="1" />
+    		<element name="WeightUnit" type="tns:WeightUnitType" maxOccurs="1" minOccurs="1" />
+    	</sequence>
+    </complexType>
+    
+    <simpleType name="WeightUnitType">
+    	<restriction base="string">
+    		<enumeration value="lb" />
+    		<enumeration value="kg" />
+    		<enumeration value="oz" />
+    	</restriction>
+    </simpleType>
+
+    <simpleType name="DistanceUnitType">
+    	<restriction base="string">
+    		<enumeration value="in" />
+    		<enumeration value="cm" />
+    	</restriction>
+    </simpleType>
+
+
+    <simpleType name="SourceType">
+    	<restriction base="string">
+    		<enumeration value="merchant" />
+    		<enumeration value="warehouse" />
+    		<enumeration value="shipwire" />
+                <enumeration value="manufacturer" />
+                <enumeration value="supplier" />
+                <enumeration value="carrier" />
+    	</restriction>
+    </simpleType>
+
+</schema>

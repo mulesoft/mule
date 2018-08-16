@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+		targetNamespace="http://www.shipwire.com/warehouse" 
+		xmlns:tns="http://www.shipwire.com/warehouse"
+		elementFormDefault="qualified">
+		
+	<include schemaLocation="Dimensions.xsd"/>
+    <include schemaLocation="WarehouseStockNo.xsd"/>
+    <include schemaLocation="Carrier.xsd"/>
+	
+    <element name="ASN" type="tns:ASN" />
+	
+    <complexType name="ASN">
+    	<sequence maxOccurs="unbounded">
+    		<element name="RequestPreamble" type="tns:RequestPreamble" minOccurs="1" maxOccurs="1"/>
+			<element name="Header" type="tns:Header" minOccurs="1" maxOccurs="1" />
+			<element name="Items" type="tns:ShippingContents" minOccurs="1" maxOccurs="unbounded" />
+    	</sequence>
+    </complexType>
+    
+    <complexType name="RequestPreamble">
+    	<sequence>
+    		<element name="SenderID" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="ReceiverID" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="TransactionType" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="Version" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="Username" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="Password" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="TransactionId" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="Timestamp" type="string" minOccurs="1" maxOccurs="1" />
+    	</sequence>
+    </complexType>
+
+    <complexType name="Header">
+    	<sequence>
+            <element name="Warehouse" type="integer" minOccurs="0" maxOccurs="1" />
+    		<element name="ShipwireTransactionId" type="string" minOccurs="1" maxOccurs="1" />
+            <element name="Action" type="tns:ActionType" minOccurs="0" maxOccurs="1" />
+    		<element name="ShipwireInternalId" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="ExpectedDate" type="dateTime" minOccurs="1" maxOccurs="1" />
+    		<element name="Carrier" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="CarrierTrackingNumber" type="string" minOccurs="1" maxOccurs="unbounded" />
+    		<element name="CarrierContact" type="string" minOccurs="0" maxOccurs="1" />
+    		<element name="ContainerOrTrailerNumber" type="string" minOccurs="0" maxOccurs="1" />
+    		<element name="DocumentType" type="tns:DocumentType" />
+    	    <element name="CarrierInfo" type="tns:Carrier" minOccurs="0" maxOccurs="unbounded" />
+    	</sequence>
+    </complexType>
+    
+    <complexType name="ShippingContents">
+    	<sequence>
+            <element name="Equipment" type="tns:Equipment" minOccurs="0" maxOccurs="unbounded" />
+    		<element name="SKU" type="tns:SKU" minOccurs="0" maxOccurs="unbounded" />
+    	</sequence>
+    </complexType>
+
+    <complexType name="Equipment">
+        <sequence>
+            <element name="Palletized" type="string" minOccurs="0" maxOccurs="1" />
+            <element name="EquipmentSize" type="string" minOccurs="0" maxOccurs="1" />
+            <element name="EquipmentId" type="string" minOccurs="0" maxOccurs="1" />
+            <element name="ShippingConfiguration" type="tns:ShippingContainer" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+    </complexType>
+    
+    <complexType name="ShippingContainer">
+    	<sequence>
+    		<element name="Description" type="string" />
+    		<element name="Dimensions" type="tns:Dimensions" />
+    		<element name="Quantity" type="string" />
+    		<element name="Contents" type="tns:ShippingContents" minOccurs="1" maxOccurs="unbounded" />
+    	</sequence>
+    </complexType>
+
+    <complexType name="SKU">
+    	<sequence>
+    		<element name="WarehouseStockNo" type="tns:WarehouseStockNo" minOccurs="1" maxOccurs="1" />
+    		<element name="ShipwireStockNo" type="string" minOccurs="0" maxOccurs="1" />
+    		<element name="Description" type="string" minOccurs="0" maxOccurs="1" />
+			<element name="requiresLotControl" type="boolean" minOccurs="0" maxOccurs = "1" />
+    		<element name="Quantity" type="string" minOccurs="1" maxOccurs="1" />
+            <element name="ExpectedDamaged" type="boolean" minOccurs="0" maxOccurs="1" />
+    		<element name="ItemType" type="tns:ItemType" minOccurs="1" maxOccurs="1" />
+    		<element name="Dimensions" type="tns:Dimensions" minOccurs="1" maxOccurs="1" />
+    	</sequence>
+    </complexType>
+
+    <simpleType name="ItemType">
+    	<restriction base="string">
+    		<enumeration value="LickAndStick"></enumeration>
+    		<enumeration value="PickAndPack"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <simpleType name="DocumentType">
+    	<restriction base="string">
+			<enumeration value="asn"></enumeration>
+			<enumeration value="rma"></enumeration>
+    	</restriction>
+    </simpleType>
+    
+    <simpleType name="ActionType">
+    	<restriction base="string">
+			<enumeration value="createOrUpdate"></enumeration>
+			<enumeration value="cancel"></enumeration>
+      	</restriction>
+    </simpleType>
+
+</schema>

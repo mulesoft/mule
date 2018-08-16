@@ -208,6 +208,20 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                 <xsd:attribute name="acceptExternalEntities" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Include external general and parameter entities. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="expandInternalEntities" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specifies that the parser produced by this code will expand entity reference nodes.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
