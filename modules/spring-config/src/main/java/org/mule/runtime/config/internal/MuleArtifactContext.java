@@ -23,9 +23,6 @@ import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValid
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.IMPORT_ELEMENT;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_EE_DOMAIN_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -505,9 +502,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     applicationModel.executeOnEveryMuleComponentTree(cm -> {
       SpringComponentModel componentModel = (SpringComponentModel) cm;
       if (!mustBeRoot || componentModel.isRoot()) {
-        if (componentModel.getIdentifier().equals(MULE_IDENTIFIER)
-            || componentModel.getIdentifier().equals(MULE_DOMAIN_IDENTIFIER)
-            || componentModel.getIdentifier().equals(MULE_EE_DOMAIN_IDENTIFIER)) {
+        if (beanDefinitionFactory.isComponentIgnored(componentModel.getIdentifier())) {
           return;
         }
 
