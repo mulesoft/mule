@@ -18,8 +18,6 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
@@ -35,11 +33,7 @@ import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.func.Once;
-import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -55,10 +49,6 @@ import java.util.concurrent.ExecutionException;
  */
 public class LookupFunction implements ExpressionFunction {
 
-  private static final Logger LOGGER = getLogger(LookupFunction.class);
-  private static final RunOnce DISCOURAGE_NOTICE = Once.of(() -> LOGGER
-      .warn("Usage of `lookup` is discouraged, and should be replaced with `flow-ref` components featuring a target variable ideally."));
-
   private static final DataType TYPED_VALUE = fromType(TypedValue.class);
 
   private final ConfigurationComponentLocator componentLocator;
@@ -71,8 +61,6 @@ public class LookupFunction implements ExpressionFunction {
   public Object call(Object[] parameters, BindingContext context) {
     String flowName = (String) parameters[0];
     Object payload = parameters[1];
-
-    DISCOURAGE_NOTICE.runOnce();
 
     Location componentLocation = Location.builder().globalName(flowName).build();
     Component component = componentLocator.find(componentLocation)
