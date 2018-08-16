@@ -78,7 +78,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
             // route chains.
             .onErrorMap(throwable -> !(throwable instanceof MessagingException),
                         throwable -> new MessagingException(event, throwable, this))
-            .errorStrategyStop());
+            .onErrorStop());
   }
 
   /**
