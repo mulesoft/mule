@@ -4201,22 +4201,6 @@
                       },
                       {
                         "key": {
-                          "name": "useSecureHash"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
                           "name": "messageDigestAlgorithm"
                         },
                         "model": {
@@ -4230,14 +4214,56 @@
                       },
                       {
                         "key": {
-                          "name": "idExpression"
+                          "name": "MessageIdentifier"
                         },
                         "model": {
-                          "type": "String"
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "RedeliveryPolicyMessageIdentifier",
+                            "exclusiveOptionals": {
+                              "exclusiveParameterNames": [
+                                "useSecureHash",
+                                "idExpression"
+                              ],
+                              "isOneRequired": true
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "useSecureHash"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "true"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "idExpression"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                                }
+                              }
+                            }
+                          ]
                         },
                         "annotations": {
+                          "flattened": {},
                           "description": {
-                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            "value": "Defines which strategy is used to identify the messages."
                           }
                         }
                       },
@@ -4456,22 +4482,6 @@
                       },
                       {
                         "key": {
-                          "name": "useSecureHash"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
                           "name": "messageDigestAlgorithm"
                         },
                         "model": {
@@ -4485,14 +4495,56 @@
                       },
                       {
                         "key": {
-                          "name": "idExpression"
+                          "name": "MessageIdentifier"
                         },
                         "model": {
-                          "type": "String"
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "RedeliveryPolicyMessageIdentifier",
+                            "exclusiveOptionals": {
+                              "exclusiveParameterNames": [
+                                "useSecureHash",
+                                "idExpression"
+                              ],
+                              "isOneRequired": true
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "useSecureHash"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "true"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "idExpression"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                                }
+                              }
+                            }
+                          ]
                         },
                         "annotations": {
+                          "flattened": {},
                           "description": {
-                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            "value": "Defines which strategy is used to identify the messages."
                           }
                         }
                       },
@@ -6888,22 +6940,6 @@
                   },
                   {
                     "key": {
-                      "name": "useSecureHash"
-                    },
-                    "model": {
-                      "type": "Boolean",
-                      "annotations": {
-                        "default": "true"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
@@ -6917,14 +6953,56 @@
                   },
                   {
                     "key": {
-                      "name": "idExpression"
+                      "name": "MessageIdentifier"
                     },
                     "model": {
-                      "type": "String"
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
                     },
                     "annotations": {
+                      "flattened": {},
                       "description": {
-                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                        "value": "Defines which strategy is used to identify the messages."
                       }
                     }
                   },
@@ -7143,22 +7221,6 @@
                   },
                   {
                     "key": {
-                      "name": "useSecureHash"
-                    },
-                    "model": {
-                      "type": "Boolean",
-                      "annotations": {
-                        "default": "true"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
@@ -7172,14 +7234,56 @@
                   },
                   {
                     "key": {
-                      "name": "idExpression"
+                      "name": "MessageIdentifier"
                     },
                     "model": {
-                      "type": "String"
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
                     },
                     "annotations": {
+                      "flattened": {},
                       "description": {
-                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                        "value": "Defines which strategy is used to identify the messages."
                       }
                     }
                   },
@@ -7363,22 +7467,6 @@
                   },
                   {
                     "key": {
-                      "name": "useSecureHash"
-                    },
-                    "model": {
-                      "type": "Boolean",
-                      "annotations": {
-                        "default": "true"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
@@ -7392,14 +7480,56 @@
                   },
                   {
                     "key": {
-                      "name": "idExpression"
+                      "name": "MessageIdentifier"
                     },
                     "model": {
-                      "type": "String"
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
                     },
                     "annotations": {
+                      "flattened": {},
                       "description": {
-                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                        "value": "Defines which strategy is used to identify the messages."
                       }
                     }
                   },
@@ -7774,22 +7904,6 @@
                   },
                   {
                     "key": {
-                      "name": "useSecureHash"
-                    },
-                    "model": {
-                      "type": "Boolean",
-                      "annotations": {
-                        "default": "true"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
@@ -7803,14 +7917,56 @@
                   },
                   {
                     "key": {
-                      "name": "idExpression"
+                      "name": "MessageIdentifier"
                     },
                     "model": {
-                      "type": "String"
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
                     },
                     "annotations": {
+                      "flattened": {},
                       "description": {
-                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                        "value": "Defines which strategy is used to identify the messages."
                       }
                     }
                   },
@@ -8071,22 +8227,6 @@
                   },
                   {
                     "key": {
-                      "name": "useSecureHash"
-                    },
-                    "model": {
-                      "type": "Boolean",
-                      "annotations": {
-                        "default": "true"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
@@ -8100,14 +8240,56 @@
                   },
                   {
                     "key": {
-                      "name": "idExpression"
+                      "name": "MessageIdentifier"
                     },
                     "model": {
-                      "type": "String"
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
                     },
                     "annotations": {
+                      "flattened": {},
                       "description": {
-                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                        "value": "Defines which strategy is used to identify the messages."
                       }
                     }
                   },
@@ -8370,22 +8552,6 @@
                   },
                   {
                     "key": {
-                      "name": "useSecureHash"
-                    },
-                    "model": {
-                      "type": "Boolean",
-                      "annotations": {
-                        "default": "true"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
@@ -8399,14 +8565,56 @@
                   },
                   {
                     "key": {
-                      "name": "idExpression"
+                      "name": "MessageIdentifier"
                     },
                     "model": {
-                      "type": "String"
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
                     },
                     "annotations": {
+                      "flattened": {},
                       "description": {
-                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                        "value": "Defines which strategy is used to identify the messages."
                       }
                     }
                   },
@@ -8854,22 +9062,6 @@
                   },
                   {
                     "key": {
-                      "name": "useSecureHash"
-                    },
-                    "model": {
-                      "type": "Boolean",
-                      "annotations": {
-                        "default": "true"
-                      }
-                    },
-                    "annotations": {
-                      "description": {
-                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
@@ -8883,14 +9075,56 @@
                   },
                   {
                     "key": {
-                      "name": "idExpression"
+                      "name": "MessageIdentifier"
                     },
                     "model": {
-                      "type": "String"
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "RedeliveryPolicyMessageIdentifier",
+                        "exclusiveOptionals": {
+                          "exclusiveParameterNames": [
+                            "useSecureHash",
+                            "idExpression"
+                          ],
+                          "isOneRequired": true
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "useSecureHash"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "true"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "idExpression"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                            }
+                          }
+                        }
+                      ]
                     },
                     "annotations": {
+                      "flattened": {},
                       "description": {
-                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                        "value": "Defines which strategy is used to identify the messages."
                       }
                     }
                   },
