@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
@@ -16,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -73,7 +72,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private static final Logger LOGGER = getLogger(RegionClassLoader.class);
   private static final String RESOURCE_PREFIX = "resource::";
   private static final Pattern GAV_PATTERN = Pattern.compile(RESOURCE_PREFIX + "(\\S+):(\\S+):(\\S+)?:(\\S+)");
-  private static final Set<String> API_CLASSIFIERS = newHashSet("raml", "raml-fragment", "oas");
 
   private final ReadWriteLock innerStateRWLock = new ReentrantReadWriteLock();
   private final Lock innerStateReadLock = innerStateRWLock.readLock();
