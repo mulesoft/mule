@@ -8,20 +8,20 @@
 package org.mule.runtime.container.internal;
 
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -54,11 +54,12 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   }
 
   private void createModulesTemporaryFolder() {
-    File modulesTempFolder = MuleFoldersUtil.getModulesTempFolder();
+    File modulesTempFolder = getModulesTempFolder();
     if (!modulesTempFolder.exists() || modulesTempFolder.list().length > 0) {
       try {
         deleteDirectory(modulesTempFolder);
         modulesTempFolder.mkdirs();
+        modulesTempFolder.deleteOnExit();
       } catch (IOException e) {
         throw new MuleRuntimeException(createStaticMessage(format(
                                                                   "Could not clean up folder %s, validate that the process has permissions over that directory",
@@ -127,8 +128,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
       String serviceImplementation = split[1];
       URL resource;
       try {
-        File serviceFile =
-            Files.createTempFile(MuleFoldersUtil.getModulesTempFolder().toPath(), serviceInterface, "tmp").toFile();
+        File serviceFile = createTempFile(getModulesTempFolder().toPath(), serviceInterface, "tmp").toFile();
         serviceFile.deleteOnExit();
 
         stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);

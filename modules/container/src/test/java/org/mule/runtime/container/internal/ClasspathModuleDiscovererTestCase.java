@@ -43,7 +43,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   private final ClassLoader classLoader = mock(ClassLoader.class);
 
   @Rule
-  public TemporaryFolder muleHome =  new TemporaryFolder();
+  public TemporaryFolder muleHome = new TemporaryFolder();
 
   @Rule
   public ExpectedException expectedException = none();
@@ -127,7 +127,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
       List<URL> moduleProperties = new ArrayList();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleExportedServices.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-         .thenReturn(new EnumerationAdapter(moduleProperties));
+          .thenReturn(new EnumerationAdapter(moduleProperties));
 
       List<MuleModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
