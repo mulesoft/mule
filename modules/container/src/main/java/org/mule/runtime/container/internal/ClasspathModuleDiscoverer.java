@@ -58,7 +58,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     if (!modulesTempFolder.exists() || modulesTempFolder.list().length > 0) {
       try {
         deleteDirectory(modulesTempFolder);
-        modulesTempFolder.mkdir();
+        modulesTempFolder.mkdirs();
       } catch (IOException e) {
         throw new MuleRuntimeException(createStaticMessage(format(
                                                                   "Could not clean up folder %s, validate that the process has permissions over that directory",
