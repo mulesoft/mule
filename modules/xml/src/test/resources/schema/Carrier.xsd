@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+		targetNamespace="http://www.shipwire.com/warehouse"
+		xmlns:tns="http://www.shipwire.com/warehouse" 
+		elementFormDefault="unqualified">
+
+	<complexType name="Carrier">
+    	<sequence>
+    		<element name="Name" type="string" minOccurs="1" maxOccurs="1" />
+    		<element name="CarrierSCAC" type="string" minOccurs="0" maxOccurs="1" />
+    		<element name="CarrierRef" type="string" minOccurs="0" maxOccurs="1" />
+    		<element name="CarrierRefType" type="string" minOccurs="0" maxOccurs="1" />
+    		<element name="ContactPhoneNumber" type="string" minOccurs="0" maxOccurs="unbounded" />
+            <element name="ContactEmail" type="string" minOccurs="0" maxOccurs="unbounded" />
+    	</sequence>
+    </complexType>
+
+</schema>

@@ -35,11 +35,8 @@ import org.mule.util.IOUtils;
 @SmallTest
 public class SchemaValidationTestCase extends AbstractMuleTestCase
 {
-
-    // this is disabled (secure) by default, so we need to change it for the test
-    @Rule
-    public SystemProperty externalEntities = new SystemProperty(EXTERNAL_ENTITIES_PROPERTY, "true");
-
+    private static final String SCHEMA_WITH_REFERENCES = "schema/schema-with-references.xsd";
+    
     private static final String SIMPLE_SCHEMA = "schema/schema1.xsd";
 
     private static final String INCLUDE_SCHEMA = "schema/schema-with-include.xsd";
@@ -73,11 +70,22 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
 
         assertThat(filter.getResourceResolver(), is(not(nullValue())));
     }
+    
+    @Test
+    public void invalidWithInclude() throws Exception {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setAcceptExternalEntities(true);
+        filter.setSchemaLocations(SCHEMA_WITH_REFERENCES);
+        filter.initialise();
+        
+        assertThat(filter.getResourceResolver(), is(not(nullValue())));
+    }
 
     @Test
     public void testValidateWithIncludes() throws Exception
     {
         SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setAcceptExternalEntities(true);
         filter.setSchemaLocations(INCLUDE_SCHEMA);
         filter.initialise();
 

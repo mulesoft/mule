@@ -19,6 +19,11 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.xmlsecurity.XMLSecureFactories;
 
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -56,6 +61,9 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     private LSResourceResolver resourceResolver;
     private boolean useStaxSource = false;
     private boolean returnResult = true;
+    private boolean acceptExternalEntities = getBoolean(getProperty(EXTERNAL_ENTITIES_PROPERTY, "false"));
+    private boolean expandInternalEntities = getBoolean(getProperty(EXPAND_ENTITIES_PROPERTY, "false"));
+    
     private XMLInputFactory xmlInputFactory = XMLSecureFactories.createDefault().getXMLInputFactory();
 
     /**
@@ -232,7 +240,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 schemas[i] = new StreamSource(schemaStream, IOUtils.getResourceAsUrl(split[i], getClass()).toString());
             }
             
-            SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
+            SchemaFactory schemaFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, expandInternalEntities).getSchemaFactory(getSchemaLanguage());
 
             if (logger.isInfoEnabled())
             {
@@ -407,5 +415,25 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     public void setReturnResult(boolean returnResult)
     {
         this.returnResult = returnResult;
+    }
+
+    public boolean isAcceptExternalEntities()
+    {
+        return acceptExternalEntities;
+    }
+
+    public void setAcceptExternalEntities(boolean acceptExternalEntities)
+    {
+        this.acceptExternalEntities = acceptExternalEntities;
+    }
+
+    public boolean isExpandInternalEntities()
+    {
+        return expandInternalEntities;
+    }
+
+    public void setExpandInternalEntities(boolean expandInternalEntities)
+    {
+        this.expandInternalEntities = expandInternalEntities;
     }
 }
