@@ -9,7 +9,7 @@ package org.mule.runtime.container.internal;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempFile;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
@@ -55,14 +55,18 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   private void createModulesTemporaryFolder() {
     File modulesTempFolder = getModulesTempFolder();
-    if (!modulesTempFolder.exists() || modulesTempFolder.list().length > 0) {
+    if (modulesTempFolder.exists()) {
       try {
-        deleteDirectory(modulesTempFolder);
-        modulesTempFolder.mkdirs();
-        modulesTempFolder.deleteOnExit();
+        cleanDirectory(modulesTempFolder);
       } catch (IOException e) {
         throw new MuleRuntimeException(createStaticMessage(format(
                                                                   "Could not clean up folder %s, validate that the process has permissions over that directory",
+                                                                  modulesTempFolder.getAbsolutePath())));
+      }
+    } else {
+      if (!modulesTempFolder.mkdir()) {
+        throw new MuleRuntimeException(createStaticMessage(format(
+                                                                  "Could not create folder %s, validate that the process has permissions over that directory",
                                                                   modulesTempFolder.getAbsolutePath())));
       }
     }

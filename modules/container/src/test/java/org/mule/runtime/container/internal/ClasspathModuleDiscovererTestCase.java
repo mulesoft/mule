@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
@@ -173,6 +174,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   private void testWithMuleHome(CheckedConsumer<ClasspathModuleDiscoverer> testCallback) throws Exception {
     testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHome.getRoot().getAbsolutePath(), () -> {
+      MuleFoldersUtil.getExecutionFolder().mkdir();
       ClasspathModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(classLoader);
       testCallback.accept(moduleDiscoverer);
     });
