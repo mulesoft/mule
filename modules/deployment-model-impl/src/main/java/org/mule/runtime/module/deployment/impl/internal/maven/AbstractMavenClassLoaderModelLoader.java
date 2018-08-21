@@ -253,6 +253,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
   }
 
+  // TODO: MULE-15577 - Review plugin and API definition resolution
   private Set<BundleDependency> findMissingApiDependencies(List<org.mule.maven.client.api.model.BundleDependency> dependencies,
                                                            Map<String, Object> attributes) {
     Set<org.mule.maven.client.api.model.BundleDependency> apiDependencies = dependencies.stream()
