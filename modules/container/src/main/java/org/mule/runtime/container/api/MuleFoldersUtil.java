@@ -33,6 +33,7 @@ public class MuleFoldersUtil {
   public static final String USER_FOLDER = "user";
   public static final String PATCHES_FOLDER = "patches";
   public static final String SERVICES_FOLDER = "services";
+  private static final String MODULES_FOLDER = "modules";
 
 
   private MuleFoldersUtil() {}
@@ -189,4 +190,12 @@ public class MuleFoldersUtil {
   public static File getServicesTempFolder() {
     return new File(getExecutionFolder(), SERVICES_FOLDER);
   }
+
+  /**
+   * @return a {@link File} pointing to the container folder used to temporarily store the exported module services for SPI.
+   */
+  public static File getModulesTempFolder() {
+    return new File(getExecutionFolder(), MODULES_FOLDER);
+  }
+
 }
