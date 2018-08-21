@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -25,6 +26,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
@@ -43,13 +45,16 @@ import org.mule.tools.api.classloader.model.Artifact;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
@@ -233,17 +238,52 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                        new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
           .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
           .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
-      Set<BundleDependency> bundleDependencies =
-          dependencies.stream().filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
-              .map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
-      loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
-      Set<BundleDependency> allBundleDependencies =
-          dependencies.stream().map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
-      classLoaderModelBuilder.dependingOn(allBundleDependencies);
+      Set<BundleDependency> missingApiDependencyBundles = findMissingApiDependencies(dependencies, attributes);
+      Stream<BundleDependency> bundleDependencies = dependencies.stream()
+          .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
+          .map(this::convertBundleDependency);
+      loadUrls(artifactFile, classLoaderModelBuilder, concat(bundleDependencies,
+                                                             missingApiDependencyBundles.stream()).collect(toSet()));
+      Stream<BundleDependency> allBundleDependencies = dependencies.stream().map(this::convertBundleDependency);
+      classLoaderModelBuilder.dependingOn(concat(allBundleDependencies,
+                                                 missingApiDependencyBundles.stream()).collect(toSet()));
       return classLoaderModelBuilder.build();
     } finally {
       deleteQuietly(temporaryDirectory);
     }
+  }
+
+  // TODO: MULE-15577 - Review plugin and API definition resolution
+  private Set<BundleDependency> findMissingApiDependencies(List<org.mule.maven.client.api.model.BundleDependency> dependencies,
+                                                           Map<String, Object> attributes) {
+    Set<org.mule.maven.client.api.model.BundleDependency> apiDependencies = dependencies.stream()
+        .filter(dependency -> {
+          Optional<String> classifier = dependency.getDescriptor().getClassifier();
+          return classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get());
+        })
+        .collect(toSet());
+
+    Deque<org.mule.maven.client.api.model.BundleDependency> dependenciesToCheck = new ArrayDeque<>(apiDependencies);
+    Set<org.mule.maven.client.api.model.BundleDependency> missingApiDependencies = new HashSet<>();
+
+    while (!dependenciesToCheck.isEmpty()) {
+      org.mule.maven.client.api.model.BundleDependency dependency = dependenciesToCheck.pop();
+      for (org.mule.maven.client.api.model.BundleDependency apiDependency : mavenClient
+          .resolveBundleDescriptorDependencies(includeTestDependencies(attributes), dependency.getDescriptor())) {
+        if (noEquivalentPresent(apiDependencies, apiDependency) && noEquivalentPresent(missingApiDependencies, apiDependency)) {
+          missingApiDependencies.add(apiDependency);
+          dependenciesToCheck.add(apiDependency);
+        }
+      }
+    }
+
+    return missingApiDependencies.stream().map(this::convertBundleDependency).collect(toSet());
+  }
+
+  private boolean noEquivalentPresent(Set<org.mule.maven.client.api.model.BundleDependency> dependencies,
+                                      org.mule.maven.client.api.model.BundleDependency dependency) {
+    return dependencies.stream()
+        .noneMatch(currentApiArtifact -> currentApiArtifact.getDescriptor().equals(dependency.getDescriptor()));
   }
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
