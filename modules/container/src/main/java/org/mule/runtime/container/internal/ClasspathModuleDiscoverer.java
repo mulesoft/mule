@@ -64,7 +64,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
                                                                   modulesTempFolder.getAbsolutePath())));
       }
     } else {
-      if (!modulesTempFolder.mkdir()) {
+      if (!modulesTempFolder.mkdirs()) {
         throw new MuleRuntimeException(createStaticMessage(format(
                                                                   "Could not create folder %s, validate that the process has permissions over that directory",
                                                                   modulesTempFolder.getAbsolutePath())));
