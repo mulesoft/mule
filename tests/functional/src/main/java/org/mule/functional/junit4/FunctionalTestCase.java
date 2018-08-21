@@ -7,12 +7,19 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
+import org.mule.runtime.container.internal.CompositeModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.internal.JreModuleDiscoverer;
+import org.mule.runtime.container.internal.ModuleDiscoverer;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -23,9 +30,14 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.processor.FlowAssert;
 
+import com.google.common.io.Files;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -110,10 +122,48 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected ClassLoader getExecutionClassLoader() {
     if (!isDisposeContextPerClass() || executionClassLoader == null) {
       executionClassLoader =
-          new ContainerClassLoaderFactory().createContainerClassLoader(getClass().getClassLoader());
+          new ContainerClassLoaderFactory(new DefaultModuleRepository(new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
+              .getClassLoader())))
+                  .createContainerClassLoader(getClass().getClassLoader());
     }
 
     return executionClassLoader.getClassLoader();
+  }
+
+  /**
+   * Test module discover that uses a custom implementation of a classpath module discovered in order to use a temporary folder for service module
+   * files.
+   */
+  private class TestContainerModuleDiscoverer implements ModuleDiscoverer {
+
+    private final CompositeModuleDiscoverer moduleDiscoverer;
+
+    public TestContainerModuleDiscoverer(ClassLoader containerClassLoader) {
+      checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
+      moduleDiscoverer =
+          new CompositeModuleDiscoverer(getModuleDiscoverers(containerClassLoader).toArray(new ModuleDiscoverer[0]));
+    }
+
+    protected List<ModuleDiscoverer> getModuleDiscoverers(ClassLoader containerClassLoader) {
+      List<ModuleDiscoverer> result = new ArrayList<>();
+      result.add(new JreModuleDiscoverer());
+      result.add(new ClasspathModuleDiscoverer(containerClassLoader) {
+
+        @Override
+        protected File createModulesTemporaryFolder() {
+          File temp = Files.createTempDir();
+          temp.deleteOnExit();
+          return temp;
+        }
+
+      });
+      return result;
+    }
+
+    @Override
+    public List<MuleModule> discover() {
+      return moduleDiscoverer.discover();
+    }
   }
 
   @Override
