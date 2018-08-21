@@ -7,11 +7,15 @@
 
 package org.mule.runtime.container.internal;
 
-import static java.io.File.createTempFile;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempFile;
+import static org.apache.commons.io.FileUtils.cleanDirectory;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
@@ -46,6 +50,26 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader) {
     this.classLoader = classLoader;
+    createModulesTemporaryFolder();
+  }
+
+  private void createModulesTemporaryFolder() {
+    File modulesTempFolder = getModulesTempFolder();
+    if (modulesTempFolder.exists()) {
+      try {
+        cleanDirectory(modulesTempFolder);
+      } catch (IOException e) {
+        throw new MuleRuntimeException(createStaticMessage(format(
+                                                                  "Could not clean up folder %s, validate that the process has permissions over that directory",
+                                                                  modulesTempFolder.getAbsolutePath())));
+      }
+    } else {
+      if (!modulesTempFolder.mkdir()) {
+        throw new MuleRuntimeException(createStaticMessage(format(
+                                                                  "Could not create folder %s, validate that the process has permissions over that directory",
+                                                                  modulesTempFolder.getAbsolutePath())));
+      }
+    }
   }
 
   @Override
@@ -108,7 +132,9 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
       String serviceImplementation = split[1];
       URL resource;
       try {
-        File serviceFile = createTempFile(serviceInterface, "tmp");
+        File serviceFile = createTempFile(getModulesTempFolder().toPath(), serviceInterface, "tmp").toFile();
+        serviceFile.deleteOnExit();
+
         stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);
         resource = serviceFile.toURI().toURL();
       } catch (IOException e) {
