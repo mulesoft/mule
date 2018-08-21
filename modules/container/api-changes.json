@@ -1,4 +1,19 @@
 {
+  "4.1.4": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method java.io.File org.mule.runtime.container.api.MuleFoldersUtil::getModulesTempFolder()",
+          "package": "org.mule.runtime.container.api",
+          "classSimpleName": "MuleFoldersUtil",
+          "methodName": "getModulesTempFolder",
+          "elementKind": "method",
+          "justification": "MULE-15573"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
