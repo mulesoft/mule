@@ -47,13 +47,14 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   public static final String EXPORTED_SERVICES_PROPERTY = "artifact.export.services";
 
   private final ClassLoader classLoader;
+  private final File temporaryFolder;
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader) {
     this.classLoader = classLoader;
-    createModulesTemporaryFolder();
+    this.temporaryFolder = createModulesTemporaryFolder();
   }
 
-  private void createModulesTemporaryFolder() {
+  protected File createModulesTemporaryFolder() {
     File modulesTempFolder = getModulesTempFolder();
     if (modulesTempFolder.exists()) {
       try {
@@ -70,6 +71,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
                                                                   modulesTempFolder.getAbsolutePath())));
       }
     }
+    return modulesTempFolder;
   }
 
   @Override
@@ -132,7 +134,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
       String serviceImplementation = split[1];
       URL resource;
       try {
-        File serviceFile = createTempFile(getModulesTempFolder().toPath(), serviceInterface, "tmp").toFile();
+        File serviceFile = createTempFile(temporaryFolder.toPath(), serviceInterface, "tmp").toFile();
         serviceFile.deleteOnExit();
 
         stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);
