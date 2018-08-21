@@ -110,7 +110,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected ClassLoader getExecutionClassLoader() {
     if (!isDisposeContextPerClass() || executionClassLoader == null) {
       executionClassLoader =
-          new ContainerClassLoaderFactory().createContainerClassLoader(getClass().getClassLoader());
+          new ContainerClassLoaderFactory(new FunctionalTestModuleRepository())
+              .createContainerClassLoader(getClass().getClassLoader());
     }
 
     return executionClassLoader.getClassLoader();
