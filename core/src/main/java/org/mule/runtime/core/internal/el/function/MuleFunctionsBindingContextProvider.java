@@ -4,16 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el.mvel.function;
+package org.mule.runtime.core.internal.el.function;
 
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 
 import javax.inject.Inject;
@@ -37,6 +39,9 @@ public class MuleFunctionsBindingContextProvider implements GlobalBindingContext
   @Inject
   private ErrorTypeRepository errorTypeRepository;
 
+  @Inject
+  private SchedulerService schedulerService;
+
   @Override
   public BindingContext getBindingContext() {
     BindingContext.Builder builder = BindingContext.builder();
@@ -44,7 +49,7 @@ public class MuleFunctionsBindingContextProvider implements GlobalBindingContext
     PropertyAccessFunction propertyFunction = new PropertyAccessFunction(configurationProperties);
     builder.addBinding("p", new TypedValue(propertyFunction, fromFunction(propertyFunction)));
 
-    ExpressionFunction lookupFunction = new LookupFunction(componentLocator);
+    ExpressionFunction lookupFunction = new LookupFunction(componentLocator, schedulerService);
     builder.addBinding("lookup", new TypedValue(lookupFunction, fromFunction(lookupFunction)));
 
     ExpressionFunction causedByFunction = new CausedByFunction(errorTypeRepository);

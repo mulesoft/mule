@@ -4,12 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el.mvel.function;
+package org.mule.runtime.core.internal.el.function;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
 import static java.util.Optional.of;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
@@ -18,6 +20,8 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
@@ -31,6 +35,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -39,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -49,12 +56,21 @@ import java.util.concurrent.ExecutionException;
  */
 public class LookupFunction implements ExpressionFunction {
 
+  public static final String DATA_WEAVE_SCRIPT_LOOKUP_TIMEOUT = SYSTEM_PROPERTY_PREFIX + "dwScript.lookupTimeoutMillis";
+
   private static final DataType TYPED_VALUE = fromType(TypedValue.class);
 
   private final ConfigurationComponentLocator componentLocator;
 
-  public LookupFunction(ConfigurationComponentLocator componentLocator) {
+  private final SchedulerService schedulerService;
+
+  private Integer timeoutFromSysProp;
+
+  public LookupFunction(ConfigurationComponentLocator componentLocator, SchedulerService schedulerService) {
     this.componentLocator = componentLocator;
+    this.schedulerService = schedulerService;
+
+    timeoutFromSysProp = Integer.getInteger(DATA_WEAVE_SCRIPT_LOOKUP_TIMEOUT);
   }
 
   @Override
@@ -67,6 +83,20 @@ public class LookupFunction implements ExpressionFunction {
         .orElseThrow(() -> new IllegalArgumentException(format("There is no component named '%s'.", flowName)));
 
     if (component instanceof Flow) {
+      int timeout;
+      TimeUnit timeUnit;
+
+      if (timeoutFromSysProp != null) {
+        timeout = timeoutFromSysProp;
+        timeUnit = MILLISECONDS;
+      } else if (schedulerService.isCurrentThreadForCpuWork()) {
+        timeout = 1000;
+        timeUnit = MILLISECONDS;
+      } else {
+        timeout = 60;
+        timeUnit = SECONDS;
+      }
+
       try {
         Message incomingMessage = lookupValue(context, MESSAGE, Message.builder().nullValue().build());
         Map<String, ?> incomingVariables = lookupValue(context, VARS, EMPTY_MAP);
@@ -78,7 +108,11 @@ public class LookupFunction implements ExpressionFunction {
             .error(incomingError)
             .message(message)
             .build();
-        return ((ExecutableComponent) component).execute(event).get().getMessage().getPayload();
+
+        return ((ExecutableComponent) component).execute(event)
+            // If this timeout is hit, the thread that is executing the flow is interrupted
+            .get(timeout, timeUnit)
+            .getMessage().getPayload();
       } catch (ExecutionException e) {
         ComponentExecutionException componentExecutionException = (ComponentExecutionException) e.getCause();
         Error error = componentExecutionException.getEvent().getError().get();
@@ -89,6 +123,11 @@ public class LookupFunction implements ExpressionFunction {
                                        error.getCause());
       } catch (InterruptedException e) {
         throw new MuleRuntimeException(e);
+      } catch (TimeoutException e) {
+        throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has timed out after %d %s",
+                                                                  flowName,
+                                                                  timeout,
+                                                                  timeUnit.name().toLowerCase())));
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));
