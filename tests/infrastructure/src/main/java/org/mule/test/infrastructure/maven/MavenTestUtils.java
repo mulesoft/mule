@@ -12,14 +12,8 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -29,6 +23,13 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -134,6 +135,7 @@ public class MavenTestUtils {
       InvocationResult result = invoker.execute(request);
       if (result.getExitCode() != 0) {
         LOGGER.error("Error while running Maven invoker", result.getExecutionException());
+        throw new RuntimeException("Error while running Maven invoker", result.getExecutionException());
       }
 
     } catch (MavenInvocationException e) {
