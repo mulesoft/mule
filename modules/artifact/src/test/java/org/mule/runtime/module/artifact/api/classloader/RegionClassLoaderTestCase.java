@@ -10,9 +10,11 @@ package org.mule.runtime.module.artifact.api.classloader;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.list;
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -31,14 +33,6 @@ import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.duplicatePackageMappingError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.util.EnumerationMatcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -53,6 +47,18 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.util.EnumerationMatcher;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
@@ -497,10 +503,83 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "1.5.6-SNAPSHOT", RESOURCE_NAME), null);
   }
 
+  @Test
+  public void findExportedPackageAsResource() throws Exception {
+    findExportedPackageAsResource("com/mycompany/SomeClass.class", new URL("http://com.mycompany/SomeClass.class"),
+                                  "com.mycompany");
+  }
+
+  @Test
+  public void findExportedClassInRootPackage() throws Exception {
+    findExportedPackageAsResource("Root.class", new URL("http://com.mycompany/Root.class"), "");
+  }
+
+  @Test
+  public void findExportedPackageClasses() throws Exception {
+    findExportedPackageClasses("com/mycompany", "com.mycompany",
+                               ImmutableList.of("com/mycompany/SomeClass.class", "com/mycompany/SomeOtherClass.class"),
+                               ImmutableList.of(new URL("http://com.mycompany/SomeClass.class"),
+                                                new URL("http://com.mycompany/SomeOtherClass.class")));
+  }
+
+  @Test
+  public void findExportedPackageClassesWithEndSlash() throws Exception {
+    findExportedPackageClasses("com/mycompany/", "com.mycompany",
+                               ImmutableList.of("com/mycompany/SomeClass.class", "com/mycompany/SomeOtherClass.class"),
+                               ImmutableList.of(new URL("http://com.mycompany/SomeClass.class"),
+                                                new URL("http://com.mycompany/SomeOtherClass.class")));
+  }
+
+
+  @Test
+  public void findExportedPackageClassesInRootPackage() throws Exception {
+    findExportedPackageClasses("", "",
+                               ImmutableList.of("SomeClass.class", "SomeOtherClass.class"),
+                               ImmutableList.of(new URL("http://com.mycompany/SomeClass.class"),
+                                                new URL("http://com.mycompany/SomeOtherClass.class")));
+  }
+
+  private void findExportedPackageAsResource(String resource, URL resourceExpectedUrl, String resourcePackage) {
+    ClassLoader parentClassLoader = mock(ClassLoader.class);
+    createClassLoaders(parentClassLoader);
+
+    appClassLoader.addResource(resource, resourceExpectedUrl);
+    when(lookupPolicy.getPackageLookupStrategy(resourcePackage)).thenReturn(CHILD_FIRST);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    regionClassLoader.addClassLoader(appClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(ImmutableSet.of(resourcePackage), emptySet()));
+
+    URL result = regionClassLoader.findResource(resource);
+    assertThat(result, is(resourceExpectedUrl));
+  }
+
+  private void findExportedPackageClasses(String resource, String exportedPackage, List<String> classes, List<URL> urls)
+      throws IOException {
+    ClassLoader parentClassLoader = mock(ClassLoader.class);
+    createClassLoaders(parentClassLoader);
+
+    for (int i = 0; i < classes.size(); i++) {
+      appClassLoader.addResource(classes.get(i), urls.get(i));
+    }
+
+    when(lookupPolicy.getPackageLookupStrategy(exportedPackage)).thenReturn(CHILD_FIRST);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    regionClassLoader.addClassLoader(appClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(ImmutableSet.of(exportedPackage), emptySet()));
+    Enumeration<URL> resources = regionClassLoader.findResources(resource);
+    List<URL> resourcesAsList = list(resources);
+    assertThat(resourcesAsList, containsInAnyOrder(urls.toArray()));
+  }
+
   private void getResourceFromExportingArtifact(String resource, URL expectedResult) {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
+    getResourceFromExportingArtifact(resource, expectedResult, regionClassLoader);
+  }
+
+  private void getResourceFromExportingArtifact(String resource, URL expectedResult, RegionClassLoader regionClassLoader) {
     ArtifactClassLoader pluginClassloader = mock(ArtifactClassLoader.class);
     ArtifactDescriptor pluginDescriptor = mock(ArtifactDescriptor.class);
 
