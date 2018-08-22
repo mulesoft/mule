@@ -544,7 +544,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     createClassLoaders(parentClassLoader);
 
     appClassLoader.addResource(resource, resourceExpectedUrl);
-    when(lookupPolicy.getPackageLookupStrategy(resourcePackage)).thenReturn(ChildFirstLookupStrategy.CHILD_FIRST);
+    when(lookupPolicy.getPackageLookupStrategy(resourcePackage)).thenReturn(CHILD_FIRST);
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     regionClassLoader.addClassLoader(appClassLoader,
@@ -563,7 +563,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
       appClassLoader.addResource(classes.get(i), urls.get(i));
     }
 
-    when(lookupPolicy.getPackageLookupStrategy(exportedPackage)).thenReturn(ChildFirstLookupStrategy.CHILD_FIRST);
+    when(lookupPolicy.getPackageLookupStrategy(exportedPackage)).thenReturn(CHILD_FIRST);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     regionClassLoader.addClassLoader(appClassLoader,
                                      new DefaultArtifactClassLoaderFilter(ImmutableSet.of(exportedPackage), emptySet()));
