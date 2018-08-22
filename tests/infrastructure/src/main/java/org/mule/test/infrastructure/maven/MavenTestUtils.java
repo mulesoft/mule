@@ -135,6 +135,7 @@ public class MavenTestUtils {
       InvocationResult result = invoker.execute(request);
       if (result.getExitCode() != 0) {
         LOGGER.error("Error while running Maven invoker", result.getExecutionException());
+        throw new RuntimeException("Error while running Maven invoker", result.getExecutionException());
       }
 
     } catch (MavenInvocationException e) {
