@@ -4,20 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el.mvel.function;
+package org.mule.runtime.core.internal.el.function;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
 import static java.util.Optional.of;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
@@ -31,6 +35,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -39,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -53,14 +59,18 @@ public class LookupFunction implements ExpressionFunction {
 
   private final ConfigurationComponentLocator componentLocator;
 
-  public LookupFunction(ConfigurationComponentLocator componentLocator) {
+  private final SchedulerService schedulerService;
+
+  public LookupFunction(ConfigurationComponentLocator componentLocator, SchedulerService schedulerService) {
     this.componentLocator = componentLocator;
+    this.schedulerService = schedulerService;
   }
 
   @Override
   public Object call(Object[] parameters, BindingContext context) {
     String flowName = (String) parameters[0];
     Object payload = parameters[1];
+    Integer timeout = (Integer) parameters[2];
 
     Location componentLocation = Location.builder().globalName(flowName).build();
     Component component = componentLocator.find(componentLocation)
@@ -78,7 +88,11 @@ public class LookupFunction implements ExpressionFunction {
             .error(incomingError)
             .message(message)
             .build();
-        return ((ExecutableComponent) component).execute(event).get().getMessage().getPayload();
+
+        return ((ExecutableComponent) component).execute(event)
+            // If this timeout is hit, the thread that is executing the flow is interrupted
+            .get(timeout, MILLISECONDS)
+            .getMessage().getPayload();
       } catch (ExecutionException e) {
         ComponentExecutionException componentExecutionException = (ComponentExecutionException) e.getCause();
         Error error = componentExecutionException.getEvent().getError().get();
@@ -89,6 +103,10 @@ public class LookupFunction implements ExpressionFunction {
                                        error.getCause());
       } catch (InterruptedException e) {
         throw new MuleRuntimeException(e);
+      } catch (TimeoutException e) {
+        throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has timed out after %d millis",
+                                                                  flowName,
+                                                                  timeout)));
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));
@@ -103,7 +121,14 @@ public class LookupFunction implements ExpressionFunction {
   @Override
   public List<FunctionParameter> parameters() {
     return asList(new FunctionParameter("flowName", STRING),
-                  new FunctionParameter("payload", OBJECT));
+                  new FunctionParameter("payload", OBJECT),
+                  new FunctionParameter("timeoutMillis", NUMBER, context -> {
+                    if (schedulerService.isCurrentThreadForCpuWork()) {
+                      return 2000;
+                    } else {
+                      return SECONDS.toMillis(60);
+                    }
+                  }));
   }
 
   private <T> T lookupValue(BindingContext context, String binding, T fallback) {
