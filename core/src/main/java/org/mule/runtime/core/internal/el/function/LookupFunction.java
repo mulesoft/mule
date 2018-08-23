@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.function;
 
-import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
@@ -22,7 +21,6 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
@@ -57,21 +55,15 @@ import java.util.concurrent.TimeoutException;
  */
 public class LookupFunction implements ExpressionFunction {
 
-  public static final String DATA_WEAVE_SCRIPT_LOOKUP_TIMEOUT = SYSTEM_PROPERTY_PREFIX + "dwScript.lookupTimeoutMillis";
-
   private static final DataType TYPED_VALUE = fromType(TypedValue.class);
 
   private final ConfigurationComponentLocator componentLocator;
 
   private final SchedulerService schedulerService;
 
-  private Integer timeoutFromSysProp;
-
   public LookupFunction(ConfigurationComponentLocator componentLocator, SchedulerService schedulerService) {
     this.componentLocator = componentLocator;
     this.schedulerService = schedulerService;
-
-    timeoutFromSysProp = getInteger(DATA_WEAVE_SCRIPT_LOOKUP_TIMEOUT);
   }
 
   @Override
@@ -131,9 +123,7 @@ public class LookupFunction implements ExpressionFunction {
     return asList(new FunctionParameter("flowName", STRING),
                   new FunctionParameter("payload", OBJECT),
                   new FunctionParameter("timeoutMillis", NUMBER, context -> {
-                    if (timeoutFromSysProp != null) {
-                      return timeoutFromSysProp;
-                    } else if (schedulerService.isCurrentThreadForCpuWork()) {
+                    if (schedulerService.isCurrentThreadForCpuWork()) {
                       return 2000;
                     } else {
                       return SECONDS.toMillis(60);
