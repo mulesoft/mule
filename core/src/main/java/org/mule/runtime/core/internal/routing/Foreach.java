@@ -21,7 +21,6 @@ import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -41,8 +40,6 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import com.google.common.collect.Iterators;
 
 import java.util.Iterator;
@@ -52,6 +49,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -195,8 +193,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         // iterator is to check atomic count
         .switchIfEmpty(defer(() -> {
           if (count.get() == 0) {
-            logger
-                .warn("Split expression returned no results. If this is not expected please check your expression");
+            if (logger.isDebugEnabled()) {
+              logger.debug(
+                           "<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
+                           expression);
+            }
             return just(request);
           } else {
             return empty();
