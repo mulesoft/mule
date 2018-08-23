@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.config;
 
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
+import org.mule.runtime.api.util.MuleSystemProperties;
 
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.
@@ -189,36 +190,132 @@ public class MuleProperties {
 
   /**
    * The prefix for any Mule-specific properties set in the system properties
+   * @deprecated since 4.2. Use {@link MuleSystemProperties#SYSTEM_PROPERTY_PREFIX} instead
    */
-  public static final String SYSTEM_PROPERTY_PREFIX = "mule.";
-  public static final String MULE_CONTEXT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "context";
-  public static final String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
-  public static final String MULE_SECURITY_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "security.model";
-  public static final String MULE_SECURITY_PROVIDER_PROPERTY = SYSTEM_PROPERTY_PREFIX + "security.provider";
-  public static final String MULE_STREAMING_BUFFER_SIZE = SYSTEM_PROPERTY_PREFIX + "streaming.bufferSize";
+  @Deprecated
+  public static final String SYSTEM_PROPERTY_PREFIX = MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_CONTEXT_PROPERTY} instead
+   */
+  @Deprecated
+  public static final String MULE_CONTEXT_PROPERTY = MuleSystemProperties.MULE_CONTEXT_PROPERTY;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_ENCODING_SYSTEM_PROPERTY} instead
+   */
+  @Deprecated
+  public static final String MULE_ENCODING_SYSTEM_PROPERTY = MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_SECURITY_SYSTEM_PROPERTY} instead
+   */
+  @Deprecated
+  public static final String MULE_SECURITY_SYSTEM_PROPERTY = MuleSystemProperties.MULE_SECURITY_SYSTEM_PROPERTY;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_SECURITY_PROVIDER_PROPERTY} instead
+   */
+  @Deprecated
+  public static final String MULE_SECURITY_PROVIDER_PROPERTY = MuleSystemProperties.MULE_SECURITY_PROVIDER_PROPERTY;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_STREAMING_BUFFER_SIZE} instead
+   */
+  @Deprecated
+  public static final String MULE_STREAMING_BUFFER_SIZE = MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
 
   /**
    * System property key for the default size of a streaming buffer bucket
    * @since 4.1.4
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_STREAMING_BUCKET_SIZE} instead
    */
   public static final String MULE_STREAMING_BUCKET_SIZE = SYSTEM_PROPERTY_PREFIX + "streaming.bucketSize";
 
-  public static final String MULE_STREAMING_MAX_MEMORY = SYSTEM_PROPERTY_PREFIX + "max.streaming.memory";
-  public static final String MULE_SIMPLE_LOG = SYSTEM_PROPERTY_PREFIX + "simpleLog";
-  public static final String MULE_FORCE_CONSOLE_LOG = SYSTEM_PROPERTY_PREFIX + "forceConsoleLog";
-  public static final String MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS = SYSTEM_PROPERTY_PREFIX + "log.context.dispose.delay.millis";
-  public static final String MULE_LOG_DEFAULT_POLICY_INTERVAL =
-      SYSTEM_PROPERTY_PREFIX + "log.defaultAppender.timeBasedTriggerPolicy.interval";
-  public static final String MULE_LOG_DEFAULT_STRATEGY_MAX = SYSTEM_PROPERTY_PREFIX + "log.defaultAppender.rolloverStrategy.max";
-  public static final String MULE_LOG_DEFAULT_STRATEGY_MIN = SYSTEM_PROPERTY_PREFIX + "log.defaultAppender.rolloverStrategy.min";
-  public static final String MULE_FLOW_TRACE = SYSTEM_PROPERTY_PREFIX + "flowTrace";
-  public static final String MULE_LOG_VERBOSE_CLASSLOADING = SYSTEM_PROPERTY_PREFIX + "classloading.verbose";
-  public static final String MULE_MEL_AS_DEFAULT = SYSTEM_PROPERTY_PREFIX + "test.mel.default";
-  public static final String MULE_DISABLE_RESPONSE_TIMEOUT = SYSTEM_PROPERTY_PREFIX + "timeout.disable";
-  public static final String MULE_ALLOW_JRE_EXTENSION = SYSTEM_PROPERTY_PREFIX + "classloading.jreExtension";
-  public static final String MULE_JRE_EXTENSION_PACKAGES = SYSTEM_PROPERTY_PREFIX + "classloading.jreExtension.packages";
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_STREAMING_MAX_MEMORY} instead
+   */
+  @Deprecated
+  public static final String MULE_STREAMING_MAX_MEMORY = MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_SIMPLE_LOG} instead
+   */
+  @Deprecated
+  public static final String MULE_SIMPLE_LOG = MuleSystemProperties.MULE_SIMPLE_LOG;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_FORCE_CONSOLE_LOG} instead
+   */
+  @Deprecated
+  public static final String MULE_FORCE_CONSOLE_LOG = MuleSystemProperties.MULE_FORCE_CONSOLE_LOG;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS} instead
+   */
+  @Deprecated
+  public static final String MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS = MuleSystemProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOG_DEFAULT_POLICY_INTERVAL} instead
+   */
+  @Deprecated
+  public static final String MULE_LOG_DEFAULT_POLICY_INTERVAL = MuleSystemProperties.MULE_LOG_DEFAULT_POLICY_INTERVAL;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOG_DEFAULT_STRATEGY_MAX} instead
+   */
+  @Deprecated
+  public static final String MULE_LOG_DEFAULT_STRATEGY_MAX = MuleSystemProperties.MULE_LOG_DEFAULT_STRATEGY_MAX;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOG_DEFAULT_STRATEGY_MIN} instead
+   */
+  @Deprecated
+  public static final String MULE_LOG_DEFAULT_STRATEGY_MIN = MuleSystemProperties.MULE_LOG_DEFAULT_STRATEGY_MIN;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_FLOW_TRACE} instead
+   */
+  @Deprecated
+  public static final String MULE_FLOW_TRACE = MuleSystemProperties.MULE_FLOW_TRACE;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOG_VERBOSE_CLASSLOADING} instead
+   */
+  @Deprecated
+  public static final String MULE_LOG_VERBOSE_CLASSLOADING = MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_MEL_AS_DEFAULT} instead
+   */
+  @Deprecated
+  public static final String MULE_MEL_AS_DEFAULT = MuleSystemProperties.MULE_MEL_AS_DEFAULT;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_DISABLE_RESPONSE_TIMEOUT} instead
+   */
+  @Deprecated
+  public static final String MULE_DISABLE_RESPONSE_TIMEOUT = MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_ALLOW_JRE_EXTENSION} instead
+   */
+  @Deprecated
+  public static final String MULE_ALLOW_JRE_EXTENSION = MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_JRE_EXTENSION_PACKAGES} instead
+   */
+  @Deprecated
+  public static final String MULE_JRE_EXTENSION_PACKAGES = MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
+
+  /**
+   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT} instead
+   */
+  @Deprecated
   public static final String MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT =
-      SYSTEM_PROPERTY_PREFIX + "schedulers.latency.report.interval";
+      MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
   private MuleProperties() {}
 }
