@@ -16,9 +16,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -76,7 +78,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
                                     extensionModelLoaderRepository,
                                     classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
                                     artifactPluginDescriptorLoader,
-                                    discoverLicenseValidator(getClass().getClassLoader()));
+                                    discoverLicenseValidator(getClass().getClassLoader()),
+                                    getRuntimeComponentBuildingDefinitionProvider());
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

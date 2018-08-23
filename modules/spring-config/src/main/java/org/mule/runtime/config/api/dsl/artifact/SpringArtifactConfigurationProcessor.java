@@ -41,7 +41,8 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
                                           artifactContextConfiguration.getArtifactProperties(),
                                           artifactContextConfiguration.getArtifactType(),
                                           artifactContextConfiguration.isEnableLazyInitialization(),
-                                          artifactContextConfiguration.isDisableXmlValidations());
+                                          artifactContextConfiguration.isDisableXmlValidations(),
+                                          artifactContextConfiguration.getRuntimeComponentBuildingDefinitionProvider());
     artifactContextConfiguration.getParentContext()
         .ifPresent(parentMuleContext -> springXmlConfigurationBuilder.setParentContext(parentMuleContext));
     artifactContextConfiguration.getServiceConfigurators().stream()

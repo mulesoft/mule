@@ -23,6 +23,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
@@ -66,9 +67,10 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               PluginDependenciesResolver pluginDependenciesResolver,
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderManager extensionModelLoaderManager,
-                              LicenseValidator licenseValidator) {
+                              LicenseValidator licenseValidator,
+                              ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
 
-    super(licenseValidator);
+    super(licenseValidator, runtimeComponentBuildingDefinitionProvider);
 
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
@@ -158,7 +160,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager);
+                              extensionModelLoaderManager, getRuntimeComponentBuildingDefinitionProvider());
 
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

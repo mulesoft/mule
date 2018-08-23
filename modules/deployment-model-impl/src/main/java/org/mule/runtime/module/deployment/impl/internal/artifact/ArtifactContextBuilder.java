@@ -26,6 +26,18 @@ import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactor
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -49,6 +61,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
@@ -58,17 +71,6 @@ import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtension
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext} and a
@@ -114,6 +116,7 @@ public class ArtifactContextBuilder {
   private DeployableArtifact parentArtifact;
   private Optional<Properties> properties = empty();
   private String dataFolderName;
+  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   private ArtifactContextBuilder() {}
 
@@ -269,7 +272,7 @@ public class ArtifactContextBuilder {
    * {@code MuleContext} to be created. It may also be that the configuration files make use of this extensions.
    *
    * @param artifactPlugins collection of artifact extensions that define resources as part of the {@code MuleContext} to be
-   *                        created.
+   *        created.
    * @return the builder
    */
   public ArtifactContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins) {
@@ -311,10 +314,10 @@ public class ArtifactContextBuilder {
    * Allows to lazily create the artifact resources.
    *
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
-   *                       components from the configuration will be created on demand when requested. For instance, when using
-   *                       {@link ArtifactContext#getConnectivityTestingService()} and then invoking
-   *                       {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
-   *                       test connectivity, if it was not already created. when false, the application will be created completely at startup.
+   *        components from the configuration will be created on demand when requested. For instance, when using
+   *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
+   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
+   *        test connectivity, if it was not already created. when false, the application will be created completely at startup.
    * @return the builder
    */
   public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {
@@ -357,6 +360,16 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  /**
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   * @return the builder
+   */
+  public ArtifactContextBuilder setRuntimeComponentBuildingDefinitionProvider(ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
+    return this;
+  }
+
   private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
     if (deploymentProperties == null) {
       return properties;
@@ -373,7 +386,7 @@ public class ArtifactContextBuilder {
 
   /**
    * @return the {@code MuleContext} created with the provided configuration
-   * @throws ConfigurationException  when there's a problem creating the {@code MuleContext}
+   * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
    */
   public ArtifactContext build() throws InitialisationException, ConfigurationException {
@@ -431,7 +444,8 @@ public class ArtifactContextBuilder {
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
-                    .setServiceConfigurators(serviceConfigurators);
+                    .setServiceConfigurators(serviceConfigurators)
+                    .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider);
 
             withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
             artifactContext
@@ -510,4 +524,5 @@ public class ArtifactContextBuilder {
 
     return this;
   }
+
 }

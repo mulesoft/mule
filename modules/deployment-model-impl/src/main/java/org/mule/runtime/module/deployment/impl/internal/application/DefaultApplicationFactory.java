@@ -12,6 +12,17 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -22,6 +33,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -36,16 +48,6 @@ import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateCla
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.license.api.LicenseValidator;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Creates default mule applications
@@ -73,8 +75,9 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                   LicenseValidator licenseValidator) {
-    super(licenseValidator);
+                                   LicenseValidator licenseValidator,
+                                   ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+    super(licenseValidator, runtimeComponentBuildingDefinitionProvider);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
@@ -152,12 +155,13 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                           new DefaultPolicyInstanceProviderFactory(
                                                                                    serviceRepository,
                                                                                    classLoaderRepository,
-                                                                                   extensionModelLoaderRepository));
+                                                                                   extensionModelLoaderRepository,
+                                                                                   getRuntimeComponentBuildingDefinitionProvider()));
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
                                    classLoaderRepository,
-                                   applicationPolicyProvider);
+                                   applicationPolicyProvider, getRuntimeComponentBuildingDefinitionProvider());
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);
