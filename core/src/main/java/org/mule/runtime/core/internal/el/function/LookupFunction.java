@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el.function;
 
+import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
@@ -16,6 +17,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
@@ -44,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
@@ -70,33 +71,20 @@ public class LookupFunction implements ExpressionFunction {
     this.componentLocator = componentLocator;
     this.schedulerService = schedulerService;
 
-    timeoutFromSysProp = Integer.getInteger(DATA_WEAVE_SCRIPT_LOOKUP_TIMEOUT);
+    timeoutFromSysProp = getInteger(DATA_WEAVE_SCRIPT_LOOKUP_TIMEOUT);
   }
 
   @Override
   public Object call(Object[] parameters, BindingContext context) {
     String flowName = (String) parameters[0];
     Object payload = parameters[1];
+    Integer timeout = (Integer) parameters[2];
 
     Location componentLocation = Location.builder().globalName(flowName).build();
     Component component = componentLocator.find(componentLocation)
         .orElseThrow(() -> new IllegalArgumentException(format("There is no component named '%s'.", flowName)));
 
     if (component instanceof Flow) {
-      int timeout;
-      TimeUnit timeUnit;
-
-      if (timeoutFromSysProp != null) {
-        timeout = timeoutFromSysProp;
-        timeUnit = MILLISECONDS;
-      } else if (schedulerService.isCurrentThreadForCpuWork()) {
-        timeout = 1000;
-        timeUnit = MILLISECONDS;
-      } else {
-        timeout = 60;
-        timeUnit = SECONDS;
-      }
-
       try {
         Message incomingMessage = lookupValue(context, MESSAGE, Message.builder().nullValue().build());
         Map<String, ?> incomingVariables = lookupValue(context, VARS, EMPTY_MAP);
@@ -111,7 +99,7 @@ public class LookupFunction implements ExpressionFunction {
 
         return ((ExecutableComponent) component).execute(event)
             // If this timeout is hit, the thread that is executing the flow is interrupted
-            .get(timeout, timeUnit)
+            .get(timeout, MILLISECONDS)
             .getMessage().getPayload();
       } catch (ExecutionException e) {
         ComponentExecutionException componentExecutionException = (ComponentExecutionException) e.getCause();
@@ -124,10 +112,9 @@ public class LookupFunction implements ExpressionFunction {
       } catch (InterruptedException e) {
         throw new MuleRuntimeException(e);
       } catch (TimeoutException e) {
-        throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has timed out after %d %s",
+        throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has timed out after %d millis",
                                                                   flowName,
-                                                                  timeout,
-                                                                  timeUnit.name().toLowerCase())));
+                                                                  timeout)));
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));
@@ -142,7 +129,16 @@ public class LookupFunction implements ExpressionFunction {
   @Override
   public List<FunctionParameter> parameters() {
     return asList(new FunctionParameter("flowName", STRING),
-                  new FunctionParameter("payload", OBJECT));
+                  new FunctionParameter("payload", OBJECT),
+                  new FunctionParameter("timeoutMillis", NUMBER, context -> {
+                    if (timeoutFromSysProp != null) {
+                      return timeoutFromSysProp;
+                    } else if (schedulerService.isCurrentThreadForCpuWork()) {
+                      return 2000;
+                    } else {
+                      return SECONDS.toMillis(60);
+                    }
+                  }));
   }
 
   private <T> T lookupValue(BindingContext context, String binding, T fallback) {
