@@ -98,6 +98,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this.artifactType = APP;
     this.enableLazyInit = enableLazyInit;
     this.disableXmlValidations = disableXmlValidations;
+    this.runtimeComponentBuildingDefinitionsProvider = getRuntimeComponentBuildingDefinitionProvider();
   }
 
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
