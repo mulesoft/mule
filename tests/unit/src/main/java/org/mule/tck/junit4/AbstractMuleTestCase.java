@@ -16,6 +16,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.util.MuleSystemProperties.TESTING_MODE_PROPERTY_NAME;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
@@ -31,7 +32,6 @@ import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
-import org.mule.tck.report.ThreadDumper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,8 +64,6 @@ public abstract class AbstractMuleTestCase {
 
   public static final ComponentLocation TEST_CONNECTOR_LOCATION = fromSingleComponent(TEST_CONNECTOR);
 
-  public static final String TESTING_MODE_PROPERTY_NAME = "mule.testingMode";
-
   public static final int DEFAULT_TEST_TIMEOUT_SECS = 60;
 
   public static final String TEST_TIMEOUT_SYSTEM_PROPERTY = "mule.test.timeoutSecs";
@@ -85,7 +83,7 @@ public abstract class AbstractMuleTestCase {
       verbose = true;
     }
 
-    System.setProperty(TESTING_MODE_PROPERTY_NAME, StringUtils.EMPTY);
+    System.setProperty(TESTING_MODE_PROPERTY_NAME, "true");
   }
 
   private static final Logger LOGGER = getLogger(AbstractMuleTestCase.class);
