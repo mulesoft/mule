@@ -99,8 +99,8 @@
             <version>${staxApiVersion}</version>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.java-json-tools</groupId>
@@ -126,6 +126,10 @@
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>javax.mail</groupId>
+                	<artifactId>mailapi</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
