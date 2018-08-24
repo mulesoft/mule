@@ -70,7 +70,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
 
-  private Set<ExtensionModel> extensSchedulerInitialStateTestCaseions = emptySet();
+  private Set<ExtensionModel> extensions = emptySet();
 
   public void setExtensions(Set<ExtensionModel> extensions) {
     this.extensions = extensions;
