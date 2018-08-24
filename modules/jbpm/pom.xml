@@ -76,8 +76,8 @@
             <artifactId>javassist</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
         <dependency>
             <!-- Use this one, already bundled with Mule, juel-api duplicates it and is excluded -->
