@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 
 import java.io.File;
 import java.net.URL;
@@ -72,7 +73,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     application = new DefaultMuleApplication(applicationDescriptorMock, parentArtifactClassLoader, emptyList(),
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
-                                             appLocation, null, null);
+                                             appLocation, null, null,
+                                             getRuntimeComponentBuildingDefinitionProvider());
     application.setArtifactContext(mockArtifactContext);
 
     muleContext.getInjector().inject(this);
@@ -117,7 +119,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
-                                   null, null, appLocation, null, null);
+                                   null, null, appLocation, null, null, null);
     application.install();
     assertThat(application.deploymentClassLoader, is(notNullValue()));
     application.dispose();

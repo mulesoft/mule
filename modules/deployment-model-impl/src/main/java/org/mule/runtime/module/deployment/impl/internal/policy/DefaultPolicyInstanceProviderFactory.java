@@ -13,6 +13,7 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
@@ -24,6 +25,7 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
   private final ServiceRepository serviceRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
+  private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   /**
    * Creates a new factory
@@ -31,17 +33,23 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
    * @param serviceRepository contains available service instances. Non null.
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    */
   public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository,
                                               ClassLoaderRepository classLoaderRepository,
-                                              ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+                                              ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                              ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     checkArgument(serviceRepository != null, "serviceRepository cannot be null");
     checkArgument(classLoaderRepository != null, "classLoaderRepository cannot be null");
     checkArgument(extensionModelLoaderRepository != null, "extensionModelLoaderRepository cannot be null");
+    checkArgument(runtimeComponentBuildingDefinitionProvider != null,
+                  "runtimeComponentBuildingDefinitionProvider cannot be null");
 
     this.serviceRepository = serviceRepository;
     this.classLoaderRepository = classLoaderRepository;
+    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
   }
 
   @Override
@@ -49,7 +57,8 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
                                           PolicyParametrization parametrization) {
     return new DefaultApplicationPolicyInstance(application, policyTemplate, parametrization, serviceRepository,
                                                 classLoaderRepository, policyTemplate.getArtifactPlugins(),
-                                                extensionModelLoaderRepository, null);
+                                                extensionModelLoaderRepository, null,
+                                                runtimeComponentBuildingDefinitionProvider);
   }
 
 }

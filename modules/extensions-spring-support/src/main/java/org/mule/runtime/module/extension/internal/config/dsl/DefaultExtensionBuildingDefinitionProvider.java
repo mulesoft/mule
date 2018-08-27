@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -53,12 +60,6 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
 /**
  * A generic {@link ComponentBuildingDefinitionProvider} which provides definitions capable of handling all extensions registered
  * on the {@link ExtensionManager}.
@@ -69,7 +70,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
 
-  private Set<ExtensionModel> extensions;
+  private Set<ExtensionModel> extensions = emptySet();
 
   public void setExtensions(Set<ExtensionModel> extensions) {
     this.extensions = extensions;

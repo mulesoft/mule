@@ -22,6 +22,14 @@ import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -45,13 +53,7 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +87,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *        org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties
    * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -92,11 +95,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  List<ClassLoader> pluginsClassLoaders,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
-                                 Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations)
+                                 Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations,
+                                 ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider)
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
           extendArtifactProperties(artifactProperties), artifactType, pluginsClassLoaders, parentConfigurationProperties,
-          disableXmlValidations);
+          disableXmlValidations, runtimeComponentBuildingDefinitionProvider);
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
 
@@ -239,8 +243,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       unregisterBeans(alreadyCreatedApplicationComponents);
       if (alreadyCreatedApplicationComponents.contains(OBJECT_SECURITY_MANAGER)) {
         try {
-          // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to retrieve
-          // it (through MuleContext and registry) while creating it. See org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
+          // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to
+          // retrieve
+          // it (through MuleContext and registry) while creating it. See
+          // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
           muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
         } catch (RegistrationException e) {
           throw new IllegalStateException("Couldn't create a new instance of Mule security manager", e);
