@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.metadata.cache;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
@@ -71,8 +72,8 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
         return metadataCache;
 
       } catch (Exception e) {
-        String msg = String.format("An error occurred while retrieving the MetadataCache with ID '%s': %s",
-                                   id, e.getMessage());
+        String msg = format("An error occurred while retrieving the MetadataCache with ID '%s': %s",
+                            id, e.getMessage());
         LOGGER.error(msg);
         throw new RuntimeException(msg, e);
       }
@@ -89,8 +90,8 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
         }
         metadataStore.get().store(key, cache);
       } catch (Exception e) {
-        String msg = String.format("An error occurred while updating the MetadataCache with ID '%s': %s",
-                                   id, e.getMessage());
+        String msg = format("An error occurred while updating the MetadataCache with ID '%s': %s",
+                            id, e.getMessage());
         LOGGER.error(msg);
         throw new RuntimeException(msg, e);
       }
@@ -104,11 +105,13 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
       try {
         metadataStore.get().remove(key);
       } catch (ObjectDoesNotExistException e) {
-        LOGGER.debug("No exact match found: " + key);
+        LOGGER
+            .debug(format("No exact match found for key '%s'. Disposing all the elements with a prefix matching the given value.",
+                          key));
         disposeAllMatches(keyHash);
       } catch (Exception e) {
-        String msg = String.format("An error occurred while disposing the MetadataCache with ID '%s': %s",
-                                   keyHash, e.getMessage());
+        String msg = format("An error occurred while disposing the MetadataCache with ID '%s': %s",
+                            keyHash, e.getMessage());
         LOGGER.error(msg);
         throw new RuntimeException(msg, e);
       }
@@ -124,12 +127,12 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
             try {
               this.dispose(id);
             } catch (Exception inner) {
-              LOGGER.debug(String.format("Failed to dispose ID '%s' with partial match: %s", id, inner.getMessage()));
+              LOGGER.debug(format("Failed to dispose ID '%s' with partial prefix match: %s", id, inner.getMessage()));
             }
           });
     } catch (ObjectStoreException e) {
-      String msg = String.format("Failed to perform a cache disposal for partial ID '%s': %s",
-                                 keyHash, e.getMessage());
+      String msg = format("Failed to perform a cache disposal for partial prefix ID '%s': %s",
+                          keyHash, e.getMessage());
       LOGGER.error(msg);
       throw new RuntimeException(msg, e);
     }

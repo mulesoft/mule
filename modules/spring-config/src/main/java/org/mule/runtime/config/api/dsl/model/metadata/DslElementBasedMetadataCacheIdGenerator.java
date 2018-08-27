@@ -195,7 +195,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     final String value = element.getValue().get();
     final String sourceElementName = getModelName(element.getModel())
         .map(modelName -> isBlank(element.getDsl().getPrefix()) ? modelName : element.getDsl().getPrefix() + ":" + modelName)
-        .orElse(null);
+        .orElseGet(() -> element.getIdentifier().map(Object::toString).orElse(null));
 
     final MetadataCacheId valuePart = new MetadataCacheId(value.hashCode(), sourceElementName);
     if (value.contains(DEFAULT_EXPRESSION_PREFIX)) {
@@ -271,7 +271,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
       return Optional.of(((NamedObject) model).getName());
     }
 
-    if (model instanceof MetadataType) {
+    if (model instanceof ObjectType) {
       return ExtensionMetadataTypeUtils.getId((MetadataType) model);
     }
 

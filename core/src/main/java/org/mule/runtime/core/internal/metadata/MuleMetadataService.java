@@ -130,8 +130,8 @@ public class MuleMetadataService implements MetadataService {
     try {
       return cacheManager.getOrCreateCache(id);
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new MuleRuntimeException(createStaticMessage("Could not get the cache with id '" + id + "':" + e.getMessage()),
+      throw new MuleRuntimeException(createStaticMessage("An error occurred while obtaCould not get the cache with id '" + id
+          + "':" + e.getMessage()),
                                      e);
     }
   }
