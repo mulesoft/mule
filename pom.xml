@@ -2005,16 +2005,6 @@
                 <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
             </properties>
         </profile>
-        <profile>
-            <!-- This module needs to be run after all of the sources jars of the reactor are available -->
-            <!-- So we have moved it to another module that it should be executed indivdually after run 'mvn clean install' in the
-                 root pom.xml. This is needed to be sure that this module is built at the end in a parallel execution (-T) without
-                 adding all the modules of the reactor as deps-->
-            <id>sources-community</id>
-            <modules>
-                <module>sources-community</module>
-            </modules>
-        </profile>
 		<profile>
             <id>release</id>
             <properties>
