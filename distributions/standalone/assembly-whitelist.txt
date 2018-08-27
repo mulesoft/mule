@@ -359,8 +359,8 @@
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.1.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-8.0.0.jar
-/mule-standalone-${productVersion}/lib/opt/mail-1.5.4.jar
-/mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
+/mule-standalone-${productVersion}/lib/opt/javax.mail-1.5.4.jar
+/mule-standalone-${productVersion}/lib/opt/mailapi-1.5.4.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.11.jar
 /mule-standalone-${productVersion}/lib/opt/mimepull-1.9.3.jar
 /mule-standalone-${productVersion}/lib/opt/modulator-1.0.jar
