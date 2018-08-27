@@ -28,7 +28,7 @@ public interface MetadataCacheIdGenerator<T> {
    * @return a {@link MetadataCacheId} that identifies the component Types with all its current configuration or
    * {@link Optional#empty} if no valid identifier can be created for the component.
    */
-  Optional<MetadataCacheId> getIdForMetadata(T component);
+  Optional<MetadataCacheId> getIdForComponentMetadata(T component);
 
   /**
    * Calculates the {@link MetadataCacheId} required to identify the {@link org.mule.runtime.api.metadata.MetadataKey}s
@@ -40,5 +40,16 @@ public interface MetadataCacheIdGenerator<T> {
    * or {@link Optional#empty} if no valid identifier can be created for the component.
    */
   Optional<MetadataCacheId> getIdForMetadataKeys(T component);
+
+  /**
+   * Calculates the {@link MetadataCacheId} required to identify all the Metadata associated to the given {@code component},
+   * and its siblings, based on the referenced global element configuration.
+   * This method will ignore the values of the configured MetadataKeys as long as they don't affect the resolution of nested keys.
+   *
+   * @param component the configured component
+   * @return a {@link MetadataCacheId} that identifies the global Metadata associated to the component with its current configuration,
+   * or {@link Optional#empty} if no valid identifier can be created for the component.
+   */
+  Optional<MetadataCacheId> getIdForGlobalMetadata(T component);
 
 }

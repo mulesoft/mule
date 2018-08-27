@@ -31,11 +31,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTEXT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -53,14 +51,14 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
+
+import java.util.Collection;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -72,9 +70,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
-
-import java.util.Collection;
-import java.util.Optional;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -296,17 +291,6 @@ public class LifecycleAwareConfigurationInstanceTestCase
     if (connectionProvider.isPresent()) {
       verify((Disposable) connectionProvider.get()).dispose();
     }
-  }
-
-  @Test
-  public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
-    MuleMetadataService muleMetadataManager =
-        ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(MuleMetadataService.class);
-    muleMetadataManager.getMetadataCache(NAME);
-    interceptable.initialise();
-    interceptable.start();
-    interceptable.stop();
-    new PollingProber(1000, 100).check(new JUnitLambdaProbe(() -> muleMetadataManager.getMetadataCaches().entrySet().isEmpty()));
   }
 
   @Test

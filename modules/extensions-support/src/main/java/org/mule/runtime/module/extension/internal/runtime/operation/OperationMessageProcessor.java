@@ -13,8 +13,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -67,7 +65,8 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   @Override
   public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
                                                                       () -> entityMetadataMediator.getEntityKeys(context)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
@@ -77,8 +76,9 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   @Override
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
-          .getEntityMetadata(context, key)));
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
+                                        .getEntityMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }
