@@ -149,6 +149,10 @@ import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
 
+import com.google.common.collect.ImmutableList;
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
+
 /**
  * Set of utility operations to get insights about objects and their components
  *
@@ -1045,7 +1049,7 @@ public final class IntrospectionUtils {
       classes.addAll(collectRelativeClasses(subTypesModel.getBaseType(), extensionClassLoader));
       classes.addAll(subTypesModel.getSubTypes()
           .stream()
-          .flatMap(type -> collectRelativeClasses(subTypesModel.getBaseType(), extensionClassLoader)
+          .flatMap(type -> collectRelativeClasses(type, extensionClassLoader)
               .stream())
           .collect(toSet()));
       return classes.stream();
