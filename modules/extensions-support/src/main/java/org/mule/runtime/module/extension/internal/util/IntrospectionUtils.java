@@ -106,11 +106,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
-import org.reflections.ReflectionUtils;
-import org.springframework.core.ResolvableType;
-
-import com.google.common.collect.ImmutableList;
-
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -143,6 +138,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+
+import com.google.common.collect.ImmutableList;
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -1085,7 +1084,7 @@ public final class IntrospectionUtils {
       classes.addAll(collectRelativeClasses(subTypesModel.getBaseType(), extensionClassLoader));
       classes.addAll(subTypesModel.getSubTypes()
           .stream()
-          .flatMap(type -> collectRelativeClasses(subTypesModel.getBaseType(), extensionClassLoader)
+          .flatMap(type -> collectRelativeClasses(type, extensionClassLoader)
               .stream())
           .collect(toSet()));
       return classes.stream();
