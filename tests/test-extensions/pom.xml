@@ -43,6 +43,7 @@
         <module>values-extension</module>
         <module>substitution-group-extension</module>
         <module>classloading-extension</module>
+        <module>resource-extension</module>
     </modules>
 
     <build>
