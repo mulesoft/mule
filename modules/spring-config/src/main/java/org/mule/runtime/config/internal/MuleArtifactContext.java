@@ -8,22 +8,17 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.IMPORT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -35,13 +30,11 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -49,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
@@ -65,16 +57,10 @@ import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
-import org.mule.runtime.config.api.dsl.processor.ConfigFile;
-import org.mule.runtime.config.api.dsl.processor.ConfigLine;
-import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -123,16 +109,12 @@ import org.springframework.context.support.AbstractRefreshableConfigApplicationC
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.w3c.dom.Document;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
  * Classpath of file system using the MuleBeanDefinitionReader.
  */
-public class MuleArtifactContext extends AbstractRefreshableConfigApplicationContext {
+public class MuleArtifactContext extends AbstractRefreshableConfigApplicationContext implements ArtifactConfigResolverContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
 
@@ -262,7 +244,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private void createApplicationModel() {
     try {
-      ArtifactConfig artifactConfig = resolveArtifactConfig();
+      ArtifactConfig artifactConfig = new DefaultArtifactConfigResolver().resolveArtifactConfig(this);
       Set<ExtensionModel> extensions =
           muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions() : emptySet();
       ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
@@ -275,107 +257,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
-  }
-
-  private ArtifactConfig resolveArtifactConfig() {
-    ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
-    applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
-
-    if (!isEmpty(artifactConfigResources)) {
-      List<Pair<String, Supplier<InputStream>>> initialConfigFiles = new ArrayList<>();
-      for (ConfigResource artifactConfigResource : artifactConfigResources) {
-        initialConfigFiles.add(new Pair<>(artifactConfigResource.getResourceName(), () -> {
-          try {
-            return artifactConfigResource.getInputStream();
-          } catch (IOException e) {
-            throw new MuleRuntimeException(e);
-          }
-        }));
-      }
-
-      List<ConfigFile> configFiles = new ArrayList<>();
-      recursivelyResolveConfigFiles(initialConfigFiles, configFiles).forEach(applicationConfigBuilder::addConfigFile);
-    }
-
-    applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
-    return applicationConfigBuilder.build();
-  }
-
-  private List<ConfigFile> recursivelyResolveConfigFiles(List<Pair<String, Supplier<InputStream>>> configFilesToResolve,
-                                                         List<ConfigFile> alreadyResolvedConfigFiles) {
-
-    DefaultConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new EnvironmentPropertiesConfigurationProvider());
-
-    ImmutableList.Builder<ConfigFile> resolvedConfigFilesBuilder =
-        ImmutableList.<ConfigFile>builder().addAll(alreadyResolvedConfigFiles);
-    configFilesToResolve.stream()
-        .filter(fileNameInputStreamPair -> !alreadyResolvedConfigFiles.stream()
-            .anyMatch(configFile -> configFile.getFilename().equals(fileNameInputStreamPair.getFirst())))
-        .forEach(fileNameInputStreamPair -> {
-          InputStream is = null;
-          try {
-            is = fileNameInputStreamPair.getSecond().get();
-            Document document =
-                xmlConfigurationDocumentLoader.loadDocument(muleContext.getExtensionManager() == null ? emptySet()
-                    : muleContext.getExtensionManager().getExtensions(),
-                                                            fileNameInputStreamPair.getFirst(),
-                                                            is);
-            ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
-            ConfigFile configFile = new ConfigFile(fileNameInputStreamPair.getFirst(), asList(mainConfigLine));
-            resolvedConfigFilesBuilder.add(configFile);
-          } finally {
-            if (is != null) {
-              try {
-                is.close();
-              } catch (IOException e) {
-                throw new MuleRuntimeException(e);
-              }
-            }
-          }
-        });
-
-    ImmutableSet.Builder<String> importedFiles = ImmutableSet.builder();
-    for (ConfigFile configFile : resolvedConfigFilesBuilder.build()) {
-      List<ConfigLine> rootConfigLines = configFile.getConfigLines();
-      ConfigLine muleRootElementConfigLine = rootConfigLines.get(0);
-      importedFiles.addAll(muleRootElementConfigLine.getChildren().stream()
-          .filter(configLine -> configLine.getNamespace().equals(CORE_PREFIX)
-              && configLine.getIdentifier().equals(IMPORT_ELEMENT))
-          .map(configLine -> {
-            SimpleConfigAttribute fileConfigAttribute = configLine.getConfigAttributes().get("file");
-            if (fileConfigAttribute == null) {
-              throw new RuntimeConfigurationException(
-                                                      createStaticMessage(format("<import> does not have a file attribute defined. At file '%s', at line %s",
-                                                                                 configFile.getFilename(),
-                                                                                 configLine.getLineNumber())));
-            }
-            return fileConfigAttribute.getValue();
-          })
-          .map(value -> (String) propertyResolver.resolveValue(value))
-          .filter(fileName -> !alreadyResolvedConfigFiles.stream()
-              .anyMatch(solvedConfigFile -> solvedConfigFile.getFilename().equals(fileName)))
-          .collect(toList()));
-    }
-
-    Set<String> importedConfigurationFiles = importedFiles.build();
-
-    if (importedConfigurationFiles.isEmpty()) {
-      return resolvedConfigFilesBuilder.build();
-    }
-
-    List<Pair<String, Supplier<InputStream>>> newConfigFilesToResolved = importedConfigurationFiles.stream()
-        .map(importedFileName -> {
-          ClassLoader classLoader = muleContext.getExecutionClassLoader();
-          if (classLoader.getResource(importedFileName) == null) {
-            throw new RuntimeConfigurationException(createStaticMessage(format("Could not find imported resource '%s'",
-                                                                               importedFileName)));
-          }
-          return (Pair<String, Supplier<InputStream>>) new Pair(importedFileName, (Supplier<InputStream>) () -> classLoader
-              .getResourceAsStream(importedFileName));
-        }).collect(toList());
-
-    return recursivelyResolveConfigFiles(newConfigFilesToResolved, resolvedConfigFilesBuilder.build());
   }
 
   @Override
@@ -757,4 +638,45 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   public String toString() {
     return format("%s: %s (%s)", this.getClass().getName(), muleContext.getConfiguration().getId(), artifactType.name());
   }
+
+  // *****************************
+  // ArtifactConfigResolverContext
+  // *****************************
+
+
+  @Override
+  public String getArtifactName() {
+    return muleContext.getConfiguration().getId();
+  }
+
+  @Override
+  public Map<String, String> getArtifactProperties() {
+    return artifactProperties;
+  }
+
+  @Override
+  public ConfigResource[] getArtifactConfigResources() {
+    return artifactConfigResources;
+  }
+
+  @Override
+  public XmlConfigurationDocumentLoader getXmlConfigurationDocumentLoader() {
+    return xmlConfigurationDocumentLoader;
+  }
+
+  @Override
+  public Set<ExtensionModel> getExtensions() {
+    return muleContext.getExtensionManager() == null ? emptySet() : muleContext.getExtensionManager().getExtensions();
+  }
+
+  @Override
+  public XmlApplicationParser getXmlApplicationParser() {
+    return xmlApplicationParser;
+  }
+
+  @Override
+  public ClassLoader getExecutionClassLoader() {
+    return muleContext.getExecutionClassLoader();
+  }
+
 }
