@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Provides a context for the {@link ArtifactConfigResolver} to hook up the input for the resolver.
  *
- * @since 4.1.4
+ * @since 4.1.4, 4.2.0
  */
 public interface ArtifactConfigResolverContext {
 

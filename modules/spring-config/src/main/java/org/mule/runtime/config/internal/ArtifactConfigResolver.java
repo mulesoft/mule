@@ -11,7 +11,7 @@ import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 /**
  * Resolves the {@link ArtifactConfig} for the given {@link ArtifactConfigResolverContext context}.
  *
- * @since 4.1.4
+ * @since 4.1.4, 4.2.0
  */
 public interface ArtifactConfigResolver {
 
