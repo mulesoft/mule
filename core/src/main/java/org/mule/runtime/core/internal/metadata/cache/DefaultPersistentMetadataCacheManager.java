@@ -27,11 +27,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * //TODO
+ * Default implementation of a {@link MetadataCacheManager}.
+ * This implementation provides a way of managing persistent {@link MetadataCache}s
+ * that are stored at container-level using the ObjectStore as handler for the persistence.
+ *
+ * Cache's are <b>never evicted</b>, and will be cleared only when an explicit disposal is invoked.
+ *
+ * @since 4.1.4, 4.2.0
  */
-public class DefaultMetadataCacheManager implements MetadataCacheManager, Startable {
+public class DefaultPersistentMetadataCacheManager implements MetadataCacheManager, Startable {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMetadataCacheManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPersistentMetadataCacheManager.class);
   public static final String PERSISTENT_METADATA_SERVICE_CACHE = "_mulePersistentMetadataService";
 
   @Inject
@@ -52,7 +58,7 @@ public class DefaultMetadataCacheManager implements MetadataCacheManager, Starta
   }
 
   @Override
-  public MetadataCache getCache(String id) {
+  public MetadataCache getOrCreateCache(String id) {
     return withKeyLock(id, key -> {
       try {
         if (metadataStore.get().contains(key)) {
@@ -74,10 +80,10 @@ public class DefaultMetadataCacheManager implements MetadataCacheManager, Starta
   }
 
   @Override
-  public void saveCache(String id, MetadataCache cache) {
+  public void updateCache(String id, MetadataCache cache) {
     withKeyLock(id, key -> {
       try {
-        LOGGER.debug("saveCache Key: " + id);
+        LOGGER.debug("updateCache Key: " + id);
         if (metadataStore.get().contains(key)) {
           metadataStore.get().remove(key);
         }

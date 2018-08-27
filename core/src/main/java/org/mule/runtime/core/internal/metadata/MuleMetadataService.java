@@ -128,7 +128,7 @@ public class MuleMetadataService implements MetadataService {
 
   public MetadataCache getMetadataCache(String id) {
     try {
-      return cacheManager.getCache(id);
+      return cacheManager.getOrCreateCache(id);
     } catch (Exception e) {
       e.printStackTrace();
       throw new MuleRuntimeException(createStaticMessage("Could not get the cache with id '" + id + "':" + e.getMessage()),
@@ -192,7 +192,7 @@ public class MuleMetadataService implements MetadataService {
   }
 
   public void saveCache(String id, MetadataCache cache) {
-    cacheManager.saveCache(id, cache);
+    cacheManager.updateCache(id, cache);
   }
 
   @FunctionalInterface

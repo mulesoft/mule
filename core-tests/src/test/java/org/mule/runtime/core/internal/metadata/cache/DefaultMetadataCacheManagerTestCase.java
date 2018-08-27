@@ -53,7 +53,7 @@ public class DefaultMetadataCacheManagerTestCase {
   private MetadataCache mockCache;
 
   @InjectMocks
-  private DefaultMetadataCacheManager cacheManager = new DefaultMetadataCacheManager();
+  private DefaultPersistentMetadataCacheManager cacheManager = new DefaultPersistentMetadataCacheManager();
 
   @Before
   public void setUp() {
@@ -68,7 +68,7 @@ public class DefaultMetadataCacheManagerTestCase {
   public void createCacheWhenMissingKey() throws ObjectStoreException {
     when(objectStore.contains(SOME_KEY)).thenReturn(false);
 
-    MetadataCache cache = cacheManager.getCache(SOME_KEY);
+    MetadataCache cache = cacheManager.getOrCreateCache(SOME_KEY);
     assertThat(cache, instanceOf(DefaultMetadataCache.class));
     verify(objectStore).contains(SOME_KEY);
     verify(objectStore, never()).retrieve(SOME_KEY);
@@ -80,7 +80,7 @@ public class DefaultMetadataCacheManagerTestCase {
     when(objectStore.contains(SOME_KEY)).thenReturn(true);
     when(objectStore.retrieve(SOME_KEY)).thenReturn(mockCache);
 
-    MetadataCache actual = cacheManager.getCache(SOME_KEY);
+    MetadataCache actual = cacheManager.getOrCreateCache(SOME_KEY);
     assertThat(actual, is(mockCache));
     verify(objectStore).contains(SOME_KEY);
     verify(objectStore).retrieve(SOME_KEY);
@@ -94,7 +94,7 @@ public class DefaultMetadataCacheManagerTestCase {
     when(objectStore.remove(SOME_KEY)).thenReturn(mockCache);
 
     DefaultMetadataCache cache = new DefaultMetadataCache();
-    cacheManager.saveCache(SOME_KEY, cache);
+    cacheManager.updateCache(SOME_KEY, cache);
 
     verify(objectStore).contains(SOME_KEY);
     verify(objectStore).remove(SOME_KEY);
