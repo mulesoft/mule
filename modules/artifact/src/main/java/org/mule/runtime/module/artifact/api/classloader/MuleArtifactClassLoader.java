@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -149,6 +150,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public void dispose() {
+    pathMapping.forEach((path, classloader) -> {
+      try {
+        classloader.close();
+      } catch (IOException e) {
+        reportPossibleLeak(e, path);
+      }
+    });
     pathMapping.clear();
     try {
       createResourceReleaserInstance().release();
@@ -157,6 +165,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
     super.dispose();
     shutdownListeners();
+  }
+
+  void reportPossibleLeak(Exception e, String artifactId) {
+    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(message, artifactId, e);
+    } else {
+      LOGGER.error(message, artifactId);
+    }
   }
 
   private void shutdownListeners() {

@@ -367,15 +367,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     }
   }
 
-  private void reportPossibleLeak(Exception e, String artifactId) {
-    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(message, artifactId, e);
-    } else {
-      LOGGER.error(message, artifactId);
-    }
-  }
-
   @Override
   public URL findLocalResource(String resourceName) {
     URL resource = getOwnerClassLoader().findLocalResource(resourceName);
