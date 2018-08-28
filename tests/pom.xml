@@ -30,6 +30,7 @@
         <module>runner</module>
         <module>parsers-plugin</module>
         <module>model</module>
+        <module>http-resource-service</module>
     </modules>
 
     <build>

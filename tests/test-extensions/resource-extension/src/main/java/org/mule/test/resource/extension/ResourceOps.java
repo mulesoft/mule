@@ -1,0 +1,74 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.test.resource.extension;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import javax.inject.Inject;
+
+public class ResourceOps {
+
+  @Inject
+  private HttpService fakeHttpService;
+
+  /**
+   * This operation loads MANIFEST files and gets their Bundle-Description or simply a resource as String. It allows testing which
+   * resources will be accessible to a plugin classloader.
+   *
+   * @param resource the resource to load
+   * @return the String representation of the resource or Bundle-Description if it was a MANIFEST
+   */
+  public String access(String resource) {
+    InputStream resourceStream = this.getClass().getClassLoader().getResourceAsStream(resource);
+    // We'll interpret MANIFEST files but also allow simple output to test other scenarios
+    if (resource.endsWith(".MF")) {
+      if (resourceStream != null) {
+        Properties properties = new Properties();
+        try {
+          properties.load(resourceStream);
+        } catch (IOException e) {
+          throw new MuleRuntimeException(e);
+        }
+        return properties.getProperty("Bundle-Description");
+      }
+    }
+    return resourceStream != null ? IOUtils.toString(resourceStream) : "";
+
+  }
+
+  /**
+   * This operation depends on the fake HTTP service to provide resource access through it and validate how the service classloader
+   * behaves. It should only be used when the fake HTTP service is available.
+   *
+   * @param resource the MANIFEST resource to load
+   * @return the Bundle-Description of the MANIFEST or an empty String if not found
+   */
+  public String serviceAccess(String resource) {
+    try {
+      HttpRequestBuilder requestBuilder = HttpRequest.builder().uri("pepito.com");
+      if (resource != null) {
+        requestBuilder.entity(new ByteArrayHttpEntity(resource.getBytes()));
+      }
+      return IOUtils.toString(fakeHttpService.getClientFactory()
+          .create(null)
+          .send(requestBuilder.build(), 10000, true, null)
+          .getEntity().getContent());
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+}
