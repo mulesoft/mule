@@ -21,6 +21,7 @@ public interface ComponentAnnotations {
 
   QName ANNOTATION_NAME = new QName("config", "componentIdentifier");
   QName ANNOTATION_PARAMETERS = new QName("config", "componentParameters");
+  QName ANNOTATION_COMPONENT_CONFIG = new QName("config", "componentConfiguration");
 
   /**
    * Updates the {@link Component} root container name.

@@ -32,7 +32,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.Component;
@@ -53,12 +52,17 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -78,15 +82,17 @@ import org.mule.tck.core.streaming.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
@@ -139,6 +145,12 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected ExtensionManager extensionManager;
+
+  @Mock
+  protected MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
+
+  @Mock
+  protected MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
 
   @Mock
   protected MessageProcessingManager messageProcessingManager;
@@ -226,6 +238,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     mockSubTypes(extensionModel);
     when(configurationModel.getSourceModel(SOURCE_NAME)).thenReturn(of(sourceModel));
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
+    when(extensionManager.getExtensions()).thenReturn(Collections.singleton(extensionModel));
     when(configurationProvider.get(any())).thenReturn(configurationInstance);
     when(configurationProvider.getConfigurationModel()).thenReturn(configurationModel);
     when(configurationProvider.getName()).thenReturn(CONFIG_NAME);
@@ -237,6 +250,16 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     when(metadataResolverFactory.getInputResolver("type")).thenReturn(new NullMetadataResolver());
     when(metadataResolverFactory.getOutputResolver()).thenReturn(new TestNoConfigMetadataResolver());
     when(metadataResolverFactory.getOutputAttributesResolver()).thenReturn(new TestNoConfigMetadataResolver());
+
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
+                                                                           cacheIdGeneratorFactory);
+    when(cacheIdGeneratorFactory.create(any(), any())).thenReturn(cacheIdGenerator);
+    when(cacheIdGenerator.getIdForComponentMetadata(any()))
+        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
+    when(cacheIdGenerator.getIdForGlobalMetadata(any()))
+        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
+    when(cacheIdGenerator.getIdForMetadataKeys(any()))
+        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
 
     when(sourceModel.getOutput())
         .thenReturn(new ImmutableOutputModel("Output", BaseTypeBuilder.create(JAVA).stringType().build(), true, emptySet()));

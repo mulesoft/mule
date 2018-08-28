@@ -9,7 +9,7 @@
         <metadata:connection/>
     </metadata:config>
 
-    <metadata:config name="alternative-config" dataWithDefault="staticOverride">
+    <metadata:config name="alternative-config" dataWithDefault="staticOverride" data="otherExpression">
         <metadata:connection/>
     </metadata:config>
 

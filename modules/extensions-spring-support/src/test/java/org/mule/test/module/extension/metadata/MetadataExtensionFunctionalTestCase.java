@@ -172,7 +172,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   @Override
   protected boolean isDisposeContextPerClass() {
-    return true;
+    return false;
   }
 
   public enum ResolutionType {

@@ -56,6 +56,7 @@ import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
@@ -114,22 +115,22 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ApplicationModel applicationModel = loadApplicationModel(getBaseApp());
     Map<String, MetadataCacheId> hashByLocation = new HashMap<>();
 
-    MetadataCacheIdGenerator<ComponentModel> generator = createGenerator(applicationModel);
+    MetadataCacheIdGenerator<ComponentConfiguration> generator = createGenerator(applicationModel);
 
     applicationModel.getRootComponentModel().getInnerComponents()
         .forEach(component -> hashByLocation.put(component.getComponentLocation().getLocation(),
-                                                 generator.getIdForMetadata(component).get()));
+                                                 generator.getIdForComponentMetadata(component.getConfiguration()).get()));
 
     LOGGER.debug(hashByLocation.toString());
 
     ApplicationModel reload = loadApplicationModel(getBaseApp());
-    MetadataCacheIdGenerator<ComponentModel> otherGenerator = createGenerator(reload);
+    MetadataCacheIdGenerator<ComponentConfiguration> otherGenerator = createGenerator(reload);
 
     reload.getRootComponentModel().getInnerComponents()
         .forEach(component -> {
           String location = component.getComponentLocation().getLocation();
           MetadataCacheId previousHash = hashByLocation.get(location);
-          assertThat(previousHash, is(otherGenerator.getIdForMetadata(component).get()));
+          assertThat(previousHash, is(otherGenerator.getIdForComponentMetadata(component.getConfiguration()).get()));
         });
   }
 
@@ -372,15 +373,15 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   private MetadataCacheId getHash(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
-    ComponentModel component = new Locator(app)
+    ComponentConfiguration component = new Locator(app)
         .get(Location.builderFromStringRepresentation(location).build())
         .get();
-    return createGenerator(app).getIdForMetadata(component).get();
+    return createGenerator(app).getIdForComponentMetadata(component).get();
   }
 
   private MetadataCacheId getKeyHash(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
-    ComponentModel component = new Locator(app)
+    ComponentConfiguration component = new Locator(app)
         .get(Location.builderFromStringRepresentation(location).build())
         .get();
     return createGenerator(app).getIdForMetadataKeys(component).get();
@@ -534,11 +535,11 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     return metadataKeyId;
   }
 
-  private MetadataCacheIdGenerator<ComponentModel> createGenerator(ApplicationModel app) {
+  private MetadataCacheIdGenerator<ComponentConfiguration> createGenerator(ApplicationModel app) {
     return new ModelBasedMetadataCacheIdGeneratorFactory().create(dslResolvingContext, new Locator(app));
   }
 
-  private static class Locator implements MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentModel> {
+  private static class Locator implements MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentConfiguration> {
 
     private Map<Location, ComponentModel> components = new HashMap<>();
 
@@ -547,8 +548,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     }
 
     @Override
-    public Optional<ComponentModel> get(Location location) {
-      return Optional.ofNullable(components.get(location));
+    public Optional<ComponentConfiguration> get(Location location) {
+      return Optional.ofNullable(components.get(location).getConfiguration());
     }
 
     private Location getLocation(ComponentModel component) {
