@@ -17,8 +17,6 @@ import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_KEY_MASK;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
-
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -26,9 +24,6 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.tck.message.StringAttributes;
-import org.mule.test.metadata.extension.MetadataSource;
-import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver;
 
 import java.util.Set;
 
@@ -48,11 +43,6 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   @Override
   protected String getConfigFile() {
     return METADATA_TEST;
-  }
-
-  @Override
-  protected boolean isDisposeContextPerClass() {
-    return false;
   }
 
   @Test

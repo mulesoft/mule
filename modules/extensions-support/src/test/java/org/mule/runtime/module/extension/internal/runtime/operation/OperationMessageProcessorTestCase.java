@@ -11,7 +11,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -42,14 +41,10 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
-import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
-import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -65,7 +60,6 @@ import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -88,13 +82,6 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import com.google.common.reflect.TypeToken;
 
 import java.io.InputStream;
@@ -105,6 +92,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -420,20 +414,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     setUpValueResolvers();
     final Object metadataKeyValue = messageProcessor.getParameterValueResolver().getParameterValue(SOME_PARAM_NAME);
     assertThat(metadataKeyValue, is("person"));
-  }
-
-  @Test
-  public void getMetadataKeys() throws Exception {
-    MetadataResult<MetadataKeysContainer> metadataKeysResult = messageProcessor.getMetadataKeys();
-
-    verify(metadataResolverFactory).getKeyResolver();
-
-    assertThat(metadataKeysResult.getFailures().toString(), metadataKeysResult.isSuccess(), is(true));
-    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
-    assertThat(metadataKeys.size(), is(2));
-
-    assertThat(metadataKeys, hasItem(metadataKeyWithId(BOOLEAN.name())));
-    assertThat(metadataKeys, hasItem(metadataKeyWithId(STRING.name())));
   }
 
   @Test
