@@ -44,6 +44,13 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
         testThirdMessageSendToExceptionStrategy("vm://flow2.in", flowExecutionListener);
     }
 
+    @Test
+    public void handleSingleThreadedWorkRejectedWithExceptionStrategy() throws Exception
+    {
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("singlethreadFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(2);
+        testSecondMessageSendToExceptionStrategy("vm://flow3.in", flowExecutionListener);
+    }
+
     protected void testThirdMessageSendToExceptionStrategy(String inUrl, FlowExecutionListener flowExecutionListener) throws Exception
     {
         // Send 3 messages
@@ -69,6 +76,31 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
 
         // Third message was routed via exception strategy
         MuleMessage result = client.request("vm://exception", RECEIVE_TIMEOUT);
+        assertThat(result, is(notNullValue()));
+    }
+
+    protected void testSecondMessageSendToExceptionStrategy(String inUrl, FlowExecutionListener flowExecutionListener) throws Exception
+    {
+        // Send 2 messages
+        MuleClient client = muleContext.getClient();
+        int nrMessages = 2;
+        for (int i = 0; i < nrMessages; i++)
+        {
+            client.dispatch(inUrl, TEST_MESSAGE + i, null);
+        }
+        flowExecutionListener.waitUntilFlowIsComplete();
+        // Receive 1 message
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertThat(result, is(notNullValue()));
+        assertThat(result.getExceptionPayload(), is(nullValue()));
+        assertThat(result.getPayload(), not(instanceOf(NullPayload.class)));
+        assertThat(result.getPayloadAsString(), containsString(TEST_MESSAGE));
+
+        // Second message doesn't arrive
+        assertThat(client.request("vm://out", RECEIVE_TIMEOUT / 5), is(nullValue()));
+
+        // Second message was routed via exception strategy
+        result = client.request("vm://exception", RECEIVE_TIMEOUT);
         assertThat(result, is(notNullValue()));
     }
 }

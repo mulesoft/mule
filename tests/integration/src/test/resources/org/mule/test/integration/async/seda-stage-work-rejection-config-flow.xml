@@ -21,6 +21,10 @@
             name="smallQueue" maxQueueSize="1" maxThreads="1"
             poolExhaustedAction="RUN" threadWaitTimeout="20" />
 
+    <queued-asynchronous-processing-strategy
+        name="singleThreadSmallTimeout" maxThreads="1"
+        poolExhaustedAction="WAIT" threadWaitTimeout="500" />
+
     <flow name="limitedThreadsFlow" processingStrategy="max2ThreadSmallTimeout">
         <vm:inbound-endpoint address="vm://flow1.in"
             exchange-pattern="one-way" />
@@ -42,6 +46,18 @@
         <catch-exception-strategy>
             <vm:outbound-endpoint address="vm://exception"
                                   exchange-pattern="one-way" />
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="singlethreadFlow" processingStrategy="singleThreadSmallTimeout">
+        <vm:inbound-endpoint address="vm://flow3.in"
+            exchange-pattern="one-way" />
+        <test:component waitTime="1500" />
+        <vm:outbound-endpoint address="vm://out"
+            exchange-pattern="one-way" />
+        <catch-exception-strategy>
+            <vm:outbound-endpoint address="vm://exception"
+                exchange-pattern="one-way" />
         </catch-exception-strategy>
     </flow>
 

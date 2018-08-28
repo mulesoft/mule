@@ -25,6 +25,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.NonBlockingReplyToHandler;
+import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.AsyncMessageNotification;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
@@ -64,7 +65,13 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         this.doThreading = threadingProfile.isDoThreading();
         this.threadTimeout = threadingProfile.getThreadWaitTimeout();
-        workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
+
+        // (Add one to maximum number of active threads to account for the service
+        // work item that is running continuously and polling the SEDA queue.)
+        ThreadingProfile dedicatedPollingThreadThreadingProfile = new ChainedThreadingProfile(threadingProfile);
+        dedicatedPollingThreadThreadingProfile.setMuleContext(threadingProfile.getMuleContext());
+        dedicatedPollingThreadThreadingProfile.setMaxThreadsActive(threadingProfile.getMaxThreadsActive() + 1);
+        workManager = dedicatedPollingThreadThreadingProfile.createWorkManager(name, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
         {
             @Override
