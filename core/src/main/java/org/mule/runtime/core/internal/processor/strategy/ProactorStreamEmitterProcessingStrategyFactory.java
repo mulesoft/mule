@@ -9,24 +9,23 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Integer.getInteger;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.delay;
+import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.function.Supplier;
+import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -39,10 +38,19 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Supplier;
+
 import reactor.core.publisher.EmitterProcessor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.retry.BackoffDelay;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
@@ -75,7 +83,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                            .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                                        resolveParallelism(),
-                                                       getMaxConcurrency());
+                                                       getMaxConcurrency(),
+                                                       muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override
@@ -102,6 +111,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     private Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
+    private boolean isThreadLoggingEnabled;
 
     public ProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                                    int bufferSize,
@@ -110,30 +120,54 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                    Supplier<Scheduler> blockingSchedulerSupplier,
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                   int parrelism,
-                                                   int maxConcurrency)
+                                                   int parallelism,
+                                                   int maxConcurrency,
+                                                   boolean isThreadLoggingEnabled)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parrelism,
+      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism,
             maxConcurrency);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
+      this.isThreadLoggingEnabled = isThreadLoggingEnabled;
+    }
+
+    public ProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                   int bufferSize,
+                                                   int subscriberCount,
+                                                   String waitStrategy,
+                                                   Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                   Supplier<Scheduler> blockingSchedulerSupplier,
+                                                   Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                   int parallelism,
+                                                   int maxConcurrency)
+
+    {
+      this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency, false);
     }
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
-      EmitterProcessor<CoreEvent> processor =
-          EmitterProcessor.create(bufferSize);
+      EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
+
       int subscriberCount = maxConcurrency < subscribers ? maxConcurrency : subscribers;
       CountDownLatch completionLatch = new CountDownLatch(subscriberCount);
+
       processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader)).transform(function)
           .doFinally(s -> completionLatch.countDown()).subscribe();
+
       return new ReactorSink(processor.sink(), () -> {
         long start = currentTimeMillis();
         try {
-          completionLatch.await(Long.max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS);
+          if (!completionLatch.await(max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
+            LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
+                        shutdownTimeout);
+
+          }
         } catch (InterruptedException e) {
+          currentThread().interrupt();
           throw new MuleRuntimeException(e);
         }
       }, createOnEventConsumer(), bufferSize);
@@ -158,17 +192,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     @Override
-    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      if (maxConcurrency > subscribers) {
-        return publisher -> from(publisher).parallel(CORES * 2)
-            .runOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
-            .composeGroup(pipeline);
-      } else {
-        return super.onPipeline(pipeline);
-      }
-    }
-
-    @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == BLOCKING || processor.getProcessingType() == IO_RW) {
         return proactor(processor, blockingScheduler);
@@ -180,33 +203,55 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
+      reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+
       return publisher -> from(publisher).flatMap(event -> {
         if (processor.getProcessingType() == IO_RW && !scheduleIoRwEvent(event)) {
           // If payload is not a stream o length is < STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD (default 16KB) perform processing on
           // current thread in stead of scheduling using IO pool.
-          return just(event).transform(processor);
+          return just(event)
+              .transform(processor)
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
         } else {
-          return scheduleProcessor(processor, scheduler, event);
+          return scheduleProcessor(processor, publishOnScheduler, scheduler, event);
         }
       }, max(maxConcurrency / (getParallelism() * subscribers), 1));
     }
 
     private boolean scheduleIoRwEvent(CoreEvent event) {
       return event.getMessage().getPayload().getDataType().isStreamType()
-          && event.getMessage().getPayload().getLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
+          && event.getMessage().getPayload().getByteLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
     }
 
-    private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler scheduler, CoreEvent event) {
-      return just(event)
-          .transform(processor)
-          .publishOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
-          .subscribeOn(fromExecutorService(decorateScheduler(scheduler)))
-          .doOnError(RejectedExecutionException.class, throwable -> LOGGER.trace("Shared scheduler " + scheduler.getName()
-              + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS + "ms."))
-          .retryWhen(errors -> errors
-              .flatMap(error -> delay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), fromExecutorService(getCpuLightScheduler()))));
+    private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
+                                                   reactor.core.scheduler.Scheduler eventLoopScheduler,
+                                                   Scheduler processorScheduler, CoreEvent event) {
+      return scheduleWithLogging(processor, processorScheduler, event)
+          .publishOn(eventLoopScheduler)
+          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
+          .doOnError(RejectedExecutionException.class,
+                     throwable -> LOGGER.trace("Shared scheduler " + processorScheduler.getName()
+                         + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS
+                         + "ms."))
+          .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
+              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), ZERO, ZERO))
+              .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }
 
+    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+      if (isThreadLoggingEnabled) {
+        return just(event)
+            .flatMap(e -> subscriberContext()
+                .flatMap(ctx -> Mono.just(e).transform(processor)
+                    .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
+                        .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
+                                                                                               e.getContext().getId())))));
+      } else {
+        return just(event)
+            .transform(processor)
+            .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)));
+      }
+    }
 
   }
 

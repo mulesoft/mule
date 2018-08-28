@@ -11,9 +11,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
@@ -37,13 +38,6 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import java.util.OptionalLong;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.commons.io.input.NullInputStream;
-import org.junit.Test;
-
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -55,8 +49,14 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
-import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import org.apache.commons.io.input.NullInputStream;
+import org.junit.Test;
+
+import java.util.OptionalLong;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -386,13 +386,13 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Test
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
-    testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
+    testBackPressure(FAIL, lessThanOrEqualTo(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("When back-pressure strategy is 'DROP' the flow rejects requests in the same way way with 'FAIL. It is the source that handles FAIL and DROP differently.")
   public void sourceBackPressureDrop() throws Exception {
-    testBackPressure(DROP, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
+    testBackPressure(DROP, lessThanOrEqualTo(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
@@ -424,7 +424,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Test
   @Description("If the processing type is IO_RW and the payload is not a stream processing occurs in CPU_LIGHT thread.")
   public void singleIOWRWString() throws Exception {
-    super.singleIORW(() -> testEvent());
+    super.singleIORW(() -> testEvent(), contains(CPU_LIGHT));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(IO))));
@@ -435,7 +435,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Test
   @Description("If the processing type is IO_RW and the payload is a stream with unknown length then processing occurs in BLOCKING thread.")
   public void singleIOWRWUnkownLengthStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.empty()));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.empty()), contains(IO));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -446,7 +446,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Test
   @Description("If the processing type is IO_RW and the payload is a stream shorter that 16KB in length then processing occurs in CPU_LIGHT thread.")
   public void singleIOWRWSmallStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(10))));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(10))), contains(CPU_LIGHT));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(IO))));
@@ -457,7 +457,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Test
   @Description("If the processing type is IO_RW and the payload is a longer than 16KB in length then processing occurs in BLOCKING thread.")
   public void singleIOWRWLargeStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(20))));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(20))), contains(IO));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
