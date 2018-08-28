@@ -10,6 +10,9 @@
                 <parameter name="configParameterWithComplexJavadoc">
                     <description><![CDATA[Config Parameter with an Optional value]]></description>
                 </parameter>
+                <parameter name="name">
+                    <description><![CDATA[The identifier of this element used to reference it in other components]]></description>
+                </parameter>
                 <parameter name="expirationPolicy">
                     <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
                 </parameter>
@@ -62,6 +65,9 @@
             <parameters>
                 <parameter name="otherFriend">
                     <description><![CDATA[Some other friend]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>

@@ -81,12 +81,6 @@ abstract class ExecutableTypeSchemaDelegate {
     complexContentExtension.setBase(base);
     complexContent.setExtension(complexContentExtension);
 
-    if (dslSyntax.requiresConfig()) {
-      Attribute configAttr =
-          builder.createAttribute(CONFIG_ATTRIBUTE_NAME, CONFIG_ATTRIBUTE_DESCRIPTION, hasImplicitConfig, SUBSTITUTABLE_NAME);
-      complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
-    }
-
     this.builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
     return complexContentExtension;
   }

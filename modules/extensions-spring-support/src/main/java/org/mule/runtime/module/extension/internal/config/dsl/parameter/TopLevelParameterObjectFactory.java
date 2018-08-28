@@ -37,9 +37,6 @@ import javax.inject.Inject;
  */
 public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements ObjectTypeProvider {
 
-  @Inject
-  private ReflectionCache reflectionCache;
-
   private LazyValue<DefaultObjectBuilder> builder;
   private LazyValue<Class<?>> objectClass;
   private final ObjectType objectType;

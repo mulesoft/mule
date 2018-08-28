@@ -10,6 +10,8 @@ import static java.util.Arrays.stream;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor.defaultContributor;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -78,14 +80,11 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
-    return ImmutableList
-        .of(StackableTypesParameterContributor.defaultContributor(typeLoader));
+    return ImmutableList.of(defaultContributor(typeLoader));
   }
 
   private ImmutableList<ParameterDeclarerContributor> getParameterFieldsContributors() {
-    return ImmutableList
-        .of(new InfrastructureFieldContributor(),
-            StackableTypesParameterContributor.defaultContributor(typeLoader));
+    return ImmutableList.of(new InfrastructureFieldContributor(), defaultContributor(typeLoader));
   }
 
   public DefaultJavaModelLoaderDelegate(Class<?> extensionType, String version) {

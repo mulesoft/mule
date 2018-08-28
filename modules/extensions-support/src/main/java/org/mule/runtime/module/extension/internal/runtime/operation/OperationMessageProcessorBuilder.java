@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -27,35 +28,33 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 public final class OperationMessageProcessorBuilder
     extends ComponentMessageProcessorBuilder<OperationModel, OperationMessageProcessor> {
 
-  public OperationMessageProcessorBuilder(ExtensionModel extensionModel,
-                                          OperationModel operationModel,
+  public OperationMessageProcessorBuilder(ExtensionModel extension,
+                                          OperationModel operation,
                                           PolicyManager policyManager,
                                           MuleContext muleContext,
                                           Registry registry) {
 
-    super(extensionModel, operationModel, policyManager, registry.lookupByType(ReflectionCache.class).get(),
-          registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
+    super(extension, operation, policyManager, registry.lookupByType(ReflectionCache.class).get(),
+            registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
+
   }
 
   @Override
   protected OperationMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
+    ConfigurationProvider configurationProvider = getConfigurationProvider();
     if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
       return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                arguments,
-                                                cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                reflectionCache, extensionConnectionSupplier);
+                                                arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
+                                                policyManager, reflectionCache, extensionConnectionSupplier);
     }
 
     if (supportsOAuth(extensionModel)) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                arguments,
-                                                cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                reflectionCache, oauthManager);
+                                                arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
+                                                policyManager, reflectionCache, oauthManager);
     }
-    return new OperationMessageProcessor(extensionModel, operationModel,
-                                         configurationProvider, target, targetValue,
-                                         arguments,
-                                         cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                         policyManager, reflectionCache);
+    return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+                                         arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
+                                         reflectionCache);
   }
 }

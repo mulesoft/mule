@@ -37,7 +37,7 @@ public final class ConstructMessageProcessorBuilder
   @Override
   protected ConstructMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
     return new ConstructMessageProcessor(extensionModel, operationModel,
-                                         configurationProvider, target, targetValue,
+                                         getConfigurationProvider(), target, targetValue,
                                          arguments,
                                          cursorProviderFactory, retryPolicyTemplate,
                                          extensionManager,

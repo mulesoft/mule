@@ -21,9 +21,13 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="requiredPojoExpressionRequired"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="requiredPojoDefault"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

@@ -126,7 +126,7 @@ class ExtensionPluginMetadataGenerator {
     });
     try {
       extensionManager.initialise();
-    } catch (InitialisationException e) {
+    } catch (Exception e) {
       throw new RuntimeException("Error while initialising the extension manager", e);
     }
     return extensionManager;

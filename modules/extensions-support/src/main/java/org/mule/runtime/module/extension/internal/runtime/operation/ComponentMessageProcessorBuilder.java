@@ -150,4 +150,10 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     return this;
   }
 
+  protected ConfigurationProvider getConfigurationProvider() {
+    return parameters.values().stream()
+        .filter(v -> v instanceof ConfigurationProvider)
+        .map(v -> ((ConfigurationProvider) v)).findAny()
+        .orElse(configurationProvider);
+  }
 }

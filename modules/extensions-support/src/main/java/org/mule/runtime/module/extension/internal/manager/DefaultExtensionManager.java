@@ -46,6 +46,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigu
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,7 +86,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   private ExtensionActivator extensionActivator;
 
   @Override
-  public void initialise() throws InitialisationException {
+  public void initialise() {
     extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
     extensionErrorsRegistrant =
         new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(),
@@ -187,15 +188,11 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   @Override
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
-    Optional<ConfigurationModel> config = getConfigurationModelForExtension(extensionModel,
-                                                                            getConfigurationForComponent(extensionModel,
-                                                                                                         componentModel));
+    Set<ConfigurationModel> configurationsForComponent = getConfigurationForComponent(extensionModel, componentModel);
+    Optional<ConfigurationModel> config = getConfigurationModelForExtension(extensionModel, configurationsForComponent);
     if (!config.isPresent() && requiresConfig(extensionModel, componentModel)) {
-      throw new IllegalStateException(
-                                      format("No config-ref was specified for component '%s' of extension '%s'. Please specify which to use",
-                                             componentModel.getName(), extensionModel.getName()));
+      throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
-
     return config.map(c -> getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, c))).orElse(empty());
   }
 
