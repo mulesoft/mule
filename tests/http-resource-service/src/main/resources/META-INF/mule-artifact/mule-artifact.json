@@ -1,0 +1,19 @@
+{
+  "name": "Resource HTTP service",
+  "minMuleVersion": "4.2.0",
+  "requiredProduct": "MULE",
+  "contracts": [
+    {
+      "serviceProviderClassName": "org.mule.test.http.ResourceHttpServiceProvider",
+      "contractClassName": "org.mule.runtime.http.api.HttpService"
+    }
+  ],
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

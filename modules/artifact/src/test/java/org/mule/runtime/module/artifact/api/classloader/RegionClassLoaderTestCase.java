@@ -33,6 +33,17 @@ import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.duplicatePackageMappingError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.util.EnumerationMatcher;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -47,18 +58,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.util.EnumerationMatcher;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
@@ -94,7 +93,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     PARENT_LOADED_RESOURCE = new URL("file:///parent.txt");
     APP_LOADED_RESOURCE = new URL("file:///app.txt");
     PLUGIN_LOADED_RESOURCE = new URL("file:///plugin.txt");
-    API_LOCATION = ClassUtils.getResource("classloader-test-api.zip", this.getClass());
+    API_LOCATION = ClassUtils.getResource("com/organization/test-artifact/1.0.0/classloader-test-api.zip", this.getClass());
     API_LOADED_RESOURCE = new URL("jar:" + API_LOCATION.toString() + "!/" + API_RESOURCE_NAME);
     artifactDescriptor = new ArtifactDescriptor(APP_NAME);
   }

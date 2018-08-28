@@ -17,6 +17,14 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.CompoundEnumeration;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -33,16 +41,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.util.CompoundEnumeration;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import org.slf4j.Logger;
 
@@ -70,12 +68,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   }
 
 
-  private static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
-  private static final String PACKAGE_PATH_SEPARATOR = "/";
   private static final String CLASS_EXTENSION = ".class";
   private static final Logger LOGGER = getLogger(RegionClassLoader.class);
-  private static final String RESOURCE_PREFIX = "resource::";
-  private static final Pattern GAV_PATTERN = Pattern.compile(RESOURCE_PREFIX + "(\\S+):(\\S+):(\\S+)?:(\\S+)");
 
   private final ReadWriteLock innerStateRWLock = new ReentrantReadWriteLock();
   private final Lock innerStateReadLock = innerStateRWLock.readLock();
@@ -150,12 +144,12 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       // *.class files may be requested as resources.
       for (String exportedClassPackage : filter.getExportedClassPackages()) {
         String packageAsDirectory =
-            normalize(DOT_REPLACEMENT_PATTERN.matcher(exportedClassPackage).replaceAll(PACKAGE_PATH_SEPARATOR), true);
+            normalize(DOT_REPLACEMENT_PATTERN.matcher(exportedClassPackage).replaceAll(PATH_SEPARATOR), true);
         List<ArtifactClassLoader> classLoaders =
             resourceMapping.computeIfAbsent(packageAsDirectory, k -> new ArrayList<>());
         classLoaders.add(artifactClassLoader);
         classLoaders =
-            resourceMapping.computeIfAbsent(normalize(packageAsDirectory + PACKAGE_PATH_SEPARATOR), k -> new ArrayList<>());
+            resourceMapping.computeIfAbsent(normalize(packageAsDirectory + PATH_SEPARATOR), k -> new ArrayList<>());
         classLoaders.add(artifactClassLoader);
       }
     } finally {
@@ -273,7 +267,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
         if (exportingArtifactClassLoaders != null) {
           for (ArtifactClassLoader artifactClassLoader : exportingArtifactClassLoaders) {
             BundleDescriptor descriptor = artifactClassLoader.getArtifactDescriptor().getBundleDescriptor();
-            if (isRequestedArtifact(descriptor, groupId, artifactId, version, () -> {
+            // The descriptor may not be present during some tests
+            if (descriptor != null && isRequestedArtifact(descriptor, groupId, artifactId, version, () -> {
               LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
                           version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
               return true;
@@ -303,7 +298,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       }
     } else if (name.endsWith(CLASS_EXTENSION)) {
       // This is when a class is requested as a resource like with spring classpath scanning.
-      int lastIndexOfPackageSeparator = name.lastIndexOf(PACKAGE_PATH_SEPARATOR);
+      int lastIndexOfPackageSeparator = name.lastIndexOf(PATH_SEPARATOR);
       String resourceFolder = name.substring(0, lastIndexOfPackageSeparator != -1 ? lastIndexOfPackageSeparator : 0);
       List<ArtifactClassLoader> resourceFolderArtifactClassLoaders = resourceMapping.get(resourceFolder);
       if (resourceFolderArtifactClassLoaders == null) {
@@ -370,15 +365,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       classLoader.dispose();
     } catch (Exception e) {
       reportPossibleLeak(e, classLoader.getArtifactId());
-    }
-  }
-
-  private void reportPossibleLeak(Exception e, String artifactId) {
-    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(message, artifactId, e);
-    } else {
-      LOGGER.error(message, artifactId);
     }
   }
 

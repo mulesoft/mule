@@ -9,18 +9,26 @@ package org.mule.runtime.module.artifact.api.classloader;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
+import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
@@ -34,9 +42,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
-
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
+
+  static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
+  static final String PATH_SEPARATOR = "/";
+  static final String RESOURCE_PREFIX = "resource::";
+  static final Pattern GAV_PATTERN = Pattern.compile(RESOURCE_PREFIX + "(\\S+):(\\S+):(\\S+)?:(\\S+)");
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
@@ -46,6 +58,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
   private ResourceReleaser resourceReleaserInstance;
   private ArtifactDescriptor artifactDescriptor;
+  private Map<String, URLClassLoader> pathMapping = new HashMap<>();
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -76,6 +89,42 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   @Override
+  public URL findResource(String name) {
+    if (name.startsWith(RESOURCE_PREFIX)) {
+      Matcher matcher = GAV_PATTERN.matcher(name);
+      // Check for specific artifact requests within our URLs
+      if (matcher.matches()) {
+        String groupId = matcher.group(1);
+        String artifactId = matcher.group(2);
+        String version = matcher.group(3);
+        String resource = matcher.group(4);
+        LOGGER.debug("Artifact request for '{}' in group '{}', artifact '{}' and version '{}'.", resource, groupId, artifactId,
+                     version);
+        String normalizedResource = normalize(resource, true);
+
+        URLClassLoader classLoader =
+            pathMapping.computeIfAbsent(asPath(groupId, artifactId, version),
+                                        (CheckedFunction<String, URLClassLoader>) path -> Arrays.stream(getURLs())
+                                            .filter(url -> url.getPath().contains(path))
+                                            .findAny()
+                                            .map(url -> new URLClassLoader(new URL[] {url}))
+                                            .orElse(null));
+
+        if (classLoader != null) {
+          return classLoader.findResource(normalizedResource);
+        }
+      }
+    }
+    return super.findResource(name);
+  }
+
+  private String asPath(String groupId, String artifactId, String version) {
+    String groupIdPath = DOT_REPLACEMENT_PATTERN.matcher(groupId).replaceAll(PATH_SEPARATOR);
+    String versionPath = version != null ? version : "";
+    return groupIdPath + PATH_SEPARATOR + artifactId + PATH_SEPARATOR + versionPath;
+  }
+
+  @Override
   public URL findInternalResource(String resource) {
     return findResource(resource);
   }
@@ -101,6 +150,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public void dispose() {
+    pathMapping.forEach((path, classloader) -> {
+      try {
+        classloader.close();
+      } catch (IOException e) {
+        reportPossibleLeak(e, path);
+      }
+    });
+    pathMapping.clear();
     try {
       createResourceReleaserInstance().release();
     } catch (Exception e) {
@@ -108,6 +165,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
     super.dispose();
     shutdownListeners();
+  }
+
+  void reportPossibleLeak(Exception e, String artifactId) {
+    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(message, artifactId, e);
+    } else {
+      LOGGER.error(message, artifactId);
+    }
   }
 
   private void shutdownListeners() {
