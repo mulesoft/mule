@@ -145,8 +145,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency, false);
-        this.blockingSchedulerSupplier = blockingSchedulerSupplier;
-        this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
     }
 
     @Override
@@ -191,17 +189,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
         cpuIntensiveScheduler.stop();
       }
       super.stop();
-    }
-
-    @Override
-    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      if (maxConcurrency > subscribers) {
-        return publisher -> from(publisher).parallel(CORES * 2)
-            .runOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
-            .composeGroup(pipeline);
-      } else {
-        return super.onPipeline(pipeline);
-      }
     }
 
     @Override
