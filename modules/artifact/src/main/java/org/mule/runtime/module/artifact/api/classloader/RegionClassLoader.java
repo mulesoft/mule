@@ -267,6 +267,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
         if (exportingArtifactClassLoaders != null) {
           for (ArtifactClassLoader artifactClassLoader : exportingArtifactClassLoaders) {
             BundleDescriptor descriptor = artifactClassLoader.getArtifactDescriptor().getBundleDescriptor();
+            // The descriptor may not be present during some tests
             if (descriptor != null && isRequestedArtifact(descriptor, groupId, artifactId, version, () -> {
               LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
                           version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
