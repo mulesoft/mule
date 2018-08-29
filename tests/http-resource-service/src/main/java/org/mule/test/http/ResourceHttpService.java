@@ -8,6 +8,7 @@ package org.mule.test.http;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.ClientNotFoundException;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.client.HttpClientFactory;
@@ -93,6 +94,11 @@ public class ResourceHttpService implements HttpService {
 
           }
         };
+      }
+
+      @Override
+      public HttpClient lookup(String name) throws ClientNotFoundException {
+        throw new UnsupportedOperationException("not implemented for this test");
       }
     };
   }

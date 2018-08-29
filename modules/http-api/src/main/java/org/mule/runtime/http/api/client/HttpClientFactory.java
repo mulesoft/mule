@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.http.api.client;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Factory object for {@link HttpClient}.
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpClientFactory {
 
   /**
@@ -19,4 +23,15 @@ public interface HttpClientFactory {
    */
   HttpClient create(HttpClientConfiguration configuration);
 
+  /**
+   * Allows to retrieve a previously created {@link HttpClient}, if used from the same context. Keep in mind lifecycle changes to
+   * the retrieved instance won't take effect since only the owner of the server can modify it's status.
+   *
+   * @param name the name the desired {@link HttpClient} was given when created (see {@link HttpClientConfiguration#getName()})
+   * @return the server found
+   * @throws ClientNotFoundException when the desired server was not found
+   * @since 4.1.5 as experimental.
+   */
+  @Experimental
+  HttpClient lookup(String name) throws ClientNotFoundException;
 }

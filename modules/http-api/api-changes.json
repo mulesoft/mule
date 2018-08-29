@@ -2,101 +2,317 @@
   "4.1.5": {
     "revapi": {
       "ignore": [
-         {
-           "code": "java.method.addedToInterface",
-           "new": "method org.mule.runtime.http.api.utils.RequestMatcherRegistry.RequestMatcherRegistryBuilder org.mule.runtime.http.api.HttpService::getRequestMatcherRegistryBuilder()",
-           "package": "org.mule.runtime.http.api",
-           "classSimpleName": "HttpService",
-           "methodName": "getRequestMatcherRegistryBuilder",
-           "elementKind": "method",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.method.staticMethodAddedToInterface",
-           "new": "method org.mule.runtime.http.api.server.MethodRequestMatcher org.mule.runtime.http.api.server.MethodRequestMatcher::acceptAll()",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "MethodRequestMatcher",
-           "methodName": "acceptAll",
-           "elementKind": "method",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.method.defaultMethodAddedToInterface",
-           "new": "method boolean org.mule.runtime.http.api.server.MethodRequestMatcher::acceptsAll()",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "MethodRequestMatcher",
-           "methodName": "acceptsAll",
-           "elementKind": "method",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.method.staticMethodAddedToInterface",
-           "new": "method org.mule.runtime.http.api.server.MethodRequestMatcherBuilder org.mule.runtime.http.api.server.MethodRequestMatcher::builder()",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "MethodRequestMatcher",
-           "methodName": "builder",
-           "elementKind": "method",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.method.staticMethodAddedToInterface",
-           "new": "method org.mule.runtime.http.api.server.MethodRequestMatcherBuilder org.mule.runtime.http.api.server.MethodRequestMatcher::builder(java.util.Collection<java.lang.String>)",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "MethodRequestMatcher",
-           "methodName": "builder",
-           "elementKind": "method",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.class.added",
-           "new": "class org.mule.runtime.http.api.server.MethodRequestMatcherBuilder",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "MethodRequestMatcherBuilder",
-           "elementKind": "class",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.method.staticMethodAddedToInterface",
-           "new": "method org.mule.runtime.http.api.server.PathAndMethodRequestMatcherBuilder org.mule.runtime.http.api.server.PathAndMethodRequestMatcher::builder()",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "PathAndMethodRequestMatcher",
-           "methodName": "builder",
-           "elementKind": "method",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.class.added",
-           "new": "class org.mule.runtime.http.api.server.PathAndMethodRequestMatcherBuilder",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "PathAndMethodRequestMatcherBuilder",
-           "elementKind": "class",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.class.added",
-           "new": "interface org.mule.runtime.http.api.utils.RequestMatcherRegistry<T extends java.lang.Object>",
-           "package": "org.mule.runtime.http.api.utils",
-           "classSimpleName": "RequestMatcherRegistry",
-           "elementKind": "interface",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.class.added",
-           "new": "class org.mule.runtime.http.api.utils.MatcherCollisionException",
-           "package": "org.mule.runtime.http.api.utils",
-           "classSimpleName": "MatcherCollisionException",
-           "elementKind": "class",
-           "justification": "@Experimental feature. Feature flagged by default"
-         },
-         {
-           "code": "java.method.defaultMethodAddedToInterface",
-           "new": "method java.lang.ClassLoader org.mule.runtime.http.api.server.RequestHandler::getContextClassLoader()",
-           "package": "org.mule.runtime.http.api.server",
-           "classSimpleName": "RequestHandler",
-           "methodName": "getContextClassLoader",
-           "elementKind": "method",
-           "justification": "Added to provide a fix for a logging issue."
-        }         
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.http.api.utils.RequestMatcherRegistry.RequestMatcherRegistryBuilder org.mule.runtime.http.api.HttpService::getRequestMatcherRegistryBuilder()",
+          "package": "org.mule.runtime.http.api",
+          "classSimpleName": "HttpService",
+          "methodName": "getRequestMatcherRegistryBuilder",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.staticMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.server.MethodRequestMatcher org.mule.runtime.http.api.server.MethodRequestMatcher::acceptAll()",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "MethodRequestMatcher",
+          "methodName": "acceptAll",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.http.api.server.MethodRequestMatcher::acceptsAll()",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "MethodRequestMatcher",
+          "methodName": "acceptsAll",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.staticMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.server.MethodRequestMatcherBuilder org.mule.runtime.http.api.server.MethodRequestMatcher::builder()",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "MethodRequestMatcher",
+          "methodName": "builder",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.staticMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.server.MethodRequestMatcherBuilder org.mule.runtime.http.api.server.MethodRequestMatcher::builder(java.util.Collection<java.lang.String>)",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "MethodRequestMatcher",
+          "methodName": "builder",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.server.MethodRequestMatcherBuilder",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "MethodRequestMatcherBuilder",
+          "elementKind": "class",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.staticMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.server.PathAndMethodRequestMatcherBuilder org.mule.runtime.http.api.server.PathAndMethodRequestMatcher::builder()",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "PathAndMethodRequestMatcher",
+          "methodName": "builder",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.server.PathAndMethodRequestMatcherBuilder",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "PathAndMethodRequestMatcherBuilder",
+          "elementKind": "class",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.utils.RequestMatcherRegistry<T extends java.lang.Object>",
+          "package": "org.mule.runtime.http.api.utils",
+          "classSimpleName": "RequestMatcherRegistry",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.client.ClientNotFoundException",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "ClientNotFoundException",
+          "elementKind": "class",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.http.api.ws.WebSocket> org.mule.runtime.http.api.client.HttpClient::openWebSocket(org.mule.runtime.http.api.domain.message.request.HttpRequest, org.mule.runtime.http.api.client.HttpRequestOptions, java.lang.String, org.mule.runtime.http.api.client.ws.WebSocketCallback)",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpClient",
+          "methodName": "openWebSocket",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.http.api.client.HttpClient",
+          "new": "interface org.mule.runtime.http.api.client.HttpClient",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpClient",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.http.api.client.HttpClientFactory",
+          "new": "interface org.mule.runtime.http.api.client.HttpClientFactory",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpClientFactory",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.client.HttpRequestOptions",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpRequestOptions",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.client.HttpRequestOptionsBuilder",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpRequestOptionsBuilder",
+          "elementKind": "class",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.client.ws.WebSocketCallback",
+          "package": "org.mule.runtime.http.api.client.ws",
+          "classSimpleName": "WebSocketCallback",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.http.api.domain.message.BaseHttpMessage::<init>(org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>)",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "BaseHttpMessage",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Refactor. RevApi over reacting"
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.http.api.domain.message.BaseHttpMessage",
+          "new": "class org.mule.runtime.http.api.domain.message.BaseHttpMessage",
+          "superClass": "org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "BaseHttpMessage",
+          "elementKind": "class",
+          "justification": "Refactor. RevApi over reacting"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "BaseMessageWithHeaders",
+          "elementKind": "class",
+          "justification": "Refactor. RevApi over reacting"
+        },
+        {
+          "code": "java.class.nowImplementsInterface",
+          "old": "interface org.mule.runtime.http.api.domain.message.HttpMessage",
+          "new": "interface org.mule.runtime.http.api.domain.message.HttpMessage",
+          "interface": "org.mule.runtime.http.api.domain.message.MessageWithHeaders",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "HttpMessage",
+          "elementKind": "interface",
+          "justification": "Refactor. RevApi over reacting"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.domain.message.MessageWithHeaders",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "MessageWithHeaders",
+          "elementKind": "interface",
+          "justification": "Refactor. RevApi over reacting"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder::protocol(org.mule.runtime.http.api.domain.HttpProtocol)",
+          "package": "org.mule.runtime.http.api.domain.message.request",
+          "classSimpleName": "HttpRequestBuilder",
+          "methodName": "protocol",
+          "elementKind": "method",
+          "justification": "Refactor. RevApi over reacting"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.exception.InvalidStatusCodeException",
+          "package": "org.mule.runtime.http.api.exception",
+          "classSimpleName": "InvalidStatusCodeException",
+          "elementKind": "class",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.server.ws.WebSocketHandlerManager org.mule.runtime.http.api.server.HttpServer::addWebSocketHandler(org.mule.runtime.http.api.server.ws.WebSocketHandler)",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "HttpServer",
+          "methodName": "addWebSocketHandler",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.http.api.server.HttpServer",
+          "new": "interface org.mule.runtime.http.api.server.HttpServer",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "HttpServer",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.server.ws.WebSocketConnectionHandler",
+          "package": "org.mule.runtime.http.api.server.ws",
+          "classSimpleName": "WebSocketConnectionHandler",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.server.ws.WebSocketConnectionRejectedException",
+          "package": "org.mule.runtime.http.api.server.ws",
+          "classSimpleName": "WebSocketConnectionRejectedException",
+          "elementKind": "class",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.server.ws.WebSocketHandler",
+          "package": "org.mule.runtime.http.api.server.ws",
+          "classSimpleName": "WebSocketHandler",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.server.ws.WebSocketHandlerManager",
+          "package": "org.mule.runtime.http.api.server.ws",
+          "classSimpleName": "WebSocketHandlerManager",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.server.ws.WebSocketMessageHandler",
+          "package": "org.mule.runtime.http.api.server.ws",
+          "classSimpleName": "WebSocketMessageHandler",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.ws.FragmentHandler",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "FragmentHandler",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.ws.WebSocket",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocket",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.ws.WebSocketAlreadyExistsException",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketAlreadyExistsException",
+          "elementKind": "class",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.ws.WebSocketMessage",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketMessage",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "enum org.mule.runtime.http.api.ws.WebSocketProtocol",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketProtocol",
+          "elementKind": "enum",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.ws.WebSocketRequest",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketRequest",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        }
       ]
     }
   },

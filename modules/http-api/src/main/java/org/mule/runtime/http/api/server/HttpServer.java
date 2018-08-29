@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
+import org.mule.runtime.http.api.server.ws.WebSocketHandler;
+import org.mule.runtime.http.api.server.ws.WebSocketHandlerManager;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -16,6 +20,7 @@ import java.util.Collection;
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpServer {
 
   /**
@@ -82,4 +87,9 @@ public interface HttpServer {
    * @return a {@link RequestHandlerManager} for the handler
    */
   RequestHandlerManager addRequestHandler(final String path, final RequestHandler requestHandler);
+
+  @Experimental
+  default WebSocketHandlerManager addWebSocketHandler(WebSocketHandler handler) {
+    throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
 }

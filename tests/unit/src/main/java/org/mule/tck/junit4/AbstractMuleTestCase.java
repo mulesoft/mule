@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
-import org.mule.tck.report.ThreadDumper;
 
 import java.util.ArrayList;
 import java.util.Collections;
