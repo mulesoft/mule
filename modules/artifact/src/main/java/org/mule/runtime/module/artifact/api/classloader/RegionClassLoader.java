@@ -281,19 +281,31 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
         }
 
         // Check whether it's a resource from an API dependency, since all those should be considered exported
-        ClassLoaderModel classLoaderModel = this.getArtifactDescriptor().getClassLoaderModel();
-        for (BundleDependency dependency : classLoaderModel.getDependencies()) {
-          Optional<String> classifier = dependency.getDescriptor().getClassifier();
-          if (classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get())) {
-            BundleDescriptor descriptor = dependency.getDescriptor();
-            if (isRequestedArtifact(descriptor, groupId, artifactId, version, () -> false)) {
-              return descriptorMapping.computeIfAbsent(descriptor, (CheckedFunction<BundleDescriptor, URLClassLoader>) d -> {
-                try {
-                  return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()});
-                } catch (MalformedURLException e) {
-                  throw new MuleRuntimeException(e);
+        if (version != null) {
+          BundleDescriptor requiredDescriptor = new BundleDescriptor.Builder()
+              .setGroupId(groupId)
+              .setArtifactId(artifactId)
+              .setVersion(version)
+              .build();
+          URLClassLoader classLoader = descriptorMapping.get(requiredDescriptor);
+          if (classLoader != null) {
+            return classLoader.findResource(normalizedResource);
+          } else {
+            ClassLoaderModel classLoaderModel = this.getArtifactDescriptor().getClassLoaderModel();
+            for (BundleDependency dependency : classLoaderModel.getDependencies()) {
+              Optional<String> classifier = dependency.getDescriptor().getClassifier();
+              if (classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get())) {
+                BundleDescriptor descriptor = dependency.getDescriptor();
+                if (isRequestedArtifact(descriptor, groupId, artifactId, version, () -> false)) {
+                  return descriptorMapping.computeIfAbsent(descriptor, (CheckedFunction<BundleDescriptor, URLClassLoader>) d -> {
+                    try {
+                      return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()});
+                    } catch (MalformedURLException e) {
+                      throw new MuleRuntimeException(e);
+                    }
+                  }).findResource(normalizedResource);
                 }
-              }).findResource(normalizedResource);
+              }
             }
           }
         }

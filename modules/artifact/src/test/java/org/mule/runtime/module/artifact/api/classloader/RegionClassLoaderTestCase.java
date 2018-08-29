@@ -24,6 +24,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
@@ -463,6 +464,35 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   @Test
   public void doesNotFindResourceFromApiWithWrongVersion() throws Exception {
     getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "1.5.6-SNAPSHOT", RESOURCE_NAME), null);
+  }
+
+  @Test
+  public void remembersRamlApiClassLoader() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+        .dependingOn(newHashSet(new BundleDependency.Builder()
+            .setBundleUri(API_LOCATION.toURI())
+            .setDescriptor(new BundleDescriptor.Builder()
+                .setGroupId(GROUP_ID)
+                .setArtifactId(SPECIFIC_ARTIFACT_ID)
+                .setVersion(ARTIFACT_VERSION)
+                .setClassifier("raml")
+                .build())
+            .build()))
+        .build();
+
+    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+
+    String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME);
+    assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
+    assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
+    assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
+    assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
+    assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
+    verify(appDescriptor, times(1)).getClassLoaderModel();
   }
 
   @Test
