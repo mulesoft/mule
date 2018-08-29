@@ -7,20 +7,30 @@
 
 package org.mule.module.db.internal.domain.connection;
 
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
-
 import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Struct;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 
 /**
  * Custom {@link DbConnection} for Oracle databases
  */
 public class OracleDbConnection extends DefaultDbConnection
 {
+    public static final String ATTR_TYPE_NAME_PARAM = "ATTR_TYPE_NAME";
 
+    public static final String ATTR_NO_PARAM = "ATTR_NO";
+
+    public static final String QUERY_TYPE_ATTRS = "SELECT ATTR_NO, ATTR_TYPE_NAME FROM ALL_TYPE_ATTRS WHERE TYPE_NAME = ? AND ATTR_TYPE_NAME IN ('CLOB', 'BLOB')";
+    
     private Method createArrayMethod;
     private boolean initialized;
 
@@ -77,4 +87,50 @@ public class OracleDbConnection extends DefaultDbConnection
 
         return createArrayMethod;
     }
+
+    @Override
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException
+    {
+        return super.createStruct(typeName, attributes);
+    }
+
+    @Override
+    protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
+    {
+        Map<Integer, String> dataTypes = getDataTypes(typeName);
+
+        for (int index : dataTypes.keySet())
+        {
+            String dataTypeName = dataTypes.get(index);
+            doResolveLobIn(attributes, index-1, dataTypeName);
+        }
+    }
+
+    private Map<Integer, String> getDataTypes(String typeName) throws SQLException
+    {
+        Map<Integer, String> dataTypes = new HashMap<Integer, String>();
+
+        PreparedStatement ps = this.prepareStatement(QUERY_TYPE_ATTRS);
+        ps.setString(1, typeName);
+        ResultSet resultSet = null;
+
+        try
+        {
+            resultSet = ps.executeQuery();
+
+            while (resultSet.next())
+            {
+                dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resultSet.getString(ATTR_TYPE_NAME_PARAM));
+            }
+        }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
+        }
+        return dataTypes;
+    }
+
 }

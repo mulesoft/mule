@@ -7,9 +7,17 @@
 
 package org.mule.module.db.internal.domain.connection;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
+import org.mule.util.IOUtils;
 
+import static java.lang.String.format;
+import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
+import static org.mule.util.IOUtils.toByteArray;
+
+import java.io.InputStream;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -18,6 +26,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -34,6 +43,9 @@ import java.util.concurrent.Executor;
  */
 public class DefaultDbConnection extends AbstractDbConnection
 {
+    protected transient Log logger = LogFactory.getLog(getClass());
+
+    public static final int ATTR_TYPE_NAME_INDEX = 6;
 
     public DefaultDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory)
     {
@@ -319,6 +331,14 @@ public class DefaultDbConnection extends AbstractDbConnection
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException
     {
+        try
+        {
+            resolveLobs(typeName, attributes);
+        }
+        catch (SQLException e)
+        {
+            logger.warn("Unable to resolve lobs. Proceeding with original attributes.");
+        }
         return delegate.createStruct(typeName, attributes);
     }
 
@@ -363,5 +383,85 @@ public class DefaultDbConnection extends AbstractDbConnection
     {
         return delegate.getNetworkTimeout();
     }
+    
+    @Override
+    protected void resolveLobs(String typeName, Object[] attributes) throws SQLException {
+        ResultSet resultSet = null;
+        try
+        {
+            resultSet = this.getMetaData().getAttributes(this.getCatalog(), null, typeName, null);
+            int index = 0;
+            while (resultSet.next())
+            {
+                String dataType = resultSet.getString(ATTR_TYPE_NAME_INDEX);
+                
+                doResolveLobIn(attributes, index, dataType);
+                
+                index++;
+            }
+        }
+        finally 
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
+        }
+    }
+    
 
+    protected void doResolveLobIn(Object[] attributes, int index, String dataTypeName) throws SQLException
+    {
+        if (dataTypeName.equals(BLOB_DB_TYPE.getName()))
+        {
+            attributes[index] = createBlob(attributes[index]);
+        }
+        else
+        {
+            attributes[index] = createClob(attributes[index]);
+        }
+    }
+    
+
+    protected Blob createBlob(Object attribute) throws SQLException
+    {
+        Blob blob = this.createBlob();
+        if (attribute instanceof byte[])
+        {
+            blob.setBytes(1, (byte[]) attribute);
+        }
+        else if (attribute instanceof InputStream)
+        {
+            blob.setBytes(1, toByteArray((InputStream) attribute));
+        }
+        else if (attribute instanceof String)
+        {
+            blob.setBytes(1, ((String) attribute).getBytes());
+        }
+        else
+        {
+            throw new IllegalArgumentException(format("Cannot create a %s from a value of type %s", Struct.class.getName(), attribute.getClass()));
+        }
+
+        return blob;
+    }
+
+    protected Clob createClob(Object attribute) throws SQLException
+    {
+        Clob clob = this.createClob();
+        if (attribute instanceof String)
+        {
+            clob.setString(1, (String) attribute);
+        }
+        else if (attribute instanceof InputStream)
+        {
+            clob.setString(1, IOUtils.toString((InputStream) attribute));
+        }
+        else
+        {
+            throw new IllegalArgumentException(format("Cannot create a %s from a value of type %s", Struct.class.getName(), attribute.getClass()));
+        }
+
+        return clob;
+    }
 }
