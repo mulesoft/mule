@@ -103,7 +103,6 @@ public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
     List<String> actualKeys = getMetadataObjectStore().allKeys();
-    System.out.println(actualKeys);
     assertThat(actualKeys, hasSize(3));
     assertThat(actualKeys,
                hasItems(OUTPUT_AND_METADATA_KEY_CACHE_ID, OUTPUT_METADATA_WITHOUT_KEY_CACHE_ID, CONTENT_AND_OUTPUT_CACHE_ID));
