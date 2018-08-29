@@ -10,7 +10,6 @@ import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.getLong;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -32,8 +31,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -197,7 +196,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
     private boolean scheduleIoRwEvent(CoreEvent event) {
       return event.getMessage().getPayload().getDataType().isStreamType()
-          && event.getMessage().getPayload().getLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
+          && event.getMessage().getPayload().getByteLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
     }
 
     private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
@@ -206,11 +205,11 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
       return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .doOnError(RejectedExecutionException.class,
-                     throwable -> LOGGER.trace("Shared scheduler " + processorScheduler.getName()
-                         + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS
-                         + "ms."))
+                     throwable -> LOGGER
+                         .trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                                processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS))
           .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
-              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), ZERO, ZERO))
+              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }
 

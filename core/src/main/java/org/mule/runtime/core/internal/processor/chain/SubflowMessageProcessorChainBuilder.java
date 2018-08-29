@@ -11,7 +11,9 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -31,8 +33,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
@@ -100,17 +100,28 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     }
 
     private Consumer<CoreEvent> pushSubFlowFlowStackElement() {
-      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
+      return event -> {
+        if (isFlowTrace()) {
+          ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
+        }
+      };
     }
 
     private Consumer<CoreEvent> popSubFlowFlowStackElement() {
-      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+      return event -> {
+        if (isFlowTrace()) {
+          ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+        }
+      };
     }
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      return from(publisher).concatMap(event -> Mono.just(event).doOnNext(pushSubFlowFlowStackElement())
-          .transform(s -> super.apply(s)).doOnSuccessOrError((result, throwable) -> popSubFlowFlowStackElement().accept(event)));
+      return from(publisher)
+          .concatMap(event -> just(event)
+              .doOnNext(pushSubFlowFlowStackElement())
+              .transform(s -> super.apply(s))
+              .doOnSuccessOrError((result, throwable) -> popSubFlowFlowStackElement().accept(event)));
     }
   }
 }

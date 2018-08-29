@@ -23,6 +23,7 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -47,6 +48,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractSelectiveRouter extends AbstractComponent implements SelectiveRouter,
     RouterStatisticsRecorder, Lifecycle, MuleContextAware {
+
+  private static final I18nMessage NO_PATH_MESSAGE =
+      createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined");
 
   private final List<MessageProcessorExpressionPair> conditionalMessageProcessors = new ArrayList<>();
   private Optional<Processor> defaultProcessor = empty();
@@ -165,8 +169,7 @@ public abstract class AbstractSelectiveRouter extends AbstractComponent implemen
   protected Processor getProcessorToRoute(CoreEvent event) throws RoutePathNotFoundException {
     Optional<Processor> selectedProcessor = selectProcessor(event);
     return (selectedProcessor.isPresent() ? selectedProcessor : defaultProcessor)
-        .orElseThrow(() -> new RoutePathNotFoundException(createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-                                                          this));
+        .orElseThrow(() -> new RoutePathNotFoundException(NO_PATH_MESSAGE, this));
   }
 
   /**
