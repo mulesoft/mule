@@ -62,7 +62,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
       throw new IllegalStateException("A value was already given for key " + key);
     }
 
-    if (!dynamic && resolver.isDynamic() && !(resolver instanceof ConfigurationValueResolver)) {
+    if (!dynamic && resolver.isDynamic()) {
       dynamic = true;
     }
     return this;
