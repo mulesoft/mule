@@ -106,7 +106,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
-                                                                  configurationModel.getName(), extensionModel.getName())), e);
+                                                                  configurationModel.getName(), extensionModel.getName())),
+                                       e);
       }
       return configurationProvider;
     });
