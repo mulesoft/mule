@@ -16,26 +16,28 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 @SmallTest
 public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
@@ -58,7 +60,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
 
     domain = new TestMuleDomain(domainDescriptor, artifactClassLoader, domainClassLoaderRepository, serviceRepository,
-                                artifactPlugins, extensionModelLoaderManager);
+                                artifactPlugins, extensionModelLoaderManager, getRuntimeComponentBuildingDefinitionProvider());
     currentThread().setContextClassLoader(originalThreadClassloader);
     when(domainDescriptor.getDeploymentProperties()).thenReturn(empty());
     when(domainDescriptor.getDataFolderName()).thenReturn("dataFolderName");
@@ -98,9 +100,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
 
     public TestMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
                           ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository,
-                          List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager) {
+                          List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager,
+                          ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
       super(descriptor, deploymentClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-            extensionModelLoaderManager);
+            extensionModelLoaderManager, runtimeComponentBuildingDefinitionProvider);
     }
 
     @Override

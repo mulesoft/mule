@@ -8,7 +8,9 @@ package org.mule.runtime.module.deployment.impl.internal;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
@@ -28,6 +30,7 @@ import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibrary
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -167,11 +170,13 @@ public class MuleArtifactResourcesRegistry {
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
+    ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider =
+        getRuntimeComponentBuildingDefinitionProvider();
     domainFactory =
         new DefaultDomainFactory(domainDescriptorFactory, domainManager,
                                  artifactClassLoaderManager, serviceManager,
                                  pluginDependenciesResolver, domainClassLoaderBuilderFactory,
-                                 extensionModelLoaderManager, licenseValidator);
+                                 extensionModelLoaderManager, licenseValidator, runtimeComponentBuildingDefinitionProvider);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
@@ -184,7 +189,8 @@ public class MuleArtifactResourcesRegistry {
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
                                                        artifactPluginDescriptorLoader,
-                                                       licenseValidator);
+                                                       licenseValidator,
+                                                       runtimeComponentBuildingDefinitionProvider);
     toolingApplicationDescriptorFactory =
         new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                 artifactDescriptorValidatorBuilder);

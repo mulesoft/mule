@@ -8,7 +8,9 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils;
 import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
@@ -80,7 +82,8 @@ public class TestDomainFactory extends DefaultDomainFactory {
     super(domainDescriptorFactory, new DefaultDomainManager(),
           classLoaderRepository, serviceRepository,
           pluginDependenciesResolver, domainClassLoaderBuilderFactory,
-          extensionModelLoaderManager, mock(LicenseValidator.class));
+          extensionModelLoaderManager, mock(LicenseValidator.class),
+          RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider());
   }
 
   @Override

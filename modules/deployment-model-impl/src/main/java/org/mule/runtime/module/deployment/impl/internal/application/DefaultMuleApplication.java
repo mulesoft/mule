@@ -50,6 +50,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
@@ -81,6 +82,7 @@ public class DefaultMuleApplication implements Application {
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
+  private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private ApplicationStatus status;
 
   protected ArtifactClassLoader deploymentClassLoader;
@@ -97,7 +99,8 @@ public class DefaultMuleApplication implements Application {
                                 ServiceRepository serviceRepository,
                                 ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
-                                ApplicationPolicyProvider applicationPolicyProvider) {
+                                ApplicationPolicyProvider applicationPolicyProvider,
+                                ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
@@ -107,6 +110,7 @@ public class DefaultMuleApplication implements Application {
     this.location = location;
     this.deploymentClassLoader = deploymentClassLoader;
     this.policyManager = applicationPolicyProvider;
+    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -207,7 +211,8 @@ public class DefaultMuleApplication implements Application {
               .setArtifactDeclaration(descriptor.getArtifactDeclaration())
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
-              .setPolicyProvider(policyManager);
+              .setPolicyProvider(policyManager)
+              .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider);
 
       Domain domain = domainRepository.getDomain(descriptor.getDomainName());
       if (domain.getRegistry() != null) {

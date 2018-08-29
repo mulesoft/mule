@@ -7,14 +7,16 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
+
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.module.license.api.LicenseValidator;
 
 /**
  * Abstract class for {@link DeployableArtifact} factories.
@@ -27,14 +29,18 @@ import java.util.Properties;
 public abstract class AbstractDeployableArtifactFactory<T extends DeployableArtifact> implements ArtifactFactory<T> {
 
   private LicenseValidator licenseValidator;
+  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
    * 
    * @param licenseValidator the license validator to use for plugins.
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    */
-  public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator) {
+  public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
+                                           ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
     this.licenseValidator = licenseValidator;
+    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
   }
 
   @Override
@@ -64,5 +70,10 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
   public abstract DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation,
                                                                         Optional<Properties> deploymentProperties);
 
-
+  /**
+   * @return {@link ComponentBuildingDefinitionProvider} for runtime components.
+   */
+  public ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
+    return runtimeComponentBuildingDefinitionProvider;
+  }
 }

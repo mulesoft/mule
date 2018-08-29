@@ -16,6 +16,14 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
+
+import java.io.File;
+
+import javax.inject.Inject;
+
+import org.junit.Test;
+
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -28,12 +36,6 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRep
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-
-import java.io.File;
-
-import javax.inject.Inject;
-
-import org.junit.Test;
 
 /**
  * This tests verifies that the {@link DefaultMuleApplication} status is set correctly depending on its
@@ -59,7 +61,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     application = new DefaultMuleApplication(null, parentArtifactClassLoader, emptyList(),
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
-                                             appLocation, null, null);
+                                             appLocation, null, null,
+                                             getRuntimeComponentBuildingDefinitionProvider());
     application.setArtifactContext(mockArtifactContext);
 
     muleContext.getInjector().inject(this);
@@ -104,7 +107,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
-                                   null, null, appLocation, null, null);
+                                   null, null, appLocation, null, null, null);
     application.install();
     assertThat(application.deploymentClassLoader, is(notNullValue()));
     application.dispose();

@@ -11,15 +11,16 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
 /**
  * Configuration required for the creation of an {@link ArtifactContext}.
@@ -38,6 +39,7 @@ public final class ArtifactContextConfiguration {
   private boolean disableXmlValidations;
   private List<ServiceConfigurator> serviceConfigurators = emptyList();
   private Optional<MuleContext> parentContext = empty();
+  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   private ArtifactContextConfiguration() {}
 
@@ -118,12 +120,17 @@ public final class ArtifactContextConfiguration {
     return parentContext;
   }
 
+  public ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
+    return runtimeComponentBuildingDefinitionProvider;
+  }
+
   /**
    * Builder for {@code ArtifactContextConfiguration}.
    */
   public static class ArtifactContextConfigurationBuilder {
 
     private ArtifactContextConfiguration artifactContextConfiguration = new ArtifactContextConfiguration();
+
 
     /**
      * @param muleContext the artifact {@link MuleContext}
@@ -212,6 +219,17 @@ public final class ArtifactContextConfiguration {
       artifactContextConfiguration.parentContext = of(parentContext);
       return this;
     }
+
+    /**
+     * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
+     *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+     * @return {@code this} builder
+     */
+    public ArtifactContextConfigurationBuilder setRuntimeComponentBuildingDefinitionProvider(ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+      artifactContextConfiguration.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
+      return this;
+    }
+
 
     /**
      * @return creates a {@link ArtifactContextConfiguration} with te provided configuration.

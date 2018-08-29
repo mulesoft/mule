@@ -19,6 +19,10 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -38,15 +42,12 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Default implementation of {@link ApplicationPolicyInstance} that depends on a {@link PolicyTemplate} artifact.
@@ -65,6 +66,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final MuleContextListener muleContextListener;
   private ArtifactContext policyContext;
   private PolicyInstance policyInstance;
+  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   /**
    * Creates a new policy instance
@@ -78,13 +80,16 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    * @param muleContextListener the listener to execute for specific events that occur on the {@link MuleContext} of the policy.
    *        May be {@code null}.
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
                                           PolicyParametrization parametrization,
                                           ServiceRepository serviceRepository,
                                           ClassLoaderRepository classLoaderRepository, List<ArtifactPlugin> artifactPlugins,
                                           ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                          MuleContextListener muleContextListener) {
+                                          MuleContextListener muleContextListener,
+                                          ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
     this.application = application;
     this.template = template;
     this.parametrization = parametrization;
@@ -93,6 +98,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.artifactPlugins = artifactPlugins;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.muleContextListener = muleContextListener;
+    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
   }
 
   private void initPolicyContext() throws InitialisationException {
@@ -109,6 +115,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setExtensionManagerFactory(new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
                                                                                      artifactPlugins,
                                                                                      new DefaultExtensionManagerFactory()))
+            .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
             .setMuleContextListener(muleContextListener);
 
     artifactBuilder.withServiceConfigurator(customizationService -> {

@@ -24,6 +24,17 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createCompositeErrorTypeRepository;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -47,6 +58,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
@@ -56,17 +68,6 @@ import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtension
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext} and a
@@ -112,6 +113,7 @@ public class ArtifactContextBuilder {
   private DeployableArtifact parentArtifact;
   private Optional<Properties> properties = empty();
   private String dataFolderName;
+  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   private ArtifactContextBuilder() {}
 
@@ -355,6 +357,16 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  /**
+   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   * @return the builder
+   */
+  public ArtifactContextBuilder setRuntimeComponentBuildingDefinitionProvider(ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
+    return this;
+  }
+
   private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
     if (deploymentProperties == null) {
       return properties;
@@ -427,6 +439,7 @@ public class ArtifactContextBuilder {
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
+                    .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
                     .setServiceConfigurators(serviceConfigurators);
             if (parentArtifact != null) {
               artifactContextConfigurationBuilder
@@ -515,4 +528,5 @@ public class ArtifactContextBuilder {
 
     return this;
   }
+
 }

@@ -1,4 +1,28 @@
 {
+  "4.1.4": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder::setRuntimeComponentBuildingDefinitionProvider(org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider)",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactContextConfigurationBuilder",
+          "methodName": "setRuntimeComponentBuildingDefinitionProvider",
+          "elementKind": "method",
+          "justification": "not used by others"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration::getRuntimeComponentBuildingDefinitionProvider()",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactContextConfiguration",
+          "methodName": "getRuntimeComponentBuildingDefinitionProvider",
+          "elementKind": "method",
+          "justification": "not used by others"
+        }
+      ]
+    }
+  },
   "4.1.3": {
     "revapi": {
       "ignore": [
