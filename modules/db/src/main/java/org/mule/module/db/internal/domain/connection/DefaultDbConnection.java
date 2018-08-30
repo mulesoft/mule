@@ -343,7 +343,7 @@ public class DefaultDbConnection extends AbstractDbConnection
         }
         catch (SQLException e)
         {
-            logger.warn("Unable to resolve lobs. Proceeding with original attributes.", e.getMessage());
+            logger.warn("Unable to resolve lobs: {}. Proceeding with original attributes.", e.getMessage());
         }
         return delegate.createStruct(typeName, attributes);
     }
@@ -424,15 +424,14 @@ public class DefaultDbConnection extends AbstractDbConnection
 
     private boolean shouldResolveAttributeWithJdbcType(int dbDataType, String dbDataTypeName, DbType jdbcType)
     {
-        if (dbDataType == UNKNOWN_DATA_TYPE || dbDataType == jdbcType.getId())
+        if (dbDataType == UNKNOWN_DATA_TYPE)
         {
-            if (dbDataTypeName.equals(jdbcType.getName()))
-            {
-                return true;
-            }
+            return dbDataTypeName.equals(jdbcType.getName());
         }
-        
-        return false;
+        else
+        {
+            return dbDataType == jdbcType.getId();
+        }
     }
 
     protected void doResolveLobIn(Object[] attributes, int index, String dataTypeName) throws SQLException

@@ -119,9 +119,8 @@ public class OracleDbConnection extends DefaultDbConnection
         try (PreparedStatement ps = this.prepareStatement(QUERY_TYPE_ATTRS))
         {
             ps.setString(1, typeName);
-            ResultSet resultSet = null;
-
-            resultSet = ps.executeQuery();
+            
+            ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next())
             {
