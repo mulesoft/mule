@@ -283,6 +283,7 @@ public class ApplicationModel {
           .build();
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
+  private final ArtifactConfig artifactConfig;
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
   private PropertiesResolverConfigurationProperties configurationProperties;
   private ResourceProvider externalResourceProvider;
@@ -333,6 +334,7 @@ public class ApplicationModel {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
+    this.artifactConfig = artifactConfig;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
@@ -845,7 +847,16 @@ public class ApplicationModel {
     executeOnEveryRootElement(componentModel -> {
       String nameAttributeValue = componentModel.getNameAttribute();
       if (nameAttributeValue != null) {
-        verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
+        try {
+          verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
+        } catch (IllegalArgumentException e) {
+          throw new MuleRuntimeException(createStaticMessage(
+                                                             format("Invalid global element name '%s' in %s:%s. Problem is: %s",
+                                                                    nameAttributeValue,
+                                                                    componentModel.getConfigFileName().orElse("unknown"),
+                                                                    componentModel.getLineNumber().orElse(-1),
+                                                                    e.getMessage())));
+        }
       }
     });
   }
