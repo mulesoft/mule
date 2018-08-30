@@ -114,6 +114,7 @@ public abstract class AbstractTestDatabase
 
             if (supportsSimpleUdt())
             {
+                createBlobAndClobType(connection);
                 createContactDetailsType(connection);
                 createRegionManagersTestTable(connection);
 
@@ -157,6 +158,11 @@ public abstract class AbstractTestDatabase
     }
 
     protected void createContactDetailsType(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+    
+    protected void createBlobAndClobType(Connection connection) throws SQLException
     {
         throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
     }

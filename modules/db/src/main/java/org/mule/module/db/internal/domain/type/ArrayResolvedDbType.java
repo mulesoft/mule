@@ -63,7 +63,7 @@ public class ArrayResolvedDbType extends AbstractStructuredDbType
      * @return the error message for the provided value's class
      */
     protected static String createUnsupportedTypeErrorMessage(Object value) {
-        return format("Cannot create a %s from a value of type %s", Struct.class.getName(), value.getClass());
+        return format("Cannot create a %s from a value of type '%s'", Struct.class.getName(), value.getClass());
     }
 
     @Override
