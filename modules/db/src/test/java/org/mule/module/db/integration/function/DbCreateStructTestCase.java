@@ -9,12 +9,15 @@ package org.mule.module.db.integration.function;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.mule.module.db.integration.TestDbConfig.getOracleResource;
 import static org.mule.module.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
 import org.mule.api.MuleEvent;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.OracleTestDatabase;
 
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Struct;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,5 +59,16 @@ public class DbCreateStructTestCase extends AbstractDbFunctionTestCase
         MuleEvent response = runFlow("createsStruct", payload);
 
         assertThat(((Struct) response.getMessage().getPayload()).getAttributes(), equalTo(SOUTHWEST_MANAGER.getContactDetails().asObjectArray()));
+    }
+
+    @Test
+    public void createsStructWithBlobAndClob() throws Exception
+    {
+        Object[] payload = {"blob", "clob"};
+
+        MuleEvent response = runFlow("createsStructWithBlobAndClob", payload);
+
+        assertThat(((Struct) response.getMessage().getPayload()).getAttributes()[0], instanceOf(Blob.class));
+        assertThat(((Struct) response.getMessage().getPayload()).getAttributes()[1], instanceOf(Clob.class));
     }
 }

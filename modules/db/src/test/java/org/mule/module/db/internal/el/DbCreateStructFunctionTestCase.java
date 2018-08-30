@@ -9,16 +9,37 @@ package org.mule.module.db.internal.el;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.tck.size.SmallTest;
+import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.ATTR_TYPE_NAME_INDEX;
+import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.DATA_TYPE_INDEX;
+import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_NO_PARAM;
+import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_TYPE_NAME_PARAM;
+import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_TYPE_ATTRS;
+import static org.mule.module.db.internal.domain.transaction.TransactionalAction.ALWAYS_JOIN;
+import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
+import static org.mule.module.db.internal.domain.type.JdbcTypes.CLOB_DB_TYPE;
 
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.Struct;
 import java.util.Arrays;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.mule.api.MuleContext;
+import org.mule.module.db.internal.domain.connection.DbConnection;
+import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.module.db.internal.domain.connection.DefaultDbConnection;
+import org.mule.module.db.internal.domain.connection.DefaultDbConnectionReleaser;
+import org.mule.module.db.internal.domain.connection.OracleDbConnection;
+import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
+import org.mule.tck.size.SmallTest;
+
+import com.mysql.jdbc.PreparedStatement;
 
 @SmallTest
 public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTestCase
@@ -54,6 +75,91 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         Object result = function.call(params, context);
 
         assertThat(result, Matchers.<Object>equalTo(struct));
+    }
+    
+    @Test
+    public void createStructResolvingBlobInDefaultDbConnection() throws Exception
+    {
+        Object[] structValues = {"foo", "bar"};
+        Connection delegate = mock(Connection.class);
+        Blob blob = mock(Blob.class);
+        when(delegate.createBlob()).thenReturn(blob);
+        testThroughMetadata(delegate, structValues, BLOB_DB_TYPE.getId(), BLOB_DB_TYPE.getName());
+        verify(delegate).createStruct(TYPE_NAME, structValues);
+        assertThat(structValues[0], Matchers.<Object>equalTo(blob));
+    }
+    
+    @Test
+    public void createStructResolvingClobInDefaultDbConnection() throws Exception
+    {
+        Object[] structValues = {"foo", "bar"};
+        Connection delegate = mock(Connection.class);
+        Clob clob = mock(Clob.class);
+        when(delegate.createClob()).thenReturn(clob);
+        testThroughMetadata(delegate, structValues, CLOB_DB_TYPE.getId(), CLOB_DB_TYPE.getName());
+        verify(delegate).createStruct(TYPE_NAME, structValues);
+        assertThat(structValues[0], Matchers.<Object>equalTo(clob));
+    }
+    
+    @Test
+    public void createStructResolvingBlobInOracleDb() throws Exception
+    {
+        Object[] structValues = {"foo", "bar"};
+        Connection delegate = mock(Connection.class);
+        Blob blob = mock(Blob.class);
+        when(delegate.createBlob()).thenReturn(blob);
+        testThroughOracleQuery(delegate, structValues, BLOB_DB_TYPE.getName());
+        verify(delegate).createStruct(TYPE_NAME, structValues);
+        assertThat(structValues[0], Matchers.<Object>equalTo(blob));
+    }
+    
+    @Test
+    public void createStructResolvingClobAndClobInOracleDb() throws Exception
+    {
+        Object[] structValues = {"foo", "bar"};
+        Connection delegate = mock(Connection.class);
+        Clob clob = mock(Clob.class);
+        when(delegate.createClob()).thenReturn(clob);
+        testThroughOracleQuery(delegate, structValues, CLOB_DB_TYPE.getName());
+        verify(delegate).createStruct(TYPE_NAME, structValues);
+        assertThat(structValues[0], Matchers.<Object>equalTo(clob));
+    }
+    
+    private void testThroughMetadata(Connection delegate, Object[] structValues, int dataType, String dataTypeName) throws Exception
+    {
+        DatabaseMetaData metadata = mock(DatabaseMetaData.class);
+        ResultSet resultSet = mock(ResultSet.class);
+        when(delegate.getMetaData()).thenReturn(metadata);
+        when(delegate.getCatalog()).thenReturn("catalog");
+        when(resultSet.next()).thenReturn(true).thenReturn(false);
+        when(resultSet.getInt(DATA_TYPE_INDEX)).thenReturn(dataType);
+        when(resultSet.getString(ATTR_TYPE_NAME_INDEX)).thenReturn(dataTypeName);
+        when(metadata.getAttributes("catalog", null, TYPE_NAME, null)).thenReturn(resultSet);
+        DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
+        DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
+        ParamTypeResolverFactory paramTypeResolverFactory = mock(ParamTypeResolverFactory.class);
+        DefaultDbConnection defaultDbConnection = new DefaultDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory);
+        defaultDbConnection.createStruct(TYPE_NAME, structValues);
+        defaultDbConnection.close();
+    }
+    
+    private void testThroughOracleQuery(Connection delegate, Object[] structValues, String dataTypeName) throws Exception
+    {
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+        
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(delegate.prepareStatement(QUERY_TYPE_ATTRS)).thenReturn(preparedStatement);
+        when(resultSet.next()).thenReturn(true).thenReturn(false);
+        when(resultSet.getInt(ATTR_NO_PARAM)).thenReturn(1);
+        when(resultSet.getString(ATTR_TYPE_NAME_PARAM)).thenReturn(dataTypeName);
+        
+        DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
+        DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
+        ParamTypeResolverFactory paramTypeResolverFactory = mock(ParamTypeResolverFactory.class);
+        OracleDbConnection defaultDbConnection = new OracleDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory);
+        defaultDbConnection.createStruct(TYPE_NAME, structValues);
+        defaultDbConnection.close();
     }
 
 
