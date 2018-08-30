@@ -1064,7 +1064,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",

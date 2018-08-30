@@ -2114,7 +2114,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",
@@ -2614,7 +2614,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",
@@ -4258,7 +4258,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",
@@ -4846,7 +4846,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",
@@ -4915,7 +4915,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4940,7 +4940,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 0
+                "order": 1
               },
               "showInDsl": false,
               "name": "General",
@@ -4969,7 +4969,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5001,7 +5001,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5018,7 +5018,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "showInDsl": false,
               "name": "Output",
@@ -5147,7 +5147,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5172,7 +5172,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 3
               },
               "showInDsl": false,
               "name": "Connection",
@@ -5318,7 +5318,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",
@@ -6576,7 +6576,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemorySize"
                             },
                             "model": {
                               "type": "Number",
@@ -6922,7 +6922,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",
@@ -7433,7 +7433,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemorySize"
                             },
                             "model": {
                               "type": "Number",
@@ -7768,7 +7768,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemoryObjects"
                             },
                             "model": {
                               "type": "Number",
@@ -10769,7 +10769,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemorySize"
                             },
                             "model": {
                               "type": "Number",
@@ -12707,7 +12707,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemorySize"
                             },
                             "model": {
                               "type": "Number",
@@ -14638,7 +14638,7 @@
                         "fields": [
                           {
                             "key": {
-                              "name": "maxInMemorySize"
+                              "name": "inMemorySize"
                             },
                             "model": {
                               "type": "Number",
