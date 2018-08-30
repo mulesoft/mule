@@ -203,8 +203,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
                                                    reactor.core.scheduler.Scheduler eventLoopScheduler,
                                                    Scheduler processorScheduler, CoreEvent event) {
-      return scheduleWithLogging(processor, processorScheduler, event)
-          .publishOn(eventLoopScheduler)
+      return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .doOnError(RejectedExecutionException.class,
                      throwable -> LOGGER.trace("Shared scheduler " + processorScheduler.getName()
@@ -215,17 +214,20 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }
 
-    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, reactor.core.scheduler.Scheduler eventLoopScheduler,
+                                                Scheduler processorScheduler, CoreEvent event) {
       if (isThreadLoggingEnabled) {
         return just(event)
             .flatMap(e -> Mono.subscriberContext()
                 .flatMap(ctx -> Mono.just(e).transform(processor)
+                    .publishOn(eventLoopScheduler)
                     .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
                         .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
                                                                                                e.getContext().getId())))));
       } else {
         return just(event)
             .transform(processor)
+            .publishOn(eventLoopScheduler)
             .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)));
       }
     }
