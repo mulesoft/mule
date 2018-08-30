@@ -102,6 +102,12 @@ public class OracleDbConnection extends DefaultDbConnection
         for (int index : dataTypes.keySet())
         {
             String dataTypeName = dataTypes.get(index);
+            // In Oracle we do not have the data type for structs, as the 
+            // the driver does not provide the getAttributes functionality  
+            // in their DatabaseMetaData.
+            // It has to be taken into account that the data type depends on JDBC, so the
+            // driver is the unit responsible for the mapping and we do not have that information
+            // in the DB catalog. We resolve the lobs depending on the name only.
             doResolveLobIn(attributes, index-1, dataTypeName);
         }
     }
@@ -114,22 +120,13 @@ public class OracleDbConnection extends DefaultDbConnection
         ps.setString(1, typeName);
         ResultSet resultSet = null;
 
-        try
-        {
-            resultSet = ps.executeQuery();
+        resultSet = ps.executeQuery();
 
-            while (resultSet.next())
-            {
-                dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resultSet.getString(ATTR_TYPE_NAME_PARAM));
-            }
-        }
-        finally
+        while (resultSet.next())
         {
-            if (resultSet != null)
-            {
-                resultSet.close();
-            }
+            dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resultSet.getString(ATTR_TYPE_NAME_PARAM));
         }
+
         return dataTypes;
     }
 

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.ATTR_TYPE_NAME_INDEX;
+import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.DATA_TYPE_INDEX;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_NO_PARAM;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_TYPE_NAME_PARAM;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_TYPE_ATTRS;
@@ -83,7 +84,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         Connection delegate = mock(Connection.class);
         Blob blob = mock(Blob.class);
         when(delegate.createBlob()).thenReturn(blob);
-        testThroughMetadata(delegate, structValues, BLOB_DB_TYPE.getName());
+        testThroughMetadata(delegate, structValues, BLOB_DB_TYPE.getId(), BLOB_DB_TYPE.getName());
         verify(delegate).createStruct(TYPE_NAME, structValues);
         assertThat(structValues[0], Matchers.<Object>equalTo(blob));
     }
@@ -95,7 +96,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         Connection delegate = mock(Connection.class);
         Clob clob = mock(Clob.class);
         when(delegate.createClob()).thenReturn(clob);
-        testThroughMetadata(delegate, structValues, CLOB_DB_TYPE.getName());
+        testThroughMetadata(delegate, structValues, CLOB_DB_TYPE.getId(), CLOB_DB_TYPE.getName());
         verify(delegate).createStruct(TYPE_NAME, structValues);
         assertThat(structValues[0], Matchers.<Object>equalTo(clob));
     }
@@ -124,14 +125,15 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         assertThat(structValues[0], Matchers.<Object>equalTo(clob));
     }
     
-    private void testThroughMetadata(Connection delegate, Object[] structValues, String dataType) throws Exception
+    private void testThroughMetadata(Connection delegate, Object[] structValues, int dataType, String dataTypeName) throws Exception
     {
         DatabaseMetaData metadata = mock(DatabaseMetaData.class);
         ResultSet resultSet = mock(ResultSet.class);
         when(delegate.getMetaData()).thenReturn(metadata);
         when(delegate.getCatalog()).thenReturn("catalog");
         when(resultSet.next()).thenReturn(true).thenReturn(false);
-        when(resultSet.getString(ATTR_TYPE_NAME_INDEX)).thenReturn(dataType);
+        when(resultSet.getInt(DATA_TYPE_INDEX)).thenReturn(dataType);
+        when(resultSet.getString(ATTR_TYPE_NAME_INDEX)).thenReturn(dataTypeName);
         when(metadata.getAttributes("catalog", null, TYPE_NAME, null)).thenReturn(resultSet);
         DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
         DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
@@ -141,7 +143,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         defaultDbConnection.close();
     }
     
-    private void testThroughOracleQuery(Connection delegate, Object[] structValues, String dataType) throws Exception
+    private void testThroughOracleQuery(Connection delegate, Object[] structValues, String dataTypeName) throws Exception
     {
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         ResultSet resultSet = mock(ResultSet.class);
@@ -150,7 +152,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         when(delegate.prepareStatement(QUERY_TYPE_ATTRS)).thenReturn(preparedStatement);
         when(resultSet.next()).thenReturn(true).thenReturn(false);
         when(resultSet.getInt(ATTR_NO_PARAM)).thenReturn(1);
-        when(resultSet.getString(ATTR_TYPE_NAME_PARAM)).thenReturn(dataType);
+        when(resultSet.getString(ATTR_TYPE_NAME_PARAM)).thenReturn(dataTypeName);
         
         DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
         DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
