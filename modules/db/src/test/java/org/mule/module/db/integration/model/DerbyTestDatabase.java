@@ -108,6 +108,9 @@ public class DerbyTestDatabase extends AbstractTestDatabase
     public static final String CREATE_CONTACT_DETAILS_TYPE =
             "CREATE TYPE CONTACT_DETAILS EXTERNAL NAME '" + ContactDetails.class.getName() + "' LANGUAGE JAVA";
 
+    public static final String CREATE_BLOB_AND_CLOB_TYPE =
+            "CREATE TYPE BLOB_AND_CLOB_TYPE EXTERNAL NAME '" + BlobAndClobType.class.getName() + "' LANGUAGE JAVA";
+
     @Override
     public void createPlanetTable(Connection connection) throws SQLException
     {
@@ -178,6 +181,25 @@ public class DerbyTestDatabase extends AbstractTestDatabase
         try
         {
             String ddl = CREATE_CONTACT_DETAILS_TYPE;
+
+            executeDdl(connection, ddl);
+        }
+        catch (SQLException e)
+        {
+            // Ignore exception when type already exists
+            if (!DERBY_ERROR_OBJECT_ALREADY_EXISTS.equals(e.getSQLState()))
+            {
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    protected void createBlobAndClobType(Connection connection) throws SQLException
+    {
+        try
+        {
+            String ddl = CREATE_BLOB_AND_CLOB_TYPE;
 
             executeDdl(connection, ddl);
         }

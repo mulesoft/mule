@@ -23,4 +23,10 @@
             <set-payload value="#[payload.get(0)['DETAILS']]"/>
         </transactional>
     </flow>
+	<flow name="createsStructWithBlobAndClob">
+		<transactional>
+			<set-payload value="#[dbCreateStruct('dbConfig', 'BLOB_AND_CLOB_TYPE', payload)]"
+				/>
+		</transactional>		
+	</flow>
 </mule>

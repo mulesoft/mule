@@ -64,4 +64,17 @@ public abstract class AbstractDbConnection implements DbConnection
     {
         connectionReleaseListener.release(this);
     }
+
+    /**
+     * Management of lob resolution for UDTs in structs
+     * By default, nothing is done
+     * 
+     * @param typeName type name of the UDT
+     * @param attributes attributes of the struct to populate
+     * @throws SQLException raises if a problems occurs on retrieval of the metadata
+     */
+    protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
+    {
+        // Do nothing
+    }
 }

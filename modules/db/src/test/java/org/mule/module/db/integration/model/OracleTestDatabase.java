@@ -318,6 +318,26 @@ public class OracleTestDatabase extends AbstractTestDatabase
             }
         }
     }
+    
+    protected void createBlobAndClobType(Connection connection) throws SQLException
+    {
+        final String ddl = "CREATE OR REPLACE TYPE BLOB_AND_CLOB_TYPE AS object(" +
+                           "REMARK_B BLOB," +
+                           "REMARK_C CLOB)";
+
+        try
+        {
+            executeDdl(connection, ddl);
+        }
+        catch (SQLException e)
+        {
+            // If the type already exists, ignore the error
+            if (!e.getMessage().contains("ORA-02303"))
+            {
+                throw e;
+            }
+        }
+    }
 
     @Override
     protected void createContactDetailsArrayType(Connection connection) throws SQLException
