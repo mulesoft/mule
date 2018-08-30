@@ -63,7 +63,6 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -851,7 +850,7 @@ public class ApplicationModel {
         try {
           verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
         } catch (IllegalArgumentException e) {
-          throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(String
+          throw new MuleRuntimeException(createStaticMessage(String
               .format("Invalid global element name '%s' in %s:%s. Problem is: %s", nameAttributeValue,
                       componentModel.getConfigFileName().orElse("unknown"), componentModel.getLineNumber().orElse(-1),
                       e.getMessage())));
