@@ -850,10 +850,12 @@ public class ApplicationModel {
         try {
           verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
         } catch (IllegalArgumentException e) {
-          throw new MuleRuntimeException(createStaticMessage(String
-              .format("Invalid global element name '%s' in %s:%s. Problem is: %s", nameAttributeValue,
-                      componentModel.getConfigFileName().orElse("unknown"), componentModel.getLineNumber().orElse(-1),
-                      e.getMessage())));
+          throw new MuleRuntimeException(createStaticMessage(
+                                                             format("Invalid global element name '%s' in %s:%s. Problem is: %s",
+                                                                    nameAttributeValue,
+                                                                    componentModel.getConfigFileName().orElse("unknown"),
+                                                                    componentModel.getLineNumber().orElse(-1),
+                                                                    e.getMessage())));
         }
       }
     });
