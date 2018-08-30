@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 import org.mule.util.IOUtils;
 import org.slf4j.Logger;
@@ -342,7 +343,7 @@ public class DefaultDbConnection extends AbstractDbConnection
         }
         catch (SQLException e)
         {
-            logger.warn("Unable to resolve lobs. Proceeding with original attributes.", e);
+            logger.warn("Unable to resolve lobs. Proceeding with original attributes.", e.getMessage());
         }
         return delegate.createStruct(typeName, attributes);
     }
@@ -392,33 +393,46 @@ public class DefaultDbConnection extends AbstractDbConnection
     @Override
     protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
     {
-        ResultSet resultSet = null;
-
-        resultSet = this.getMetaData().getAttributes(this.getCatalog(), null, typeName, null);
-
-        int index = 0;
-        while (resultSet.next())
+        try (ResultSet resultSet = this.getMetaData().getAttributes(this.getCatalog(), null, typeName, null))
         {
-            int dataType = resultSet.getInt(DATA_TYPE_INDEX);
-            String dataTypeName = resultSet.getString(ATTR_TYPE_NAME_INDEX);
 
-            doResolveLobIn(attributes, index, dataType, dataTypeName);
+            int index = 0;
+            while (resultSet.next())
+            {
+                int dataType = resultSet.getInt(DATA_TYPE_INDEX);
+                String dataTypeName = resultSet.getString(ATTR_TYPE_NAME_INDEX);
 
-            index++;
+                doResolveLobIn(attributes, index, dataType, dataTypeName);
+
+                index++;
+            }
         }
     }
 
 
     protected void doResolveLobIn(Object[] attributes, int index, int dataType, String dataTypeName) throws SQLException
     {
-        if (dataTypeName.equals(BLOB_DB_TYPE.getName()) && (dataType == UNKNOWN_DATA_TYPE || dataType == BLOB_DB_TYPE.getId()))
+        if (shouldResolveAttributeWithJdbcType(dataType, dataTypeName, BLOB_DB_TYPE))
         {
             attributes[index] = createBlob(attributes[index]);
         }
-        else if (dataTypeName.equals(CLOB_DB_TYPE.getName()) && (dataType == UNKNOWN_DATA_TYPE || dataType == CLOB_DB_TYPE.getId()))
+        else if (shouldResolveAttributeWithJdbcType(dataType, dataTypeName, CLOB_DB_TYPE))
         {
             attributes[index] = createClob(attributes[index]);
         }
+    }
+
+    private boolean shouldResolveAttributeWithJdbcType(int dbDataType, String dbDataTypeName, DbType jdbcType)
+    {
+        if (dbDataType == UNKNOWN_DATA_TYPE || dbDataType == jdbcType.getId())
+        {
+            if (dbDataTypeName.equals(jdbcType.getName()))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     protected void doResolveLobIn(Object[] attributes, int index, String dataTypeName) throws SQLException

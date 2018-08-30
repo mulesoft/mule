@@ -116,18 +116,20 @@ public class OracleDbConnection extends DefaultDbConnection
     {
         Map<Integer, String> dataTypes = new HashMap<Integer, String>();
 
-        PreparedStatement ps = this.prepareStatement(QUERY_TYPE_ATTRS);
-        ps.setString(1, typeName);
-        ResultSet resultSet = null;
-
-        resultSet = ps.executeQuery();
-
-        while (resultSet.next())
+        try (PreparedStatement ps = this.prepareStatement(QUERY_TYPE_ATTRS))
         {
-            dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resultSet.getString(ATTR_TYPE_NAME_PARAM));
-        }
+            ps.setString(1, typeName);
+            ResultSet resultSet = null;
 
-        return dataTypes;
+            resultSet = ps.executeQuery();
+
+            while (resultSet.next())
+            {
+                dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resultSet.getString(ATTR_TYPE_NAME_PARAM));
+            }
+
+            return dataTypes;
+        }
     }
 
 }
