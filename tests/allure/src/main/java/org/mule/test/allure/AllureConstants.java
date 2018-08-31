@@ -472,6 +472,12 @@ public interface AllureConstants {
 
     }
 
+    interface DslValidationStory {
+
+      String DSL_VALIDATION_STORY = "Mule DSL Validations";
+
+    }
+
   }
 
   interface ConfigurationProperties {
