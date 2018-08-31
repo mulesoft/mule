@@ -11,6 +11,12 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 
 import static java.lang.String.format;
 
+/**
+ * {@link IllegalStateException} implementation that aims to be thrown when no configuration reference was specified for a
+ * component that requires one.
+ *
+ * @since 4.2
+ */
 public class NoConfigRefFoundException extends IllegalStateException {
 
   NoConfigRefFoundException(ExtensionModel extension, ComponentModel component) {

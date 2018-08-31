@@ -66,7 +66,7 @@ final class ObjectTypeSchemaDelegate {
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final SchemaBuilder builder;
   private final DslSyntaxResolver dsl;
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final MetadataType STRING_TYPE = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(String.class);
 
   ObjectTypeSchemaDelegate(SchemaBuilder builder) {
     this.builder = builder;
@@ -493,7 +493,7 @@ final class ObjectTypeSchemaDelegate {
     objectElement.setComplexType(createTypeExtension(typeQName));
     if (typeDsl.supportsTopLevelDeclaration()) {
       objectElement.getComplexType().getComplexContent().getExtension().getAttributeOrAttributeGroup()
-          .add(builder.createAttribute(NAME_ATTRIBUTE_NAME, typeLoader.load(String.class), false, NOT_SUPPORTED));
+          .add(builder.createAttribute(NAME_ATTRIBUTE_NAME, STRING_TYPE, false, NOT_SUPPORTED));
     }
 
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(objectElement);

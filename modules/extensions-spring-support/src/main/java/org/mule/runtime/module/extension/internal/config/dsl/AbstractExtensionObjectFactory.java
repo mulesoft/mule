@@ -10,7 +10,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.*;
+import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.isChildKey;
+import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.unwrapChildKey;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.ConfigurationProperties;

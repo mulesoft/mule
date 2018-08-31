@@ -362,7 +362,6 @@
             "element": "org.mule.test.heisenberg.extension.model.Weapon"
           }
         },
-        "org.mule.runtime.extension.api.declaration.type.annotation.ComponentIdFieldTypeAnnotation": {},
         "typeAlias": {
           "value": "SomeExportedPojo"
         }

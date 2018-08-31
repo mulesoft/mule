@@ -36,6 +36,11 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
+/**
+ * A Factory that creates different {@link ValueResolver} instances for different parameter types.
+ *
+ * @since 4.2
+ */
 public class ValueResolverFactory {
 
   private final DslSyntaxResolver dslResolver;

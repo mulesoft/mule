@@ -15,6 +15,11 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
+/**
+ * Utility class containing methods commonly used when parsing an extension.
+ *
+ * @since 4.2
+ */
 public class ExtensionParsingUtils {
 
   static final String CHILD_ELEMENT_KEY_PREFIX = "<<";

@@ -13,6 +13,7 @@ import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -43,6 +44,12 @@ import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionPar
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
+/**
+ * A {@link MetadataTypeVisitor} implementation that creates a {@link ValueResolver} instances
+ * depending on a parameter {@link MetadataType}.
+ *
+ * @since 4.2
+ */
 public class ValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
 
   private final ConversionService conversionService = new DefaultConversionService();
@@ -69,6 +76,10 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
     this.defaultValue = defaultValue;
     this.acceptsReferences = acceptsReferences;
     this.expectedClass = expectedClass;
+  }
+
+  public ValueResolver getResolver() {
+    return resolverValueHolder.get();
   }
 
   @Override
@@ -121,10 +132,6 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeMetadataVisitor {
             : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(value), expectedClass));
 
     resolverValueHolder.set(delegateResolver);
-  }
-
-  public ValueResolver getResolver() {
-    return resolverValueHolder.get();
   }
 
   private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue) {

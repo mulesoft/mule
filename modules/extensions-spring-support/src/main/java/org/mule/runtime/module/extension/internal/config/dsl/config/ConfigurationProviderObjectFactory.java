@@ -138,10 +138,10 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
           try {
             return ((String) vr.resolve(null));
           } catch (MuleException e) {
-            throw new IllegalStateException("A problem occur while obtaining configuration name");
+            throw new IllegalStateException("Error obtaining configuration name", e);
           }
         })
-        .orElseThrow(() -> new RequiredParameterNotSetException("cannot create a config without a name"));
+        .orElseThrow(() -> new RequiredParameterNotSetException("cannot create a configuration without a name"));
   }
 
   public void setExpirationPolicy(ExpirationPolicy expirationPolicy) {

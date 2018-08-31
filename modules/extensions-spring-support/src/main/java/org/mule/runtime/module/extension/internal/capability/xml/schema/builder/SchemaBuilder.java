@@ -135,6 +135,7 @@ public final class SchemaBuilder {
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final MetadataType OBJECT_STORE_TYPE = typeLoader.load(ObjectStore.class);
+  private final MetadataType STRING_TYPE = typeLoader.load(String.class);
 
   private Schema schema;
   private boolean requiresTls = false;
@@ -644,8 +645,7 @@ public final class SchemaBuilder {
       importTlsNamespace();
       requiresTls = true;
     }
-    extensionType.getAttributeOrAttributeGroup()
-        .add(createAttribute(TLS_PARAMETER_NAME, typeLoader.load(String.class), false, NOT_SUPPORTED));
+    extensionType.getAttributeOrAttributeGroup().add(createAttribute(TLS_PARAMETER_NAME, STRING_TYPE, false, NOT_SUPPORTED));
   }
 
   void addTlsSupport(ExtensionType extensionType, List<TopLevelElement> childElements) {
