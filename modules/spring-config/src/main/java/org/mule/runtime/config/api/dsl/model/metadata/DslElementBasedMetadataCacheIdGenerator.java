@@ -74,9 +74,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
   @Override
   public Optional<MetadataCacheId> getIdForGlobalMetadata(DslElementModel<?> elementModel) {
+    List<MetadataCacheId> keyParts = new ArrayList<>();
     if (elementModel.getModel() instanceof ConfigurationModel) {
-      List<MetadataCacheId> keyParts = new ArrayList<>();
-
       resolveDslTagId(elementModel)
           .ifPresent(keyParts::add);
 
@@ -87,13 +86,33 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     }
 
     Optional<MetadataCacheId> configId = resolveConfigId(elementModel);
-    return configId.isPresent() ? configId : resolveDslTagId(elementModel);
+    if (configId.isPresent()) {
+      keyParts.add(configId.get());
+      resolveCategoryId(elementModel)
+          .ifPresent(keyParts::add);
+      return Optional.of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
+    }
+
+    return resolveDslTagId(elementModel);
+  }
+
+  private Optional<MetadataCacheId> resolveCategoryId(DslElementModel<?> elementModel) {
+    if (!(elementModel.getModel() instanceof ComponentModel)) {
+      return empty();
+    }
+
+    return ((ComponentModel) elementModel.getModel()).getModelProperty(MetadataKeyIdModelProperty.class)
+        .map(mp -> mp.getCategoryName().orElse(null))
+        .map(name -> new MetadataCacheId(name.hashCode(), "category:" + name));
   }
 
   private Optional<MetadataCacheId> doResolve(DslElementModel<?> elementModel, boolean includeAllKeys) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     resolveConfigId(elementModel)
+        .ifPresent(keyParts::add);
+
+    resolveCategoryId(elementModel)
         .ifPresent(keyParts::add);
 
     resolveDslTagId(elementModel)

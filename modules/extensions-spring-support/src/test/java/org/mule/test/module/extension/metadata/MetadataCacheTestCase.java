@@ -36,9 +36,9 @@ import org.junit.Test;
 
 public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
 
-  private static final String OUTPUT_AND_METADATA_KEY_CACHE_ID = "1874947571-1840879217-380895431-1745289126";
+  private static final String OUTPUT_AND_METADATA_KEY_CACHE_ID = "1874947571-1840879217-380895431-174528912676912086";
   private static final String OUTPUT_METADATA_WITHOUT_KEY_CACHE_ID = "1874947571-1840879217-380895431-1745289126";
-  private static final String CONTENT_AND_OUTPUT_CACHE_ID = "1874947571-1840879217-1768400440-1745289126";
+  private static final String CONTENT_AND_OUTPUT_CACHE_ID = "1874947571-1840879217-1768400440-174528912676912086";
 
   @Inject
   @Named(OBJECT_STORE_MANAGER)
@@ -103,7 +103,7 @@ public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
     List<String> actualKeys = getMetadataObjectStore().allKeys();
-    assertThat(actualKeys, hasSize(2));
+    assertThat(actualKeys, hasSize(3));
     assertThat(actualKeys,
                hasItems(OUTPUT_AND_METADATA_KEY_CACHE_ID, OUTPUT_METADATA_WITHOUT_KEY_CACHE_ID, CONTENT_AND_OUTPUT_CACHE_ID));
   }
