@@ -7,25 +7,26 @@
 package org.mule.test.module.extension.notification;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.notification.ExtensionNotification;
 import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -35,8 +36,16 @@ import org.junit.Test;
 public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final String HEISENBERG = HeisenbergExtension.HEISENBERG.toUpperCase();
+  private static final String NEW_BATCH = "NEW_BATCH";
+  private static final String NEXT_BATCH = "NEXT_BATCH";
+  private static final String BATCH_TERMINATED = "BATCH_TERMINATED";
+  private static final String BATCH_DELIVERY_FAILED = "BATCH_DELIVERY_FAILED";
+  private static final String BATCH_DELIVERED = "BATCH_DELIVERED";
+  private static final String BATCH_FAILED = "BATCH_FAILED";
+  private static final String KNOCKING_DOOR = "KNOCKING_DOOR";
+  private static final String KNOCKED_DOOR = "KNOCKED_DOOR";
 
-  private TestExtensionNotificationListener listener;
+  private TestExtensionNotificationListener listener = null;
 
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
@@ -48,159 +57,161 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void operationFiresNotificationsWithCustomData() throws Exception {
-    CountDownLatch latch = new CountDownLatch(2);
-    setUpListener(notification -> latch.countDown());
+    Latch latch = new Latch();
+    setUpListener(notification -> checkIfDone(latch, 2));
 
     String correlationId = flowRunner("operationNotification").run().getCorrelationId();
 
-    latch.await(2000, MILLISECONDS);
+    assertThat("Expected notifications not received.", latch.await(6000, MILLISECONDS), is(true));
 
-    assertThat(listener.getNotifications(), hasSize(2));
+    MultiMap<String, ExtensionNotification> notifications = listener.getNotifications();
+    assertThat(notifications.keySet(), containsInAnyOrder(KNOCKING_DOOR, KNOCKED_DOOR));
 
-    ExtensionNotification notification1 = listener.getNotifications().get(0);
-    assertThat(notification1.getAction().getNamespace(), is(HEISENBERG));
-    assertThat(notification1.getAction().getIdentifier(), is("KNOCKING_DOOR"));
-    assertThat(notification1.getData().getValue(), instanceOf(SimpleKnockeableDoor.class));
-    assertThat(((SimpleKnockeableDoor) notification1.getData().getValue()).getSimpleName(),
+    ExtensionNotification knockingDoor = notifications.get(KNOCKING_DOOR);
+    assertThat(knockingDoor, is(notNullValue()));
+    assertThat(knockingDoor.getAction().getNamespace(), is(HEISENBERG));
+    assertThat(knockingDoor.getData().getValue(), instanceOf(SimpleKnockeableDoor.class));
+    assertThat(((SimpleKnockeableDoor) knockingDoor.getData().getValue()).getSimpleName(),
                is("Top Level Skyler @ 308 Negra Arroyo Lane"));
-    assertThat(notification1.getEvent().getCorrelationId(), is(correlationId));
+    assertThat(knockingDoor.getEvent().getCorrelationId(), is(correlationId));
 
-    ExtensionNotification notification2 = listener.getNotifications().get(1);
-    assertThat(notification2.getAction().getNamespace(), is(HEISENBERG));
-    assertThat(notification2.getAction().getIdentifier(), is("KNOCKED_DOOR"));
-    assertThat(notification2.getData().getValue(), instanceOf(SimpleKnockeableDoor.class));
-    assertThat(((SimpleKnockeableDoor) notification2.getData().getValue()).getSimpleName(),
+    ExtensionNotification knockedDoor = notifications.get(KNOCKED_DOOR);
+    assertThat(knockedDoor, is(notNullValue()));
+    assertThat(knockedDoor.getAction().getNamespace(), is(HEISENBERG));
+    assertThat(knockedDoor.getData().getValue(), instanceOf(SimpleKnockeableDoor.class));
+    assertThat(((SimpleKnockeableDoor) knockedDoor.getData().getValue()).getSimpleName(),
                is("Top Level Skyler @ 308 Negra Arroyo Lane"));
-    assertThat(notification2.getEvent().getCorrelationId(), is(correlationId));
+    assertThat(knockedDoor.getEvent().getCorrelationId(), is(correlationId));
   }
 
   @Test
   public void sourceFiresNotificationsOnSuccess() throws Exception {
-    CountDownLatch latch = new CountDownLatch(4);
-    setUpListener(notification -> latch.countDown());
+    Latch latch = new Latch();
+    setUpListener(notification -> checkIfDone(latch, 4));
 
     Flow flow = (Flow) getFlowConstruct("sourceNotifications");
     flow.start();
 
-    latch.await(4000, MILLISECONDS);
+    assertThat("Expected notifications not received.", latch.await(6000, MILLISECONDS), is(true));
 
-    assertThat(listener.getNotifications(), hasSize(4));
+    Map<String, ExtensionNotification> notifications = listener.getNotifications();
+    assertThat(notifications.keySet(), containsInAnyOrder(NEW_BATCH, NEXT_BATCH, BATCH_DELIVERED, BATCH_TERMINATED));
 
-    ExtensionNotification notification1 = listener.getNotifications().get(0);
-    verifyNewBatch(notification1, 1);
+    ExtensionNotification newBatch = verifyNotificationAndValue(notifications.get(NEW_BATCH), 1);
 
-    String correlationId = notification1.getEvent().getCorrelationId();
+    String correlationId = newBatch.getEvent().getCorrelationId();
 
-    ExtensionNotification notification2 = listener.getNotifications().get(1);
-    verifyNextBatch(notification2, 100000L);
-    assertThat(notification2.getEvent().getCorrelationId(), is(correlationId));
+    ExtensionNotification nextBatch = verifyNotificationAndValue(notifications.get(NEXT_BATCH), 100000L);
+    assertThat(nextBatch.getEvent().getCorrelationId(), is(correlationId));
 
-    ExtensionNotification notification3 = listener.getNotifications().get(2);
-    verifyNotificationAndValue(notification3, "BATCH_DELIVERED", 100L);
-    assertThat(notification3.getEvent().getCorrelationId(), is(correlationId));
+    ExtensionNotification batchRedelivered = verifyNotificationAndValue(notifications.get(BATCH_DELIVERED), 100L);
+    assertThat(batchRedelivered.getEvent().getCorrelationId(), is(correlationId));
 
-    ExtensionNotification notification4 = listener.getNotifications().get(3);
-    verifyBatchTerminated(notification4, 1);
-    assertThat(notification4.getEvent().getCorrelationId(), is(correlationId));
+    ExtensionNotification batchTerminated = verifyNotificationAndValue(notifications.get(BATCH_TERMINATED), 1);
+    assertThat(batchTerminated.getEvent().getCorrelationId(), is(correlationId));
   }
 
   @Test
   public void sourceFiresNotificationsOnError() throws Exception {
-    CountDownLatch latch = new CountDownLatch(4);
-    setUpListener(notification -> latch.countDown());
+    Latch latch = new Latch();
+    setUpListener(notification -> checkIfDone(latch, 4));
 
     Flow flow = (Flow) getFlowConstruct("sourceNotificationsError");
     flow.start();
 
-    latch.await(4000, MILLISECONDS);
+    assertThat("Expected notifications not received", latch.await(6000, MILLISECONDS), is(true));
 
-    assertThat(listener.getNotifications(), hasSize(4));
+    MultiMap<String, ExtensionNotification> notifications = listener.getNotifications();
+    assertThat(notifications.keySet(), containsInAnyOrder(NEW_BATCH, NEXT_BATCH, BATCH_DELIVERY_FAILED, BATCH_TERMINATED));
 
-    ExtensionNotification notification1 = listener.getNotifications().get(0);
-    verifyNewBatch(notification1, 1);
+    ExtensionNotification newBatch = verifyNotificationAndValue(notifications.get(NEW_BATCH), 1);
 
-    String correlationId = notification1.getEvent().getCorrelationId();
+    String correlationId = newBatch.getEvent().getCorrelationId();
 
-    ExtensionNotification notification2 = listener.getNotifications().get(1);
-    verifyNextBatch(notification2, 100000L);
-    assertThat(notification2.getEvent().getCorrelationId(), is(correlationId));
+    ExtensionNotification nextBatch = verifyNotificationAndValue(notifications.get(NEXT_BATCH), 100000L);
+    assertThat(nextBatch.getEvent().getCorrelationId(), is(correlationId));
 
-    ExtensionNotification notification3 = listener.getNotifications().get(2);
-    assertThat(notification3.getAction().getNamespace(), is(HEISENBERG));
-    assertThat(notification3.getAction().getIdentifier(), is("BATCH_DELIVERY_FAILED"));
-    assertThat(notification3.getData().getValue(), instanceOf(PersonalInfo.class));
-    assertThat(((PersonalInfo) notification3.getData().getValue()).getAge(), is(27));
-    assertThat(notification3.getEvent().getCorrelationId(), is(correlationId));
+    ExtensionNotification batchDeliveryFailed = notifications.get(BATCH_DELIVERY_FAILED);
+    assertThat(batchDeliveryFailed, is(notNullValue()));
+    assertThat(batchDeliveryFailed.getAction().getNamespace(), is(HEISENBERG));
+    assertThat(batchDeliveryFailed.getData().getValue(), instanceOf(PersonalInfo.class));
+    assertThat(((PersonalInfo) batchDeliveryFailed.getData().getValue()).getAge(), is(27));
+    assertThat(batchDeliveryFailed.getEvent().getCorrelationId(), is(correlationId));
 
-    ExtensionNotification notification4 = listener.getNotifications().get(3);
-    verifyBatchTerminated(notification4, 1);
-    assertThat(notification4.getEvent().getCorrelationId(), is(correlationId));
+    ExtensionNotification batchTerminated = verifyNotificationAndValue(notifications.get(BATCH_TERMINATED), 1);
+    assertThat(batchTerminated.getEvent().getCorrelationId(), is(correlationId));
   }
 
   @Test
   public void sourceFiresNotificationsOnBackPressure() throws Exception {
-    Latch latch = new Latch();
-    String batchFailed = "BATCH_FAILED";
+    Latch failed = new Latch();
+    final Reference<ExtensionNotification> batchFailed = new Reference<>();
 
     setUpListener(notification -> {
-      if (batchFailed.equals(notification.getAction().getIdentifier())) {
-        latch.release();
+      if (BATCH_FAILED.equals(notification.getAction().getIdentifier())) {
+        batchFailed.set(notification);
+        failed.release();
       }
     });
 
     Flow flow = (Flow) getFlowConstruct("sourceNotificationsBackPressure");
     flow.start();
 
-    latch.await(10000, MILLISECONDS);
+    assertThat("Batch failure notification not received.", failed.await(10000, MILLISECONDS), is(true));
+
+    ExtensionNotification backPressureNotification = batchFailed.get();
+    assertThat(backPressureNotification, is(notNullValue()));
+    String correlationId = backPressureNotification.getEvent().getCorrelationId();
+
+    new PollingProber(10000, 200).check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return new MultiMap<>(listener.getNotifications()).entryList().stream()
+            .filter(entry -> correlationId.equals(entry.getValue().getEvent().getCorrelationId()))
+            .count() == 4;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Expected notifications not found.";
+      }
+    });
     flow.stop();
 
-    assertThat(listener.getNotifications(), hasSize(greaterThan(3)));
-
-    //Find first BATCH_FAILED
-    ExtensionNotification backPressureNotification = listener.getNotifications()
-        .stream()
-        .filter(n -> batchFailed.equals(n.getAction().getIdentifier()))
-        .findFirst().get();
-    //Find matching event notifications
-    List<ExtensionNotification> notifications = listener.getNotifications()
-        .stream()
-        .filter(n -> backPressureNotification.getEvent().getCorrelationId().equals(n.getEvent().getCorrelationId()))
-        .collect(toList());
-
-    assertThat(notifications, hasSize(4));
+    MultiMap<String, ExtensionNotification> notifications = listener.getNotifications();
+    assertThat(notifications.keySet(), containsInAnyOrder(NEW_BATCH, NEXT_BATCH, BATCH_FAILED, BATCH_TERMINATED));
 
     int batchNumber = (Integer) backPressureNotification.getData().getValue();
 
-    ExtensionNotification notification1 = notifications.get(0);
-    verifyNewBatch(notification1, batchNumber);
+    verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, NEW_BATCH), batchNumber);
 
-    ExtensionNotification notification2 = notifications.get(1);
-    verifyNextBatch(notification2, 10L);
+    verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, NEXT_BATCH), 10L);
 
-    ExtensionNotification notification3 = notifications.get(2);
-    verifyNotificationAndValue(notification3, batchFailed, batchNumber);
+    verifyNotificationAndValue(backPressureNotification, batchNumber);
 
-    ExtensionNotification notification4 = notifications.get(3);
-    verifyBatchTerminated(notification4, batchNumber);
+    verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, BATCH_TERMINATED), batchNumber);
   }
 
-  private void verifyNewBatch(ExtensionNotification notification, Integer expected) {
-    verifyNotificationAndValue(notification, "NEW_BATCH", expected);
+  private void checkIfDone(Latch latch, int expectedKeys) {
+    if (listener.getNotifications().keySet().size() == expectedKeys) {
+      latch.release();
+    }
   }
 
-  private void verifyNextBatch(ExtensionNotification notification, Long expected) {
-    verifyNotificationAndValue(notification, "NEXT_BATCH", expected);
+  private ExtensionNotification getNotificationMatch(MultiMap<String, ExtensionNotification> notifications, String correlation,
+                                                     String id) {
+    return notifications.getAll(id).stream()
+        .filter(n -> correlation.equals(n.getEvent().getCorrelationId()))
+        .findAny()
+        .orElse(null);
   }
 
-  private void verifyBatchTerminated(ExtensionNotification notification, int expected) {
-    verifyNotificationAndValue(notification, "BATCH_TERMINATED", expected);
-  }
-
-  private <T> void verifyNotificationAndValue(ExtensionNotification notification, String id, T expected) {
+  private <T> ExtensionNotification verifyNotificationAndValue(ExtensionNotification notification, T expected) {
     assertThat(notification.getAction().getNamespace(), is(HEISENBERG));
-    assertThat(notification.getAction().getIdentifier(), is(id));
     assertThat(notification.getData().getValue(), instanceOf(expected.getClass()));
     assertThat(notification.getData().getValue(), is(expected));
+    return notification;
   }
 
   private void setUpListener(Consumer<ExtensionNotification> onNotification) {
@@ -211,7 +222,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   private class TestExtensionNotificationListener implements ExtensionNotificationListener {
 
     private Consumer<ExtensionNotification> onNotification;
-    private List<ExtensionNotification> notifications = new LinkedList<>();
+    private MultiMap<String, ExtensionNotification> notifications = new MultiMap<>();
 
     public TestExtensionNotificationListener(Consumer<ExtensionNotification> onNotification) {
       this.onNotification = onNotification;
@@ -219,11 +230,11 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     @Override
     public void onNotification(ExtensionNotification notification) {
-      notifications.add(notification);
+      notifications.put(notification.getAction().getIdentifier(), notification);
       onNotification.accept(notification);
     }
 
-    public List<ExtensionNotification> getNotifications() {
+    public MultiMap<String, ExtensionNotification> getNotifications() {
       return notifications;
     }
 
