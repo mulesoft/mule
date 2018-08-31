@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import static com.google.common.cache.CacheBuilder.newBuilder;
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Thread.currentThread;
 
@@ -21,12 +21,10 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.status.StatusLogger;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Implementation of {@link org.apache.logging.log4j.core.selector.ContextSelector} which is used to implement log separation
@@ -62,14 +60,10 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
 
   private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
-  private static final LoadingCache<ClassLoader, ClassLoader> classLoaderLoggerCache =
-      newBuilder().weakKeys().weakValues().build(new CacheLoader<ClassLoader, ClassLoader>() {
-
-        @Override
-        public ClassLoader load(ClassLoader key) throws Exception {
-          return getLoggerClassLoader(key);
-        }
-      });
+  private static final LoadingCache<ClassLoader, ClassLoader> classLoaderLoggerCache = newBuilder()
+      .weakKeys()
+      .weakValues()
+      .build(key -> getLoggerClassLoader(key));
 
   ArtifactAwareContextSelector() {}
 
@@ -81,6 +75,10 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   @Override
   public LoggerContext getContext(String fqcn, ClassLoader classLoader, boolean currentContext, URI configLocation) {
     return cache.getLoggerContext(resolveLoggerContextClassLoader(classLoader));
+  }
+
+  LoggerContext getContextWithResolvedContextClassLoader(ClassLoader resolvedContextClassLoader) {
+    return cache.getLoggerContext(resolvedContextClassLoader);
   }
 
   @Override
@@ -108,16 +106,12 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
    * @return the {@link ClassLoader} owner of the logger context
    */
   static ClassLoader resolveLoggerContextClassLoader(ClassLoader classLoader) {
-    // Cannot store null as key in the cache
-    if (classLoader == null && currentThread().getContextClassLoader() == null) {
-      return SYSTEM_CLASSLOADER;
-    }
+    return classLoaderLoggerCache.get(classLoader == null ? resolveTcclOrSystemCl() : classLoader);
+  }
 
-    try {
-      return classLoaderLoggerCache.get(classLoader == null ? currentThread().getContextClassLoader() : classLoader);
-    } catch (ExecutionException e) {
-      throw new IllegalStateException("Unable to obtain logger context classLoader for: " + classLoader, e.getCause());
-    }
+  protected static ClassLoader resolveTcclOrSystemCl() {
+    ClassLoader tccl = currentThread().getContextClassLoader();
+    return tccl == null ? SYSTEM_CLASSLOADER : tccl;
   }
 
   private static ClassLoader getLoggerClassLoader(ClassLoader loggerClassLoader) {

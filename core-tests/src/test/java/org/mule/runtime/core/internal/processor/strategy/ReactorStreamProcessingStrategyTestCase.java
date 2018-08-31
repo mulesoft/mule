@@ -18,8 +18,6 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
@@ -99,29 +97,16 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
 
   @Override
   @Test
-  @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
-  public void sourceBackPressureWait() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
-    }
-  }
-
-  @Override
-  @Test
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, lessThanOrEqualTo(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(FAIL, lessThanOrEqualTo(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Override
   @Test
   @Description("When back-pressure strategy is 'DROP' the flow rejects requests in the same way way with 'FAIL. It is the source that handles FAIL and DROP differently.")
   public void sourceBackPressureDrop() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, lessThanOrEqualTo(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(DROP, lessThanOrEqualTo(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
 }

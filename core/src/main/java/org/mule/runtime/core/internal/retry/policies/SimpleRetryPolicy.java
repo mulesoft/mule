@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.retry.policies;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
-import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
@@ -73,7 +72,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
     return from(publisher).onErrorResume(e -> {
       if (shouldRetry.test(e)) {
         Retry<T> retry = (Retry<T>) onlyIf(ctx -> shouldRetry.test(unwrap(ctx.exception())))
-            .backoff(ctx -> new BackoffDelay(frequency, ZERO, ZERO));
+            .backoff(ctx -> new BackoffDelay(frequency));
 
         if (count != RETRY_COUNT_FOREVER) {
           retry = retry.retryMax(count - 1);

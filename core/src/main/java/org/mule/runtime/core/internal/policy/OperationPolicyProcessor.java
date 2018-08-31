@@ -22,10 +22,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import java.util.Optional;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -105,14 +107,14 @@ public class OperationPolicyProcessor implements Processor {
 
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyStateId.getPolicyId(),
-                                     getMessageAttributesAsString(event), "Before operation"))
+                                     () -> getMessageAttributesAsString(event), "Before operation"))
         .cast(CoreEvent.class)
         .transform(policyChain)
         .cast(PrivilegedEvent.class)
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
         .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyStateId.getPolicyId(),
-                                     getMessageAttributesAsString(event), "After operation"));
+                                     () -> getMessageAttributesAsString(event), "After operation"));
   }
 
   private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent,
@@ -149,10 +151,10 @@ public class OperationPolicyProcessor implements Processor {
     return event.getMessage().getAttributes().getValue().toString();
   }
 
-  private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
+  private void logPolicy(String eventId, String policyName, Supplier<String> message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       // TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n" + message);
+      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n" + message.get());
     }
   }
 }
