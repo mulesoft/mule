@@ -161,6 +161,7 @@
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.59</bouncycastleVersion>
         <c3p0Version>0.9.5.2-MULE-001</c3p0Version>
+        <caffeineVersion>2.6.2</caffeineVersion>
         <cglibVersion>3.2.6</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
@@ -180,6 +181,7 @@
         <derbyVersion>10.13.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <eaioUuidVersion>3.4.0</eaioUuidVersion>
+        <fastUtilVersion>8.1.1</fastUtilVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>

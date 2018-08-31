@@ -126,11 +126,11 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
     return just(event)
-        .doOnNext(s -> logEvent(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event),
+        .doOnNext(s -> logEvent(getCoreEventId(event), getPolicyName(policy), () -> getCoreEventAttributesAsString(event),
                                 "Starting Policy "))
         .transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
         .doOnNext(responseEvent -> logEvent(getCoreEventId(responseEvent), getPolicyName(policy),
-                                            getCoreEventAttributesAsString(responseEvent), "At the end of the Policy "));
+                                            () -> getCoreEventAttributesAsString(responseEvent), "At the end of the Policy "));
   }
 
   /**
@@ -189,10 +189,10 @@ public class CompositeSourcePolicy extends
     return concatMap;
   }
 
-  private void logEvent(String eventId, String policyName, String message, String startingMessage) {
+  private void logEvent(String eventId, String policyName, Supplier<String> message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       //TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + policyName + "\n" + message);
+      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + policyName + "\n" + message.get());
     }
   }
 

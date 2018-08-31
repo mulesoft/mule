@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -18,8 +19,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -66,15 +66,15 @@ final class LoggerContextCache implements Disposable {
   LoggerContextCache(ArtifactAwareContextSelector artifactAwareContextSelector, ClassLoader reaperContextClassLoader) {
     acquireContextDisposeDelay();
     this.artifactAwareContextSelector = artifactAwareContextSelector;
-    activeContexts = CacheBuilder.newBuilder().build();
+    activeContexts = newBuilder().build();
 
-    disposedContexts = CacheBuilder.newBuilder().expireAfterWrite(disposeDelayInMillis, MILLISECONDS)
-        .removalListener(notification -> {
-          stop((LoggerContext) notification.getValue());
-          activeContexts.invalidate(notification.getKey());
+    disposedContexts = newBuilder().expireAfterWrite(disposeDelayInMillis, MILLISECONDS)
+        .removalListener((key, value, cause) -> {
+          stop((LoggerContext) value);
+          activeContexts.invalidate(key);
 
           Int2ObjectMap<LoggerContext> newBuiltContexts = new Int2ObjectOpenHashMap<>(builtContexts);
-          newBuiltContexts.remove(((Integer) notification.getKey()).intValue());
+          newBuiltContexts.remove(((Integer) key).intValue());
           builtContexts = newBuiltContexts;
         }).build();
 
@@ -144,14 +144,14 @@ final class LoggerContextCache implements Disposable {
    * @throws ExecutionException
    */
   protected LoggerContext doGetLoggerContext(final ClassLoader classLoader, final Integer key) throws ExecutionException {
-    return activeContexts.get(key, () -> {
-      if (builtContexts.containsKey(key.intValue())) {
-        return builtContexts.get(key.intValue());
+    return activeContexts.get(key, k -> {
+      if (builtContexts.containsKey(k.intValue())) {
+        return builtContexts.get(k.intValue());
       } else {
         LoggerContext context = artifactAwareContextSelector.buildContext(classLoader);
 
         Int2ObjectMap<LoggerContext> newBuiltContexts = new Int2ObjectOpenHashMap<>(builtContexts);
-        newBuiltContexts.put(key.intValue(), context);
+        newBuiltContexts.put(k.intValue(), context);
         builtContexts = newBuiltContexts;
 
         return context;

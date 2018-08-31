@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
-
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
@@ -28,6 +24,11 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
 import org.apache.logging.log4j.spi.ExtendedLogger;
+
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Suppose that class X is used in applications Y and Z. If X holds a static reference to a logger L, then all the log events are
@@ -61,7 +62,7 @@ abstract class DispatchingLogger extends Logger {
 
 
   private Logger getLogger() {
-    final ClassLoader currentClassLoader = resolveLoggerContextClassLoader(Thread.currentThread().getContextClassLoader());
+    final ClassLoader currentClassLoader = resolveLoggerContextClassLoader(currentThread().getContextClassLoader());
     if (useThisLoggerContextClassLoader(currentClassLoader)) {
       return originalLogger;
     }
@@ -69,7 +70,12 @@ abstract class DispatchingLogger extends Logger {
     // trick - this is probably a logger declared in a static field
     // the classloader used to create it and the TCCL can be different
     // ask contextSelector for the correct context
-    return contextSelector.getContext(getName(), currentClassLoader, true).getLogger(getName(), getMessageFactory());
+    if (contextSelector instanceof ArtifactAwareContextSelector) {
+      return ((ArtifactAwareContextSelector) contextSelector).getContextWithResolvedContextClassLoader(currentClassLoader)
+          .getLogger(getName(), getMessageFactory());
+    } else {
+      return contextSelector.getContext(getName(), currentClassLoader, true).getLogger(getName(), getMessageFactory());
+    }
   }
 
   /**
@@ -84,7 +90,7 @@ abstract class DispatchingLogger extends Logger {
   /**
    * This is workaround for the low visibility of the {@link Logger#updateConfiguration(Configuration)} method, which invokes it
    * on the {@code originalLogger}.
-   * 
+   *
    * Using a wrapper in the log4j package causes an {@link IllegalAccessError}.
    *
    * @param config

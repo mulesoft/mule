@@ -195,6 +195,17 @@
             <version>${commonsPool2Version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>${fastUtilVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeineVersion}</version>
+        </dependency>
+
         <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>
             <groupId>javax.jms</groupId>
