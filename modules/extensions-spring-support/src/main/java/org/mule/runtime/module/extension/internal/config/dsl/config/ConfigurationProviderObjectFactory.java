@@ -19,6 +19,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -52,6 +53,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private Optional<ConnectionProviderValueResolver> connectionProviderResolver = empty();
   private ConfigurationProvider instance;
   private boolean requiresConnection = false;
+  private LazyValue<String> configName = new LazyValue<>(this::getName);
 
   ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
                                      ConfigurationModel configurationModel,
@@ -84,7 +86,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       try {
         if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
           configurationProvider =
-              configurationProviderFactory.createDynamicConfigurationProvider(getName(), extensionModel,
+              configurationProviderFactory.createDynamicConfigurationProvider(configName.get(), extensionModel,
                                                                               configurationModel,
                                                                               resolverSet,
                                                                               connectionProviderResolver,
@@ -94,7 +96,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                                               muleContext);
         } else {
           configurationProvider = configurationProviderFactory
-              .createStaticConfigurationProvider(getName(),
+              .createStaticConfigurationProvider(configName.get(),
                                                  extensionModel,
                                                  configurationModel,
                                                  resolverSet,
