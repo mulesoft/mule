@@ -298,11 +298,11 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(cacheIdGenerator.getIdForMetadataKeys(any()))
         .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
 
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
-                                                                           cacheIdGeneratorFactory);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
+                                                                         cacheIdGeneratorFactory);
 
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("core.metadata.cache.manager",
-                                                                           metadataCacheManager);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("core.metadata.cache.manager",
+                                                                         metadataCacheManager);
 
     when(resolverSet.resolve(argThat(new BaseMatcher<ValueResolvingContext>() {
 

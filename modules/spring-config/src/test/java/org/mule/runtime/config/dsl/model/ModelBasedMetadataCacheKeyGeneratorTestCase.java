@@ -108,6 +108,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     dslResolvingContext = DslResolvingContext.getDefault(extensions);
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
+    mockSimpleMetadataKeyId(operation);
   }
 
   @Test
@@ -135,23 +136,37 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   }
 
   @Test
-  public void valueChangeModifiesHash() throws Exception {
+  public void configurationParameterModifiesHash() throws Exception {
     ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId keyParts = getHash(declaration, OPERATION_LOCATION);
-    LOGGER.debug(keyParts.toString());
+    MetadataCacheId cacheId = getIdForComponent(declaration);
+    LOGGER.debug(cacheId.toString());
 
     ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
         .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
 
-    MetadataCacheId otherKeyParts = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponent(declaration);
     LOGGER.debug(otherKeyParts.toString());
-    assertThat(keyParts, not(otherKeyParts));
+    assertThat(cacheId, not(otherKeyParts));
+  }
+
+  @Test
+  public void configurationParameterModifiesGlobalHash() throws Exception {
+    ArtifactDeclaration declaration = getBaseApp();
+    MetadataCacheId cacheId = getGlobalId(declaration);
+    LOGGER.debug(cacheId.toString());
+
+    ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
+        .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
+
+    MetadataCacheId otherKeyParts = getGlobalId(declaration);
+    LOGGER.debug(otherKeyParts.toString());
+    assertThat(cacheId, not(otherKeyParts));
   }
 
   @Test
   public void operationParameterDoesNotModifyHash() throws Exception {
     ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId keyParts = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId keyParts = getIdForComponent(declaration);
     LOGGER.debug(keyParts.toString());
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
@@ -162,17 +177,33 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     operationDeclaration.getParameterGroups().get(0)
         .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
 
-    MetadataCacheId otherKeyParts = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponent(declaration);
+    LOGGER.debug(otherKeyParts.toString());
+    assertThat(keyParts, is(otherKeyParts));
+  }
+
+  @Test
+  public void operationParameterDoesNotModifyGlobal() throws Exception {
+    ArtifactDeclaration declaration = getBaseApp();
+    MetadataCacheId keyParts = getGlobalId(declaration);
+    LOGGER.debug(keyParts.toString());
+
+    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
+    operationDeclaration.getParameterGroups().get(0)
+        .getParameter(CONTENT_NAME).get().setValue(ParameterSimpleValue.of("otherValue"));
+    operationDeclaration.getParameterGroups().get(0)
+        .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
+
+    MetadataCacheId otherKeyParts = getGlobalId(declaration);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(keyParts, is(otherKeyParts));
   }
 
   @Test
   public void metadataKeyModifiesHash() throws Exception {
-    MetadataCacheId keyParts = getHash(getBaseApp(), OPERATION_LOCATION);
+    MetadataCacheId keyParts = getIdForComponent(getBaseApp());
     LOGGER.debug(keyParts.toString());
-
-    mockSimpleMetadataKeyId(operation);
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
@@ -181,12 +212,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
 
-    MetadataCacheId otherKeyParts = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponent(declaration);
     LOGGER.debug(otherKeyParts.toString());
 
     metadataKeyPartParam.setValue(ParameterSimpleValue.of("Document"));
 
-    MetadataCacheId finalKeyParts = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId finalKeyParts = getIdForComponent(declaration);
     LOGGER.debug(finalKeyParts.toString());
 
     assertThat(otherKeyParts, not(keyParts));
@@ -195,14 +226,32 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   }
 
   @Test
-  public void metadataKeyDoesNotModifyKeyHash() throws Exception {
-    when(operation.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional.empty());
-    when(operation.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(Optional.empty());
+  public void metadataCategoryModifiesGlobalHash() throws Exception {
+    ArtifactDeclaration declaration = getBaseApp();
+    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
 
+    ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
+    operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
+
+    MetadataCacheId id = getGlobalId(declaration);
+    LOGGER.debug(id.toString());
+
+    when(operation.getModelProperty(MetadataKeyIdModelProperty.class))
+        .thenReturn(Optional.of(new MetadataKeyIdModelProperty(TYPE_LOADER.load(String.class),
+                                                               METADATA_KEY_PART_1,
+                                                               "OTHER_CATEGORY")));
+
+    MetadataCacheId otherId = getGlobalId(declaration);
+    LOGGER.debug(id.toString());
+
+    assertThat(id, not(otherId));
+  }
+
+  @Test
+  public void metadataKeyDoesNotModifyKeyHash() throws Exception {
     MetadataCacheId keyParts = getKeyHash(getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
-
-    mockSimpleMetadataKeyId(operation);
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
@@ -237,12 +286,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
     keyGroup.addParameter(newParam(METADATA_KEY_PART_2, "8080"));
 
-    MetadataCacheId twoLevelParts = getHash(declaration, OPERATION_LOCATION);
-    LOGGER.debug(toString());
+    MetadataCacheId twoLevelParts = getIdForComponent(declaration);
+    LOGGER.debug(twoLevelParts.toString());
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
 
-    MetadataCacheId otherKeyParts = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponent(declaration);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(otherKeyParts, not(twoLevelParts));
@@ -266,13 +315,13 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
 
-    MetadataCacheId original = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId original = getIdForComponent(declaration);
     LOGGER.debug(original.toString());
 
     partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getHash(declaration, OPERATION_LOCATION);
+    MetadataCacheId newHash = getIdForComponent(declaration);
     LOGGER.debug(newHash.toString());
-    LOGGER.debug(newHash.getParts().toString());
+    LOGGER.debug(newHash.toString());
 
     assertThat(original, not(newHash));
   }
@@ -300,6 +349,31 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     partTwo.setValue(ParameterSimpleValue.of("6666"));
     MetadataCacheId newHash = getKeyHash(declaration, OPERATION_LOCATION);
+    LOGGER.debug(newHash.toString());
+
+    assertThat(original, is(newHash));
+  }
+
+  @Test
+  public void multiLevelPartValueDoesNotModifyGlobalId() throws Exception {
+    mockMultiLevelMetadataKeyId(operation);
+
+    ArtifactDeclaration declaration = getBaseApp();
+    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
+
+    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
+    operationDeclaration.addParameterGroup(keyGroup);
+    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
+    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
+    keyGroup.addParameter(partTwo);
+    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
+
+    MetadataCacheId original = getGlobalId(declaration);
+    LOGGER.debug(original.toString());
+
+    partTwo.setValue(ParameterSimpleValue.of("6666"));
+    MetadataCacheId newHash = getGlobalId(declaration);
     LOGGER.debug(newHash.toString());
 
     assertThat(original, is(newHash));
@@ -371,10 +445,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   }
 
 
-  private MetadataCacheId getHash(ArtifactDeclaration declaration, String location) throws Exception {
+  private MetadataCacheId getIdForComponent(ArtifactDeclaration declaration) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentConfiguration component = new Locator(app)
-        .get(Location.builderFromStringRepresentation(location).build())
+        .get(Location.builderFromStringRepresentation(ModelBasedMetadataCacheKeyGeneratorTestCase.OPERATION_LOCATION).build())
         .get();
     return createGenerator(app).getIdForComponentMetadata(component).get();
   }
@@ -385,6 +459,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
         .get(Location.builderFromStringRepresentation(location).build())
         .get();
     return createGenerator(app).getIdForMetadataKeys(component).get();
+  }
+
+  private MetadataCacheId getGlobalId(ArtifactDeclaration declaration) throws Exception {
+    ApplicationModel app = loadApplicationModel(declaration);
+    ComponentConfiguration component = new Locator(app)
+        .get(Location.builderFromStringRepresentation(ModelBasedMetadataCacheKeyGeneratorTestCase.OPERATION_LOCATION).build())
+        .get();
+    return createGenerator(app).getIdForGlobalMetadata(component).get();
   }
 
   private ParameterElementDeclaration newParam(String name, String value) {

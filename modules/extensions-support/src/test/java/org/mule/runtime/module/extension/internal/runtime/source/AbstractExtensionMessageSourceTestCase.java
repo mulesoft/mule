@@ -251,8 +251,8 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     when(metadataResolverFactory.getOutputResolver()).thenReturn(new TestNoConfigMetadataResolver());
     when(metadataResolverFactory.getOutputAttributesResolver()).thenReturn(new TestNoConfigMetadataResolver());
 
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
-                                                                           cacheIdGeneratorFactory);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
+                                                                         cacheIdGeneratorFactory);
     when(cacheIdGeneratorFactory.create(any(), any())).thenReturn(cacheIdGenerator);
     when(cacheIdGenerator.getIdForComponentMetadata(any()))
         .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
