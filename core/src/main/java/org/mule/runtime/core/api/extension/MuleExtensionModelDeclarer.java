@@ -804,7 +804,8 @@ class MuleExtensionModelDeclarer {
         .withRequiredParameter("file")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"properties"})).build())
+        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"yaml", "properties"}))
+            .build())
         .describedAs(" The location of the file with the configuration properties to use. "
             + "It may be a location in the classpath or an absolute location. The file location\n"
             + " value may also contains references to properties that will only be resolved based on "
