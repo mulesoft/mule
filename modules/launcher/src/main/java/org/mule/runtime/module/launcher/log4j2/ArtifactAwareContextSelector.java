@@ -77,6 +77,10 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
     return cache.getLoggerContext(resolveLoggerContextClassLoader(classLoader));
   }
 
+  LoggerContext getContextWithResolvedContextClassLoader(ClassLoader resolvedContextClassLoader) {
+    return cache.getLoggerContext(resolvedContextClassLoader);
+  }
+
   @Override
   public List<LoggerContext> getLoggerContexts() {
     return cache.getAllLoggerContexts();
@@ -102,12 +106,12 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
    * @return the {@link ClassLoader} owner of the logger context
    */
   static ClassLoader resolveLoggerContextClassLoader(ClassLoader classLoader) {
-    // Cannot store null as key in the cache
-    if (classLoader == null && currentThread().getContextClassLoader() == null) {
-      return SYSTEM_CLASSLOADER;
-    }
+    return classLoaderLoggerCache.get(classLoader == null ? resolveTcclOrSystemCl() : classLoader);
+  }
 
-    return classLoaderLoggerCache.get(classLoader == null ? currentThread().getContextClassLoader() : classLoader);
+  protected static ClassLoader resolveTcclOrSystemCl() {
+    ClassLoader tccl = currentThread().getContextClassLoader();
+    return tccl == null ? SYSTEM_CLASSLOADER : tccl;
   }
 
   private static ClassLoader getLoggerClassLoader(ClassLoader loggerClassLoader) {

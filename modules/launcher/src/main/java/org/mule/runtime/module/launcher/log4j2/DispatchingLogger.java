@@ -70,7 +70,12 @@ abstract class DispatchingLogger extends Logger {
     // trick - this is probably a logger declared in a static field
     // the classloader used to create it and the TCCL can be different
     // ask contextSelector for the correct context
-    return contextSelector.getContext(getName(), currentClassLoader, true).getLogger(getName(), getMessageFactory());
+    if (contextSelector instanceof ArtifactAwareContextSelector) {
+      return ((ArtifactAwareContextSelector) contextSelector).getContextWithResolvedContextClassLoader(currentClassLoader)
+          .getLogger(getName(), getMessageFactory());
+    } else {
+      return contextSelector.getContext(getName(), currentClassLoader, true).getLogger(getName(), getMessageFactory());
+    }
   }
 
   /**
