@@ -173,12 +173,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Creates a new instance
    *
-   * @param builder     a {@link Builder} used as a prototype to generate new definitions
+   * @param definitionBuilder     a {@link Builder} used as a prototype to generate new definitions
    * @param dslResolver a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
    * @param ctx         the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
-  protected ExtensionDefinitionParser(Builder builder, DslSyntaxResolver dslResolver, ExtensionParsingContext ctx) {
-    this.definitionBuilder = builder;
+  protected ExtensionDefinitionParser(Builder definitionBuilder, DslSyntaxResolver dslResolver, ExtensionParsingContext ctx) {
+    this.definitionBuilder = definitionBuilder;
     this.dslResolver = dslResolver;
     this.parsingContext = ctx;
     this.valueResolverFactory = new ValueResolverFactory(dslResolver);
