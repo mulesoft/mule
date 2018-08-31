@@ -17,8 +17,11 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExt
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
-import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.cdata;
-import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
+import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.BOOLEAN;
+import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.DATETIME;
+import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
+import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.STRING;
+import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.TIME;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
@@ -47,10 +50,16 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NumberType;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.TimeType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -90,6 +99,7 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterizedBuilder;
 import org.mule.runtime.app.declaration.api.fluent.ParameterizedElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.RouteElementDeclarer;
+import org.mule.runtime.app.declaration.api.fluent.SimpleValueType;
 import org.mule.runtime.app.declaration.api.fluent.TopLevelParameterDeclarer;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
@@ -98,6 +108,7 @@ import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegist
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
@@ -110,6 +121,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.Document;
 
@@ -121,9 +133,14 @@ import org.w3c.dom.Document;
 public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
 
   public static final String TRANSFORM_IDENTIFIER = "transform";
-  public static final String TRANSFORM_SCRIPT = "script";
-  public static final String TRANSFORM_RESOURCE = "resource";
-  public static final String TRANSFORM_VARIABLE_NAME = "variableName";
+  private static final String TRANSFORM_SCRIPT = "script";
+  private static final String TRANSFORM_RESOURCE = "resource";
+  private static final String TRANSFORM_VARIABLE_NAME = "variableName";
+  private static final String MESSAGE_GROUP_NAME = "Message";
+  private static final String SET_PAYLOAD_PARAM_NAME = "setPayload";
+  private static final String SET_ATTRIBUTES_PARAM_NAME = "setAttributes";
+  private static final String SET_VARIABLES_PARAM_NAME = "setVariables";
+  private static final String SET_VARIABLES_GROUP_NAME = "Set Variables";
 
   private final DslResolvingContext context;
   private final Map<String, DslSyntaxResolver> resolvers;
@@ -299,6 +316,14 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         });
       }
 
+      private ParameterGroupModel getParameterGroup(ParameterizedModel model, String groupName) {
+        for (ParameterGroupModel parameterGroupModel : model.getParameterGroupModels()) {
+          if (parameterGroupModel.getName().equals(groupName))
+            return parameterGroupModel;
+        }
+        return null;
+      }
+
       private void declareTransform(ComponentModel model) {
         final DslElementSyntax elementDsl = dsl.resolve(model);
         if (model.getName().equals(TRANSFORM_IDENTIFIER) && elementDsl.getElementName().equals(line.getIdentifier())) {
@@ -309,15 +334,18 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               .filter(c -> c.getIdentifier().equals("message"))
               .findFirst()
               .ifPresent(messageConfig -> {
-                ParameterGroupElementDeclarer messageGroup = newParameterGroup("Message");
+                ParameterGroupElementDeclarer messageGroup = newParameterGroup(MESSAGE_GROUP_NAME);
+                ParameterGroupModel messageParameterGroup = getParameterGroup(model, MESSAGE_GROUP_NAME);
 
                 messageConfig.getChildren().stream()
                     .filter(c -> c.getIdentifier().equals("set-payload"))
                     .findFirst()
                     .ifPresent(payloadConfig -> {
                       ParameterObjectValue.Builder payload = newObjectValue();
-                      populateTransformScriptParameter(payloadConfig, payload);
-                      messageGroup.withParameter("setPayload", payload.build());
+
+                      MetadataType setPayloadType = messageParameterGroup.getParameter(SET_PAYLOAD_PARAM_NAME).get().getType();
+                      populateTransformScriptParameter(payloadConfig, payload, setPayloadType);
+                      messageGroup.withParameter(SET_PAYLOAD_PARAM_NAME, payload.build());
                     });
 
                 messageConfig.getChildren().stream()
@@ -325,8 +353,10 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                     .findFirst()
                     .ifPresent(attributesConfig -> {
                       ParameterObjectValue.Builder attributes = newObjectValue();
-                      populateTransformScriptParameter(attributesConfig, attributes);
-                      messageGroup.withParameter("setAttributes", attributes.build());
+                      MetadataType setAttributesType =
+                          messageParameterGroup.getParameter(SET_ATTRIBUTES_PARAM_NAME).get().getType();
+                      populateTransformScriptParameter(attributesConfig, attributes, setAttributesType);
+                      messageGroup.withParameter(SET_ATTRIBUTES_PARAM_NAME, attributes.build());
                     });
 
                 transform.withParameterGroup(messageGroup.getDeclaration());
@@ -336,7 +366,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               .filter(c -> c.getIdentifier().equals("variables"))
               .findFirst()
               .ifPresent(variablesConfig -> {
-                ParameterGroupElementDeclarer variablesGroup = newParameterGroup("Set Variables");
+                ParameterGroupElementDeclarer variablesGroup = newParameterGroup(SET_VARIABLES_GROUP_NAME);
+                ParameterGroupModel setVariablesParameterGroup = getParameterGroup(model, SET_VARIABLES_GROUP_NAME);
                 ParameterListValue.Builder variables = newListValue();
 
                 variablesConfig.getChildren()
@@ -345,14 +376,16 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                       variable.withParameter(TRANSFORM_VARIABLE_NAME,
                                              variableConfig.getConfigAttributes().get(TRANSFORM_VARIABLE_NAME).getValue());
 
-                      populateTransformScriptParameter(variableConfig, variable);
+                      MetadataType setVariablesType =
+                          setVariablesParameterGroup.getParameter(SET_VARIABLES_PARAM_NAME).get().getType();
+                      populateTransformScriptParameter(variableConfig, variable, setVariablesType);
 
                       variables.withValue(variable.build());
 
                     });
 
                 transform.withParameterGroup(variablesGroup
-                    .withParameter("setVariables", variables.build())
+                    .withParameter(SET_VARIABLES_PARAM_NAME, variables.build())
                     .getDeclaration());
               });
 
@@ -413,19 +446,25 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
     return Optional.empty();
   }
 
-  private void populateTransformScriptParameter(ConfigLine config, ParameterObjectValue.Builder builder) {
+  private void populateTransformScriptParameter(ConfigLine config, ParameterObjectValue.Builder builder,
+                                                MetadataType type) {
     if (config.getConfigAttributes().containsKey(TRANSFORM_RESOURCE)) {
-      builder.withParameter(TRANSFORM_RESOURCE, config.getConfigAttributes().get(TRANSFORM_RESOURCE).getValue());
+      builder.withParameter(TRANSFORM_RESOURCE,
+                            createParameterSimpleValue(config.getConfigAttributes().get(TRANSFORM_RESOURCE).getValue(),
+                                                       getChildMetadataType(type, TRANSFORM_RESOURCE)));
     }
 
     if (!isBlank(config.getTextContent())) {
-      builder.withParameter(TRANSFORM_SCRIPT, config.getTextContent());
+      builder.withParameter(TRANSFORM_SCRIPT, ParameterSimpleValue.of(config.getTextContent(), STRING));
     }
 
     config.getConfigAttributes().entrySet().stream()
         .filter(e -> !e.getKey().equals(TRANSFORM_RESOURCE))
         .map(Map.Entry::getValue)
-        .forEach(a -> builder.withParameter(a.getName(), a.getValue()));
+        .forEach(a -> {
+          MetadataType childMetadataType = getChildMetadataType(type, a.getName());
+          builder.withParameter(a.getName(), createParameterSimpleValue(a.getValue(), childMetadataType));
+        });
   }
 
   private boolean isCData(ConfigLine config) {
@@ -501,10 +540,12 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                         children.stream()
                             .filter(c -> c.getIdentifier().equals(paramDsl.getElementName()))
                             .findFirst()
-                            .ifPresent(paramConfig -> param.getType()
-                                .accept(getParameterDeclarerVisitor(paramConfig, paramDsl,
-                                                                    value -> groupDeclarer.withParameter(param.getName(),
-                                                                                                         value))));
+                            .ifPresent(paramConfig -> {
+                              param.getType()
+                                  .accept(getParameterDeclarerVisitor(paramConfig, paramDsl,
+                                                                      value -> groupDeclarer.withParameter(param.getName(),
+                                                                                                           value)));
+                            });
                       }
                     }));
             if (!groupDeclarer.getDeclaration().getParameters().isEmpty()) {
@@ -518,7 +559,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                                   ParameterizedElementDeclarer groupContainer) {
 
     ParameterGroupElementDeclarer groupDeclarer = newParameterGroup(model.getName());
-    copyExplicitAttributes(config.getConfigAttributes(), groupDeclarer);
+    copyExplicitAttributes(config.getConfigAttributes(), groupDeclarer, model);
     declareComplexParameterValue(model, dsl, config.getChildren(), groupDeclarer);
     groupContainer.withParameterGroup(groupDeclarer.getDeclaration());
   }
@@ -545,7 +586,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         if (config.getTextContent() != null) {
-          valueConsumer.accept(isCData(config) ? cdata(config.getTextContent()) : plain(config.getTextContent()));
+          valueConsumer.accept(isCData(config) ? createParameterSimpleCdataValue(config.getTextContent(), metadataType)
+              : createParameterSimpleValue(config.getTextContent(), metadataType));
         }
       }
 
@@ -571,7 +613,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
         ParameterObjectValue.Builder objectValue = ElementDeclarer.newObjectValue();
         if (isMap(objectType)) {
-          createMapValue(objectValue, config);
+          createMapValue(objectValue, config, objectType.getOpenRestriction().orElse(null));
         } else {
           if (paramDsl.isWrapped()) {
             if (config.getChildren().size() == 1) {
@@ -586,14 +628,15 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
     };
   }
 
-  private void createMapValue(ParameterObjectValue.Builder objectValue, ConfigLine config) {
+  private void createMapValue(ParameterObjectValue.Builder objectValue, ConfigLine config, MetadataType elementMetadataType) {
     config.getChildren().stream()
         .map(ConfigLine::getConfigAttributes)
         .forEach(entry -> {
           SimpleConfigAttribute entryKey = entry.get(KEY_ATTRIBUTE_NAME);
           SimpleConfigAttribute entryValue = entry.get(VALUE_ATTRIBUTE_NAME);
           if (entryKey != null && entryValue != null) {
-            objectValue.withParameter(entryKey.getValue(), entryValue.getValue());
+            objectValue.withParameter(entryKey.getValue(),
+                                      createParameterSimpleValue(entryValue.getValue(), elementMetadataType));
           }
         });
   }
@@ -623,9 +666,10 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
     objectType.getFieldByName(CONFIG_ATTRIBUTE_NAME)
         .map(f -> config.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME))
-        .ifPresent(configRef -> objectValue.withParameter(CONFIG_ATTRIBUTE_NAME, configRef.getValue()));
+        .ifPresent(configRef -> objectValue.withParameter(CONFIG_ATTRIBUTE_NAME,
+                                                          ParameterSimpleValue.of(configRef.getValue(), STRING)));
 
-    copyExplicitAttributes(config.getConfigAttributes(), objectValue);
+    copyExplicitAttributes(config.getConfigAttributes(), objectValue, objectType);
 
     config.getChildren().forEach(fieldConfig -> objectType.getFields().stream()
         .filter(fieldType -> paramDsl.getContainedElement(getLocalPart(fieldType))
@@ -650,7 +694,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         findAnyMatchingChildById(declaredConfigs, RECONNECTION_CONFIG_PARAMETER_NAME)
             .ifPresent(config -> {
               ParameterObjectValue.Builder reconnection = newObjectValue().ofType(config.getIdentifier());
-              copyExplicitAttributes(config.getConfigAttributes(), reconnection);
+              copyExplicitAttributes(config.getConfigAttributes(), reconnection, paramModel.getType());
               config.getChildren().forEach(child -> {
                 String paramName;
                 if (child.getIdentifier().equals(RECONNECT_ELEMENT_IDENTIFIER)
@@ -660,8 +704,9 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                   paramName = child.getIdentifier();
                 }
 
+                MetadataType type = getChildMetadataType(paramModel.getType(), paramName, RECONNECT_ELEMENT_IDENTIFIER);
                 ParameterObjectValue.Builder childBuilder = newObjectValue().ofType(child.getIdentifier());
-                cloneAsDeclaration(child, childBuilder);
+                cloneAsDeclaration(child, childBuilder, type);
                 reconnection.withParameter(paramName, childBuilder.build());
               });
               declarer.withParameterGroup(newParameterGroup(CONNECTION)
@@ -675,7 +720,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         findAnyMatchingChildById(declaredConfigs, RECONNECT_ELEMENT_IDENTIFIER, RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
             .ifPresent(config -> {
               ParameterObjectValue.Builder reconnection = newObjectValue().ofType(config.getIdentifier());
-              copyExplicitAttributes(config.getConfigAttributes(), reconnection);
+              MetadataType childMetadataType = getChildMetadataType(paramModel.getType(), config.getIdentifier());
+              copyExplicitAttributes(config.getConfigAttributes(), reconnection, childMetadataType);
               declarer.withParameterGroup(newParameterGroup(CONNECTION)
                   .withParameter(RECONNECTION_STRATEGY_PARAMETER_NAME, reconnection.build())
                   .getDeclaration());
@@ -686,7 +732,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         findAnyMatchingChildById(declaredConfigs, REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
             .ifPresent(config -> {
               ParameterObjectValue.Builder redelivery = newObjectValue();
-              copyExplicitAttributes(config.getConfigAttributes(), redelivery);
+              copyExplicitAttributes(config.getConfigAttributes(), redelivery, paramModel.getType());
               declarer.withParameterGroup(newParameterGroup()
                   .withParameter(REDELIVERY_POLICY_PARAMETER_NAME, redelivery.build())
                   .getDeclaration());
@@ -697,7 +743,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         findAnyMatchingChildById(declaredConfigs, EXPIRATION_POLICY_ELEMENT_IDENTIFIER)
             .ifPresent(config -> {
               ParameterObjectValue.Builder expiration = newObjectValue();
-              copyExplicitAttributes(config.getConfigAttributes(), expiration);
+              copyExplicitAttributes(config.getConfigAttributes(), expiration, paramModel.getType());
               declarer.withParameterGroup(newParameterGroup()
                   .withParameter(EXPIRATION_POLICY_PARAMETER_NAME, expiration.build())
                   .getDeclaration());
@@ -708,7 +754,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         findAnyMatchingChildById(declaredConfigs, POOLING_PROFILE_ELEMENT_IDENTIFIER)
             .ifPresent(config -> {
               ParameterObjectValue.Builder poolingProfile = newObjectValue();
-              cloneAsDeclaration(config, poolingProfile);
+              cloneAsDeclaration(config, poolingProfile, paramModel.getType());
               declarer.withParameterGroup(newParameterGroup(CONNECTION)
                   .withParameter(POOLING_PROFILE_PARAMETER_NAME, poolingProfile.build())
                   .getDeclaration());
@@ -724,7 +770,9 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                                      .ifPresent(config -> {
                                        ParameterObjectValue.Builder streaming = newObjectValue()
                                            .ofType(config.getIdentifier());
-                                       cloneAsDeclaration(config, streaming);
+                                       MetadataType childMetadataType =
+                                           getChildMetadataType(paramModel.getType(), config.getIdentifier());
+                                       cloneAsDeclaration(config, streaming, childMetadataType);
                                        declarer.withParameterGroup(newParameterGroup()
                                            .withParameter(STREAMING_STRATEGY_PARAMETER_NAME, streaming.build())
                                            .getDeclaration());
@@ -736,18 +784,22 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
             .ifPresent(config -> {
               ParameterObjectValue.Builder tls = newObjectValue();
 
-              copyExplicitAttributes(config.getConfigAttributes(), tls);
+              copyExplicitAttributes(config.getConfigAttributes(), tls, paramModel.getType());
 
               config.getChildren().forEach(child -> {
                 ParameterObjectValue.Builder childBuilder = newObjectValue();
 
                 if (child.getIdentifier().equals(TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER)) {
                   child.getChildren().stream().findFirst().ifPresent(configLine -> {
-                    cloneAsDeclaration(configLine, childBuilder);
+                    MetadataType childMetadataType =
+                        getChildMetadataType(paramModel.getType(), TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER,
+                                             configLine.getIdentifier());
+                    cloneAsDeclaration(configLine, childBuilder, childMetadataType);
                     childBuilder.ofType(configLine.getIdentifier());
                   });
                 } else {
-                  cloneAsDeclaration(child, childBuilder);
+                  MetadataType childMetadataType = getChildMetadataType(paramModel.getType(), child.getIdentifier());
+                  cloneAsDeclaration(child, childBuilder, childMetadataType);
                 }
 
                 tls.withParameter(child.getIdentifier(), childBuilder.build());
@@ -761,14 +813,91 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
     }
   }
 
+  private MetadataType getChildMetadataType(MetadataType parentMetadataType, String modelParamName) {
+    return getChildMetadataType(parentMetadataType, modelParamName, modelParamName);
+  }
+
+  private MetadataType getChildMetadataType(MetadataType parentMetadataType, String configParamName, String modelParamName) {
+    MetadataType childMetadataType;
+
+    if (parentMetadataType instanceof ObjectFieldType) {
+      parentMetadataType = ((ObjectFieldType) parentMetadataType).getValue();
+    }
+
+    if (parentMetadataType instanceof ObjectType) {
+      childMetadataType = getMetadataTypeFromObjectType((ObjectType) parentMetadataType, configParamName, modelParamName);
+    } else if (parentMetadataType instanceof UnionType) {
+      childMetadataType = getChildMetadataTypeFromUnion((UnionType) parentMetadataType, modelParamName);
+    } else if (parentMetadataType instanceof ArrayType) {
+      childMetadataType = getChildMetadataType(((ArrayType) parentMetadataType).getType(), modelParamName, configParamName);
+    } else {
+      throw new IllegalStateException("Cannot obtain child parameter type from " + parentMetadataType.getClass().getName());
+    }
+
+    return childMetadataType;
+  }
+
+  private MetadataType getMetadataTypeFromObjectType(ObjectType objectMetadataType, String configParamName,
+                                                     String modelParamName) {
+    MetadataType childMetadataType;
+    Optional<ObjectFieldType> fieldByName = objectMetadataType.getFieldByName(configParamName);
+
+    if (fieldByName.isPresent()) {
+      ObjectFieldType objectFieldType = fieldByName.get();
+
+      if (objectFieldType.getValue() instanceof ObjectType) {
+        childMetadataType = objectFieldType;
+      } else if (objectFieldType.getValue() instanceof org.mule.metadata.api.model.SimpleType) {
+        childMetadataType = objectFieldType.getValue();
+      } else if (objectFieldType.getValue() instanceof UnionType) {
+        childMetadataType = getChildMetadataTypeFromUnion((UnionType) objectFieldType.getValue(), modelParamName);
+      } else {
+        throw new IllegalStateException("Unsupported attribute type: " + objectFieldType.getValue().getClass().getName());
+      }
+    } else {
+      childMetadataType = getMetadataTypeFromFlattenedFields(objectMetadataType, modelParamName);
+    }
+    return childMetadataType;
+  }
+
+  private MetadataType getChildMetadataTypeFromUnion(UnionType parentMetadataType, String modelParamName) {
+    Optional<MetadataType> result = parentMetadataType.getTypes().stream()
+        .filter(metadataType -> metadataType.getAnnotation(TypeIdAnnotation.class).get().getValue().equals(modelParamName))
+        .findFirst();
+
+    return result.orElse(null);
+  }
+
+  private MetadataType getMetadataTypeFromFlattenedFields(ObjectType objectMetadataType, String modelParamName) {
+    MetadataType childMetadataType = null;
+
+    List<MetadataType> flattenedFieldTypes =
+        objectMetadataType.getFields().stream().filter(field -> field.getAnnotation(FlattenedTypeAnnotation.class).isPresent())
+            .map(ObjectFieldType::getValue).collect(Collectors.toList());
+
+    for (MetadataType flattenedFieldType : flattenedFieldTypes) {
+      for (ObjectFieldType field : ((ObjectType) flattenedFieldType).getFields()) {
+        if (field.getKey().getName().getLocalPart().equals(modelParamName)) {
+          childMetadataType = field.getValue();
+          break;
+        }
+      }
+
+      if (childMetadataType != null) {
+        break;
+      }
+    }
+    return childMetadataType;
+  }
+
   private Optional<ConfigLine> findAnyMatchingChildById(List<ConfigLine> configs, String... validIds) {
     List<String> ids = Arrays.asList(validIds);
     return configs.stream().filter(c -> ids.contains(c.getIdentifier())).findFirst();
   }
 
-  private void cloneAsDeclaration(ConfigLine config, ParameterObjectValue.Builder objectValue) {
-    copyExplicitAttributes(config.getConfigAttributes(), objectValue);
-    copyChildren(config, objectValue);
+  private void cloneAsDeclaration(ConfigLine config, ParameterObjectValue.Builder objectValue, MetadataType metadataType) {
+    copyExplicitAttributes(config.getConfigAttributes(), objectValue, metadataType);
+    copyChildren(config, objectValue, metadataType);
   }
 
   private String getNamespace(ConfigLine configLine) {
@@ -776,12 +905,24 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   }
 
   private void copyExplicitAttributes(Map<String, SimpleConfigAttribute> attributes,
-                                      ParameterizedBuilder<String, ParameterValue, ?> builder) {
+                                      ParameterizedBuilder<String, ParameterValue, ?> builder,
+                                      ParameterGroupModel group) {
     attributes.values().stream()
         .filter(a -> !a.getName().equals(NAME_ATTRIBUTE_NAME) && !a.getName().equals(CONFIG_ATTRIBUTE_NAME))
         .filter(a -> !a.isValueFromSchema())
         .forEach(a -> builder
-            .withParameter(a.getName(), ParameterSimpleValue.of(a.getValue())));
+            .withParameter(a.getName(),
+                           createParameterSimpleValue(a.getValue(), group.getParameter(a.getName()).get().getType())));
+  }
+
+  private void copyExplicitAttributes(Map<String, SimpleConfigAttribute> attributes,
+                                      ParameterizedBuilder<String, ParameterValue, ?> builder, MetadataType parentMetadataType) {
+    attributes.values().stream()
+        .filter(a -> !a.getName().equals(NAME_ATTRIBUTE_NAME) && !a.getName().equals(CONFIG_ATTRIBUTE_NAME))
+        .filter(a -> !a.isValueFromSchema())
+        .forEach(a -> builder.withParameter(a.getName(), createParameterSimpleValue(a.getValue(),
+                                                                                    getChildMetadataType(parentMetadataType,
+                                                                                                         a.getName()))));
   }
 
   private void copyExplicitAttributes(ParameterizedModel model,
@@ -797,7 +938,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           if (ownerGroup.isPresent()) {
             builder
                 .withParameterGroup(newParameterGroup(ownerGroup.get().getName())
-                    .withParameter(a.getName(), ParameterSimpleValue.of(a.getValue()))
+                    .withParameter(a.getName(), createParameterSimpleValue(a.getValue(), ownerGroup.get()
+                        .getParameter(a.getName()).get().getType()))
                     .getDeclaration());
           } else {
             builder.withCustomParameter(a.getName(), a.getValue());
@@ -805,12 +947,35 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         });
   }
 
-  private void copyChildren(ConfigLine config, ParameterizedBuilder<String, ParameterValue, ?> builder) {
+  private void copyChildren(ConfigLine config, ParameterizedBuilder<String, ParameterValue, ?> builder,
+                            MetadataType metadataType) {
     config.getChildren().forEach(child -> {
       ParameterObjectValue.Builder childBuilder = newObjectValue();
-      cloneAsDeclaration(child, childBuilder);
+      MetadataType childMetadataType = getChildMetadataType(metadataType, child.getIdentifier());
+      cloneAsDeclaration(child, childBuilder, childMetadataType);
       builder.withParameter(child.getIdentifier(), childBuilder.build());
     });
   }
 
+  private ParameterValue createParameterSimpleValue(String a, MetadataType type) {
+    return ParameterSimpleValue.of(a, getSimpleTypeFromMetadataType(type));
+  }
+
+  private ParameterValue createParameterSimpleCdataValue(String a, MetadataType type) {
+    return ParameterSimpleValue.cdata(a, getSimpleTypeFromMetadataType(type));
+  }
+
+  private SimpleValueType getSimpleTypeFromMetadataType(MetadataType type) {
+    if (type instanceof DateTimeType) {
+      return DATETIME;
+    } else if (type instanceof TimeType) {
+      return TIME;
+    } else if (type instanceof BooleanType) {
+      return BOOLEAN;
+    } else if (type instanceof NumberType) {
+      return NUMBER;
+    } else {
+      return STRING;
+    }
+  }
 }
