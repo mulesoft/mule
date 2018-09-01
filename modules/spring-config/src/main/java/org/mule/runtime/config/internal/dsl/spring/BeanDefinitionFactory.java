@@ -34,6 +34,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDE
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
@@ -238,6 +239,7 @@ public class BeanDefinitionFactory {
               }).collect(toList()), componentModel);
             }
             componentLocator.addComponentLocation(componentModel.getComponentLocation());
+            addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel.getConfiguration(), componentModel);
           }
         });
 

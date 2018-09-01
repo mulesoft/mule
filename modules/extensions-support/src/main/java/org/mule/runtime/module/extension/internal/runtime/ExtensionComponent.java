@@ -17,17 +17,18 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -36,6 +37,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
+import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
@@ -55,9 +57,13 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.util.TemplateParser;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -126,13 +132,19 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected TransactionFactoryLocator transactionFactoryLocator;
 
   @Inject
-  private MuleMetadataService metadataService;
+  protected MuleMetadataService metadataService;
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
 
   @Inject
   protected ReflectionCache reflectionCache;
+
+  @Inject
+  private MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
+
+  protected MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
+
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
@@ -171,6 +183,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }, InitialisationException.class, e -> {
       throw new InitialisationException(e, this);
     });
+
+    setCacheIdGenerator();
   }
 
   /**
@@ -264,7 +278,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
-                                    context -> withContextClassLoader(getClassLoader(this.extensionModel),
+                                    context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getMetadataKeys(context,
                                                                                                              getParameterValueResolver(),
                                                                                                              reflectionCache)));
@@ -279,10 +293,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata() throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator
-                                                                          .getMetadata(context, getParameterValueResolver(),
-                                                                                       reflectionCache)));
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
+                                        .getMetadata(context, getParameterValueResolver(),
+                                                     reflectionCache)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
@@ -294,7 +308,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
+      return runWithMetadataContext(
+                                    context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
@@ -307,7 +322,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public Set<Value> getValues(String parameterName) throws ValueResolvingException {
     try {
-      return runWithValueProvidersContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
+      return runWithValueProvidersContext(context -> withContextClassLoader(classLoader,
                                                                             () -> valueProviderMediator
                                                                                 .getValues(parameterName,
                                                                                            getParameterValueResolver(),
@@ -329,13 +344,19 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
-  protected <R> R runWithMetadataContext(Function<MetadataContext, R> metadataContextFunction)
+  protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = null;
-    R result;
     try {
-      context = withContextClassLoader(getClassLoader(this.extensionModel), this::getMetadataContext);
-      result = metadataContextFunction.apply(context);
+      MetadataCacheId cacheId = getMetadataCacheId();
+      MetadataCache metadataCache = metadataService.getMetadataCache(cacheId.getValue());
+      context = withContextClassLoader(classLoader, () -> getMetadataContext(metadataCache));
+      MetadataResult<R> result = contextConsumer.apply(context);
+      if (result.isSuccess()) {
+        metadataService.saveCache(cacheId.getValue(), metadataCache);
+      }
+
+      return result;
     } catch (MuleRuntimeException e) {
       // TODO(MULE-13621) this should be deleted once the configuration is created lazily in the getMetadataContext method.
       try {
@@ -350,7 +371,21 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         context.dispose();
       }
     }
-    return result;
+  }
+
+  private MetadataCacheId getMetadataCacheId() {
+    return cacheIdGenerator.getIdForGlobalMetadata((ComponentConfiguration) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
+        .map(id -> {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(id.getParts().toString());
+          }
+          return id;
+        })
+        .orElseThrow(() -> new IllegalStateException(
+                                                     format("Missing information to obtain the MetadataCache for the component '%s'. "
+                                                         +
+                                                         "Expected to have the ComponentConfiguration information in the '%s' annotation but none was found.",
+                                                            this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
   private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> valueProviderFunction) {
@@ -364,7 +399,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return result;
   }
 
-  private MetadataContext getMetadataContext() throws MetadataResolvingException {
+  private MetadataContext getMetadataContext(MetadataCache cache)
+      throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
       fakeEvent = getInitialiserEvent(muleContext);
@@ -381,10 +417,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         }
       }
 
-      String cacheId = configuration.map(ConfigurationInstance::getName)
-          .orElseGet(() -> extensionModel.getName() + "|" + componentModel.getName());
-
-      return new DefaultMetadataContext(() -> configuration, connectionManager, metadataService.getMetadataCache(cacheId),
+      return new DefaultMetadataContext(() -> configuration, connectionManager,
+                                        cache,
                                         typeLoader);
     } finally {
       if (fakeEvent != null) {
@@ -479,13 +513,23 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
     if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProvider.get().getName())) {
       throw new InitialisationException(
-                                        createStaticMessage(format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
-                                            + "Expressions are not allowed as config references",
+                                        createStaticMessage(
+                                                            format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
+                                                                + "Expressions are not allowed as config references",
                                                                    getLocation().getRootContainerName(),
                                                                    hyphenize(componentModel.getName()),
                                                                    configurationProvider)),
                                         this);
     }
+  }
+
+  private void setCacheIdGenerator() {
+    DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
+    MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentConfiguration> configLocator = location -> componentLocator
+        .find(location)
+        .map(component -> (ComponentConfiguration) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
+
+    this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();

@@ -40,7 +40,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -65,14 +64,20 @@ import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -96,6 +101,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -103,8 +112,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
@@ -185,6 +192,15 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Mock
   private ExecutionContextAdapter<OperationModel> executionContext;
+
+  @Mock
+  private MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
+
+  @Mock
+  private MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
+
+  @Mock
+  private MetadataCacheManager metadataCacheManager;
 
   protected OperationMessageProcessor messageProcessor;
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
@@ -272,10 +288,22 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
     when(operationExecutor.execute(any())).thenReturn(just(""));
 
-    // when(resolverSet.resolve(from(event))).thenReturn(parameters);
-    // when(resolverSet.resolve(from(event, of(configurationInstance)))).thenReturn(parameters);
-    //
-    //
+    when(extensionManager.getExtensions()).thenReturn(Collections.singleton(extensionModel));
+
+    when(cacheIdGeneratorFactory.create(any(), any())).thenReturn(cacheIdGenerator);
+    when(cacheIdGenerator.getIdForComponentMetadata(any()))
+        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
+    when(cacheIdGenerator.getIdForGlobalMetadata(any()))
+        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
+    when(cacheIdGenerator.getIdForMetadataKeys(any()))
+        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
+
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
+                                                                         cacheIdGeneratorFactory);
+
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("core.metadata.cache.manager",
+                                                                         metadataCacheManager);
+
     when(resolverSet.resolve(argThat(new BaseMatcher<ValueResolvingContext>() {
 
       @Override

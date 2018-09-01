@@ -94,12 +94,6 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
   }
 
   @Override
-  public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
-    interceptable.initialise();
-    super.disposeMetadataCacheWhenConfigIsDisposed();
-  }
-
-  @Override
   @Test
   public void interceptorsStarted() throws Exception {
     interceptable.initialise();

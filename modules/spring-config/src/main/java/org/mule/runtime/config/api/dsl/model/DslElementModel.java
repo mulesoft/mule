@@ -126,7 +126,7 @@ public final class DslElementModel<T> {
   /**
    * Lookup method for finding a given {@link DslElementModel} based on its {@code parameterName} from {@code this} element as
    * root. If {@code this} {@link DslElementModel} name doesn't match with the given parameterName, then a DFS lookup is performed
-   * for each of its {@link #getContainedElements inner elements}. Since not all the elements may in an application may have an
+   * for each of its {@link #getContainedElements inner elements}. Since not all the elements in an application may have an
    * {@link DslElementSyntax::getElementName} this lookup method may produce different results than the lookup by
    * {@link ComponentIdentifier identifier}
    *

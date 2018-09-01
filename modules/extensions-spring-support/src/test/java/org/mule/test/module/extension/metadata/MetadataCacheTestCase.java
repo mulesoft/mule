@@ -8,33 +8,41 @@ package org.mule.test.module.extension.metadata;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager.PERSISTENT_METADATA_SERVICE_CACHE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.metadata.MetadataCache;
-import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreManager;
+
+import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
 
-  private static final String CONFIG = "config";
-  private static final String ALTERNATIVE_CONFIG = "alternative-config";
+  private static final String OUTPUT_AND_METADATA_KEY_CACHE_ID = "1874947571-1840879217-380895431-174528912676912086";
+  private static final String OUTPUT_METADATA_WITHOUT_KEY_CACHE_ID = "1874947571-1840879217-380895431-1745289126";
+  private static final String CONTENT_AND_OUTPUT_CACHE_ID = "1874947571-1840879217-1768400440-174528912676912086";
 
   @Inject
-  private MetadataService metadataManager;
+  @Named(OBJECT_STORE_MANAGER)
+  private ObjectStoreManager objectStoreManager;
 
   public MetadataCacheTestCase(ResolutionType resolutionType) {
     super(resolutionType);
@@ -47,7 +55,7 @@ public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
 
   @Override
   public boolean enableLazyInit() {
-    return false;
+    return true;
   }
 
   @Override
@@ -55,58 +63,132 @@ public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
     return false;
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return false;
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    try {
+      getMetadataObjectStore().clear();
+    } catch (Exception ignored) {
+    }
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    try {
+      getMetadataObjectStore().clear();
+    } catch (Exception ignored) {
+    }
+  }
+
   @Test
   public void multipleCaches() throws Exception {
-    Map<String, ? extends MetadataCache> caches = getMetadataCaches(metadataManager);
-    caches.keySet().forEach(metadataManager::disposeCache);
-
     // using config
-    location = Location.builder().globalName(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    setLocation(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER);
+    metadataService.getMetadataKeys(location);
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
-    location = Location.builder().globalName(OUTPUT_METADATA_WITHOUT_KEY_PARAM).addProcessorsPart().addIndexPart(0).build();
+    setLocation(OUTPUT_METADATA_WITHOUT_KEY_PARAM);
     getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
 
     // using alternative-config
-    location = Location.builder().globalName(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG).addProcessorsPart()
-        .addIndexPart(0).build();
+    setLocation(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG);
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
-    caches = getMetadataCaches(metadataManager);
+    // re-use same key
+    setLocation(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER);
+    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
-    assertThat(caches.keySet(), hasSize(2));
-    assertThat(caches.keySet(), hasItems(CONFIG, ALTERNATIVE_CONFIG));
+    List<String> actualKeys = getMetadataObjectStore().allKeys();
+    assertThat(actualKeys, hasSize(3));
+    assertThat(actualKeys,
+               hasItems(OUTPUT_AND_METADATA_KEY_CACHE_ID, OUTPUT_METADATA_WITHOUT_KEY_CACHE_ID, CONTENT_AND_OUTPUT_CACHE_ID));
+  }
+
+  protected void setLocation(String outputAndMetadataKeyCacheResolver) {
+    location = Location.builder().globalName(outputAndMetadataKeyCacheResolver).addProcessorsPart().addIndexPart(0).build();
   }
 
   @Test
   public void elementsAreStoredInCaches() throws Exception {
     // using config
-    location = Location.builder().globalName(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    setLocation(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER);
     metadataService.getMetadataKeys(location);
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
     // using alternative-config
-    location = Location.builder().globalName(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG).addProcessorsPart()
-        .addIndexPart(0).build();
+    setLocation(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG);
     getSuccessComponentDynamicMetadata();
 
-    MetadataCache configCache = getMetadataCaches(metadataManager).get(CONFIG);
+    MetadataCache configCache = getMetadataObjectStore().retrieve(OUTPUT_AND_METADATA_KEY_CACHE_ID);
 
     assertThat(configCache.get(AGE).get(), is(AGE_VALUE));
     assertThat(configCache.get(NAME).get(), is(NAME_VALUE));
     assertThat(configCache.get(BRAND).get(), is(BRAND_VALUE));
 
-    MetadataCache alternativeConfigCache = getMetadataCaches(metadataManager).get(ALTERNATIVE_CONFIG);
+    MetadataCache alternativeConfigCache = getMetadataObjectStore().retrieve(CONTENT_AND_OUTPUT_CACHE_ID);
     assertThat(alternativeConfigCache.get(BRAND).get(), is(BRAND_VALUE));
   }
 
-  private Map<String, ? extends MetadataCache> getMetadataCaches(MetadataService metadataManager) {
+  @Test
+  public void disposeCacheForConfig() throws Exception {
+    // using config
+    setLocation(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER);
+    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
+
+    // using alternative-config
+    setLocation(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG);
+    getSuccessComponentDynamicMetadata();
+
+    assertThat(getMetadataObjectStore().allKeys(), hasSize(2));
+    getMetadataObjectStore().retrieve(OUTPUT_AND_METADATA_KEY_CACHE_ID);
+    getMetadataObjectStore().retrieve(CONTENT_AND_OUTPUT_CACHE_ID);
+
+    metadataService.disposeCache(CONTENT_AND_OUTPUT_CACHE_ID);
+
+    assertThat(getMetadataObjectStore().allKeys(), hasSize(1));
+    getMetadataObjectStore().retrieve(OUTPUT_AND_METADATA_KEY_CACHE_ID);
     try {
-      Method getMetadataCachesMethod = metadataManager.getClass().getMethod("getMetadataCaches");
-      return (Map<String, ? extends MetadataCache>) getMetadataCachesMethod.invoke(metadataManager);
-    } catch (Exception e) {
-      throw new IllegalStateException("Cannot obtain metadata caches", e);
+      getMetadataObjectStore().retrieve(CONTENT_AND_OUTPUT_CACHE_ID);
+      fail();
+    } catch (ObjectDoesNotExistException success) {
     }
+  }
+
+  @Test
+  public void disposeCacheForPartialId() throws Exception {
+    // using config
+    setLocation(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER);
+    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
+
+    // using alternative-config
+    setLocation(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG);
+    getSuccessComponentDynamicMetadata();
+
+    assertThat(getMetadataObjectStore().allKeys(), hasSize(2));
+    getMetadataObjectStore().retrieve(OUTPUT_AND_METADATA_KEY_CACHE_ID);
+    getMetadataObjectStore().retrieve(CONTENT_AND_OUTPUT_CACHE_ID);
+
+    metadataService.disposeCache("1874947571-1840879217");
+
+    assertThat(getMetadataObjectStore().allKeys(), hasSize(0));
+    try {
+      getMetadataObjectStore().retrieve(OUTPUT_AND_METADATA_KEY_CACHE_ID);
+      fail();
+    } catch (ObjectDoesNotExistException success) {
+    }
+    try {
+      getMetadataObjectStore().retrieve(CONTENT_AND_OUTPUT_CACHE_ID);
+      fail();
+    } catch (ObjectDoesNotExistException success) {
+    }
+  }
+
+  private ObjectStore<MetadataCache> getMetadataObjectStore() {
+    return objectStoreManager.getObjectStore(PERSISTENT_METADATA_SERVICE_CACHE);
   }
 
 }
