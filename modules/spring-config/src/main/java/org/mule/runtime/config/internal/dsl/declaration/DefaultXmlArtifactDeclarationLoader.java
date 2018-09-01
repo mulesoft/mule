@@ -316,12 +316,9 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         });
       }
 
-      private ParameterGroupModel getParameterGroup(ParameterizedModel model, String groupName) {
-        for (ParameterGroupModel parameterGroupModel : model.getParameterGroupModels()) {
-          if (parameterGroupModel.getName().equals(groupName))
-            return parameterGroupModel;
-        }
-        return null;
+      private Optional<ParameterGroupModel> getParameterGroup(ParameterizedModel model, String groupName) {
+        return model.getParameterGroupModels().stream()
+            .filter(parameterGroupModel -> parameterGroupModel.getName().equals(groupName)).findFirst();
       }
 
       private void declareTransform(ComponentModel model) {
@@ -335,7 +332,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               .findFirst()
               .ifPresent(messageConfig -> {
                 ParameterGroupElementDeclarer messageGroup = newParameterGroup(MESSAGE_GROUP_NAME);
-                ParameterGroupModel messageParameterGroup = getParameterGroup(model, MESSAGE_GROUP_NAME);
+                Optional<ParameterGroupModel> messageParameterGroup = getParameterGroup(model, MESSAGE_GROUP_NAME);
 
                 messageConfig.getChildren().stream()
                     .filter(c -> c.getIdentifier().equals("set-payload"))
@@ -343,7 +340,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                     .ifPresent(payloadConfig -> {
                       ParameterObjectValue.Builder payload = newObjectValue();
 
-                      MetadataType setPayloadType = messageParameterGroup.getParameter(SET_PAYLOAD_PARAM_NAME).get().getType();
+                      MetadataType setPayloadType = getGroupParameterType(messageParameterGroup, SET_PAYLOAD_PARAM_NAME);
                       populateTransformScriptParameter(payloadConfig, payload, setPayloadType);
                       messageGroup.withParameter(SET_PAYLOAD_PARAM_NAME, payload.build());
                     });
@@ -353,8 +350,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                     .findFirst()
                     .ifPresent(attributesConfig -> {
                       ParameterObjectValue.Builder attributes = newObjectValue();
-                      MetadataType setAttributesType =
-                          messageParameterGroup.getParameter(SET_ATTRIBUTES_PARAM_NAME).get().getType();
+                      MetadataType setAttributesType = getGroupParameterType(messageParameterGroup, SET_ATTRIBUTES_PARAM_NAME);
                       populateTransformScriptParameter(attributesConfig, attributes, setAttributesType);
                       messageGroup.withParameter(SET_ATTRIBUTES_PARAM_NAME, attributes.build());
                     });
@@ -367,7 +363,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               .findFirst()
               .ifPresent(variablesConfig -> {
                 ParameterGroupElementDeclarer variablesGroup = newParameterGroup(SET_VARIABLES_GROUP_NAME);
-                ParameterGroupModel setVariablesParameterGroup = getParameterGroup(model, SET_VARIABLES_GROUP_NAME);
+                Optional<ParameterGroupModel> setVariablesParameterGroup = getParameterGroup(model, SET_VARIABLES_GROUP_NAME);
                 ParameterListValue.Builder variables = newListValue();
 
                 variablesConfig.getChildren()
@@ -376,8 +372,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                       variable.withParameter(TRANSFORM_VARIABLE_NAME,
                                              variableConfig.getConfigAttributes().get(TRANSFORM_VARIABLE_NAME).getValue());
 
-                      MetadataType setVariablesType =
-                          setVariablesParameterGroup.getParameter(SET_VARIABLES_PARAM_NAME).get().getType();
+                      MetadataType setVariablesType = getGroupParameterType(setVariablesParameterGroup, SET_VARIABLES_PARAM_NAME);
                       populateTransformScriptParameter(variableConfig, variable, setVariablesType);
 
                       variables.withValue(variable.build());
@@ -396,6 +391,27 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         }
       }
     };
+  }
+
+  private MetadataType getGroupParameterType(Optional<ParameterGroupModel> messageParameterGroup, String paramName) {
+    MetadataType metadataType = null;
+
+    if (messageParameterGroup.isPresent()) {
+      metadataType = getGroupParameterType(messageParameterGroup.get(), paramName);
+    }
+
+    return metadataType;
+  }
+
+  private MetadataType getGroupParameterType(ParameterGroupModel model, String paramName) {
+    MetadataType metadataType = null;
+
+    Optional<ParameterModel> parameter = model.getParameter(paramName);
+    if (parameter.isPresent()) {
+      metadataType = model.getParameter(paramName).get().getType();
+    }
+
+    return metadataType;
   }
 
   private boolean declareAsConnectionProvider(ExtensionModel ownerExtension,
@@ -912,7 +928,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         .filter(a -> !a.isValueFromSchema())
         .forEach(a -> builder
             .withParameter(a.getName(),
-                           createParameterSimpleValue(a.getValue(), group.getParameter(a.getName()).get().getType())));
+                           createParameterSimpleValue(a.getValue(), getGroupParameterType(group, a.getName()))));
   }
 
   private void copyExplicitAttributes(Map<String, SimpleConfigAttribute> attributes,
@@ -938,8 +954,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           if (ownerGroup.isPresent()) {
             builder
                 .withParameterGroup(newParameterGroup(ownerGroup.get().getName())
-                    .withParameter(a.getName(), createParameterSimpleValue(a.getValue(), ownerGroup.get()
-                        .getParameter(a.getName()).get().getType()))
+                    .withParameter(a.getName(), createParameterSimpleValue(a.getValue(),
+                                                                           getGroupParameterType(ownerGroup, a.getName())))
                     .getDeclaration());
           } else {
             builder.withCustomParameter(a.getName(), a.getValue());
