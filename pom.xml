@@ -150,7 +150,7 @@
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.14-MULE-003</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.59</bouncycastleVersion>
+        <bouncycastleVersion>1.60</bouncycastleVersion>
         <caffeineVersion>2.6.2</caffeineVersion>
         <c3p0Version>0.9.5.2-MULE-001</c3p0Version>
         <cglibVersion>2.2</cglibVersion>
