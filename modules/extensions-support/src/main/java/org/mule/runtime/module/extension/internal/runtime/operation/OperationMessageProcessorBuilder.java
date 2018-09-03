@@ -35,7 +35,7 @@ public final class OperationMessageProcessorBuilder
                                           Registry registry) {
 
     super(extension, operation, policyManager, registry.lookupByType(ReflectionCache.class).get(),
-            registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
+          registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
 
   }
 

@@ -157,8 +157,6 @@ public class ValueResolverFactory {
         && ((ExclusiveOptionalModelProperty) modelProperty).isOneRequired());
   }
 
-
-
   private ValueResolver getValueResolverFromMetadataType(String paramName, MetadataType expected, Object value,
                                                          Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     ValueResolverFactoryTypeVisitor visitor =
@@ -167,6 +165,4 @@ public class ValueResolverFactory {
     expected.accept(visitor);
     return visitor.getResolver();
   }
-
-
 }
