@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  *
  * @since 4.0
  */
+@NoImplement
 public interface MethodRequestMatcher extends RequestMatcher {
 
   /**

@@ -46,7 +46,172 @@
           "methodName": "enableTls",
           "elementKind": "method",
           "justification": "This interface is not meant to be extended by the user"
-        }
+        },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.HttpService",
+           "new": "interface org.mule.runtime.http.api.HttpService",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api",
+           "classSimpleName": "HttpService",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.client.HttpClient",
+           "new": "interface org.mule.runtime.http.api.client.HttpClient",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.client",
+           "classSimpleName": "HttpClient",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.client.HttpClientFactory",
+           "new": "interface org.mule.runtime.http.api.client.HttpClientFactory",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.client",
+           "classSimpleName": "HttpClientFactory",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.client.auth.HttpAuthentication",
+           "new": "interface org.mule.runtime.http.api.client.auth.HttpAuthentication",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.client.auth",
+           "classSimpleName": "HttpAuthentication",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.HttpServer",
+           "new": "interface org.mule.runtime.http.api.server.HttpServer",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "HttpServer",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.HttpServerFactory",
+           "new": "interface org.mule.runtime.http.api.server.HttpServerFactory",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "HttpServerFactory",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.MethodRequestMatcher",
+           "new": "interface org.mule.runtime.http.api.server.MethodRequestMatcher",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "MethodRequestMatcher",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.PathAndMethodRequestMatcher",
+           "new": "interface org.mule.runtime.http.api.server.PathAndMethodRequestMatcher",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "PathAndMethodRequestMatcher",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.RequestHandlerManager",
+           "new": "interface org.mule.runtime.http.api.server.RequestHandlerManager",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "RequestHandlerManager",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.ServerAddress",
+           "new": "interface org.mule.runtime.http.api.server.ServerAddress",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "ServerAddress",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.async.HttpResponseReadyCallback",
+           "new": "interface org.mule.runtime.http.api.server.async.HttpResponseReadyCallback",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server.async",
+           "classSimpleName": "HttpResponseReadyCallback",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.domain.request.ClientConnection",
+           "new": "interface org.mule.runtime.http.api.domain.request.ClientConnection",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.domain.request",
+           "classSimpleName": "ClientConnection",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.domain.request.HttpRequestContext",
+           "new": "interface org.mule.runtime.http.api.domain.request.HttpRequestContext",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.domain.request",
+           "classSimpleName": "HttpRequestContext",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.domain.request.ServerConnection",
+           "new": "interface org.mule.runtime.http.api.domain.request.ServerConnection",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.domain.request",
+           "classSimpleName": "ServerConnection",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         },
+         {
+           "code": "java.annotation.added",
+           "old": "interface org.mule.runtime.http.api.server.RequestMatcher",
+           "new": "interface org.mule.runtime.http.api.server.RequestMatcher",
+           "annotationType": "org.mule.api.annotation.NoImplement",
+           "annotation": "@org.mule.api.annotation.NoImplement",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "RequestMatcher",
+           "elementKind": "interface",
+           "justification": "This is a formalization since services implementations should match container API and users should not implement this."
+         }
       ]
     }
   },

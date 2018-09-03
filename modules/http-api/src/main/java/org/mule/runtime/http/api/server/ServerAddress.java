@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Representation of a server's address.
  *
  * @since 4.0
  */
+@NoImplement
 public interface ServerAddress {
 
   /**

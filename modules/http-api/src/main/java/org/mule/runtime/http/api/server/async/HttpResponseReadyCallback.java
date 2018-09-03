@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.server.async;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.io.Writer;
@@ -16,6 +17,7 @@ import java.nio.charset.Charset;
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpResponseReadyCallback {
 
   /**

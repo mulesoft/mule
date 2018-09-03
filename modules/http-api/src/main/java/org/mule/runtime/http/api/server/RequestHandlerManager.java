@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Object to manage a {@link RequestHandler} for a server.
  *
  * @since 4.0
  */
+@NoImplement
 public interface RequestHandlerManager {
 
   /**

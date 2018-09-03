@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.client;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -17,11 +18,13 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 
 /**
- * Object that sends an HTTP request, and returns the response. Notice must be started to be used and stopped to be disposed
- * properly. Blocking and non-blocking options are available to execute requests.
+ * Object that sends an HTTP request, and returns the response. Notice it must be started to be used and stopped to be disposed
+ * properly. Blocking and non-blocking options are available to execute requests. To extends it's functionality and not depend on
+ * API changes, this object should be used internally instead of decorated.
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpClient {
 
   /**

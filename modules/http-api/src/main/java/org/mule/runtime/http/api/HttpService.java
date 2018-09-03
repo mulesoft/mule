@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientFactory;
@@ -17,6 +18,7 @@ import org.mule.runtime.http.api.server.HttpServerFactory;
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpService extends Service {
 
   /**

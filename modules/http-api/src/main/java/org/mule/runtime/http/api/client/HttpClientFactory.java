@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.http.api.client;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Factory object for {@link HttpClient}.
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpClientFactory {
 
   /**
