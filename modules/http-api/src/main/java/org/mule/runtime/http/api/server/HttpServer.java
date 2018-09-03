@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
 
@@ -13,10 +14,13 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * Represents a ServerSocket connection.
+ * Represents a ServerSocket connection. Notice it should be started to be bound, stopped to be unbound and finally disposed to
+ * release all related components. To extends it's functionality and not depend on API changes, this object should be used
+ * internally instead of decorated.
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpServer {
 
   /**

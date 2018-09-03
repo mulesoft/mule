@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.domain.request;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.server.HttpServer;
 
@@ -14,6 +15,7 @@ import org.mule.runtime.http.api.server.HttpServer;
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpRequestContext {
 
   /**

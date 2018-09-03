@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.domain.request;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.server.HttpServer;
 
 import java.net.InetSocketAddress;
@@ -16,6 +17,7 @@ import java.security.cert.Certificate;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ClientConnection {
 
   /**

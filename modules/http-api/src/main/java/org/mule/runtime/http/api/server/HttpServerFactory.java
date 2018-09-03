@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Factory object for {@link HttpServer}.
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpServerFactory {
 
   /**

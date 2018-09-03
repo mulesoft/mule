@@ -9,6 +9,7 @@ package org.mule.runtime.http.api.client.auth;
 import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.BASIC;
 import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.DIGEST;
 import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.NTLM;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthenticationBuilder.HttpNtlmAuthenticationBuilder;
 
 /**
@@ -16,6 +17,7 @@ import org.mule.runtime.http.api.client.auth.HttpAuthenticationBuilder.HttpNtlmA
  *
  * @since 4.0
  */
+@NoImplement
 public interface HttpAuthentication {
 
   /**
