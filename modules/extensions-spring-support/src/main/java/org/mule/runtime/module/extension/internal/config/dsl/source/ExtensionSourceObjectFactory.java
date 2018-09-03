@@ -76,7 +76,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                                                parameters.keySet());
       ResolverSet nonCallbackParameters = getNonCallbackParameters();
 
-      if (nonCallbackParameters.isDynamic()) {
+      if (hasDynamicNonCallbackParameters(nonCallbackParameters)) {
         throw dynamicParameterException(nonCallbackParameters, sourceModel);
       }
 
@@ -102,6 +102,14 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                         backPressureStrategy,
                                         muleContext.getExtensionManager());
     });
+  }
+
+  // TODO(MULE-15641): REMOVE THIS METHOD. REPLACE WITH `nonCallbackParameters.isDynamic()`
+  private boolean hasDynamicNonCallbackParameters(ResolverSet nonCallbackParameters) {
+    return nonCallbackParameters.getResolvers()
+        .entrySet().stream()
+        .filter(e -> !CONFIG_ATTRIBUTE_NAME.equals(e.getKey()))
+        .anyMatch(e -> e.getValue().isDynamic());
   }
 
   private BackPressureStrategy getBackPressureStrategy() {
@@ -160,17 +168,12 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   private ConfigurationException dynamicParameterException(ResolverSet resolverSet, SourceModel model) {
     List<String> dynamicParams = resolverSet.getResolvers().entrySet()
-        .stream().filter(entry -> entry.getValue().isDynamic())
+        .stream()
+        .filter(entry -> entry.getValue().isDynamic())
         .map(Map.Entry::getKey).collect(toList());
 
-    String message;
-    if (dynamicParams.contains(CONFIG_ATTRIBUTE_NAME)) {
-      message = "the source: '" + model.getName() + "' points to a configuration that contains "
-          + "expressions values (dynamic configuration). Sources cannot use dynamic configurations.";
-    } else {
-      message = "The source: '" + model.getName() + "' is using expressions, which are not allowed on message sources."
-          + " Offending parameters are: [" + Joiner.on(',').join(dynamicParams) + "]";
-    }
+    String message = "The source: '" + model.getName() + "' is using expressions, which are not allowed on message sources."
+        + " Offending parameters are: [" + Joiner.on(',').join(dynamicParams) + "]";
 
     return new ConfigurationException(createStaticMessage(message));
   }

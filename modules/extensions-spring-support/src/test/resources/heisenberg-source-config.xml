@@ -14,13 +14,11 @@
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="0"
                        initialHealth="CANCER"
+                       enemies="#[[]]"
                        finalHealth="CANCER">
         <heisenberg:connection>
             <reconnection failsDeployment="true"/>
         </heisenberg:connection>
-        <heisenberg:enemies>
-            <heisenberg:enemy value="juani"/>
-        </heisenberg:enemies>
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>

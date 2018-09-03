@@ -260,7 +260,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     Map<String, Object> configParameters = configurationState.getConfigParameters();
 
     assertThat(configParameters.size(), is(13));
-    assertParameter(configParameters, "enemies", hasSize(1));
     assertParameter(configParameters, "monthlyIncomes", hasSize(2));
     assertParameter(configParameters, "cancer", is(true));
     assertParameter(configParameters, "money", equalTo(new BigDecimal("0")));
