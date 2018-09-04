@@ -103,12 +103,20 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
   public void dispose(String keyHash) {
     withKeyLock(keyHash, key -> {
       try {
-        metadataStore.get().remove(key);
+        if (keyHash.isEmpty()) {
+          metadataStore.get().clear();
+        } else {
+          metadataStore.get().remove(key);
+        }
       } catch (ObjectDoesNotExistException e) {
         LOGGER
             .debug(format("No exact match found for key '%s'. Disposing all the elements with a prefix matching the given value.",
                           key));
         disposeAllMatches(keyHash);
+      } catch (ObjectStoreException e) {
+        String msg = format("An error occurred while clearing the MetadataCache: %s", e.getMessage());
+        LOGGER.debug(msg);
+        throw new RuntimeException(msg, e);
       } catch (Exception e) {
         String msg = format("An error occurred while disposing the MetadataCache with ID '%s': %s",
                             keyHash, e.getMessage());
