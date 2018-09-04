@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.internal.processor.chain;
 
+import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
-import org.reactivestreams.Publisher;
 
-import static reactor.core.publisher.Flux.from;
+import org.reactivestreams.Publisher;
 
 /**
  * Allows to apply processing strategy to processor + previous interceptors while using the processing type of the processor
@@ -38,10 +38,14 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
-    return from(eventPublisher)
-        .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId()))
-        .transform(publisher -> next.apply(publisher))
-        .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId()));
+    if (threadNotificationLogger != null) {
+      return from(eventPublisher)
+          .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId()))
+          .transform(publisher -> next.apply(publisher))
+          .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId()));
+    } else {
+      return next.apply(eventPublisher);
+    }
   }
 
   @Override

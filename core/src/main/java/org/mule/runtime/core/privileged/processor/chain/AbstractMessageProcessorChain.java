@@ -34,6 +34,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -41,7 +42,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
-import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
@@ -245,7 +245,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId())));
       } else {
         interceptors.add((processor, next) -> processingStrategy
-            .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)));
+            .onProcessor(new InterceptedReactiveProcessor(processor, next, null)));
       }
     }
 
