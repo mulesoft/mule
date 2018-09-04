@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -51,7 +53,11 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
     try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + serializer.getFileName(name))) {
       if (resource != null) {
-        XmlExtensionDocumentation documenter = serializer.deserialize(IOUtils.toString(resource));
+        XmlExtensionDocumentation documenter = withContextClassLoader(
+                                                                      ExtensionDescriptionsEnricher.class
+                                                                          .getClassLoader(),
+                                                                      () -> serializer
+                                                                          .deserialize(IOUtils.toString(resource)));
         document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter);
       }
     } catch (IOException e) {
