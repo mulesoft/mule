@@ -51,7 +51,7 @@
     </flow>
 
     <flow name="sourceNotifications" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="100000">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="1000000">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -63,11 +63,11 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
     <flow name="sourceNotificationsError" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="100000">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="1000000">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -83,7 +83,7 @@
     </flow>
 
     <flow name="sourceNotificationsBackPressure" initialState="stopped" maxConcurrency="1">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="10">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="1">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
