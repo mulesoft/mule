@@ -11,7 +11,6 @@ import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -24,12 +23,9 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.MuleSession;
@@ -114,7 +110,7 @@ public class EventQuickCopy implements InternalEvent, DeserializationPostInitial
 
   @Override
   public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
-    return event.getMessageAsBytes(muleContext)t;
+    return event.getMessageAsBytes(muleContext);
   }
 
   @Override
