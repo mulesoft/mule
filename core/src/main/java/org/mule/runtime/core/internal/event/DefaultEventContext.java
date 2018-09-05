@@ -138,6 +138,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     return empty();
   }
 
+  @Override
+  public BaseEventContext getRootContext() {
+    return this;
+  }
+
   /**
    * Builds a new execution context with the given parameters.
    *
@@ -221,6 +226,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     private static final long serialVersionUID = 1054412872901205234L;
 
+    private final BaseEventContext root;
     private final BaseEventContext parent;
     private final ComponentLocation componentLocation;
     private final String id;
@@ -229,9 +235,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
                               FlowExceptionHandler messagingExceptionHandler, int depthLevel) {
       super(messagingExceptionHandler, depthLevel, empty());
       this.flowCallStack = parent.getFlowCallStack().clone();
+      this.root = parent.getRootContext();
       this.parent = parent;
       this.componentLocation = componentLocation;
-      this.id = parent.getId() + identityHashCode(this);
+      this.id = parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)));
     }
 
     @Override
@@ -272,6 +279,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public boolean isCorrelationIdFromSource() {
       return parent.isCorrelationIdFromSource();
+    }
+
+    @Override
+    public BaseEventContext getRootContext() {
+      return root;
     }
 
     @Override

@@ -7,9 +7,9 @@
 package org.mule.runtime.core.internal.el.dataweave;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
+import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
@@ -218,8 +218,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       contextBuilder = BindingContext.builder(context);
     }
     if (componentLocation != null) {
-      contextBuilder.addBinding(FLOW, () -> new TypedValue<>(new FlowVariablesAccessor(componentLocation.getRootContainerName()),
-                                                             fromType(FlowVariablesAccessor.class)));
+      contextBuilder = addFlowNameBindingsToBuilder(componentLocation, contextBuilder);
     }
     return contextBuilder.build();
   }
@@ -244,17 +243,4 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     return sanitizedExpression;
   }
 
-  private class FlowVariablesAccessor {
-
-    private String name;
-
-    public FlowVariablesAccessor(String name) {
-      this.name = name;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-  }
 }

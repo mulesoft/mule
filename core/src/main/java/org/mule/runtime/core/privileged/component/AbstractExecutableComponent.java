@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -73,7 +73,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
     CoreEvent internalEvent;
     BaseEventContext child = createChildEventContext(event.getContext());
     if (event instanceof CoreEvent) {
-      internalEvent = builder(child, (CoreEvent) event).build();
+      internalEvent = quickCopy(child, (CoreEvent) event);
     } else {
       internalEvent = CoreEvent.builder(createEventContext(null))
           .message(event.getMessage())
@@ -87,7 +87,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
           CoreEvent messagingExceptionEvent = messagingException.getEvent();
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(), messagingExceptionEvent);
         })
-        .map(r -> builder(event.getContext(), r).build())
+        .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
   }

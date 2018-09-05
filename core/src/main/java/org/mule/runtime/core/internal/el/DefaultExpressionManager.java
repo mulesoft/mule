@@ -208,8 +208,15 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                  boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
     return resolveBoolean(evaluate(expression, DataType.BOOLEAN, NULL_BINDING_CONTEXT, event, componentLocation, false)
-        .getValue(), nullReturnsTrue,
-                          nonBooleanReturnsTrue, expression);
+        .getValue(), nullReturnsTrue, nonBooleanReturnsTrue, expression);
+  }
+
+  @Override
+  public boolean evaluateBoolean(String expression, BindingContext bindingCtx, ComponentLocation componentLocation,
+                                 boolean nullReturnsTrue, boolean nonBooleanReturnsTrue)
+      throws ExpressionRuntimeException {
+    return resolveBoolean(evaluate(expression, DataType.BOOLEAN, bindingCtx).getValue(), nullReturnsTrue, nonBooleanReturnsTrue,
+                          expression);
   }
 
   protected boolean resolveBoolean(Object result, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue, String expression) {

@@ -181,6 +181,9 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   private volatile SchedulerService schedulerService;
 
+  private volatile SecurityManager securityManager;
+  private Object securityManagerLock = new Object();
+
   /**
    * LifecycleManager for the MuleContext. Note: this is NOT the same lifecycle manager as the one in the Registry.
    */
@@ -549,10 +552,13 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public void setSecurityManager(SecurityManager securityManager) {
     checkLifecycleForPropertySet(OBJECT_SECURITY_MANAGER, Initialisable.PHASE_NAME);
-    try {
-      registryBroker.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
+    synchronized (securityManagerLock) {
+      try {
+        this.securityManager = null;
+        muleRegistryHelper.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
   }
 
@@ -565,17 +571,25 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
    */
   @Override
   public SecurityManager getSecurityManager() {
-    SecurityManager securityManager = registryBroker.lookupObject(OBJECT_SECURITY_MANAGER);
-    if (securityManager == null) {
-      Collection<SecurityManager> temp = registryBroker.lookupObjects(SecurityManager.class);
-      if (temp.size() > 0) {
-        securityManager = (temp.iterator().next());
+    if (this.securityManager == null) {
+      synchronized (securityManagerLock) {
+        if (this.securityManager == null) {
+          SecurityManager _securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
+          if (_securityManager == null) {
+            Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
+            if (temp.size() > 0) {
+              _securityManager = (temp.iterator().next());
+            }
+          }
+          if (_securityManager == null) {
+            throw new MuleRuntimeException(objectIsNull("securityManager"));
+          }
+          this.securityManager = _securityManager;
+        }
       }
     }
-    if (securityManager == null) {
-      throw new MuleRuntimeException(objectIsNull("securityManager"));
-    }
-    return securityManager;
+
+    return this.securityManager;
   }
 
   @Override
