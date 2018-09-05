@@ -15,6 +15,7 @@ import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
@@ -36,8 +37,7 @@ import java.util.Properties;
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 
-import org.mule.runtime.core.internal.logging.LogUtil;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -487,10 +487,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       if (containsType(t, DeploymentStartException.class)) {
         log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
                               artifact.getArtifactName())));
-        logger.error(t.getMessage());
+        logger.error(t.getMessage(), t);
       } else {
         log(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), t.getCause().getMessage())));
-        logger.info(t.getMessage(), t);
+        logger.error(t.getMessage(), t);
       }
 
       addZombieApp(artifact);
