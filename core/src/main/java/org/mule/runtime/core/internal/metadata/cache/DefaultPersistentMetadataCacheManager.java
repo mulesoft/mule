@@ -150,6 +150,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
     } catch (ObjectStoreException e) {
       String msg = format("An error occurred while clearing MetadataCaches: %s", e.getMessage());
       LOGGER.debug(msg);
+      throw new RuntimeException(msg, e);
     }
   }
 
