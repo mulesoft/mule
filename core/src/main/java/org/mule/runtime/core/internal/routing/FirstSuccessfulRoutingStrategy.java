@@ -9,26 +9,26 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.privileged.routing.RoutingException;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -108,7 +108,7 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
       }
     }
 
-    return returnEvent != null ? builder(event.getContext(), returnEvent).build() : null;
+    return returnEvent != null ? quickCopy(event.getContext(), returnEvent) : null;
   }
 
   /**

@@ -180,6 +180,21 @@ public interface ExpressionManager extends MuleExpressionLanguage {
       throws ExpressionRuntimeException;
 
   /**
+   * Evaluates an expression considering a {@code boolean} as output.
+   *
+   * @param expression a single expression to be evaluated and transformed
+   * @param bindingCtx the {@link BindingContext} to consider
+   * @param componentLocation the location of the component where the event is being processed
+   * @param nullReturnsTrue whether or not a {@link null} outcome should be considered a {@link true}
+   * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@link true}
+   * @return {@link true} if the expression evaluated to that, "true" or the above flags where considered, {@link false} otherwise
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
+   */
+  boolean evaluateBoolean(String expression, BindingContext bindingCtx, ComponentLocation componentLocation,
+                          boolean nullReturnsTrue, boolean nonBooleanReturnsTrue)
+      throws ExpressionRuntimeException;
+
+  /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent} and a flowName.
    *
    * @param expression the expression to be executed

@@ -6,55 +6,56 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static com.google.common.collect.Multimaps.synchronizedMultimap;
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
-  protected Multimap<String, PolicyStateId> policyStateIdsByExecutionIdentifier =
-      synchronizedMultimap(HashMultimap.<String, PolicyStateId>create());
-  protected Map<PolicyStateId, CoreEvent> stateMap = new ConcurrentHashMap<>();
-  protected Map<String, Processor> nextOperationMap = new ConcurrentHashMap<>();
+  protected MultiMap<String, PolicyStateId> policyStateIdsByExecutionIdentifier = new MultiMap<>();
+  protected Map<PolicyStateId, CoreEvent> stateMap = new HashMap<>();
+  protected Map<String, Processor> nextOperationMap = new HashMap<>();
 
-  public void updateNextOperation(String identifier, Processor nextOperation) {
+  public synchronized void updateNextOperation(String identifier, Processor nextOperation) {
     nextOperationMap.put(identifier, nextOperation);
   }
 
-  public Processor retrieveNextOperation(String identifier) {
+  public synchronized Processor retrieveNextOperation(String identifier) {
     return nextOperationMap.get(identifier);
   }
 
   public Optional<CoreEvent> getLatestState(PolicyStateId identifier) {
-    return ofNullable(stateMap.get(identifier));
+    final CoreEvent state;
+    synchronized (this) {
+      state = stateMap.get(identifier);
+    }
+    return ofNullable(state);
   }
 
   public void updateState(PolicyStateId identifier, CoreEvent lastStateEvent) {
     ((BaseEventContext) lastStateEvent.getContext()).getRootContext()
         .onTerminated((response, throwable) -> destroyState(identifier.getExecutionIdentifier()));
-    stateMap.put(identifier, lastStateEvent);
-    policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIdentifier(), identifier);
+    synchronized (this) {
+      stateMap.put(identifier, lastStateEvent);
+      policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIdentifier(), identifier);
+    }
   }
 
-  public void destroyState(String identifier) {
-    Collection<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.get(identifier);
+  public synchronized void destroyState(String identifier) {
+    List<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.removeAll(identifier);
     if (policyStateIds != null) {
-      policyStateIds.stream().forEach(stateMap::remove);
+      policyStateIds.forEach(stateMap::remove);
     }
-    policyStateIdsByExecutionIdentifier.removeAll(identifier);
     nextOperationMap.remove(identifier);
   }
 
