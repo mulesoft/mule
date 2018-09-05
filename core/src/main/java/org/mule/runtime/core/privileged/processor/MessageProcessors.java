@@ -9,9 +9,9 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -266,13 +266,13 @@ public class MessageProcessors {
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       EventContext child, boolean completeParentOnEmpty,
                                                                       Publisher<CoreEvent> responsePublisher) {
-    return just(builder(child, event).build())
+    return just(quickCopy(child, event))
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded(child, true))
         .switchIfEmpty(from(responsePublisher))
-        .map(result -> builder(event.getContext(), result).build())
+        .map(result -> quickCopy(event.getContext(), result))
         .doOnError(MessagingException.class,
-                   me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
+                   me -> me.setProcessedEvent(quickCopy(event.getContext(), me.getEvent())))
         .doOnSuccess(result -> {
           if (result == null && completeParentOnEmpty) {
             ((BaseEventContext) event.getContext()).success();
