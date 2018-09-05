@@ -7,7 +7,7 @@
 package org.mule.test.module.extension.notification;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -26,7 +26,9 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -58,14 +60,16 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   @Test
   public void operationFiresNotificationsWithCustomData() throws Exception {
     Latch latch = new Latch();
-    setUpListener(notification -> checkIfDone(latch, 2));
+    setUpListener(notification -> checkIfDone(latch, 2), false);
 
     String correlationId = flowRunner("operationNotification").run().getCorrelationId();
 
     assertThat("Expected notifications not received.", latch.await(6000, MILLISECONDS), is(true));
 
     MultiMap<String, ExtensionNotification> notifications = listener.getNotifications();
-    assertThat(notifications.keySet(), containsInAnyOrder(KNOCKING_DOOR, KNOCKED_DOOR));
+    Set<String> keys = notifications.keySet();
+    assertThat(keys, hasItem(KNOCKING_DOOR));
+    assertThat(keys, hasItem(KNOCKED_DOOR));
 
     ExtensionNotification knockingDoor = notifications.get(KNOCKING_DOOR);
     assertThat(knockingDoor, is(notNullValue()));
@@ -87,7 +91,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   @Test
   public void sourceFiresNotificationsOnSuccess() throws Exception {
     Latch latch = new Latch();
-    setUpListener(notification -> checkIfDone(latch, 4));
+    setUpListener(notification -> checkIfDone(latch, 4), false);
 
     Flow flow = (Flow) getFlowConstruct("sourceNotifications");
     flow.start();
@@ -95,13 +99,17 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
     assertThat("Expected notifications not received.", latch.await(6000, MILLISECONDS), is(true));
 
     Map<String, ExtensionNotification> notifications = listener.getNotifications();
-    assertThat(notifications.keySet(), containsInAnyOrder(NEW_BATCH, NEXT_BATCH, BATCH_DELIVERED, BATCH_TERMINATED));
+    Set<String> keys = notifications.keySet();
+    assertThat(keys, hasItem(NEW_BATCH));
+    assertThat(keys, hasItem(NEXT_BATCH));
+    assertThat(keys, hasItem(BATCH_DELIVERED));
+    assertThat(keys, hasItem(BATCH_TERMINATED));
 
     ExtensionNotification newBatch = verifyNotificationAndValue(notifications.get(NEW_BATCH), 1);
 
     String correlationId = newBatch.getEvent().getCorrelationId();
 
-    ExtensionNotification nextBatch = verifyNotificationAndValue(notifications.get(NEXT_BATCH), 100000L);
+    ExtensionNotification nextBatch = verifyNotificationAndValue(notifications.get(NEXT_BATCH), 1000000L);
     assertThat(nextBatch.getEvent().getCorrelationId(), is(correlationId));
 
     ExtensionNotification batchRedelivered = verifyNotificationAndValue(notifications.get(BATCH_DELIVERED), 100L);
@@ -114,7 +122,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   @Test
   public void sourceFiresNotificationsOnError() throws Exception {
     Latch latch = new Latch();
-    setUpListener(notification -> checkIfDone(latch, 4));
+    setUpListener(notification -> checkIfDone(latch, 4), false);
 
     Flow flow = (Flow) getFlowConstruct("sourceNotificationsError");
     flow.start();
@@ -122,13 +130,17 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
     assertThat("Expected notifications not received", latch.await(6000, MILLISECONDS), is(true));
 
     MultiMap<String, ExtensionNotification> notifications = listener.getNotifications();
-    assertThat(notifications.keySet(), containsInAnyOrder(NEW_BATCH, NEXT_BATCH, BATCH_DELIVERY_FAILED, BATCH_TERMINATED));
+    Set<String> keys = notifications.keySet();
+    assertThat(keys, hasItem(NEW_BATCH));
+    assertThat(keys, hasItem(NEXT_BATCH));
+    assertThat(keys, hasItem(BATCH_DELIVERY_FAILED));
+    assertThat(keys, hasItem(BATCH_TERMINATED));
 
     ExtensionNotification newBatch = verifyNotificationAndValue(notifications.get(NEW_BATCH), 1);
 
     String correlationId = newBatch.getEvent().getCorrelationId();
 
-    ExtensionNotification nextBatch = verifyNotificationAndValue(notifications.get(NEXT_BATCH), 100000L);
+    ExtensionNotification nextBatch = verifyNotificationAndValue(notifications.get(NEXT_BATCH), 1000000L);
     assertThat(nextBatch.getEvent().getCorrelationId(), is(correlationId));
 
     ExtensionNotification batchDeliveryFailed = notifications.get(BATCH_DELIVERY_FAILED);
@@ -152,7 +164,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
         batchFailed.set(notification);
         failed.release();
       }
-    });
+    }, true);
 
     Flow flow = (Flow) getFlowConstruct("sourceNotificationsBackPressure");
     flow.start();
@@ -167,9 +179,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
       @Override
       public boolean isSatisfied() {
-        return new MultiMap<>(listener.getNotifications()).entryList().stream()
-            .filter(entry -> correlationId.equals(entry.getValue().getEvent().getCorrelationId()))
-            .count() == 4;
+        return listener.getCorrelationCount(correlationId) >= 4;
       }
 
       @Override
@@ -180,13 +190,17 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
     flow.stop();
 
     MultiMap<String, ExtensionNotification> notifications = listener.getNotifications();
-    assertThat(notifications.keySet(), containsInAnyOrder(NEW_BATCH, NEXT_BATCH, BATCH_FAILED, BATCH_TERMINATED));
+    Set<String> keys = notifications.keySet();
+    assertThat(keys, hasItem(NEW_BATCH));
+    assertThat(keys, hasItem(NEXT_BATCH));
+    assertThat(keys, hasItem(BATCH_FAILED));
+    assertThat(keys, hasItem(BATCH_TERMINATED));
 
     int batchNumber = (Integer) backPressureNotification.getData().getValue();
 
     verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, NEW_BATCH), batchNumber);
 
-    verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, NEXT_BATCH), 10L);
+    verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, NEXT_BATCH), 1L);
 
     verifyNotificationAndValue(backPressureNotification, batchNumber);
 
@@ -214,8 +228,8 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
     return notification;
   }
 
-  private void setUpListener(Consumer<ExtensionNotification> onNotification) {
-    listener = new TestExtensionNotificationListener(onNotification);
+  private void setUpListener(Consumer<ExtensionNotification> onNotification, boolean correlationOn) {
+    listener = new TestExtensionNotificationListener(onNotification, correlationOn);
     notificationListenerRegistry.registerListener(listener);
   }
 
@@ -223,19 +237,31 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     private Consumer<ExtensionNotification> onNotification;
     private MultiMap<String, ExtensionNotification> notifications = new MultiMap<>();
+    private Map<String, Integer> correlationCount;
 
-    public TestExtensionNotificationListener(Consumer<ExtensionNotification> onNotification) {
+    public TestExtensionNotificationListener(Consumer<ExtensionNotification> onNotification, boolean correlationOn) {
       this.onNotification = onNotification;
+      if (correlationOn) {
+        correlationCount = new HashMap<>();
+      }
     }
 
     @Override
-    public void onNotification(ExtensionNotification notification) {
+    public synchronized void onNotification(ExtensionNotification notification) {
       notifications.put(notification.getAction().getIdentifier(), notification);
+      if (correlationCount != null) {
+        String correlationId = notification.getEvent().getCorrelationId();
+        correlationCount.put(correlationId, correlationCount.computeIfAbsent(correlationId, correlation -> 0) + 1);
+      }
       onNotification.accept(notification);
     }
 
     public MultiMap<String, ExtensionNotification> getNotifications() {
       return notifications;
+    }
+
+    public synchronized Integer getCorrelationCount(String correlationId) {
+      return correlationCount.get(correlationId);
     }
 
   }
