@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.charThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,5 +125,12 @@ public class DefaultMetadataCacheManagerTestCase {
 
     verify(objectStore).remove(SOME_KEY);
     verify(objectStore).remove(OTHER_KEY);
+  }
+
+  @Test
+  public void clearMetadataCaches() throws ObjectStoreException {
+    cacheManager.dispose("");
+
+    verify(objectStore).clear();
   }
 }
