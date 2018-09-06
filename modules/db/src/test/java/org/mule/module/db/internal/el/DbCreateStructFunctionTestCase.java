@@ -16,6 +16,9 @@ import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_NO_PARAM;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_TYPE_NAME_PARAM;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_TYPE_ATTRS;
+import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_TYPE_OWNER_CONDITION;
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getOwnerFrom;
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getTypeSimpleName;
 import static org.mule.module.db.internal.domain.transaction.TransactionalAction.ALWAYS_JOIN;
 import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
 import static org.mule.module.db.internal.domain.type.JdbcTypes.CLOB_DB_TYPE;
@@ -102,29 +105,51 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
     }
     
     @Test
-    public void createStructResolvingBlobInOracleDb() throws Exception
+    public void createStructResolvingBlobInOracleDbUsingUDTSimpleName() throws Exception
+    {
+        createStructResolvingBlobInOracleDb(TYPE_NAME);
+    }
+
+    @Test
+    public void createStructResolvingBlobInOracleDbUsingUDTFullame() throws Exception
+    {
+        createStructResolvingBlobInOracleDb(TYPE_NAME_WITH_OWNER);
+    }
+
+    @Test
+    public void createStructResolvingClobInOracleDbUsingUDTSimpleName() throws Exception
+    {
+        createStructResolvingClobAndClobInOracleDb(TYPE_NAME);
+    }
+
+    @Test
+    public void createStructResolvingClobInOracleDbUsingUDTFullame() throws Exception
+    {
+        createStructResolvingClobAndClobInOracleDb(TYPE_NAME_WITH_OWNER);
+    }
+
+    public void createStructResolvingBlobInOracleDb(String typeName) throws Exception
     {
         Object[] structValues = {"foo", "bar"};
         Connection delegate = mock(Connection.class);
         Blob blob = mock(Blob.class);
         when(delegate.createBlob()).thenReturn(blob);
-        testThroughOracleQuery(delegate, structValues, BLOB_DB_TYPE.getName());
-        verify(delegate).createStruct(TYPE_NAME, structValues);
-        assertThat(structValues[0], Matchers.<Object>equalTo(blob));
+        testThroughOracleQuery(delegate, structValues, BLOB_DB_TYPE.getName(), typeName);
+        verify(delegate).createStruct(typeName, structValues);
+        assertThat(structValues[0], Matchers.<Object> equalTo(blob));
     }
-    
-    @Test
-    public void createStructResolvingClobAndClobInOracleDb() throws Exception
+
+    public void createStructResolvingClobAndClobInOracleDb(String typeName) throws Exception
     {
         Object[] structValues = {"foo", "bar"};
         Connection delegate = mock(Connection.class);
         Clob clob = mock(Clob.class);
         when(delegate.createClob()).thenReturn(clob);
-        testThroughOracleQuery(delegate, structValues, CLOB_DB_TYPE.getName());
-        verify(delegate).createStruct(TYPE_NAME, structValues);
-        assertThat(structValues[0], Matchers.<Object>equalTo(clob));
+        testThroughOracleQuery(delegate, structValues, CLOB_DB_TYPE.getName(), typeName);
+        verify(delegate).createStruct(typeName, structValues);
+        assertThat(structValues[0], Matchers.<Object> equalTo(clob));
     }
-    
+
     private void testThroughMetadata(Connection delegate, Object[] structValues, int dataType, String dataTypeName) throws Exception
     {
         DatabaseMetaData metadata = mock(DatabaseMetaData.class);
@@ -142,24 +167,41 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         defaultDbConnection.createStruct(TYPE_NAME, structValues);
         defaultDbConnection.close();
     }
-    
-    private void testThroughOracleQuery(Connection delegate, Object[] structValues, String dataTypeName) throws Exception
+
+    private void testThroughOracleQuery(Connection delegate, Object[] structValues, String dataTypeName, String udtName) throws Exception
     {
+        String owner = getOwnerFrom(udtName);
+        String typeSimpleName = getTypeSimpleName(udtName);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         ResultSet resultSet = mock(ResultSet.class);
-        
+
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(delegate.prepareStatement(QUERY_TYPE_ATTRS)).thenReturn(preparedStatement);
+        if (owner == null)
+        {
+            when(delegate.prepareStatement(QUERY_TYPE_ATTRS)).thenReturn(preparedStatement);
+        }
+        else
+        {
+            when(delegate.prepareStatement(QUERY_TYPE_ATTRS + QUERY_TYPE_OWNER_CONDITION)).thenReturn(preparedStatement);
+        }
+
         when(resultSet.next()).thenReturn(true).thenReturn(false);
         when(resultSet.getInt(ATTR_NO_PARAM)).thenReturn(1);
         when(resultSet.getString(ATTR_TYPE_NAME_PARAM)).thenReturn(dataTypeName);
-        
+
         DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
         DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
         ParamTypeResolverFactory paramTypeResolverFactory = mock(ParamTypeResolverFactory.class);
         OracleDbConnection defaultDbConnection = new OracleDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory);
-        defaultDbConnection.createStruct(TYPE_NAME, structValues);
+        defaultDbConnection.createStruct(udtName, structValues);
         defaultDbConnection.close();
+
+        verify(preparedStatement).setString(1, typeSimpleName);
+
+        if (owner != null)
+        {
+            verify(preparedStatement).setString(2, owner);
+        }
     }
 
 
