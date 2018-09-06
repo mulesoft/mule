@@ -7,6 +7,9 @@
 
 package org.mule.module.db.internal.domain.connection;
 
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getOwnerFrom;
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getTypeSimpleName;
+
 import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Connection;
@@ -30,7 +33,9 @@ public class OracleDbConnection extends DefaultDbConnection
     public static final String ATTR_NO_PARAM = "ATTR_NO";
 
     public static final String QUERY_TYPE_ATTRS = "SELECT ATTR_NO, ATTR_TYPE_NAME FROM ALL_TYPE_ATTRS WHERE TYPE_NAME = ? AND ATTR_TYPE_NAME IN ('CLOB', 'BLOB')";
-    
+
+    public static final String QUERY_TYPE_OWNER_CONDITION = " AND OWNER = ?";
+
     private Method createArrayMethod;
     private boolean initialized;
 
@@ -99,6 +104,11 @@ public class OracleDbConnection extends DefaultDbConnection
     {
         Map<Integer, String> dataTypes = getDataTypes(typeName);
 
+        if (dataTypes.keySet().isEmpty())
+        {
+            logger.warn("No catalog information was found for the typename '%s'. No lob resolution will be performed", typeName);
+        }
+
         for (int index : dataTypes.keySet())
         {
             String dataTypeName = dataTypes.get(index);
@@ -116,10 +126,19 @@ public class OracleDbConnection extends DefaultDbConnection
     {
         Map<Integer, String> dataTypes = new HashMap<Integer, String>();
 
-        try (PreparedStatement ps = this.prepareStatement(QUERY_TYPE_ATTRS))
+        String owner = getOwnerFrom(typeName);
+        String type = getTypeSimpleName(typeName);
+
+        String query = QUERY_TYPE_ATTRS + (owner != null ? QUERY_TYPE_OWNER_CONDITION : "");
+
+        try (PreparedStatement ps = this.prepareStatement(query))
         {
-            ps.setString(1, typeName);
-            
+            ps.setString(1, type);
+            if (owner != null)
+            {
+                ps.setString(2, owner);
+            }
+
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next())
