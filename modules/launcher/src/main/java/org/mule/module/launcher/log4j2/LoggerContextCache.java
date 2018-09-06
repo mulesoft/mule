@@ -9,16 +9,6 @@ package org.mule.module.launcher.log4j2;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.Disposable;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -26,9 +16,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.lifecycle.Disposable;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import com.google.common.collect.ImmutableList;
 
 /**
  * A cache which relates {@link ClassLoader} instances
@@ -78,19 +77,18 @@ final class LoggerContextCache implements Disposable
     {
         acquireContextDisposeDelay();
         this.artifactAwareContextSelector = artifactAwareContextSelector;
-        activeContexts = CacheBuilder.newBuilder().build();
+        activeContexts = Caffeine.newBuilder().build();
 
-        disposedContexts = CacheBuilder.newBuilder()
+        disposedContexts = Caffeine.newBuilder()
                 .expireAfterWrite(disposeDelayInMillis, TimeUnit.MILLISECONDS)
                 .removalListener(new RemovalListener<Integer, LoggerContext>()
                 {
-                    @Override
-                    public void onRemoval(RemovalNotification<Integer, LoggerContext> notification)
+                    public void onRemoval(Integer key, LoggerContext value, com.github.benmanes.caffeine.cache.RemovalCause cause)
                     {
-                        stop(notification.getValue());
-                        activeContexts.invalidate(notification.getKey());
-                        builtContexts.remove(notification.getKey());
-                    }
+                        stop(value);
+                        activeContexts.invalidate(key);
+                        builtContexts.remove(key);
+                }
                 })
                 .build();
 
@@ -184,10 +182,10 @@ final class LoggerContextCache implements Disposable
      */
     protected LoggerContext doGetLoggerContext(final ClassLoader classLoader, final Integer key) throws ExecutionException
     {
-        return activeContexts.get(key, new Callable<LoggerContext>()
+        return activeContexts.get(key, new Function<Integer, LoggerContext>()
         {
             @Override
-            public LoggerContext call() throws Exception
+            public LoggerContext apply(Integer key)
             {
                 if (builtContexts.containsKey(key))
                 {
