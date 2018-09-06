@@ -15,6 +15,8 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.work.WorkExecutor;
 import org.mule.config.ImmutableThreadingProfile;
 
+import static java.lang.Integer.getInteger;
+
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -88,7 +90,7 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
 
     public synchronized void start() throws MuleException
     {
-        gracefulShutdownTimeout = getMuleContext().getConfiguration().getShutdownTimeout();
+        gracefulShutdownTimeout = getInteger(MuleWorkManager.class.getName() + ".shutdownTimeout", getMuleContext().getConfiguration().getShutdownTimeout());
         
         if (workExecutorService == null)
         {
