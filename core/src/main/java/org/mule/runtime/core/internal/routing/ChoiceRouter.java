@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
-
-import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -31,10 +28,8 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
 
   @Override
   protected Optional<Processor> selectProcessor(CoreEvent event) {
-    BindingContext bindingCtx =
-        addFlowNameBindingsToBuilder(getLocation(), BindingContext.builder(event.asBindingContext())).build();
     return getConditionalMessageProcessors().stream()
-        .filter(cmp -> expressionManager.evaluateBoolean(cmp.getExpression(), bindingCtx, getLocation(), false, true))
+        .filter(cmp -> expressionManager.evaluateBoolean(cmp.getExpression(), event, getLocation(), false, true))
         .findFirst()
         .map(cmp -> cmp.getMessageProcessor());
   }

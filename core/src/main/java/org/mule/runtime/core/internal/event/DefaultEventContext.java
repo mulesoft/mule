@@ -238,7 +238,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.root = parent.getRootContext();
       this.parent = parent;
       this.componentLocation = componentLocation;
-      this.id = parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)));
+      this.id = parent.getId() != null
+          ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
+          : Integer.toString(identityHashCode(this));
     }
 
     @Override
