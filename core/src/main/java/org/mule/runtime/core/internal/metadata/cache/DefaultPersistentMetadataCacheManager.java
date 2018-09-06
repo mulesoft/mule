@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.metadata.cache;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataCache;
@@ -103,7 +105,11 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
   public void dispose(String keyHash) {
     withKeyLock(keyHash, key -> {
       try {
-        metadataStore.get().remove(key);
+        if (isBlank(keyHash)) {
+          clearMetadataCaches();
+        } else {
+          metadataStore.get().remove(key);
+        }
       } catch (ObjectDoesNotExistException e) {
         LOGGER
             .debug(format("No exact match found for key '%s'. Disposing all the elements with a prefix matching the given value.",
@@ -134,6 +140,16 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
       String msg = format("Failed to perform a cache disposal for partial prefix ID '%s': %s",
                           keyHash, e.getMessage());
       LOGGER.error(msg);
+      throw new RuntimeException(msg, e);
+    }
+  }
+
+  private void clearMetadataCaches() {
+    try {
+      metadataStore.get().clear();
+    } catch (ObjectStoreException e) {
+      String msg = format("An error occurred while clearing MetadataCaches: %s", e.getMessage());
+      LOGGER.debug(msg);
       throw new RuntimeException(msg, e);
     }
   }
