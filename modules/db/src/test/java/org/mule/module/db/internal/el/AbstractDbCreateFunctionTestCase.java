@@ -32,6 +32,7 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
 
     protected static final String DB_CONFIG_NAME = "dbConfig";
     protected static final String TYPE_NAME = "TEST_ARRAY";
+    protected static final String TYPE_NAME_WITH_OWNER = "OWNER.TEST_ARRAY";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

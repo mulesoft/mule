@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultDbConnection extends AbstractDbConnection
 {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final int UNKNOWN_DATA_TYPE = -1;
 
