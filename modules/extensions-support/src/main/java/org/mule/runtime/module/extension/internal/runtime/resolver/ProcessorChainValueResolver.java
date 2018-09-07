@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -32,6 +33,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.xml.namespace.QName;
+
+import org.reactivestreams.Publisher;
 
 /**
  * An {@link ValueResolver} which wraps the given {@link Processor} in a {@link Chain},
@@ -112,6 +115,11 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
     public void dispose() {
       this.delegate.dispose();
       initialised = false;
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      return this.delegate.apply(publisher);
     }
 
     @Override

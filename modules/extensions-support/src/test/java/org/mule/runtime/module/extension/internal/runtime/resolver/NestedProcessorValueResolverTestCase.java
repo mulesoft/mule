@@ -12,8 +12,10 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -70,6 +72,20 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     Chain resolved2 = resolver.resolve(ValueResolvingContext.from(testEvent()));
 
     assertThat(resolved1, is(not(sameInstance(resolved2))));
+  }
+
+  @Test
+  public void chainIsCalledAsNonBlocking() throws Exception {
+    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
+
+    Chain resolve = resolver.resolve(ValueResolvingContext.from(testEvent()));
+
+    resolve.process(result -> {
+    }, (t, r) -> {
+    });
+
+    verify(messageProcessor, times(1)).apply(any());
+    verify(messageProcessor, times(0)).process(any());
   }
 
 }
