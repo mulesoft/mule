@@ -165,7 +165,6 @@ import org.mule.runtime.core.internal.routing.SplitAggregateScope;
 import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
-import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
