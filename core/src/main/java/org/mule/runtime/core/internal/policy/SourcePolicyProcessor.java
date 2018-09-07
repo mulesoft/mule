@@ -52,6 +52,7 @@ public class SourcePolicyProcessor implements Processor {
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
   private final Processor nextProcessor;
+  private final PolicyStateIdFactory stateIdFactory;
 
   /**
    * Creates a new {@code DefaultSourcePolicy}.
@@ -65,6 +66,7 @@ public class SourcePolicyProcessor implements Processor {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
+    this.stateIdFactory = new PolicyStateIdFactory(policy.getPolicyId());
   }
 
   /**
@@ -85,9 +87,9 @@ public class SourcePolicyProcessor implements Processor {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(sourceEvent -> {
-          String executionIdentifier = rootEventId(sourceEvent);
-          policyStateHandler.updateNextOperation(executionIdentifier,
-                                                 buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
+          PolicyStateId policyStateId = stateIdFactory.create(sourceEvent);
+          policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(),
+                                                 buildSourceExecutionWithPolicyFunction(policyStateId, sourceEvent));
           return just(sourceEvent)
               .map(event -> policyEventConverter.createEvent(sourceEvent, noVariablesEvent(sourceEvent)))
               .cast(CoreEvent.class)
@@ -97,10 +99,8 @@ public class SourcePolicyProcessor implements Processor {
         });
   }
 
-  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, PrivilegedEvent sourceEvent) {
+  private Processor buildSourceExecutionWithPolicyFunction(PolicyStateId policyStateId, PrivilegedEvent sourceEvent) {
     return new Processor() {
-
-      private PolicyStateId policyStateId = new PolicyStateId(executionIdentifier, policy.getPolicyId());
 
       @Override
       public CoreEvent process(CoreEvent event) throws MuleException {
@@ -131,10 +131,6 @@ public class SourcePolicyProcessor implements Processor {
         return (PrivilegedEvent) policyStateHandler.getLatestState(policyStateId).get();
       }
     };
-  }
-
-  private String rootEventId(CoreEvent event) {
-    return ((BaseEventContext) event.getContext()).getRootContext().getId();
   }
 
   private PrivilegedEvent noVariablesEvent(CoreEvent event) {

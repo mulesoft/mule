@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Optional;
@@ -53,6 +52,7 @@ public class OperationPolicyProcessor implements Processor {
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
   private final Processor nextProcessor;
+  private final PolicyStateIdFactory stateIdFactory;
 
   public OperationPolicyProcessor(Policy policy,
                                   PolicyStateHandler policyStateHandler,
@@ -60,6 +60,7 @@ public class OperationPolicyProcessor implements Processor {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
+    this.stateIdFactory = new PolicyStateIdFactory(policy.getPolicyId());
   }
 
   /**
@@ -80,7 +81,7 @@ public class OperationPolicyProcessor implements Processor {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(operationEvent -> {
-          PolicyStateId policyStateId = new PolicyStateId(rootEventId(operationEvent), policy.getPolicyId());
+          PolicyStateId policyStateId = stateIdFactory.create(operationEvent);
           PrivilegedEvent variablesProviderEvent = variablesProvider(operationEvent, policyStateId);
           PrivilegedEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
           Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent, policyStateId);
@@ -137,10 +138,6 @@ public class OperationPolicyProcessor implements Processor {
             });
       }
     };
-  }
-
-  private String rootEventId(CoreEvent event) {
-    return ((BaseEventContext) event.getContext()).getRootContext().getId();
   }
 
   private PrivilegedEvent variablesProvider(CoreEvent event, PolicyStateId policyStateId) {
