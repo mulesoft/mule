@@ -99,7 +99,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
       setIgnoredObjectTypes(new Class[] {ExtensionManager.class, SpringRegistry.class, SpringRegistryBootstrap.class,
           Component.class, MessageSource.class, InterceptingMessageProcessor.class, AbstractMessageProcessorOwner.class,
-          FlowExceptionHandler.class, AbstractAsyncRequestReplyRequester.class, OutboundRouter.class,
+          FlowExceptionHandler.class, OutboundRouter.class,
           MessageProcessorChain.class, MuleContext.class, Service.class});
     }
 
