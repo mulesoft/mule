@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Optional;
@@ -84,13 +85,11 @@ public class SourcePolicyProcessor implements Processor {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(sourceEvent -> {
-          String executionIdentifier = sourceEvent.getContext().getCorrelationId();
+          String executionIdentifier = rootEventId(sourceEvent);
           policyStateHandler.updateNextOperation(executionIdentifier,
                                                  buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
           return just(sourceEvent)
-              .map(event -> policyEventConverter.createEvent(sourceEvent,
-                                                             PrivilegedEvent.builder(sourceEvent.getContext()).message(of(null))
-                                                                 .build()))
+              .map(event -> policyEventConverter.createEvent(sourceEvent, noVariablesEvent(sourceEvent)))
               .cast(CoreEvent.class)
               .transform(policy.getPolicyChain())
               .cast(PrivilegedEvent.class)
@@ -132,5 +131,13 @@ public class SourcePolicyProcessor implements Processor {
         return (PrivilegedEvent) policyStateHandler.getLatestState(policyStateId).get();
       }
     };
+  }
+
+  private String rootEventId(CoreEvent event) {
+    return ((BaseEventContext) event.getContext()).getRootContext().getId();
+  }
+
+  private PrivilegedEvent noVariablesEvent(CoreEvent event) {
+    return PrivilegedEvent.builder(event.getContext()).message(of(null)).build();
   }
 }

@@ -93,10 +93,12 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), this.muleContext.getConfiguration().getId()))
         .flatMap(event -> {
-          Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
+          String eventId = rootEventId(event);
+          Processor nextOperation = policyStateHandler.retrieveNextOperation(eventId);
+
           if (nextOperation == null) {
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
-                + event.getContext().getCorrelationId())));
+                + eventId)));
           }
 
           popBeforeNextFlowFlowStackElement().accept(event);
@@ -107,8 +109,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                   .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
               .onErrorResume(MessagingException.class, t -> {
 
-                PolicyStateId policyStateId =
-                    new PolicyStateId(event.getContext().getCorrelationId(), muleContext.getConfiguration().getId());
+                PolicyStateId policyStateId = new PolicyStateId(eventId, muleContext.getConfiguration().getId());
                 policyStateHandler.getLatestState(policyStateId)
                     .ifPresent(latestStateEvent -> t.setProcessedEvent(policyEventConverter
                         .createEvent((PrivilegedEvent) t.getEvent(), (PrivilegedEvent) latestStateEvent)));
@@ -138,8 +139,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   @Override
   public void initialise() throws InitialisationException {
     notificationHelper =
-        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(),
-                                     this);
+        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(), this);
   }
 
   private void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {
@@ -147,5 +147,9 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
       LOGGER.trace("\nEvent Id: " + eventContext.getCorrelationId() + "\n" + startingMessage + ".\nPolicy: " + policyName
           + "\n" + message.getAttributes().getValue().toString());
     }
+  }
+
+  private String rootEventId(CoreEvent event) {
+    return ((BaseEventContext) event.getContext()).getRootContext().getId();
   }
 }
