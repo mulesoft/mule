@@ -22,12 +22,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -53,6 +52,7 @@ public class OperationPolicyProcessor implements Processor {
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
   private final Processor nextProcessor;
+  private final PolicyStateIdFactory stateIdFactory;
 
   public OperationPolicyProcessor(Policy policy,
                                   PolicyStateHandler policyStateHandler,
@@ -60,6 +60,7 @@ public class OperationPolicyProcessor implements Processor {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
+    this.stateIdFactory = new PolicyStateIdFactory(policy.getPolicyId());
   }
 
   /**
@@ -80,12 +81,8 @@ public class OperationPolicyProcessor implements Processor {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(operationEvent -> {
-          PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
-          Optional<CoreEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
-          PrivilegedEvent variablesProviderEvent =
-              (PrivilegedEvent) latestPolicyState
-                  .orElseGet(() -> PrivilegedEvent.builder(operationEvent.getContext()).message(of(null)).build());
-          policyStateHandler.updateState(policyStateId, variablesProviderEvent);
+          PolicyStateId policyStateId = stateIdFactory.create(operationEvent);
+          PrivilegedEvent variablesProviderEvent = variablesProvider(operationEvent, policyStateId);
           PrivilegedEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
           Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent, policyStateId);
           policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
@@ -141,6 +138,12 @@ public class OperationPolicyProcessor implements Processor {
             });
       }
     };
+  }
+
+  private PrivilegedEvent variablesProvider(CoreEvent event, PolicyStateId policyStateId) {
+    Optional<CoreEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
+    return (PrivilegedEvent) latestPolicyState
+        .orElseGet(() -> PrivilegedEvent.builder(event.getContext()).message(of(null)).build());
   }
 
   private String getMessageAttributesAsString(CoreEvent event) {
