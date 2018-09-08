@@ -68,6 +68,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   private PolicyEventConverter policyEventConverter = new PolicyEventConverter();
 
+  private PolicyStateIdFactory stateIdFactory;
+
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
@@ -91,12 +93,14 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
-                                                   coreEvent.getMessage(), this.muleContext.getConfiguration().getId()))
+                                                   coreEvent.getMessage(), muleContext.getConfiguration().getId()))
         .flatMap(event -> {
-          Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
+          PolicyStateId policyStateId = stateIdFactory.create(event);
+          Processor nextOperation = policyStateHandler.retrieveNextOperation(policyStateId.getExecutionIdentifier());
+
           if (nextOperation == null) {
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
-                + event.getContext().getCorrelationId())));
+                + policyStateId.getExecutionIdentifier())));
           }
 
           popBeforeNextFlowFlowStackElement().accept(event);
@@ -107,8 +111,6 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                   .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
               .onErrorResume(MessagingException.class, t -> {
 
-                PolicyStateId policyStateId =
-                    new PolicyStateId(event.getContext().getCorrelationId(), muleContext.getConfiguration().getId());
                 policyStateHandler.getLatestState(policyStateId)
                     .ifPresent(latestStateEvent -> t.setProcessedEvent(policyEventConverter
                         .createEvent((PrivilegedEvent) t.getEvent(), (PrivilegedEvent) latestStateEvent)));
@@ -138,8 +140,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   @Override
   public void initialise() throws InitialisationException {
     notificationHelper =
-        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(),
-                                     this);
+        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(), this);
+    stateIdFactory = new PolicyStateIdFactory(muleContext.getConfiguration().getId());
   }
 
   private void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {
@@ -148,4 +150,5 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
           + "\n" + message.getAttributes().getValue().toString());
     }
   }
+
 }
