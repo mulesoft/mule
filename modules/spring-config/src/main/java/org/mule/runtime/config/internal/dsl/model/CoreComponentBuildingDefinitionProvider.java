@@ -165,7 +165,6 @@ import org.mule.runtime.core.internal.routing.SplitAggregateScope;
 import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
-import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
@@ -257,7 +256,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String CHOICE = "choice";
   private static final String OTHERWISE = "otherwise";
   private static final String SCHEDULER = "scheduler";
-  private static final String REQUEST_REPLY = "request-reply";
   private static final String ERROR_TYPE = "errorType";
   private static final String TYPE = "type";
   private static final String TX_ACTION = "transactionalAction";
@@ -531,13 +529,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
         .withSetterParameterDefinition("filterOnErrorType", fromSimpleParameter("filterOnErrorType").build())
         .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(REQUEST_REPLY)
-        .withTypeDefinition(fromType(SimpleAsyncRequestReplyRequester.class))
-        .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
-        .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
-        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-        .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier(SCHEDULER)
