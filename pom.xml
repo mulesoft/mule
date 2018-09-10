@@ -1900,7 +1900,7 @@
                             <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>${dev.list}</Dev-List-Email>
                             <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_60,11)</Recommended-Jdks>
+                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
                         </manifestEntries>
                     </archive>
                 </configuration>
