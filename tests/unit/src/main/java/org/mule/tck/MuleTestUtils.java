@@ -163,7 +163,7 @@ public final class MuleTestUtils {
     }
   }
 
-  public static final class TestDirectProcessingStrategy extends AbstractProcessingStrategy {
+  public static class TestDirectProcessingStrategy extends AbstractProcessingStrategy {
 
     @Override
     public boolean isSynchronous() {
