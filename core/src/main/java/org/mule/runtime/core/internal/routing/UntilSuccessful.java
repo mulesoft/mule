@@ -10,24 +10,19 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
-import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
-import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
 
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -56,7 +51,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private static final int DEFAULT_RETRIES = 5;
 
   @Inject
-  private ConfigurationComponentLocator componentLocator;
+  private SchedulerService schedulerService;
 
   private int maxRetries = DEFAULT_RETRIES;
   private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
@@ -64,7 +59,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private Predicate<CoreEvent> shouldRetry;
   private SimpleRetryPolicyTemplate policyTemplate;
   private Scheduler timer;
-  private ProcessingStrategy processingStrategy;
   private List<Processor> processors;
 
   @Override
@@ -75,16 +69,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     }
     this.nestedChain = newChain(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
-    timer = muleContext.getSchedulerService().cpuLightScheduler();
-    policyTemplate =
-        new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries);
+    timer = schedulerService.cpuLightScheduler();
+    policyTemplate = new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries);
     shouldRetry = event -> event.getError().isPresent();
-    Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
-    if (rootContainer instanceof FlowConstruct) {
-      processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
-    } else {
-      processingStrategy = DIRECT_PROCESSING_STRATEGY_INSTANCE;
-    }
   }
 
   @Override
@@ -101,9 +88,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .flatMap(event -> Mono.from(processWithChildContext(event,
-                                                            scheduleRoute(p -> Mono.from(p).transform(nestedChain)),
-                                                            ofNullable(getLocation())))
+        .flatMap(event -> Mono.from(processWithChildContext(event, nestedChain, ofNullable(getLocation())))
             .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
             }, getThrowableFunction(event), timer)));
   }
@@ -121,10 +106,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
                                                                       cause, this),
                                     this);
     };
-  }
-
-  private ReactiveProcessor scheduleRoute(ReactiveProcessor route) {
-    return publisher -> from(publisher).transform(processingStrategy.onPipeline(route));
   }
 
   /**

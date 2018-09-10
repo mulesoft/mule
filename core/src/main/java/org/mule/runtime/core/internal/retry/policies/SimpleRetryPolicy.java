@@ -71,6 +71,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
                                       Scheduler retryScheduler) {
     return from(publisher).onErrorResume(e -> {
       if (shouldRetry.test(e)) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Retrying execution of event...");
+        }
         Retry<T> retry = (Retry<T>) onlyIf(ctx -> shouldRetry.test(unwrap(ctx.exception())))
             .backoff(ctx -> new BackoffDelay(frequency));
 
@@ -83,11 +86,18 @@ public class SimpleRetryPolicy implements RetryPolicy {
 
         Mono<T> retryMono = from(publisher)
             .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler))
-            .doOnError(e2 -> onExhausted.accept(unwrap(e2)))
+            .doOnError(e2 -> {
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Retry attempts exhausted. Failing...");
+              }
+              onExhausted.accept(unwrap(e2));
+            })
             .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
         return delay(frequency, reactorRetryScheduler).then(isTransactionActive() ? just(retryMono.block()) : retryMono);
-
       } else {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Not retrying execution of event. Failing...");
+        }
         e = unwrap(e);
         onExhausted.accept(e);
         return error(errorFunction.apply(e));
