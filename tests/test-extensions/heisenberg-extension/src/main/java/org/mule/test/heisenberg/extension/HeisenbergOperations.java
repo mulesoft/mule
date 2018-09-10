@@ -489,6 +489,5 @@ public class HeisenbergOperations implements Disposable {
     }
   }
 
-  public void blockingNonBlocking(CompletionCallback<Void, Void> completionCallback) {
-  }
+  public void blockingNonBlocking(CompletionCallback<Void, Void> completionCallback) {}
 }
