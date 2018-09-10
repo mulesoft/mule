@@ -51,6 +51,7 @@ import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
@@ -73,8 +74,6 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -86,6 +85,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableMap;
 
 
 @Stereotype(EmpireStereotype.class)
@@ -487,4 +488,6 @@ public class HeisenbergOperations implements Disposable {
       throw new RuntimeException(e);
     }
   }
+
+  public void blockingNonBlocking(CompletionCallback<Void, Void> completionCallback) {}
 }
