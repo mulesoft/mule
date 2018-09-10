@@ -43,12 +43,9 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory;
-import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
 import org.reactivestreams.Publisher;
 
@@ -343,15 +340,6 @@ public class DefaultFlowBuilder implements Builder {
             me.setProcessedEvent(returnEventFromFlowMapper.apply(me.getEvent(), event));
             return me;
           });
-    }
-
-    @Override
-    protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      super.configureMessageProcessors(builder);
-      if (getSource() instanceof LegacyImmutableEndpoint
-          && !((LegacyImmutableEndpoint) getSource()).getExchangePattern().hasResponse()) {
-        builder.chain(new AsyncReplyToPropertyRequestReplyReplier(getSource()));
-      }
     }
 
     /**
