@@ -76,13 +76,13 @@ public final class MuleTestUtils {
    * Creates an empty flow with the provided name.
    */
   public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
-    final Flow flow = builder(flowName, context).processingStrategyFactory(spy(new DirectProcessingStrategyFactory() {
+    final Flow flow = builder(flowName, context).processingStrategyFactory(new DirectProcessingStrategyFactory() {
 
       @Override
       public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
         return spy(super.create(muleContext, schedulersNamePrefix));
       }
-    })).build();
+    }).build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));
     return flow;
   }
