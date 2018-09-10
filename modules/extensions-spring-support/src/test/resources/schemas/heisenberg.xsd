@@ -1731,6 +1731,14 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="BlockingNonBlockingType" substitutionGroup="heisenberg-empire" name="blocking-non-blocking"></xs:element>
+  <xs:complexType name="BlockingNonBlockingType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ByPassWeaponType" substitutionGroup="heisenberg-empire" name="by-pass-weapon"></xs:element>
   <xs:complexType name="ByPassWeaponType">
     <xs:complexContent>

@@ -6,6 +6,8 @@
  */
 package org.mule.test.module.extension.scopes;
 
+import static java.lang.Runtime.getRuntime;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -14,11 +16,18 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import javax.inject.Inject;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,6 +35,12 @@ import org.junit.rules.ExpectedException;
 public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final String KILL_REASON = "I'm the one who knocks";
+
+  @Inject
+  private SchedulerService schedulerService;
+
+  private Scheduler cpuLightScheduler;
+  private Scheduler testScheduler;
 
   @Rule
   public SystemProperty maxRedelivery = new SystemProperty("killingReason", KILL_REASON);
@@ -41,6 +56,19 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   @Override
   protected boolean isDisposeContextPerClass() {
     return true;
+  }
+
+  @Before
+  public void setUp() {
+    cpuLightScheduler = schedulerService.cpuLightScheduler();
+    testScheduler = schedulerService.customScheduler(SchedulerConfig.config().withName("SCOPE-TEST")
+        .withMaxConcurrentTasks(2 + getRuntime().availableProcessors() * 2));
+  }
+
+  @After
+  public void tearDown() {
+    cpuLightScheduler.stop();
+    testScheduler.stop();
   }
 
   @Test
@@ -152,4 +180,15 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
     assertThat(event.getMessage().getPayload().getValue(), is("EMPTY"));
   }
 
+  @Test
+  public void scopeExecutionDoesntBlockThreads() throws Exception {
+    testScheduler.submit(() -> flowRunner("executeNonBlocking").withPayload(TEST_MESSAGE).run());
+    int threadsToCreate = (getRuntime().availableProcessors() * 2) - 1;
+    for (int i = 0; i < threadsToCreate; ++i) {
+      testScheduler.submit(() -> flowRunner("executeNonBlocking").withPayload(TEST_MESSAGE).run());
+    }
+    Thread.sleep(2000);
+    cpuLightScheduler.submit(() -> {
+    }).get(5, SECONDS);
+  }
 }
