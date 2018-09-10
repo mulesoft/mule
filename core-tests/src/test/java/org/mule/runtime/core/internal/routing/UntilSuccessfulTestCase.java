@@ -15,7 +15,10 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
@@ -24,8 +27,11 @@ import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -83,6 +89,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
+  private Flow flow;
   private UntilSuccessful untilSuccessful;
   private ConfigurableMessageProcessor targetMessageProcessor;
   private boolean tx;
@@ -99,7 +106,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
+    flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     untilSuccessful = buildUntilSuccessful(1000L);
     if (tx) {
       getInstance().bindTransaction(mock(Transaction.class));
@@ -143,7 +150,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testSuccessfulDeliveryStreamPayload() throws Exception {
-    untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -156,7 +162,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testPermanentDeliveryFailure() throws Exception {
     targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
-    untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -173,7 +178,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testTemporaryDeliveryFailure() throws Exception {
     targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
-    untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -181,6 +185,19 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
     assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
+  }
+
+  @Test
+  public void testProcessingStrategyUsage() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("ERROR")).build();
+    untilSuccessful.process(testEvent).getMessage();
+
+    ProcessingStrategy ps = flow.getProcessingStrategy();
+    verify(ps, never()).onPipeline(any(ReactiveProcessor.class));
   }
 
   @Test
@@ -202,7 +219,5 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     // and their payload
     assertEquals(testEvent.getMessage(), eventReceived.getMessage());
   }
-
-
 
 }
