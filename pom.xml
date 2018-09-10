@@ -159,7 +159,7 @@
         <apacheHttpCoreVersion>4.4.6</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.3</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
-        <bouncycastleVersion>1.59</bouncycastleVersion>
+        <bouncycastleVersion>1.60</bouncycastleVersion>
         <c3p0Version>0.9.5.2-MULE-001</c3p0Version>
         <caffeineVersion>2.6.2</caffeineVersion>
         <cglibVersion>3.2.6</cglibVersion>
