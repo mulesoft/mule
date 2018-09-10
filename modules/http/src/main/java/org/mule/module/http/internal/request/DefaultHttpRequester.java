@@ -475,10 +475,12 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
     private String resolveURI(MuleEvent muleEvent) throws MessagingException
     {
-        if (url.getRawValue() != null) {
+        if (url.getRawValue() != null)
+        {
             return url.resolveStringValue(muleEvent);
         }
-        else {
+        else
+        {
             String resolvedPath = replaceUriParams(buildPath(basePath.resolveStringValue(muleEvent),
                                                              path.resolveStringValue(muleEvent)), muleEvent);
 
@@ -497,11 +499,14 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     {
         Integer resolvedPort = port.resolveIntegerValue(muleEvent);
         int defaultProtocolPort = requestConfig.getProtocol().getDefaultPort();
-        if (resolvedPort == null) {
+        if (resolvedPort == null)
+        {
             return defaultProtocolPort;
         }
-        else if (resolvedPort < 0) {
-            if (logger.isWarnEnabled()) {
+        else if (resolvedPort < 0)
+        {
+            if (logger.isWarnEnabled())
+            {
                 logger.warn("Invalid port: " + resolvedPort + " for host " + host + ", defaulting to " + defaultProtocolPort);
             }
             return defaultProtocolPort;
