@@ -33,136 +33,149 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultHttpRequesterTestCase extends AbstractMuleContextTestCase {
+public class DefaultHttpRequesterTestCase extends AbstractMuleContextTestCase
+{
+    private static final String TEST_HOST = "TEST_HOST";
+    private static final String TEST_PORT = "TEST_PORT";
 
-  private static final String TEST_HOST = "TEST_HOST";
-  private static final String TEST_PORT = "TEST_PORT";
+    private static final String INVALID_PORT = "-703";
+    private static final String INVALID_PORT_EXPRESSION = "#['"+ INVALID_PORT + "']";
+    private static final String NULL_PORT_EXPRESSION = "#[flowVars.pepe]";
 
-  private static final String INVALID_PORT = "-703";
-  private static final String INVALID_PORT_EXPRESSION = "#['" + INVALID_PORT + "']";
-  private static final String NULL_PORT_EXPRESSION = "#[flowVars.pepe]";
+    private static final String HTTP_DEFAULT_URI = "http://" + TEST_HOST + ":" + HTTP.getDefaultPort() + "/";
+    private static final String HTTPS_DEFAULT_URI = "http://" + TEST_HOST + ":" + HTTPS.getDefaultPort() + "/";
 
-  private static final String HTTP_DEFAULT_URI = "http://" + TEST_HOST + ":" + HTTP.getDefaultPort() + "/";
-  private static final String HTTPS_DEFAULT_URI = "http://" + TEST_HOST + ":" + HTTPS.getDefaultPort() + "/";
+    private final ValueHolder<String> uriValueHolder = new ValueHolder<>();
 
-  private final ValueHolder<String> uriValueHolder = new ValueHolder<>();
+    private DefaultHttpRequester requester = new DefaultHttpRequester();
 
-  private DefaultHttpRequester requester = new DefaultHttpRequester();
+    @Spy
+    private DefaultHttpRequesterConfig config = new DefaultHttpRequesterConfig();
 
-  @Spy
-  private DefaultHttpRequesterConfig config = new DefaultHttpRequesterConfig();
+    @Before
+    public void setup() throws Exception
+    {
+        requester.setMuleContext(muleContext);
+        config.setMuleContext(muleContext);
+        requester.setConfig(config);
+        requester.setPath("/");
 
-  @Before
-  public void setup() throws Exception {
-    requester.setMuleContext(muleContext);
-    config.setMuleContext(muleContext);
-    requester.setConfig(config);
-    requester.setPath("/");
+        HttpClient mockedHttpClient = mock(HttpClient.class);
+        final HttpResponse mockedHttpResponse = mock(HttpResponse.class);
+        InputStreamHttpEntity mockedHttpEntity = mock(InputStreamHttpEntity.class);
+        when(mockedHttpEntity.getInputStream()).thenReturn(null);
+        when(mockedHttpResponse.getEntity()).thenReturn(mockedHttpEntity);
+        when(mockedHttpClient.send((HttpRequest) anyObject(), anyInt(), anyBoolean(), (HttpRequestAuthentication) anyObject())).thenAnswer(new Answer<HttpResponse>() {
+            @Override
+            public HttpResponse answer(InvocationOnMock invocation) throws Throwable {
+                uriValueHolder.set(((HttpRequest)invocation.getArguments()[0]).getUri());
+                return mockedHttpResponse;
+            }
+        });
+        when(config.getHttpClient()).thenReturn(mockedHttpClient);
+    }
 
-    HttpClient mockedHttpClient = mock(HttpClient.class);
-    final HttpResponse mockedHttpResponse = mock(HttpResponse.class);
-    InputStreamHttpEntity mockedHttpEntity = mock(InputStreamHttpEntity.class);
-    when(mockedHttpEntity.getInputStream()).thenReturn(null);
-    when(mockedHttpResponse.getEntity()).thenReturn(mockedHttpEntity);
-    when(mockedHttpClient.send((HttpRequest) anyObject(), anyInt(), anyBoolean(), (HttpRequestAuthentication) anyObject())).thenAnswer(new Answer<HttpResponse>() {
-      @Override
-      public HttpResponse answer(InvocationOnMock invocation) throws Throwable {
-        uriValueHolder.set(((HttpRequest) invocation.getArguments()[0]).getUri());
-        return mockedHttpResponse;
-      }
-    });
-    when(config.getHttpClient()).thenReturn(mockedHttpClient);
-  }
+    @Test
+    public void initializesWithHostAndPortInRequesterConfig() throws InitialisationException
+    {
+        config.setHost(TEST_HOST);
+        config.setPort(TEST_PORT);
+        requester.initialise();
+        assertThat(requester.getHost(), equalTo(TEST_HOST));
+        assertThat(requester.getPort(), equalTo(TEST_PORT));
+    }
 
-  @Test
-  public void initializesWithHostAndPortInRequesterConfig() throws InitialisationException {
-    config.setHost(TEST_HOST);
-    config.setPort(TEST_PORT);
-    requester.initialise();
-    assertThat(requester.getHost(), equalTo(TEST_HOST));
-    assertThat(requester.getPort(), equalTo(TEST_PORT));
-  }
+    @Test
+    public void initializesWithHostAndPortInRequester() throws InitialisationException
+    {
+        requester.setHost(TEST_HOST);
+        requester.setPort(TEST_PORT);
+        requester.initialise();
+        assertThat(requester.getHost(), equalTo(TEST_HOST));
+        assertThat(requester.getPort(), equalTo(TEST_PORT));
+    }
 
-  @Test
-  public void initializesWithHostAndPortInRequester() throws InitialisationException {
-    requester.setHost(TEST_HOST);
-    requester.setPort(TEST_PORT);
-    requester.initialise();
-    assertThat(requester.getHost(), equalTo(TEST_HOST));
-    assertThat(requester.getPort(), equalTo(TEST_PORT));
-  }
+    @Test(expected = InitialisationException.class)
+    public void failsToInitialiseWithoutHost() throws InitialisationException
+    {
+        config.setHost(null);
+        config.setPort(TEST_PORT);
+        requester.initialise();
+    }
 
-  @Test(expected = InitialisationException.class)
-  public void failsToInitialiseWithoutHost() throws InitialisationException {
-    config.setHost(null);
-    config.setPort(TEST_PORT);
-    requester.initialise();
-  }
+    @Test(expected = InitialisationException.class)
+    public void failsToInitializeWithoutPort() throws InitialisationException
+    {
+        config.setHost(TEST_HOST);
+        config.setPort(null);
+        requester.initialise();
+    }
 
-  @Test(expected = InitialisationException.class)
-  public void failsToInitializeWithoutPort() throws InitialisationException {
-    config.setHost(TEST_HOST);
-    config.setPort(null);
-    requester.initialise();
-  }
+    private void executeRequest(String configuredPort) throws Exception{
+        config.setHost(TEST_HOST);
+        config.setPort(configuredPort);
+        requester.initialise();
+        requester.process(getTestEvent(null));
+    }
 
-  private void executeRequest(String configuredPort) throws Exception {
-    config.setHost(TEST_HOST);
-    config.setPort(configuredPort);
-    requester.initialise();
-    requester.process(getTestEvent(null));
-  }
+    private void assertPortResolvedHTTP(String configuredPort) throws Exception {
+        config.setProtocol(HTTP);
+        executeRequest(configuredPort);
+        assertThat(uriValueHolder.get(), is(equalTo(HTTP_DEFAULT_URI)));
+    }
 
-  private void assertPortResolvedHTTP(String configuredPort) throws Exception {
-    config.setProtocol(HTTP);
-    executeRequest(configuredPort);
-    assertThat(uriValueHolder.get(), is(equalTo(HTTP_DEFAULT_URI)));
-  }
+    private void assertPortResolvedHTTPS(String configuredPort) throws Exception {
+        config.setProtocol(HTTPS);
+        executeRequest(configuredPort);
+        assertThat(uriValueHolder.get(), is(equalTo(HTTPS_DEFAULT_URI)));
+    }
 
-  private void assertPortResolvedHTTPS(String configuredPort) throws Exception {
-    config.setProtocol(HTTPS);
-    executeRequest(configuredPort);
-    assertThat(uriValueHolder.get(), is(equalTo(HTTPS_DEFAULT_URI)));
-  }
+    @Test
+    public void validPortWithHttp() throws Exception
+    {
+        assertPortResolvedHTTP("80");
+    }
 
-  @Test
-  public void validPortWithHttp() throws Exception {
-    assertPortResolvedHTTP("80");
-  }
+    @Test
+    public void validPortWithHttps() throws Exception
+    {
+        assertPortResolvedHTTPS("443");
+    }
 
-  @Test
-  public void validPortWithHttps() throws Exception {
-    assertPortResolvedHTTPS("443");
-  }
+    @Test
+    public void invalidPortWithHttp() throws Exception
+    {
+        assertPortResolvedHTTP(INVALID_PORT);
+    }
 
-  @Test
-  public void invalidPortWithHttp() throws Exception {
-    assertPortResolvedHTTP(INVALID_PORT);
-  }
+    @Test
+    public void invalidPortWithHttps() throws Exception
+    {
+        assertPortResolvedHTTPS(INVALID_PORT);
+    }
 
-  @Test
-  public void invalidPortWithHttps() throws Exception {
-    assertPortResolvedHTTPS(INVALID_PORT);
-  }
+    @Test
+    public void invalidPortExpressionWithHttp() throws Exception
+    {
+        assertPortResolvedHTTP(INVALID_PORT_EXPRESSION);
+    }
 
-  @Test
-  public void invalidPortExpressionWithHttp() throws Exception {
-    assertPortResolvedHTTP(INVALID_PORT_EXPRESSION);
-  }
+    @Test
+    public void invalidPortExpressionWithHttps() throws Exception
+    {
+        assertPortResolvedHTTPS(INVALID_PORT_EXPRESSION);
+    }
 
-  @Test
-  public void invalidPortExpressionWithHttps() throws Exception {
-    assertPortResolvedHTTPS(INVALID_PORT_EXPRESSION);
-  }
+    @Test
+    public void nullPortExpressionWithHttp() throws Exception
+    {
+        assertPortResolvedHTTP(NULL_PORT_EXPRESSION);
+    }
 
-  @Test
-  public void nullPortExpressionWithHttp() throws Exception {
-    assertPortResolvedHTTP(NULL_PORT_EXPRESSION);
-  }
-
-  @Test
-  public void nullPortExpressionWithHttps() throws Exception {
-    assertPortResolvedHTTPS(NULL_PORT_EXPRESSION);
-  }
+    @Test
+    public void nullPortExpressionWithHttps() throws Exception
+    {
+        assertPortResolvedHTTPS(NULL_PORT_EXPRESSION);
+    }
 
 }
