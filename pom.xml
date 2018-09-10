@@ -197,7 +197,7 @@
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
-        <javaMailVersion>1.4.3</javaMailVersion>
+        <javaMailVersion>1.6.2</javaMailVersion>
         <javaXmlBindVersion>2.3.0-MULE-001</javaXmlBindVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jdomVersion>1.1.3</jdomVersion>
@@ -798,7 +798,7 @@
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
+                <artifactId>javax.mail-api</artifactId>
                 <version>${javaMailVersion}</version>
                 <exclusions>
                     <exclusion>
@@ -1497,7 +1497,7 @@
                                     <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
                                     <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
                                     <ignoredUsedUndeclaredDependency>javax.inject:javax.inject</ignoredUsedUndeclaredDependency>
-                                    <ignoredUsedUndeclaredDependency>javax.mail:mail</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>javax.mail:javax.mail-api</ignoredUsedUndeclaredDependency>
                                 </ignoredUsedUndeclaredDependencies>
                                 <ignoredUnusedDeclaredDependencies>
                                     <!-- Don't need to worry about this -->
