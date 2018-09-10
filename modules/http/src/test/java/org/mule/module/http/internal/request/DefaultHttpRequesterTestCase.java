@@ -40,7 +40,7 @@ public class DefaultHttpRequesterTestCase extends AbstractMuleContextTestCase
 
     private static final String INVALID_PORT = "-703";
     private static final String INVALID_PORT_EXPRESSION = "#['"+ INVALID_PORT + "']";
-    private static final String NULL_PORT_EXPRESSION = "#[flowVars.pepe]";
+    private static final String NULL_PORT_EXPRESSION = "#[flowVars.nullVariable]";
 
     private static final String HTTP_DEFAULT_URI = "http://" + TEST_HOST + ":" + HTTP.getDefaultPort() + "/";
     private static final String HTTPS_DEFAULT_URI = "http://" + TEST_HOST + ":" + HTTPS.getDefaultPort() + "/";
