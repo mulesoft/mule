@@ -800,12 +800,6 @@
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>${javaMailVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.mule.glassfish.jaxb</groupId>
@@ -1905,8 +1899,8 @@
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[${javaVersion}.0,1.9)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_60,1.9)</Recommended-Jdks>
+                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
+                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
                         </manifestEntries>
                     </archive>
                 </configuration>
