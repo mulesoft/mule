@@ -34,11 +34,6 @@
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeineVersion}</version>
-        </dependency>
 
         <!--Unit Tests-->
         <dependency>
