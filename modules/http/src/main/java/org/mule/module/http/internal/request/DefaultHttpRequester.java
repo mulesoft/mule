@@ -487,10 +487,31 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             // Encode spaces to generate a valid HTTP request.
             resolvedPath = HttpParser.encodeSpaces(resolvedPath);
 
-            return String.format("%s://%s:%s%s", requestConfig.getScheme(), host.resolveStringValue(muleEvent),
-                                 port.resolveIntegerValue(muleEvent), resolvedPath);
+            String resolvedHost = host.resolveStringValue(muleEvent);
+
+            return String.format("%s://%s:%s%s", requestConfig.getScheme(), resolvedHost,
+                                 resolveAndValidatePort(muleEvent, resolvedHost), resolvedPath);
         }
 
+    }
+
+    private Integer resolveAndValidatePort(MuleEvent muleEvent, String host) throws MessagingException
+    {
+        Integer resolvedPort = port.resolveIntegerValue(muleEvent);
+        int defaultProtocolPort = requestConfig.getProtocol().getDefaultPort();
+        if (resolvedPort == null)
+        {
+            return defaultProtocolPort;
+        }
+        else if (resolvedPort < 0)
+        {
+            if (logger.isWarnEnabled())
+            {
+                logger.warn("Invalid port: " + resolvedPort + " for host " + host + ", defaulting to " + defaultProtocolPort);
+            }
+            return defaultProtocolPort;
+        }
+        return resolvedPort;
     }
 
 

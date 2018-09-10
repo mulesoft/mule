@@ -417,4 +417,8 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         this.protocol = protocol;
     }
 
+    public HttpConstants.Protocols getProtocol() {
+        return this.protocol;
+    }
+
 }
