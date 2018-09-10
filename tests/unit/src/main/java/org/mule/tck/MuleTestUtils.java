@@ -21,12 +21,15 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 
 import org.mockito.Mockito;
@@ -76,13 +79,8 @@ public final class MuleTestUtils {
    * Creates an empty flow with the provided name.
    */
   public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
-    final Flow flow = builder(flowName, context).processingStrategyFactory(new DirectProcessingStrategyFactory() {
-
-      @Override
-      public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-        return spy(super.create(muleContext, schedulersNamePrefix));
-      }
-    }).build();
+    final Flow flow = builder(flowName, context)
+        .processingStrategyFactory((muleContext, schedulersNamePrefix) -> spy(new TestDirectProcessingStrategy())).build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));
     return flow;
   }
@@ -161,6 +159,20 @@ public final class MuleTestUtils {
         } else {
           System.setProperty(propertyName, originalPropertyValue);
         }
+      });
+    }
+  }
+
+  public static final class TestDirectProcessingStrategy extends AbstractProcessingStrategy {
+
+    @Override
+    public boolean isSynchronous() {
+      return true;
+    }
+
+    @Override
+    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
+      return new StreamPerEventSink(pipeline, event -> {
       });
     }
   }
