@@ -218,7 +218,7 @@
         <saxonVersion>9.7.0-15</saxonVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
         <snakeYamlVersion>1.21</snakeYamlVersion>
-        <springVersion>4.3.17.RELEASE</springVersion>
+        <springVersion>4.3.18.RELEASE</springVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
