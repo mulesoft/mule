@@ -46,7 +46,6 @@ import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -125,8 +124,6 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -137,6 +134,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
@@ -180,9 +178,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   private AllStatistics stats = new AllStatistics();
 
   private volatile SchedulerService schedulerService;
-
-  private volatile SecurityManager securityManager;
-  private Object securityManagerLock = new Object();
 
   /**
    * LifecycleManager for the MuleContext. Note: this is NOT the same lifecycle manager as the one in the Registry.
@@ -552,13 +547,10 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public void setSecurityManager(SecurityManager securityManager) {
     checkLifecycleForPropertySet(OBJECT_SECURITY_MANAGER, Initialisable.PHASE_NAME);
-    synchronized (securityManagerLock) {
-      try {
-        this.securityManager = null;
-        muleRegistryHelper.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
+    try {
+      muleRegistryHelper.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
     }
   }
 
@@ -571,25 +563,17 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
    */
   @Override
   public SecurityManager getSecurityManager() {
-    if (this.securityManager == null) {
-      synchronized (securityManagerLock) {
-        if (this.securityManager == null) {
-          SecurityManager _securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
-          if (_securityManager == null) {
-            Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
-            if (temp.size() > 0) {
-              _securityManager = (temp.iterator().next());
-            }
-          }
-          if (_securityManager == null) {
-            throw new MuleRuntimeException(objectIsNull("securityManager"));
-          }
-          this.securityManager = _securityManager;
-        }
+    SecurityManager securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
+    if (securityManager == null) {
+      Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
+      if (temp.size() > 0) {
+        securityManager = (temp.iterator().next());
       }
     }
-
-    return this.securityManager;
+    if (securityManager == null) {
+      throw new MuleRuntimeException(objectIsNull("securityManager"));
+    }
+    return securityManager;
   }
 
   @Override
