@@ -7,11 +7,13 @@
 package org.mule.tck;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.of;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -26,9 +28,9 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 
@@ -38,7 +40,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -79,8 +80,9 @@ public final class MuleTestUtils {
    * Creates an empty flow with the provided name.
    */
   public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
-    final Flow flow = builder(flowName, context)
-        .processingStrategyFactory((muleContext, schedulersNamePrefix) -> spy(new TestDirectProcessingStrategy())).build();
+    final Flow flow = builder(flowName, context).processingStrategyFactory((muleContext, schedulersNamePrefix) -> {
+      return withContextClassLoader(MuleTestUtils.class.getClassLoader(), () -> spy(new TestDirectProcessingStrategy()));
+    }).build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));
     return flow;
   }
