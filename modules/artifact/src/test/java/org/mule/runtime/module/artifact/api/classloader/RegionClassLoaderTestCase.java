@@ -74,7 +74,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private static final String GROUP_ID = "com.organization";
   private static final String SPECIFIC_ARTIFACT_ID = "test-artifact";
   private static final String ARTIFACT_VERSION = "1.0.0";
-  private static final String SPECIFIC_RESOURCE_FORMAT = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID + ":%s:%s";
+  private static final String SPECIFIC_RESOURCE_FORMAT = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID + ":%s:%s:%s:%s";
   private static final String API_RESOURCE_NAME = "test-api.raml";
 
   private final URL APP_LOADED_RESOURCE;
@@ -95,7 +95,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     PARENT_LOADED_RESOURCE = new URL("file:///parent.txt");
     APP_LOADED_RESOURCE = new URL("file:///app.txt");
     PLUGIN_LOADED_RESOURCE = new URL("file:///plugin.txt");
-    API_LOCATION = ClassUtils.getResource("com/organization/test-artifact/1.0.0/classloader-test-api.zip", this.getClass());
+    API_LOCATION = ClassUtils.getResource("com/organization/test-artifact/1.0.0/test-artifact-1.0.0-raml.zip", this.getClass());
     API_LOADED_RESOURCE = new URL("jar:" + API_LOCATION.toString() + "!/" + API_RESOURCE_NAME);
     artifactDescriptor = new ArtifactDescriptor(APP_NAME);
   }
@@ -416,54 +416,61 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void findsExportedResourceFromSpecificArtifact() {
-    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, RESOURCE_NAME), PLUGIN_LOADED_RESOURCE);
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "mule-plugin", "jar", RESOURCE_NAME),
+                                     PLUGIN_LOADED_RESOURCE);
   }
 
   @Test
   public void findsExportedResourceFromSpecificArtifactWithNoVersion() {
-    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, "", RESOURCE_NAME), PLUGIN_LOADED_RESOURCE);
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, "*", "mule-plugin", "jar", RESOURCE_NAME),
+                                     PLUGIN_LOADED_RESOURCE);
   }
 
   @Test
   public void findsExportedResourceFromSpecificArtifactWithWrongVersion() {
-    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, "1.2.0", RESOURCE_NAME), PLUGIN_LOADED_RESOURCE);
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, "1.2.0", "mule-plugin", "jar", RESOURCE_NAME),
+                                     PLUGIN_LOADED_RESOURCE);
   }
 
   @Test
   public void doesNotFindNonExportedResourceFromSpecificArtifact() {
-    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, NON_EXPORTED_RESOURCE_NAME), null);
+    getResourceFromExportingArtifact(format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "mule-plugin", "jar",
+                                            NON_EXPORTED_RESOURCE_NAME),
+                                     null);
   }
 
   @Test
   public void findsResourceFromRamlApi() throws Exception {
-    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME),
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml", "zip", API_RESOURCE_NAME),
                                API_LOADED_RESOURCE);
   }
 
   @Test
   public void findsResourceFromRamlFragment() throws Exception {
-    getResourceFromApiArtifact("raml-fragment", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME),
+    getResourceFromApiArtifact("raml-fragment",
+                               format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml-fragment", "zip", API_RESOURCE_NAME),
                                API_LOADED_RESOURCE);
   }
 
   @Test
   public void findsResourceFromOasApi() throws Exception {
-    getResourceFromApiArtifact("oas", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME), API_LOADED_RESOURCE);
+    getResourceFromApiArtifact("oas", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "oas", "zip", API_RESOURCE_NAME),
+                               API_LOADED_RESOURCE);
   }
 
   @Test
   public void doesNotFindNonExistentResourceFromApi() throws Exception {
-    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, RESOURCE_NAME), null);
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml", "zip", RESOURCE_NAME), null);
   }
 
   @Test
   public void doesNotFindResourceFromApiWithNoVersion() throws Exception {
-    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "", RESOURCE_NAME), null);
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "*", "raml", "zip", RESOURCE_NAME), null);
   }
 
   @Test
   public void doesNotFindResourceFromApiWithWrongVersion() throws Exception {
-    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "1.5.6-SNAPSHOT", RESOURCE_NAME), null);
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, "1.5.6-SNAPSHOT", "raml", "zip", RESOURCE_NAME), null);
   }
 
   @Test
@@ -480,13 +487,14 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                 .setArtifactId(SPECIFIC_ARTIFACT_ID)
                 .setVersion(ARTIFACT_VERSION)
                 .setClassifier("raml")
+                .setType("zip")
                 .build())
             .build()))
         .build();
 
     when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
 
-    String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, API_RESOURCE_NAME);
+    String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml", "zip", API_RESOURCE_NAME);
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
@@ -581,6 +589,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
         .setGroupId(GROUP_ID)
         .setArtifactId(SPECIFIC_ARTIFACT_ID)
         .setVersion(ARTIFACT_VERSION)
+        .setClassifier("mule-plugin")
+        .setType("jar")
         .build());
     when(pluginClassloader.findResource(RESOURCE_NAME)).thenReturn(PLUGIN_LOADED_RESOURCE);
     when(pluginClassloader.findResource(NON_EXPORTED_RESOURCE_NAME)).thenReturn(PLUGIN_LOADED_RESOURCE);
@@ -607,6 +617,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                 .setArtifactId(SPECIFIC_ARTIFACT_ID)
                 .setVersion(ARTIFACT_VERSION)
                 .setClassifier(apiKind)
+                .setType("zip")
                 .build())
             .build()))
         .build();
