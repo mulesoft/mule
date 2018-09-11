@@ -260,8 +260,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
         String classifier = matcher.group(4);
         String type = matcher.group(5);
         String resource = matcher.group(6);
-        LOGGER.debug("Region request for '{}' in group '{}', artifact '{}' and version '{}'.", resource, groupId, artifactId,
-                     version);
+        LOGGER.debug("Region request for '{}' in group '{}', artifact '{}' and version '{}', with classifier '{}' and type '{}'.",
+                     resource, groupId, artifactId, version, classifier, type);
         String normalizedResource = normalize(resource, true);
 
         if (API_CLASSIFIERS.contains(classifier) && "zip".equals(type) && !WILDCARD.equals(version)) {
