@@ -100,7 +100,7 @@ public final class MuleTestUtils {
     if (registry != null) {
       registry.registerFlowConstruct(flow);
     }
-    when(mockComponentLocator.find(Location.builder().globalName(flowName).build())).thenReturn(Optional.of(flow));
+    when(mockComponentLocator.find(Location.builder().globalName(flowName).build())).thenReturn(of(flow));
     return flow;
   }
 
@@ -165,7 +165,7 @@ public final class MuleTestUtils {
     }
   }
 
-  public static class TestDirectProcessingStrategy extends AbstractProcessingStrategy {
+  public static class TestDirectProcessingStrategy implements ProcessingStrategy {
 
     @Override
     public boolean isSynchronous() {
