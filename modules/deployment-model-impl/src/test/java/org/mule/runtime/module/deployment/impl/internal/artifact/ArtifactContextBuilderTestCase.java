@@ -12,6 +12,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_WAS_NOT_SET;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.EXECUTION_CLASSLOADER_WAS_NOT_SET;
@@ -22,17 +23,17 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.tck.config.TestServicesConfigurationBuilder;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
 
@@ -46,6 +47,7 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   public void emptyBuilder() throws Exception {
     MuleContext muleContext =
         newBuilder(new TestServicesConfigurationBuilder()).setExecutionClassloader(currentThread().getContextClassLoader())
+            .setRuntimeComponentBuildingDefinitionProvider(getRuntimeComponentBuildingDefinitionProvider())
             .setClassLoaderRepository(mock(ClassLoaderRepository.class)).build().getMuleContext();
     assertThat(muleContext, notNullValue());
     assertThat(muleContext.isInitialised(), is(true));
