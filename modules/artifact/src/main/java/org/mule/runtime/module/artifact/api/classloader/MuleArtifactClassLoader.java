@@ -15,8 +15,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ResourceArtifactDescriptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,7 +49,38 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
   static final String PATH_SEPARATOR = "/";
   static final String RESOURCE_PREFIX = "resource::";
-  static final Pattern GAV_PATTERN = Pattern.compile(RESOURCE_PREFIX + "(\\S+):(\\S+):(\\S+)?:(\\S+)");
+  static final String WILDCARD = "*";
+
+  private static final String NO_WILDCARD_NO_SPACES = "([^\\" + WILDCARD + "|\\s]+)";
+  private static final String NO_SPACES = "(\\S+)";
+
+  static final Pattern GAV_EXTENDED_PATTERN = Pattern.compile(
+                                                              RESOURCE_PREFIX
+                                                                  // groupId
+                                                                  + NO_WILDCARD_NO_SPACES + ":"
+                                                                  // artifactId
+                                                                  + NO_WILDCARD_NO_SPACES + ":"
+                                                                  // version (can be a wildcard)
+                                                                  + NO_SPACES + ":"
+                                                                  // classifier (optional)
+                                                                  + NO_WILDCARD_NO_SPACES + "?:"
+                                                                  // type
+                                                                  + NO_WILDCARD_NO_SPACES + ":"
+                                                                  // resource
+                                                                  + NO_WILDCARD_NO_SPACES);
+
+  private static final Pattern MAVEN_ARTIFACT_PATTERN = Pattern.compile(
+                                                                        PATH_SEPARATOR
+                                                                            // artifactId
+                                                                            + NO_SPACES + PATH_SEPARATOR
+                                                                            // version
+                                                                            + NO_SPACES + PATH_SEPARATOR
+                                                                            // artifactId-version
+                                                                            + "\\1-\\2"
+                                                                            // classifier (optional)
+                                                                            + "-?" + NO_SPACES + "?"
+                                                                            // type
+                                                                            + "\\." + NO_SPACES);
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
@@ -58,7 +90,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
   private ResourceReleaser resourceReleaserInstance;
   private ArtifactDescriptor artifactDescriptor;
-  private Map<String, URLClassLoader> pathMapping = new HashMap<>();
+  private final Object artifactMappingLock = new Object();
+  private Map<ResourceArtifactDescriptor, URLClassLoader> artifactMapping = new HashMap<>();
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -91,37 +124,98 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   @Override
   public URL findResource(String name) {
     if (name.startsWith(RESOURCE_PREFIX)) {
-      Matcher matcher = GAV_PATTERN.matcher(name);
+      Matcher matcher = GAV_EXTENDED_PATTERN.matcher(name);
       // Check for specific artifact requests within our URLs
       if (matcher.matches()) {
         String groupId = matcher.group(1);
         String artifactId = matcher.group(2);
         String version = matcher.group(3);
-        String resource = matcher.group(4);
-        LOGGER.debug("Artifact request for '{}' in group '{}', artifact '{}' and version '{}'.", resource, groupId, artifactId,
-                     version);
+        String classifier = matcher.group(4);
+        String type = matcher.group(5);
+        String resource = matcher.group(6);
+        LOGGER
+            .debug("Artifact request for '{}' in group '{}', artifact '{}' and version '{}', with classifier '{}' and type '{}'.",
+                   resource, groupId, artifactId, version, classifier, type);
         String normalizedResource = normalize(resource, true);
 
-        URLClassLoader classLoader =
-            pathMapping.computeIfAbsent(asPath(groupId, artifactId, version),
-                                        (CheckedFunction<String, URLClassLoader>) path -> Arrays.stream(getURLs())
-                                            .filter(url -> url.getPath().contains(path))
-                                            .findAny()
-                                            .map(url -> new URLClassLoader(new URL[] {url}))
-                                            .orElse(null));
+        ResourceArtifactDescriptor requestDescriptor = new ResourceArtifactDescriptor.Builder()
+            .groupId(groupId)
+            .artifactId(artifactId)
+            .version(version)
+            .classifier(resolveClassifier(classifier))
+            .type(type)
+            .build();
 
+        URLClassLoader classLoader;
+        if (WILDCARD.equals(version)) {
+          // Need to check for equals in this case
+          classLoader = artifactMapping.entrySet().stream()
+              .filter(entry -> entry.getKey().equals(requestDescriptor))
+              .map(Map.Entry::getValue)
+              .findAny().orElse(null);
+        } else {
+          // Otherwise hash will work
+          classLoader = artifactMapping.get(requestDescriptor);
+        }
         if (classLoader != null) {
           return classLoader.findResource(normalizedResource);
+        } else {
+          // Analyze whether there's a matching URL in this CL
+          Optional<URL> match = Arrays.stream(getURLs())
+              .filter(url -> {
+                String urlPath = url.getPath();
+                return urlPath.contains(asPath(requestDescriptor)) && urlPath.endsWith(asExtension(requestDescriptor));
+              })
+              .findFirst();
+          if (match.isPresent()) {
+            URL url = match.get();
+            ResourceArtifactDescriptor matchDescriptor = toResourceArtifactDescriptor(url, groupId);
+            // We don't want class loaders in limbo
+            synchronized (artifactMappingLock) {
+              if (artifactMapping.get(matchDescriptor) == null) {
+                URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {url});
+                artifactMapping.put(matchDescriptor, urlClassLoader);
+              }
+            }
+            return artifactMapping.get(matchDescriptor).findResource(normalizedResource);
+          }
         }
       }
     }
     return super.findResource(name);
   }
 
-  private String asPath(String groupId, String artifactId, String version) {
-    String groupIdPath = DOT_REPLACEMENT_PATTERN.matcher(groupId).replaceAll(PATH_SEPARATOR);
-    String versionPath = version != null ? version : "";
-    return groupIdPath + PATH_SEPARATOR + artifactId + PATH_SEPARATOR + versionPath;
+  private String asPath(ResourceArtifactDescriptor descriptor) {
+    String groupIdPath = getGroupIdPath(descriptor.getGroupId());
+    String versionPath = WILDCARD.equals(descriptor.getVersion()) ? "" : descriptor.getVersion();
+    return groupIdPath + PATH_SEPARATOR + descriptor.getArtifactId() + PATH_SEPARATOR + versionPath;
+  }
+
+  private String asExtension(ResourceArtifactDescriptor descriptor) {
+    return descriptor.getClassifier() + "." + descriptor.getType();
+  }
+
+  private ResourceArtifactDescriptor toResourceArtifactDescriptor(URL artifactUrl, String groupId) {
+    String artifactPath = artifactUrl.getPath();
+    String groupIdPath = getGroupIdPath(groupId);
+    int artifactIdIndex = artifactPath.indexOf(groupIdPath) + groupIdPath.length();
+    Matcher urlMatcher = MAVEN_ARTIFACT_PATTERN.matcher(artifactPath.substring(artifactIdIndex));
+    urlMatcher.find();
+    return new ResourceArtifactDescriptor.Builder()
+        .groupId(groupId)
+        .artifactId(urlMatcher.group(1))
+        .version(urlMatcher.group(2))
+        .classifier(resolveClassifier(urlMatcher.group(3)))
+        .type(urlMatcher.group(4))
+        .build();
+  }
+
+  private String resolveClassifier(String classifier) {
+    return classifier == null ? "" : classifier;
+  }
+
+  private String getGroupIdPath(String groupId) {
+    return DOT_REPLACEMENT_PATTERN.matcher(groupId).replaceAll(PATH_SEPARATOR);
   }
 
   @Override
@@ -150,14 +244,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public void dispose() {
-    pathMapping.forEach((path, classloader) -> {
+    artifactMapping.forEach((descriptor, classloader) -> {
       try {
         classloader.close();
       } catch (IOException e) {
-        reportPossibleLeak(e, path);
+        reportPossibleLeak(e, descriptor.getArtifactId());
       }
     });
-    pathMapping.clear();
+    artifactMapping.clear();
     try {
       createResourceReleaserInstance().release();
     } catch (Exception e) {

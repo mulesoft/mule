@@ -35,7 +35,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -78,6 +77,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private final List<RegionMemberClassLoader> registeredClassLoaders = new ArrayList<>();
   private final Map<String, ArtifactClassLoader> packageMapping = new HashMap<>();
   private final Map<String, List<ArtifactClassLoader>> resourceMapping = new HashMap<>();
+  private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
   private ArtifactClassLoader ownerClassLoader;
 
@@ -251,39 +251,27 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
         }
       }
     } else if (name.startsWith(RESOURCE_PREFIX)) {
-      Matcher matcher = GAV_PATTERN.matcher(name);
+      Matcher matcher = GAV_EXTENDED_PATTERN.matcher(name);
       // Check for specific artifact requests
       if (matcher.matches()) {
         String groupId = matcher.group(1);
         String artifactId = matcher.group(2);
         String version = matcher.group(3);
-        String resource = matcher.group(4);
+        String classifier = matcher.group(4);
+        String type = matcher.group(5);
+        String resource = matcher.group(6);
         LOGGER.debug("Region request for '{}' in group '{}', artifact '{}' and version '{}'.", resource, groupId, artifactId,
                      version);
         String normalizedResource = normalize(resource, true);
 
-        // Check whether it's an exported resource from a matching artifact
-        List<ArtifactClassLoader> exportingArtifactClassLoaders = resourceMapping.get(normalizedResource);
-        if (exportingArtifactClassLoaders != null) {
-          for (ArtifactClassLoader artifactClassLoader : exportingArtifactClassLoaders) {
-            BundleDescriptor descriptor = artifactClassLoader.getArtifactDescriptor().getBundleDescriptor();
-            // The descriptor may not be present during some tests
-            if (descriptor != null && isRequestedArtifact(descriptor, groupId, artifactId, version, () -> {
-              LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
-                          version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
-              return true;
-            })) {
-              return artifactClassLoader.findResource(normalizedResource);
-            }
-          }
-        }
-
-        // Check whether it's a resource from an API dependency, since all those should be considered exported
-        if (version != null) {
+        if (API_CLASSIFIERS.contains(classifier) && "zip".equals(type) && !WILDCARD.equals(version)) {
+          // Check whether it's a resource from an API dependency, since all those should be considered exported
           BundleDescriptor requiredDescriptor = new BundleDescriptor.Builder()
               .setGroupId(groupId)
               .setArtifactId(artifactId)
               .setVersion(version)
+              .setClassifier(classifier)
+              .setType(type)
               .build();
           URLClassLoader classLoader = descriptorMapping.get(requiredDescriptor);
           if (classLoader != null) {
@@ -291,18 +279,38 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
           } else {
             ClassLoaderModel classLoaderModel = this.getArtifactDescriptor().getClassLoaderModel();
             for (BundleDependency dependency : classLoaderModel.getDependencies()) {
-              Optional<String> classifier = dependency.getDescriptor().getClassifier();
-              if (classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get())) {
-                BundleDescriptor descriptor = dependency.getDescriptor();
-                if (isRequestedArtifact(descriptor, groupId, artifactId, version, () -> false)) {
-                  return descriptorMapping.computeIfAbsent(descriptor, (CheckedFunction<BundleDescriptor, URLClassLoader>) d -> {
-                    try {
-                      return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()});
-                    } catch (MalformedURLException e) {
-                      throw new MuleRuntimeException(e);
+              BundleDescriptor descriptor = dependency.getDescriptor();
+              if (isRequestedArtifact(descriptor, groupId, artifactId, version, classifier, type, () -> false)) {
+                return descriptorMapping.computeIfAbsent(descriptor, (CheckedFunction<BundleDescriptor, URLClassLoader>) d -> {
+                  // We don't want class loaders in limbo
+                  synchronized (descriptorMappingLock) {
+                    if (descriptorMapping.containsKey(descriptor)) {
+                      return descriptorMapping.get(descriptor);
+                    } else {
+                      try {
+                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()});
+                      } catch (MalformedURLException e) {
+                        throw new MuleRuntimeException(e);
+                      }
                     }
-                  }).findResource(normalizedResource);
-                }
+                  }
+                }).findResource(normalizedResource);
+              }
+            }
+          }
+        } else {
+          // Check whether it's an exported resource from a matching artifact
+          List<ArtifactClassLoader> exportingArtifactClassLoaders = resourceMapping.get(normalizedResource);
+          if (exportingArtifactClassLoaders != null) {
+            for (ArtifactClassLoader artifactClassLoader : exportingArtifactClassLoaders) {
+              BundleDescriptor descriptor = artifactClassLoader.getArtifactDescriptor().getBundleDescriptor();
+              // The descriptor may not be present during some tests
+              if (descriptor != null && isRequestedArtifact(descriptor, groupId, artifactId, version, classifier, type, () -> {
+                LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
+                            version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+                return true;
+              })) {
+                return artifactClassLoader.findResource(normalizedResource);
               }
             }
           }
@@ -328,12 +336,13 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   }
 
   private boolean isRequestedArtifact(BundleDescriptor descriptor, String groupId, String artifactId, String version,
-                                      Supplier<Boolean> onVersionMismatch) {
+                                      String classifier, String type, Supplier<Boolean> onVersionMismatch) {
     boolean versionResult = true;
-    if (!descriptor.getVersion().equals(version)) {
+    if (!descriptor.getVersion().equals(version) && !WILDCARD.equals(version)) {
       versionResult = onVersionMismatch.get();
     }
-    return descriptor.getGroupId().equals(groupId) && descriptor.getArtifactId().equals(artifactId) && versionResult;
+    return descriptor.getGroupId().equals(groupId) && descriptor.getArtifactId().equals(artifactId) && versionResult
+        && descriptor.getClassifier().orElse("").equals(classifier) && descriptor.getType().equals(type);
   }
 
   @Override

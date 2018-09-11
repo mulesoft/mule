@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 
 public class DefaultResourceLocator implements ResourceLocator {
 
-  private static final String RESOURCE_FORMAT = "resource::%s:%s:%s:%s";
+  private static final String RESOURCE_FORMAT = "resource::%s:%s:%s:%s:%s:%s";
 
   @Override
   public Optional<InputStream> load(String resource, Object caller) {
@@ -31,13 +31,14 @@ public class DefaultResourceLocator implements ResourceLocator {
 
   @Override
   public Optional<InputStream> loadFrom(String resource, String groupId, String artifactId, Optional<String> version,
-                                        Object caller) {
-    return load(format(RESOURCE_FORMAT, groupId, artifactId, version.orElse(""), resource), caller);
+                                        String classifier, String type, Object caller) {
+    return load(format(RESOURCE_FORMAT, groupId, artifactId, version.orElse(""), classifier, type, resource), caller);
   }
 
   @Override
-  public Optional<URL> findIn(String resource, String groupId, String artifactId, Optional<String> version, Object caller) {
-    return find(format(RESOURCE_FORMAT, groupId, artifactId, version.orElse(""), resource), caller);
+  public Optional<URL> findIn(String resource, String groupId, String artifactId, Optional<String> version, String classifier,
+                              String type, Object caller) {
+    return find(format(RESOURCE_FORMAT, groupId, artifactId, version.orElse(""), classifier, type, resource), caller);
   }
 
   private <T> T lookFrom(BiFunction<String, ClassLoader, T> action, String resource, Object caller) {
