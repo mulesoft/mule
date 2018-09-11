@@ -70,8 +70,13 @@ public final class BundleDescriptor {
     if (!artifactId.equals(that.artifactId)) {
       return false;
     }
-    return version.equals(that.version);
-
+    if (!version.equals(that.version)) {
+      return false;
+    }
+    if (!classifier.equals(that.classifier)) {
+      return false;
+    }
+    return type.equals(that.type);
   }
 
   @Override
@@ -79,6 +84,8 @@ public final class BundleDescriptor {
     int result = groupId.hashCode();
     result = 31 * result + artifactId.hashCode();
     result = 31 * result + version.hashCode();
+    result = 31 * result + classifier.hashCode();
+    result = 31 * result + type.hashCode();
     return result;
   }
 

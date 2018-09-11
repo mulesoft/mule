@@ -11,6 +11,7 @@ import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
@@ -280,7 +280,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
             ClassLoaderModel classLoaderModel = this.getArtifactDescriptor().getClassLoaderModel();
             for (BundleDependency dependency : classLoaderModel.getDependencies()) {
               BundleDescriptor descriptor = dependency.getDescriptor();
-              if (isRequestedArtifact(descriptor, groupId, artifactId, version, classifier, type, () -> false)) {
+              if (isRequestedArtifact(descriptor, requiredDescriptor, () -> false)) {
                 return descriptorMapping.computeIfAbsent(descriptor, (CheckedFunction<BundleDescriptor, URLClassLoader>) d -> {
                   // We don't want class loaders in limbo
                   synchronized (descriptorMappingLock) {
@@ -305,11 +305,12 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
             for (ArtifactClassLoader artifactClassLoader : exportingArtifactClassLoaders) {
               BundleDescriptor descriptor = artifactClassLoader.getArtifactDescriptor().getBundleDescriptor();
               // The descriptor may not be present during some tests
-              if (descriptor != null && isRequestedArtifact(descriptor, groupId, artifactId, version, classifier, type, () -> {
-                LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
-                            version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
-                return true;
-              })) {
+              if (descriptor != null
+                  && isRequestedArtifact(descriptor, groupId, artifactId, version, ofNullable(classifier), type, () -> {
+                    LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
+                                version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+                    return true;
+                  })) {
                 return artifactClassLoader.findResource(normalizedResource);
               }
             }
@@ -333,16 +334,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     }
 
     return null;
-  }
-
-  private boolean isRequestedArtifact(BundleDescriptor descriptor, String groupId, String artifactId, String version,
-                                      String classifier, String type, Supplier<Boolean> onVersionMismatch) {
-    boolean versionResult = true;
-    if (!descriptor.getVersion().equals(version) && !WILDCARD.equals(version)) {
-      versionResult = onVersionMismatch.get();
-    }
-    return descriptor.getGroupId().equals(groupId) && descriptor.getArtifactId().equals(artifactId) && versionResult
-        && descriptor.getClassifier().orElse("").equals(classifier) && descriptor.getType().equals(type);
   }
 
   @Override

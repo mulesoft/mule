@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ResourceArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,8 +91,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
   private ResourceReleaser resourceReleaserInstance;
   private ArtifactDescriptor artifactDescriptor;
-  private final Object artifactMappingLock = new Object();
-  private Map<ResourceArtifactDescriptor, URLClassLoader> artifactMapping = new HashMap<>();
+  private final Object descriptorMappingLock = new Object();
+  private Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -138,24 +139,24 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
                    resource, groupId, artifactId, version, classifier, type);
         String normalizedResource = normalize(resource, true);
 
-        ResourceArtifactDescriptor requestDescriptor = new ResourceArtifactDescriptor.Builder()
-            .groupId(groupId)
-            .artifactId(artifactId)
-            .version(version)
-            .classifier(resolveClassifier(classifier))
-            .type(type)
+        BundleDescriptor requestDescriptor = new BundleDescriptor.Builder()
+            .setGroupId(groupId)
+            .setArtifactId(artifactId)
+            .setVersion(version)
+            .setClassifier(classifier)
+            .setType(type)
             .build();
 
         URLClassLoader classLoader;
         if (WILDCARD.equals(version)) {
           // Need to check for equals in this case
-          classLoader = artifactMapping.entrySet().stream()
-              .filter(entry -> entry.getKey().equals(requestDescriptor))
+          classLoader = descriptorMapping.entrySet().stream()
+              .filter(entry -> isRequestedArtifact(entry.getKey(), requestDescriptor, () -> false))
               .map(Map.Entry::getValue)
               .findAny().orElse(null);
         } else {
           // Otherwise hash will work
-          classLoader = artifactMapping.get(requestDescriptor);
+          classLoader = descriptorMapping.get(requestDescriptor);
         }
         if (classLoader != null) {
           return classLoader.findResource(normalizedResource);
@@ -169,15 +170,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
               .findFirst();
           if (match.isPresent()) {
             URL url = match.get();
-            ResourceArtifactDescriptor matchDescriptor = toResourceArtifactDescriptor(url, groupId);
+            BundleDescriptor matchDescriptor = toBundleDescriptor(url, groupId);
             // We don't want class loaders in limbo
-            synchronized (artifactMappingLock) {
-              if (artifactMapping.get(matchDescriptor) == null) {
+            synchronized (descriptorMappingLock) {
+              if (descriptorMapping.get(matchDescriptor) == null) {
                 URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {url});
-                artifactMapping.put(matchDescriptor, urlClassLoader);
+                descriptorMapping.put(matchDescriptor, urlClassLoader);
               }
             }
-            return artifactMapping.get(matchDescriptor).findResource(normalizedResource);
+            return descriptorMapping.get(matchDescriptor).findResource(normalizedResource);
           }
         }
       }
@@ -185,37 +186,48 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     return super.findResource(name);
   }
 
-  private String asPath(ResourceArtifactDescriptor descriptor) {
+  private String asPath(BundleDescriptor descriptor) {
     String groupIdPath = getGroupIdPath(descriptor.getGroupId());
     String versionPath = WILDCARD.equals(descriptor.getVersion()) ? "" : descriptor.getVersion();
     return groupIdPath + PATH_SEPARATOR + descriptor.getArtifactId() + PATH_SEPARATOR + versionPath;
   }
 
-  private String asExtension(ResourceArtifactDescriptor descriptor) {
-    return descriptor.getClassifier() + "." + descriptor.getType();
+  private String asExtension(BundleDescriptor descriptor) {
+    return descriptor.getClassifier().orElse("") + "." + descriptor.getType();
   }
 
-  private ResourceArtifactDescriptor toResourceArtifactDescriptor(URL artifactUrl, String groupId) {
+  private BundleDescriptor toBundleDescriptor(URL artifactUrl, String groupId) {
     String artifactPath = artifactUrl.getPath();
     String groupIdPath = getGroupIdPath(groupId);
     int artifactIdIndex = artifactPath.indexOf(groupIdPath) + groupIdPath.length();
     Matcher urlMatcher = MAVEN_ARTIFACT_PATTERN.matcher(artifactPath.substring(artifactIdIndex));
     urlMatcher.find();
-    return new ResourceArtifactDescriptor.Builder()
-        .groupId(groupId)
-        .artifactId(urlMatcher.group(1))
-        .version(urlMatcher.group(2))
-        .classifier(resolveClassifier(urlMatcher.group(3)))
-        .type(urlMatcher.group(4))
+    return new BundleDescriptor.Builder()
+        .setGroupId(groupId)
+        .setArtifactId(urlMatcher.group(1))
+        .setVersion(urlMatcher.group(2))
+        .setClassifier(urlMatcher.group(3))
+        .setType(urlMatcher.group(4))
         .build();
-  }
-
-  private String resolveClassifier(String classifier) {
-    return classifier == null ? "" : classifier;
   }
 
   private String getGroupIdPath(String groupId) {
     return DOT_REPLACEMENT_PATTERN.matcher(groupId).replaceAll(PATH_SEPARATOR);
+  }
+
+  boolean isRequestedArtifact(BundleDescriptor descriptor, BundleDescriptor artifact, Supplier<Boolean> onVersionMismatch) {
+    return isRequestedArtifact(descriptor, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
+                               artifact.getClassifier(), artifact.getType(), onVersionMismatch);
+  }
+
+  boolean isRequestedArtifact(BundleDescriptor descriptor, String groupId, String artifactId, String version,
+                              Optional<String> classifier, String type, Supplier<Boolean> onVersionMismatch) {
+    boolean versionResult = true;
+    if (!descriptor.getVersion().equals(version) && !WILDCARD.equals(version)) {
+      versionResult = onVersionMismatch.get();
+    }
+    return descriptor.getGroupId().equals(groupId) && descriptor.getArtifactId().equals(artifactId) && versionResult
+        && descriptor.getClassifier().equals(classifier) && descriptor.getType().equals(type);
   }
 
   @Override
@@ -244,14 +256,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public void dispose() {
-    artifactMapping.forEach((descriptor, classloader) -> {
+    descriptorMapping.forEach((descriptor, classloader) -> {
       try {
         classloader.close();
       } catch (IOException e) {
         reportPossibleLeak(e, descriptor.getArtifactId());
       }
     });
-    artifactMapping.clear();
+    descriptorMapping.clear();
     try {
       createResourceReleaserInstance().release();
     } catch (Exception e) {
