@@ -19,7 +19,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -117,7 +116,9 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
     T object = createInstance(prototypeClass);
 
     for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet()) {
-      setField(entry.getKey(), object, resolveCursor(resolveValue(entry.getValue(), context)));
+      setField(entry.getKey(), object,
+               context == null || context.resolveCursors() ? resolveCursor(resolveValue(entry.getValue(), context))
+                   : resolveValue(entry.getValue(), context));
     }
 
     injectFields(object, name, encoding, reflectionCache);
