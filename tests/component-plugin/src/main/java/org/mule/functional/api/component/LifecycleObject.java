@@ -21,7 +21,7 @@ public class LifecycleObject extends AbstractComponent implements Lifecycle {
 
   @Inject
   private MuleContext muleContext;
-  @Inject
+
   private LifecycleObject otherLifecycleObject;
 
   private String failurePhase;
