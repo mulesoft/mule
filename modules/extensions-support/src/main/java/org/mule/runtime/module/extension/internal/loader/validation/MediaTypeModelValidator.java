@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -125,6 +126,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
         MediaTypeModelProperty mediaTypeModelProperty = model.getModelProperty(MediaTypeModelProperty.class).orElse(null);
         return outputTypeNeedsMediaTypeAnnotation(outputMetadataType) &&
             hasMediaTypeModelProperty(model) &&
+            mediaTypeModelPropertyIsStrict(mediaTypeModelProperty) &&
             !mediaTypeModelPropertyHasDefaultValue(mediaTypeModelProperty) &&
             hasStaticMetadataDefined(model, mediaTypeModelProperty.getMediaType().get());
       }
@@ -162,12 +164,17 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
       }
 
       private boolean mediaTypeModelPropertyHasDefaultValue(MediaTypeModelProperty mediaTypeModelProperty) {
-        return !mediaTypeModelProperty.getMediaType().isPresent();
+        return mediaTypeModelProperty != null && !mediaTypeModelProperty.getMediaType().isPresent();
+      }
+
+      private boolean mediaTypeModelPropertyIsStrict(MediaTypeModelProperty mediaTypeModelProperty) {
+        return mediaTypeModelProperty != null && mediaTypeModelProperty.isStrict();
       }
 
       private boolean outputTypeNeedsMediaTypeAnnotation(MetadataType metadataType) {
         return (metadataType instanceof StringType && !metadataType.getAnnotation(EnumAnnotation.class).isPresent())
-            || metadataType instanceof BinaryType;
+            || metadataType instanceof BinaryType
+            || metadataType instanceof AnyType;
       }
 
     }.walk(extensionModel);
