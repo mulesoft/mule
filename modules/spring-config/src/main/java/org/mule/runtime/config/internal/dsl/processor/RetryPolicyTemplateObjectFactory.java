@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.D
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -67,8 +68,13 @@ public class RetryPolicyTemplateObjectFactory extends AbstractComponentFactory<R
 
   @Override
   public RetryPolicyTemplate doGetObject() throws Exception {
-    SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
-    retryPolicyTemplate.setNotificationFirer(notificationFirer);
+    RetryPolicyTemplate retryPolicyTemplate;
+    if (count != 0) {
+      retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
+      ((SimpleRetryPolicyTemplate) retryPolicyTemplate).setNotificationFirer(notificationFirer);
+    } else {
+      retryPolicyTemplate = new NoRetryPolicyTemplate();
+    }
     if (retryNotifier != null) {
       retryPolicyTemplate.setNotifier(retryNotifier);
     }
