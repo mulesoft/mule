@@ -23,7 +23,9 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.Scope;
@@ -57,7 +59,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private MessageProcessorChain nestedChain;
   private Predicate<CoreEvent> shouldRetry;
-  private SimpleRetryPolicyTemplate policyTemplate;
+  private RetryPolicyTemplate policyTemplate;
   private Scheduler timer;
   private List<Processor> processors;
 
@@ -70,7 +72,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     this.nestedChain = newChain(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
     timer = schedulerService.cpuLightScheduler();
-    policyTemplate = new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries);
+    policyTemplate =
+        maxRetries > 0 ? new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries) : new NoRetryPolicyTemplate();
     shouldRetry = event -> event.getError().isPresent();
   }
 

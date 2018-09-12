@@ -70,7 +70,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
                                       Function<Throwable, Throwable> errorFunction,
                                       Scheduler retryScheduler) {
     return from(publisher).onErrorResume(e -> {
-      if (this.count > 0 && shouldRetry.test(e)) {
+      if (shouldRetry.test(e)) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Retrying execution of event...");
         }

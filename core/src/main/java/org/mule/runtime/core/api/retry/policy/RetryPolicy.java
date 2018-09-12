@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+import static reactor.core.publisher.Mono.from;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -74,7 +76,11 @@ public interface RetryPolicy {
                                        Consumer<Throwable> onExhausted,
                                        Function<Throwable, Throwable> errorFunction,
                                        Scheduler retryScheduler) {
-    return publisher;
+    return from(publisher).onErrorMap(e -> {
+      e = unwrap(e);
+      onExhausted.accept(e);
+      return errorFunction.apply(e);
+    });
   }
 
 }
