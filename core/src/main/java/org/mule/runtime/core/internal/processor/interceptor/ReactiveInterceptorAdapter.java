@@ -30,6 +30,7 @@ import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -261,17 +262,27 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
           builder.internalParameters(interceptionEventParams);
         });
+      } catch (ExpressionRuntimeException e) {
+        // Some operation parameter threw an expression exception.
+        // Continue with the interception as it it were not an operation so that the call to `before` is guaranteed.
+        setInternalParamsForNotParamResolver(processor, resolvedParameters, builder);
       } catch (MuleException e) {
         throw new InterceptionException(e);
       }
     } else {
-      Map<String, Object> interceptionEventParams = new HashMap<>();
-      interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
-      interceptionEventParams.put(INTERCEPTION_COMPONENT, processor);
-      builder.internalParameters(interceptionEventParams);
+      setInternalParamsForNotParamResolver(processor, resolvedParameters, builder);
     }
 
     return builder.build();
+  }
+
+  protected void setInternalParamsForNotParamResolver(Processor processor,
+                                                      Map<String, ProcessorParameterValue> resolvedParameters,
+                                                      InternalEvent.Builder builder) {
+    Map<String, Object> interceptionEventParams = new HashMap<>();
+    interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
+    interceptionEventParams.put(INTERCEPTION_COMPONENT, processor);
+    builder.internalParameters(interceptionEventParams);
   }
 
   protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor,
