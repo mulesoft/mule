@@ -181,13 +181,19 @@ public class ModuleFlowProcessingPhase
       fireNotification(ctx.messageProcessContext.getMessageSource(), successResult.getResult(),
                        flowConstruct, MESSAGE_RESPONSE);
       try {
-        return from(ctx.template
-            .sendResponseToClient(successResult.getResult(), successResult.getResponseParameters().get()))
-                .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
-                                              right(successResult.getResult())))
-                .onErrorResume(e -> policySuccessError(new SourceErrorException(successResult.getResult(),
-                                                                                sourceResponseSendErrorType, e),
-                                                       successResult, ctx, flowConstruct, messageSource));
+        Publisher<Void> sendResponseToClient = Mono.empty().doOnNext(v -> {
+          logger.error("This seems like a good place to apply an interceptor...");
+        }).transform(v -> ctx.template.sendResponseToClient(successResult.getResult(),
+                                                            successResult.getResponseParameters().get()));
+
+        // Publisher<Void> sendResponseToClient =
+        // ctx.template.sendResponseToClient(successResult.getResult(), successResult.getResponseParameters().get());
+        return from(sendResponseToClient)
+            .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
+                                          right(successResult.getResult())))
+            .onErrorResume(e -> policySuccessError(new SourceErrorException(successResult.getResult(),
+                                                                            sourceResponseSendErrorType, e),
+                                                   successResult, ctx, flowConstruct, messageSource));
       } catch (Exception e) {
         return policySuccessError(new SourceErrorException(successResult.getResult(), sourceResponseGenerateErrorType, e),
                                   successResult, ctx, flowConstruct, messageSource);
@@ -241,8 +247,13 @@ public class ModuleFlowProcessingPhase
                                             messagingException));
     } else {
       try {
-        return from(ctx.template
-            .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
+        Publisher<Void> sendFailureResponseToClient = Mono.empty().doOnNext(v -> {
+          logger.error("This seems like a good place to apply an interceptor for errors...");
+        }).transform(v -> ctx.template.sendFailureResponseToClient(messagingException, errorParameters.apply(event)));
+
+        // Publisher<Void> sendFailureResponseToClient = ctx.template
+        // .sendFailureResponseToClient(messagingException, errorParameters.apply(event));
+        return from(sendFailureResponseToClient)
                 .onErrorMap(e -> new SourceErrorException(builder(messagingException.getEvent())
                     .error(builder(e).errorType(sourceErrorResponseSendErrorType).build()).build(),
                                                           sourceErrorResponseSendErrorType, e));
