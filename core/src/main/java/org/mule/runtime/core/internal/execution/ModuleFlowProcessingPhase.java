@@ -39,6 +39,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
@@ -52,12 +53,14 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
+import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorSourceCallbackAdapter;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -69,11 +72,15 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.reactivestreams.Publisher;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import javax.inject.Inject;
 
 import reactor.core.publisher.Mono;
 
@@ -95,6 +102,11 @@ public class ModuleFlowProcessingPhase
 
   private final PolicyManager policyManager;
 
+  private List<ReactiveInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
+
+  @Inject
+  private ProcessorInterceptorManager processorInterceptorManager;
+
   public ModuleFlowProcessingPhase(PolicyManager policyManager) {
     this.policyManager = policyManager;
   }
@@ -108,6 +120,19 @@ public class ModuleFlowProcessingPhase
     sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND).get();
     sourceErrorResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_GENERATE).get();
     sourceErrorResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_SEND).get();
+
+    if (processorInterceptorManager != null) {
+      processorInterceptorManager.getInterceptorFactories().stream().forEach(interceptorFactory -> {
+        ReactiveInterceptorSourceCallbackAdapter reactiveInterceptorAdapter =
+            new ReactiveInterceptorSourceCallbackAdapter(interceptorFactory);
+        try {
+          muleContext.getInjector().inject(reactiveInterceptorAdapter);
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
+        }
+        additionalInterceptors.add(0, reactiveInterceptorAdapter);
+      });
+    }
   }
 
   @Override
@@ -181,14 +206,13 @@ public class ModuleFlowProcessingPhase
       fireNotification(ctx.messageProcessContext.getMessageSource(), successResult.getResult(),
                        flowConstruct, MESSAGE_RESPONSE);
       try {
-        Publisher<Void> sendResponseToClient = Mono.empty().doOnNext(v -> {
-          logger.error("This seems like a good place to apply an interceptor...");
-        }).transform(v -> ctx.template.sendResponseToClient(successResult.getResult(),
-                                                            successResult.getResponseParameters().get()));
+        Function<SourcePolicySuccessResult, Publisher<Void>> sendResponseToClient =
+            result -> ctx.template.sendResponseToClient(result.getResult(), result.getResponseParameters().get());
+        for (ReactiveInterceptorSourceCallbackAdapter interceptor : additionalInterceptors) {
+          sendResponseToClient = interceptor.apply(messageSource, sendResponseToClient);
+        }
 
-        // Publisher<Void> sendResponseToClient =
-        // ctx.template.sendResponseToClient(successResult.getResult(), successResult.getResponseParameters().get());
-        return from(sendResponseToClient)
+        return from(sendResponseToClient.apply(successResult))
             .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
                                           right(successResult.getResult())))
             .onErrorResume(e -> policySuccessError(new SourceErrorException(successResult.getResult(),
@@ -230,8 +254,9 @@ public class ModuleFlowProcessingPhase
     return when(just(messagingException).flatMapMany(flowConstruct.getExceptionListener()).last()
         .onErrorResume(e -> empty()),
                 sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx, flowConstruct)
-                    .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer, left(messagingException))))
-                        .then();
+                    .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
+                                                  left(messagingException))))
+                                                      .then();
   }
 
   /*
@@ -247,13 +272,8 @@ public class ModuleFlowProcessingPhase
                                             messagingException));
     } else {
       try {
-        Publisher<Void> sendFailureResponseToClient = Mono.empty().doOnNext(v -> {
-          logger.error("This seems like a good place to apply an interceptor for errors...");
-        }).transform(v -> ctx.template.sendFailureResponseToClient(messagingException, errorParameters.apply(event)));
-
-        // Publisher<Void> sendFailureResponseToClient = ctx.template
-        // .sendFailureResponseToClient(messagingException, errorParameters.apply(event));
-        return from(sendFailureResponseToClient)
+        return from(ctx.template
+            .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
                 .onErrorMap(e -> new SourceErrorException(builder(messagingException.getEvent())
                     .error(builder(e).errorType(sourceErrorResponseSendErrorType).build()).build(),
                                                           sourceErrorResponseSendErrorType, e));

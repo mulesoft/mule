@@ -77,7 +77,7 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
   private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
                                                     Processor component, Map<String, String> dslParameters,
                                                     ReactiveProcessor next) {
-    final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
+    final InternalEvent eventWithResolvedParams = addResolvedParameters(event, (Component) component, dslParameters);
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
     final ReactiveInterceptionAction reactiveInterceptionAction =
