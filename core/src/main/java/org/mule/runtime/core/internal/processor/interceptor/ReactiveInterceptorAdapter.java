@@ -27,8 +27,6 @@ import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -39,7 +37,6 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import org.slf4j.Logger;
@@ -51,27 +48,18 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javax.inject.Inject;
-
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
  *
  * @since 4.0
  */
-public class ReactiveInterceptorAdapter implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> {
+public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
+    implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
 
   private static final String BEFORE_METHOD_NAME = "before";
   private static final String AFTER_METHOD_NAME = "after";
-
-  private static final String INTERCEPTION_COMPONENT = "core:interceptionComponent";
-
-  @Inject
-  private MuleContext muleContext;
-
-  @Inject
-  private ExtendedExpressionManager expressionManager;
 
   private ProcessorInterceptorFactory interceptorFactory;
 
@@ -108,19 +96,63 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       return publisher -> from(publisher)
           .concatMap(event -> just(event)
               .cast(InternalEvent.class)
-              .map(doBefore(interceptor, component, dslParameters))
+              .map(doBefore(interceptor, (Component) component, dslParameters))
               .cast(CoreEvent.class)
               .transform(next)
               .onErrorMap(MessagingException.class,
-                          error -> createMessagingException(doAfter(interceptor, component, of(error.getCause()))
+                          error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
                               .apply((InternalEvent) error.getEvent()),
                                                             error.getCause(), (Component) component, of(error)))
               .cast(InternalEvent.class)
-              .map(doAfter(interceptor, component, empty()))
+              .map(doAfter(interceptor, (Component) component, empty()))
               .errorStrategyStop());
     } else {
       return next;
     }
+  }
+
+  protected Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Component component,
+                                                            Map<String, String> dslParameters) {
+    return event -> {
+      final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
+      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
+                     component.getLocation().getLocation());
+      }
+
+      try {
+        withContextClassLoader(interceptor.getClass().getClassLoader(),
+                               () -> interceptor.before(component.getLocation(),
+                                                        getResolvedParams(eventWithResolvedParams),
+                                                        interceptionEvent));
+        return interceptionEvent.resolve();
+      } catch (Exception e) {
+        throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
+      }
+    };
+  }
+
+  protected Function<InternalEvent, InternalEvent> doAfter(ProcessorInterceptor interceptor, Component component,
+                                                           Optional<Throwable> thrown) {
+    return event -> {
+      final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
+      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
+                     component.getLocation().getLocation());
+      }
+
+      try {
+        withContextClassLoader(interceptor.getClass().getClassLoader(),
+                               () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
+        return interceptionEvent.resolve();
+      } catch (Exception e) {
+        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
+      }
+    };
   }
 
   private boolean implementsBeforeOrAfter(ProcessorInterceptor interceptor) {
@@ -134,72 +166,12 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     }
   }
 
-  private Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Processor component,
-                                                          Map<String, String> dslParameters) {
-    return event -> {
-      final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
-      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
-                     ((Component) component).getLocation().getLocation());
-      }
-
-      try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.before(((Component) component).getLocation(),
-                                                        getResolvedParams(eventWithResolvedParams),
-                                                        interceptionEvent));
-        return interceptionEvent.resolve();
-      } catch (Exception e) {
-        throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), (Component) component));
-      }
-    };
-  }
-
-  protected Map<String, ProcessorParameterValue> getResolvedParams(final InternalEvent eventWithResolvedParams) {
-    return (Map<String, ProcessorParameterValue>) eventWithResolvedParams.getInternalParameters()
-        .get(INTERCEPTION_RESOLVED_PARAMS);
-  }
-
-  private Function<InternalEvent, InternalEvent> doAfter(ProcessorInterceptor interceptor, Processor component,
-                                                         Optional<Throwable> thrown) {
-    return event -> {
-      final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
-      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
-                     ((Component) component).getLocation().getLocation());
-      }
-
-      try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.after(((Component) component).getLocation(), interceptionEvent, thrown));
-        return interceptionEvent.resolve();
-      } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), (Component) component, empty()));
-      }
-    };
-  }
-
   private boolean isInterceptable(Processor component) {
     return ((Component) component).getLocation() != null;
   }
 
-  protected InternalEvent addResolvedParameters(InternalEvent event, Processor component, Map<String, String> dslParameters) {
-    boolean sameComponent = internalParametersFrom(event).containsKey(INTERCEPTION_COMPONENT)
-        ? component.equals(internalParametersFrom(event).get(INTERCEPTION_COMPONENT))
-        : false;
-
-    if (!sameComponent || !internalParametersFrom(event).containsKey(INTERCEPTION_RESOLVED_PARAMS)) {
-      return resolveParameters(removeResolvedParameters(event), component, dslParameters);
-    } else {
-      return event;
-    }
-  }
-
-  private InternalEvent removeResolvedParameters(InternalEvent event) {
+  @Override
+  protected InternalEvent removeResolvedParameters(InternalEvent event) {
     if (internalParametersFrom(event).containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
       Processor processor = (Processor) internalParametersFrom(event).get(INTERCEPTION_COMPONENT);
 
@@ -214,18 +186,11 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       }
     }
 
-    return InternalEvent.builder(event)
-        .removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS)
-        .removeInternalParameter(INTERCEPTION_COMPONENT)
-        .removeInternalParameter(INTERCEPTION_RESOLVED_CONTEXT)
-        .build();
+    return super.removeResolvedParameters(event);
   }
 
-  private Map<String, ?> internalParametersFrom(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameters();
-  }
-
-  private InternalEvent resolveParameters(InternalEvent event, Processor processor, Map<String, String> parameters) {
+  @Override
+  protected InternalEvent resolveParameters(InternalEvent event, Component component, Map<String, String> parameters) {
     Map<String, ProcessorParameterValue> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
       String providedValue = entry.getValue();
@@ -235,11 +200,11 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
         // handling exceptions here in the interceptor adapter code. Any exception is to be handling by the interceptor
         // implementation
         if (expressionManager.isExpression(providedValue)) {
-          if (processor instanceof LoggerMessageProcessor || processor instanceof ParseTemplateProcessor) {
-            return expressionManager.parseLogTemplate(providedValue, event, ((Component) processor).getLocation(),
+          if (component instanceof LoggerMessageProcessor || component instanceof ParseTemplateProcessor) {
+            return expressionManager.parseLogTemplate(providedValue, event, component.getLocation(),
                                                       NULL_BINDING_CONTEXT);
           } else {
-            return expressionManager.evaluate(providedValue, event, ((Component) processor).getLocation()).getValue();
+            return expressionManager.evaluate(providedValue, event, component.getLocation()).getValue();
           }
         } else {
           return valueOf(providedValue);
@@ -249,52 +214,37 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
     InternalEvent.Builder builder = InternalEvent.builder(event);
 
-    if (processor instanceof ParametersResolverProcessor) {
+    setInternalParamsForNotParamResolver(component, resolvedParameters, builder);
+
+    return builder.build();
+  }
+
+  @Override
+  protected void setInternalParamsForNotParamResolver(Component component,
+                                                      Map<String, ProcessorParameterValue> resolvedParameters,
+                                                      InternalEvent.Builder builder) {
+    if (component instanceof ParametersResolverProcessor) {
       try {
-        ((ParametersResolverProcessor<?>) processor).resolveParameters(builder, (params, context) -> {
+        ((ParametersResolverProcessor<?>) component).resolveParameters(builder, (params, context) -> {
           resolvedParameters.putAll(params.entrySet().stream()
               .collect(toMap(e -> e.getKey(),
                              e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
           Map<String, Object> interceptionEventParams = new HashMap<>();
           interceptionEventParams.put(INTERCEPTION_RESOLVED_CONTEXT, context);
           interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
-          interceptionEventParams.put(INTERCEPTION_COMPONENT, processor);
+          interceptionEventParams.put(INTERCEPTION_COMPONENT, component);
 
           builder.internalParameters(interceptionEventParams);
         });
       } catch (ExpressionRuntimeException e) {
         // Some operation parameter threw an expression exception.
         // Continue with the interception as it it were not an operation so that the call to `before` is guaranteed.
-        setInternalParamsForNotParamResolver(processor, resolvedParameters, builder);
+        super.setInternalParamsForNotParamResolver(component, resolvedParameters, builder);
       } catch (MuleException e) {
         throw new InterceptionException(e);
       }
     } else {
-      setInternalParamsForNotParamResolver(processor, resolvedParameters, builder);
+      super.setInternalParamsForNotParamResolver(component, resolvedParameters, builder);
     }
-
-    return builder.build();
-  }
-
-  protected void setInternalParamsForNotParamResolver(Processor processor,
-                                                      Map<String, ProcessorParameterValue> resolvedParameters,
-                                                      InternalEvent.Builder builder) {
-    Map<String, Object> interceptionEventParams = new HashMap<>();
-    interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
-    interceptionEventParams.put(INTERCEPTION_COMPONENT, processor);
-    builder.internalParameters(interceptionEventParams);
-  }
-
-  protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor,
-                                                        Optional<MessagingException> original) {
-    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
-    MessagingException me = new MessagingException(event, cause, processor);
-    original.ifPresent(error -> error.getInfo().forEach((name, info) -> me.addInfo(name, info)));
-
-    return exceptionResolver.resolve(me, muleContext);
-  }
-
-  protected MuleContext getMuleContext() {
-    return muleContext;
   }
 }
