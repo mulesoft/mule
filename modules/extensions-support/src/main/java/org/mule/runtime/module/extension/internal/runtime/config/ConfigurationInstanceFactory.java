@@ -8,11 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -66,7 +65,7 @@ public final class ConfigurationInstanceFactory<T> {
     this.configurationModel = configurationModel;
     this.muleContext = muleContext;
     configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
-    requiresConnection = !getConnectedComponents(extensionModel, configurationModel).isEmpty();
+    requiresConnection = supportsConnectivity(extensionModel, configurationModel);
     implicitConnectionProviderFactory =
         new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, reflectionCache, muleContext);
   }
