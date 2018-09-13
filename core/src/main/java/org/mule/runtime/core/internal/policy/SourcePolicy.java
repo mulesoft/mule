@@ -24,7 +24,6 @@ public interface SourcePolicy {
    * Process the source policy chain of processors. The provided {@code nextOperation} function has the behaviour to be executed
    * by the next-operation of the chain which may be the next policy in the chain or the flow execution.
    *
-   *
    * @param sourceEvent the event with the data created from the source message that must be used to execute the source policy.
    *        execute the successful or failure response function of the source.
    * @return the result of processing the {@code event} through the policy chain.

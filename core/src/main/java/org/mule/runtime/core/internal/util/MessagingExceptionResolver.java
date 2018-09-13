@@ -29,6 +29,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -36,6 +37,7 @@ import org.mule.runtime.core.internal.policy.FlowExecutionException;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -66,13 +68,35 @@ public class MessagingExceptionResolver {
    * highest position in the causes list
    *
    * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link CoreEvent}
+   *
+   * @deprecated Use {@link #resolve(MessagingException, ErrorTypeLocator, Collection)} instead.
    */
+  @Deprecated
   public MessagingException resolve(final MessagingException me, MuleContext context) {
-    ErrorTypeLocator locator = ((PrivilegedMuleContext) context).getErrorTypeLocator();
+    return resolve(me, ((PrivilegedMuleContext) context).getErrorTypeLocator(), context.getExceptionContextProviders());
+  }
+
+  /**
+   * Resolves a new {@link MessagingException} with the real cause of the problem based on the content of an Incoming
+   * {@link MessagingException} with a chain of causes inside it and the current event that the exception is carrying.
+   * <p>
+   * This method will pick the FIRST cause exception that has a mule or extension KNOWN error as the real cause, if there is not
+   * an exception in the causes that match with an Known error type then this method will try to find the error that the current
+   * {@link Event} is carrying.
+   * <p>
+   * When there are multiple exceptions that contains the same root error type, then this method will wrap the one that has
+   * highest position in the causes list
+   *
+   * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link CoreEvent}
+   *
+   * @since 4.1.3
+   */
+  public MessagingException resolve(final MessagingException me, ErrorTypeLocator locator,
+                                    Collection<ExceptionContextProvider> exceptionContextProviders) {
     Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
 
     if (!rootCause.isPresent()) {
-      return updateCurrent(me, component, context);
+      return updateCurrent(me, component, locator, exceptionContextProviders);
     }
 
     Throwable root = rootCause.get().getFirst();
@@ -100,7 +124,7 @@ public class MessagingExceptionResolver {
     if (me.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
       result.addInfo(INFO_ALREADY_LOGGED_KEY, me.getInfo().get(INFO_ALREADY_LOGGED_KEY));
     }
-    return enrich(result, failingComponent, event, context);
+    return enrich(result, failingComponent, event, exceptionContextProviders);
   }
 
   private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, ErrorTypeLocator locator) {
@@ -141,14 +165,14 @@ public class MessagingExceptionResolver {
     return errors;
   }
 
-  private MessagingException updateCurrent(MessagingException me, Component processor, MuleContext context) {
-    CoreEvent errorEvent =
-        createErrorEvent(me.getEvent(), processor, me, ((PrivilegedMuleContext) context).getErrorTypeLocator());
+  private MessagingException updateCurrent(MessagingException me, Component processor, ErrorTypeLocator locator,
+                                           Collection<ExceptionContextProvider> exceptionContextProviders) {
+    CoreEvent errorEvent = createErrorEvent(me.getEvent(), processor, me, locator);
     Component failingProcessor = me.getFailingComponent() != null ? me.getFailingComponent() : processor;
     MessagingException updated =
         me instanceof FlowExecutionException ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)
             : new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
-    return enrich(updated, failingProcessor, errorEvent, context);
+    return enrich(updated, failingProcessor, errorEvent, exceptionContextProviders);
   }
 
   private Optional<Component> getFailingProcessor(MessagingException me, Throwable root) {
@@ -172,9 +196,10 @@ public class MessagingExceptionResolver {
     return cause instanceof MessagingException && ((MessagingException) cause).getEvent().getError().isPresent();
   }
 
-  private MessagingException enrich(MessagingException me, Component failing, CoreEvent event, MuleContext context) {
+  private MessagingException enrich(MessagingException me, Component failing, CoreEvent event,
+                                    Collection<ExceptionContextProvider> exceptionContextProviders) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
-    context.getExceptionContextProviders().forEach(cp -> {
+    exceptionContextProviders.forEach(cp -> {
       cp.getContextInfo(notificationInfo, failing).forEach((k, v) -> me.getInfo().putIfAbsent(k, v));
     });
     return me;

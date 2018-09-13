@@ -11,15 +11,18 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.interception.ProcessorInterceptorFactory.INTERCEPTORS_ORDER_REGISTRY_KEY;
+import static org.mule.runtime.api.interception.SourceInterceptorFactory.SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory.ProcessorInterceptorOrder;
+import org.mule.runtime.api.interception.SourceInterceptorFactory;
+import org.mule.runtime.api.interception.SourceInterceptorFactory.SourceInterceptorOrder;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.internal.interception.InterceptorManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +31,15 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class DefaultProcessorInterceptorManager implements ProcessorInterceptorManager, Initialisable {
+public class DefaultProcessorInterceptorManager implements InterceptorManager, Initialisable {
 
   @Inject
   private MuleContext context;
 
   private List<ProcessorInterceptorFactory> interceptorFactories = new ArrayList<>();
+  private List<SourceInterceptorFactory> sourceInterceptorFactories = new ArrayList<>();
   private List<String> interceptorsOrder = new ArrayList<>();
+  private List<String> sourceInterceptorsOrder = new ArrayList<>();
 
   @Override
   @Inject
@@ -44,8 +49,22 @@ public class DefaultProcessorInterceptorManager implements ProcessorInterceptorM
   }
 
   @Override
+  @Inject
+  @Named(SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY)
+  public void setSourceInterceptorsOrder(Optional<SourceInterceptorOrder> packagesOrder) {
+    sourceInterceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
+  }
+
+  @Override
   public void initialise() throws InitialisationException {
     interceptorFactories.forEach(interceptorFactory -> {
+      try {
+        context.getInjector().inject(interceptorFactory);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
+    sourceInterceptorFactories.forEach(interceptorFactory -> {
       try {
         context.getInjector().inject(interceptorFactory);
       } catch (MuleException e) {
@@ -61,6 +80,12 @@ public class DefaultProcessorInterceptorManager implements ProcessorInterceptorM
   }
 
   @Override
+  @Inject
+  public void setSourceInterceptorFactories(Optional<List<SourceInterceptorFactory>> interceptorFactories) {
+    this.sourceInterceptorFactories = interceptorFactories.orElse(emptyList());
+  }
+
+  @Override
   public List<ProcessorInterceptorFactory> getInterceptorFactories() {
     final List<ProcessorInterceptorFactory> sortedInterceptors = new ArrayList<>(interceptorFactories);
 
@@ -72,6 +97,26 @@ public class DefaultProcessorInterceptorManager implements ProcessorInterceptorM
   private int orderIndexOf(ProcessorInterceptorFactory factory) {
     int i = 0;
     for (String interceptorsOrderItem : interceptorsOrder) {
+      if (factory.getClass().getName().startsWith(interceptorsOrderItem)) {
+        return i;
+      }
+      ++i;
+    }
+    return MAX_VALUE;
+  }
+
+  @Override
+  public List<SourceInterceptorFactory> getSourceInterceptorFactories() {
+    final List<SourceInterceptorFactory> sortedInterceptors = new ArrayList<>(sourceInterceptorFactories);
+
+    sortedInterceptors.sort((o1, o2) -> orderIndexOf(o1) - orderIndexOf(o2));
+
+    return unmodifiableList(sortedInterceptors);
+  }
+
+  private int orderIndexOf(SourceInterceptorFactory factory) {
+    int i = 0;
+    for (String interceptorsOrderItem : sourceInterceptorsOrder) {
       if (factory.getClass().getName().startsWith(interceptorsOrderItem)) {
         return i;
       }

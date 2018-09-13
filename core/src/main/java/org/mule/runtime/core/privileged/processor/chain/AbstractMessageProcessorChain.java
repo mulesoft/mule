@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
@@ -109,7 +109,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
 
   @Inject
-  private ProcessorInterceptorManager processorInterceptorManager;
+  private InterceptorManager processorInterceptorManager;
 
   @Inject
   private StreamingManager streamingManager;
