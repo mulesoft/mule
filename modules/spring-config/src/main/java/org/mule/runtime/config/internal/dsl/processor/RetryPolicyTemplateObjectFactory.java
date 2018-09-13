@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.config.internal.dsl.processor;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
@@ -71,10 +69,7 @@ public class RetryPolicyTemplateObjectFactory extends AbstractComponentFactory<R
   @Override
   public RetryPolicyTemplate doGetObject() throws Exception {
     RetryPolicyTemplate retryPolicyTemplate;
-    if (count < 0) {
-      throw new IllegalArgumentException("The number of retries configured should be a positive number, or 0.");
-    }
-    if (count > 0) {
+    if (count != 0) {
       retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
       ((SimpleRetryPolicyTemplate) retryPolicyTemplate).setNotificationFirer(notificationFirer);
     } else {

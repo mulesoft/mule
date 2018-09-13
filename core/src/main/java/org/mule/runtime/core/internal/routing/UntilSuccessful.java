@@ -69,15 +69,11 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       throw new InitialisationException(createStaticMessage("One message processor must be configured within 'until-successful'."),
                                         this);
     }
-    if (maxRetries < 0) {
-      throw new InitialisationException(createStaticMessage("The number of retries configured within 'until-successful' should be a positive number, or 0."),
-                                        this);
-    }
     this.nestedChain = newChain(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
     timer = schedulerService.cpuLightScheduler();
     policyTemplate =
-        maxRetries > 0 ? new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries) : new NoRetryPolicyTemplate();
+        maxRetries != 0 ? new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries) : new NoRetryPolicyTemplate();
     shouldRetry = event -> event.getError().isPresent();
   }
 
