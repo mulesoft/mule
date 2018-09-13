@@ -440,7 +440,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * @param message
      * @return creates a new {@link org.mule.api.MuleMessage} with message as payload
      */
-    protected MuleMessage getTestMuleMessage(Object message)
+    protected static MuleMessage getTestMuleMessage(Object message)
     {
         return new DefaultMuleMessage(message, muleContext);
     }
@@ -640,7 +640,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return new File(getWorkingDirectory(), fileName);
     }
 
-    protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler) throws Exception
+    protected static MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler) throws Exception
     {
         final Flow flow = new Flow("", muleContext);
         flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
