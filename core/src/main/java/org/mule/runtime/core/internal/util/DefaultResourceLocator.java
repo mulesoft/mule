@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.util.ResourceLocator;
 
@@ -17,7 +16,7 @@ import java.util.function.BiFunction;
 
 public class DefaultResourceLocator implements ResourceLocator {
 
-  private static final String RESOURCE_FORMAT = "resource::%s:%s:%s:%s:%s:%s";
+  private ResourceLoaderFormatter formatter = new ResourceLoaderFormatter();
 
   @Override
   public Optional<InputStream> load(String resource, Object caller) {
@@ -32,13 +31,13 @@ public class DefaultResourceLocator implements ResourceLocator {
   @Override
   public Optional<InputStream> loadFrom(String resource, String groupId, String artifactId, Optional<String> version,
                                         String classifier, String type, Object caller) {
-    return load(format(RESOURCE_FORMAT, groupId, artifactId, version.orElse(""), classifier, type, resource), caller);
+    return load(formatter.format(resource, groupId, artifactId, version, classifier, type), caller);
   }
 
   @Override
   public Optional<URL> findIn(String resource, String groupId, String artifactId, Optional<String> version, String classifier,
                               String type, Object caller) {
-    return find(format(RESOURCE_FORMAT, groupId, artifactId, version.orElse(""), classifier, type, resource), caller);
+    return find(formatter.format(resource, groupId, artifactId, version, classifier, type), caller);
   }
 
   private <T> T lookFrom(BiFunction<String, ClassLoader, T> action, String resource, Object caller) {
@@ -48,6 +47,20 @@ public class DefaultResourceLocator implements ResourceLocator {
     } else {
       return callingClassResult;
     }
+  }
+
+  /**
+   * Helper class to build the resource loader formatter string.
+   */
+  public static class ResourceLoaderFormatter {
+
+    private static final String RESOURCE_FORMAT = "resource::%s:%s:%s:%s:%s:%s";
+
+    public String format(String resource, String groupId, String artifactId, Optional<String> version, String classifier,
+                         String type) {
+      return String.format(RESOURCE_FORMAT, groupId, artifactId, version.orElse(""), classifier, type, resource);
+    }
+
   }
 
 }
