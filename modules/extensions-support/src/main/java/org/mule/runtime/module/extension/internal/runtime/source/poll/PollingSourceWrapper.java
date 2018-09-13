@@ -19,6 +19,7 @@ import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItem
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.SOURCE_STOPPING;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.fromRunnable;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -45,6 +46,7 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -320,7 +322,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
               if (updatedWatermarkCompare == 0) {
                 pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
               } else if (updatedWatermarkCompare < 0) {
-                idsOnUpdatedWatermark.clear();
                 pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
                 setUpdatedWatermark(itemWatermark);
               }
@@ -335,7 +336,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
           }
         } else if (compare == 0 && pollItem.getItemId().isPresent()) {
           try {
-            accept = !recentlyProcessedIds.contains(itemId);
+            accept = !(recentlyProcessedIds.contains(itemId) || idsOnUpdatedWatermark.contains(itemId));
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
                                            createStaticMessage("An error occurred while checking the existance for Item with ID [%s]",
@@ -483,13 +484,22 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   }
 
   private void updateRecentlyProcessedIds() throws ObjectStoreException {
-    recentlyProcessedIds.clear();
-
-    // Object Stores are swaped to avoid copying one to another.
-    ObjectStore temp = recentlyProcessedIds;
-    recentlyProcessedIds = idsOnUpdatedWatermark;
-    idsOnUpdatedWatermark = temp;
-
+    Lock osClearingLock = lockFactory.createLock("OSClearing");
+    try {
+      osClearingLock.lock();
+      List<String> strings = recentlyProcessedIds.allKeys();
+      idsOnUpdatedWatermark.clear();
+      strings.forEach(key -> {
+        try {
+          idsOnUpdatedWatermark.store(key, recentlyProcessedIds.retrieve(key));
+        } catch (ObjectStoreException e) {
+          throw new MuleRuntimeException(createStaticMessage("Unable to store key: [%s] on ObjectStore"));
+        }
+      });
+      recentlyProcessedIds.clear();
+    } finally {
+      osClearingLock.unlock();
+    }
   }
 
   private Serializable getCurrentWatermark() {
@@ -564,6 +574,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
                           id, flowName, e.getMessage()),
                    e);
       return false;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -594,8 +606,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         }
       } catch (ObjectStoreException e) {
         LOGGER.error(format("Could not untrack item '%s' in source at flow '%s'. %s", id, flowName, e.getMessage()), e);
-      } finally {
-        lock.unlock();
       }
     }
   }
