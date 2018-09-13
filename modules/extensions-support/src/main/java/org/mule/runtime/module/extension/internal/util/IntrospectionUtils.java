@@ -12,7 +12,6 @@ import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.reverse;
 import static java.util.Objects.isNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -35,7 +34,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -145,11 +143,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Types;
 
-import com.google.common.collect.ImmutableList;
-import org.reflections.ReflectionUtils;
-import org.springframework.core.ResolvableType;
-
-import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
 
@@ -1316,7 +1309,7 @@ public final class IntrospectionUtils {
   private static void injectFieldFromModelProperty(Object target, String value,
                                                    Optional<? extends InjectedFieldModelProperty> modelProperty,
                                                    Class<? extends Annotation> annotationClass) {
-    if (value == null) {
+    if (value == null || modelProperty == null) {
       return;
     }
 

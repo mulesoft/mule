@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:custom-os="http://www.mulesoft.org/schema/mule/custom-os"
+      xmlns:os="http://www.mulesoft.org/schema/mule/os"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/custom-os http://www.mulesoft.org/schema/mule/custom-os/current/mule-custom-os.xsd
+            http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+
+    <os:config name="ObjectStore_Config">
+        <custom-os:connection />
+    </os:config>
+
+    <os:object-store name="customOS" config-ref="ObjectStore_Config" />
+
+    <flow name="customStore">
+        <os:store key="key" objectStore="customOS">
+            <os:value>Extend all the things!</os:value>
+        </os:store>
+        <custom-os:retrieve key="key" />
+    </flow>
+
+</mule>

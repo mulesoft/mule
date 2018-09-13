@@ -44,6 +44,7 @@
         <module>substitution-group-extension</module>
         <module>classloading-extension</module>
         <module>resource-extension</module>
+        <module>custom-object-store-extension</module>
     </modules>
 
     <build>
