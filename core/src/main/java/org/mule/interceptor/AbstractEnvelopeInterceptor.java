@@ -71,7 +71,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
     {
         final long startTime = System.currentTimeMillis();
         final ProcessingTime time = event.getProcessingTime();
-        MuleEvent responseEvent = event;
+        MuleEvent responseEvent = before(event);
 
         final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
         responseEvent = new DefaultMuleEvent(event, new ResponseReplyToHandler(originalReplyToHandler, time, startTime));
@@ -85,11 +85,12 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
             {
                 responseEvent = processResponse(responseEvent, event);
             }
+            
+            responseEvent = after(responseEvent);
         }
-        catch (Exception exception)
+        finally
         {
-            last(responseEvent, time, startTime, true);
-            throw exception;
+            responseEvent = last(responseEvent, time, startTime, true);
         }
         return responseEvent;
     }

@@ -6,23 +6,32 @@
  */
 package org.mule.interceptor;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.collections.Factory;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.interceptor.Interceptor;
 import org.mule.api.service.Service;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.component.AbstractComponent;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.model.seda.SedaService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Test;
-
+@RunWith(Parameterized.class)
 public class InterceptorTestCase extends AbstractMuleContextTestCase
 {
     private final String BEFORE = "Before";
@@ -38,7 +47,53 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
                                                        + INTERCEPTOR_THREE + BEFORE + COMPONENT
                                                        + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER
                                                        + INTERCEPTOR_ONE + AFTER;
+    @Parameters
+    public static Collection<Object[]> data() {
+        return asList(new Object[][] {
+            {
+                new Factory()
+                {
+                    @Override
+                    public Object create()
+                    {
+                        try
+                        {
+                            return getTestEvent("");
+                        }
+                        catch (Exception e)
+                        {
+                            throw new MuleRuntimeException(e);
+                        }
+                    }
+                }
+            },
+            {
+                new Factory()
+                {
+                    @Override
+                    public Object create()
+                    {
+                        try
+                        {
+                            return getNonBlockingTestEventUsingFlow("", mock(ReplyToHandler.class));
+                        }
+                        catch (Exception e)
+                        {
+                            throw new MuleRuntimeException(e);
+                        }
+                    }
+                }
+            }  
+       });
+    }
 
+    private Factory testEventFactory;
+    
+    public InterceptorTestCase(Factory testEventFactory)
+    {
+        this.testEventFactory = testEventFactory;
+    }
+    
     @Test
     public void testSingleInterceptor() throws Exception
     {
@@ -51,7 +106,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestEvent(""));
+        MuleEvent result = component.process((MuleEvent) testEventFactory.create());
 
         assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -70,7 +125,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestEvent(""));
+        MuleEvent result = component.process((MuleEvent) testEventFactory.create());
 
         assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -89,7 +144,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestEvent(""));
+        MuleEvent result = component.process((MuleEvent) testEventFactory.create());
 
         assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -110,7 +165,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestEvent(""));
+        MuleEvent result = component.process((MuleEvent) testEventFactory.create());
 
         assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -134,7 +189,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestEvent(""));
+        MuleEvent result = component.process((MuleEvent) testEventFactory.create());
 
         assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE
                      + INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE
