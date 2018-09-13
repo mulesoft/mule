@@ -35,7 +35,7 @@ public interface InterceptorManager {
    * Determines the order in which the {@link SourceInterceptorFactory SourceInterceptorFactories} products will be applied to the
    * applicable components.
    *
-   * @see SourceInterceptorFactory#INTERCEPTORS_ORDER_REGISTRY_KEY
+   * @see SourceInterceptorFactory#SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY
    * @param packagesOrder the wanted order for the interceptors.
    */
   void setSourceInterceptorsOrder(Optional<SourceInterceptorOrder> packagesOrder);

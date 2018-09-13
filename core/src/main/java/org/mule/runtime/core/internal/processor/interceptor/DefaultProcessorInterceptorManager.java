@@ -11,6 +11,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.interception.ProcessorInterceptorFactory.INTERCEPTORS_ORDER_REGISTRY_KEY;
+import static org.mule.runtime.api.interception.SourceInterceptorFactory.SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -48,6 +49,8 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
   }
 
   @Override
+  @Inject
+  @Named(SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY)
   public void setSourceInterceptorsOrder(Optional<SourceInterceptorOrder> packagesOrder) {
     sourceInterceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
   }
@@ -77,6 +80,7 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
   }
 
   @Override
+  @Inject
   public void setSourceInterceptorFactories(Optional<List<SourceInterceptorFactory>> interceptorFactories) {
     this.sourceInterceptorFactories = interceptorFactories.orElse(emptyList());
   }
