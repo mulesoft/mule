@@ -11,9 +11,11 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
@@ -30,6 +32,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
@@ -43,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -105,6 +109,50 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
     } else {
       return next;
     }
+  }
+
+  protected Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Component component,
+                                                            Map<String, String> dslParameters) {
+    return event -> {
+      final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
+      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
+                     component.getLocation().getLocation());
+      }
+
+      try {
+        withContextClassLoader(interceptor.getClass().getClassLoader(),
+                               () -> interceptor.before(component.getLocation(),
+                                                        getResolvedParams(eventWithResolvedParams),
+                                                        interceptionEvent));
+        return interceptionEvent.resolve();
+      } catch (Exception e) {
+        throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
+      }
+    };
+  }
+
+  protected Function<InternalEvent, InternalEvent> doAfter(ProcessorInterceptor interceptor, Component component,
+                                                           Optional<Throwable> thrown) {
+    return event -> {
+      final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
+      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
+                     component.getLocation().getLocation());
+      }
+
+      try {
+        withContextClassLoader(interceptor.getClass().getClassLoader(),
+                               () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
+        return interceptionEvent.resolve();
+      } catch (Exception e) {
+        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
+      }
+    };
   }
 
   private boolean implementsBeforeOrAfter(ProcessorInterceptor interceptor) {

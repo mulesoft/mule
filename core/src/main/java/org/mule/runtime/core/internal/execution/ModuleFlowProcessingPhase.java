@@ -53,7 +53,7 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -105,7 +105,7 @@ public class ModuleFlowProcessingPhase
   private List<ReactiveInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
 
   @Inject
-  private ProcessorInterceptorManager processorInterceptorManager;
+  private InterceptorManager processorInterceptorManager;
 
   public ModuleFlowProcessingPhase(PolicyManager policyManager) {
     this.policyManager = policyManager;
@@ -122,7 +122,7 @@ public class ModuleFlowProcessingPhase
     sourceErrorResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_SEND).get();
 
     if (processorInterceptorManager != null) {
-      processorInterceptorManager.getInterceptorFactories().stream().forEach(interceptorFactory -> {
+      processorInterceptorManager.getSourceInterceptorFactories().stream().forEach(interceptorFactory -> {
         ReactiveInterceptorSourceCallbackAdapter reactiveInterceptorAdapter =
             new ReactiveInterceptorSourceCallbackAdapter(interceptorFactory);
         try {

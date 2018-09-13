@@ -7,20 +7,15 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
-import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
-import static reactor.core.Exceptions.propagate;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -31,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -50,53 +44,9 @@ class AbstractInterceptorAdapter {
   @Inject
   protected ExtendedExpressionManager expressionManager;
 
-  protected Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Component component,
-                                                            Map<String, String> dslParameters) {
-    return event -> {
-      final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
-      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
-
-      try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.before(component.getLocation(),
-                                                        getResolvedParams(eventWithResolvedParams),
-                                                        interceptionEvent));
-        return interceptionEvent.resolve();
-      } catch (Exception e) {
-        throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
-      }
-    };
-  }
-
   protected Map<String, ProcessorParameterValue> getResolvedParams(final InternalEvent eventWithResolvedParams) {
     return (Map<String, ProcessorParameterValue>) eventWithResolvedParams.getInternalParameters()
         .get(INTERCEPTION_RESOLVED_PARAMS);
-  }
-
-  protected Function<InternalEvent, InternalEvent> doAfter(ProcessorInterceptor interceptor, Component component,
-                                                           Optional<Throwable> thrown) {
-    return event -> {
-      final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
-      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
-
-      try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
-        return interceptionEvent.resolve();
-      } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
-      }
-    };
   }
 
   protected InternalEvent addResolvedParameters(InternalEvent event, Component component, Map<String, String> dslParameters) {
