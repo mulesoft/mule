@@ -12,7 +12,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -28,14 +27,14 @@ import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 
-import org.slf4j.Logger;
-
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable, Disposable {
 

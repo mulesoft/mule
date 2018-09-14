@@ -7,9 +7,14 @@
 package org.mule.runtime.core.internal.metadata.cache;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.apache.commons.lang3.math.NumberUtils.toLong;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataCache;
@@ -20,6 +25,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.util.LazyValue;
 
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
@@ -42,6 +48,9 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPersistentMetadataCacheManager.class);
   public static final String PERSISTENT_METADATA_SERVICE_CACHE = "_mulePersistentMetadataService";
+  public static final String MULE_METADATA_CACHE_ENTRY_TTL = SYSTEM_PROPERTY_PREFIX + "metadata.cache.entryTtl.minutes";
+  public static final String MULE_METADATA_CACHE_EXPIRATION_INTERVAL =
+      SYSTEM_PROPERTY_PREFIX + "metadata.cache.expirationInterval.millis";
 
   @Inject
   @Named(OBJECT_STORE_MANAGER)
@@ -54,10 +63,18 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
 
   @Override
   public void start() {
-    metadataStore = new LazyValue<>(() -> objectStoreManager.getOrCreateObjectStore(PERSISTENT_METADATA_SERVICE_CACHE,
-                                                                                    ObjectStoreSettings.builder()
-                                                                                        .persistent(true)
-                                                                                        .build()));
+    metadataStore = new LazyValue<>(() -> {
+      ObjectStoreSettings.Builder builder = ObjectStoreSettings.builder().persistent(true);
+      getSystemProperty(MULE_METADATA_CACHE_ENTRY_TTL).map(stringValue -> toLong(stringValue))
+          .ifPresent(entryTtl -> builder.entryTtl(MINUTES.convert(entryTtl, MILLISECONDS)));
+      getSystemProperty(MULE_METADATA_CACHE_EXPIRATION_INTERVAL).map(stringValue -> toLong(stringValue))
+          .ifPresent(expirationInterval -> builder.expirationInterval(expirationInterval));
+      return objectStoreManager.getOrCreateObjectStore(PERSISTENT_METADATA_SERVICE_CACHE, builder.build());
+    });
+  }
+
+  private Optional<String> getSystemProperty(String propertyName) {
+    return ofNullable(getProperty(propertyName, null));
   }
 
   @Override

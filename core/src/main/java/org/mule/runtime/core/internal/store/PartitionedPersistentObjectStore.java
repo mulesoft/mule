@@ -156,8 +156,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
 
   private void initObjectStoreDirectory() {
     if (storeDirectory == null) {
-      String workingDirectory = muleContext.getConfiguration().getWorkingDirectory();
-      String path = workingDirectory + File.separator + OBJECT_STORE_DIR;
+      String path = getWorkingDirectory() + File.separator + OBJECT_STORE_DIR;
       storeDirectory = FileUtils.newFile(path);
       if (!storeDirectory.exists()) {
         createStoreDirectory(storeDirectory);
@@ -211,4 +210,9 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   public void expire(long entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
     getPartitionObjectStore(partitionName).expire(entryTTL, maxEntries);
   }
+
+  protected String getWorkingDirectory() {
+    return muleContext.getConfiguration().getWorkingDirectory();
+  }
+
 }
