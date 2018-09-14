@@ -18,9 +18,8 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
-import org.mule.runtime.module.deployment.impl.internal.LightweightClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -51,10 +50,11 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   }
 
   @Override
-  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile, ClassLoaderModelBuilder classLoaderModelBuilder,
+  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile,
+                                                             ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
                                                              Set<BundleDependency> dependencies) {
     try {
-      ((LightweightClassLoaderModelBuilder) classLoaderModelBuilder).sharingLibraries();
+      classLoaderModelBuilder.exportingSharedLibraries();
       classLoaderModelBuilder.containing(artifactFile.toURI().toURL());
     } catch (MalformedURLException e) {
       throw new MuleRuntimeException(e);

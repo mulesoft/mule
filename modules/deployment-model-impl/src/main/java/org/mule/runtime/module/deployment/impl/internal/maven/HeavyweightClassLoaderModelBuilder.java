@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal;
+package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 
@@ -14,8 +14,7 @@ import com.vdurmont.semver4j.Semver;
 
 import java.io.File;
 
-
-public class HeavyweightClassLoaderModelBuilder extends LightweightClassLoaderModelBuilder {
+public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
   private static final Semver CLASS_LOADER_MODEL_NEW_VERSION = new Semver("1.1.0", LOOSE);
 

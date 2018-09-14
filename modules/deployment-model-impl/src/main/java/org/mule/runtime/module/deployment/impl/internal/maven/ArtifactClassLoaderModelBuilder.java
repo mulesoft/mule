@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal;
+package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -29,7 +29,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-public class LightweightClassLoaderModelBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
+public class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
 
   protected Set<BundleDependency> bundleDependencies;
 
@@ -37,7 +37,7 @@ public class LightweightClassLoaderModelBuilder extends ClassLoaderModel.ClassLo
   private File applicationFolder;
   private FileJarExplorer fileJarExplorer = new FileJarExplorer();
 
-  public LightweightClassLoaderModelBuilder(File applicationFolder) {
+  public ArtifactClassLoaderModelBuilder(File applicationFolder) {
     this.applicationFolder = applicationFolder;
   }
 
@@ -48,7 +48,7 @@ public class LightweightClassLoaderModelBuilder extends ClassLoaderModel.ClassLo
     return this;
   }
 
-  public ClassLoaderModel.ClassLoaderModelBuilder sharingLibraries() {
+  public ClassLoaderModel.ClassLoaderModelBuilder exportingSharedLibraries() {
     this.processSharedLibraries = true;
     return this;
   }
