@@ -10,6 +10,7 @@ package org.mule.runtime.deployment.model.api.application;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -17,7 +18,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import com.google.common.collect.ImmutableSet;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +33,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   private String encoding;
   private Map<String, String> appProperties = new HashMap<>();
-  private File logConfigFile;
   private ArtifactDeclaration artifactDeclaration;
   private volatile Optional<BundleDescriptor> domainDescriptor;
   private String domainName;
@@ -98,14 +97,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   public void setDomainName(String domainName) {
     this.domainName = domainName;
-  }
-
-  public void setLogConfigFile(File logConfigFile) {
-    this.logConfigFile = logConfigFile;
-  }
-
-  public File getLogConfigFile() {
-    return logConfigFile;
   }
 
   /**
