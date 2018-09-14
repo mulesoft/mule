@@ -35,7 +35,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   private static final Logger LOGGER = getLogger(PartitionedPersistentObjectStore.class);
   public static final String OBJECT_STORE_DIR = "objectstore";
 
-  private MuleContext muleContext;
+  protected MuleContext muleContext;
   private File storeDirectory;
   private Map<String, PersistentObjectStorePartition> partitionsByName = new HashMap<>();
   private boolean initialized = false;
@@ -50,7 +50,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   @Override
-  public synchronized void open() throws ObjectStoreException {
+  public void open() throws ObjectStoreException {
     if (!initialized) {
       initObjectStoreDirectory();
       loadPreviousStoredPartitions();
@@ -156,8 +156,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
 
   private void initObjectStoreDirectory() {
     if (storeDirectory == null) {
-      String workingDirectory = muleContext.getConfiguration().getWorkingDirectory();
-      String path = workingDirectory + File.separator + OBJECT_STORE_DIR;
+      String path = getWorkingDirectory() + File.separator + OBJECT_STORE_DIR;
       storeDirectory = FileUtils.newFile(path);
       if (!storeDirectory.exists()) {
         createStoreDirectory(storeDirectory);
@@ -211,4 +210,9 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   public void expire(long entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
     getPartitionObjectStore(partitionName).expire(entryTTL, maxEntries);
   }
+
+  protected String getWorkingDirectory() {
+    return muleContext.getConfiguration().getWorkingDirectory();
+  }
+
 }

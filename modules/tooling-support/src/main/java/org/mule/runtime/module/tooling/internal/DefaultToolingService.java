@@ -13,7 +13,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
+import static org.mule.runtime.config.internal.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
@@ -58,10 +59,10 @@ import org.slf4j.LoggerFactory;
 @NoImplement
 public class DefaultToolingService implements ToolingService {
 
-  private static final String MULE_TMP_FILENAME = "tmp";
-  private static final String TOOLING_APPS_FOLDER = "tooling";
+  private static final String TOOLING_FOLDER = "tooling";
+  private static final String TOOLING_APPS_FOLDER = "apps";
 
-  private static final String TOOLING_PREFIX = "tooling";
+  private static final String TOOLING_PREFIX = TOOLING_FOLDER;
   private static final String APPLICATION = "application";
   private static final String DOMAIN = "domain";
 
@@ -235,12 +236,12 @@ public class DefaultToolingService implements ToolingService {
     return new ToolingDomainWrapper(domain);
   }
 
-  private static Properties createDeploymentProperties() {
+  private Properties createDeploymentProperties() {
     final Properties properties = new Properties();
     return createDeploymentProperties(of(properties));
   }
 
-  private static Properties createDeploymentProperties(Optional<Properties> deploymentProperties) {
+  private Properties createDeploymentProperties(Optional<Properties> deploymentProperties) {
     Properties properties;
     if (deploymentProperties.isPresent()) {
       properties = new Properties();
@@ -249,6 +250,7 @@ public class DefaultToolingService implements ToolingService {
       properties = new Properties();
     }
     properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "true");
+    properties.setProperty(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH, getToolingWorkingDir().getAbsolutePath());
     return properties;
   }
 
@@ -268,7 +270,7 @@ public class DefaultToolingService implements ToolingService {
    * @throws InitialisationException if there was an error while creating the folder.
    */
   private File createToolingServiceAppsFolder() throws InitialisationException {
-    File toolingServiceAppsFolder = new File(new File(getMuleBaseFolder(), MULE_TMP_FILENAME), TOOLING_APPS_FOLDER);
+    File toolingServiceAppsFolder = new File(getToolingWorkingDir(), TOOLING_APPS_FOLDER);
     if (!toolingServiceAppsFolder.exists()) {
       boolean folderCreated = toolingServiceAppsFolder.mkdirs();
       if (!folderCreated) {
@@ -278,7 +280,7 @@ public class DefaultToolingService implements ToolingService {
                                           this);
       }
       if (logger.isDebugEnabled()) {
-        logger.debug("Create tooling service resources folder at: " + toolingServiceAppsFolder);
+        logger.debug("Created tooling service resources folder at: " + toolingServiceAppsFolder);
       }
     } else {
       try {
@@ -288,6 +290,10 @@ public class DefaultToolingService implements ToolingService {
       }
     }
     return toolingServiceAppsFolder;
+  }
+
+  private File getToolingWorkingDir() {
+    return new File(getExecutionFolder(), TOOLING_FOLDER);
   }
 
   /**
