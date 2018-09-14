@@ -6,14 +6,30 @@
  */
 package org.mule.runtime.core.internal.store;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import java.io.File;
 import java.io.Serializable;
 
+/**
+ * Extends {@link PartitionedPersistentObjectStore} in order to allow using a shared path where OS data will be persisted.
+ * This means also that if this is used by different MuleContext they will share the OS data.
+ *
+ * @param <T> the serializable entity to be persisted by OS
+ *
+ * @since 4.2.0, 4.1.4
+ */
 public class SharedPartitionedPersistentObjectStore<T extends Serializable> extends PartitionedPersistentObjectStore<T> {
 
   private File workingDirectory;
 
+  /**
+   * Creates a shared partitioned persistent object store.
+   *
+   * @param workingDirectory {@link File} where to store this OS data. Not null.
+   */
   public SharedPartitionedPersistentObjectStore(File workingDirectory) {
+    checkArgument(workingDirectory != null, "workingDirectory cannot be null");
     this.workingDirectory = workingDirectory;
   }
 
