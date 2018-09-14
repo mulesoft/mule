@@ -19,6 +19,7 @@ import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItem
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.SOURCE_STOPPING;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.fromRunnable;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -45,6 +46,7 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -72,6 +74,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
   private static final String WATERMARK_OS_KEY = "watermark";
   private static final String UPDATED_WATERMARK_OS_KEY = "updatedWatermark";
+  private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
 
   private final PollingSource<T, A> delegate;
   private final Scheduler scheduler;
@@ -320,7 +323,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
               if (updatedWatermarkCompare == 0) {
                 pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
               } else if (updatedWatermarkCompare < 0) {
-                idsOnUpdatedWatermark.clear();
                 pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
                 setUpdatedWatermark(itemWatermark);
               }
@@ -335,7 +337,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
           }
         } else if (compare == 0 && pollItem.getItemId().isPresent()) {
           try {
-            accept = !recentlyProcessedIds.contains(itemId);
+            accept = !(recentlyProcessedIds.contains(itemId) || idsOnUpdatedWatermark.contains(itemId));
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
                                            createStaticMessage("An error occurred while checking the existance for Item with ID [%s]",
@@ -483,13 +485,24 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   }
 
   private void updateRecentlyProcessedIds() throws ObjectStoreException {
-    recentlyProcessedIds.clear();
-
-    // Object Stores are swaped to avoid copying one to another.
-    ObjectStore temp = recentlyProcessedIds;
-    recentlyProcessedIds = idsOnUpdatedWatermark;
-    idsOnUpdatedWatermark = temp;
-
+    Lock osClearingLock = lockFactory.createLock(UPDATE_PROCESSED_LOCK);
+    try {
+      osClearingLock.lock();
+      List<String> strings = recentlyProcessedIds.allKeys();
+      idsOnUpdatedWatermark.clear();
+      strings.forEach(key -> {
+        try {
+          idsOnUpdatedWatermark.store(key, recentlyProcessedIds.retrieve(key));
+        } catch (ObjectStoreException e) {
+          throw new MuleRuntimeException(createStaticMessage("An error occurred while updating the watermark Ids. Failed to update key '%s' in Watermark-IDs ObjectStore: %s",
+                                                             key, e.getMessage()),
+                                         e);
+        }
+      });
+      recentlyProcessedIds.clear();
+    } finally {
+      osClearingLock.unlock();
+    }
   }
 
   private Serializable getCurrentWatermark() {
@@ -543,7 +556,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
           LOGGER.debug("Source at flow '{}' polled item '{}', but skipping it since it is already being processed in another "
               + "thread or node", flowName, id);
         }
-        lock.unlock();
         return false;
       } else {
         try {
@@ -551,7 +563,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
           callbackContext.addVariable(ITEM_RELEASER_CTX_VAR, new ItemReleaser(id, lock));
           return true;
         } catch (ObjectStoreException e) {
-          lock.unlock();
           LOGGER.error(format("Flow at source '%s' could not track item '%s' as being processed. %s",
                               flowName, id, e.getMessage()),
                        e);
@@ -559,11 +570,12 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         }
       }
     } catch (Exception e) {
-      lock.unlock();
       LOGGER.error(format("Could not guarantee idempotency for item '%s' for source at flow '%s'. '%s",
                           id, flowName, e.getMessage()),
                    e);
       return false;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -594,8 +606,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         }
       } catch (ObjectStoreException e) {
         LOGGER.error(format("Could not untrack item '%s' in source at flow '%s'. %s", id, flowName, e.getMessage()), e);
-      } finally {
-        lock.unlock();
       }
     }
   }
