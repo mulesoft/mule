@@ -74,6 +74,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
   private static final String WATERMARK_OS_KEY = "watermark";
   private static final String UPDATED_WATERMARK_OS_KEY = "updatedWatermark";
+  private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
 
   private final PollingSource<T, A> delegate;
   private final Scheduler scheduler;
@@ -484,7 +485,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   }
 
   private void updateRecentlyProcessedIds() throws ObjectStoreException {
-    Lock osClearingLock = lockFactory.createLock("OSClearing");
+    Lock osClearingLock = lockFactory.createLock(UPDATE_PROCESSED_LOCK);
     try {
       osClearingLock.lock();
       List<String> strings = recentlyProcessedIds.allKeys();
@@ -493,7 +494,9 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         try {
           idsOnUpdatedWatermark.store(key, recentlyProcessedIds.retrieve(key));
         } catch (ObjectStoreException e) {
-          throw new MuleRuntimeException(createStaticMessage("Unable to store key: [%s] on ObjectStore"));
+          throw new MuleRuntimeException(createStaticMessage("An error occurred while updating the watermark Ids. Failed to update key '%s' in Watermark-IDs ObjectStore: %s",
+                                                             key, e.getMessage()),
+                                         e);
         }
       });
       recentlyProcessedIds.clear();
@@ -553,7 +556,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
           LOGGER.debug("Source at flow '{}' polled item '{}', but skipping it since it is already being processed in another "
               + "thread or node", flowName, id);
         }
-        lock.unlock();
         return false;
       } else {
         try {
@@ -561,7 +563,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
           callbackContext.addVariable(ITEM_RELEASER_CTX_VAR, new ItemReleaser(id, lock));
           return true;
         } catch (ObjectStoreException e) {
-          lock.unlock();
           LOGGER.error(format("Flow at source '%s' could not track item '%s' as being processed. %s",
                               flowName, id, e.getMessage()),
                        e);
@@ -569,7 +570,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         }
       }
     } catch (Exception e) {
-      lock.unlock();
       LOGGER.error(format("Could not guarantee idempotency for item '%s' for source at flow '%s'. '%s",
                           id, flowName, e.getMessage()),
                    e);
