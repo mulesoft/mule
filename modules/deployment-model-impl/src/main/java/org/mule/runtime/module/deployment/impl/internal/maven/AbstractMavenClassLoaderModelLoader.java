@@ -40,6 +40,8 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.deployment.impl.internal.HeavyweightClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.LightweightClassLoaderModelBuilder;
 import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
@@ -127,7 +129,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         deserialize(classLoaderModelDescriptor);
     File deployableArtifactRepositoryFolder = getDeployableArtifactRepositoryFolder(artifactFile);
 
-    final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
+    final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder =
+        new HeavyweightClassLoaderModelBuilder(packagerClassLoaderModel, artifactFile);
     classLoaderModelBuilder
         .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
         .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -231,7 +234,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                   ofNullable((MavenReactorResolver) attributes
                                                       .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER)),
                                                   of(temporaryDirectory));
-      final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
+      final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder =
+          new LightweightClassLoaderModelBuilder(artifactFile);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
