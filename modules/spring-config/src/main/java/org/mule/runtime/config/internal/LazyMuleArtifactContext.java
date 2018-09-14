@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
@@ -22,14 +23,6 @@ import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -51,9 +44,18 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
+import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +72,8 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  */
 public class LazyMuleArtifactContext extends MuleArtifactContext
     implements LazyComponentInitializerAdapter, ComponentModelInitializer {
+
+  public static final String SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH = "_sharedPartitionatedPersistentObjectStorePath";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
 
@@ -127,8 +131,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
                                                                      MuleValueProviderService.class);
 
-
     muleContext.getCustomizationService().overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
+
+    String sharedPartitionatedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
+    if (sharedPartitionatedPersistentObjectStorePath != null) {
+      muleContext.getCustomizationService().overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
+                                                                       new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath)));
+
+    }
   }
 
   private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
