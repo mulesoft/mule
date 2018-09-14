@@ -189,6 +189,7 @@
 /mule-standalone-${productVersion}/lib/opt/abdera-parser-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/abdera-server-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/abdera-spring-1.1.3.jar
+/mule-standalone-${productVersion}/lib/opt/animal-sniffer-annotations-1.14.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-3.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/ant-1.9.6.jar
@@ -213,6 +214,7 @@
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.15.jar
 /mule-standalone-${productVersion}/lib/opt/caffeine-2.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
+/mule-standalone-${productVersion}/lib/opt/checker-qual-2.5.2.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-server-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.3.jar
@@ -237,6 +239,7 @@
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-databinding-jaxb-2.7.19-MULE-005.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-databinding-jibx-2.7.19-MULE-005.jar
 /mule-standalone-${productVersion}/lib/opt/ehcache-core-2.5.1.jar
+/mule-standalone-${productVersion}/lib/opt/error_prone_annotations-2.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/jibx-extras-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/jibx-schema-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/jibx-run-1.2.5.jar
@@ -269,7 +272,7 @@
 /mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.36-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.36-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.15-indy.jar
-/mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
+/mule-standalone-${productVersion}/lib/opt/guava-26.0-jre.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-library-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-api-2.3.0-b05.jar
@@ -277,6 +280,7 @@
 /mule-standalone-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/invokebinder-1.10.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
+/mule-standalone-${productVersion}/lib/opt/j2objc-annotations-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.14-MULE-002.jar
@@ -350,6 +354,7 @@
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-5.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-9.1.16.0.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-1.0.0.jar
+/mule-standalone-${productVersion}/lib/opt/jsr305-3.0.2.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.8.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.8.jar
