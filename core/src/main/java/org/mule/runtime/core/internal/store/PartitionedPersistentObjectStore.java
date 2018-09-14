@@ -35,7 +35,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   private static final Logger LOGGER = getLogger(PartitionedPersistentObjectStore.class);
   public static final String OBJECT_STORE_DIR = "objectstore";
 
-  protected MuleContext muleContext;
+  private MuleContext muleContext;
   private File storeDirectory;
   private Map<String, PersistentObjectStorePartition> partitionsByName = new HashMap<>();
   private boolean initialized = false;
@@ -50,7 +50,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   @Override
-  public void open() throws ObjectStoreException {
+  public synchronized void open() throws ObjectStoreException {
     if (!initialized) {
       initObjectStoreDirectory();
       loadPreviousStoredPartitions();
