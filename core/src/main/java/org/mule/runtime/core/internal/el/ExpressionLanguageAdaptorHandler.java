@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -24,11 +25,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,8 +48,25 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
   private final Pattern exprPrefixPattern;
   private Map<String, ExtendedExpressionLanguageAdaptor> expressionLanguages;
-  private ConcurrentMap<String, ExtendedExpressionLanguageAdaptor> expressionLanguagesByExpressionCache =
-      new ConcurrentHashMap<>(3, 0.9f);
+  private LoadingCache<String, ExtendedExpressionLanguageAdaptor> expressionLanguagesByExpressionCache =
+      newBuilder().build(expression -> {
+        final String languagePrefix = getLanguagePrefix(expression);
+        if (isEmpty(languagePrefix)) {
+          if (isMelDefault()) {
+            return expressionLanguages.get(MEL_PREFIX);
+          } else {
+            return expressionLanguages.get(DW_PREFIX);
+          }
+        } else if (expressionLanguages.size() == 1) {
+          return expressionLanguages.values().iterator().next();
+        } else {
+          ExtendedExpressionLanguageAdaptor extendedExpressionLanguageAdaptor = expressionLanguages.get(languagePrefix);
+          if (extendedExpressionLanguageAdaptor == null) {
+            throw new IllegalStateException(format("There is no expression language registered for '%s'", languagePrefix));
+          }
+          return extendedExpressionLanguageAdaptor;
+        }
+      });
 
   private boolean melDefault = false;
 
@@ -56,7 +74,9 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
                                           ExtendedExpressionLanguageAdaptor mvelExpressionLanguage) {
     expressionLanguages = new HashMap<>();
     expressionLanguages.put(DW_PREFIX, defaultExtendedExpressionLanguage);
-    expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
+    if (mvelExpressionLanguage != null) {
+      expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
+    }
 
     exprPrefixPattern = compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
 
@@ -151,29 +171,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {
-    // This pre-check is made in order to avoid the synchronized block in the implementation of ConcurrentHashMap
-    // (https://bugs.openjdk.java.net/browse/JDK-8161372)
-    final ExtendedExpressionLanguageAdaptor el = expressionLanguagesByExpressionCache.get(expression);
-    if (el != null) {
-      return el;
-    }
-
-    return expressionLanguagesByExpressionCache.computeIfAbsent(expression, e -> {
-      final String languagePrefix = getLanguagePrefix(e);
-      if (isEmpty(languagePrefix)) {
-        if (melDefault) {
-          return expressionLanguages.get(MEL_PREFIX);
-        } else {
-          return expressionLanguages.get(DW_PREFIX);
-        }
-      } else {
-        ExtendedExpressionLanguageAdaptor extendedExpressionLanguageAdaptor = expressionLanguages.get(languagePrefix);
-        if (extendedExpressionLanguageAdaptor == null) {
-          throw new IllegalStateException(format("There is no expression language registered for '%s'", languagePrefix));
-        }
-        return extendedExpressionLanguageAdaptor;
-      }
-    });
+    return expressionLanguagesByExpressionCache.get(expression);
   }
 
   public String getLanguagePrefix(String expression) {
