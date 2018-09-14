@@ -11,23 +11,27 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
+import static org.openjdk.jmh.annotations.Threads.MAX;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Threads;
 
 @OutputTimeUnit(NANOSECONDS)
+@Threads(MAX)
 public class ExpressionBenchmark extends AbstractBenchmark {
 
-
+  private ExtendedExpressionManager expressionManager;
   private MuleContext muleContext;
   private CoreEvent event;
   private EventContext context;
@@ -35,6 +39,7 @@ public class ExpressionBenchmark extends AbstractBenchmark {
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
+    expressionManager = muleContext.getExpressionManager();
     context = create(createFlow(muleContext), CONNECTOR_LOCATION);
     event = CoreEvent.builder(context).message(of(PAYLOAD)).addVariable("foo", "bar").build();
   }
@@ -47,32 +52,32 @@ public class ExpressionBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Object melPayload() {
-    return muleContext.getExpressionManager().evaluate("mel:payload", event).getValue();
+    return expressionManager.evaluate("mel:payload", event).getValue();
   }
 
   @Benchmark
   public Object dwPayload() {
-    return muleContext.getExpressionManager().evaluate("payload", event).getValue();
+    return expressionManager.evaluate("payload", event.asBindingContext()).getValue();
   }
 
   @Benchmark
   public Object melFlowVars() {
-    return muleContext.getExpressionManager().evaluate("mel:flowVars['foo']=='bar'", event).getValue();
+    return expressionManager.evaluate("mel:flowVars['foo']=='bar'", event).getValue();
   }
 
   @Benchmark
   public Object dwFlowVars() {
-    return muleContext.getExpressionManager().evaluate("vars.foo == 'bar'", event).getValue();
+    return expressionManager.evaluate("vars.foo == 'bar'", event.asBindingContext()).getValue();
   }
 
   @Benchmark
   public Object melGetLocale() {
-    return muleContext.getExpressionManager().evaluate("mel:java.util.Locale.getDefault().getLanguage()", event).getValue();
+    return expressionManager.evaluate("mel:java.util.Locale.getDefault().getLanguage()", event).getValue();
   }
 
   @Benchmark
   public Object dwGetLocale() {
-    return muleContext.getExpressionManager().evaluate("java!java::util::Locale::getDefault().language", event).getValue();
+    return expressionManager.evaluate("java!java::util::Locale::getDefault().language", event.asBindingContext()).getValue();
   }
 
 }
