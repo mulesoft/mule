@@ -12,14 +12,20 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.util.Arrays.asList;
+import static java.util.regex.Pattern.compile;
 import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,29 +33,22 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 public class Controller {
 
   protected static final String ANCHOR_SUFFIX = "-anchor.txt";
-  private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
+  private static final IOFileFilter ANCHOR_FILTER = suffixFileFilter(ANCHOR_SUFFIX);
   private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
   private static final String DOMAIN_BUNDLE_DEPLOY_ERROR = "Error deploying domain bundle %s.";
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
   private static final int IS_RUNNING_STATUS_CODE = 0;
-  private static final Pattern pattern = Pattern.compile("wrapper\\.java\\.additional\\.(\\d*)=");
+  private static final Pattern pattern = compile("wrapper\\.java\\.additional\\.(\\d*)=");
 
   private final AbstractOSController osSpecificController;
 
@@ -108,7 +107,7 @@ public class Controller {
 
   protected void verify(boolean condition, String message, Object... args) {
     if (!condition) {
-      throw new MuleControllerException(String.format(message, args));
+      throw new MuleControllerException(format(message, args));
     }
   }
 
@@ -122,7 +121,7 @@ public class Controller {
         copyFileToDirectory(domainFile, this.domainsDir);
       }
     } catch (IOException e) {
-      throw new MuleControllerException(String.format(DOMAIN_DEPLOY_ERROR, domain), e);
+      throw new MuleControllerException(format(DOMAIN_DEPLOY_ERROR, domain), e);
     }
   }
 
@@ -132,7 +131,7 @@ public class Controller {
     try {
       copyFileToDirectory(domainBundleFile, this.domainsDir);
     } catch (IOException e) {
-      throw new MuleControllerException(String.format(DOMAIN_BUNDLE_DEPLOY_ERROR, domainBundle), e);
+      throw new MuleControllerException(format(DOMAIN_BUNDLE_DEPLOY_ERROR, domainBundle), e);
     }
   }
 
@@ -144,7 +143,7 @@ public class Controller {
     try {
       copyFileToDirectory(jar, libsDir);
     } catch (IOException e) {
-      throw new MuleControllerException(String.format(ADD_LIBRARY_ERROR, jar, libsDir), e);
+      throw new MuleControllerException(format(ADD_LIBRARY_ERROR, jar, libsDir), e);
     }
   }
 
@@ -155,7 +154,7 @@ public class Controller {
       try {
         forceDelete(anchor);
       } catch (IOException e) {
-        throw new MuleControllerException(String.format(ANCHOR_DELETE_ERROR, anchor), e);
+        throw new MuleControllerException(format(ANCHOR_DELETE_ERROR, anchor), e);
       }
     }
   }
@@ -202,7 +201,7 @@ public class Controller {
    */
   public void redeploy(String application) {
     validateApplicationExists(application);
-    File descriptor = new File(new File(appsDir, application), ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+    File descriptor = new File(new File(appsDir, application), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
     descriptor.setLastModified(System.currentTimeMillis());
   }
 
@@ -258,20 +257,20 @@ public class Controller {
 
   public File getLog() {
     String muleHome = osSpecificController.getMuleHome();
-    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, osSpecificController.getMuleAppName());
+    List<String> serviceNames = asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, osSpecificController.getMuleAppName());
 
     return serviceNames.stream().map(s -> Paths.get(muleHome, "logs", s + ".log").toFile())
         .filter(f -> f.exists() && f.isFile())
         .findFirst()
-        .orElseThrow(() -> new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome)));
+        .orElseThrow(() -> new MuleControllerException(format("There is no mule log available at %s/logs/", muleHome)));
   }
 
   public File getLog(String appName) {
-    File log = newFile(String.format("%s/logs/mule-app-%s.log", osSpecificController.getMuleHome(), appName));
+    File log = newFile(format("%s/logs/mule-app-%s.log", osSpecificController.getMuleHome(), appName));
     if (log.exists() && log.isFile()) {
       return log;
     }
-    throw new MuleControllerException(String.format("There is no app log available at %s/logs/%s",
+    throw new MuleControllerException(format("There is no app log available at %s/logs/mule-app-%s",
                                                     osSpecificController.getMuleHome(), appName));
   }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.api;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
+
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -31,6 +32,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private File location;
   private Set<String> configResources;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
+  private File logConfigFile;
 
   /**
    * Creates a new deployable artifact descriptor
@@ -117,6 +119,14 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   protected Set<String> getDefaultConfigResources() {
     return emptySet();
+  }
+
+  public void setLogConfigFile(File logConfigFile) {
+    this.logConfigFile = logConfigFile;
+  }
+
+  public File getLogConfigFile() {
+    return logConfigFile;
   }
 
 }
