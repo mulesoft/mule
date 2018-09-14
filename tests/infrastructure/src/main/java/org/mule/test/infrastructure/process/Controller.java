@@ -271,7 +271,7 @@ public class Controller {
       return log;
     }
     throw new MuleControllerException(format("There is no app log available at %s/logs/mule-app-%s",
-                                                    osSpecificController.getMuleHome(), appName));
+                                             osSpecificController.getMuleHome(), appName));
   }
 
   public void addConfProperty(String value) {
