@@ -19,7 +19,25 @@
           "methodName": "getRuntimeComponentBuildingDefinitionProvider",
           "elementKind": "method",
           "justification": "not used by others"
-        }
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.io.File org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::getLogConfigFile()",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "getLogConfigFile",
+          "elementKind": "method",
+          "justification": "Feature was in Mule 3.x but missing in Mule 4"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::setLogConfigFile(java.io.File)",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "setLogConfigFile",
+          "elementKind": "method",
+          "justification": "Feature was in Mule 3.x but missing in Mule 4"
+        }        
       ]
     }
   },
