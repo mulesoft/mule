@@ -53,7 +53,9 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   @Override
   protected void doDescriptorConfig(MuleDomainModel artifactModel, DomainDescriptor descriptor, File artifactLocation) {
     super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
-    descriptor.setLogConfigFile(new File(artifactModel.getLogConfigFile()));
+    if (artifactModel.getLogConfigFile() != null) {
+      descriptor.setLogConfigFile(new File(artifactModel.getLogConfigFile()));
+    }
   }
 
   @Override
