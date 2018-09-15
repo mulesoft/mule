@@ -189,8 +189,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
     when(extension1ConfigurationModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel));
     when(connectionProviderModel.getAllParameterModels()).thenReturn(emptyList());
+
     when(connectionProviderModel.getModelProperty(ConnectionProviderFactoryModelProperty.class))
-        .thenReturn(Optional.of(new ConnectionProviderFactoryModelProperty(mock(ConnectionProviderFactory.class))));
+        .thenReturn(Optional.of(new ConnectionProviderFactoryModelProperty(mock(ConnectionProviderFactory.class,
+                                                                                RETURNS_DEEP_STUBS.get()))));
     mockParameters(extension1ConfigurationModel);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
 

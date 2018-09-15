@@ -1351,7 +1351,7 @@ public final class IntrospectionUtils {
   private static void injectFieldFromModelProperty(Object target, String value,
                                                    Optional<? extends InjectedFieldModelProperty> modelProperty,
                                                    Class<? extends Annotation> annotationClass) {
-    if (value == null) {
+    if (value == null || modelProperty == null) {
       return;
     }
 
