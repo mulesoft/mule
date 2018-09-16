@@ -11,7 +11,6 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
-import static org.openjdk.jmh.annotations.Threads.MAX;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.event.EventContext;
@@ -25,10 +24,10 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.annotations.Threads;
 
 @OutputTimeUnit(NANOSECONDS)
-@Threads(MAX)
+// TODO MULE-15707: MVEL hangs with this level of concurrency
+// @Threads(MAX)
 public class ExpressionBenchmark extends AbstractBenchmark {
 
   private ExtendedExpressionManager expressionManager;
