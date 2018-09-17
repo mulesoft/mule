@@ -5,13 +5,14 @@
     <parent>
         <artifactId>mule-test-extensions-parent</artifactId>
         <groupId>org.mule.tests</groupId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>custom-os-extension</artifactId>
 
     <name>Custom Object Store Extension</name>
+    <packaging>jar</packaging>
 
     <properties>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
