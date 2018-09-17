@@ -144,9 +144,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   }
 
   /**
-   * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one through
-   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the {@link ProcessingStrategyFactory}
-   * class name system property
+   * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one, either
+   * through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the {@link ProcessingStrategyFactory} class name
+   * system property
    *
    * @return a {@link DirectProcessingStrategyFactory}
    */
