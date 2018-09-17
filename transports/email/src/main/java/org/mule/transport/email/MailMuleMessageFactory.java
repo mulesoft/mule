@@ -6,12 +6,6 @@
  */
 package org.mule.transport.email;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
-import org.mule.transport.AbstractMuleMessageFactory;
-import org.mule.util.StringUtils;
-
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -20,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Address;
 import javax.mail.Header;
 import javax.mail.Message;
@@ -27,14 +23,26 @@ import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
+import javax.mail.util.SharedByteArrayInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
+import org.mule.transport.AbstractMuleMessageFactory;
+import org.mule.util.StringUtils;
 
 public class MailMuleMessageFactory extends AbstractMuleMessageFactory
 {
     public static final String HEADER_LIST_PREFIX = "List:";
+
+    public static final String DEFAULT_ATTACHMENT_FILENAME = "attachment.bin";
+
+    public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
 
     private static Log log = LogFactory.getLog(MailMuleMessageFactory.class);
 
@@ -188,6 +196,53 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
                 addAttachmentHeaders(name, part, muleMessage);
             }
         }
+        
+        if (content instanceof SharedByteArrayInputStream)
+        {
+            String filename = getFileName(transportMessage);
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+            DataSource ds = new ByteArrayDataSource((SharedByteArrayInputStream) content, getContentType(transportMessage));
+            attachmentPart = new MimeBodyPart();
+            attachmentPart.setDataHandler(new DataHandler(ds));
+            muleMessage.addInboundAttachment(filename, attachmentPart.getDataHandler());
+            addAttachmentHeaders(filename, attachmentPart, muleMessage);
+        }
+    }
+
+    private String getContentType(Object transportMessage)
+    {
+        String contentType = DEFAULT_BINARY_CONTENT_TYPE;
+        if (transportMessage instanceof MimeMessage)
+        {
+            try
+            {
+                contentType =  ((MimeMessage) transportMessage).getContentType();
+            }
+            catch (MessagingException e)
+            {
+                log.warn("Error on retrieving content type from attachment: " + e.getMessage());
+            }
+        }
+        
+        return contentType;
+    }
+
+    private String getFileName(Object transportMessage)
+    {
+        String fileName = DEFAULT_ATTACHMENT_FILENAME;
+        if (transportMessage instanceof MimeMessage)
+        {
+            try
+            {
+                fileName =  ((MimeMessage) transportMessage).getFileName();
+            }
+            catch (MessagingException e)
+            {
+                log.warn("Error on retrieving filename from attachment: " + e.getMessage());
+            }
+        }
+        
+        return fileName;
     }
 
     protected void addAttachmentHeaders(String name, Part part, MuleMessage muleMessage) throws javax.mail.MessagingException

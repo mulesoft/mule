@@ -6,13 +6,15 @@
  */
 package org.mule.transport.email;
 
-import static org.junit.Assert.assertEquals;
-
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.MuleMessageFactory;
-import org.mule.transport.AbstractMuleMessageFactoryTestCase;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.transport.email.MailMuleMessageFactory.DEFAULT_BINARY_CONTENT_TYPE;
 
 import java.util.Date;
+import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -28,12 +30,18 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.mail.util.SharedByteArrayInputStream;
 
 import org.junit.Test;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.transport.MuleMessageFactory;
+import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
 public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
 
+    private static final String BINARY_BIN_FILE = "binary.bin";
     protected static final String TEST_TO = "Information <info@domain.com>";
     protected static final String TEST_CC = "\"info@\" <domain.com info@domain.com>";
     protected static final String TEST_BCC = "'invalid@domain.com', info <info@domain.com>";
@@ -70,7 +78,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
 
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
-        assertEquals(2, muleMessage.getInboundAttachmentNames().size());
+        assertThat(muleMessage.getInboundAttachmentNames(), hasSize(2));
     }
 
     @Test
@@ -89,14 +97,39 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
 
-        assertEquals(TEST_TO, muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY));
-        assertEquals(TEST_CC, muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY));
-        assertEquals(TEST_BCC, muleMessage.getInboundProperty(MailProperties.BCC_ADDRESSES_PROPERTY));
-        assertEquals(TEST_FROM, muleMessage.getInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY));
-        assertEquals(TEST_REPLY_TO, muleMessage.getInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY));
-        assertEquals("(no subject)", muleMessage.getInboundProperty(MailProperties.SUBJECT_PROPERTY));
-        assertEquals(TEST_CONTENT_TYPE, muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY));
-        assertEquals(new MailDateFormat().parse(new MailDateFormat().format(now)), muleMessage.getInboundProperty(MailProperties.SENT_DATE_PROPERTY));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY), equalTo(TEST_TO));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY), equalTo(TEST_CC));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.BCC_ADDRESSES_PROPERTY), equalTo(TEST_BCC));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY), equalTo(TEST_FROM));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY), equalTo(TEST_REPLY_TO));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.SUBJECT_PROPERTY), equalTo("(no subject)"));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY), equalTo(TEST_CONTENT_TYPE));
+        assertThat((Date) muleMessage.getInboundProperty(MailProperties.SENT_DATE_PROPERTY), equalTo(new MailDateFormat().parse(new MailDateFormat().format(now))));
+    }
+
+    @Test
+    public void testAddAttachments() throws Exception
+    {
+        Date now = new Date();
+
+        MailMuleMessageFactory factory = (MailMuleMessageFactory) createMuleMessageFactory();
+        MimeMessage payload = getValidTransportMessage();
+        payload.setHeader(RecipientType.TO.toString(), TEST_TO);
+        payload.setHeader(RecipientType.CC.toString(), TEST_CC);
+        payload.setHeader(RecipientType.BCC.toString(), TEST_BCC);
+        payload.setFrom(new InternetAddress(TEST_FROM));
+        payload.setReplyTo(new InternetAddress[] {new InternetAddress(TEST_REPLY_TO)});
+        payload.setSentDate(now);
+        MimeMessage transportMessage = new MimeMessage(Session.getDefaultInstance(new Properties()));
+        DefaultMuleMessage muleMessage = (DefaultMuleMessage) factory.create(payload, encoding, muleContext);
+        transportMessage.setFileName(BINARY_BIN_FILE);
+        transportMessage.setContent(new SharedByteArrayInputStream(TEST_MESSAGE.getBytes()), DEFAULT_BINARY_CONTENT_TYPE);
+        factory.addAttachments(muleMessage, transportMessage);
+        DataHandler attachment = muleMessage.getAttachment(BINARY_BIN_FILE);
+        assertThat(muleMessage.getInboundAttachmentNames(), hasSize(1));
+        assertThat(attachment, is(notNullValue()));
+        assertThat(attachment.getContentType(), equalTo(transportMessage.getContentType()));
+        assertThat(attachment.getContent().toString(), equalTo(TEST_MESSAGE));
     }
 
     @Test
@@ -126,15 +159,15 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
 
-        assertEquals(TEST_TO, muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY));
-        assertEquals(TEST_CC, muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY));
-        assertEquals(TEST_BCC, muleMessage.getInboundProperty(MailProperties.BCC_ADDRESSES_PROPERTY));
-        assertEquals(TEST_FROM, muleMessage.getInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY));
-        assertEquals(TEST_REPLY_TO, muleMessage.getInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY));
-        assertEquals(TEST_SUBJECT, muleMessage.getInboundProperty(MailProperties.SUBJECT_PROPERTY));
-        assertEquals(TEST_CONTENT_TYPE, muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY));
-        assertEquals(new MailDateFormat().parse(new MailDateFormat().format(now)), muleMessage.getInboundProperty(MailProperties.SENT_DATE_PROPERTY));
-        assertEquals(customProperty, muleMessage.getInboundProperty(customProperty));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY), equalTo(TEST_TO));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY), equalTo(TEST_CC));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.BCC_ADDRESSES_PROPERTY), equalTo(TEST_BCC));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.FROM_ADDRESS_PROPERTY), equalTo(TEST_FROM));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY), equalTo(TEST_REPLY_TO));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.SUBJECT_PROPERTY), equalTo(TEST_SUBJECT));
+        assertThat((String) muleMessage.getInboundProperty(MailProperties.CONTENT_TYPE_PROPERTY), equalTo(TEST_CONTENT_TYPE));
+        assertThat((Date) muleMessage.getInboundProperty(MailProperties.SENT_DATE_PROPERTY), equalTo(new MailDateFormat().parse(new MailDateFormat().format(now))));
+        assertThat((String) muleMessage.getInboundProperty(customProperty), equalTo(customProperty));
     }
 
     @Test
@@ -144,7 +177,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
 
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
-        assertEquals(3, muleMessage.getInboundAttachmentNames().size());
+        assertThat(muleMessage.getInboundAttachmentNames(), hasSize(3));
     }
 
     private Message createMimeMessageWithAttachment() throws Exception
