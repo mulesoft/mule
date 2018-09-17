@@ -11,10 +11,12 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -30,6 +32,8 @@ import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -41,6 +45,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.qameta.allure.Description;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -64,6 +69,18 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private MavenClient mockMavenClient = mock(MavenClient.class);
+
+  private static File getResourceFile(String resource) throws URISyntaxException {
+    return new File(ApplicationDescriptorFactoryTestCase.class.getResource(resource).toURI());
+  }
+
+  @Test
+  @Description("Heavyweight packaged apps will deploy ok with shared libraries information in classloader-model.json")
+  public void sharedLibrariesAreReadFromModel() throws Exception {
+    URL patchedAppUrl = getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "shared-libraries-in-model").toString());
+    ClassLoaderModel classLoaderModel = buildClassLoaderModel(toFile(patchedAppUrl));
+    assertThat(classLoaderModel.getExportedResources(), is(not(empty())));
+  }
 
   @Test
   public void patchedApplicationLoadsUpdatedConnector() throws InvalidDescriptorLoaderException {
