@@ -20,6 +20,7 @@ import java.util.jar.Manifest;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -52,6 +53,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-15709")
   public void testIsSupportedJdkVersion() {
     // supported
     assertTrue(JdkVersionUtils.isSupportedJdkVersion());
@@ -110,6 +112,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-15709")
   public void testRecommendedJdkVersion() {
     // recommended
     setJdkVersion("1.8.0_129");
