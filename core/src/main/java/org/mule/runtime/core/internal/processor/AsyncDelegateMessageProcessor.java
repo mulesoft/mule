@@ -19,12 +19,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
-import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -35,6 +36,7 @@ import org.mule.runtime.api.notification.AsyncMessageNotification;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -47,6 +49,7 @@ import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFacto
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -54,14 +57,15 @@ import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
-import java.util.List;
-import java.util.function.Consumer;
-
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+
+import javax.inject.Inject;
 
 /**
  * Processes {@link CoreEvent}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
@@ -105,7 +109,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public void initialise() throws InitialisationException {
     Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
-    if (rootContainer instanceof FlowConstruct) {
+    if (!Objects.equals(((Component) rootContainer).getLocation().getLocation(),
+                        this.getLocation().getRootContainerName())) {
+      // This is for the case of the async inside a sub-flow
+      processingStrategy = defaultProcessingStrategy().create(muleContext, getLocation().getLocation());
+      ownProcessingStrategy = true;
+    } else if (rootContainer instanceof FlowConstruct) {
       if (maxConcurrency != null && rootContainer instanceof Pipeline) {
         ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
 
@@ -120,7 +129,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
       }
     } else {
-      processingStrategy = DIRECT_PROCESSING_STRATEGY_INSTANCE;
+      processingStrategy = createDefaultProcessingStrategyFactory().create(getMuleContext(), getLocation().getLocation());
+      ownProcessingStrategy = true;
     }
     if (delegateBuilder == null) {
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
@@ -131,6 +141,27 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     initialiseIfNeeded(delegate, muleContext);
 
     super.initialise();
+  }
+
+  /**
+   * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one, either
+   * through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the {@link ProcessingStrategyFactory} class name
+   * system property
+   *
+   * @return a {@link DirectProcessingStrategyFactory}
+   */
+  protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
+    return new DirectProcessingStrategyFactory();
+  }
+
+  private ProcessingStrategyFactory defaultProcessingStrategy() {
+    final ProcessingStrategyFactory defaultProcessingStrategyFactory =
+        getMuleContext().getConfiguration().getDefaultProcessingStrategyFactory();
+    if (defaultProcessingStrategyFactory == null) {
+      return createDefaultProcessingStrategyFactory();
+    } else {
+      return defaultProcessingStrategyFactory;
+    }
   }
 
   @Override
