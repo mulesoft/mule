@@ -322,6 +322,7 @@ public class MacroExpansionModuleModel {
 
     operationRefModel.getConfigFileName().ifPresent(processorChainBuilder::setConfigFileName);
     operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
+    operationRefModel.getStartColumn().ifPresent(processorChainBuilder::setStartColumn);
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
     return processorChainModel;
   }
@@ -621,6 +622,7 @@ public class MacroExpansionModuleModel {
   private ComponentModel buildFrom(ComponentModel componentModelOrigin, ComponentModel.Builder operationReplacementModel) {
     componentModelOrigin.getConfigFileName().ifPresent(operationReplacementModel::setConfigFileName);
     componentModelOrigin.getLineNumber().ifPresent(operationReplacementModel::setLineNumber);
+    componentModelOrigin.getStartColumn().ifPresent(operationReplacementModel::setStartColumn);
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {
       child.setParent(componentModel);

@@ -25,7 +25,6 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
@@ -43,16 +42,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.reactivestreams.Publisher;
-
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
@@ -67,6 +56,15 @@ import java.util.function.Supplier;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.reactivestreams.Publisher;
 
 /**
  * TODO MULE-14000 Create hamcrest matchers to assert EventContext state
@@ -584,7 +582,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
         .build();
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getComponentIdentifier()).thenReturn(typedComponentIdentifier);
-    when(location.getParts()).thenReturn(asList(new DefaultLocationPart("flow", empty(), empty(), empty())));
+    when(location.getParts()).thenReturn(asList(new DefaultLocationPart("flow", empty(), empty(), empty(), empty())));
     BaseEventContext context = contextWithComponentLocation.apply(location);
 
     assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), is("http"));

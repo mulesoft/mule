@@ -8,8 +8,8 @@ package org.mule.runtime.config.internal;
 
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.config.internal.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
-
 import org.mule.runtime.config.internal.parsers.DefaultXmlMetadataAnnotations;
+import org.mule.runtime.config.internal.parsers.SourcePosition;
 import org.mule.runtime.config.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 
@@ -98,9 +98,7 @@ final public class MuleDocumentLoader implements DocumentLoader {
 
     @Override
     public XmlMetadataAnnotations create(Locator locator) {
-      DefaultXmlMetadataAnnotations annotations = new DefaultXmlMetadataAnnotations();
-      annotations.setLineNumber(locator.getLineNumber());
-      return annotations;
+      return new DefaultXmlMetadataAnnotations();
     }
   }
 
@@ -113,6 +111,7 @@ final public class MuleDocumentLoader implements DocumentLoader {
     private DomWalkerElement walker;
     private XmlMetadataAnnotationsFactory metadataFactory;
     private Stack<XmlMetadataAnnotations> annotationsStack = new Stack<>();
+    private SourcePosition trackingPoint = new SourcePosition();
 
     private XmlMetadataAnnotator(Document doc, XmlMetadataAnnotationsFactory metadataFactory) {
       this.walker = new DomWalkerElement(doc.getDocumentElement());
@@ -130,6 +129,8 @@ final public class MuleDocumentLoader implements DocumentLoader {
       walker = walker.walkIn();
 
       XmlMetadataAnnotations metadataBuilder = metadataFactory.create(locator);
+      metadataBuilder.setLineNumber(locator.getLineNumber());
+      metadataBuilder.setColumnNumber(trackingPoint.getColumn() - 1);
       LinkedHashMap<String, String> attsMap = new LinkedHashMap<>();
       for (int i = 0; i < atts.getLength(); ++i) {
         attsMap.put(atts.getQName(i), atts.getValue(i));
@@ -140,21 +141,46 @@ final public class MuleDocumentLoader implements DocumentLoader {
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
+      this.updateTrackingPoint();// update the starting point
       annotationsStack.peek().appendElementBody(new String(ch, start, length).trim());
     }
 
     @Override
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+      this.updateTrackingPoint();// update the starting point
+    }
+
+    @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
+
+      /* here we can get our source position */
+      SourcePosition tagStartingPosition = this.trackingPoint;
+      SourcePosition tagEndPosition =
+          new SourcePosition(this.locator.getLineNumber(),
+                             this.locator.getColumnNumber());
+
       XmlMetadataAnnotations metadataAnnotations = annotationsStack.pop();
       metadataAnnotations.appendElementEnd(qName);
 
       if (!annotationsStack.isEmpty()) {
-        annotationsStack.peek()
+        XmlMetadataAnnotations xmlMetadataAnnotations = annotationsStack.peek();
+
+        xmlMetadataAnnotations
             .appendElementBody(LINE_SEPARATOR + metadataAnnotations.getElementString() + LINE_SEPARATOR);
       }
 
       walker.getParentNode().setUserData(METADATA_ANNOTATIONS_KEY, metadataAnnotations, COPY_METADATA_ANNOTATIONS_DATA_HANDLER);
       walker = walker.walkOut();
+
+      // update the starting point for the next tag
+      this.updateTrackingPoint();
+    }
+
+    private void updateTrackingPoint() {
+      SourcePosition item = new SourcePosition(locator.getLineNumber(), locator.getColumnNumber());
+      if (this.trackingPoint.compareTo(item) < 0) {
+        this.trackingPoint = item;
+      }
     }
   }
 
