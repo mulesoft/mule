@@ -21,6 +21,9 @@ import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NO
 import static org.mule.runtime.config.internal.LazyMetadataService.NON_LAZY_METADATA_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -46,6 +49,8 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
@@ -160,6 +165,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
+            if (object instanceof MessageProcessorChainBuilder) {
+              MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
+              initialiseIfNeeded(messageProcessorChain.getMessageProcessors(), true, muleContext);
+            }
             muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
           } catch (MuleException e) {
             throw new RuntimeException(e);
@@ -170,6 +179,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
+            if (object instanceof MessageProcessorChainBuilder) {
+              MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
+              startIfNeeded(messageProcessorChain.getMessageProcessors());
+            }
             muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
           } catch (MuleException e) {
             throw new RuntimeException(e);
@@ -311,6 +324,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     if (muleContext.isStarted()) {
       beanNames.forEach(beanName -> {
         try {
+          getRegistry().lookupByName(beanName).ifPresent(component -> {
+            if (component instanceof MessageProcessorChainBuilder) {
+              MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) component).build();
+              disposeIfNeeded(messageProcessorChain.getMessageProcessors(), LOGGER);
+            }
+          });
           unregisterObject(muleContext, beanName);
         } catch (Exception e) {
           logger
