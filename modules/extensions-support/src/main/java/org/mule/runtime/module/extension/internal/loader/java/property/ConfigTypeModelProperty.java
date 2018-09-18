@@ -10,6 +10,8 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 
+import java.lang.ref.WeakReference;
+
 /**
  * An immutable model property which specifies that the owning {@link EnrichableModel} requires a configuration of a given
  * {@link #configType}
@@ -18,7 +20,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
  */
 public class ConfigTypeModelProperty implements ModelProperty {
 
-  private final Class<?> configType;
+  private final WeakReference<Class<?>> configType;
 
   /**
    * Creates a new instance for the given {@code configType}
@@ -26,14 +28,14 @@ public class ConfigTypeModelProperty implements ModelProperty {
    * @param configType
    */
   public ConfigTypeModelProperty(Class<?> configType) {
-    this.configType = configType;
+    this.configType = new WeakReference<>(configType);
   }
 
   /**
    * @return the {@link {@link #configType }}
    */
   public Class<?> getConfigType() {
-    return configType;
+    return configType.get();
   }
 
   /**

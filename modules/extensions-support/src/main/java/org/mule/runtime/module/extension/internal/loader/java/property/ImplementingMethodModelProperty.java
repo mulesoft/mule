@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
 /**
@@ -19,7 +20,7 @@ import java.lang.reflect.Method;
  */
 public class ImplementingMethodModelProperty implements ModelProperty {
 
-  private final Method method;
+  private final WeakReference<Method> method;
 
   /**
    * Creates a new instance referencing the given {@code method}
@@ -29,14 +30,14 @@ public class ImplementingMethodModelProperty implements ModelProperty {
    */
   public ImplementingMethodModelProperty(Method method) {
     checkArgument(method != null, "method cannot be null");
-    this.method = method;
+    this.method = new WeakReference<>(method);
   }
 
   /**
    * @return a {@link Method} which defines the owning {@link OperationModel}
    */
   public Method getMethod() {
-    return method;
+    return method.get();
   }
 
   /**
