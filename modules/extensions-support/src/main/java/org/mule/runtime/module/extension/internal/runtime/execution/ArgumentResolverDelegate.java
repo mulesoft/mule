@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 import java.util.function.Supplier;
 
@@ -17,6 +18,8 @@ import java.util.function.Supplier;
  * @since 3.7.0
  */
 interface ArgumentResolverDelegate {
+
+  ArgumentResolver<?>[] getArgumentResolvers();
 
   /**
    * Returns an object array with the argument values of the given {@code executionContext}

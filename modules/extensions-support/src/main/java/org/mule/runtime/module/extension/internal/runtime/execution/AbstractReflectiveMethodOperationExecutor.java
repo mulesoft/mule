@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -42,13 +43,12 @@ abstract class AbstractReflectiveMethodOperationExecutor<M extends ComponentMode
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
 
-  protected final ReflectiveMethodComponentExecutor<M> executor;
+  protected final ByteBuddyWrappedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
   public AbstractReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
-    executor = new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
-                                                       operationMethod,
-                                                       operationInstance);
+    executor = new ByteBuddyWrappedMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
+                                                             operationMethod, operationInstance);
   }
 
   @Override

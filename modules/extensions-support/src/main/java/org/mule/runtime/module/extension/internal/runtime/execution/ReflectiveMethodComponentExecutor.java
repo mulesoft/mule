@@ -26,6 +26,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -48,6 +49,11 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
     private static final Object[] EMPTY = new Object[][] {};
     private static final Supplier<Object>[] EMPTY_DEFERRED = new Supplier[] {};
+
+    @Override
+    public ArgumentResolver<?>[] getArgumentResolvers() {
+      return new ArgumentResolver[] {};
+    }
 
     @Override
     public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {

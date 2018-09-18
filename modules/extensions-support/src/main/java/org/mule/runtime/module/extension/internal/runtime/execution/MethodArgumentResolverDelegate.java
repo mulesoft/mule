@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
@@ -86,6 +87,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -238,6 +240,18 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
       argumentResolvers[i] = addResolverDecorators((ArgumentResolver<Object>) argumentResolver, parameter);
     }
+  }
+
+  @Override
+  public ArgumentResolver<?>[] getArgumentResolvers() {
+    ArgumentResolver<?>[] wrappedResolvers = new ArgumentResolver<?>[argumentResolvers.length];
+    for (int i = 0; i < argumentResolvers.length; i++) {
+      int j = i;
+      wrappedResolvers[i] = executionContext -> wrapParameterResolution(method.getParameterTypes()[j],
+                                                                        argumentResolvers[j].resolve(executionContext));
+    }
+
+    return wrappedResolvers;
   }
 
   @Override
