@@ -109,8 +109,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public void initialise() throws InitialisationException {
     Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
-    if (!Objects.equals(((Component) rootContainer).getLocation().getLocation(),
-                        this.getLocation().getRootContainerName())) {
+    if (rootContainer != null && !Objects.equals(((Component) rootContainer).getLocation().getLocation(),
+                                                 this.getLocation().getRootContainerName())) {
       // This is for the case of the async inside a sub-flow
       processingStrategy = defaultProcessingStrategy().create(muleContext, getLocation().getLocation());
       ownProcessingStrategy = true;
