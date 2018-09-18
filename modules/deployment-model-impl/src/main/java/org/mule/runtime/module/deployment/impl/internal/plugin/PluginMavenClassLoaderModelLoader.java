@@ -17,6 +17,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -46,7 +47,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   }
 
   @Override
-  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile, ClassLoaderModelBuilder classLoaderModelBuilder,
+  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile,
+                                                             ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
                                                              Set<BundleDependency> dependencies) {
     classLoaderModelBuilder.containing(getUrl(artifactFile, artifactFile));
   }
