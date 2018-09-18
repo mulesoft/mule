@@ -12,6 +12,8 @@ import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoad
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
+import java.lang.ref.WeakReference;
+
 /**
  * A {@link ModelProperty} meant to be used on {@link ConnectionProviderModel connection provider models},
  * which indicates the type of the produced connections
@@ -20,7 +22,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeW
  */
 public final class ConnectionTypeModelProperty implements ModelProperty {
 
-  private Class<?> connectionType;
+  private WeakReference<Class<?>> connectionType;
   private Type type;
 
   /**
@@ -29,7 +31,7 @@ public final class ConnectionTypeModelProperty implements ModelProperty {
    * @param connectionType a connection type
    */
   public ConnectionTypeModelProperty(Class<?> connectionType) {
-    this.connectionType = connectionType;
+    this.connectionType = new WeakReference<>(connectionType);
     this.type = new TypeWrapper(connectionType, new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
   }
 
@@ -41,7 +43,7 @@ public final class ConnectionTypeModelProperty implements ModelProperty {
    * @return a connection type
    */
   public Class<?> getConnectionType() {
-    return connectionType;
+    return connectionType.get();
   }
 
   public Type getConnectionTypeElement() {
