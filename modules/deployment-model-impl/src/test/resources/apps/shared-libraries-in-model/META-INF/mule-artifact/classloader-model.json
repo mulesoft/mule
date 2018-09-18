@@ -26,8 +26,7 @@
         "type": "jar",
         "classifier": "mule-plugin"
       },
-      "uri": "repository/org/mule/group/mule-plugin-b/1.0.0/mule-plugin-b-1.0.0-mule-plugin.jar",
-      "isShared": false
+      "uri": "repository/org/mule/group/mule-plugin-b/1.0.0/mule-plugin-b-1.0.0-mule-plugin.jar"
     }
   ]
 }

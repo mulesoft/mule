@@ -29,6 +29,11 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * ClassLoaderModelBuilder that adds the concept of Shared Library for the configured dependencies.
+ *
+ * @since 4.2.0
+ */
 public class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
 
   protected Set<BundleDependency> bundleDependencies;
@@ -48,6 +53,11 @@ public class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.ClassLoade
     return this;
   }
 
+  /**
+   * Sets a flag to export the configured shared libraries when building the ClassLoaderModel
+   * @return this builder
+   * @since 4.2.0
+   */
   public ClassLoaderModel.ClassLoaderModelBuilder exportingSharedLibraries() {
     this.processSharedLibraries = true;
     return this;
@@ -66,8 +76,8 @@ public class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.ClassLoade
   }
 
   /**
-   * Template method for exporting shared libraries and packages. If no classloader-model.json is provided or
-   * the information needed is not present, the pom needs to be parsed again to find which dependencies need to be shared.
+   * Template method for exporting shared libraries and packages.
+   * By default, the pom needs to be parsed again to find which dependencies need to be shared.
    */
   protected void doExportSharedLibrariesResourcesAndPackages() {
     Model model = getPomModelFolder(applicationFolder);
