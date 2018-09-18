@@ -7,20 +7,19 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 
-import org.springframework.beans.factory.SmartFactoryBean;
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
  * Repository for storing the dynamic class generated to mimic {@link org.springframework.beans.factory.FactoryBean} from an
@@ -84,6 +83,7 @@ public class ObjectFactoryClassRepository {
     // Setting this to false will generate an excessive amount of different proxy classes loaded by the container CL
     // that will end up in Metaspace OOM.
     enhancer.setUseCache(!instancePostCreationFunction.isPresent());
+    final boolean prototype = componentBuildingDefinition.isPrototype();
 
     Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
@@ -91,7 +91,7 @@ public class ObjectFactoryClassRepository {
           final boolean eager = !isLazyInitFunction.get();
 
           if (method.getName().equals("isSingleton")) {
-            return !componentBuildingDefinition.isPrototype();
+            return !prototype;
           }
           if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
             return createdObjectType;
@@ -102,7 +102,7 @@ public class ObjectFactoryClassRepository {
             return createdInstance;
           }
           if (method.getName().equals("isPrototype")) {
-            return componentBuildingDefinition.isPrototype();
+            return prototype;
           }
           if (method.getName().equals("isEagerInit")) {
             return eager;

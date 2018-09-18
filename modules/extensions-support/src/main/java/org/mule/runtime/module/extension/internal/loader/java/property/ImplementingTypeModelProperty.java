@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 
+import java.lang.ref.WeakReference;
+
 /**
  * An immutable model property which indicates that the owning {@link EnrichableModel} was derived from a given {@link #type}
  *
@@ -16,7 +18,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
  */
 public final class ImplementingTypeModelProperty implements ModelProperty {
 
-  private final Class<?> type;
+  private final WeakReference<Class<?>> type;
 
   /**
    * Creates a new instance referencing the given {@code type}
@@ -24,14 +26,14 @@ public final class ImplementingTypeModelProperty implements ModelProperty {
    * @param type a {@link Class} which defines the owning {@link EnrichableModel}
    */
   public ImplementingTypeModelProperty(Class<?> type) {
-    this.type = type;
+    this.type = new WeakReference<>(type);
   }
 
   /**
    * @return a {@link Class} which defines the owning {@link EnrichableModel}
    */
   public Class<?> getType() {
-    return type;
+    return type.get();
   }
 
   /**

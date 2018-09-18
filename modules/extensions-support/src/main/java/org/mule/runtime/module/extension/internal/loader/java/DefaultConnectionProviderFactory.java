@@ -17,6 +17,8 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}
@@ -26,8 +28,8 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
  */
 final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFactory<C> {
 
-  private final Class<? extends ConnectionProvider> providerClass;
-  private final ClassLoader extensionClassLoader;
+  private final WeakReference<Class<? extends ConnectionProvider>> providerClass;
+  private final WeakReference<ClassLoader> extensionClassLoader;
 
   /**
    * Creates a new instance which creates {@link ConnectionProvider} instances of the given {@code providerClass}
@@ -38,7 +40,7 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
    * @throws IllegalArgumentException if {@code providerClass} is not an instantiable type
    */
   DefaultConnectionProviderFactory(Class<?> providerClass, ClassLoader extensionClassLoader) {
-    this.extensionClassLoader = extensionClassLoader;
+    this.extensionClassLoader = new WeakReference<>(extensionClassLoader);
     if (!ConnectionProvider.class.isAssignableFrom(providerClass)) {
       throw new IllegalConnectionProviderModelDefinitionException(String
           .format("Class '%s' was specified as a connection provider but it doesn't implement the '%s' interface",
@@ -46,7 +48,7 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
     }
 
     checkInstantiable(providerClass, new ReflectionCache());
-    this.providerClass = (Class<? extends ConnectionProvider>) providerClass;
+    this.providerClass = new WeakReference<>((Class<? extends ConnectionProvider>) providerClass);
   }
 
   /**
@@ -55,10 +57,10 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
   @Override
   public ConnectionProvider<C> newInstance() {
     try {
-      return withContextClassLoader(extensionClassLoader, providerClass::newInstance);
+      return withContextClassLoader(extensionClassLoader.get(), () -> (ConnectionProvider<C>) providerClass.get().newInstance());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create connection provider of type "
-          + providerClass.getName()), e);
+          + providerClass.get().getName()), e);
     }
   }
 
@@ -67,6 +69,6 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
    */
   @Override
   public Class<? extends ConnectionProvider> getObjectType() {
-    return providerClass;
+    return providerClass.get();
   }
 }
