@@ -83,6 +83,10 @@ public class ObjectFactoryClassRepository {
     // Setting this to false will generate an excessive amount of different proxy classes loaded by the container CL
     // that will end up in Metaspace OOM.
     enhancer.setUseCache(!instancePostCreationFunction.isPresent());
+
+    // MG says: this is super important. Generating this variable here prevents the lambda below from
+    // keeping a reference to the componentBuildingDefinition, which in turn references a classloader and has
+    // caused leaks in the past
     final boolean prototype = componentBuildingDefinition.isPrototype();
 
     Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
