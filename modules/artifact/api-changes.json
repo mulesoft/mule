@@ -9,6 +9,42 @@
           "classSimpleName": "NonCachingURLStreamHandlerFactory",
           "elementKind": "class",
           "justification": "Undo remove of this handler for JarUrlConnection as useCache should be false when loading resources from application to prevent file descriptor leaks"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::getClassLoaderModelAttributes(java.util.Optional<java.util.Properties>, org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "AbstractArtifactDescriptorFactory",
+          "methodName": "getClassLoaderModelAttributes",
+          "elementKind": "method",
+          "justification": "Added new protected method. Implementation already in this class"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder::<init>(org.mule.runtime.module.artifact.api.descriptor.BundleDependency)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "Builder",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Added builder, should not cause issues"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder::setAdditionalDependencies(java.util.Set<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "Builder",
+          "methodName": "setAdditionalDependencies",
+          "elementKind": "method",
+          "justification": "Setter for new attributes"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Set<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getAdditionalDependencies()",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "BundleDependency",
+          "methodName": "getAdditionalDependencies",
+          "elementKind": "method",
+          "justification": "Getter for new attributes"
         }
       ]
     }

@@ -10,6 +10,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
 import java.net.URI;
+import java.util.Set;
 
 /**
  * Describes a dependency on a bundle.
@@ -21,6 +22,7 @@ public final class BundleDependency {
   private BundleDescriptor descriptor;
   private BundleScope scope;
   private URI bundleUri;
+  private Set<BundleDependency> additionalDependencies;
 
   private BundleDependency() {}
 
@@ -36,12 +38,17 @@ public final class BundleDependency {
     return bundleUri;
   }
 
+  public Set<BundleDependency> getAdditionalDependencies() {
+    return additionalDependencies;
+  }
+
   @Override
   public String toString() {
     return "BundleDependency{" +
         "descriptor=" + descriptor +
         ", scope=" + scope +
         ", bundleUri=" + bundleUri +
+        ", additionalDependencies=" + additionalDependencies +
         '}';
   }
 
@@ -55,6 +62,15 @@ public final class BundleDependency {
     private static final String REQUIRED_FIELD_IS_NULL = "bundle cannot be created with null %s";
 
     private BundleDependency bundleDependency = new BundleDependency();
+
+    public Builder() {}
+
+    public Builder(BundleDependency template) {
+      bundleDependency.bundleUri = template.bundleUri;
+      bundleDependency.descriptor = template.descriptor;
+      bundleDependency.scope = template.scope;
+      bundleDependency.additionalDependencies = template.additionalDependencies;
+    }
 
     /**
      * This is the descriptor of the bundle.
@@ -84,6 +100,11 @@ public final class BundleDependency {
 
     public Builder setBundleUri(URI bundleUri) {
       this.bundleDependency.bundleUri = bundleUri;
+      return this;
+    }
+
+    public Builder setAdditionalDependencies(Set<BundleDependency> additionalDependencies) {
+      this.bundleDependency.additionalDependencies = additionalDependencies;
       return this;
     }
 

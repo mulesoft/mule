@@ -65,21 +65,25 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
           .build();
     } else {
-      Model model;
-      if (artifactFile.isDirectory()) {
-        model = getPomModelFolder(artifactFile);
-      } else {
-        model = getPomModelFromJar(artifactFile);
-      }
-
-      return new BundleDescriptor.Builder()
-          .setArtifactId(model.getArtifactId())
-          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
-          .setType(EXTENSION_BUNDLE_TYPE)
-          .setClassifier(MULE_PLUGIN_CLASSIFIER)
-          .build();
+      return getBundleDescriptor(artifactFile);
     }
+  }
+
+  public static BundleDescriptor getBundleDescriptor(File artifactFile) {
+    Model model;
+    if (artifactFile.isDirectory()) {
+      model = getPomModelFolder(artifactFile);
+    } else {
+      model = getPomModelFromJar(artifactFile);
+    }
+
+    return new BundleDescriptor.Builder()
+        .setArtifactId(model.getArtifactId())
+        .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+        .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
+        .setType(EXTENSION_BUNDLE_TYPE)
+        .setClassifier(MULE_PLUGIN_CLASSIFIER)
+        .build();
   }
 
   private boolean isHeavyPackage(File artifactFile) {

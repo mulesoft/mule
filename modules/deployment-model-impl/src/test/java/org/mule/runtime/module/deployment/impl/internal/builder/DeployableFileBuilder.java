@@ -17,7 +17,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
-
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
@@ -29,13 +28,17 @@ import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> extends AbstractArtifactFileBuilder<T> {
 
   protected Properties deployProperties = new Properties();
+  private Map<PluginAdditionalDependenciesKey, List<JarFileBuilder>> additionalPluginDependencies = new HashMap<>();
 
   private boolean useHeavyPackage = true;
 
@@ -53,6 +56,22 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
   public DeployableFileBuilder(String artifactId, T source) {
     super(artifactId, source);
+  }
+
+  /**
+   * Adds a new dependency that will be visible only to the plugin defined by the groupId and artifactId of the {@link ArtifactPluginFileBuilder}.
+   *
+   * @param dependencyFileBuilder shared dependency.
+   * @return the same builder instance
+   */
+  public T additionalPluginDependencies(ArtifactPluginFileBuilder pluginFileBuilder, JarFileBuilder dependencyFileBuilder) {
+    PluginAdditionalDependenciesKey pluginAdditionalDependenciesKey =
+        new PluginAdditionalDependenciesKey(pluginFileBuilder.getGroupId(), pluginFileBuilder.getArtifactId());
+    if (!additionalPluginDependencies.containsKey(pluginAdditionalDependenciesKey)) {
+      additionalPluginDependencies.put(pluginAdditionalDependenciesKey, new ArrayList<>());
+    }
+    additionalPluginDependencies.get(pluginAdditionalDependenciesKey).add(dependencyFileBuilder);
+    return getThis();
   }
 
   /**
@@ -169,4 +188,47 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   }
 
   protected abstract List<ZipUtils.ZipResource> doGetCustomResources();
+
+  private class PluginAdditionalDependenciesKey {
+
+    private String groupId;
+    private String artifactId;
+
+    public PluginAdditionalDependenciesKey(String groupId, String artifactId) {
+      this.groupId = groupId;
+      this.artifactId = artifactId;
+    }
+
+    public String getGroupId() {
+      return groupId;
+    }
+
+    public String getArtifactId() {
+      return artifactId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      PluginAdditionalDependenciesKey that = (PluginAdditionalDependenciesKey) o;
+
+      if (!groupId.equals(that.groupId)) {
+        return false;
+      }
+      return artifactId.equals(that.artifactId);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = groupId.hashCode();
+      result = 31 * result + artifactId.hashCode();
+      return result;
+    }
+  }
 }

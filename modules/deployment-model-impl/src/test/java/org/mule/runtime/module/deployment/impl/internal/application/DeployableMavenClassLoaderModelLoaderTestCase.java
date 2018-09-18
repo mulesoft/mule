@@ -12,10 +12,12 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -61,13 +63,23 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
       createBundleDependency("other.company", "dummy-lib", "1.2.0", "raml-fragment");
   private static final org.mule.maven.client.api.model.BundleDependency TRAIT_BUNDLE =
       createBundleDependency("some.company", "dummy-trait", "1.0.3", "raml-fragment");
+
   private static final String POM_FORMAT = "%s-%s.pom";
+
   private List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES = asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
+
+  @Test
+  @io.qameta.allure.Description("Heavyweight packaged apps will deploy ok with shared libraries information in classloader-model.json")
+  public void sharedLibrariesAreReadFromModel() throws Exception {
+    URL patchedAppUrl = getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "shared-libraries-in-model").toString());
+    ClassLoaderModel classLoaderModel = buildClassLoaderModel(toFile(patchedAppUrl));
+    assertThat(classLoaderModel.getExportedResources(), is(not(empty())));
+  }
 
   @Test
   public void patchedApplicationLoadsUpdatedConnector() throws InvalidDescriptorLoaderException {
