@@ -294,7 +294,9 @@ public final class IntrospectionUtils {
     }
 
     if ((returnType.isSameType(Object.class) ||
-        returnType.isSameType(InputStream.class)) && type != null) {
+        returnType.isAssignableTo(InputStream.class) ||
+        returnType.isAssignableTo(Byte[].class) ||
+        returnType.isAssignableTo(byte[].class)) && type != null) {
 
       MetadataType metadataType = typeBuilder().anyType().build();
       MetadataTypeEnricher enricher = new MetadataTypeEnricher();
