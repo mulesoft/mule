@@ -163,16 +163,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
-            if (object instanceof MessageProcessorChainBuilder) {
-              MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
-              messageProcessorChain.getMessageProcessors().stream().forEach(processor -> {
-                try {
-                  muleContext.getRegistry().applyLifecycle(processor, Initialisable.PHASE_NAME);
-                } catch (MuleException e) {
-                  throw new RuntimeException(e);
-                }
-              });
-            }
+            applyLifecycleMessageProcessorChainBuilder(object, Initialisable.PHASE_NAME);
             muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
           } catch (MuleException e) {
             throw new RuntimeException(e);
@@ -183,16 +174,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
-            if (object instanceof MessageProcessorChainBuilder) {
-              MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
-              messageProcessorChain.getMessageProcessors().stream().forEach(processor -> {
-                try {
-                  muleContext.getRegistry().applyLifecycle(processor, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
-                } catch (MuleException e) {
-                  throw new RuntimeException(e);
-                }
-              });
-            }
+            applyLifecycleMessageProcessorChainBuilder(object, Startable.PHASE_NAME);
             muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
           } catch (MuleException e) {
             throw new RuntimeException(e);
@@ -200,6 +182,19 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         }
       }
     });
+  }
+
+  private void applyLifecycleMessageProcessorChainBuilder(Object object, String phase) {
+    if (object instanceof MessageProcessorChainBuilder) {
+      MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
+      messageProcessorChain.getMessageProcessors().stream().forEach(processor -> {
+        try {
+          muleContext.getRegistry().applyLifecycle(processor, phase);
+        } catch (MuleException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    }
   }
 
   @Override
@@ -334,18 +329,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     if (muleContext.isStarted()) {
       beanNames.forEach(beanName -> {
         try {
-          getRegistry().lookupByName(beanName).ifPresent(component -> {
-            if (component instanceof MessageProcessorChainBuilder) {
-              MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) component).build();
-              messageProcessorChain.getMessageProcessors().stream().forEach(processor -> {
-                try {
-                  muleContext.getRegistry().applyLifecycle(processor, Disposable.PHASE_NAME);
-                } catch (MuleException e) {
-                  throw new RuntimeException(e);
-                }
-              });
-            }
-          });
+          getRegistry().lookupByName(beanName)
+              .ifPresent(component -> applyLifecycleMessageProcessorChainBuilder(component, Disposable.PHASE_NAME));
           unregisterObject(muleContext, beanName);
         } catch (Exception e) {
           logger
