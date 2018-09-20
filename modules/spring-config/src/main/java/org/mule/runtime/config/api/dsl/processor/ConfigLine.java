@@ -60,6 +60,7 @@ public final class ConfigLine {
   // TODO MULE-9638 remove once we don't need the old parsing mechanism anymore.
   private Node node;
   private String textContent;
+  private int startColumn;
 
   public ConfigLine() {}
 
@@ -99,6 +100,10 @@ public final class ConfigLine {
     return lineNumber;
   }
 
+  public int getStartColumn() {
+    return startColumn;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -130,6 +135,7 @@ public final class ConfigLine {
     return result;
   }
 
+
   public static class Builder {
 
     public static final String BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT =
@@ -152,6 +158,12 @@ public final class ConfigLine {
     public Builder setLineNumber(int lineNumber) {
       checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
       configLine.lineNumber = lineNumber;
+      return this;
+    }
+
+    public Builder setStartColumn(int startColumn) {
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
+      configLine.startColumn = startColumn;
       return this;
     }
 

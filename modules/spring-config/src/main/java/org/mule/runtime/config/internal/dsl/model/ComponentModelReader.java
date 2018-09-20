@@ -46,7 +46,8 @@ public class ComponentModelReader {
             .build())
         .setTextContent(resolveValueIfIsPlaceHolder(configLine.getTextContent()))
         .setConfigFileName(configFileName)
-        .setLineNumber(configLine.getLineNumber());
+        .setLineNumber(configLine.getLineNumber())
+        .setStartColumn(configLine.getStartColumn());
     to(builder).addNode(from(configLine).getNode());
     for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
       builder.addParameter(simpleConfigAttribute.getName(), resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()),
