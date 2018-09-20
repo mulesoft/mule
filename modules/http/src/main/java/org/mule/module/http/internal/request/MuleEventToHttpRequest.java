@@ -138,8 +138,8 @@ public class MuleEventToHttpRequest
             }
         }
 
-        if (!outboundPropertyNames.contains(CONTENT_TYPE_PROPERTY)
-            && !builder.getHeaders().containsKey(CONTENT_TYPE_PROPERTY))
+        if (!outboundPropertyNames.contains(CONTENT_TYPE_PROPERTY) && !builder.getHeaders().containsKey(CONTENT_TYPE_PROPERTY) &&
+          !isEmptyBody(event, resolvedMethod))
         {
             DataType<?> dataType = event.getMessage().getDataType();
             if (!MimeTypes.ANY.equals(dataType.getMimeType()))
