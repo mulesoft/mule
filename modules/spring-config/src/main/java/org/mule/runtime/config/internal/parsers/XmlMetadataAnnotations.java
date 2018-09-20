@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.config.internal.parsers;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.Map;
 
 /**
  * Stores the metadata annotations from the XML parser so they are available when building the actual objects of the application.
  */
+@NoImplement
 public interface XmlMetadataAnnotations {
 
   String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
@@ -49,4 +52,19 @@ public interface XmlMetadataAnnotations {
    * @return the line where the declaration of the element starts in its source xml file.
    */
   int getLineNumber();
+
+  /**
+   * @param lineNumber the line where the declaration of the element starts in its source xml file.
+   */
+  void setLineNumber(int lineNumber);
+
+  /**
+   * @return the column where the declaration of the element starts in the source xml file.
+   */
+  int getColumnNumber();
+
+  /**
+   * @param columnNumber the column where the declaration of the element starts in the source xml file.
+   */
+  void setColumnNumber(int columnNumber);
 }

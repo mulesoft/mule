@@ -11,7 +11,6 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -64,6 +63,7 @@ public abstract class ComponentModel {
   private Object objectInstance;
   private Class<?> type;
   private Integer lineNumber;
+  private Integer startColumn;
   private String configFileName;
   private boolean enabled = true;
 
@@ -73,6 +73,14 @@ public abstract class ComponentModel {
    */
   public Optional<Integer> getLineNumber() {
     return ofNullable(lineNumber);
+  }
+
+  /**
+   * @return the start column in which the component was defined in the configuration file. It may be empty if the component was
+   *         created pragmatically.
+   */
+  public Optional<Integer> getStartColumn() {
+    return ofNullable(startColumn);
   }
 
   /**
@@ -147,14 +155,16 @@ public abstract class ComponentModel {
   }
 
   /**
-   * @return the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be created when processing this {@code ComponentModel}.
+   * @return the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be created when
+   *         processing this {@code ComponentModel}.
    */
   public Optional<TypedComponentIdentifier.ComponentType> getComponentType() {
     return ofNullable(componentType);
   }
 
   /**
-   * @param componentType the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be created when processing this {@code ComponentModel}.
+   * @param componentType the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be
+   *        created when processing this {@code ComponentModel}.
    */
   public void setComponentType(TypedComponentIdentifier.ComponentType componentType) {
     this.componentType = componentType;
@@ -391,6 +401,16 @@ public abstract class ComponentModel {
     public Builder setLineNumber(int lineNumber) {
       checkIsNotBuildingFromRootComponentModel("lineNumber");
       this.model.lineNumber = lineNumber;
+      return this;
+    }
+
+    /**
+     * @param startColumn the start column within the config file in which this component was defined.
+     * @return the builder.
+     */
+    public Builder setStartColumn(int startColumn) {
+      checkIsNotBuildingFromRootComponentModel("startColumn");
+      this.model.startColumn = startColumn;
       return this;
     }
 
