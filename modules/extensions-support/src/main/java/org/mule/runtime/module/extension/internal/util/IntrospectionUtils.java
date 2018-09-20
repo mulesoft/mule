@@ -39,6 +39,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -97,6 +98,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
@@ -109,6 +111,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.RequireNa
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
@@ -288,6 +291,17 @@ public final class IntrospectionUtils {
       if (itemType.isAssignableTo(Result.class)) {
         return returnListOfMessagesType(returnType, itemType);
       }
+    }
+
+    if ((returnType.isSameType(Object.class) ||
+        returnType.isAssignableTo(InputStream.class) ||
+        returnType.isAssignableTo(Byte[].class) ||
+        returnType.isAssignableTo(byte[].class)) && type != null) {
+
+      MetadataType metadataType = typeBuilder().anyType().build();
+      MetadataTypeEnricher enricher = new MetadataTypeEnricher();
+
+      return enricher.enrich(metadataType, type.asMetadataType().getAnnotations());
     }
 
     return type != null ? type.asMetadataType() : typeBuilder().anyType().build();

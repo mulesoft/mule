@@ -56,7 +56,7 @@ import java.util.Set;
  *
  * @since 1.1
  */
-class MetadataTypeEnricher {
+public class MetadataTypeEnricher {
 
   public MetadataType enrich(MetadataType target, Set<TypeAnnotation> annotations) {
     TypeEnricherVisitor visitor = new TypeEnricherVisitor(target, annotations);
