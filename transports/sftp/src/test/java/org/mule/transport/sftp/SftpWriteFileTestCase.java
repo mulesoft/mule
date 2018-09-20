@@ -81,7 +81,7 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
         client.send("vm://overwrite-with-temp-dir-outbound", "hello", null);
         client.send("vm://overwrite-with-temp-dir-outbound", "world", null);
         MuleMessage message = client.request("file://testdir/overwrite.txt", RECEIVE_TIMEOUT);
-        assertEquals("world", message.getPayloadAsString());
+        assertEquals("hello", message.getPayloadAsString());
     }
 
 }
