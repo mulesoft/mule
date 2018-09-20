@@ -11,13 +11,13 @@
     <flow name="payload">
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
 
-        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET"/>
+        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="#[method]"/>
     </flow>
 
     <flow name="header">
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="text/plain" encoding="UTF-16"/>
 
-        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET">
+        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="#[method]">
             <http:request-builder>
                 <http:header headerName="Content-Type" value="application/json; charset=UTF-8"/>
             </http:request-builder>
@@ -29,6 +29,18 @@
 
         <set-property propertyName="Content-Type" value="application/json; charset=UTF-8"/>
 
-        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET"/>
+        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="#[method]"/>
+    </flow>
+
+    <flow name="payloadNever">
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
+
+        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="#[method]" sendBodyMode="NEVER"/>
+    </flow>
+
+    <flow name="payloadAlways">
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
+
+        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="#[method]" sendBodyMode="ALWAYS"/>
     </flow>
 </mule>
