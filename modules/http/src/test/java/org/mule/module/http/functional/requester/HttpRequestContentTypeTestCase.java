@@ -10,9 +10,11 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.transformer.types.MimeTypes.HTML;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -43,25 +45,43 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsContentTypeFromPayload() throws Exception
     {
-        validateContentTypeFromFlow("payload");
+        validateContentTypeFromFlow("payload", "POST");
     }
 
     @Test
     public void sendsContentTypeFromHeader() throws Exception
     {
-        validateContentTypeFromFlow("header");
+        validateContentTypeFromFlow("header", "POST");
     }
 
     @Test
     public void sendsContentTypeFromProperty() throws Exception
     {
-        validateContentTypeFromFlow("property");
+        validateContentTypeFromFlow("property", "POST");
+    }
+
+    @Test
+    public void doesNotSendContentTypeFromPayloadOnEmptyBody() throws Exception
+    {
+        validateNoContentTypeFromFlow("payload", "GET");
+    }
+
+    @Test
+    public void doesNotSendContentTypeFromPayloadOnNeverBody() throws Exception
+    {
+        validateNoContentTypeFromFlow("payloadNever", "POST");
+    }
+
+    @Test
+    public void sendsContentTypeFromPayloadOnAlwaysBody() throws Exception
+    {
+        validateContentTypeFromFlow("payloadAlways", "GET");
     }
 
     @Test
     public void returnsContentTypeWhenAvailable() throws Exception
     {
-        MuleMessage result = runFlow("payload").getMessage();
+        MuleMessage result = runFlow("payload", "POST").getMessage();
         assertThat(result.getDataType().getMimeType(), is(HTML));
     }
 
@@ -69,7 +89,7 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase
     public void returnsDefaultContentTypeWhenNotAvailable() throws Exception
     {
         responseContentType = null;
-        MuleMessage result = runFlow("payload").getMessage();
+        MuleMessage result = runFlow("payload", "POST").getMessage();
         assertThat(result.getDataType().getMimeType(), is("application/octet-stream"));
     }
 
@@ -78,7 +98,7 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase
     {
         requestResponse = null;
         responseContentType = null;
-        MuleMessage result = runFlow("payload").getMessage();
+        MuleMessage result = runFlow("payload", "POST").getMessage();
         assertThat(result.getDataType().getMimeType(), is("*/*"));
     }
 
@@ -96,10 +116,21 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase
         }
     }
 
-    private void validateContentTypeFromFlow(String flowName) throws Exception
+    private void validateContentTypeFromFlow(String flowName, String method) throws Exception
     {
-        runFlow(flowName, TEST_MESSAGE);
+        runFlow(flowName, method);
         assertThat(getFirstReceivedHeader(CONTENT_TYPE_PROPERTY), equalTo(EXPECTED_CONTENT_TYPE));
+    }
+
+    private void validateNoContentTypeFromFlow(String payload, String method) throws Exception {
+        runFlow(payload, method);
+        assertThat(headers.get(CONTENT_TYPE_PROPERTY), is(empty()));
+    }
+
+    private MuleEvent runFlow(String flowName, String method) throws Exception {
+        MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+        testEvent.setFlowVariable("method", method);
+        return runFlow(flowName, testEvent);
     }
 
 }
