@@ -16,6 +16,7 @@
 
 package org.mule.transport.sftp;
 
+import static org.mule.transport.sftp.SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -89,7 +90,7 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             filename = client.duplicateHandling(destDir, filename, sftpUtil.getDuplicateHandling());
             transferFilename = filename;
 
-            boolean appendMode = sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND);
+            boolean appendMode = sftpUtil.getDuplicateHandling().equals(PROPERTY_DUPLICATE_HANDLING_APPEND);
             useTempDir = sftpUtil.isUseTempDirOutbound();
             if (useTempDir)
             {
