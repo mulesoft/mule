@@ -32,7 +32,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
@@ -54,12 +53,16 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.w3c.dom.Element;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -74,11 +77,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanReference;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.w3c.dom.Element;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -288,13 +286,9 @@ public class BeanDefinitionFactory {
 
   private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry) {
     if (componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-      AtomicReference<BeanDefinition> defaultRetryPolicyTemplate = new AtomicReference<>();
       AtomicReference<BeanDefinition> expressionLanguage = new AtomicReference<>();
 
       componentModel.getInnerComponents().stream().forEach(childComponentModel -> {
-        if (areMatchingTypes(RetryPolicyTemplate.class, childComponentModel.getType())) {
-          defaultRetryPolicyTemplate.set(((SpringComponentModel) childComponentModel).getBeanDefinition());
-        }
         if (areMatchingTypes(MVELExpressionLanguage.class, childComponentModel.getType())) {
           expressionLanguage.set(((SpringComponentModel) childComponentModel).getBeanDefinition());
         }
@@ -305,9 +299,6 @@ public class BeanDefinitionFactory {
           registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
           registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
         }
-      }
-      if (defaultRetryPolicyTemplate.get() != null) {
-        registry.registerBeanDefinition(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, defaultRetryPolicyTemplate.get());
       }
       if (expressionLanguage.get() != null) {
         registry.registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage.get());

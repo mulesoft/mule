@@ -81,6 +81,15 @@
           "classSimpleName": "Builder",
           "elementKind": "interface",
           "justification": "This interface is not meant to be extended by the user"
+        },
+        {
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE",
+          "elementKind": "field",
+          "justification": "Reconnection strategies cannot be configured globally in Mule 4"
         }
       ]
     }

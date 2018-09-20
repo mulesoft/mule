@@ -136,7 +136,6 @@ public class MuleProperties {
   public static final String OBJECT_MULE_STREAM_CLOSER_SERVICE = "_muleStreamCloserService";
   public static final String OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP = "_muleSimpleRegistryBootstrap";
   public static final String OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY = "_defaultGlobalExceptionStrategy";
-  public static final String OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE = "_defaultRetryPolicyTemplate";
   public static final String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
   public static final String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
   public static final String OBJECT_CONVERTER_RESOLVER = "_converterResolver";
@@ -231,6 +230,7 @@ public class MuleProperties {
    * @since 4.1.4
    * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_STREAMING_BUCKET_SIZE} instead
    */
+  @Deprecated
   public static final String MULE_STREAMING_BUCKET_SIZE = SYSTEM_PROPERTY_PREFIX + "streaming.bucketSize";
 
   /**
