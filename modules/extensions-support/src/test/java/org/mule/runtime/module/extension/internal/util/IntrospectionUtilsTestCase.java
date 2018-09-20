@@ -435,6 +435,13 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(itemType, is(instanceOf(StringType.class)));
   }
 
+  @Test
+  public void getByteArrayOutputType() throws Exception {
+    OperationElement operation = getMethod("byteArray");
+    MetadataType metadataType = operation.getOperationReturnMetadataType();
+    assertThat(metadataType, instanceOf(AnyType.class));
+  }
+
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
     Field field = findField(name, fields);
     assertThat(field, is(notNullValue()));
@@ -524,6 +531,10 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   public void setBaskets(List<FruitBasket> baskets) {
     this.baskets = baskets;
+  }
+
+  public Byte[] byteArray() {
+    return null;
   }
 
   private void assertAttributesType(String method) throws Exception {
