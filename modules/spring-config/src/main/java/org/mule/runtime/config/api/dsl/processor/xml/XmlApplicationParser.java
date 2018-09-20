@@ -45,8 +45,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.api.dsl.processor.ConfigLine}
- * objects.
+ * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.api.dsl.processor.ConfigLine} objects.
  * <p>
  * It uses the SPI interface {@link XmlNamespaceInfoProvider} to locate for all namespace info provided and normalize the
  * namespace from the XML document.
@@ -174,7 +173,7 @@ public final class XmlApplicationParser {
 
     XmlMetadataAnnotations userData = (XmlMetadataAnnotations) node.getUserData(XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY);
     int lineNumber = userData.getLineNumber();
-    builder.setLineNumber(lineNumber);
+    builder.setLineNumber(lineNumber).setStartColumn(userData.getColumnNumber());
 
     to(builder).addNode(node);
 

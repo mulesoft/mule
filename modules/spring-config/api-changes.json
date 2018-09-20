@@ -1,4 +1,28 @@
 {
+  "4.1.7": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.config.api.dsl.processor.ConfigLine.Builder org.mule.runtime.config.api.dsl.processor.ConfigLine.Builder::setStartColumn(int)",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "Builder",
+          "methodName": "setStartColumn",
+          "elementKind": "method",
+          "justification": "MULE-15715 - Support column number for component locations"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method int org.mule.runtime.config.api.dsl.processor.ConfigLine::getStartColumn()",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ConfigLine",
+          "methodName": "getStartColumn",
+          "elementKind": "method",
+          "justification": "MULE-15715 - Support column number for component locations"
+        }
+      ]
+    }
+  },
   "4.1.4": {
     "revapi": {
       "ignore": [
