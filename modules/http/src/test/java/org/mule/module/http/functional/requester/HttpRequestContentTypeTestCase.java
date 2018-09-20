@@ -10,6 +10,7 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.transformer.types.MimeTypes.HTML;
@@ -21,7 +22,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -124,7 +124,7 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase
 
     private void validateNoContentTypeFromFlow(String payload, String method) throws Exception {
         runFlow(payload, method);
-        assertThat(headers.get(CONTENT_TYPE_PROPERTY), is(Matchers.<String>empty()));
+        assertThat(headers.get(CONTENT_TYPE_PROPERTY), is(empty()));
     }
 
     private MuleEvent runFlow(String flowName, String method) throws Exception {
