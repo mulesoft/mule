@@ -198,6 +198,7 @@ public class MuleProperties
     public static final String MULE_FORCE_CONSOLE_LOG = SYSTEM_PROPERTY_PREFIX + "forceConsoleLog";
     public static final String MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS = SYSTEM_PROPERTY_PREFIX + "log.context.dispose.delay.millis";
     public static final String MULE_DEFAULT_PROCESSING_STRATEGY = SYSTEM_PROPERTY_PREFIX + "default.processing.strategy";
+    public static final String MULE_HANDLE_COPY_OF_EVENT_IN_MESSAGE_PROCESSOR_NOTIFICATION = SYSTEM_PROPERTY_PREFIX + "handle.copy.event.for.notification";
     public static final String MULE_FLOW_TRACE = SYSTEM_PROPERTY_PREFIX + "flowTrace";
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
     public static final String MULE_PGP_ENCRYPTION_ALGORITHM = SYSTEM_PROPERTY_PREFIX + "pgp.encryption.algorithm";

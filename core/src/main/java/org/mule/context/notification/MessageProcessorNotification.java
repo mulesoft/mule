@@ -6,6 +6,9 @@
  */
 package org.mule.context.notification;
 
+import static java.lang.Boolean.parseBoolean;
+import static org.mule.api.config.MuleProperties.MULE_HANDLE_COPY_OF_EVENT_IN_MESSAGE_PROCESSOR_NOTIFICATION;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -15,7 +18,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.MessageProcessorPathResolver;
-import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
@@ -26,6 +28,8 @@ public class MessageProcessorNotification extends ServerNotification implements 
 {
 
     private static final long serialVersionUID = 1L;
+
+    private static Boolean handleCopyOfEvent;
 
     public static final int MESSAGE_PROCESSOR_PRE_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 1;
 
@@ -55,9 +59,32 @@ public class MessageProcessorNotification extends ServerNotification implements 
                                         MessageProcessor processor,
                                         MessagingException exceptionThrown, int action)
     {
-        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null, action == MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT);
+        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null, shouldReferenceOriginal(action));
         this.exceptionThrown = exceptionThrown;
         this.processor = processor;
+    }
+
+    // Not referencing the original message can be used to consume notifications
+    // from different listeners. However this is disabled by default as this
+    // has a significant performance overhead.
+    private static boolean shouldReferenceOriginal(int action)
+    {
+        if (shouldHandleCopyOfEvent())
+        {
+            return action == MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT;
+        }
+
+        return true;
+    }
+
+    private static boolean shouldHandleCopyOfEvent()
+    {
+        if (handleCopyOfEvent == null)
+        {
+            handleCopyOfEvent = parseBoolean(System.getProperty(MULE_HANDLE_COPY_OF_EVENT_IN_MESSAGE_PROCESSOR_NOTIFICATION, "false"));
+        }
+
+        return handleCopyOfEvent;
     }
 
     @Override
