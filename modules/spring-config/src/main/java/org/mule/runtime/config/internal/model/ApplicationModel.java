@@ -536,7 +536,8 @@ public class ApplicationModel {
                       new DefaultComponentLocation.DefaultLocationPart(componentIdentifier.getName(),
                                                                        of(typedComponentIdentifier),
                                                                        of(configFile.getFilename()),
-                                                                       of(configLine.getLineNumber()));
+                                                                       of(configLine.getLineNumber()),
+                                                                       of(configLine.getStartColumn()));
                   providerComponent.setAnnotations(ImmutableMap.<QName, Object>builder()
                       .put(AbstractComponent.LOCATION_KEY,
                            new DefaultComponentLocation(of(componentIdentifier.getName()),
