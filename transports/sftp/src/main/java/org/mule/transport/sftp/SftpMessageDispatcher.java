@@ -16,10 +16,10 @@
 
 package org.mule.transport.sftp;
 
+import static org.mule.transport.sftp.SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -90,25 +90,32 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             filename = client.duplicateHandling(destDir, filename, sftpUtil.getDuplicateHandling());
             transferFilename = filename;
 
+            boolean appendMode = sftpUtil.getDuplicateHandling().equals(PROPERTY_DUPLICATE_HANDLING_APPEND);
             useTempDir = sftpUtil.isUseTempDirOutbound();
             if (useTempDir)
             {
-                // TODO move to a init-method like doConnect?
-                // cd to tempDir and create it if it doesn't already exist
-                sftpUtil.cwdToTempDirOnOutbound(client, destDir);
-
-                // Add unique file-name (if configured) for use during transfer to
-                // temp-dir
-                boolean addUniqueSuffix = sftpUtil.isUseTempFileTimestampSuffix();
-                if (addUniqueSuffix)
+                if (appendMode)
                 {
-                    transferFilename = sftpUtil.createUniqueSuffix(transferFilename);
+                    logger.warn("Using file append mode to write, tempDirOutbound will be ignored as it is not supported on this mode.");
+                }
+                else
+                {
+                    // TODO move to a init-method like doConnect?
+                    // cd to tempDir and create it if it doesn't already exist
+                    sftpUtil.cwdToTempDirOnOutbound(client, destDir);
+
+                    // Add unique file-name (if configured) for use during transfer to
+                    // temp-dir
+                    boolean addUniqueSuffix = sftpUtil.isUseTempFileTimestampSuffix();
+                    if (addUniqueSuffix) {
+                        transferFilename = sftpUtil.createUniqueSuffix(transferFilename);
+                    }
                 }
             }
 
             // send file over sftp
             // choose appropriate writing mode
-            if (sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND))
+            if (appendMode)
             {
                 if (event.getMessage().getPayload() instanceof OutputHandler)
                 {
@@ -133,7 +140,7 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            if (useTempDir)
+            if (useTempDir && !appendMode)
             {
                 // Move the file to its final destination
                 client.rename(transferFilename, destDir + "/" + filename);
