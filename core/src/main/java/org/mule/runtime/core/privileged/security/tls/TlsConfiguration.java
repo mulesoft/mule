@@ -240,7 +240,7 @@ public final class TlsConfiguration extends AbstractComponent
     KeyStore tempKeyStore;
     try {
       tempKeyStore = loadKeyStore();
-      checkKeyStoreContainsAlias(tempKeyStore);
+      checkKeyStoreContainsKeyAlias(tempKeyStore);
     } catch (Exception e) {
       throw new CreateException(failedToLoad("KeyStore: " + keyStoreName), e, this);
     }
@@ -265,18 +265,22 @@ public final class TlsConfiguration extends AbstractComponent
     return tempKeyStore;
   }
 
-  private void checkKeyStoreContainsAlias(KeyStore keyStore) throws KeyStoreException {
+  /**
+   * Check whether we have the alias required, if it's a key or if we have any key to use otherwise.
+   */
+  private void checkKeyStoreContainsKeyAlias(KeyStore keyStore) throws KeyStoreException {
+    Enumeration<String> aliases = keyStore.aliases();
     if (!isBlank(keyAlias)) {
-      boolean keyAliasFound = false;
-
-      Enumeration<String> aliases = keyStore.aliases();
+      boolean aliasFound = false;
       while (aliases.hasMoreElements()) {
         String alias = aliases.nextElement();
-
         if (alias.equals(keyAlias)) {
           // if alias is found all is valid but continue processing to strip out all
           // other (unwanted) keys
-          keyAliasFound = true;
+          aliasFound = true;
+          if (!keyStore.isKeyEntry(keyAlias)) {
+            throw new IllegalArgumentException("Keystore entry for alias '" + keyAlias + "' is not a key.");
+          }
         } else {
           // if the current alias is not the one we are looking for, remove
           // it from the keystore
@@ -285,8 +289,20 @@ public final class TlsConfiguration extends AbstractComponent
       }
 
       // if the alias was not found, throw an exception
-      if (!keyAliasFound) {
+      if (!aliasFound) {
         throw new IllegalStateException("Key with alias \"" + keyAlias + "\" was not found");
+      }
+    } else {
+      boolean hasKey = false;
+      while (aliases.hasMoreElements()) {
+        String alias = aliases.nextElement();
+        if (keyStore.isKeyEntry(alias)) {
+          hasKey = true;
+          break;
+        }
+      }
+      if (!hasKey) {
+        throw new IllegalArgumentException("No key entries found.");
       }
     }
   }
