@@ -7,10 +7,10 @@
 package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+
+import org.junit.Test;
 
 public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
     
@@ -18,7 +18,7 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
     protected String getConfigFile()
     {
         return "mule-sftp-write-file-config.xml";
-    }    
+    }
     
     @Test
     public void appendFile() throws Exception
@@ -31,6 +31,40 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
     }
 
     @Test
+    public void addSeqNo() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.send("vm://add-seq-no", "hello", null);
+        client.send("vm://add-seq-no", " world", null);
+        MuleMessage message = client.request("file://testdir/append.txt", RECEIVE_TIMEOUT);
+        assertEquals("hello", message.getPayloadAsString());
+        message = client.request("file://testdir/append_1.txt", RECEIVE_TIMEOUT);
+        assertEquals(" world", message.getPayloadAsString());
+    }
+
+    @Test
+    public void addSeqNoUsingTempDirOutbound() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.send("vm://add-seq-no-with-temp-dir-outbound", "hello", null);
+        client.send("vm://add-seq-no-with-temp-dir-outbound", " world", null);
+        MuleMessage message = client.request("file://testdir/append.txt", RECEIVE_TIMEOUT);
+        assertEquals("hello", message.getPayloadAsString());
+        message = client.request("file://testdir/append_1.txt", RECEIVE_TIMEOUT);
+        assertEquals(" world", message.getPayloadAsString());
+    }
+
+    @Test
+    public void appendFileUsingTempDirOutbound() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.send("vm://append-with-temp-dir-outbound", "hello", null);
+        client.send("vm://append-with-temp-dir-outbound", " world", null);
+        MuleMessage message = client.request("file://testdir/append.txt", RECEIVE_TIMEOUT);
+        assertEquals("hello world", message.getPayloadAsString());
+    }
+
+    @Test
     public void overwriteFile() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -38,6 +72,16 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
         client.send("vm://overwrite", "world", null);
         MuleMessage message = client.request("file://testdir/overwrite.txt", RECEIVE_TIMEOUT);
         assertEquals("world", message.getPayloadAsString());
+    }
+
+    @Test
+    public void overwriteFileUsingTempDirOutbound() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.send("vm://overwrite-with-temp-dir-outbound", "hello", null);
+        client.send("vm://overwrite-with-temp-dir-outbound", "world", null);
+        MuleMessage message = client.request("file://testdir/overwrite.txt", RECEIVE_TIMEOUT);
+        assertEquals("hello", message.getPayloadAsString());
     }
 
 }
