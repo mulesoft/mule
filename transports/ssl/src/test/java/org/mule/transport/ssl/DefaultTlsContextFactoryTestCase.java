@@ -9,9 +9,12 @@ package org.mule.transport.ssl;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -66,6 +69,31 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
     public static String getFileEnabledCipherSuites()
     {
         return "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
+    }
+
+    @Test
+    public void failIfKeyStoreHasNoKey() throws Exception
+    {
+        DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+        tlsContextFactory.setKeyStorePath("trustStore");
+        tlsContextFactory.setKeyStorePassword("mulepassword");
+        tlsContextFactory.setKeyManagerPassword("mulepassword");
+        expectedException.expectCause(hasCause(isA(IllegalArgumentException.class)));
+        expectedException.expectCause(hasCause(hasMessage(equalTo("No key entries found."))));
+        tlsContextFactory.initialise();
+    }
+
+    @Test
+    public void failIfKeyStoreAliasIsNotAKey() throws Exception
+    {
+        DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+        tlsContextFactory.setKeyStorePath("serverKeystore");
+        tlsContextFactory.setKeyAlias("muleclient");
+        tlsContextFactory.setKeyStorePassword("mulepassword");
+        tlsContextFactory.setKeyManagerPassword("mulepassword");
+        expectedException.expectCause(hasCause(isA(IllegalArgumentException.class)));
+        expectedException.expectCause(hasCause(hasMessage(equalTo("Keystore entry for alias 'muleclient' is not a key."))));
+        tlsContextFactory.initialise();
     }
 
     @Test
