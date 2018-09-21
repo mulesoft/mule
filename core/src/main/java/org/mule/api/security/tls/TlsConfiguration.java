@@ -7,12 +7,12 @@
 package org.mule.api.security.tls;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.config.i18n.CoreMessages.failedToLoad;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
@@ -21,7 +21,6 @@ import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.SecurityUtils;
-import org.mule.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -308,11 +307,10 @@ public final class TlsConfiguration
 
     protected void checkKeyStoreContainsAlias(KeyStore keyStore) throws KeyStoreException
     {
-        if (StringUtils.isNotBlank(keyAlias))
+        Enumeration<String> aliases = keyStore.aliases();
+        if (isNotBlank(keyAlias))
         {
             boolean keyAliasFound = false;
-
-            Enumeration<String> aliases = keyStore.aliases();
             while (aliases.hasMoreElements())
             {
                 String alias = aliases.nextElement();
@@ -321,6 +319,10 @@ public final class TlsConfiguration
                 {
                     // if alias is found all is valid but continue processing to strip out all
                     // other (unwanted) keys
+                    if (!keyStore.isKeyEntry(keyAlias))
+                    {
+                        throw new IllegalArgumentException("Keystore entry for alias '" + keyAlias + "' is not a key.");
+                    }
                     keyAliasFound = true;
                 }
                 else
@@ -335,6 +337,23 @@ public final class TlsConfiguration
             if (!keyAliasFound)
             {
                 throw new IllegalStateException("Key with alias \"" + keyAlias + "\" was not found");
+            }
+        }
+        else
+        {
+            boolean hasKey = false;
+            while (aliases.hasMoreElements())
+            {
+                String alias = aliases.nextElement();
+                if (keyStore.isKeyEntry(alias))
+                {
+                    hasKey = true;
+                    break;
+                }
+            }
+            if (!hasKey)
+            {
+                throw new IllegalArgumentException("No key entries found.");
             }
         }
     }
