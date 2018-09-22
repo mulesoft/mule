@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import org.mule.runtime.api.exception.MuleException;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 /**
  * Default implementation of {@link ResolverSetBasedObjectBuilder} which uses reflection
@@ -29,7 +31,11 @@ public class DefaultResolverSetBasedObjectBuilder<T> extends ResolverSetBasedObj
 
   @Override
   protected T instantiateObject() {
-    return createInstance(prototypeClass);
+    try {
+      return withContextClassLoader(prototypeClass.getClassLoader(), () -> createInstance(prototypeClass));
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create instance of " + prototypeClass), e);
+    }
   }
 
 }

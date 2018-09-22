@@ -21,14 +21,11 @@ import java.util.function.Supplier;
 
 public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T> {
 
-  private final ParameterGroupDescriptor group;
-
-  private final ReflectionCache reflectionCache;
+  private final ParameterGroupObjectBuilder<T> parameterGroupObjectBuilder;
 
   public ParameterGroupArgumentResolver(ParameterGroupDescriptor group, ReflectionCache reflectionCache) {
     checkState(group.getType().isInstantiable(), "Class %s cannot be instantiated.");
-    this.group = group;
-    this.reflectionCache = reflectionCache;
+    this.parameterGroupObjectBuilder = new ParameterGroupObjectBuilder<>(group, reflectionCache);
   }
 
   /**
@@ -38,7 +35,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
   public Supplier<T> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> {
       try {
-        return new ParameterGroupObjectBuilder<T>(group, reflectionCache).build((EventedExecutionContext) executionContext);
+        return parameterGroupObjectBuilder.build((EventedExecutionContext) executionContext);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not create parameter group"), e);
       }
