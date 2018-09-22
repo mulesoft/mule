@@ -1642,7 +1642,7 @@
                   "text/plain"
                 ]
               },
-              "type": "Binary",
+              "type": "Any",
               "annotations": {
                 "classInformation": {
                   "classname": "java.io.InputStream",
@@ -3036,7 +3036,7 @@
                   "text/plain"
                 ]
               },
-              "type": "Binary",
+              "type": "Any",
               "annotations": {
                 "classInformation": {
                   "classname": "java.io.InputStream",

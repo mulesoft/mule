@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
@@ -41,6 +42,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Sourc
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;

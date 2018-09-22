@@ -6,12 +6,14 @@
  */
 package org.mule.test.vegan.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class EatAppleOperation {
 
   @OutputResolver(output = AppleTypesResolver.class)
+  @MediaType(value = TEXT_PLAIN, strict = false)
   public Object eatApple(@Connection Apple apple, @Config AppleConfig config, @MetadataKeyId @Optional String key) {
     apple.bite();
     return apple;

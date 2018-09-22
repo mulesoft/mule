@@ -77,6 +77,7 @@ public class TypedValueParameterOperations {
   }
 
   @OutputResolver(output = NullOutputResolver.class)
+  @MediaType(value = TEXT_PLAIN, strict = false)
   public TypedValue<Object> typedValueForObject(@Content TypedValue<Object> objectTypedValue) {
     return objectTypedValue;
   }
