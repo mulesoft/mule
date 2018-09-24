@@ -27,6 +27,9 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 public abstract class Controller
 {
 
+    public static final String MULE_INSTANCE_NOT_RESTARTED = "The mule instance couldn't be restarted";
+    public static final String MULE_INSTANCE_NOT_STOPPED = "The mule instance couldn't be stopped";
+    public static final String MULE_INSTANCE_NOT_STARTED = "The mule instance couldn't be started";
     protected static final String ANCHOR_SUFFIX = "-anchor.txt";
     private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
     protected static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
@@ -61,14 +64,14 @@ public abstract class Controller
         int error = runSync("start", args);
         if (error != 0)
         {
-            throw new MuleControllerException("The mule instance couldn't be started");
+            throw new MuleControllerException(MULE_INSTANCE_NOT_STARTED);
         }
     }
 
     public void stop(String[] args)
     {
         int error = runSync("stop", args);
-        verify(error == 0, "The mule instance couldn't be stopped");
+        verify(error == 0, MULE_INSTANCE_NOT_STOPPED);
         deleteAnchors();
     }
 
@@ -81,7 +84,7 @@ public abstract class Controller
         int error = runSync("restart", args);
         if (error != 0)
         {
-            throw new MuleControllerException("The mule instance couldn't be restarted");
+            throw new MuleControllerException(MULE_INSTANCE_NOT_RESTARTED);
         }
     }
 
