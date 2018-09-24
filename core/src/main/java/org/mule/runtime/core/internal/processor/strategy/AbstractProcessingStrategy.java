@@ -83,9 +83,10 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
       onEventConsumer.accept(event);
       // Optimization to avoid using synchronized block for all emissions.
       // See: https://github.com/reactor/reactor-core/issues/1037
-      if (fluxSink.requestedFromDownstream() == 0) {
+      long remainingCapacity = fluxSink.requestedFromDownstream();
+      if (remainingCapacity == 0) {
         return false;
-      } else if (fluxSink.requestedFromDownstream() > (bufferSize > CORES * 4 ? CORES : 0)) {
+      } else if (remainingCapacity > (bufferSize > CORES * 4 ? CORES : 0)) {
         // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
         // emit without synchronized block.
         fluxSink.next(event);
@@ -93,7 +94,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
       } else {
         // If there is very little room in buffer also emit but synchronized.
         synchronized (fluxSink) {
-          if (fluxSink.requestedFromDownstream() > 0) {
+          if (remainingCapacity > 0) {
             fluxSink.next(event);
             return true;
           } else {
