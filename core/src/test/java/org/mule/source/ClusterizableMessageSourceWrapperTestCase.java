@@ -6,6 +6,8 @@
  */
 package org.mule.source;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -31,7 +33,7 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
 {
 
     private TestMessageSource messageSource = mock(TestMessageSource.class);
-    private ClusterizableMessageSourceWrapper wrapper = new ClusterizableMessageSourceWrapper(messageSource);
+    private TestClusterizableMessageSourceWrapper wrapper = new TestClusterizableMessageSourceWrapper(messageSource);
     private MuleContext muleContext = mock(MuleContext.class);
 
     @Test
@@ -155,6 +157,7 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
         when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
         primaryNodeLifecycleNotificationListener[0].onNotification(new ClusterNodeNotification("", 1));
         verify(messageSource, times(1)).start();
+        assertThat(wrapper.isClassLoaderSwitch(), equalTo(true));
     }
 
     @Test
@@ -181,5 +184,28 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
     private interface TestMessageSource extends ClusterizableMessageSource, Lifecycle
     {
 
+    }
+
+    private class TestClusterizableMessageSourceWrapper extends ClusterizableMessageSourceWrapper
+    {
+
+        private boolean classLoaderSwitch = false;
+
+        public TestClusterizableMessageSourceWrapper(ClusterizableMessageSource messageSource)
+        {
+            super(messageSource);
+        }
+
+        @Override
+        protected void setOriginalClassLoader()
+        {
+            classLoaderSwitch = true;
+            super.setOriginalClassLoader();
+        }
+
+        public boolean isClassLoaderSwitch()
+        {
+            return classLoaderSwitch;
+        }
     }
 }
