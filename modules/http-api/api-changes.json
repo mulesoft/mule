@@ -1,4 +1,89 @@
 {
+  "4.1.4": {
+    "revapi": {
+      "ignore": [
+         {
+           "code": "java.method.addedToInterface",
+           "new": "method org.mule.runtime.http.api.utils.RequestMatcherRegistry.RequestMatcherRegistryBuilder org.mule.runtime.http.api.HttpService::getRequestMatcherRegistryBuilder()",
+           "package": "org.mule.runtime.http.api",
+           "classSimpleName": "HttpService",
+           "methodName": "getRequestMatcherRegistryBuilder",
+           "elementKind": "method",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.method.staticMethodAddedToInterface",
+           "new": "method org.mule.runtime.http.api.server.MethodRequestMatcher org.mule.runtime.http.api.server.MethodRequestMatcher::acceptAll()",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "MethodRequestMatcher",
+           "methodName": "acceptAll",
+           "elementKind": "method",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.method.defaultMethodAddedToInterface",
+           "new": "method boolean org.mule.runtime.http.api.server.MethodRequestMatcher::acceptsAll()",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "MethodRequestMatcher",
+           "methodName": "acceptsAll",
+           "elementKind": "method",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.method.staticMethodAddedToInterface",
+           "new": "method org.mule.runtime.http.api.server.MethodRequestMatcherBuilder org.mule.runtime.http.api.server.MethodRequestMatcher::builder()",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "MethodRequestMatcher",
+           "methodName": "builder",
+           "elementKind": "method",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.method.staticMethodAddedToInterface",
+           "new": "method org.mule.runtime.http.api.server.MethodRequestMatcherBuilder org.mule.runtime.http.api.server.MethodRequestMatcher::builder(java.util.Collection<java.lang.String>)",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "MethodRequestMatcher",
+           "methodName": "builder",
+           "elementKind": "method",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.class.added",
+           "new": "class org.mule.runtime.http.api.server.MethodRequestMatcherBuilder",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "MethodRequestMatcherBuilder",
+           "elementKind": "class",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.method.staticMethodAddedToInterface",
+           "new": "method org.mule.runtime.http.api.server.PathAndMethodRequestMatcherBuilder org.mule.runtime.http.api.server.PathAndMethodRequestMatcher::builder()",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "PathAndMethodRequestMatcher",
+           "methodName": "builder",
+           "elementKind": "method",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.class.added",
+           "new": "class org.mule.runtime.http.api.server.PathAndMethodRequestMatcherBuilder",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "PathAndMethodRequestMatcherBuilder",
+           "elementKind": "class",
+           "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.class.added",
+           "new": "interface org.mule.runtime.http.api.utils.RequestMatcherRegistry<T extends java.lang.Object>",
+           "package": "org.mule.runtime.http.api.utils",
+           "classSimpleName": "RequestMatcherRegistry",
+           "elementKind": "interface",
+           "justification": "@Experimental feature. Feature flagged by default"
+         }
+
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

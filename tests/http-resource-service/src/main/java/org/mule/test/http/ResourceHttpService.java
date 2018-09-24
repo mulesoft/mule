@@ -18,6 +18,7 @@ import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.utils.RequestMatcherRegistry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +95,11 @@ public class ResourceHttpService implements HttpService {
         };
       }
     };
+  }
+
+  @Override
+  public RequestMatcherRegistry.RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder() {
+    return null;
   }
 
   private HttpEntity resolveEntity(String bundleDescription) {

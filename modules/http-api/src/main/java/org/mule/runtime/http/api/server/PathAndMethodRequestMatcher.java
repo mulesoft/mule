@@ -16,6 +16,14 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 public interface PathAndMethodRequestMatcher extends RequestMatcher {
 
   /**
+   * @return a fresh {@link PathAndMethodRequestMatcherBuilder}
+   * @since 4.1.5
+   */
+  static PathAndMethodRequestMatcherBuilder builder() {
+    return new PathAndMethodRequestMatcherBuilder();
+  }
+
+  /**
    * @return the path to match
    */
   String getPath();
@@ -24,4 +32,5 @@ public interface PathAndMethodRequestMatcher extends RequestMatcher {
    * @return the {@link MethodRequestMatcher} to use
    */
   MethodRequestMatcher getMethodRequestMatcher();
+
 }
