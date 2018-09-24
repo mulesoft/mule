@@ -12,6 +12,8 @@ import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientFactory;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.utils.RequestMatcherRegistry;
+import org.mule.runtime.http.api.utils.RequestMatcherRegistry.RequestMatcherRegistryBuilder;
 
 /**
  * Provides HTTP server and client factories.
@@ -30,5 +32,11 @@ public interface HttpService extends Service {
    * @return an {@link HttpClientFactory} capable of creating {@link HttpClient}s.
    */
   HttpClientFactory getClientFactory();
+
+  /**
+   * @return a fresh builder of {@link RequestMatcherRegistry RequestMatcherRegistries}.
+   * @since 4.1.5
+   */
+  RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder();
 
 }
