@@ -39,6 +39,7 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     private final ClusterizableMessageSource messageSource;
     private MuleContext muleContext;
     private FlowConstruct flowConstruct;
+    private ClassLoader classLoader;
     private final Object lock = new Object();
     private boolean started;
     private boolean messageSourceStarted;
@@ -46,11 +47,13 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
     public ClusterizableMessageSourceWrapper(ClusterizableMessageSource messageSource)
     {
         this.messageSource = messageSource;
+        this.classLoader = Thread.currentThread().getContextClassLoader();
     }
 
     public ClusterizableMessageSourceWrapper(MuleContext muleContext, ClusterizableMessageSource messageSource, FlowConstruct flowConstruct)
     {
         this.messageSource = messageSource;
+        this.classLoader = Thread.currentThread().getContextClassLoader();
         setMuleContext(muleContext);
         setFlowConstruct(flowConstruct);
     }
@@ -61,6 +64,11 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
         messageSource.setListener(listener);
     }
 
+    protected void setOriginalClassLoader()
+    {
+        Thread.currentThread().setContextClassLoader(classLoader);
+    }
+    
     @Override
     public void initialise() throws InitialisationException
     {
@@ -69,7 +77,10 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
             public void start() throws MuleException {
                 if (ClusterizableMessageSourceWrapper.this.isStarted())
                 {
+                    ClassLoader notificationClassLoader = Thread.currentThread().getContextClassLoader();
+                    setOriginalClassLoader();
                     ClusterizableMessageSourceWrapper.this.start();
+                    Thread.currentThread().setContextClassLoader(notificationClassLoader);
                 }
             }
         },muleContext);
