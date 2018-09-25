@@ -7,14 +7,18 @@
 package org.mule.runtime.module.extension.internal.runtime.notification;
 
 import static java.lang.String.format;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.notification.HasNotifications;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
+
+import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link NotificationEmitter}.
@@ -40,6 +44,12 @@ public class DefaultNotificationEmitter implements NotificationEmitter {
   public void fire(NotificationActionDefinition action, TypedValue<?> data) {
     validateAction((Enum) action);
     notificationManager.fireNotification(new DefaultExtensionNotification(event, component, action, data));
+  }
+
+  @Override
+  public void fireLazy(NotificationActionDefinition action, Supplier<?> data, DataType actualDataType) {
+    validateAction((Enum) action);
+    notificationManager.fireNotification(new DefaultExtensionNotification(event, component, action, data, actualDataType));
   }
 
   private void validateAction(Enum action) {
