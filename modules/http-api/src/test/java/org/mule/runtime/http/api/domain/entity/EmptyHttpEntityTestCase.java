@@ -11,9 +11,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 
+import org.junit.Test;
+
 import java.io.IOException;
 
-import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -51,7 +52,7 @@ public class EmptyHttpEntityTestCase {
 
   @Test
   public void hasZeroSize() {
-    assertThat(entity.getLength().get(), is(0L));
+    assertThat(entity.getBytesLength().getAsLong(), is(0L));
   }
 
 }

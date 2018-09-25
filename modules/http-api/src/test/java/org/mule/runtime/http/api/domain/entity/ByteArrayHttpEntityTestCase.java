@@ -10,15 +10,15 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.util.IOUtils.toByteArray;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 
-import org.mule.runtime.api.util.IOUtils;
+import org.junit.Test;
 
 import java.io.IOException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(HTTP_SERVICE)
 @Story("Entities")
@@ -44,8 +44,8 @@ public class ByteArrayHttpEntityTestCase {
 
   @Test
   public void providesNewStream() throws IOException {
-    assertThat(IOUtils.toByteArray(entity.getContent()), equalTo(content));
-    assertThat(IOUtils.toByteArray(entity.getContent()), equalTo(content));
+    assertThat(toByteArray(entity.getContent()), equalTo(content));
+    assertThat(toByteArray(entity.getContent()), equalTo(content));
   }
 
   @Test
@@ -55,7 +55,7 @@ public class ByteArrayHttpEntityTestCase {
 
   @Test
   public void providesSize() {
-    assertThat(entity.getLength().get(), is((long) content.length));
+    assertThat(entity.getBytesLength().getAsLong(), is((long) content.length));
   }
 
 }

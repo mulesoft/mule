@@ -14,11 +14,12 @@ import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 
 import org.mule.runtime.api.util.IOUtils;
 
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -75,9 +76,9 @@ public class InputStreamHttpEntityTestCase {
 
   @Test
   public void hasNoSizeUnlessSpecified() {
-    assertThat(entity.getLength().isPresent(), is(false));
+    assertThat(entity.getBytesLength().isPresent(), is(false));
     HttpEntity specifiedEntity = new InputStreamHttpEntity(new ByteArrayInputStream("TEST".getBytes()), 4L);
-    assertThat(specifiedEntity.getLength().get(), is(4L));
+    assertThat(specifiedEntity.getBytesLength().getAsLong(), is(4L));
   }
 
 }

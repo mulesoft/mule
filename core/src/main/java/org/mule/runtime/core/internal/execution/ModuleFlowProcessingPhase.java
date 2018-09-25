@@ -33,9 +33,10 @@ import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
 
-import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -47,7 +48,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
@@ -81,6 +81,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 import reactor.core.publisher.Mono;
 
@@ -152,8 +153,7 @@ public class ModuleFlowProcessingPhase
       final CoreEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
 
       try {
-        FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct.getExceptionListener(), templateEvent);
-        flowExecutionProcessor.setAnnotations(flowConstruct.getAnnotations());
+        FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct, templateEvent);
         final SourcePolicy policy =
             policyManager.createSourcePolicyInstance(messageSource, templateEvent, flowExecutionProcessor, template);
         final PhaseContext phaseContext =
@@ -386,17 +386,17 @@ public class ModuleFlowProcessingPhase
     return 0;
   }
 
-  private class FlowProcessor extends AbstractComponent implements Processor {
+  private class FlowProcessor implements Processor, Component {
 
     private final ModuleFlowProcessingPhaseTemplate template;
     private final CoreEvent templateEvent;
-    private final FlowExceptionHandler messagingExceptionHandler;
+    private final FlowConstruct flowConstruct;
 
-    public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, FlowExceptionHandler messagingExceptionHandler,
+    public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, FlowConstruct flowConstruct,
                          CoreEvent templateEvent) {
       this.template = template;
       this.templateEvent = templateEvent;
-      this.messagingExceptionHandler = messagingExceptionHandler;
+      this.flowConstruct = flowConstruct;
     }
 
     @Override
@@ -410,7 +410,32 @@ public class ModuleFlowProcessingPhase
           .flatMapMany(event -> processWithChildContext(event,
                                                         p -> from(p).flatMapMany(e -> template.routeEventAsync(e))
                                                             .switchIfEmpty(fromCallable(() -> emptyEvent(templateEvent))),
-                                                        Optional.empty(), messagingExceptionHandler));
+                                                        Optional.empty(), flowConstruct.getExceptionListener()));
+    }
+
+    @Override
+    public Object getAnnotation(QName name) {
+      return flowConstruct.getAnnotation(name);
+    }
+
+    @Override
+    public Map<QName, Object> getAnnotations() {
+      return flowConstruct.getAnnotations();
+    }
+
+    @Override
+    public void setAnnotations(Map<QName, Object> annotations) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ComponentLocation getLocation() {
+      return flowConstruct.getLocation();
+    }
+
+    @Override
+    public Location getRootContainerLocation() {
+      return flowConstruct.getRootContainerLocation();
     }
   }
 

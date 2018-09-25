@@ -6,26 +6,28 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.container.api.MuleFoldersUtil;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.Introspector;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Installer for mule artifacts inside the mule container directories.
@@ -54,14 +56,13 @@ public class ArtifactArchiveInstaller {
    */
   public File installArtifact(final URI artifactUri) throws IOException {
     if (!artifactUri.toString().toLowerCase().endsWith(JAR_FILE_SUFFIX)) {
-      throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUri);
+      throw new IllegalArgumentException("Invalid Mule artifact archive: '" + artifactUri + "'");
     }
 
     final File artifactFile = new File(artifactUri);
     final String baseName = getBaseName(artifactFile.getName());
     if (baseName.contains(" ")) {
-      throw new DeploymentInitException(I18nMessageFactory
-          .createStaticMessage("Mule artifact name may not contain spaces: " + baseName));
+      throw new DeploymentInitException(createStaticMessage("Mule artifact name may not contain spaces: '" + baseName + "'"));
     }
 
     File artifactDir = null;
@@ -71,7 +72,7 @@ public class ArtifactArchiveInstaller {
       final String fullPath = artifactFile.getAbsolutePath();
 
       if (logger.isInfoEnabled()) {
-        logger.info("Exploding a Mule artifact archive: " + fullPath);
+        logger.info("Exploding a Mule artifact archive: '" + fullPath + "'");
       }
 
       artifactName = getBaseName(fullPath);
@@ -79,7 +80,7 @@ public class ArtifactArchiveInstaller {
 
       // Removes previous deployed artifact
       if (artifactDir.exists() && !deleteTree(artifactDir)) {
-        throw new IOException("Cannot delete existing folder " + artifactDir);
+        throw new IOException("Cannot delete existing folder '" + artifactDir + "'");
       }
 
       // normalize the full path + protocol to make unzip happy
@@ -95,8 +96,8 @@ public class ArtifactArchiveInstaller {
       throw e;
     } catch (Throwable t) {
       errorEncountered = true;
-      final String msg = "Failed to install artifact from URI: " + artifactUri;
-      throw new DeploymentInitException(I18nMessageFactory.createStaticMessage(msg), t);
+      final String msg = "Failed to install artifact from URI: '" + artifactUri + "'";
+      throw new DeploymentInitException(createStaticMessage(msg), t);
     } finally {
       // delete an artifact dir, as it's broken
       if (errorEncountered && artifactDir != null && artifactDir.exists()) {
@@ -110,7 +111,7 @@ public class ArtifactArchiveInstaller {
    * Uninstalls an artifact from the Mule container installation.
    *
    * It will remove the artifact folder and the anchor file related
-   * 
+   *
    * @param artifactName name of the artifact to be uninstalled.
    */
   void uninstallArtifact(final String artifactName) {
@@ -126,13 +127,13 @@ public class ArtifactArchiveInstaller {
         throw ((DeploymentException) t);
       }
 
-      final String msg = String.format("Failed to undeployArtifact artifact [%s]", artifactName);
-      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+      final String msg = format("Failed to undeployArtifact artifact [%s]", artifactName);
+      throw new DeploymentException(createStaticMessage(msg), t);
     }
   }
 
   private File getArtifactAnchorFile(String artifactName) {
-    return new File(artifactParentDir, String.format("%s%s", artifactName, MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX));
+    return new File(artifactParentDir, format("%s%s", artifactName, ARTIFACT_ANCHOR_SUFFIX));
   }
 
   void createAnchorFile(String artifactName) throws IOException {

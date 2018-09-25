@@ -140,6 +140,70 @@
           "methodName": "enrich",
           "elementKind": "method",
           "justification": "method was deprecated and only used internally"
+        },
+        {
+          "code": "java.class.nonPublicPartOfAPI",
+          "old": "class org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap",
+          "new": "class org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap",
+          "classSimpleName": "InternalCaseInsensitiveHashMap",
+          "exampleUseChainInNewApi": "org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap is used as parameter in method java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap) (method java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap) is part of the API)",
+          "package": "org.mule.runtime.core.api.util",
+          "exampleUseChainInOldApi": "",
+          "elementKind": "class",
+          "justification": "This is not exposed"
+        },
+        {
+          "code": "java.field.serialVersionUIDUnchanged",
+          "old": "field org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>.serialVersionUID",
+          "new": "field org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>.serialVersionUID",
+          "serialVersionUID": "-7074633917369299456",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "CaseInsensitiveHashMap",
+          "fieldName": "serialVersionUID",
+          "elementKind": "field",
+          "justification": "Just generalizing a type definition"
+        }
+      ]
+    }
+  },
+  "4.1.5": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method <K, V> org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V> org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::emptyCaseInsensitiveMap()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "CaseInsensitiveHashMap",
+          "methodName": "emptyCaseInsensitiveMap",
+          "elementKind": "method",
+          "justification": "Added for performance"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V> org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::toImmutableCaseInsensitiveMap()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "CaseInsensitiveHashMap",
+          "methodName": "toImmutableCaseInsensitiveMap",
+          "elementKind": "method",
+          "justification": "Added for performance"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap)",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "CaseInsensitiveHashMap",
+          "methodName": "wrap",
+          "elementKind": "method",
+          "justification": "Added for performance"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.core.api.util.UUID::getClusterUUID(java.lang.String)",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "UUID",
+          "methodName": "getClusterUUID",
+          "elementKind": "method",
+          "justification": "Added for performance"
         }
       ]
     }

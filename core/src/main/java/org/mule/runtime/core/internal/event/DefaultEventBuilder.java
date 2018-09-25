@@ -18,6 +18,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseInsensitiveMap;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
@@ -69,7 +70,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
+  private boolean varsModified = false;
   private Map<String, TypedValue<?>> flowVariables = new HashMap<>();
+  private CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
   private Map<String, Object> internalParameters = new HashMap<>(4);
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
@@ -85,6 +88,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   public DefaultEventBuilder(BaseEventContext messageContext) {
     this.context = messageContext;
     this.session = new DefaultMuleSession();
+    this.originalVars = emptyCaseInsensitiveMap();
   }
 
   public DefaultEventBuilder(InternalEvent event) {
@@ -101,6 +105,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     this.flowVariables.putAll(event.getVariables());
+    if (event instanceof InternalEventImplementation) {
+      this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) ((InternalEventImplementation) event).getVariables();
+    } else {
+      varsModified = true;
+    }
     this.internalParameters.putAll(event.getInternalParameters());
   }
 
@@ -129,12 +138,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   @Override
   public DefaultEventBuilder variables(Map<String, ?> flowVariables) {
     copyFromTo(flowVariables, this.flowVariables);
+    this.varsModified = true;
     return this;
   }
 
   @Override
   public DefaultEventBuilder addVariable(String key, Object value) {
     flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
+    this.varsModified = true;
     this.modified = true;
     return this;
 
@@ -143,6 +154,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   @Override
   public DefaultEventBuilder addVariable(String key, Object value, DataType dataType) {
     flowVariables.put(key, new TypedValue<>(value, dataType));
+    this.varsModified = true;
     this.modified = true;
     return this;
   }
@@ -150,6 +162,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   @Override
   public DefaultEventBuilder removeVariable(String key) {
     this.modified = flowVariables.remove(key) != null || modified;
+    this.varsModified = this.varsModified || modified;
     return this;
   }
 
@@ -242,10 +255,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      Message message = messageFactory.apply(context);
-      requireNonNull(message);
-
-      return new InternalEventImplementation(context, message, flowVariables,
+      return new InternalEventImplementation(context, requireNonNull(messageFactory.apply(context)),
+                                             varsModified ? flowVariables : originalVars,
                                              internalParameters, session, securityContext, replyToDestination,
                                              replyToHandler, itemSequenceInfo, error,
                                              legacyCorrelationId,
@@ -310,6 +321,31 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.securityContext = securityContext;
       this.message = message;
       this.variables = new CaseInsensitiveHashMap<>(variables);
+      this.internalParameters = internalParameters;
+
+      this.replyToHandler = replyToHandler;
+      this.replyToDestination = replyToDestination;
+
+      this.itemSequenceInfo = itemSequenceInfo.orElse(null);
+      this.error = error;
+      this.legacyCorrelationId = legacyCorrelationId;
+
+      this.notificationsEnabled = notificationsEnabled;
+    }
+
+    // Use this constructor from the builder
+    private InternalEventImplementation(BaseEventContext context, Message message,
+                                        CaseInsensitiveHashMap<String, TypedValue<?>> variables,
+                                        Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
+                                        Object replyToDestination, ReplyToHandler replyToHandler,
+                                        Optional<ItemSequenceInfo> itemSequenceInfo,
+                                        Error error,
+                                        String legacyCorrelationId, boolean notificationsEnabled) {
+      this.context = context;
+      this.session = session;
+      this.securityContext = securityContext;
+      this.message = message;
+      this.variables = variables;
       this.internalParameters = internalParameters;
 
       this.replyToHandler = replyToHandler;
@@ -473,7 +509,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Map<String, TypedValue<?>> getVariables() {
-      return unmodifiableMap(variables);
+      return variables.toImmutableCaseInsensitiveMap();
     }
 
     @Override

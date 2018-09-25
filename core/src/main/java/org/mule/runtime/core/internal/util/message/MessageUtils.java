@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -205,9 +204,10 @@ public final class MessageUtils {
     Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getByteLength()));
 
     result.getAttributes().ifPresent(att -> {
-      final DataTypeParamsBuilder dataTypeBuilder = builder(DataType.fromObject(att));
-      result.getAttributesMediaType().ifPresent(amt -> dataTypeBuilder.mediaType(amt));
-      builder.attributes(new TypedValue<>(att, dataTypeBuilder.build(), OptionalLong.empty()));
+      DataType attDataType = result.getAttributesMediaType()
+          .map(amt -> builder().type(att.getClass()).mediaType(amt).build())
+          .orElse(DataType.fromObject(att));
+      builder.attributes(new TypedValue<>(att, attDataType, OptionalLong.empty()));
     });
 
     return builder.build();

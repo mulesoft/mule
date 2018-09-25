@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.processor.strategy;
 
-import static reactor.core.publisher.Flux.from;
-
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -39,7 +37,7 @@ public interface ProcessingStrategy {
    * @return enriched pipeline function/
    */
   default ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-    return publisher -> from(publisher).transform(pipeline);
+    return pipeline;
   }
 
   /**
@@ -49,7 +47,7 @@ public interface ProcessingStrategy {
    * @return enriched processor function
    */
   default ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    return publisher -> from(publisher).transform(processor);
+    return processor;
   }
 
   /**
