@@ -13,7 +13,6 @@ import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
@@ -55,22 +54,6 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       ResourceBundle.clearCache(this.getClass().getClassLoader());
     } catch (Exception e) {
       logger.warn("Couldn't clean up ResourceBundle. This can cause a memory leak.", e);
-    }
-
-    try {
-      // Even the cache is cleaned up there is a reference to a CacheKey that is hold by ResouceBundle.NONEXISTENT_BUNDLE
-      // so we have to cleanup this reference too instead of just leaving it and waiting for a next
-      // ResourceBundle.getBundle() call to a bundle that is missing that would change this reference
-      Field nonExistentBundleField = ResourceBundle.class.getDeclaredField("NONEXISTENT_BUNDLE");
-      nonExistentBundleField.setAccessible(true);
-
-      ResourceBundle resourceBundle = (ResourceBundle) nonExistentBundleField.get(null);
-
-      Field cacheKeyField = ResourceBundle.class.getDeclaredField("cacheKey");
-      cacheKeyField.setAccessible(true);
-      cacheKeyField.set(resourceBundle, null);
-    } catch (Exception e) {
-      logger.warn("Couldn't clean up ResourceBundle references. This can cause a memory leak.", e);
     }
   }
 
@@ -223,7 +206,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   *  Shutdowns the AWS IdleConnectionReaper Thread if one is present, since it will cause a leak if not closed correctly.
+   * Shutdowns the AWS IdleConnectionReaper Thread if one is present, since it will cause a leak if not closed correctly.
    */
   private void shutdownAwsIdleConnectionReaperThread() {
 
