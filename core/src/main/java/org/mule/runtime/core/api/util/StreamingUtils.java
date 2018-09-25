@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -106,9 +105,9 @@ public final class StreamingUtils {
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
    * {@link CursorProviderFactory#of(EventContext, Object)} is returned. Otherwise, the original {@code value} is.
    *
-   * @param value a value which may be a repeatable streaming resource
+   * @param value                 a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
-   * @param eventContext the root context of the event on which the {@code value} was generated
+   * @param eventContext          the root context of the event on which the {@code value} was generated
    * @return the {@code value} or a {@link CursorProvider}
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory,
@@ -124,9 +123,9 @@ public final class StreamingUtils {
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
    * {@link CursorProviderFactory#of(EventContext, Object)} is returned. Otherwise, the original {@code value} is.
    *
-   * @param value a value which may be a repeatable streaming resource
+   * @param value                 a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
-   * @param event the event on which the {@code value} was generated
+   * @param event                 the event on which the {@code value} was generated
    * @return the {@code value} or a {@link CursorProvider}
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
@@ -207,14 +206,48 @@ public final class StreamingUtils {
    */
   public static CoreEvent consumeRepeatablePayload(CoreEvent event) {
     TypedValue payload = event.getMessage().getPayload();
-    final Object originalPayload = payload.getValue();
 
-    if (originalPayload == null) {
+    if (payload.getValue() == null) {
       return event;
     }
 
-    DataType originalDataType = payload.getDataType();
-    TypedValue replacedPayload = null;
+    TypedValue replacedPayload = consumeRepeatableValue(payload);
+    if (replacedPayload != payload) {
+      event = CoreEvent.builder(event).message(
+                                               Message.builder(event.getMessage())
+                                                   .payload(replacedPayload)
+                                                   .build())
+          .build();
+    }
+
+    return event;
+  }
+
+  /**
+   * If the {@code typedValue} has a repeatable payload (instance of {@link CursorProvider}), then this method returns a new
+   * {@link TypedValue} which payload has an equivalent, already consumed structure. This functionality makes sense for cases like
+   * caching in which the contents of the stream need to survive the completion of the event that generated it.
+   * <p>
+   * If the payload is a {@link CursorStreamProvider}, then it will be consumed into a {@link ByteArrayCursorStreamProvider}
+   * so that the contents are fully in memory while still keeping repeatable byte streaming semantics.
+   * <p>
+   * If the payload is a {@link CursorIteratorProvider}, then the contents will be consumed into a {@link List}.
+   * <p>
+   * In any other case, the same input event is returned
+   *
+   * @param typedValue a typed value which might have a repeatable payload
+   * @return a {@link TypedValue}
+   * @since 4.1.4
+   */
+  public static TypedValue consumeRepeatableValue(TypedValue typedValue) {
+    final Object originalPayload = typedValue.getValue();
+
+    if (originalPayload == null) {
+      return typedValue;
+    }
+
+    DataType originalDataType = typedValue.getDataType();
+    TypedValue replacedPayload = typedValue;
 
     if (originalPayload instanceof CursorStreamProvider) {
       Object consumedPayload = asCursorProvider(toByteArray((CursorStreamProvider) originalPayload));
@@ -240,15 +273,7 @@ public final class StreamingUtils {
       replacedPayload = new TypedValue(consumed, newDataType);
     }
 
-    if (replacedPayload != null) {
-      event = CoreEvent.builder(event).message(
-                                               Message.builder(event.getMessage())
-                                                   .payload(replacedPayload)
-                                                   .build())
-          .build();
-    }
-
-    return event;
+    return replacedPayload;
   }
 
   private static CoreEvent replacePayload(CoreEvent event, Object newPayload) {
@@ -325,8 +350,8 @@ public final class StreamingUtils {
   /**
    * Updates the {@link Cursor} value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
    *
-   * @param value the typed value to update
-   * @param event the current event
+   * @param value            the typed value to update
+   * @param event            the current event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
