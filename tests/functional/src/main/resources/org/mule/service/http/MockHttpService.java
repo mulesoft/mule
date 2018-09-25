@@ -14,6 +14,7 @@ import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientFactory;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.utils.RequestMatcherRegistry;
 
 public class MockHttpService implements HttpService {
 
@@ -27,6 +28,10 @@ public class MockHttpService implements HttpService {
   }
 
   public HttpClientFactory getClientFactory() {
+    throw new UnsupportedOperationException();
+  }
+
+  public RequestMatcherRegistry.RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder() {
     throw new UnsupportedOperationException();
   }
 
