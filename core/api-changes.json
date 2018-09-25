@@ -10,6 +10,15 @@
         "fieldName": "MULE_STREAMING_BUCKET_SIZE",
         "elementKind": "field",
         "justification": "This is a false positive"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.api.metadata.TypedValue org.mule.runtime.core.api.util.StreamingUtils::consumeRepeatableValue(org.mule.runtime.api.metadata.TypedValue)",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "StreamingUtils",
+          "methodName": "consumeRepeatableValue",
+          "elementKind": "method",
+          "justification": "Fixes EE-6307 and does no evil"
         }
       ]
     }

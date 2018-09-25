@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.StreamingUtils.consumeRepeatablePayload;
+import static org.mule.runtime.core.api.util.StreamingUtils.consumeRepeatableValue;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
@@ -62,6 +63,14 @@ public class StreamingUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Description("Test that repeatable stream in the typed value is consumed into another fully in memory stream provider")
+  public void consumeRepeatableInputStreamTypedValue() throws Exception {
+    CursorStreamProvider payload = asCursorProvider(TEST_PAYLOAD);
+    TypedValue consumed = consumeRepeatableValue(TypedValue.of(payload));
+    assertConsumedRepeatableInputStream(payload, consumed);
+  }
+
+  @Test
   @Description("Test that repeatable stream in the payload is consumed into another fully in memory stream provider while maintaining "
       + "the original media type")
   public void consumeJsonRepeatableInputStreamPayload() throws Exception {
@@ -76,11 +85,32 @@ public class StreamingUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Description("Test that repeatable stream in the typed value is consumed into another fully in memory stream provider while "
+      + "maintaining the original media type")
+  public void consumeJsonRepeatableInputStreamTypedValue() throws Exception {
+    CursorStreamProvider payload = asCursorProvider(TEST_PAYLOAD);
+    TypedValue original =
+        new TypedValue(payload, DataType.builder().type(payload.getClass()).mediaType(APPLICATION_JSON).build());
+    TypedValue consumed = consumeRepeatableValue(original);
+
+    assertConsumedRepeatableInputStream(payload, consumed);
+    assertThat(consumed.getDataType().getMediaType(), is(APPLICATION_JSON));
+  }
+
+  @Test
   @Description("Test that repeatable iterator is consumed into a list")
   public void consumeRepeatableIteratorPayload() throws Exception {
     CursorIteratorProvider payload = asCursorProvider(TEST_LIST);
     CoreEvent event = consumeRepeatablePayload(getEventBuilder().message(Message.of(payload)).build());
     assertConsumedObjectStream(payload, event);
+  }
+
+  @Test
+  @Description("Test that repeatable iterator in typed value is consumed into a list")
+  public void consumeRepeatableIteratorTypedValue() throws Exception {
+    CursorIteratorProvider payload = asCursorProvider(TEST_LIST);
+    TypedValue consumed = consumeRepeatableValue(TypedValue.of(payload));
+    assertConsumedObjectStream(payload, consumed);
   }
 
   @Test
@@ -102,10 +132,35 @@ public class StreamingUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Description("Test that event without repeatable streamm payload is not modified")
+  @Description("Test that repeatable iterator in typed value is consumed into a list while maintaining the collection data type")
+  public void consumeTypedRepeatableIteratorTypedValue() throws Exception {
+    CursorIteratorProvider payload = asCursorProvider(TEST_LIST);
+    TypedValue original = new TypedValue(payload, DataType.builder()
+        .collectionType(ArrayList.class)
+        .itemType(String.class)
+        .build());
+
+    TypedValue consumed = consumeRepeatableValue(original);
+
+    assertConsumedObjectStream(payload, consumed);
+
+    DataType dataType = consumed.getDataType();
+    assertThat(dataType, is(instanceOf(CollectionDataType.class)));
+    assertThat(((CollectionDataType) dataType).getItemDataType(), equalTo(STRING));
+  }
+
+  @Test
+  @Description("Test that event without repeatable stream payload is not modified")
   public void dontConsumeUnrepeatableInputStreamPayload() throws Exception {
     CoreEvent event = getEventBuilder().message(Message.of(TEST_PAYLOAD)).build();
     assertThat(consumeRepeatablePayload(event), is(sameInstance(event)));
+  }
+
+  @Test
+  @Description("Test that typed value without repeatable stream payload is not modified")
+  public void dontConsumeUnrepeatableInputStreamTypedValue() throws Exception {
+    TypedValue value = TypedValue.of(TEST_PAYLOAD);
+    assertThat(consumeRepeatableValue(value), is(sameInstance(value)));
   }
 
   @Test
@@ -115,15 +170,42 @@ public class StreamingUtilsTestCase extends AbstractMuleTestCase {
     assertThat(consumeRepeatablePayload(event), is(sameInstance(event)));
   }
 
+  @Test
+  @Description("Test that typed value without repeatable iterator payload is not modified")
+  public void dontConsumeUnrepeatableIteratorTypedValue() throws Exception {
+    TypedValue value = TypedValue.of(TEST_LIST);
+    assertThat(consumeRepeatableValue(value), is(sameInstance(value)));
+  }
+
+  @Test
+  public void consumeEventWithNullPayload() throws Exception {
+    CoreEvent event = getEventBuilder().message(Message.of(null)).build();
+    assertThat(consumeRepeatablePayload(event), is(sameInstance(event)));
+  }
+
+  @Test
+  public void consumeNullTypedValue() throws Exception {
+    TypedValue value = TypedValue.of(null);
+    assertThat(consumeRepeatableValue(value), is(sameInstance(value)));
+  }
+
   private void assertConsumedRepeatableInputStream(CursorStreamProvider payload, CoreEvent event) {
-    Object responsePayload = event.getMessage().getPayload().getValue();
+    assertConsumedRepeatableInputStream(payload, event.getMessage().getPayload());
+  }
+
+  private void assertConsumedRepeatableInputStream(CursorStreamProvider payload, TypedValue value) {
+    Object responsePayload = value.getValue();
     assertThat(responsePayload, is(not(sameInstance(payload))));
     assertThat(responsePayload, is(instanceOf(ByteArrayCursorStreamProvider.class)));
     assertThat(IOUtils.toString((CursorStreamProvider) responsePayload), equalTo(TEST_PAYLOAD));
   }
 
   private void assertConsumedObjectStream(CursorIteratorProvider payload, CoreEvent event) {
-    Object responsePayload = event.getMessage().getPayload().getValue();
+    assertConsumedObjectStream(payload, event.getMessage().getPayload());
+  }
+
+  private void assertConsumedObjectStream(CursorIteratorProvider payload, TypedValue value) {
+    Object responsePayload = value.getValue();
     assertThat(responsePayload, is(not(sameInstance(payload))));
     assertThat(responsePayload, is(instanceOf(List.class)));
     assertThat(responsePayload, equalTo(TEST_LIST));
