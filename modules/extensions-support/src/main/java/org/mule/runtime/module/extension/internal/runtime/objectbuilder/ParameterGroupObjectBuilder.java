@@ -28,6 +28,8 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * An {@link ObjectBuilder} used to build pojos which are used with the {@link ParameterGroup} annotation.
@@ -53,8 +55,8 @@ public class ParameterGroupObjectBuilder<T> {
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
-    Map<String, Object> params = executionContext.getParameters();
-    return doBuild(params, from(executionContext.getEvent(), executionContext.getConfiguration()));
+    return doBuild(executionContext::hasParameter, executionContext::getParameter,
+                   from(executionContext.getEvent(), executionContext.getConfiguration()));
   }
 
   public T build(ResolverSetResult result) throws MuleException {
@@ -62,7 +64,7 @@ public class ParameterGroupObjectBuilder<T> {
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-      return doBuild(resultMap, from(initialiserEvent));
+      return doBuild(resultMap::containsKey, resultMap::get, from(initialiserEvent));
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -70,14 +72,14 @@ public class ParameterGroupObjectBuilder<T> {
     }
   }
 
-  private T doBuild(Map<String, Object> resultMap, ValueResolvingContext context)
+  private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context)
       throws MuleException {
     T object = createInstance(prototypeClass);
 
     for (FieldElement field : groupDescriptorFields) {
-      Object value = resultMap.get(field.getName());
-      if (value != null) {
-        Object resolvedValue = resolveValue(new StaticValueResolver<>(value), context);
+      String name = field.getName();
+      if (hasParameter.test(name)) {
+        Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters.apply(name)), context);
         setField(field.getField().get(), object,
                  context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue);
       }
