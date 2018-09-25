@@ -123,13 +123,6 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     Map actualCacheList = (Map) cacheListField.get(null);
 
     assertThat(actualCacheList.size(), equalTo(0));
-
-    Field nonExistentBundleField = ResourceBundle.class.getDeclaredField("NONEXISTENT_BUNDLE");
-    nonExistentBundleField.setAccessible(true);
-    ResourceBundle nonExistentBundle = (ResourceBundle) nonExistentBundleField.get(null);
-    Field cacheKeyField = ResourceBundle.class.getDeclaredField("cacheKey");
-    cacheKeyField.setAccessible(true);
-    assertThat(cacheKeyField.get(nonExistentBundle), is(nullValue()));
   }
 
   @Test

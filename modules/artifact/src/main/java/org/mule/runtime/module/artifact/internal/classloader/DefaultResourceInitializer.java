@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.internal.classloader;
 
+import static java.util.ResourceBundle.clearCache;
+
 import java.sql.DriverManager;
 
 import org.slf4j.Logger;
@@ -38,6 +40,10 @@ public class DefaultResourceInitializer {
     } catch (Throwable t) {
       logger.warn("Couldn't initialize DataTypeConverterImpl in order to prevent a class loader leak", t);
     }
+
+    // This is done so the ResourceBundle.NONEXISTENT_BUNDLE gets loaded with the container classloader thus preventing a memory
+    // leak.
+    clearCache();
 
     initializeDriverManager();
   }
