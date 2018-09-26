@@ -59,7 +59,7 @@ public final class TemplateParser {
   }
 
   /**
-   * LOGGER used by this class
+   * Logger used by this class
    */
   protected static final Logger logger = LoggerFactory.getLogger(TemplateParser.class);
 
