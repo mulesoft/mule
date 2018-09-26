@@ -532,7 +532,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                                   Matcher<Integer> rejectedAssertion, Matcher<Integer> totalAssertion)
       throws MuleException {
     if (mode.equals(SOURCE)) {
-
+      Latch latch = new Latch();
       triggerableMessageSource = new TriggerableMessageSource(backPressureStrategy);
       flow =
           flowBuilder.get()
@@ -542,7 +542,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                 @Override
                 public CoreEvent process(CoreEvent event) throws MuleException {
                   try {
-                    sleep(3);
+                    latch.await();
                   } catch (InterruptedException e) {
                     currentThread().interrupt();
                     throw new RuntimeException(e);
@@ -568,6 +568,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
             .cast(CoreEvent.class).transform(triggerableMessageSource.getListener())
             .doOnNext(event -> processed.getAndIncrement())
             .doOnError(e -> rejected.getAndIncrement()).subscribe());
+        if (i == STREAM_ITERATIONS / 2) {
+          latch.release();
+        }
       }
 
       new PollingProber(DEFAULT_TIMEOUT * 10, DEFAULT_POLLING_INTERVAL)
