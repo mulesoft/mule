@@ -18,6 +18,7 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
@@ -28,6 +29,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,8 +43,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
-import org.junit.Test;
-
 @SmallTest
 public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
 
@@ -49,7 +50,7 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
   public void notAnnotated() throws Exception {
     Component annotated = addAnnotationsToClass(NotAnnotated.class).newInstance();
     assertThat(annotated.getAnnotations().keySet(), empty());
-    annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
+    annotated.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("value")));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
 
     assertThat(annotated.getClass().getMethod("setSomething", Object.class).isAnnotationPresent(Inject.class), is(true));
@@ -62,7 +63,7 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
   public void extendsAbstractAnnotated() throws Exception {
     Component annotated = addAnnotationsToClass(ExtendsAnnotated.class).newInstance();
     assertThat(annotated.getAnnotations().keySet(), empty());
-    annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
+    annotated.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("value")));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
 
     assertThat(annotated.getClass().getMethod("setSomething", Object.class).isAnnotationPresent(Inject.class), is(true));
@@ -87,14 +88,14 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
   public void implementsInitialisable() throws Exception {
     Component annotated = addAnnotationsToClass(ImplementsInitialisable.class).newInstance();
     assertThat(annotated.getAnnotations().keySet(), empty());
-    annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
+    annotated.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("value")));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
   }
 
   @Test
   public void serializable() throws Exception {
     Component annotated = addAnnotationsToClass(IsSerializable.class).newInstance();
-    annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
+    annotated.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("value")));
     ((IsSerializable) annotated).setValue("Hello World!");
 
     final ByteArrayOutputStream serializedFormStream = new ByteArrayOutputStream();
