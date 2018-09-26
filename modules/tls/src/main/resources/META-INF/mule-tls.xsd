@@ -103,90 +103,98 @@
     </xsd:complexType>
 
     <xsd:complexType name="tlsContextTrustStoreType">
-        <xsd:attribute name="path" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The location (which will be resolved relative to the current classpath and file system, if possible)
-                    of the trust store.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="password" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The password used to protect the trust store.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="type" type="mule:keystoreType">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The type of store used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="algorithm" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The algorithm used by the trust store.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="insecure" type="mule:substitutableBoolean" default="false">
-            <xsd:annotation>
-                <xsd:documentation>
-                    If true, no certificate validations will be performed.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="path" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location (which will be resolved relative to the current classpath and file system, if possible)
+                            of the trust store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password used to protect the trust store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="type" type="mule:keystoreType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The type of store used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="algorithm" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The algorithm used by the trust store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="insecure" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If true, no certificate validations will be performed.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
 
     <xsd:complexType name="tlsContextKeyStoreType">
-        <xsd:attribute name="path" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The location (which will be resolved relative to the current classpath and file system, if possible)
-                    of the key store.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="type" type="mule:keystoreType">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The type of key store used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="alias" type="xsd:string" use="optional">
-            <xsd:annotation>
-                <xsd:documentation>
-                    When the key store contains many private keys, this attribute indicates the alias of the key that
-                    should be used. If not defined, the first key in the file will be used by default.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="keyPassword" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The password used to protect the private key.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="password" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The password used to protect the key store.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="algorithm" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The algorithm used by the key store.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="path" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location (which will be resolved relative to the current classpath and file system, if possible)
+                            of the key store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="type" type="mule:keystoreType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The type of key store used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="alias" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            When the key store contains many private keys, this attribute indicates the alias of the key that
+                            should be used. If not defined, the first key in the file will be used by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keyPassword" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password used to protect the private key.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password used to protect the key store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="algorithm" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The algorithm used by the key store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="rcWrapperElement">
