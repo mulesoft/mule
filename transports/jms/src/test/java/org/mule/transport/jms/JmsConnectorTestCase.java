@@ -180,6 +180,26 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void testCloseConnectionOnErrorWhileStarting() throws Exception
+    {
+        Connection connection = mock(Connection.class);
+        doThrow(new JMSException("connection unavailable")).when(connection).start();
+        JmsConnector connector = new StartOnConnectTestJmsConnector(muleContext);
+        JmsConnector spy = spy(connector);
+        doReturn(connection).when(spy).createConnection();
+
+        try
+        {
+            spy.doConnect();
+        }
+        catch (JMSException e)
+        {
+            // A JMS Exception should be raised.
+        }
+        verify(connection).close();
+    }
+
+    @Test
     public void testDoNotClosesSessionIfThereIsAnActiveTransaction() throws Exception
     {
         Transaction transaction = mock(Transaction.class);
@@ -373,6 +393,16 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         public int getInvocationsCreateConnectionFactory()
         {
             return invocationsCreateConnectionFactory;
+        }
+    }
+
+    private static class StartOnConnectTestJmsConnector extends JmsConnector
+    {
+
+        public StartOnConnectTestJmsConnector(MuleContext context)
+        {
+            super(context);
+            this.startOnConnect = true;
         }
     }
 
