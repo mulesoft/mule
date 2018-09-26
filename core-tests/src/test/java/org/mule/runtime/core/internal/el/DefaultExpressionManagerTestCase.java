@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -231,6 +232,16 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     TypedValue result = expressionManager.evaluate(expression, STRING, builder().build(), testEvent());
     assertThat(result.getValue(), is(TEST_PAYLOAD));
     assertThat(result.getDataType(), is(STRING));
+  }
+
+  @Test
+  public void mvelWithNullBinding() throws MuleException {
+    String expression = "#[mel: 2+2 ==4]";
+    TypedValue result = expressionManager
+        .evaluate(expression, BOOLEAN, builder().addBinding("payload", new TypedValue(null, OBJECT)).build(),
+                  testEvent());
+    assertThat(result.getValue(), is(true));
+    assertThat(result.getDataType(), is(BOOLEAN));
   }
 
   @Test
