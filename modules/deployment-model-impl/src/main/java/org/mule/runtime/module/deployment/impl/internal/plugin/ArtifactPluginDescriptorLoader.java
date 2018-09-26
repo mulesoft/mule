@@ -59,7 +59,7 @@ public class ArtifactPluginDescriptorLoader {
   public ArtifactPluginDescriptor load(File pluginFile,
                                        DeployableArtifactDescriptor deployableArtifactDescriptor)
       throws IOException {
-    checkArgument(pluginFile!= null, "plugin zip cannot be null");
+    checkArgument(pluginFile != null, "plugin zip cannot be null");
     checkArgument(pluginFile.getName().endsWith("jar"),
                   "plugin zip must be a zip file ending with .zip or .jar, but the file name was "
                       + pluginFile.getAbsolutePath());

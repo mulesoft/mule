@@ -84,7 +84,8 @@ public class ArtifactPluginDescriptorFactory
   @Override
   protected Map<String, Object> getClassLoaderModelAttributes(Optional<Properties> deploymentPropertiesOptional,
                                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor) {
-    Map<String, Object> attributes = super.getClassLoaderModelAttributes(deploymentPropertiesOptional, classLoaderModelLoaderDescriptor);
+    Map<String, Object> attributes =
+        super.getClassLoaderModelAttributes(deploymentPropertiesOptional, classLoaderModelLoaderDescriptor);
 
     if (deploymentPropertiesOptional.isPresent()) {
       Properties deploymentProperties = deploymentPropertiesOptional.get();

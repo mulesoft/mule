@@ -132,12 +132,12 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                   String dependencyArtifactId = getAttribute(dependency, ARTIFACT_ID);
                   String dependencyVersion = getAttribute(dependency, VERSION);
                   additionalDependencies.add(new BundleDependency.Builder()
-                                                 .setDescriptor(new BundleDescriptor.Builder()
-                                                                    .setGroupId(dependencyGroupId)
-                                                                    .setArtifactId(dependencyArtifactId)
-                                                                    .setVersion(dependencyVersion)
-                                                                    .build())
-                                                 .build());
+                      .setDescriptor(new BundleDescriptor.Builder()
+                          .setGroupId(dependencyGroupId)
+                          .setArtifactId(dependencyArtifactId)
+                          .setVersion(dependencyVersion)
+                          .build())
+                      .build());
                 }
                 replaceBundleDependency(bundleDependency, new BundleDependency.Builder(bundleDependency)
                     .setAdditionalDependencies(additionalDependencies)
@@ -201,11 +201,13 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     this.exportingResources(jarInfo.getResources());
   }
 
-  protected Optional<BundleDependency> findBundleDependency(String groupId, String artifactId, Optional<String> classifierOptional) {
+  protected Optional<BundleDependency> findBundleDependency(String groupId, String artifactId,
+                                                            Optional<String> classifierOptional) {
     return dependencies.stream()
         .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals(artifactId)
             && bundleDependency.getDescriptor().getGroupId().equals(groupId)
-            && classifierOptional.map(classifier -> classifier.equals(bundleDependency.getDescriptor().getClassifier().orElse(null))).orElse(true))
+            && classifierOptional
+                .map(classifier -> classifier.equals(bundleDependency.getDescriptor().getClassifier().orElse(null))).orElse(true))
         .findFirst();
   }
 

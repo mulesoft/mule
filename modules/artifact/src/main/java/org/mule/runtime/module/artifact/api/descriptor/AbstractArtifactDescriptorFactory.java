@@ -187,8 +187,8 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     final ClassLoaderModel classLoaderModel;
     try {
       classLoaderModel = classLoaderModelLoader.load(artifactFolder, getClassLoaderModelAttributes(deploymentProperties,
-                                                              classLoaderModelLoaderDescriptor),
-                getArtifactType());
+                                                                                                   classLoaderModelLoaderDescriptor),
+                                                     getArtifactType());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }

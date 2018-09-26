@@ -65,8 +65,8 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
    * @return the same builder instance
    */
   public T additionalPluginDependencies(ArtifactPluginFileBuilder pluginFileBuilder, JarFileBuilder dependencyFileBuilder) {
-    PluginAdditionalDependenciesKey
-        pluginAdditionalDependenciesKey = new PluginAdditionalDependenciesKey(pluginFileBuilder.getGroupId(), pluginFileBuilder.getArtifactId());
+    PluginAdditionalDependenciesKey pluginAdditionalDependenciesKey =
+        new PluginAdditionalDependenciesKey(pluginFileBuilder.getGroupId(), pluginFileBuilder.getArtifactId());
     if (!additionalPluginDependencies.containsKey(pluginAdditionalDependenciesKey)) {
       additionalPluginDependencies.put(pluginAdditionalDependenciesKey, new ArrayList<>());
     }

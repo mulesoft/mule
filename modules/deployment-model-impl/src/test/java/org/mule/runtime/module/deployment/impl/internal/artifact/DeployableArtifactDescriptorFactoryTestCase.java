@@ -268,7 +268,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ArtifactPluginDescriptor testEmptyPluginDescriptor = pluginDescriptorIterator.next();
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getUrls().length, is(3));
     assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url).getName()).collect(
-        toList()), hasItems(startsWith("test-empty-plugin-"), equalTo("commons-io-2.6.jar"), equalTo("commons-collections-3.2.1.jar")));
+                                                                                                                                 toList()),
+               hasItems(startsWith("test-empty-plugin-"), equalTo("commons-io-2.6.jar"),
+                        equalTo("commons-collections-3.2.1.jar")));
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
 
