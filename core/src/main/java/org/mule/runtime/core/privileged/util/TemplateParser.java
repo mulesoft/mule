@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.util;
 
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.lang.String.format;
 
 /**
  * <code>TemplateParser</code> is a simple string parser that will substitute tokens in a string with values supplied in a Map.
@@ -32,6 +35,10 @@ public final class TemplateParser {
   private static final char START_EXPRESSION = '#';
   private static final char OPEN_EXPRESSION = '[';
   private static final char CLOSE_EXPRESSION = ']';
+  private static final String EXPRESSION_NOT_CLOSED_ERROR_MSG = "\tOpened expression (%c) at line %d, column %d is not closed\n";
+  private static final String QUOTATION_NOT_CLOSED_ERROR_MSG =
+      "\tQuotation (%c) at line %d, column %d is not closed. Remember to use backslash (\\) if you are trying to use that character as a literal";
+  private static final String PARSING_TEMPLATE_ERROR = "Error while parsing template:\n";
 
   private static final Map<String, PatternInfo> patterns = new HashMap<>();
 
@@ -52,7 +59,7 @@ public final class TemplateParser {
   }
 
   /**
-   * logger used by this class
+   * LOGGER used by this class
    */
   protected static final Logger logger = LoggerFactory.getLogger(TemplateParser.class);
 
@@ -234,12 +241,15 @@ public final class TemplateParser {
   }
 
   private boolean validateBalanceMuleStyle(String template) {
-    Stack<Character> stack = new Stack<>();
+    // Save the line and column of each special character for error tracing purposes
+    Stack<Pair<Character, Pair<Integer, Integer>>> stack = new Stack<>();
     boolean lastStartedExpression = false;
     boolean lastIsBackSlash = false;
     int openBraces = 0;
     int openSingleQuotes = 0;
     int openDoubleQuotes = 0;
+    int line = 1;
+    int column = 1;
 
     for (int i = 0; i < template.length(); i++) {
       char c = template.charAt(i);
@@ -248,11 +258,11 @@ public final class TemplateParser {
           if (lastIsBackSlash) {
             break;
           }
-          if (!stack.empty() && stack.peek().equals('\'')) {
+          if (!stack.empty() && stack.peek().getFirst().equals('\'')) {
             stack.pop();
             openSingleQuotes--;
           } else {
-            stack.push(c);
+            stack.push(new Pair<>(c, new Pair<>(line, column)));
             openSingleQuotes++;
           }
           break;
@@ -260,32 +270,52 @@ public final class TemplateParser {
           if (lastIsBackSlash) {
             break;
           }
-          if (!stack.empty() && stack.peek().equals('"')) {
+          if (!stack.empty() && stack.peek().getFirst().equals('"')) {
             stack.pop();
             openDoubleQuotes--;
           } else {
-            stack.push(c);
+            stack.push(new Pair<>(c, new Pair<>(line, column)));
             openDoubleQuotes++;
           }
           break;
         case CLOSE_EXPRESSION:
-          if (!stack.empty() && stack.peek().equals(OPEN_EXPRESSION)) {
+          if (!stack.empty() && stack.peek().getFirst().equals(OPEN_EXPRESSION)) {
             stack.pop();
             openBraces--;
           }
           break;
         case OPEN_EXPRESSION:
           if ((lastStartedExpression || openBraces > 0) && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
-            stack.push(c);
+            stack.push(new Pair<>(c, new Pair<>(line, column)));
             openBraces++;
           }
+          break;
+        case '\n':
+          line++;
+          column = 0;
           break;
       }
       lastStartedExpression = c == START_EXPRESSION;
       lastIsBackSlash = c == '\\';
+      column++;
     }
+    boolean isValid = stack.empty();
+    if (!isValid) {
+      throwValidationError(template, stack);
+    }
+    return isValid;
+  }
 
-    return stack.empty();
+  private void throwValidationError(String template, Stack<Pair<Character, Pair<Integer, Integer>>> stack) {
+    String errorMsg = PARSING_TEMPLATE_ERROR;
+    for (Pair<Character, Pair<Integer, Integer>> tuple : stack) {
+      char c = tuple.getFirst();
+      int line = tuple.getSecond().getFirst();
+      int column = tuple.getSecond().getSecond();
+      String errorType = c == OPEN_EXPRESSION ? EXPRESSION_NOT_CLOSED_ERROR_MSG : QUOTATION_NOT_CLOSED_ERROR_MSG;
+      errorMsg += format(errorType, c, line, column);
+    }
+    throw new IllegalArgumentException(errorMsg);
   }
 
   private String replaceDollarSign(String valueString) {
