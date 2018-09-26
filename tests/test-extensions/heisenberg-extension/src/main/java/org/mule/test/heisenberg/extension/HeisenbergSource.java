@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
@@ -27,6 +28,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -198,7 +200,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
     executedOnSuccess = true;
 
-    notificationEmitter.fire(BATCH_DELIVERED, TypedValue.of(payment));
+    notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
 
     if (fail) {
       throw new RuntimeException("Some internal exception");
@@ -215,7 +217,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
     executedOnError = true;
-    notificationEmitter.fire(BATCH_DELIVERY_FAILED, new TypedValue<>(infoError, DataType.fromObject(infoError)));
+    notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
     if (propagateError) {
       throw new RuntimeException("Some internal exception");
     }
@@ -238,13 +240,14 @@ public class HeisenbergSource extends Source<String, Object> {
       });
     }
     executedOnTerminate = true;
-    notificationEmitter.fire(BATCH_TERMINATED,
-                             TypedValue.of(sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get()));
+    notificationEmitter.fireLazy(BATCH_TERMINATED, () -> sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
+                                 fromType(Integer.class));
   }
 
   @OnBackPressure
   public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
-    notificationEmitter.fire(BATCH_FAILED, TypedValue.of(ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get()));
+    notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
+                                 fromType(Integer.class));
     heisenberg.onBackPressure(ctx);
   }
 

@@ -8,13 +8,17 @@ package org.mule.runtime.module.extension.internal.runtime.notification;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.ExtensionNotification;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.internal.notification.ExtensionAction;
+
+import java.util.function.Supplier;
 
 /**
  * Represents notifications fired by an extension.
@@ -28,7 +32,7 @@ public class DefaultExtensionNotification implements ExtensionNotification {
   private final Event event;
   private final Component component;
   private final NotificationActionDefinition actionDefinition;
-  private final TypedValue<?> data;
+  private final Supplier<TypedValue<?>> data;
 
   private ExtensionAction action;
 
@@ -54,7 +58,32 @@ public class DefaultExtensionNotification implements ExtensionNotification {
     this.event = event;
     this.component = component;
     this.actionDefinition = actionDefinition;
-    this.data = data;
+    this.data = () -> data;
+  }
+
+  /**
+   * Creates a new {@link DefaultExtensionNotification} validating that the {@code actionDefinition} type information matches the
+   * actual data to use.
+   *
+   * @param event the {@link Event} associated to the notification
+   * @param component the {@link Component} associated to the notification
+   * @param actionDefinition the {@link NotificationActionDefinition} to use
+   * @param dataValue a supplier for the information to expose
+   * @param actualDataType the data type of the information to expose
+   * @throws IllegalArgumentException when the {@code actionDefinition} type doesn't match {@code data}
+   */
+  public DefaultExtensionNotification(Event event, Component component,
+                                      NotificationActionDefinition actionDefinition,
+                                      Supplier<?> dataValue, DataType actualDataType) {
+    DataType expectedDataType = actionDefinition.getDataType();
+    checkArgument(expectedDataType.isCompatibleWith(actualDataType),
+                  () -> format("The action data type (%s) does not match the actual data type received (%s)",
+                               expectedDataType,
+                               actualDataType));
+    this.event = event;
+    this.component = component;
+    this.actionDefinition = actionDefinition;
+    this.data = new LazyValue<>(() -> new TypedValue<>(dataValue.get(), actualDataType));
   }
 
   @Override
@@ -69,7 +98,7 @@ public class DefaultExtensionNotification implements ExtensionNotification {
 
   @Override
   public TypedValue<?> getData() {
-    return data;
+    return data.get();
   }
 
   @Override
