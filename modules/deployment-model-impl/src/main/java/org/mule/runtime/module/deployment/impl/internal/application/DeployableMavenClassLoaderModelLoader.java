@@ -11,22 +11,17 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import org.mule.maven.client.api.MavenClient;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,25 +45,20 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   }
 
   @Override
-  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile,
-                                                             ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
-                                                             Set<BundleDependency> dependencies) {
-    try {
-      classLoaderModelBuilder.exportingSharedLibraries();
-      classLoaderModelBuilder.containing(artifactFile.toURI().toURL());
-    } catch (MalformedURLException e) {
-      throw new MuleRuntimeException(e);
-    }
+  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
+                                                                                     Map<String, Object> attributes) {
+    return new LightweightClassLoaderModelBuilder(artifactFile, mavenClient);
+  }
+
+  @Override
+  protected void addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
+    classLoaderModelBuilder.exportingSharedLibraries();
+    classLoaderModelBuilder.additionalPluginLibraries();
   }
 
   @Override
   protected boolean includeTestDependencies(Map<String, Object> attributes) {
     return Boolean.valueOf((String) attributes.getOrDefault(INCLUDE_TEST_DEPENDENCIES, "false"));
-  }
-
-  @Override
-  protected Model loadPomModel(File artifactFile) {
-    return getPomModelFolder(artifactFile);
   }
 
   @Override

@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -22,13 +23,14 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -77,6 +79,23 @@ public class ArtifactPluginDescriptorFactory
     } catch (IOException e) {
       throw new ArtifactDescriptorCreateException(e);
     }
+  }
+
+  @Override
+  protected Map<String, Object> getClassLoaderModelAttributes(Optional<Properties> deploymentPropertiesOptional,
+                                                              MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor) {
+    Map<String, Object> attributes = super.getClassLoaderModelAttributes(deploymentPropertiesOptional, classLoaderModelLoaderDescriptor);
+
+    if (deploymentPropertiesOptional.isPresent()) {
+      Properties deploymentProperties = deploymentPropertiesOptional.get();
+      if (deploymentProperties instanceof PluginExtendedDeploymentProperties) {
+        PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
+            (PluginExtendedDeploymentProperties) deploymentProperties;
+        return new PluginExtendedClassLoaderModelAttributes(attributes,
+                                                            pluginExtendedDeploymentProperties.getDeployableArtifactDescriptor());
+      }
+    }
+    return attributes;
   }
 
   @Override

@@ -32,8 +32,6 @@ import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
-import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -63,16 +61,11 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
       createBundleDependency("other.company", "dummy-lib", "1.2.0", "raml-fragment");
   private static final org.mule.maven.client.api.model.BundleDependency TRAIT_BUNDLE =
       createBundleDependency("some.company", "dummy-trait", "1.0.3", "raml-fragment");
-  private List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES = asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private MavenClient mockMavenClient = mock(MavenClient.class);
-
-  private static File getResourceFile(String resource) throws URISyntaxException {
-    return new File(ApplicationDescriptorFactoryTestCase.class.getResource(resource).toURI());
-  }
 
   @Test
   @Description("Heavyweight packaged apps will deploy ok with shared libraries information in classloader-model.json")

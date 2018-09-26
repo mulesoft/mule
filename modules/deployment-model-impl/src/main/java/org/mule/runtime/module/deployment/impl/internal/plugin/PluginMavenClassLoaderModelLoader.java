@@ -6,23 +6,18 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Set;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,20 +42,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   }
 
   @Override
-  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile,
-                                                             ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
-                                                             Set<BundleDependency> dependencies) {
-    classLoaderModelBuilder.containing(getUrl(artifactFile, artifactFile));
-  }
-
-  private URL getUrl(File pluginFile, File file) {
-    try {
-      return file.toURI().toURL();
-    } catch (MalformedURLException e) {
-      throw new ArtifactDescriptorCreateException(format("There was an exception obtaining the URL for the plugin [%s], file [%s]",
-                                                         pluginFile.getAbsolutePath(), file.getAbsolutePath()),
-                                                  e);
-    }
+  protected void addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
+    classLoaderModelBuilder.includeAdditionPluginDependencies();
   }
 
   @Override
@@ -76,5 +59,17 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   @Override
   protected File getClassLoaderModelDescriptor(File artifactFile) {
     return new File(artifactFile.getParent(), CLASSLOADER_MODEL_JSON_DESCRIPTOR);
+  }
+
+  @Override
+  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
+                                                                                     Map<String, Object> attributes) {
+    final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
+        new LightweightClassLoaderModelBuilder(artifactFile, mavenClient);
+    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
+      lightweightClassLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
+          .getDeployableArtifactDescriptor());
+    }
+    return lightweightClassLoaderModelBuilder;
   }
 }
