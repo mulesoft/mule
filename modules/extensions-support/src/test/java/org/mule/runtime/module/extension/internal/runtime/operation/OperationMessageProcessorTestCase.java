@@ -45,6 +45,7 @@ import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -82,6 +83,13 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.runners.MockitoJUnitRunner;
+
 import com.google.common.reflect.TypeToken;
 
 import java.io.InputStream;
@@ -92,13 +100,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -316,10 +317,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   public void operationWithExpressionInTargetParameter() throws Exception {
 
     String flowName = FLOW_NAME;
-    expectedException.expect(IllegalOperationException.class);
-    expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression",
-                                           TARGET_PARAMETER_NAME));
-
     target = "#[mel:someExpression]";
     messageProcessor = createOperationMessageProcessor();
 
@@ -331,6 +328,11 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(flowConstruct.getName()).thenReturn(flowName);
 
     messageProcessor.setMuleContext(context);
+
+    expectedException.expect(IllegalOperationException.class);
+    expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression",
+                                           TARGET_PARAMETER_NAME));
+
     messageProcessor.initialise();
   }
 
@@ -338,24 +340,25 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   public void operationWithoutExpressionInTargetValueParameter() throws Exception {
 
     String flowName = "flowName";
-    expectedException.expect(IllegalOperationException.class);
-    expectedException
-        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "something that is not an expression",
-                              TARGET_VALUE_PARAMETER_NAME));
-
     target = TARGET_VAR;
     targetValue = TARGET_VAR;
     messageProcessor = createOperationMessageProcessor();
 
-    when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
-    when(context.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class))
-        .thenReturn(new WeaveDefaultExpressionLanguageFactoryService());
+    registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
+    registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
+                            new WeaveDefaultExpressionLanguageFactoryService());
     doReturn(new DefaultExpressionManager()).when(context)
         .getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
 
     messageProcessor.setMuleContext(context);
+
+    expectedException.expect(IllegalOperationException.class);
+    expectedException
+        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "something that is not an expression",
+                              TARGET_VALUE_PARAMETER_NAME));
+
     messageProcessor.initialise();
   }
 
