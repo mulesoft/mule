@@ -15,11 +15,6 @@ import org.springframework.context.expression.StandardBeanExpressionResolver;
 public class MuleBeanExpressionResolver extends StandardBeanExpressionResolver
 {
 
-    public MuleBeanExpressionResolver()
-    {
-        super();
-    }
-
     @Override
     public Object evaluate(String value, BeanExpressionContext evalContext) throws BeansException
     {
@@ -27,8 +22,8 @@ public class MuleBeanExpressionResolver extends StandardBeanExpressionResolver
         Matches case the value being evaluated has an occurrence of #{, which is the expressionPrefix,
         but no occurrence of }, which is the expression suffix.
         */
-        Pattern passwordCase = Pattern.compile("^.*#\\{[^}]*$");
-        if (passwordCase.matcher(value).matches())
+        Pattern nonClosedExpressionSuffixCase = Pattern.compile("^.*#\\{[^}]*$");
+        if (nonClosedExpressionSuffixCase.matcher(value).matches())
         {
             // Directly return value, since LiteralExpression(value).getValue() does that.
             return value;
