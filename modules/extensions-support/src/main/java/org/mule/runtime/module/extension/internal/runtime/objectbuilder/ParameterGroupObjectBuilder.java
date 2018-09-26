@@ -7,12 +7,18 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+import static org.springframework.util.ReflectionUtils.setField;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -20,6 +26,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -29,10 +36,10 @@ import java.util.function.Predicate;
  *
  * @param <T> the generic type of the object being built
  */
-public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
+public class ParameterGroupObjectBuilder<T> {
 
-  private final ParameterGroupDescriptor groupDescriptor;
-
+  private final Class<T> prototypeClass;
+  private final List<FieldElement> groupDescriptorFields;
 
   /**
    * Create a new instance
@@ -41,8 +48,10 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
    * @param reflectionCache the cache for expensive reflection lookups
    */
   public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor, ReflectionCache reflectionCache) {
-    super((Class<T>) groupDescriptor.getType().getDeclaringClass().get(), reflectionCache);
-    this.groupDescriptor = groupDescriptor;
+    this.prototypeClass = (Class<T>) groupDescriptor.getType().getDeclaringClass().get();
+    checkInstantiable(prototypeClass, reflectionCache);
+    this.groupDescriptorFields = reflectionCache.fieldElementsFor(groupDescriptor);
+    this.groupDescriptorFields.forEach(f -> f.getField().ifPresent(field -> field.setAccessible(true)));
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
@@ -65,13 +74,17 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context)
       throws MuleException {
-    reflectionCache.fieldElementsFor(groupDescriptor).forEach(field -> {
+    T object = createInstance(prototypeClass);
+
+    for (FieldElement field : groupDescriptorFields) {
       String name = field.getName();
       if (hasParameter.test(name)) {
-        addPropertyResolver(field.getField().get(), new StaticValueResolver<>(parameters.apply(name)));
+        Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters.apply(name)), context);
+        setField(field.getField().get(), object,
+                 context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue);
       }
-    });
+    }
 
-    return build(context);
+    return object;
   }
 }

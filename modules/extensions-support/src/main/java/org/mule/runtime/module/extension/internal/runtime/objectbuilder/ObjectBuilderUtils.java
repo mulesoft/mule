@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 /**
@@ -26,7 +26,7 @@ class ObjectBuilderUtils {
    */
   public static <T> T createInstance(Class<T> prototypeClass) {
     try {
-      return withContextClassLoader(prototypeClass.getClassLoader(), () -> prototypeClass.newInstance());
+      return prototypeClass.newInstance();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of " + prototypeClass), e);
     }
