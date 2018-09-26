@@ -2399,22 +2399,30 @@
     </xsd:complexType>
 
     <xsd:complexType name="whenMessageProcessorExpressionPairType">
-        <xsd:sequence>
-            <!-- if the first message processor is a filter, it determines
-                 whether this when clause is chosen or not.  This is only allowed when
-                 no expression is specified -->
-            <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:attribute name="expression" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>The expression to evaluate.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <!-- if the first message processor is a filter, it determines
+                         whether this when clause is chosen or not.  This is only allowed when
+                         no expression is specified -->
+                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
+                </xsd:sequence>
+                <xsd:attribute name="expression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The expression to evaluate.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="otherwiseMessageProcessorExpressionPairType">
-        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="foreach" type="foreachProcessorType"
