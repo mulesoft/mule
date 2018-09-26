@@ -591,10 +591,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 // If connection throws an exception on start and connection is cached in ConnectionFactory then
                 // close/reset connection now.
-                if (connectionFactory instanceof Closeable)
-                {
-                    ((Closeable) connectionFactory).close();
-                }
+                silentlyCloseConnection();
                 throw e;
             }
         }
@@ -608,17 +605,34 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             if (connection != null)
             {
                 disconnecting = true;
-                connection.close();
-                if (connectionFactory instanceof Closeable)
-                {
-                    ((Closeable) connectionFactory).close();
-                }
+                closeConnection();
             }
         }
         finally
         {
             connection = null;
             disconnecting = false;
+        }
+    }
+
+    private void silentlyCloseConnection()
+    {
+        try
+        {
+            closeConnection();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Error on closing JMS connection: " + e.getMessage());
+        }
+    }
+    
+    private void closeConnection() throws JMSException, MuleException
+    {
+        connection.close();
+        if (connectionFactory instanceof Closeable)
+        {
+            ((Closeable) connectionFactory).close();
         }
     }
 
