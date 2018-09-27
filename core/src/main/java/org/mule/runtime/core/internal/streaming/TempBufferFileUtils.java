@@ -25,7 +25,7 @@ public final class TempBufferFileUtils {
    * @return a {@link File}
    */
   public static File createBufferFile(String name) {
-    return createTempFile("mule-buffer-${" + name + "}-", ".tmp");
+    return createTempFile("mule-buffer-" + name + "-", ".tmp");
   }
 
   private TempBufferFileUtils() {}
