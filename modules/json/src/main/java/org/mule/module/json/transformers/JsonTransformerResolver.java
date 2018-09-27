@@ -9,6 +9,8 @@ package org.mule.module.json.transformers;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
@@ -38,7 +40,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  *
  * @since 3.0
  */
-public class JsonTransformerResolver implements TransformerResolver, MuleContextAware, Disposable
+public class JsonTransformerResolver implements TransformerResolver, MuleContextAware, Initialisable, Disposable
 {
     public static final String JSON_MIME_TYPE = "application/json";
     /**
@@ -56,6 +58,20 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
+    }
+    
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        // Force the lookup
+        try
+        {
+            getMapperResolver();
+        }
+        catch (ResolverException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
