@@ -9,9 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
-
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
@@ -44,6 +46,7 @@ import java.util.function.Supplier;
 
 /**
  * Helper class for declaring sources through a {@link DefaultJavaModelLoaderDelegate}
+ *
  * @since 4.0
  */
 final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
@@ -67,11 +70,8 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
                             SourceElement sourceType,
                             boolean supportsConfig) {
     // TODO: MULE-9220 - Add a syntax validator which checks that the sourceType doesn't implement
-    if (isLifecycle(sourceType)) {
-      throw new IllegalSourceModelDefinitionException(
-                                                      format("Source class '%s' implements a lifecycle interface. Sources are not allowed to",
-                                                             sourceType.getName()));
-    }
+    validateLifecycle(sourceType, Startable.class);
+    validateLifecycle(sourceType, Stoppable.class);
 
     final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(sourceType);
     final Optional<ExtensionParameter> connectionParameter = loader.getConnectionParameter(sourceType);
@@ -124,6 +124,16 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     declareSourceParameters(sourceType, sourceDeclarer);
     declareSourceCallback(sourceType, sourceDeclarer);
     sourceDeclarers.put(sourceType, sourceDeclarer);
+  }
+
+  private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {
+    if (sourceType.isAssignableTo(lifecycleType)) {
+      throw new IllegalSourceModelDefinitionException(format(
+                                                             "Source class '%s' implements lifecycle interface '%s'. Sources are only not allowed to implement '%s' and '%s'",
+                                                             sourceType.getName(), lifecycleType,
+                                                             Initialisable.class.getSimpleName(),
+                                                             Disposable.class.getSimpleName()));
+    }
   }
 
   private void resolveOutputTypes(SourceDeclarer source, SourceElement sourceType) {
