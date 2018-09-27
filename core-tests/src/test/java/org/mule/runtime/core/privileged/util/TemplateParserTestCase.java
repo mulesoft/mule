@@ -293,6 +293,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid("#[]"));
     assertTrue(tp.isValid("#[[]]"));
     assertTrue(tp.isValid("#['[']"));
+    assertTrue(tp.isValid("#[']']"));
     assertTrue(tp.isValid("#[#[]]"));
     assertFalse(tp.isValid("#[[]"));
     assertTrue(tp.isValid("#[#[#[[]]]]"));
@@ -309,6 +310,10 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid("#[]#[]"));
     assertTrue(tp.isValid("#[[]]"));
     assertTrue(tp.isValid("\\#["));
+    assertTrue(tp.isValid("\\#['"));
+    assertTrue(tp.isValid("#['']"));
+    assertFalse(tp.isValid("#[']"));
+    assertFalse(tp.isValid("#[']'"));
   }
 
   @Test
