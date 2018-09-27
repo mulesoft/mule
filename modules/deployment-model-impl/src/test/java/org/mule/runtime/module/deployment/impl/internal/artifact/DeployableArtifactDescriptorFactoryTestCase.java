@@ -11,6 +11,8 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -20,6 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -31,10 +34,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
-
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -49,7 +52,9 @@ import org.mule.tck.util.CompilerUtils;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.Iterator;
 
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -238,10 +243,40 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
     assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItem(socketsPluginDependencyMatcher()));
+    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher()));
 
     assertThat(classLoaderModel.getUrls().length, is(1));
     assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependencies() throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-additional-dependencies");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.getDependencies().size(), is(2));
+    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher()));
+
+    assertThat(classLoaderModel.getUrls().length, is(1));
+    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+
+    assertThat(desc.getPlugins(), hasSize(2));
+
+    Iterator<ArtifactPluginDescriptor> pluginDescriptorIterator = desc.getPlugins().iterator();
+
+    ArtifactPluginDescriptor testEmptyPluginDescriptor = pluginDescriptorIterator.next();
+    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getUrls().length, is(3));
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url).getName()).collect(
+                                                                                                                                 toList()),
+               hasItems(startsWith("test-empty-plugin-"), equalTo("commons-io-2.6.jar"),
+                        equalTo("commons-collections-3.2.1.jar")));
+    // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the urls
+    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
+
+    ArtifactPluginDescriptor dependantPluginDescriptor = pluginDescriptorIterator.next();
+    assertThat(dependantPluginDescriptor.getClassLoaderModel().getUrls().length, is(1));
+    assertThat(dependantPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
   }
 
   @Test
@@ -331,7 +366,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     };
   }
 
-  private Matcher<BundleDependency> socketsPluginDependencyMatcher() {
+  private Matcher<BundleDependency> testEmptyPluginDependencyMatcher() {
     return new BaseMatcher<BundleDependency>() {
 
       @Override
