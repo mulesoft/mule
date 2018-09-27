@@ -117,9 +117,7 @@ public final class TemplateParser {
   }
 
   private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
-    if (!validateBalanceMuleStyle(template)) {
-      return template;
-    }
+    validateBalanceMuleStyle(template);
 
     boolean lastIsBackSlash = false;
     boolean lastStartedExpression = false;
@@ -240,7 +238,7 @@ public final class TemplateParser {
     return this.getStyle().getName().equals(style);
   }
 
-  private boolean validateBalanceMuleStyle(String template) {
+  private Stack<Pair<Character, Pair<Integer, Integer>>> unbalacedCharactersMuleStyle(String template) {
     // Save the line and column of each special character for error tracing purposes
     Stack<Pair<Character, Pair<Integer, Integer>>> stack = new Stack<>();
     boolean lastStartedExpression = false;
@@ -299,11 +297,14 @@ public final class TemplateParser {
       lastIsBackSlash = c == '\\';
       column++;
     }
-    boolean isValid = stack.empty();
-    if (!isValid) {
-      throwValidationError(template, stack);
+    return stack;
+  }
+
+  private void validateBalanceMuleStyle(String template) {
+    Stack<Pair<Character, Pair<Integer, Integer>>> remaining = unbalacedCharactersMuleStyle(template);
+    if (!remaining.empty()) {
+      throwValidationError(template, remaining);
     }
-    return isValid;
   }
 
   private void throwValidationError(String template, Stack<Pair<Character, Pair<Integer, Integer>>> stack) {
@@ -390,7 +391,7 @@ public final class TemplateParser {
 
   public boolean isValid(String expression) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return validateBalanceMuleStyle(expression);
+      return unbalacedCharactersMuleStyle(expression).empty();
     }
 
     try {
