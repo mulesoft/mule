@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.el.mvel;
 
 import static java.util.Collections.singletonMap;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
@@ -229,9 +228,11 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
                              ComponentLocation componentLocation,
                              BindingContext bindingContext) {
     expression = removeExpressionMarker(expression);
-    Map<String, Object> bindingMap = bindingContext.identifiers().stream().collect(toMap(id -> id,
-                                                                                         id -> bindingContext.lookup(id).get()
-                                                                                             .getValue()));
+
+    Map<String, Object> bindingMap = new HashMap<>();
+    bindingContext.identifiers().forEach(id -> {
+      bindingMap.put(id, bindingContext.lookup(id).get().getValue());
+    });
 
     final Object value = evaluateUntyped(expression, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder,
                                          componentLocation, bindingMap);
