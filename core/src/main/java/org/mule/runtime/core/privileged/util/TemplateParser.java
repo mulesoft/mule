@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.util;
 
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.lang.String.format;
 
 /**
  * <code>TemplateParser</code> is a simple string parser that will substitute tokens in a string with values supplied in a Map.
@@ -32,6 +35,10 @@ public final class TemplateParser {
   private static final char START_EXPRESSION = '#';
   private static final char OPEN_EXPRESSION = '[';
   private static final char CLOSE_EXPRESSION = ']';
+  private static final String EXPRESSION_NOT_CLOSED_ERROR_MSG = "\tOpened expression (%c) at line %d, column %d is not closed\n";
+  private static final String QUOTATION_NOT_CLOSED_ERROR_MSG =
+      "\tQuotation (%c) at line %d, column %d is not closed. Remember to use backslash (\\) if you are trying to use that character as a literal";
+  private static final String PARSING_TEMPLATE_ERROR = "Error while parsing template:\n";
 
   private static final Map<String, PatternInfo> patterns = new HashMap<>();
 
@@ -109,10 +116,8 @@ public final class TemplateParser {
     return parse(null, template, callback);
   }
 
-  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
-    if (!validateBalanceMuleStyle(template)) {
-      return template;
-    }
+  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback, boolean insideExpression) {
+    validateBalanceMuleStyle(template);
 
     boolean lastIsBackSlash = false;
     boolean lastStartedExpression = false;
@@ -127,14 +132,14 @@ public final class TemplateParser {
         result.append(START_EXPRESSION);
       }
 
-      if (lastIsBackSlash && c != '\'' && c != '"') {
+      if (lastIsBackSlash && c != '\'' && c != '"' && c != START_EXPRESSION) {
         result.append("\\");
       }
 
       if (!lastIsBackSlash && c == '\'') {
         openSingleQuotes = !openSingleQuotes;
       }
-      if (c == OPEN_EXPRESSION && lastStartedExpression && !openSingleQuotes) {
+      if (c == OPEN_EXPRESSION && lastStartedExpression && (!insideExpression || !openSingleQuotes)) {
         int closing = closingBracesPosition(template, currentPosition);
         String enclosingTemplate = template.substring(currentPosition + 1, closing);
 
@@ -144,17 +149,17 @@ public final class TemplateParser {
           if (value == null) {
             value = NULL_AS_STRING;
           } else {
-            value = parseMule(props, value.toString(), callback);
+            value = parseMule(props, value.toString(), callback, true);
           }
         }
         result.append(value);
 
         currentPosition = closing;
-      } else if (c != START_EXPRESSION && c != '\\') {
+      } else if ((c != START_EXPRESSION || lastIsBackSlash) && c != '\\') {
         result.append(c);
       }
 
-      lastStartedExpression = c == START_EXPRESSION;
+      lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
       lastIsBackSlash = c == '\\';
       currentPosition++;
     }
@@ -188,7 +193,7 @@ public final class TemplateParser {
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return parseMule(props, template, callback);
+      return parseMule(props, template, callback, false);
     }
     String result = template;
     Map<?, ?> newProps = props;
@@ -233,59 +238,85 @@ public final class TemplateParser {
     return this.getStyle().getName().equals(style);
   }
 
-  private boolean validateBalanceMuleStyle(String template) {
-    Stack<Character> stack = new Stack<>();
+  private Stack<Pair<Character, Pair<Integer, Integer>>> unbalacedCharactersMuleStyle(String template) {
+    // Save the line and column of each special character for error tracing purposes
+    Stack<Pair<Character, Pair<Integer, Integer>>> stack = new Stack<>();
     boolean lastStartedExpression = false;
     boolean lastIsBackSlash = false;
     int openBraces = 0;
     int openSingleQuotes = 0;
     int openDoubleQuotes = 0;
+    int line = 1;
+    int column = 1;
 
     for (int i = 0; i < template.length(); i++) {
       char c = template.charAt(i);
       switch (c) {
         case '\'':
-          if (lastIsBackSlash) {
+          if (lastIsBackSlash || openBraces == 0) {
             break;
           }
-          if (!stack.empty() && stack.peek().equals('\'')) {
+          if (!stack.empty() && stack.peek().getFirst().equals('\'')) {
             stack.pop();
             openSingleQuotes--;
           } else {
-            stack.push(c);
+            stack.push(new Pair<>(c, new Pair<>(line, column)));
             openSingleQuotes++;
           }
           break;
         case '"':
-          if (lastIsBackSlash) {
+          if (lastIsBackSlash || openBraces == 0) {
             break;
           }
-          if (!stack.empty() && stack.peek().equals('"')) {
+          if (!stack.empty() && stack.peek().getFirst().equals('"')) {
             stack.pop();
             openDoubleQuotes--;
           } else {
-            stack.push(c);
+            stack.push(new Pair<>(c, new Pair<>(line, column)));
             openDoubleQuotes++;
           }
           break;
         case CLOSE_EXPRESSION:
-          if (!stack.empty() && stack.peek().equals(OPEN_EXPRESSION)) {
+          if (!stack.empty() && stack.peek().getFirst().equals(OPEN_EXPRESSION)) {
             stack.pop();
             openBraces--;
           }
           break;
         case OPEN_EXPRESSION:
           if ((lastStartedExpression || openBraces > 0) && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
-            stack.push(c);
+            stack.push(new Pair<>(c, new Pair<>(line, column)));
             openBraces++;
           }
           break;
+        case '\n':
+          line++;
+          column = 0;
+          break;
       }
-      lastStartedExpression = c == START_EXPRESSION;
+      lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
       lastIsBackSlash = c == '\\';
+      column++;
     }
+    return stack;
+  }
 
-    return stack.empty();
+  private void validateBalanceMuleStyle(String template) {
+    Stack<Pair<Character, Pair<Integer, Integer>>> remaining = unbalacedCharactersMuleStyle(template);
+    if (!remaining.empty()) {
+      throwValidationError(template, remaining);
+    }
+  }
+
+  private void throwValidationError(String template, Stack<Pair<Character, Pair<Integer, Integer>>> stack) {
+    String errorMsg = PARSING_TEMPLATE_ERROR;
+    for (Pair<Character, Pair<Integer, Integer>> tuple : stack) {
+      char c = tuple.getFirst();
+      int line = tuple.getSecond().getFirst();
+      int column = tuple.getSecond().getSecond();
+      String errorType = c == OPEN_EXPRESSION ? EXPRESSION_NOT_CLOSED_ERROR_MSG : QUOTATION_NOT_CLOSED_ERROR_MSG;
+      errorMsg += format(errorType, c, line, column);
+    }
+    throw new IllegalArgumentException(errorMsg);
   }
 
   private String replaceDollarSign(String valueString) {
@@ -360,7 +391,7 @@ public final class TemplateParser {
 
   public boolean isValid(String expression) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return validateBalanceMuleStyle(expression);
+      return unbalacedCharactersMuleStyle(expression).empty();
     }
 
     try {
