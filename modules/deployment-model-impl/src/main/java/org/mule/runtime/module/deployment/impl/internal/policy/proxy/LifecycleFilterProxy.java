@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.policy.proxy;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -18,9 +17,11 @@ import org.mule.runtime.container.internal.MetadataInvocationHandler;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import javax.inject.Inject;
+
 /**
  * Proxies an object instance to filter invocations (without raising an exception) of lifecycle methods from {@link Startable},
- * {@link Stoppable} and {@link Disposable} interfaces.
+ * {@link Stoppable} and {@link Disposable} interfaces and will also prevent any dependency injection.
  *
  * @since 4.0
  */
@@ -39,7 +40,9 @@ public class LifecycleFilterProxy<T> extends MetadataInvocationHandler<T> {
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     if (method.getDeclaringClass() == Startable.class ||
         method.getDeclaringClass() == Stoppable.class ||
-        method.getDeclaringClass() == Disposable.class) {
+        method.getDeclaringClass() == Disposable.class ||
+        method.getName().equals("setMuleContext") ||
+        method.getAnnotation(Inject.class) != null) {
       return null;
     }
 
