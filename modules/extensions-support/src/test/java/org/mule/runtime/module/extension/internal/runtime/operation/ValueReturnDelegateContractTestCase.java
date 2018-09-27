@@ -28,8 +28,12 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -44,6 +48,7 @@ import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
+import org.mule.runtime.core.internal.util.message.ResultsToMessageList;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -55,6 +60,8 @@ import org.mule.tck.size.SmallTest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.After;
@@ -201,6 +208,28 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     when(outputModel.getType()).thenReturn(typeLoader.load(InputStream.class));
     when(componentModel.supportsStreaming()).thenReturn(true);
     assertStreamIsWrapped(Result.builder().output(new ByteArrayInputStream(HELLO_WORLD_MSG.getBytes(UTF_8))).build());
+  }
+
+  @Test
+  public void operationWithResultInputStreamCollectionOutput() throws Exception {
+    MetadataType metadataType = BaseTypeBuilder.create(JAVA).arrayType().of(new MessageMetadataTypeBuilder().build()).build();
+    when(outputModel.getType()).thenReturn(metadataType);
+
+    delegate = createReturnDelegate();
+
+    List<Result> resultList = new ArrayList<>();
+    resultList.add(Result.builder().output(new ByteArrayInputStream(HELLO_WORLD_MSG.getBytes(UTF_8))).build());
+
+    CoreEvent result = delegate.asReturnValue(resultList, operationContext);
+
+    Message message = getOutputMessage(result);
+    Message message1 = ((ResultsToMessageList) message.getPayload().getValue()).get(0);
+
+    ManagedCursorStreamProvider actual = (ManagedCursorStreamProvider) message1.getPayload().getValue();
+    InputStream resultingStream = actual.openCursor();
+    assertThat(IOUtils.toString(resultingStream), is(HELLO_WORLD_MSG));
+    resultingStream.close();
+    actual.releaseResources();
   }
 
   private void assertStreamIsWrapped(Object value) throws InitialisationException, IOException {

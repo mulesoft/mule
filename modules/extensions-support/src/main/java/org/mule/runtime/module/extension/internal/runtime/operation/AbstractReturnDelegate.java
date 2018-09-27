@@ -136,7 +136,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toLazyMessageCollection((Collection<Object>) value, cursorProviderFactory, mediaType, event);
+        value = toLazyMessageCollection((Collection<Result>) value, cursorProviderFactory, mediaType, event);
         value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, payloadMediaTypeResolver),
                                     cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
       } else if (value instanceof Iterator && returnsListOfMessages) {
@@ -164,22 +164,19 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   }
 
 
-  private Collection<Object> toLazyMessageCollection(Collection<Object> values,
+  private Collection<Object> toLazyMessageCollection(Collection<Result> values,
                                                      CursorProviderFactory cursorProviderFactory,
                                                      MediaType mediaType,
                                                      CoreEvent event) {
-
     Collection<Object> lazyMessageCollection = new ArrayList<>();
-
     values.forEach(value -> {
-      Result resultValue = (Result) value;
-      if (resultValue.getOutput() instanceof InputStream) {
-        Message message = MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event);
+      if (value.getOutput() instanceof InputStream) {
+        Message message = MessageUtils.toMessage(value, mediaType, cursorProviderFactory, event);
         lazyMessageCollection.add(message);
+      } else {
+        lazyMessageCollection.add(value);
       }
-
     });
-
     return lazyMessageCollection;
   }
 
