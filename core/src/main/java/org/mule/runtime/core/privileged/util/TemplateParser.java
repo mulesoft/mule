@@ -132,7 +132,7 @@ public final class TemplateParser {
         result.append(START_EXPRESSION);
       }
 
-      if (lastIsBackSlash && c != '\'' && c != '"') {
+      if (lastIsBackSlash && c != '\'' && c != '"' && c != START_EXPRESSION) {
         result.append("\\");
       }
 
@@ -155,11 +155,11 @@ public final class TemplateParser {
         result.append(value);
 
         currentPosition = closing;
-      } else if (c != START_EXPRESSION && c != '\\') {
+      } else if ((c != START_EXPRESSION || lastIsBackSlash) && c != '\\') {
         result.append(c);
       }
 
-      lastStartedExpression = c == START_EXPRESSION;
+      lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
       lastIsBackSlash = c == '\\';
       currentPosition++;
     }
@@ -293,7 +293,7 @@ public final class TemplateParser {
           column = 0;
           break;
       }
-      lastStartedExpression = c == START_EXPRESSION;
+      lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
       lastIsBackSlash = c == '\\';
       column++;
     }
