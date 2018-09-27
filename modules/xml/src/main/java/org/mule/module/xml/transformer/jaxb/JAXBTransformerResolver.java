@@ -9,6 +9,8 @@ package org.mule.module.xml.transformer.jaxb;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
@@ -39,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @since 3.0
  */
-public class JAXBTransformerResolver implements TransformerResolver, MuleContextAware, Disposable
+public class JAXBTransformerResolver implements TransformerResolver, MuleContextAware, Initialisable, Disposable
 {
     public static final String[] ignoredPackages = {"java.,javax.,org.w3c.,org.mule.transport., org.mule.module."};
 
@@ -58,6 +60,20 @@ public class JAXBTransformerResolver implements TransformerResolver, MuleContext
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
+    }
+    
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        // Force the lookup
+        try
+        {
+            getContextResolver();
+        }
+        catch (RegistrationException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     public Transformer resolve(DataType source, DataType result) throws ResolverException
