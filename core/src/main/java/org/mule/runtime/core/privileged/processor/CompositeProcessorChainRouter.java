@@ -9,6 +9,9 @@ package org.mule.runtime.core.privileged.processor;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -23,13 +26,17 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -61,6 +68,11 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
 
   private BiFunction<CoreEvent, MessageProcessorChain, CoreEvent> processChain() {
     return (event, processorChain) -> {
+      //
+
+      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, CompositeProcessorChainRouter.this),
+                                                                 "composite processor chain router", PROCESS_START));
+
       Latch completionLatch = new Latch();
       BaseEventContext childContext = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
       childContext.onComplete((response, throwable) -> completionLatch.countDown());
@@ -68,6 +80,9 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
       try {
         // Block until all child contexts are complete
         completionLatch.await();
+
+        notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, CompositeProcessorChainRouter.this),
+                                                                   "composite processor chain router", PROCESS_COMPLETE));
       } catch (InterruptedException e) {
         throw new MuleRuntimeException(createStaticMessage("Thread interrupted waiting for child processor chain to complete.",
                                                            e));
@@ -91,10 +106,18 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
     startIfNeeded(processorChains);
   }
 
+  private NotificationDispatcher notificationFirer;
+
   @Override
   public void setMuleContext(MuleContext muleContext) {
     super.setMuleContext(muleContext);
     setMuleContextIfNeeded(processorChains, muleContext);
+    try {
+      notificationFirer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
+
   }
 
   @Override
