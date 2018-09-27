@@ -116,7 +116,7 @@ public final class TemplateParser {
     return parse(null, template, callback);
   }
 
-  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
+  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback, boolean insideExpression) {
     validateBalanceMuleStyle(template);
 
     boolean lastIsBackSlash = false;
@@ -139,7 +139,7 @@ public final class TemplateParser {
       if (!lastIsBackSlash && c == '\'') {
         openSingleQuotes = !openSingleQuotes;
       }
-      if (c == OPEN_EXPRESSION && lastStartedExpression && !openSingleQuotes) {
+      if (c == OPEN_EXPRESSION && lastStartedExpression && (!insideExpression || !openSingleQuotes)) {
         int closing = closingBracesPosition(template, currentPosition);
         String enclosingTemplate = template.substring(currentPosition + 1, closing);
 
@@ -149,7 +149,7 @@ public final class TemplateParser {
           if (value == null) {
             value = NULL_AS_STRING;
           } else {
-            value = parseMule(props, value.toString(), callback);
+            value = parseMule(props, value.toString(), callback, true);
           }
         }
         result.append(value);
@@ -193,7 +193,7 @@ public final class TemplateParser {
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return parseMule(props, template, callback);
+      return parseMule(props, template, callback, false);
     }
     String result = template;
     Map<?, ?> newProps = props;
@@ -253,7 +253,7 @@ public final class TemplateParser {
       char c = template.charAt(i);
       switch (c) {
         case '\'':
-          if (lastIsBackSlash) {
+          if (lastIsBackSlash || openBraces == 0) {
             break;
           }
           if (!stack.empty() && stack.peek().getFirst().equals('\'')) {
@@ -265,7 +265,7 @@ public final class TemplateParser {
           }
           break;
         case '"':
-          if (lastIsBackSlash) {
+          if (lastIsBackSlash || openBraces == 0) {
             break;
           }
           if (!stack.empty() && stack.peek().getFirst().equals('"')) {

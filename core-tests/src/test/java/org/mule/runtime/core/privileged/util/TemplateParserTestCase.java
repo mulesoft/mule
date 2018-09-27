@@ -267,21 +267,21 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid("[]"));
     assertTrue(tp.isValid("[]]]]]"));
     assertTrue(tp.isValid("[][][][][[]]"));
-    assertFalse(tp.isValid("\""));
+    assertTrue(tp.isValid("\""));
     assertTrue(tp.isValid("\\'"));
-    assertFalse(tp.isValid("'"));
+    assertTrue(tp.isValid("'"));
     assertTrue(tp.isValid("''"));
     assertTrue(tp.isValid("\"\""));
-    assertFalse(tp.isValid("\"'"));
-    assertFalse(tp.isValid("'\""));
-    assertFalse(tp.isValid("'\"'"));
-    assertFalse(tp.isValid("'\""));
-    assertFalse(tp.isValid("'\"\""));
+    assertTrue(tp.isValid("\"'"));
+    assertTrue(tp.isValid("'\""));
+    assertTrue(tp.isValid("'\"'"));
+    assertTrue(tp.isValid("'\""));
+    assertTrue(tp.isValid("'\"\""));
     assertTrue(tp.isValid("'\"\"'"));
-    assertFalse(tp.isValid("\"'\"'"));
-    assertFalse(tp.isValid("'\"'\""));
-    assertFalse(tp.isValid("'\"'\"'"));
-    assertFalse(tp.isValid("'\"\"''"));
+    assertTrue(tp.isValid("\"'\"'"));
+    assertTrue(tp.isValid("'\"'\""));
+    assertTrue(tp.isValid("'\"'\"'"));
+    assertTrue(tp.isValid("'\"\"''"));
     assertTrue(tp.isValid("   '\"''\"'  "));
   }
 
@@ -301,13 +301,14 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertFalse(tp.isValid("#[#[#[[]]]]#["));
     assertTrue(tp.isValid("#[#[#[[]]]]#[]"));
     assertTrue(tp.isValid("#[#[#['[]']]]#[]"));
-    assertTrue(tp.isValid("#[#[#['[]']]]'#['"));
+    assertTrue(tp.isValid("#[#[#['[]']]]\\#["));
     assertTrue(tp.isValid("#[#[#['[']]]#[]"));
     assertTrue(tp.isValid("#['[']]"));
     assertTrue(tp.isValid("asjdhkasdhaskldh #[asdadasd[asdadasd]asdadsadasd'['dfad] asdasdasd"));
     assertTrue(tp.isValid("asjdhkasdhaskldh #['asdadasd[asdadasdasdadsadasd]asdasdasd#[']"));
     assertTrue(tp.isValid("#[]#[]"));
     assertTrue(tp.isValid("#[[]]"));
+    assertTrue(tp.isValid("\\#["));
   }
 
   @Test
