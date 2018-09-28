@@ -120,7 +120,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected static final String CPU_INTENSIVE = "cpuIntensive";
   protected static final String CUSTOM = "custom";
   protected static final String RING_BUFFER = "ringBuffer";
-  protected static final int STREAM_ITERATIONS = 2000;
+  protected static final int STREAM_ITERATIONS = 3000;
 
   protected Supplier<Builder> flowBuilder;
   protected Flow flow;
