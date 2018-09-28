@@ -121,6 +121,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
         registerEditors(beanFactory);
 
+        registerExpressionResolver(beanFactory);
+
         addBeanPostProcessors(beanFactory,
                               new MuleContextPostProcessor(muleContext),
                               new ExpressionEvaluatorPostProcessor(muleContext),
@@ -133,6 +135,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         );
 
         beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
+    }
+
+    private void registerExpressionResolver(ConfigurableListableBeanFactory beanFactory)
+    {
+        beanFactory.setBeanExpressionResolver(new MuleBeanExpressionResolver());
     }
 
     private void registerEditors(ConfigurableListableBeanFactory beanFactory)
