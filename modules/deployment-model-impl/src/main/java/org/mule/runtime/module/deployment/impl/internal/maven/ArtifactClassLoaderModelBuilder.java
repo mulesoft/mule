@@ -15,6 +15,12 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
+import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
+import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
+import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
+import static org.mule.tools.api.classloader.Constants.PLUGIN_FIELD;
+import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
+import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -116,18 +122,18 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   protected void doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
     Object configuration = packagingPlugin.getConfiguration();
     if (configuration != null) {
-      Xpp3Dom additionalPluginDependenciesDom = ((Xpp3Dom) configuration).getChild("additionalPluginDependencies");
+      Xpp3Dom additionalPluginDependenciesDom = ((Xpp3Dom) configuration).getChild(ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD);
       if (additionalPluginDependenciesDom != null) {
-        Xpp3Dom[] plugins = additionalPluginDependenciesDom.getChildren("plugin");
+        Xpp3Dom[] plugins = additionalPluginDependenciesDom.getChildren(PLUGIN_FIELD);
         if (plugins != null) {
           for (Xpp3Dom plugin : plugins) {
             String pluginGroupId = getAttribute(plugin, GROUP_ID);
             String pluginArtifactId = getAttribute(plugin, ARTIFACT_ID);
             findBundleDependency(pluginGroupId, pluginArtifactId, of(MULE_PLUGIN)).ifPresent(bundleDependency -> {
-              Xpp3Dom dependenciesDom = plugin.getChild("dependencies");
+              Xpp3Dom dependenciesDom = plugin.getChild(PLUGIN_DEPENDENCIES_FIELD);
               if (dependenciesDom != null) {
                 Set<BundleDependency> additionalDependencies = new HashSet<>();
-                for (Xpp3Dom dependency : dependenciesDom.getChildren("dependency")) {
+                for (Xpp3Dom dependency : dependenciesDom.getChildren(PLUGIN_DEPENDENCY_FIELD)) {
                   String dependencyGroupId = getAttribute(dependency, GROUP_ID);
                   String dependencyArtifactId = getAttribute(dependency, ARTIFACT_ID);
                   String dependencyVersion = getAttribute(dependency, VERSION);
@@ -163,9 +169,9 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   protected void doExportSharedLibrariesResourcesAndPackages(Plugin packagingPlugin) {
     Object configuration = packagingPlugin.getConfiguration();
     if (configuration != null) {
-      Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) configuration).getChild("sharedLibraries");
+      Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) configuration).getChild(SHARED_LIBRARIES_FIELD);
       if (sharedLibrariesDom != null) {
-        Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren("sharedLibrary");
+        Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren(SHARED_LIBRARY_FIELD);
         if (sharedLibraries != null) {
           for (Xpp3Dom sharedLibrary : sharedLibraries) {
             String groupId = getAttribute(sharedLibrary, GROUP_ID);
