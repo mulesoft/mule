@@ -82,12 +82,11 @@ public class SimpleRetryPolicy implements RetryPolicy {
             fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransactionActive()));
 
         Mono<T> retryMono = from(publisher)
-            .doOnEach(e3 -> {
+            .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler).doOnRetry(retryContext -> {
               if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Retrying execution of event...");
+                LOGGER.debug("Retrying execution of event, attempt {} of {}.", retryContext.iteration(), this.count);
               }
-            })
-            .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler))
+            }))
             .doOnError(e2 -> {
               if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Retry attempts exhausted. Failing...");
