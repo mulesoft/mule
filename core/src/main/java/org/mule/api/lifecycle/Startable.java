@@ -24,12 +24,10 @@ public interface Startable
 
     /**
      * Starts a lifecycle component.
-     *
      * <p>
-     * Note: in most cases the correct context has to be set before starting the component. 
+     * <b>Note</b>: in most cases the correct context has to be set before starting the component. 
      * Special attention has to be paid to the classloader from which the component is 
      * started.
-     * </p>
      * 
      * @throws MuleException exception during the start process.
      */

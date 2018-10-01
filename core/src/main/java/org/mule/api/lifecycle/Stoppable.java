@@ -21,14 +21,12 @@ public interface Stoppable
 
     /**
      * Stops a lifecycle component.
-     *
      * <p>
-     * Note: in most cases the correct context has to be set before stopping the component. 
+     * <b>Note</b>: in most cases the correct context has to be set before stopping the component. 
      * Special attention has to be paid to the classloader from which the component is 
      * stopped.
-     * </p>
      * 
-     * @throws MuleException exception during the start process.
+     * @throws MuleException exception during the stop process.
      */
     void stop() throws MuleException;
 }
