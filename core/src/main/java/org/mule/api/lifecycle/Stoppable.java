@@ -18,6 +18,15 @@ import org.mule.api.MuleException;
 public interface Stoppable
 {
     String PHASE_NAME = "stop";
-    
+
+    /**
+     * Stops a lifecycle component.
+     * <p>
+     * <b>Note</b>: in most cases the correct context has to be set before stopping the component. 
+     * Special attention has to be paid to the classloader from which the component is 
+     * stopped.
+     * 
+     * @throws MuleException exception during the stop process.
+     */
     void stop() throws MuleException;
 }
