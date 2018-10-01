@@ -22,6 +22,15 @@ public interface Startable
 {
     String PHASE_NAME = "start";
 
+    /**
+     * Starts a lifecycle component.
+     * <p>
+     * <b>Note</b>: in most cases the correct context has to be set before starting the component. 
+     * Special attention has to be paid to the classloader from which the component is 
+     * started.
+     * 
+     * @throws MuleException exception during the start process.
+     */
     void start() throws MuleException;
 
     /**
