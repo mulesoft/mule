@@ -34,12 +34,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
@@ -237,6 +239,16 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
+  public void classLoaderModelWithPluginDependencyDeclaredAsProvided() throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/provided-plugin-dependency");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.getDependencies().size(), is(1));
+    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(PROVIDED, false)));
+  }
+
+  @Test
   public void classLoaderModelWithPluginDependency() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency");
 
@@ -367,6 +379,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   private Matcher<BundleDependency> testEmptyPluginDependencyMatcher() {
+    return testEmptyPluginDependencyMatcher(COMPILE, true);
+  }
+
+  private Matcher<BundleDependency> testEmptyPluginDependencyMatcher(BundleScope scope, boolean hasUri) {
     return new BaseMatcher<BundleDependency>() {
 
       @Override
@@ -381,12 +397,13 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         }
 
         BundleDependency bundleDependency = (BundleDependency) o;
-        return bundleDependency.getScope().equals(COMPILE) &&
+        return bundleDependency.getScope().equals(scope) &&
             bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("test-empty-plugin") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&
-            bundleDependency.getDescriptor().getVersion().equals(MULE_PROJECT_VERSION);
+            bundleDependency.getDescriptor().getVersion().equals(MULE_PROJECT_VERSION) &&
+            (hasUri ? bundleDependency.getBundleUri() != null : bundleDependency.getBundleUri() == null);
       }
     };
   }
