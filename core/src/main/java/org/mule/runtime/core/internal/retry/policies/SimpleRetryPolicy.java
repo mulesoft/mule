@@ -71,9 +71,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
                                       Scheduler retryScheduler) {
     return from(publisher).onErrorResume(e -> {
       if (shouldRetry.test(e)) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Retrying execution of event...");
-        }
         Retry<T> retry = (Retry<T>) onlyIf(ctx -> shouldRetry.test(unwrap(ctx.exception())))
             .backoff(ctx -> new BackoffDelay(frequency));
 
@@ -85,6 +82,11 @@ public class SimpleRetryPolicy implements RetryPolicy {
             fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransactionActive()));
 
         Mono<T> retryMono = from(publisher)
+            .doOnEach(e3 -> {
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Retrying execution of event...");
+              }
+            })
             .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler))
             .doOnError(e2 -> {
               if (LOGGER.isDebugEnabled()) {
