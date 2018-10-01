@@ -18,6 +18,12 @@ public interface Disposable
      * A lifecycle method where implementor should free up any resources. If an
      * exception is thrown it should just be logged and processing should continue.
      * This method should not throw Runtime exceptions.
+     * 
+     * <p>
+     * Note: in most cases the correct context has to be set before disposing the component. 
+     * Special attention has to be paid to the classloader from which the component is 
+     * disposed.
+     * </p>
      */
     void dispose();
 }

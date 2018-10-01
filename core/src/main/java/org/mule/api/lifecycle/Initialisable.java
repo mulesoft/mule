@@ -22,6 +22,12 @@ public interface Initialisable
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      * 
+     * <p>
+     * Note: in most cases the correct context has to be set before initialising the component. 
+     * Special attention has to be paid to the classloader from which the component is 
+     * initialised.
+     * </p>
+     * 
      * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
      * @throws RecoverableException if an error occurs that can be recovered from
      */
