@@ -1294,40 +1294,14 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             receiver.initialise();
             receivers.put(receiverKey, receiver);
 
-
-            // Use endpoint retry policy to perform actual connection
-            RetryPolicyTemplate endpointRetryPolicyTemplate = endpoint.getRetryPolicyTemplate();
-
+            // Embed the actual connection into a RetryCallback, to be able to perform it
+            // through the configured retry policy
             RetryCallback performEndpointConnectionCallback = new RetryCallback()
             {
                 @Override
                 public void doWork(RetryContext context) throws Exception
                 {
-                    logger.info("Acquiring connection lock");
-
-                    // This will lock until the lock is released by the connector object,
-                    // passing it to the RetryWorker in charge of executing the endpoint's retry policy
-                    AbstractConnector.this.connectionLock.lock();
-                    try
-                    {
-                        logger.info("Connection lock acquired");
-
-                        if (isConnected())
-                        {
-                            receiver.connect();
-                        }
-
-                        if (isStarted())
-                        {
-                            receiver.start();
-                        }
-
-                    } finally
-                    {
-                        logger.error("Could not perform connection. Releasing lock");
-                        AbstractConnector.this.connectionLock.unlock();
-                    }
-
+                    doConnectAndStartReceiver(receiver);
                 }
 
                 @Override
@@ -1345,13 +1319,42 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
             logger.info("Executing listener connection with endpoint retry policy");
 
-            endpointRetryPolicyTemplate.execute(performEndpointConnectionCallback,
+            // Use endpoint retry policy to perform actual connection
+            endpoint.getRetryPolicyTemplate().execute(performEndpointConnectionCallback,
                                                 endpoint.getMuleContext().getWorkManager());
 
         }
         finally
         {
             connectionLock.unlock();
+        }
+    }
+
+    private void doConnectAndStartReceiver(MessageReceiver receiver) throws Exception
+    {
+        logger.info("Acquiring connection lock");
+
+        // This will lock until the lock is released by the connector object,
+        // passing it to the RetryWorker in charge of executing the endpoint's retry policy
+        AbstractConnector.this.connectionLock.lock();
+        try
+        {
+            logger.info("Connection lock acquired");
+
+            if (isConnected())
+            {
+                receiver.connect();
+            }
+
+            if (isStarted())
+            {
+                receiver.start();
+            }
+
+        } finally
+        {
+            logger.error("Could not perform connection. Releasing lock");
+            AbstractConnector.this.connectionLock.unlock();
         }
     }
 
