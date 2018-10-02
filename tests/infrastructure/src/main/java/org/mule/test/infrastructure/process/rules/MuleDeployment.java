@@ -93,7 +93,7 @@ public class MuleDeployment extends MuleInstallation {
   private static final boolean STOP_ON_EXIT = parseBoolean(getProperty("mule.test.stopOnExit", "true"));
   private static final boolean DEBUGGING_ENABLED = parseBoolean(getProperty("mule.test.debug", "false"));
   private static final String REMOTE_REPOSITORIES = getProperty("mule.test.repositories", "");
-  private static final String DEBUG_PORT = "5005";
+  private static final String DEBUG_PORT = getProperty("mule.test.debug.port", "5005");
   private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
   private static PollingProber prober;
   private String locationSuffix = "";
