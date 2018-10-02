@@ -1317,7 +1317,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                 }
             };
 
-            logger.info("Executing listener connection with endpoint retry policy");
+            logger.info("Executing listener startup with endpoint retry policy");
 
             // Use endpoint retry policy to perform actual connection
             endpoint.getRetryPolicyTemplate().execute(performEndpointConnectionCallback,
@@ -1332,14 +1332,14 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
     private void doConnectAndStartReceiver(MessageReceiver receiver) throws Exception
     {
-        logger.info("Acquiring connection lock");
+        logger.info("Acquiring connector connection lock");
 
         // This will lock until the lock is released by the connector object,
         // passing it to the RetryWorker in charge of executing the endpoint's retry policy
         AbstractConnector.this.connectionLock.lock();
         try
         {
-            logger.info("Connection lock acquired");
+            logger.debug("Connection lock acquired");
 
             if (isConnected())
             {
@@ -1353,7 +1353,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
         } finally
         {
-            logger.error("Could not perform connection. Releasing lock");
+            logger.debug("Could not perform receiver startup. Releasing connector connection lock");
             AbstractConnector.this.connectionLock.unlock();
         }
     }
