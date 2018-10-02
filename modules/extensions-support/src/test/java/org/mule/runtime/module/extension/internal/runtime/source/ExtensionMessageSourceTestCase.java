@@ -19,6 +19,7 @@ import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -28,12 +29,14 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
@@ -41,18 +44,19 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.resource.spi.work.Work;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.resource.spi.work.Work;
+import org.mockito.InOrder;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
@@ -106,6 +110,8 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void initialise() throws Exception {
     if (!messageSource.getLifecycleState().isInitialised()) {
       messageSource.initialise();
+      verify(muleContext.getInjector()).inject(source);
+      verify((Initialisable) source).initialise();
       verify(source, never()).onStart(sourceCallback);
     }
   }
@@ -221,8 +227,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       messageSource.start();
     }
 
-    verify(source).onStart(sourceCallback);
-    verify(muleContext.getInjector()).inject(source);
+    final Injector injector = muleContext.getInjector();
+    InOrder inOrder = inOrder(injector, source);
+    inOrder.verify(injector).inject(source);
+    inOrder.verify((Initialisable) source).initialise();
+    inOrder.verify(source).onStart(sourceCallback);
   }
 
   @Test
@@ -257,6 +266,16 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
     messageSource.stop();
     verify(source).onStop();
+  }
+
+  @Test
+  public void dispose() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+    messageSource.stop();
+
+    messageSource.dispose();
+    verify((Disposable) source).dispose();
   }
 
   @Test

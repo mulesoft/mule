@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 
 import org.junit.Test;
-import org.mockito.verification.VerificationMode;
 
 public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
@@ -45,7 +45,8 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
     messageSource.initialise();
     messageSource.start();
 
-    assertStarted(never());
+    verify(sourceAdapter, never()).initialise();
+    verify(sourceAdapter, never()).start();
   }
 
   @Test
@@ -54,11 +55,7 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
 
     muleContext.getNotificationManager()
         .fireNotification(new ClusterNodeNotification("you're up", PRIMARY_CLUSTER_NODE_SELECTED));
-    assertStarted(times(1));
-  }
-
-  private void assertStarted(VerificationMode mode) throws Exception {
-    verify(sourceAdapter, mode).initialise();
-    verify(sourceAdapter, mode).start();
+    verify(sourceAdapter, atLeastOnce()).initialise();
+    verify(sourceAdapter, times(1)).start();
   }
 }
