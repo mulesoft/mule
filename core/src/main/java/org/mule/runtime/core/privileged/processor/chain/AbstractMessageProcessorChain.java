@@ -184,7 +184,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    */
   private BiConsumer<Throwable, Object> getContinueStrategyErrorHandler(Processor processor) {
     return (throwable, object) -> {
-      if (!(object instanceof CoreEvent)) {
+      if (object != null && !(object instanceof CoreEvent)) {
         LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
         throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
       }
