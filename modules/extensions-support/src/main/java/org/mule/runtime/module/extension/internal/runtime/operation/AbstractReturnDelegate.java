@@ -136,7 +136,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toLazyMessageCollection((Collection<Result>) value, cursorProviderFactory, mediaType, event);
+        value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, mediaType, event);
         value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, payloadMediaTypeResolver),
                                     cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
       } else if (value instanceof Iterator && returnsListOfMessages) {
@@ -165,13 +165,22 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
 
   private Collection<Object> toLazyMessageCollection(Collection<Result> values,
+                                                     ExecutionContextAdapter operationContext,
                                                      CursorProviderFactory cursorProviderFactory,
                                                      MediaType mediaType,
                                                      CoreEvent event) {
     Collection<Object> lazyMessageCollection = new ArrayList<>();
     values.forEach(value -> {
       if (value.getOutput() instanceof InputStream) {
+        ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
+        if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
+          value = value.copy()
+              .output(new ConnectedInputStreamWrapper((InputStream) value.getOutput(), connectionHandler))
+              .build();
+        }
+
         Message message = MessageUtils.toMessage(value, mediaType, cursorProviderFactory, event);
+
         lazyMessageCollection.add(message);
       } else {
         lazyMessageCollection.add(value);

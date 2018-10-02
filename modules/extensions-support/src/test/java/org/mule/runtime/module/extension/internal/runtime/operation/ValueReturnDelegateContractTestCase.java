@@ -31,7 +31,6 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -214,6 +213,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   public void operationWithResultInputStreamCollectionOutput() throws Exception {
     MetadataType metadataType = BaseTypeBuilder.create(JAVA).arrayType().of(new MessageMetadataTypeBuilder().build()).build();
     when(outputModel.getType()).thenReturn(metadataType);
+    when(componentModel.supportsStreaming()).thenReturn(true);
 
     delegate = createReturnDelegate();
 
@@ -230,6 +230,11 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     assertThat(IOUtils.toString(resultingStream), is(HELLO_WORLD_MSG));
     resultingStream.close();
     actual.releaseResources();
+    disposeStreamingManager();
+    probe(5000, 500, () -> {
+      verify(connectionHandler, atLeastOnce()).release();
+      return true;
+    });
   }
 
   private void assertStreamIsWrapped(Object value) throws InitialisationException, IOException {
