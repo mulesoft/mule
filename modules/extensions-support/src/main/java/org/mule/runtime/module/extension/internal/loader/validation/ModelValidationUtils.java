@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -45,8 +46,19 @@ final class ModelValidationUtils {
                                                   kind,
                                                   model.getName(),
                                                   configOverrideParameters.toString(),
-                                                  ConfigOverride.class.getSimpleName(), kind)));
+                                                  ConfigOverride.class.getSimpleName())));
     }
+  }
+
+  static void validateConfigParametersNamesNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
+
+    model.getAllParameterModels().stream()
+        .filter(parameterModel -> parameterModel.getName().equals("name"))
+        .findAny()
+        .ifPresent((parameterModel) -> reporter
+            .addError(new Problem(model, format("%s '%s' declares a parameter whose name is 'name', which is not allowed.",
+                                                kind,
+                                                model.getName()))));
   }
 
 }

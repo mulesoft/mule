@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigParametersNamesNotAllowed;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -35,8 +36,7 @@ import java.util.Optional;
  * {@link ExtensionModelValidator} which applies to {@link ExtensionModel}s which contains {@link ConfigurationModel}s and
  * {@link OperationModel}s .
  * <p>
- * This validator makes sure that all {@link OperationModel operations } are compatible with the defined {@link ConfigurationModel
- * c}
+ * This validator makes sure that all {@link OperationModel operations} are compatible with the defined {@link ConfigurationModel}
  *
  * @since 4.0
  */
@@ -91,6 +91,7 @@ public final class ConfigurationModelValidator implements ExtensionModelValidato
 
       @Override
       protected void onConfiguration(ConfigurationModel model) {
+        validateConfigParametersNamesNotAllowed(model, problemsReporter, "Configuration");
         validateConfigOverrideParametersNotAllowed(model, problemsReporter, "Configuration");
       }
     }.walk(model);
