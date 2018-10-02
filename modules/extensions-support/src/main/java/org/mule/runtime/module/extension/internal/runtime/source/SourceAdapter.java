@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
@@ -28,7 +29,6 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -37,10 +37,8 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -75,10 +73,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -90,13 +84,17 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
  * performs injection of both, dependencies and parameters
  *
  * @since 4.0
  */
-public class SourceAdapter implements Startable, Stoppable, Initialisable {
+public class SourceAdapter implements Lifecycle {
 
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
 
@@ -118,6 +116,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
   private final Supplier<Source> sourceInvokationTarget;
 
   private ErrorType flowBackPressueErrorType;
+  private boolean initialised = false;
 
   @Inject
   private StreamingManager streamingManager;
@@ -221,12 +220,38 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    if (initialised) {
+      return;
+    }
+
     flowBackPressueErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)
         .orElseThrow(() -> new IllegalStateException("FLOW_BACK_PRESSURE error type not found"));
 
     initialiseIfNeeded(nonCallbackParameters, true, muleContext);
     initialiseIfNeeded(errorCallbackParameters, true, muleContext);
     initialiseIfNeeded(successCallbackParameters, true, muleContext);
+
+    injectComponentLocation();
+
+    try {
+      setConfiguration(configurationInstance);
+      setConnection();
+      muleContext.getInjector().inject(sourceInvokationTarget.get());
+      if (source instanceof SourceWrapper) {
+        muleContext.getInjector().inject(source);
+      }
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
+    }
+
+    initialiseIfNeeded(source);
+    initialised = true;
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(source, LOGGER);
+    initialised = false;
   }
 
 
@@ -330,15 +355,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
 
   @Override
   public void start() throws MuleException {
-    injectComponentLocation();
-
     try {
-      setConfiguration(configurationInstance);
-      setConnection();
-      muleContext.getInjector().inject(sourceInvokationTarget.get());
-      if (source instanceof SourceWrapper) {
-        muleContext.getInjector().inject(source);
-      }
       source.onStart(createSourceCallback());
     } catch (Exception e) {
       throw new DefaultMuleException(e);

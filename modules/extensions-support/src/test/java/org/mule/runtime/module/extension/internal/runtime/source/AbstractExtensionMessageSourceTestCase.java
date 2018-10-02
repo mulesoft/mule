@@ -37,6 +37,7 @@ import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -140,7 +141,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   @Mock
   protected FlowConstruct flowConstruct;
 
-  @Mock
+  @Mock(extraInterfaces = Lifecycle.class)
   protected Source source;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
