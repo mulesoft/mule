@@ -24,7 +24,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -74,14 +73,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedPa
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -465,7 +463,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     public void doWork(RetryContext context) throws Exception {
       try {
         createSource();
-        initialiseIfNeeded(sourceAdapter, muleContext);
+        initialiseIfNeeded(sourceAdapter);
         sourceAdapter.start();
         reconnecting.set(false);
       } catch (Exception e) {
@@ -545,6 +543,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
         try {
           createSource();
+          initialiseIfNeeded(sourceAdapter);
         } catch (Exception e) {
           throw new InitialisationException(e, this);
         }
