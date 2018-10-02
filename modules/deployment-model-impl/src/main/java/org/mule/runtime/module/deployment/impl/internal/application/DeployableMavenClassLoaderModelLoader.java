@@ -63,7 +63,7 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   @Override
   protected boolean includeProvidedDependencies(ArtifactType artifactType) {
-    return artifactType.equals(APP) || artifactType.equals(DOMAIN);
+    return supportsArtifactType(artifactType);
   }
 
   @Override
