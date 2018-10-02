@@ -23,7 +23,7 @@ import org.junit.Test;
 public class JettyContentTypeTestCase extends FunctionalTestCase
 {
 
-    private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
+    private static final String EXPECTED_CONTENT_TYPE = "application/json;charset=utf-8";
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");

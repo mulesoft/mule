@@ -141,7 +141,7 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
     protected void extractBaseRequestParts(Request baseRequest) throws IOException
     {
         method = baseRequest.getMethod();
-        uri = baseRequest.getUri().getCompletePath();
+        uri = baseRequest.getHttpURI().getPathQuery();
 
         extractHeadersFromBaseRequest(baseRequest);
 

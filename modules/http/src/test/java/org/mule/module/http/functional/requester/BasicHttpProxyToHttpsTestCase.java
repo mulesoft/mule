@@ -157,7 +157,7 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
             String authorization = httpRequest.getHeader(AUTHORIZATION);
             if (authorization != null && authorization.equals("Basic " + PASSWORD))
             {
-                httpResponse.addHeader("target", request.getUri().toString());
+                httpResponse.addHeader("target", request.getRequestURI());
                 target.handle(pathInContext, request, httpRequest, httpResponse);
             }
             else

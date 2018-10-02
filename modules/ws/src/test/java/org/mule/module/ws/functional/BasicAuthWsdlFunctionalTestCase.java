@@ -20,6 +20,7 @@ import java.util.Collections;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -66,7 +67,9 @@ public class BasicAuthWsdlFunctionalTestCase extends AbstractWSConsumerFunctiona
         httpServer = new Server(httpServerPort.getNumber());
 
         HashLoginService loginService = new HashLoginService();
-        loginService.putUser("user", new Password("password"), new String[] {"user"});
+        UserStore userStore = new UserStore();
+        userStore.addUser("user", new Password("password"), new String[] {"user"});
+        loginService.setUserStore(userStore);
 
         ConstraintSecurityHandler security = new ConstraintSecurityHandler();
         httpServer.setHandler(security);

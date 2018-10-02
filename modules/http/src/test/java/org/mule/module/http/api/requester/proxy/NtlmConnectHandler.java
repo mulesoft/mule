@@ -14,10 +14,9 @@ import static org.glassfish.grizzly.http.server.Constants.CLOSE;
 import static org.glassfish.grizzly.http.server.Constants.CONNECTION;
 import static org.glassfish.grizzly.http.server.Constants.KEEPALIVE;
 
-import org.mule.module.http.api.requester.proxy.TestAuthorizer;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.Executor;
@@ -29,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
+import org.eclipse.jetty.io.ManagedSelector;
 import org.eclipse.jetty.io.SelectChannelEndPoint;
 import org.eclipse.jetty.io.SelectorManager;
 import org.eclipse.jetty.proxy.ConnectHandler;
@@ -176,26 +176,19 @@ public class NtlmConnectHandler extends ConnectHandler
         }
 
         @Override
-        protected EndPoint newEndPoint(SocketChannel channel, ManagedSelector selector, SelectionKey selectionKey) throws IOException
+        protected EndPoint newEndPoint(SelectableChannel channel, ManagedSelector selector, SelectionKey selectionKey) throws IOException
         {
             return new SelectChannelEndPoint(channel, selector, selectionKey, getScheduler(), getIdleTimeout());
         }
 
         @Override
-        public Connection newConnection(SocketChannel channel, EndPoint endpoint, Object attachment) throws IOException
+        public Connection newConnection(SelectableChannel channel, EndPoint endpoint, Object attachment) throws IOException
         {
-            ConnectHandler.LOG.debug("Connected to {}", channel.getRemoteAddress());
-            ConnectContext connectContext = (ConnectContext)attachment;
+            ConnectHandler.LOG.debug("Connected to {}", ((SocketChannel) channel).getRemoteAddress());
+            ConnectContext connectContext = (ConnectContext) attachment;
             UpstreamConnection connection = newUpstreamConnection(endpoint, connectContext);
             connection.setInputBufferSize(getBufferSize());
             return connection;
-        }
-
-        @Override
-        protected void connectionFailed(SocketChannel channel, Throwable ex, Object attachment)
-        {
-            ConnectContext connectContext = (ConnectContext)attachment;
-            onConnectFailure(connectContext.getRequest(), connectContext.getResponse(), connectContext.getAsyncContext(), ex);
         }
     }
 }

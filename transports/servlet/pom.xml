@@ -22,12 +22,17 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+            	<exclusion>
+            		<groupId>javax.servlet</groupId>
+            		<artifactId>javax.servlet-api</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->

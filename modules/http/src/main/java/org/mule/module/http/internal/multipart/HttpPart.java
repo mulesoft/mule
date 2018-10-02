@@ -135,4 +135,10 @@ public class HttpPart implements Part
         return fileName;
     }
 
+    @Override
+    public String getSubmittedFileName()
+    {
+        return fileName;
+    }
+
 }
