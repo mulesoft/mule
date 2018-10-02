@@ -240,15 +240,7 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
 
         MultiPartInputStreamParser inputStreamParser = new MultiPartInputStreamParser(request.getInputStream(), request.getContentType(), null, null);
 
-        try
-        {
-            parts = inputStreamParser.getParts();
-        }
-        catch (ServletException e)
-        {
-            throw new IOException(e);
-        }
-
+        parts = inputStreamParser.getParts();
 
         response.setContentType(HTML);
         response.setStatus(HttpServletResponse.SC_OK);

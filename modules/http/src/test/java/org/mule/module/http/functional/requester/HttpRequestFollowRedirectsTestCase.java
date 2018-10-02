@@ -60,7 +60,7 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
     protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         extractBaseRequestParts(baseRequest);
-        if(baseRequest.getUri().getPath().startsWith("/redirect"))
+        if(baseRequest.getRequestURI().startsWith("/redirect"))
         {
             response.getWriter().print(REDIRECTED);
         }
