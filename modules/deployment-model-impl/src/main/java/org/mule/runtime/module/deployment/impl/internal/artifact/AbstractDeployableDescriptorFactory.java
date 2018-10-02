@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -71,9 +72,9 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
       if (bundleDependency.getDescriptor().isPlugin()) {
         if (bundleDependency.getBundleUri() == null) {
-          LOGGER.warn(String.format(
-                                    "Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
-                                    bundleDependency.getDescriptor()));
+          LOGGER
+              .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
+                           bundleDependency.getDescriptor()));
         } else {
           File pluginFile = new File(bundleDependency.getBundleUri());
           pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginFile, descriptor));
