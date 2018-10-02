@@ -62,7 +62,7 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase
         response.setStatus(SC_OK);
         extractBaseRequestParts(baseRequest);
         String contentDispositionHeader;
-        String path = baseRequest.getUri().getPath();
+        String path = baseRequest.getRequestURI();
         if (path.equals(CONTENT_DISPOSITION_PATH))
         {
             contentDispositionHeader = CONTENT_DISPOSITION_HEADER;

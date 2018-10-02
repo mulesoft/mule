@@ -210,6 +210,10 @@
                     <groupId>velocity</groupId>
                     <artifactId>velocity-dep</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
