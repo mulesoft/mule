@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -25,8 +26,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployableModel, T extends DeployableArtifactDescriptor>
     extends AbstractArtifactDescriptorFactory<M, T> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDeployableDescriptorFactory.class);
 
   protected final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
 
@@ -65,8 +71,14 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
     for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
       if (bundleDependency.getDescriptor().isPlugin()) {
-        File pluginFile = new File(bundleDependency.getBundleUri());
-        pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginFile, descriptor));
+        if (bundleDependency.getBundleUri() == null) {
+          LOGGER
+              .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
+                           bundleDependency.getDescriptor()));
+        } else {
+          File pluginFile = new File(bundleDependency.getBundleUri());
+          pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginFile, descriptor));
+        }
       }
     }
     return pluginDescriptors;
