@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -20,7 +21,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,6 +45,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.qameta.allure.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -61,11 +63,13 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
       createBundleDependency("other.company", "dummy-lib", "1.2.0", "raml-fragment");
   private static final org.mule.maven.client.api.model.BundleDependency TRAIT_BUNDLE =
       createBundleDependency("some.company", "dummy-trait", "1.0.3", "raml-fragment");
+  private static final String POM_FORMAT = "%s-%s.pom";
+  private List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES = asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private MavenClient mockMavenClient = mock(MavenClient.class);
+  private MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
 
   @Test
   @Description("Heavyweight packaged apps will deploy ok with shared libraries information in classloader-model.json")
@@ -123,12 +127,18 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
     when(mockMavenClient.resolveArtifactDependencies(any(), anyBoolean(), anyBoolean(), any(), any(), any()))
         .thenReturn(asList(regularDependency, API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE));
-    when(mockMavenClient.resolveBundleDescriptorDependencies(anyBoolean(), eq(API_BUNDLE.getDescriptor())))
-        .thenReturn(asList(LIB_BUNDLE, TRAIT_BUNDLE));
-    when(mockMavenClient.resolveBundleDescriptorDependencies(anyBoolean(), eq(LIB_BUNDLE.getDescriptor())))
-        .thenReturn(emptyList());
-    when(mockMavenClient.resolveBundleDescriptorDependencies(anyBoolean(), eq(TRAIT_BUNDLE.getDescriptor())))
-        .thenReturn(singletonList(minorLibBundle));
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(API_BUNDLE.getDescriptor())), anyBoolean(),
+                                                     anyBoolean(), any(), any(), any()))
+                                                         .thenReturn(asList(LIB_BUNDLE, TRAIT_BUNDLE));
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(LIB_BUNDLE.getDescriptor())), anyBoolean(),
+                                                     anyBoolean(), any(), any(), any()))
+                                                         .thenReturn(emptyList());
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(minorLibBundle.getDescriptor())), anyBoolean(),
+                                                     anyBoolean(), any(), any(), any()))
+                                                         .thenReturn(emptyList());
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(TRAIT_BUNDLE.getDescriptor())), anyBoolean(),
+                                                     anyBoolean(), any(), any(), any()))
+                                                         .thenReturn(singletonList(minorLibBundle));
 
     ClassLoaderModel classLoaderModel = buildAndValidateModel(5);
 
@@ -152,12 +162,15 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   public void applicationWithLoopedApiArtifactDependencies() throws Exception {
     when(mockMavenClient.resolveArtifactDependencies(any(), anyBoolean(), anyBoolean(), any(), any(), any()))
         .thenReturn(asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE));
-    when(mockMavenClient.resolveBundleDescriptorDependencies(anyBoolean(), eq(API_BUNDLE.getDescriptor())))
-        .thenReturn(asList(LIB_BUNDLE, TRAIT_BUNDLE));
-    when(mockMavenClient.resolveBundleDescriptorDependencies(anyBoolean(), eq(LIB_BUNDLE.getDescriptor())))
-        .thenReturn(singletonList(TRAIT_BUNDLE));
-    when(mockMavenClient.resolveBundleDescriptorDependencies(anyBoolean(), eq(TRAIT_BUNDLE.getDescriptor())))
-        .thenReturn(singletonList(LIB_BUNDLE));
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(API_BUNDLE.getDescriptor())), anyBoolean(),
+                                                     anyBoolean(), any(), any(), any()))
+                                                         .thenReturn(asList(LIB_BUNDLE, TRAIT_BUNDLE));
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(LIB_BUNDLE.getDescriptor())), anyBoolean(),
+                                                     anyBoolean(), any(), any(), any()))
+                                                         .thenReturn(singletonList(TRAIT_BUNDLE));
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(TRAIT_BUNDLE.getDescriptor())), anyBoolean(),
+                                                     anyBoolean(), any(), any(), any()))
+                                                         .thenReturn(singletonList(LIB_BUNDLE));
 
     buildAndValidateModel(3);
   }
@@ -199,7 +212,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
   private static URI getDummyUriFor(String groupId, String artifactId, String version) {
     try {
-      return new URI(String.format("file:/%s/%s/%s", groupId, artifactId, version));
+      return new URI(format("file:/%s/%s/%s", groupId, artifactId, version));
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
@@ -227,4 +240,26 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     return deployableMavenClassLoaderModelLoader.load(rootApplication, emptyMap(), APP);
   }
 
+  private class FileNameMatcher extends TypeSafeMatcher<File> {
+
+    BundleDescriptor descriptor;
+
+    public FileNameMatcher(BundleDescriptor descriptor) {
+      this.descriptor = descriptor;
+    }
+
+    @Override
+    protected boolean matchesSafely(File item) {
+      return item.getPath().endsWith(format(POM_FORMAT, descriptor.getArtifactId(), descriptor.getVersion()));
+    }
+
+    @Override
+    public void describeTo(org.hamcrest.Description description) {
+      description
+          .appendText("a POM file for artifactId ")
+          .appendText(descriptor.getArtifactId())
+          .appendText(" and version ")
+          .appendText(descriptor.getVersion());
+    }
+  }
 }
