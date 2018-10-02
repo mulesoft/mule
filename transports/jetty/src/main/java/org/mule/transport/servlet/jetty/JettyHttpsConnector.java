@@ -304,6 +304,10 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
             sslContextFactory.setIncludeProtocols(tls.getEnabledProtocols());
 
         }
+        
+        // In newer Jetty versions, some cipher suites are disabled by default.
+        // This will be managed through the include cipher suites.
+        sslContextFactory.setExcludeCipherSuites("");
 
         return sslContextFactory;
     }
