@@ -17,7 +17,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -31,6 +30,7 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequester;
 import org.mule.retry.RetryPolicyExhaustedException;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
@@ -39,9 +39,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
+import org.junit.Test;
 
 /**
  * Tests that lifecycle methods on a connector are not processed more than once. (@see MULE-3062)
@@ -356,6 +355,49 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
             service.dispose();
         }
     }
+
+    /**
+     * This test verifies that once a connector is started, and a listener is registered for it, its connection is
+     * executed with a RetryPolicy, that could be either the one from the endpoint, or the connector.
+     * @throws Exception
+     */
+    @Test
+    public void testReceiverConnectionIsExecutedWithRetryPolicyOnceConnectorIsStarted() throws Exception{
+        Service service = getTestService();
+        service.start();
+
+        try
+        {
+            connector.start();
+            connector.connect();
+
+            // Set by default a NoRetryPolicy, in order to provoke a RetryPolicyExhausted exception
+            connector.setRetryPolicyTemplate(new NoRetryPolicyTemplate());
+
+            assertEquals(0, connector.receivers.size());
+
+            try
+            {
+                connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), service);
+            }
+            catch (RetryPolicyExhaustedException e)
+            {
+                // Since the policy would have executed, an exhaustion exception will be raised
+                assertEquals(RetryPolicyExhaustedException.class, e.getClass());
+            }
+
+            assertEquals(1, connector.receivers.size());
+            assertTrue((connector.receivers.get("in")).isConnected());
+            assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+        }
+        finally
+        {
+            service.dispose();
+        }
+    }
+
+
+
 
     @Test
     public void testReceiversServiceLifecycle() throws Exception
