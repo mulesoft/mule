@@ -262,8 +262,17 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependencies() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-additional-dependencies");
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight");
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesHeavyweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
+  }
+
+  private void assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies(String location) throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + location);
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -397,8 +406,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         }
 
         BundleDependency bundleDependency = (BundleDependency) o;
-        return bundleDependency.getScope().equals(scope) &&
-            bundleDependency.getDescriptor().getClassifier().isPresent() &&
+
+        return bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("test-empty-plugin") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&
@@ -431,8 +440,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         }
 
         BundleDependency bundleDependency = (BundleDependency) o;
-        return bundleDependency.getScope().equals(COMPILE) &&
-            bundleDependency.getDescriptor().getClassifier().isPresent() &&
+        return bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&

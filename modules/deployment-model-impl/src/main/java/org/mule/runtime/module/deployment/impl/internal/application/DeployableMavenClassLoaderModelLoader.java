@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -69,5 +70,10 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   @Override
   public boolean supportsArtifactType(ArtifactType artifactType) {
     return artifactType.equals(APP) || artifactType.equals(DOMAIN) || artifactType.equals(POLICY);
+  }
+
+  @Override
+  protected org.mule.tools.api.classloader.model.ClassLoaderModel getPackagerClassLoaderModel(File classLoaderModelDescriptor) {
+    return deserialize(classLoaderModelDescriptor);
   }
 }

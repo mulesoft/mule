@@ -72,9 +72,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR = "classloader-model-patch.json";
   public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION =
-      Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_DESCRIPTOR).toString();
+          Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_DESCRIPTOR).toString();
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION =
-      Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR).toString();
+          Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR).toString();
 
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
 
@@ -104,21 +104,22 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    * the attributes from the {@link MuleArtifactLoaderDescriptor#getAttributes()} map.
    *
    * @param artifactFile {@link File} where the current plugin to work with.
-   * @param attributes a set of attributes to work with, where the current implementation of this class will look for
-   *        {@link ArtifactDescriptorConstants#EXPORTED_PACKAGES} and {@link ArtifactDescriptorConstants#EXPORTED_RESOURCES}
+   * @param attributes   a set of attributes to work with, where the current implementation of this class will look for
+   *                     {@link ArtifactDescriptorConstants#EXPORTED_PACKAGES} and {@link ArtifactDescriptorConstants#EXPORTED_RESOURCES}
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
    */
   @Override
   public final ClassLoaderModel load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
-      throws InvalidDescriptorLoaderException {
+          throws InvalidDescriptorLoaderException {
     return createClassLoaderModel(artifactFile, attributes, artifactType);
   }
 
   private ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
-      throws InvalidDescriptorLoaderException {
+          throws InvalidDescriptorLoaderException {
     if (isHeavyPackage(artifactFile)) {
       return createHeavyPackageClassLoaderModel(artifactFile, attributes);
-    } else {
+    }
+    else {
       return createLightPackageClassLoaderModel(artifactFile, attributes, artifactType);
     }
   }
@@ -128,30 +129,31 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
 
     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
-        deserialize(classLoaderModelDescriptor);
+            getPackagerClassLoaderModel(classLoaderModelDescriptor);
+
     File deployableArtifactRepositoryFolder = getDeployableArtifactRepositoryFolder(artifactFile);
 
     final ArtifactClassLoaderModelBuilder classLoaderModelBuilder =
-        new HeavyweightClassLoaderModelBuilder(packagerClassLoaderModel, artifactFile);
+            new HeavyweightClassLoaderModelBuilder(artifactFile, packagerClassLoaderModel);
     classLoaderModelBuilder
-        .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
-        .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
-                                     new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
-        .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
+            .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
+            .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
+                                         new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
+            .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
 
     Set<BundleDependency> patchBundleDependencies =
-        getPatchedBundledDependencies(artifactFile, deployableArtifactRepositoryFolder);
+            getPatchedBundledDependencies(artifactFile, deployableArtifactRepositoryFolder);
 
     Set<BundleDependency> bundleDependencies =
-        packagerClassLoaderModel.getDependencies().stream().map(artifact -> {
-          Optional<BundleDependency> patchedBundledDependency =
-              patchBundleDependencies.stream().filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId()
-                  .equals(artifact.getArtifactCoordinates().getGroupId()) &&
-                  bundleDependency.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId()))
-                  .findAny();
-          return patchedBundledDependency
-              .orElse(createBundleDependencyFromPackagerDependency(deployableArtifactRepositoryFolder).apply(artifact));
-        }).collect(toSet());
+            packagerClassLoaderModel.getDependencies().stream().map(artifact -> {
+              Optional<BundleDependency> patchedBundledDependency =
+                      patchBundleDependencies.stream().filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId()
+                                                                                          .equals(artifact.getArtifactCoordinates().getGroupId()) &&
+                                                                                  bundleDependency.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId()))
+                              .findAny();
+              return patchedBundledDependency
+                      .orElse(createBundleDependencyFromPackagerDependency(deployableArtifactRepositoryFolder).apply(artifact));
+            }).collect(toSet());
 
     loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
     classLoaderModelBuilder.dependingOn(bundleDependencies);
@@ -159,15 +161,23 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     return classLoaderModelBuilder.build();
   }
 
+  /**
+   * Template method to deserialize a classloader-model.json into the expected {@link org.mule.tools.api.classloader.model.ClassLoaderModel} implementation
+   *
+   * @param classLoaderModelDescriptor
+   * @return a {@link org.mule.tools.api.classloader.model.ClassLoaderModel}
+   */
+  protected abstract org.mule.tools.api.classloader.model.ClassLoaderModel getPackagerClassLoaderModel(File classLoaderModelDescriptor);
+
   private Set<BundleDependency> getPatchedBundledDependencies(File artifactFile, File deployableArtifactRepositoryFolder) {
     Set<BundleDependency> patchBundleDependencies = new HashSet<>();
     File classLoaderModelPatchDescriptor = getClassLoaderModelPatchDescriptor(artifactFile);
     if (classLoaderModelPatchDescriptor.exists()) {
       org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModelPatch =
-          deserialize(classLoaderModelPatchDescriptor);
+              deserialize(classLoaderModelPatchDescriptor);
       patchBundleDependencies.addAll(packagerClassLoaderModelPatch.getDependencies().stream()
-          .map(artifact -> createBundleDependencyFromPackagerDependency(deployableArtifactRepositoryFolder).apply(artifact))
-          .collect(toSet()));
+                                             .map(artifact -> createBundleDependencyFromPackagerDependency(deployableArtifactRepositoryFolder).apply(artifact))
+                                             .collect(toSet()));
     }
     return patchBundleDependencies;
   }
@@ -197,13 +207,14 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       File bundle = new File(artifactFile, d.getUri().toString());
 
       return new BundleDependency.Builder()
-          .setDescriptor(new BundleDescriptor.Builder().setArtifactId(d.getArtifactCoordinates().getArtifactId())
-              .setGroupId(d.getArtifactCoordinates().getGroupId())
-              .setClassifier(d.getArtifactCoordinates().getClassifier())
-              .setType(d.getArtifactCoordinates().getType()).setVersion(d.getArtifactCoordinates().getVersion())
-              .build())
-          .setBundleUri(bundle.toURI())
-          .build();
+              .setDescriptor(
+                      new BundleDescriptor.Builder().setArtifactId(d.getArtifactCoordinates().getArtifactId())
+                              .setGroupId(d.getArtifactCoordinates().getGroupId())
+                              .setClassifier(d.getArtifactCoordinates().getClassifier())
+                              .setType(d.getArtifactCoordinates().getType()).setVersion(d.getArtifactCoordinates().getVersion())
+                              .build())
+              .setBundleUri(bundle.toURI())
+              .build();
     };
   }
 
@@ -225,8 +236,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     Optional<File> mavenRepository = ofNullable(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation());
     if (!mavenRepository.isPresent()) {
       throw new MuleRuntimeException(createStaticMessage(
-                                                         format("Missing Maven local repository configuration while trying to resolve class loader model for lightweight artifact: %s",
-                                                                artifactFile.getName())));
+              format("Missing Maven local repository configuration while trying to resolve class loader model for lightweight artifact: %s",
+                     artifactFile.getName())));
     }
 
     boolean includeProvidedDependencies = includeProvidedDependencies(artifactType);
@@ -240,7 +251,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                   mavenReactorResolver,
                                                   temporaryDirectory);
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-          newLightweightClassLoaderModelBuilder(artifactFile, mavenClient, attributes);
+              newLightweightClassLoaderModelBuilder(artifactFile, mavenClient, attributes);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -251,8 +262,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                      includeProvidedDependencies, mavenRepository,
                                                                                      mavenReactorResolver, temporaryDirectory);
       Stream<BundleDependency> bundleDependencies = dependencies.stream()
-          .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
-          .map(this::convertBundleDependency);
+              .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
+              .map(this::convertBundleDependency);
       loadUrls(artifactFile, classLoaderModelBuilder, concat(bundleDependencies,
                                                              missingApiDependencyBundles.stream()).collect(toSet()));
       Stream<BundleDependency> allBundleDependencies = dependencies.stream().map(this::convertBundleDependency);
@@ -275,11 +286,11 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                            Optional<MavenReactorResolver> mavenReactorResolver,
                                                            Optional<File> temporaryDirectory) {
     Set<org.mule.maven.client.api.model.BundleDependency> apiDependencies = dependencies.stream()
-        .filter(dependency -> {
-          Optional<String> classifier = dependency.getDescriptor().getClassifier();
-          return classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get());
-        })
-        .collect(toSet());
+            .filter(dependency -> {
+              Optional<String> classifier = dependency.getDescriptor().getClassifier();
+              return classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get());
+            })
+            .collect(toSet());
 
     Deque<org.mule.maven.client.api.model.BundleDependency> dependenciesToCheck = new ArrayDeque<>(apiDependencies);
     Set<org.mule.maven.client.api.model.BundleDependency> missingApiDependencies = new HashSet<>();
@@ -309,25 +320,25 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private boolean noEquivalentPresent(Set<org.mule.maven.client.api.model.BundleDependency> dependencies,
                                       org.mule.maven.client.api.model.BundleDependency dependency) {
     return dependencies.stream()
-        .noneMatch(currentApiArtifact -> currentApiArtifact.getDescriptor().equals(dependency.getDescriptor()));
+            .noneMatch(currentApiArtifact -> currentApiArtifact.getDescriptor().equals(dependency.getDescriptor()));
   }
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
 
   protected BundleDependency convertBundleDependency(org.mule.maven.client.api.model.BundleDependency mavenClientDependency) {
     BundleDependency.Builder builder = new BundleDependency.Builder()
-        .setScope(BundleScope.valueOf(mavenClientDependency.getScope().name()))
-        .setBundleUri(mavenClientDependency.getBundleUri())
-        .setDescriptor(convertBundleDescriptor(mavenClientDependency.getDescriptor()));
+            .setScope(BundleScope.valueOf(mavenClientDependency.getScope().name()))
+            .setBundleUri(mavenClientDependency.getBundleUri())
+            .setDescriptor(convertBundleDescriptor(mavenClientDependency.getDescriptor()));
     return builder.build();
   }
 
   private BundleDescriptor convertBundleDescriptor(org.mule.maven.client.api.model.BundleDescriptor descriptor) {
     BundleDescriptor.Builder builder = new BundleDescriptor.Builder().setGroupId(descriptor.getGroupId())
-        .setArtifactId(descriptor.getArtifactId())
-        // Use baseVersion as it will refer to the unresolved meta version (case of SNAPSHOTS instead of timestamp versions)
-        .setVersion(descriptor.getBaseVersion())
-        .setType(descriptor.getType());
+            .setArtifactId(descriptor.getArtifactId())
+            // Use baseVersion as it will refer to the unresolved meta version (case of SNAPSHOTS instead of timestamp versions)
+            .setVersion(descriptor.getBaseVersion())
+            .setType(descriptor.getType());
     descriptor.getClassifier().ifPresent(builder::setClassifier);
     return builder.build();
   }
@@ -337,10 +348,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    * <p>
    * It let's implementations to add artifact specific URLs by letting them override
    * {@link #addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder)}
-   * 
-   * @param artifactFile the artifact file for which the {@link ClassLoaderModel} is being generated.
+   *
+   * @param artifactFile            the artifact file for which the {@link ClassLoaderModel} is being generated.
    * @param classLoaderModelBuilder the builder of the {@link ClassLoaderModel}
-   * @param dependencies the dependencies resolved for this artifact.
+   * @param dependencies            the dependencies resolved for this artifact.
    */
   private void loadUrls(File artifactFile, ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
                         Set<BundleDependency> dependencies) {
@@ -353,7 +364,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private URL getUrl(File artifactFile, File file) {
     try {
       return file.toURI().toURL();
-    } catch (MalformedURLException e) {
+    }
+    catch (MalformedURLException e) {
       throw new ArtifactDescriptorCreateException(format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
                                                          artifactFile.getAbsolutePath(), file.getAbsolutePath()),
                                                   e);
@@ -363,15 +375,16 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private void addDependenciesToClasspathUrls(ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder,
                                               Set<BundleDependency> dependencies) {
     dependencies.stream()
-        .filter(dependency -> !MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null)))
-        .filter(dependency -> dependency.getBundleUri() != null)
-        .forEach(dependency -> {
-          try {
-            classLoaderModelBuilder.containing(dependency.getBundleUri().toURL());
-          } catch (MalformedURLException e) {
-            throw new MuleRuntimeException(e);
-          }
-        });
+            .filter(dependency -> !MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null)))
+            .filter(dependency -> dependency.getBundleUri() != null)
+            .forEach(dependency -> {
+              try {
+                classLoaderModelBuilder.containing(dependency.getBundleUri().toURL());
+              }
+              catch (MalformedURLException e) {
+                throw new MuleRuntimeException(e);
+              }
+            });
   }
 
   private List<String> getAttribute(Map<String, Object> attributes, String attribute) {

@@ -89,10 +89,10 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
       pluginOptional = findMuleMavenPluginDeclaration();
     }
     if (processSharedLibraries) {
-      pluginOptional.ifPresent(plugin -> exportSharedLibrariesResourcesAndPackages(plugin));
+      pluginOptional.ifPresent(this::exportSharedLibrariesResourcesAndPackages);
     }
     if (processAdditionalPluginLibraries) {
-      pluginOptional.ifPresent(plugin -> processAdditionalPluginLibraries(plugin));
+      pluginOptional.ifPresent(this::processAdditionalPluginLibraries);
     }
     return super.build();
   }
@@ -217,6 +217,6 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
         .findFirst();
   }
 
-  public abstract void includeAdditionPluginDependencies();
+  public abstract void includeAdditionalPluginDependencies();
 
 }

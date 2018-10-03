@@ -40,7 +40,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   @Override
-  public void includeAdditionPluginDependencies() {
+  public void includeAdditionalPluginDependencies() {
     if (deployableArtifactDescriptor != null) {
       deployableArtifactDescriptor.getClassLoaderModel().getDependencies().stream()
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
@@ -64,6 +64,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     }
   }
 
+  //TODO: MULE-15768
   private List<org.mule.maven.client.api.model.BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
     return additionalDependencies.stream()
         .map(dependency -> dependency.getDescriptor())

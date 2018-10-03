@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -43,7 +44,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   @Override
   protected void addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
-    classLoaderModelBuilder.includeAdditionPluginDependencies();
+    classLoaderModelBuilder.includeAdditionalPluginDependencies();
   }
 
   @Override
@@ -71,5 +72,10 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
           .getDeployableArtifactDescriptor());
     }
     return lightweightClassLoaderModelBuilder;
+  }
+
+  @Override
+  protected org.mule.tools.api.classloader.model.ClassLoaderModel getPackagerClassLoaderModel(File classLoaderModelDescriptor) {
+    return deserialize(classLoaderModelDescriptor);
   }
 }
