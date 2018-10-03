@@ -149,7 +149,7 @@ public final class TemplateParser {
           if (value == null) {
             value = NULL_AS_STRING;
           } else {
-            value = parseMule(props, value.toString(), callback, true);
+            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, true);
           }
         }
         result.append(value);
@@ -189,6 +189,23 @@ public final class TemplateParser {
       }
     }
     return -1;
+  }
+
+  private String escapeValue(String original, String processed) {
+    if (original.contains("#")) {
+      return processed;
+    }
+    StringBuilder result = new StringBuilder();
+    boolean lastIsBackslash = false;
+    for (char c : processed.toCharArray()) {
+      if (c != START_EXPRESSION || lastIsBackslash) {
+        result.append(c);
+      } else {
+        result.append("\\" + START_EXPRESSION);
+      }
+      lastIsBackslash = c == '\\';
+    }
+    return result.toString();
   }
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {

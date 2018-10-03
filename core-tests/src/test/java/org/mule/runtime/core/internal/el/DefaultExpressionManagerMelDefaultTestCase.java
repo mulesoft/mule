@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -197,7 +198,7 @@ public class DefaultExpressionManagerMelDefaultTestCase extends AbstractMuleCont
   @Description("Verifies that streams are logged in DW but not in MVEL.")
   public void parseLogStream() throws MuleException {
     ByteArrayInputStream stream = new ByteArrayInputStream("hello".getBytes());
-    CoreEvent event = getEventBuilder().message(Message.of(stream)).build();
+    CoreEvent event = getEventBuilder().message(of(stream)).build();
     assertThat(expressionManager.parseLogTemplate("this is #[dw:payload]", event, TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
                is("this is hello"));
@@ -223,5 +224,21 @@ public class DefaultExpressionManagerMelDefaultTestCase extends AbstractMuleCont
     assertThat(expressionManager.isExpression("2*2 + #[var]"), is(true));
     assertThat(expressionManager.isExpression("#[var]"), is(true));
     assertThat(expressionManager.isExpression("${var}"), is(false));
+  }
+
+  @Test
+  // @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
+  public void parseLogValueWithExpressionMarkers() throws MuleException {
+    String payloadWithExprMarkers = "#[hola]";
+    assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]",
+                                                  getEventBuilder().message(of(payloadWithExprMarkers)).build(),
+                                                  TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is(format("this is %s", payloadWithExprMarkers)));
+    assertThat(expressionManager.parseLogTemplate("this is #[payload]",
+                                                  getEventBuilder().message(of(payloadWithExprMarkers)).build(),
+                                                  TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is(format("this is %s", payloadWithExprMarkers)));
   }
 }
