@@ -17,6 +17,7 @@ import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyMetadataService.NON_LAZY_METADATA_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
@@ -87,6 +88,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
+  private String muleConfigurationDefaultErrorHandlerRefName;
+
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
@@ -113,8 +116,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           disableXmlValidations, runtimeComponentBuildingDefinitionProvider);
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
-
+    // By default when a lazy context is created none of its components are enabled...
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
+    enableMuleObjectConfiguration();
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
@@ -145,6 +149,17 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                                        new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath)));
 
     }
+  }
+
+  /**
+   * Custom logic to only enable the configuration element as this is immutable and once the MuleContext is started we cannot change
+   * values.
+   */
+  public void enableMuleObjectConfiguration() {
+    ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
+                                                                                             componentBuildingDefinitionRegistry);
+    new MinimalApplicationModelGenerator(dependencyResolver, true)
+        .getMinimalModel(componentModel -> componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER));
   }
 
   private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
