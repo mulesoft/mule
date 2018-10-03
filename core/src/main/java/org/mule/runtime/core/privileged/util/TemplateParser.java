@@ -149,7 +149,7 @@ public final class TemplateParser {
           if (value == null) {
             value = NULL_AS_STRING;
           } else {
-            value = parseMule(props, value.toString(), callback, true);
+            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, true);
           }
         }
         result.append(value);
@@ -189,6 +189,13 @@ public final class TemplateParser {
       }
     }
     return -1;
+  }
+
+  private String escapeValue(String original, String processed) {
+    if (original.contains("#")) {
+      return processed;
+    }
+    return processed.replaceAll("(^|[^\\\\])" + START_EXPRESSION, "\\\\" + START_EXPRESSION);
   }
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
