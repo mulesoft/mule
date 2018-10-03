@@ -105,7 +105,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
                                                             error.getCause(), (Component) component, of(error)))
               .cast(InternalEvent.class)
               .map(doAfter(interceptor, (Component) component, empty()))
-              .errorStrategyStop());
+              .onErrorStop());
     } else {
       return next;
     }

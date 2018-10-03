@@ -144,7 +144,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
           .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL, getLocalOperatorErrorHook(processor)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
-          .errorStrategyContinue(getContinueStrategyErrorHandler(processor));
+          .onErrorContinue(getContinueStrategyErrorHandler(processor));
     }
     return stream.subscriberContext(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
@@ -182,8 +182,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    * Used to process failed events which are dropped from the reactor stream due to error. Errors are processed by invoking the
    * current EventContext error callback.
    */
-  private BiConsumer<Throwable, CoreEvent> getContinueStrategyErrorHandler(Processor processor) {
-    return (throwable, event) -> {
+  private BiConsumer<Throwable, Object> getContinueStrategyErrorHandler(Processor processor) {
+    return (throwable, object) -> {
+      if (object != null && !(object instanceof CoreEvent)) {
+        LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
+        throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+      }
+      CoreEvent event = (CoreEvent) object;
       throwable = Exceptions.unwrap(throwable);
       if (throwable instanceof MessagingException) {
         // Give priority to failed event from reactor over MessagingException event.

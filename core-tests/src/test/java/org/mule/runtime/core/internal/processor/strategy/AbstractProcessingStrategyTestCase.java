@@ -733,7 +733,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
       if (getProcessingType() == CPU_LITE_ASYNC) {
         return from(schedulerTrackingPublisher).transform(processorPublisher -> Processor.super.apply(schedulerTrackingPublisher))
-            .publishOn(fromExecutorService(custom)).errorStrategyStop();
+            .publishOn(fromExecutorService(custom)).onErrorStop();
       } else {
         return Processor.super.apply(schedulerTrackingPublisher);
       }

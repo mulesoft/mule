@@ -251,7 +251,7 @@ public class DefaultFlowBuilder implements Builder {
                                   (result, event) -> createReturnEventForParentFlowConstruct((PrivilegedEvent) result,
                                                                                              (InternalEvent) event)))
           // Don't handle errors, these will be handled by parent flow
-          .errorStrategyStop();
+          .onErrorStop();
     }
 
     private PrivilegedEvent createMuleEventForCurrentFlow(PrivilegedEvent event) {
