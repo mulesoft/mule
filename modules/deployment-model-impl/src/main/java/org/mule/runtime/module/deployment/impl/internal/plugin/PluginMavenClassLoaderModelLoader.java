@@ -15,6 +15,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
 
 import java.io.File;
@@ -67,11 +68,26 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
                                                                                      Map<String, Object> attributes) {
     final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
         new LightweightClassLoaderModelBuilder(artifactFile, mavenClient);
+    configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
+    return lightweightClassLoaderModelBuilder;
+  }
+
+  @Override
+  protected HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,
+                                                                                     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+                                                                                     Map<String, Object> attributes) {
+    final HeavyweightClassLoaderModelBuilder heavyweightClassLoaderModelBuilder =
+        new HeavyweightClassLoaderModelBuilder(artifactFile, packagerClassLoaderModel);
+    configClassLoaderModelBuilder(heavyweightClassLoaderModelBuilder, attributes);
+    return heavyweightClassLoaderModelBuilder;
+  }
+
+  private void configClassLoaderModelBuilder(ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
+                                             Map<String, Object> attributes) {
     if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
-      lightweightClassLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
+      classLoaderModelBuilder.setDeployableArtifactDescriptor(((PluginExtendedClassLoaderModelAttributes) attributes)
           .getDeployableArtifactDescriptor());
     }
-    return lightweightClassLoaderModelBuilder;
   }
 
   @Override
