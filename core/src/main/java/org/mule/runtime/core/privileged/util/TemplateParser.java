@@ -195,17 +195,11 @@ public final class TemplateParser {
     if (original.contains("#")) {
       return processed;
     }
-    StringBuilder result = new StringBuilder();
-    boolean lastIsBackslash = false;
-    for (char c : processed.toCharArray()) {
-      if (c != START_EXPRESSION || lastIsBackslash) {
-        result.append(c);
-      } else {
-        result.append("\\" + START_EXPRESSION);
-      }
-      lastIsBackslash = c == '\\';
+    String escaped = processed.replaceAll("[^\\\\]" + START_EXPRESSION, "\\\\" + START_EXPRESSION);
+    if (escaped.startsWith("" + START_EXPRESSION)) {
+      escaped = "\\" + escaped;
     }
-    return result.toString();
+    return escaped;
   }
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
