@@ -7,8 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -24,7 +22,6 @@ import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.get
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -43,7 +40,6 @@ import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.CollectionReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler;
@@ -51,6 +47,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.resulthandle
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -139,6 +136,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
+        value = toLazyMessageCollection((Collection<Result>) value, operationContext, cursorProviderFactory, mediaType, event);
         value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, payloadMediaTypeResolver),
                                     cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
       } else if (value instanceof Iterator && returnsListOfMessages) {
@@ -163,6 +161,32 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
       return messageBuilder.mediaType(mediaType).build();
     }
+  }
+
+
+  private Collection<Object> toLazyMessageCollection(Collection<Result> values,
+                                                     ExecutionContextAdapter operationContext,
+                                                     CursorProviderFactory cursorProviderFactory,
+                                                     MediaType mediaType,
+                                                     CoreEvent event) {
+    Collection<Object> lazyMessageCollection = new ArrayList<>();
+    values.forEach(value -> {
+      if (value.getOutput() instanceof InputStream) {
+        ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
+        if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
+          value = value.copy()
+              .output(new ConnectedInputStreamWrapper((InputStream) value.getOutput(), connectionHandler))
+              .build();
+        }
+
+        Message message = MessageUtils.toMessage(value, mediaType, cursorProviderFactory, event);
+
+        lazyMessageCollection.add(message);
+      } else {
+        lazyMessageCollection.add(value);
+      }
+    });
+    return lazyMessageCollection;
   }
 
   private Optional<MediaType> getContextMimeType(Map<String, Object> params) {
