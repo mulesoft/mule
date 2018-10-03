@@ -1278,7 +1278,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             }
 
             logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
-                    + endpointUri.toString());
+                        + endpointUri.toString());
 
             if (getReceiver(flowConstruct, endpoint) != null)
             {
@@ -1321,7 +1321,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
             // Use endpoint retry policy to perform actual connection
             endpoint.getRetryPolicyTemplate().execute(performEndpointConnectionCallback,
-                                                endpoint.getMuleContext().getWorkManager());
+                                                      endpoint.getMuleContext().getWorkManager());
 
         }
         finally
@@ -1351,7 +1351,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                 receiver.start();
             }
 
-        } finally
+        }
+        finally
         {
             logger.debug("Could not perform receiver startup. Releasing connector connection lock");
             AbstractConnector.this.connectionLock.unlock();
