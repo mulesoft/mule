@@ -6,20 +6,22 @@
  */
 package org.mule.transport.http;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.StringContains.containsString;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.transport.ConnectException;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase implements ExceptionCallback
+public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase
 {
+
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
@@ -40,20 +42,32 @@ public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase implements 
     @Test
     public void startingSslMessageReceiverWithoutKeystoreShouldThrowConnectException() throws Exception
     {
-        TestExceptionStrategy exceptionListener = new TestExceptionStrategy();
-        exceptionListener.setExceptionCallback(this);
+        try
+        {
+            muleContext.start();
+        }
+        catch (Exception e)
+        {
+            // Lastly catched by DefaultMuleContext, and raised as LifeCycleException
+            assertThat(e, instanceOf(LifecycleException.class));
 
-        muleContext.setExceptionListener(exceptionListener);
-        muleContext.start();
+            // Since endpoint connection is done by a retry policy, the expected exception
+            // comes inside a retry policy exhaustion exception
+            Throwable retryPolicyException = e.getCause();
+            assertThat(retryPolicyException, instanceOf(RetryPolicyExhaustedException.class));
 
-        assertNotNull(exceptionFromSystemExceptionHandler);
-        assertTrue(exceptionFromSystemExceptionHandler instanceof ConnectException);
-        assertTrue(exceptionFromSystemExceptionHandler.getMessage().contains("tls-key-store"));
-    }
+            Throwable actualConnectException = retryPolicyException.getCause();
+            assertThat(actualConnectException, instanceOf(ConnectException.class));
 
-    public void onException(Throwable t)
-    {
-        exceptionFromSystemExceptionHandler = t;
+            assertThat(actualConnectException.getMessage(), containsString("tls-key-store"));
+
+            exceptionFromSystemExceptionHandler = actualConnectException;
+        }
+        finally
+        {
+            // Fail if no exception was thrown
+            assertThat(exceptionFromSystemExceptionHandler, notNullValue());
+        }
     }
 }
 
