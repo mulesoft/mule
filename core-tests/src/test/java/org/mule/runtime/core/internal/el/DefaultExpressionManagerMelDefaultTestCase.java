@@ -227,7 +227,7 @@ public class DefaultExpressionManagerMelDefaultTestCase extends AbstractMuleCont
   }
 
   @Test
-  // @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
+  @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
   public void parseLogValueWithExpressionMarkers() throws MuleException {
     String payloadWithExprMarkers = "#[hola]";
     assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]",
