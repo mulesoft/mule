@@ -48,7 +48,7 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalModelDefinitionException.class);
     expectedException
         .expectMessage("Configuration 'configWithParameterWithNameNamedName' declares a parameter whose name is 'name', which is not allowed.");
-    validate(InvalidExtension2.class);
+    validate(ConfigNoNameExtension.class);
   }
 
   private void validate(Class<?> connectorClass) {
@@ -68,8 +68,8 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
 
 
   @Extension(name = "invalidExtension")
-  @Configurations({InvalidTestConfig2.class})
-  public static class InvalidExtension2 {
+  @Configurations({ConfigWithNameParameter.class})
+  public static class ConfigNoNameExtension {
 
   }
 
@@ -96,7 +96,7 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
 
 
   @Configuration(name = "configWithParameterWithNameNamedName")
-  public static class InvalidTestConfig2 implements ConfigInterface {
+  public static class ConfigWithNameParameter implements ConfigInterface {
 
     @Parameter
     private String name;
