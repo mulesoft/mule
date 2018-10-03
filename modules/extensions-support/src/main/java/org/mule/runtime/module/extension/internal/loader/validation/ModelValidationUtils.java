@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -53,12 +54,13 @@ final class ModelValidationUtils {
   static void validateConfigParametersNamesNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
 
     model.getAllParameterModels().stream()
-        .filter(parameterModel -> parameterModel.getName().equals("name"))
+        .filter(parameterModel -> parameterModel.getName().equals(NAME_ATTRIBUTE_NAME))
         .findAny()
         .ifPresent((parameterModel) -> reporter
-            .addError(new Problem(model, format("%s '%s' declares a parameter whose name is 'name', which is not allowed.",
+            .addError(new Problem(model, format("%s '%s' declares a parameter whose name is '%s', which is not allowed.",
                                                 kind,
-                                                model.getName()))));
+                                                model.getName(),
+                                                NAME_ATTRIBUTE_NAME))));
   }
 
 }
