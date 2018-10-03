@@ -32,6 +32,7 @@ public interface CoreDslConstants {
   String ON_ERROR_CONTINUE = "on-error-continue";
   String ON_ERROR_PROPAGATE = "on-error-propagate";
   String CONFIGURATION_ELEMENT = "configuration";
+  String NAME_ATTRIBUTE_NAME = "name";
 
   ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();

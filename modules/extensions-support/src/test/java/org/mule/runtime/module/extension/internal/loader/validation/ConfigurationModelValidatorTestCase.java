@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -42,6 +43,14 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
     validate(InvalidExtension.class);
   }
 
+  @Test
+  public void invalidConfigurationWithInvalidParameter() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("Configuration 'configWithParameterWithNameNamedName' declares a parameter whose name is 'name', which is not allowed.");
+    validate(ConfigNoNameExtension.class);
+  }
+
   private void validate(Class<?> connectorClass) {
     ExtensionsTestUtils.validate(connectorClass, validator);
   }
@@ -54,6 +63,13 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
   @Extension(name = "invalidExtension")
   @Configurations({InvalidTestConfig.class})
   public static class InvalidExtension {
+
+  }
+
+
+  @Extension(name = "invalidExtension")
+  @Configurations({ConfigWithNameParameter.class})
+  public static class ConfigNoNameExtension {
 
   }
 
@@ -72,17 +88,25 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
 
-  @Operations(InvalidTestOperations.class)
-  public static class InvalidTestConfig implements ConfigInterface {
-
-  }
-
-
   @Configuration(name = "config2")
   @Operations(ValidTestOperations.class)
   public static class TestConfig2 implements ConfigInterface {
 
   }
+
+
+  @Configuration(name = "configWithParameterWithNameNamedName")
+  public static class ConfigWithNameParameter implements ConfigInterface {
+
+    @Parameter
+    private String name;
+  }
+
+  @Operations(InvalidTestOperations.class)
+  public static class InvalidTestConfig implements ConfigInterface {
+
+  }
+
 
 
   public static class ValidTestOperations {
