@@ -81,6 +81,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
 
+  private static final String POM_LOCATION_FORMAT = "%s/%s-%s.pom";
+
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final LocalRepositorySupplierFactory localRepositorySupplierFactory;
   private MavenClient mavenClient;
@@ -245,15 +247,17 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
             .composeSuppliers(localRepositorySupplierFactory.artifactFolderRepositorySupplier(artifactFile,
                                                                                               localMavenRepositoryLocation),
                               localRepositorySupplierFactory.fixedFolderSupplier(localMavenRepositoryLocation));
-    File mavenRepository = compositeRepoLocationSupplier.get();
-    File temporaryDirectory = createTempDir();
+    Optional<File> mavenRepository = of(compositeRepoLocationSupplier.get());
+    Optional<File> temporaryDirectory = of(createTempDir());
     try {
+      boolean includeProvidedDependencies = includeProvidedDependencies(artifactType);
+      Optional<MavenReactorResolver> mavenReactorResolver = ofNullable((MavenReactorResolver) attributes
+          .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
-                                                  includeProvidedDependencies(artifactType), of(mavenRepository),
-                                                  ofNullable((MavenReactorResolver) attributes
-                                                      .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER)),
-                                                  of(temporaryDirectory));
+                                                  includeProvidedDependencies, mavenRepository,
+                                                  mavenReactorResolver,
+                                                  temporaryDirectory);
       final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
@@ -261,7 +265,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                        new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
           .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
           .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
-      Set<BundleDependency> missingApiDependencyBundles = findMissingApiDependencies(dependencies, attributes);
+      Set<BundleDependency> missingApiDependencyBundles = findMissingApiDependencies(dependencies, attributes,
+                                                                                     includeProvidedDependencies, mavenRepository,
+                                                                                     mavenReactorResolver, temporaryDirectory);
       Stream<BundleDependency> bundleDependencies = dependencies.stream()
           .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
           .map(this::convertBundleDependency);
@@ -272,13 +278,16 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                  missingApiDependencyBundles.stream()).collect(toSet()));
       return classLoaderModelBuilder.build();
     } finally {
-      deleteQuietly(temporaryDirectory);
+      deleteQuietly(temporaryDirectory.get());
     }
   }
 
   // TODO: MULE-15577 - Review plugin and API definition resolution
   private Set<BundleDependency> findMissingApiDependencies(List<org.mule.maven.client.api.model.BundleDependency> dependencies,
-                                                           Map<String, Object> attributes) {
+                                                           Map<String, Object> attributes,
+                                                           boolean includeProvidedDependencies, Optional<File> mavenRepository,
+                                                           Optional<MavenReactorResolver> mavenReactorResolver,
+                                                           Optional<File> temporaryDirectory) {
     Set<org.mule.maven.client.api.model.BundleDependency> apiDependencies = dependencies.stream()
         .filter(dependency -> {
           Optional<String> classifier = dependency.getDescriptor().getClassifier();
@@ -290,9 +299,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     Set<org.mule.maven.client.api.model.BundleDependency> missingApiDependencies = new HashSet<>();
 
     while (!dependenciesToCheck.isEmpty()) {
-      org.mule.maven.client.api.model.BundleDependency dependency = dependenciesToCheck.pop();
+      File pom = getPom(dependenciesToCheck.pop());
       for (org.mule.maven.client.api.model.BundleDependency apiDependency : mavenClient
-          .resolveBundleDescriptorDependencies(includeTestDependencies(attributes), dependency.getDescriptor())) {
+          .resolveArtifactDependencies(pom, includeTestDependencies(attributes), includeProvidedDependencies,
+                                       mavenRepository, mavenReactorResolver, temporaryDirectory)) {
         if (noEquivalentPresent(apiDependencies, apiDependency) && noEquivalentPresent(missingApiDependencies, apiDependency)) {
           missingApiDependencies.add(apiDependency);
           dependenciesToCheck.add(apiDependency);
@@ -301,6 +311,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
 
     return missingApiDependencies.stream().map(this::convertBundleDependency).collect(toSet());
+  }
+
+  private File getPom(org.mule.maven.client.api.model.BundleDependency dependency) {
+    String zipPath = dependency.getBundleUri().getPath();
+    String dependencyPath = zipPath.substring(0, zipPath.lastIndexOf("/"));
+    org.mule.maven.client.api.model.BundleDescriptor descriptor = dependency.getDescriptor();
+    return new File(format(POM_LOCATION_FORMAT, dependencyPath, descriptor.getArtifactId(), descriptor.getVersion()));
   }
 
   private boolean noEquivalentPresent(Set<org.mule.maven.client.api.model.BundleDependency> dependencies,
