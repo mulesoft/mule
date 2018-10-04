@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
@@ -22,6 +23,7 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +48,9 @@ public class ApplicationDescriptorFactory
                                     File artifactLocation) {
     super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
     if (artifactModel.getLogConfigFile() != null) {
-      descriptor.setLogConfigFile(new File(artifactModel.getLogConfigFile()));
+      Path logConfigFilePath = new File(artifactModel.getLogConfigFile()).toPath();
+      Path muleHomeFolderPath = getMuleHomeFolder().toPath();
+      descriptor.setLogConfigFile(muleHomeFolderPath.resolve(logConfigFilePath).toFile());
     }
   }
 

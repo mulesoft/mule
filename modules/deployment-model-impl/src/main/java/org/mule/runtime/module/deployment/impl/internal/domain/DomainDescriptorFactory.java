@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
@@ -20,6 +21,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeploya
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -54,7 +56,9 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   protected void doDescriptorConfig(MuleDomainModel artifactModel, DomainDescriptor descriptor, File artifactLocation) {
     super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
     if (artifactModel.getLogConfigFile() != null) {
-      descriptor.setLogConfigFile(new File(artifactModel.getLogConfigFile()));
+      Path logConfigFilePath = new File(artifactModel.getLogConfigFile()).toPath();
+      Path muleHomeFolderPath = getMuleHomeFolder().toPath();
+      descriptor.setLogConfigFile(muleHomeFolderPath.resolve(logConfigFilePath).toFile());
     }
   }
 
