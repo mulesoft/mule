@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
@@ -38,6 +39,7 @@ import java.util.function.Predicate;
 public class MinimalApplicationModelGenerator {
 
   private ConfigurationDependencyResolver dependencyResolver;
+  private boolean ignoreAlwaysEnabled = false;
 
   /**
    * Creates a new instance.
@@ -45,7 +47,18 @@ public class MinimalApplicationModelGenerator {
    * @param dependencyResolver a {@link ConfigurationDependencyResolver} associated with an {@link ApplicationModel}
    */
   public MinimalApplicationModelGenerator(ConfigurationDependencyResolver dependencyResolver) {
+    this(dependencyResolver, false);
+  }
+
+  /**
+   * Creates a new instance of the minimal application generator.
+   *
+   * @param dependencyResolver a {@link ConfigurationDependencyResolver} associated with an {@link ApplicationModel}
+   * @param ignoreAlwaysEnabled {@code true} if consider those components that will not be referenced and have to be enabled anyways.
+   */
+  public MinimalApplicationModelGenerator(ConfigurationDependencyResolver dependencyResolver, boolean ignoreAlwaysEnabled) {
     this.dependencyResolver = dependencyResolver;
+    this.ignoreAlwaysEnabled = ignoreAlwaysEnabled;
   }
 
   /**
@@ -88,7 +101,8 @@ public class MinimalApplicationModelGenerator {
   private void enableComponentDependencies(ComponentModel requestedComponentModel) {
     final String requestComponentModelName = requestedComponentModel.getNameAttribute();
     final Set<DependencyNode> componentDependencies = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
-    final Set<DependencyNode> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
+    final Set<DependencyNode> alwaysEnabledComponents =
+        ignoreAlwaysEnabled ? emptySet() : dependencyResolver.resolveAlwaysEnabledComponents();
     final ImmutableSet.Builder<DependencyNode> otherRequiredGlobalComponentsSetBuilder =
         ImmutableSet.<DependencyNode>builder().addAll(componentDependencies)
             .addAll(alwaysEnabledComponents.stream().filter(dependencyNode -> dependencyNode.isTopLevel()).collect(toList()));
