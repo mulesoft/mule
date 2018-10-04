@@ -262,8 +262,17 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyAndAdditionalDependencies() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-additional-dependencies");
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight");
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesHeavyweight() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
+  }
+
+  private void assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies(String location) throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + location);
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -275,9 +284,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     assertThat(desc.getPlugins(), hasSize(2));
 
-    Iterator<ArtifactPluginDescriptor> pluginDescriptorIterator = desc.getPlugins().iterator();
-
-    ArtifactPluginDescriptor testEmptyPluginDescriptor = pluginDescriptorIterator.next();
+    ArtifactPluginDescriptor testEmptyPluginDescriptor = desc.getPlugins().stream()
+        .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("test-empty-plugin")).findFirst().get();
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getUrls().length, is(3));
     assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url).getName()).collect(
                                                                                                                                  toList()),
@@ -286,7 +294,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
 
-    ArtifactPluginDescriptor dependantPluginDescriptor = pluginDescriptorIterator.next();
+    ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
+        .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getUrls().length, is(1));
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
   }
@@ -397,8 +406,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         }
 
         BundleDependency bundleDependency = (BundleDependency) o;
-        return bundleDependency.getScope().equals(scope) &&
-            bundleDependency.getDescriptor().getClassifier().isPresent() &&
+
+        return bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("test-empty-plugin") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&
@@ -431,8 +440,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         }
 
         BundleDependency bundleDependency = (BundleDependency) o;
-        return bundleDependency.getScope().equals(COMPILE) &&
-            bundleDependency.getDescriptor().getClassifier().isPresent() &&
+        return bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&

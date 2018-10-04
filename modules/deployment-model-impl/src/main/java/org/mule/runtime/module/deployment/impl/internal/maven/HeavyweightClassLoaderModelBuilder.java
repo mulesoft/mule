@@ -7,12 +7,24 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
+import org.mule.tools.api.classloader.model.AppClassLoaderModel;
 import org.mule.tools.api.classloader.model.Artifact;
 
 import com.vdurmont.semver4j.Semver;
 
 import java.io.File;
+import java.net.URI;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Plugin;
 
 /**
@@ -28,8 +40,8 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   private org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
 
-  public HeavyweightClassLoaderModelBuilder(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
-                                            File applicationFolder) {
+  public HeavyweightClassLoaderModelBuilder(File applicationFolder,
+                                            org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
     super(applicationFolder);
     this.packagerClassLoaderModel = packagerClassLoaderModel;
   }
@@ -48,12 +60,58 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected void doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    // Nothing to do as additional plugin libraries are already being defined in the packager class loader model.
+    if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
+      AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
+      appClassLoaderModel.getAdditionalPluginDependencies()
+          .ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
+    }
   }
 
   @Override
-  public void includeAdditionPluginDependencies() {
-    //TODO MULE-15657 use classloader model to get the dependencies by plugin
+  protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
+    return bundleDependency.getAdditionalDependencies().stream().map(BundleDependency::getBundleUri).collect(toList());
+  }
+
+  private BundleDependency createExtendedBundleDependency(BundleDependency original,
+                                                          Set<BundleDependency> additionalPluginDependencies) {
+    return new BundleDependency.Builder(original).setAdditionalDependencies(additionalPluginDependencies).build();
+  }
+
+  private void updateDependency(org.mule.tools.api.classloader.model.Plugin plugin) {
+    dependencies.stream()
+        .filter(dep -> areSameDependency(plugin, dep))
+        .findFirst()
+        .ifPresent(
+                   pluginDependency -> replaceBundleDependency(
+                                                               pluginDependency,
+                                                               createExtendedBundleDependency(
+                                                                                              pluginDependency,
+                                                                                              plugin.getAdditionalDependencies()
+                                                                                                  .stream()
+                                                                                                  .map(this::toBundleDependency)
+                                                                                                  .collect(Collectors.toSet()))));
+  }
+
+  private boolean areSameDependency(org.mule.tools.api.classloader.model.Plugin plugin, BundleDependency dependency) {
+    return StringUtils.equals(dependency.getDescriptor().getGroupId(), plugin.getGroupId())
+        && StringUtils.equals(dependency.getDescriptor().getArtifactId(), plugin.getArtifactId());
+  }
+
+  private BundleDependency toBundleDependency(Artifact artifact) {
+    BundleDependency.Builder builder = new BundleDependency.Builder();
+    if (artifact.getArtifactCoordinates().getScope() != null) {
+      builder.setScope(BundleScope.valueOf(artifact.getArtifactCoordinates().getScope().toUpperCase()));
+    }
+    return builder
+        .setBundleUri(new File(artifactFolder, artifact.getUri().toString()).toURI())
+        .setDescriptor(new BundleDescriptor.Builder()
+            .setArtifactId(artifact.getArtifactCoordinates().getArtifactId())
+            .setGroupId(artifact.getArtifactCoordinates().getGroupId())
+            .setVersion(artifact.getArtifactCoordinates().getVersion())
+            .setClassifier(artifact.getArtifactCoordinates().getClassifier())
+            .setType(artifact.getArtifactCoordinates().getType())
+            .build())
+        .build();
   }
 
   /**

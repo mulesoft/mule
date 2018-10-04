@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.getBundleDescriptor;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
@@ -23,6 +24,8 @@ import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -30,6 +33,8 @@ import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -54,12 +59,15 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   private boolean processSharedLibraries = false;
   private boolean processAdditionalPluginLibraries = false;
-  protected File artifactFolder;
   private FileJarExplorer fileJarExplorer = new FileJarExplorer();
+
+  protected File artifactFolder;
+  protected DeployableArtifactDescriptor deployableArtifactDescriptor;
+  protected BundleDescriptor artifactBundleDescriptor;
 
   public ArtifactClassLoaderModelBuilder(File artifactFolder) {
     requireNonNull(artifactFolder, "artifactFolder cannot be null");
-
+    this.artifactBundleDescriptor = getBundleDescriptor(artifactFolder);
     this.artifactFolder = artifactFolder;
   }
 
@@ -82,6 +90,10 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     return this;
   }
 
+  public void setDeployableArtifactDescriptor(DeployableArtifactDescriptor deployableArtifactDescriptor) {
+    this.deployableArtifactDescriptor = deployableArtifactDescriptor;
+  }
+
   @Override
   public ClassLoaderModel build() {
     Optional<Plugin> pluginOptional = empty();
@@ -89,10 +101,10 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
       pluginOptional = findMuleMavenPluginDeclaration();
     }
     if (processSharedLibraries) {
-      pluginOptional.ifPresent(plugin -> exportSharedLibrariesResourcesAndPackages(plugin));
+      pluginOptional.ifPresent(this::exportSharedLibrariesResourcesAndPackages);
     }
     if (processAdditionalPluginLibraries) {
-      pluginOptional.ifPresent(plugin -> processAdditionalPluginLibraries(plugin));
+      pluginOptional.ifPresent(this::processAdditionalPluginLibraries);
     }
     return super.build();
   }
@@ -217,6 +229,31 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
         .findFirst();
   }
 
-  public abstract void includeAdditionPluginDependencies();
+  public void includeAdditionalPluginDependencies() {
+    if (deployableArtifactDescriptor != null) {
+      deployableArtifactDescriptor.getClassLoaderModel().getDependencies().stream()
+          .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
+          .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().getGroupId()
+              .equals(this.artifactBundleDescriptor.getGroupId())
+              && bundleDescriptor.getDescriptor().getArtifactId().equals(this.artifactBundleDescriptor.getArtifactId()))
+          .filter(bundleDependency -> bundleDependency.getAdditionalDependencies() != null
+              && !bundleDependency.getAdditionalDependencies().isEmpty())
+          .forEach(
+                   bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency)
+                       .forEach(uri -> {
+                         try {
+                           containing(uri.toURL());
+                         } catch (MalformedURLException e) {
+                           throw new ArtifactDescriptorCreateException(
+                                                                       format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
+                                                                              artifactFolder.getAbsolutePath(),
+                                                                              uri),
+                                                                       e);
+                         }
+                       }));
+    }
+  }
+
+  protected abstract List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency);
 
 }

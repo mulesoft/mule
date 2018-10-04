@@ -6,17 +6,12 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.getBundleDescriptor;
 import org.mule.maven.client.api.MavenClient;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -29,41 +24,20 @@ import java.util.Set;
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
   private MavenClient mavenClient;
-  private DeployableArtifactDescriptor deployableArtifactDescriptor;
-  private BundleDescriptor artifactBundleDescriptor;
 
   public LightweightClassLoaderModelBuilder(File artifactFolder,
                                             MavenClient mavenClient) {
     super(artifactFolder);
-    this.artifactBundleDescriptor = getBundleDescriptor(artifactFolder);
     this.mavenClient = mavenClient;
   }
 
   @Override
-  public void includeAdditionPluginDependencies() {
-    if (deployableArtifactDescriptor != null) {
-      deployableArtifactDescriptor.getClassLoaderModel().getDependencies().stream()
-          .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
-          .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().getGroupId()
-              .equals(this.artifactBundleDescriptor.getGroupId())
-              && bundleDescriptor.getDescriptor().getArtifactId().equals(this.artifactBundleDescriptor.getArtifactId()))
-          .filter(bundleDependency -> bundleDependency.getAdditionalDependencies() != null
-              && !bundleDependency.getAdditionalDependencies().isEmpty())
-          .forEach(bundleDependency -> resolveDependencies(bundleDependency.getAdditionalDependencies()).stream()
-              .forEach(additionalPluginDependency -> {
-                try {
-                  containing(additionalPluginDependency.getBundleUri().toURL());
-                } catch (MalformedURLException e) {
-                  throw new ArtifactDescriptorCreateException(
-                                                              format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
-                                                                     artifactFolder.getAbsolutePath(),
-                                                                     additionalPluginDependency.getBundleUri()),
-                                                              e);
-                }
-              }));
-    }
+  protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
+    return resolveDependencies(bundleDependency.getAdditionalDependencies()).stream()
+        .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri).collect(toList());
   }
 
+  //TODO: MULE-15768
   private List<org.mule.maven.client.api.model.BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
     return additionalDependencies.stream()
         .map(dependency -> dependency.getDescriptor())
@@ -76,9 +50,4 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .map(bundleDescriptor -> mavenClient.resolveBundleDescriptor(bundleDescriptor))
         .collect(toList());
   }
-
-  public void setDeployableArtifactDescriptor(DeployableArtifactDescriptor deployableArtifactDescriptor) {
-    this.deployableArtifactDescriptor = deployableArtifactDescriptor;
-  }
-
 }
