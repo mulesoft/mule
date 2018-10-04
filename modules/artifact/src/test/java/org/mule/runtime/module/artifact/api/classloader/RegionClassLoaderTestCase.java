@@ -496,6 +496,12 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void findsResourceFromWsdlApi() throws Exception {
+    getResourceFromApiArtifact("wsdl", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "wsdl", "zip", API_RESOURCE_NAME),
+                               API_LOADED_RESOURCE);
+  }
+
+  @Test
   public void doesNotFindNonExistentResourceFromApi() throws Exception {
     getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml", "zip", RESOURCE_NAME), null);
   }
