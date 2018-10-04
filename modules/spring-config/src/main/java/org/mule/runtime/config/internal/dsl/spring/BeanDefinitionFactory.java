@@ -39,7 +39,6 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -156,12 +155,6 @@ public class BeanDefinitionFactory {
   public boolean isComponentIgnored(ComponentIdentifier identifier) {
     return ignoredMuleCoreComponentIdentifiers.contains(identifier) ||
         ignoredMuleExtensionComponentIdentifiers.contains(identifier);
-  }
-
-  public void resolveEagerCreationObjects(ComponentModel parentComponentModel, ComponentModel componentModel,
-                                          BeanDefinitionRegistry registry,
-                                          BiConsumer<ComponentModel, BeanDefinitionRegistry> componentModelPostProcessor) {
-
   }
 
   /**
