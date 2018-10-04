@@ -15,7 +15,7 @@ public class ArtifactConstants {
   /**
    * Classifiers for API definition artifacts.
    */
-  public static final HashSet<String> API_CLASSIFIERS = newHashSet("raml", "oas", "raml-fragment");
+  public static final HashSet<String> API_CLASSIFIERS = newHashSet("raml", "oas", "raml-fragment", "wsdl");
 
   private ArtifactConstants() {}
 }
