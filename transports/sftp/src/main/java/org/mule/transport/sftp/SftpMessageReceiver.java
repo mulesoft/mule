@@ -310,6 +310,9 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             }
             catch (Exception e)
             {
+                // Since it might retry to connect, should switch the connecting flag back to false.
+                // For example, if the connection is perform with a RetryPolicy
+                connecting.compareAndSet(true, false);
                 connected.set(false);
 
                 if (logger.isDebugEnabled())
