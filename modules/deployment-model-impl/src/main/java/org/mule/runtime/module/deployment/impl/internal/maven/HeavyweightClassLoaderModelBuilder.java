@@ -98,11 +98,12 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   private BundleDependency toBundleDependency(Artifact artifact) {
-    return new BundleDependency.Builder()
+    BundleDependency.Builder builder = new BundleDependency.Builder();
+    if (artifact.getArtifactCoordinates().getScope() != null) {
+      builder.setScope(BundleScope.valueOf(artifact.getArtifactCoordinates().getScope().toUpperCase()));
+    }
+    return builder
         .setBundleUri(new File(artifactFolder, artifact.getUri().toString()).toURI())
-        .setScope(
-                  artifact.getArtifactCoordinates().getScope() != null
-                      ? BundleScope.valueOf(artifact.getArtifactCoordinates().getScope().toUpperCase()) : BundleScope.COMPILE)
         .setDescriptor(new BundleDescriptor.Builder()
             .setArtifactId(artifact.getArtifactCoordinates().getArtifactId())
             .setGroupId(artifact.getArtifactCoordinates().getGroupId())

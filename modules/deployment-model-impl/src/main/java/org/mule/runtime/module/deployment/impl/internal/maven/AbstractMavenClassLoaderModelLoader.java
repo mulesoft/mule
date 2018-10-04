@@ -104,8 +104,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    * the attributes from the {@link MuleArtifactLoaderDescriptor#getAttributes()} map.
    *
    * @param artifactFile {@link File} where the current plugin to work with.
-   * @param attributes   a set of attributes to work with, where the current implementation of this class will look for
-   *                     {@link ArtifactDescriptorConstants#EXPORTED_PACKAGES} and {@link ArtifactDescriptorConstants#EXPORTED_RESOURCES}
+   * @param attributes a set of attributes to work with, where the current implementation of this class will look for {@link ArtifactDescriptorConstants#EXPORTED_PACKAGES} and {@link ArtifactDescriptorConstants#EXPORTED_RESOURCES}
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
    */
   @Override
