@@ -10,6 +10,8 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.server.PathAndMethodRequestMatcher;
 
+import java.util.function.Supplier;
+
 /**
  * Generic registry of {@link PathAndMethodRequestMatcher PathAndMethodRequestMatchers} that can handle collision validation and
  * searching through wildcard paths for a matching entry. Additionally, entries can be managed to be temporarily disabled or
@@ -26,7 +28,7 @@ public interface RequestMatcherRegistry<T> {
    *
    * @param matcher the {@link PathAndMethodRequestMatcher} to associate with the  {@code item}
    * @param item the object to register under the {@code matcher}
-   * @throws org.mule.runtime.api.exception.MuleRuntimeException if a collision is found
+   * @throws MatcherCollisionException if a collision is found
    */
   RequestMatcherRegistryEntry add(PathAndMethodRequestMatcher matcher, T item);
 
@@ -38,6 +40,18 @@ public interface RequestMatcherRegistry<T> {
    * @return the matching registered object
    */
   T find(HttpRequest request);
+
+  /**
+   * Searches this registry for the most specific match for the given {@link HttpRequest} considering all registered
+   * {@link PathAndMethodRequestMatcher PathAndMethodRequestMatchers}.
+   *
+   * @param method the HTTP method to match against
+   * @param path the full path to match against (must not contain wildcard or parametrization)
+   * @return the matching registered object
+   */
+  default T find(String method, String path) {
+    return find(HttpRequest.builder().method(method).uri(path).build());
+  }
 
   /**
    * Entry of a {@link RequestMatcherRegistry} which allows managing it's visibility.
@@ -71,29 +85,29 @@ public interface RequestMatcherRegistry<T> {
   interface RequestMatcherRegistryBuilder<T> {
 
     /**
-     * Determines which default item should be returned if a method mismatch occurs, meaning a path match was found but the method
+     * Determines which item should be returned if a method mismatch occurs, meaning a path match was found but the method
      * was not valid.
      *
-     * @param item the default value to return
+     * @param itemSupplier a supplier of the value to return
      * @return this builder
      */
-    RequestMatcherRegistryBuilder<T> onMethodMismatch(T item);
+    RequestMatcherRegistryBuilder<T> onMethodMismatch(Supplier<T> itemSupplier);
 
     /**
-     * Determines which default item should be returned if no match is found.
+     * Determines which item should be returned if no match is found.
      *
-     * @param item the default value to return
+     * @param itemSupplier a supplier of the value to return
      * @return this builder
      */
-    RequestMatcherRegistryBuilder<T> onNotFound(T item);
+    RequestMatcherRegistryBuilder<T> onNotFound(Supplier<T> itemSupplier);
 
     /**
-     * Determines which default item should be returned if a match is found but the entry is disabled.
+     * Determines which item should be returned if a match is found but the entry is disabled.
      *
-     * @param item the default value to return
+     * @param itemSupplier a supplier of the value to return
      * @return this builder
      */
-    RequestMatcherRegistryBuilder<T> onDisabled(T item);
+    RequestMatcherRegistryBuilder<T> onDisabled(Supplier<T> itemSupplier);
 
     /**
      * @return a new {@link RequestMatcherRegistry} configured as specified.

@@ -16,22 +16,19 @@ import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.REQUEST_BUILDER;
-
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import java.net.URI;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.mule.runtime.http.api.utils.UriCache;
-
-import java.net.URI;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(HTTP_SERVICE)
 @Story(REQUEST_BUILDER)
@@ -52,6 +49,26 @@ public class HttpRequestBuilderTestCase {
     HttpRequest request = builder.uri(uri).build();
     assertThat(request.getMethod(), is("GET"));
     assertThat(request.getUri(), is(uri));
+    assertThat(request.getEntity(), is(instanceOf(EmptyHttpEntity.class)));
+    assertThat(request.getHeaderNames(), empty());
+    assertThat(request.getQueryParams().keySet(), empty());
+  }
+
+  @Test
+  public void requestFromUriString() {
+    HttpRequest request = builder.uri("http://localhost:8081/somePath/here").build();
+    assertThat(request.getMethod(), is("GET"));
+    assertThat(request.getPath(), is("/somePath/here"));
+    assertThat(request.getEntity(), is(instanceOf(EmptyHttpEntity.class)));
+    assertThat(request.getHeaderNames(), empty());
+    assertThat(request.getQueryParams().keySet(), empty());
+  }
+
+  @Test
+  public void syntheticRequest() {
+    HttpRequest request = builder.uri("/somePath/here").build();
+    assertThat(request.getMethod(), is("GET"));
+    assertThat(request.getPath(), is("/somePath/here"));
     assertThat(request.getEntity(), is(instanceOf(EmptyHttpEntity.class)));
     assertThat(request.getHeaderNames(), empty());
     assertThat(request.getQueryParams().keySet(), empty());
