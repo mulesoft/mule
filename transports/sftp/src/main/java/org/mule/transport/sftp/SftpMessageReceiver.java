@@ -16,9 +16,6 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
@@ -35,6 +32,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
+
 import javax.activation.MimetypesFileTypeMap;
 
 /**
@@ -293,48 +291,33 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             {
                 logger.debug("Connecting: " + this);
             }
-            retryTemplate.execute(new RetryCallback()
+            try
             {
-                @Override
-                public void doWork(RetryContext context) throws Exception
+                if (logger.isDebugEnabled())
                 {
-                    try
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Trying to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
-                        }
-                        sftpRRUtil.checkSFTPConnection();
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Successfully connected/reconnected to SFTP server " + endpoint.getEndpointURI());
-                        }
-                        connected.set(true);
-                        connecting.set(false);
-                    }
-                    catch (Exception e)
-                    {
-                        connected.set(false);
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Unable to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
-                        }
-                        throw new Exception("Fail to connect", e);
-                    }
+                    logger.debug("Trying to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
                 }
 
-                @Override
-                public String getWorkDescription()
+                sftpRRUtil.checkSFTPConnection();
+
+                if (logger.isDebugEnabled())
                 {
-                    return "Trying to reconnect to SFTP server " + endpoint.getEndpointURI();
+                    logger.debug("Successfully connected/reconnected to SFTP server " + endpoint.getEndpointURI());
                 }
 
-                @Override
-                public Connector getWorkOwner()
+                connected.set(true);
+                connecting.set(false);
+            }
+            catch (Exception e)
+            {
+                connected.set(false);
+
+                if (logger.isDebugEnabled())
                 {
-                    return getEndpoint().getConnector();
+                    logger.debug("Unable to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
                 }
-            }, getConnector().getMuleContext().getWorkManager());
+                throw new Exception("Fail to connect", e);
+            }
         }
 
     }
