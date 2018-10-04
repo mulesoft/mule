@@ -22,7 +22,6 @@ public class HttpsInvalidKeystoreTestCase extends AbstractInvalidKeystoreTestCas
     {
         return "https-invalid-keystore-config.xml";
     }
-
 }
 
 

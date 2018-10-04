@@ -9,7 +9,6 @@ package org.mule.transport.ssl;
 import org.mule.transport.AbstractInvalidKeystoreTestCase;
 
 public class SslInvalidKeystoreTestCase extends AbstractInvalidKeystoreTestCase
-
 {
 
     public SslInvalidKeystoreTestCase()
