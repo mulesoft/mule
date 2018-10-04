@@ -8,9 +8,7 @@ package org.mule.transport.email;
 
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.SEEN;
-
 import static org.mule.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -19,6 +17,8 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ReceiveException;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -83,28 +83,48 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     protected void doConnect() throws Exception
     {
-        SessionDetails session = castConnector().getSessionDetails(endpoint);
-
-        Store store = session.newStore();
-        store.connect();
-        folder = store.getFolder(castConnector().getMailboxFolder());
-        if (castConnector().getMoveToFolder() != null)
+        getConnector().getRetryPolicyTemplate().execute(new RetryCallback()
         {
-            moveToFolder = store.getFolder(castConnector().getMoveToFolder());
-            moveToFolder.open(Folder.READ_WRITE);
-        }
+            @Override
+            public void doWork(RetryContext context) throws Exception
+            {
+                logger.info("Attemping to establish connection with message retrieval server");
+                SessionDetails session = RetrieveMessageReceiver.this.castConnector().getSessionDetails(endpoint);
 
-        // set default value if empty/null
-        if (StringUtils.isEmpty(backupFolder))
-        {
-            this.backupFolder = getEndpoint().getMuleContext().getConfiguration().getWorkingDirectory()
-                                + "/mail/" + folder.getName();
-        }
+                Store store = session.newStore();
+                store.connect();
+                RetrieveMessageReceiver.this.folder = store.getFolder(castConnector().getMailboxFolder());
+                if (castConnector().getMoveToFolder() != null)
+                {
+                    RetrieveMessageReceiver.this.moveToFolder = store.getFolder(castConnector().getMoveToFolder());
+                    RetrieveMessageReceiver.this.moveToFolder.open(Folder.READ_WRITE);
+                }
 
-        if (backupFolder != null && !this.backupFolder.endsWith(File.separator))
-        {
-            this.backupFolder += File.separator;
-        }
+                // set default value if empty/null
+                if (StringUtils.isEmpty(backupFolder))
+                {
+                    RetrieveMessageReceiver.this.backupFolder = getEndpoint().getMuleContext().getConfiguration().getWorkingDirectory()
+                                        + "/mail/" + folder.getName();
+                }
+
+                if (RetrieveMessageReceiver.this.backupFolder != null && !RetrieveMessageReceiver.this.backupFolder.endsWith(File.separator))
+                {
+                    RetrieveMessageReceiver.this.backupFolder += File.separator;
+                }
+            }
+
+            @Override
+            public String getWorkDescription()
+            {
+                return getWorkDescription();
+            }
+
+            @Override
+            public Object getWorkOwner()
+            {
+                return RetrieveMessageReceiver.this;
+            }
+        }, getWorkManager());
     }
 
     @Override
