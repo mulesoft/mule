@@ -46,5 +46,13 @@
             <version>${mule.project.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>test-dependant-plugin</artifactId>
+            <version>${mule.project.version}</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
     </dependencies>
+    
 </project>
