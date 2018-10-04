@@ -63,14 +63,14 @@ public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCas
         RetryPolicyTemplate probeRetryPolicyTemplate = mock(NoRetryPolicyTemplate.class);
         when(probeRetryPolicyTemplate.execute(any(RetryCallback.class), any(WorkManager.class)))
                 .thenAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                retryPolicyWasEnforced.set(true);
-                return null;
-            }
-        });
+                {
+                    @Override
+                    public Object answer(InvocationOnMock invocation) throws Throwable
+                    {
+                        retryPolicyWasEnforced.set(true);
+                        return null;
+                    }
+                });
         aConnector.setRetryPolicyTemplate(probeRetryPolicyTemplate);
 
         aReceiver.connect();
