@@ -9,7 +9,6 @@ package org.mule.runtime.http.api.domain.message.request;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
-
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
@@ -43,10 +42,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    * @return this builder
    */
   public HttpRequestBuilder uri(String uri) {
-    int queryPos = uri.indexOf("?");
-    this.path = queryPos > -1 ? uri.substring(0, queryPos) : uri;
-    this.uri = getUriFromString(uri);
-    return this;
+    return uri(getUriFromString(uri));
   }
 
   /**
@@ -57,6 +53,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    */
   public HttpRequestBuilder uri(URI uri) {
     this.uri = uri;
+    this.path = uri.getPath();
     return this;
   }
 

@@ -79,8 +79,15 @@
            "classSimpleName": "RequestMatcherRegistry",
            "elementKind": "interface",
            "justification": "@Experimental feature. Feature flagged by default"
+         },
+         {
+           "code": "java.class.added",
+           "new": "class org.mule.runtime.http.api.utils.MatcherCollisionException",
+           "package": "org.mule.runtime.http.api.utils",
+           "classSimpleName": "MatcherCollisionException",
+           "elementKind": "class",
+           "justification": "@Experimental feature. Feature flagged by default"
          }
-
       ]
     }
   },
