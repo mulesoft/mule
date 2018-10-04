@@ -7,7 +7,6 @@
 package org.mule.transport;
 
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -17,12 +16,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
@@ -31,8 +24,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageDispatcher;
@@ -380,26 +371,24 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
             connector.start();
             connector.connect();
 
-            // Mock retry policy template, in order to be able to check if it was executed
-            RetryPolicyTemplate connectorRetryPolicy = mock(NoRetryPolicyTemplate.class);
-            when(connectorRetryPolicy.execute(any(RetryCallback.class), eq(connector.getMuleContext().getWorkManager()))).
-                    thenCallRealMethod();
+            // Set by default a NoRetryPolicy, in order to provoke a RetryPolicyExhausted exception
+            connector.setRetryPolicyTemplate(new NoRetryPolicyTemplate());
 
-            connector.setRetryPolicyTemplate(connectorRetryPolicy);
-            InboundEndpoint testEndpoint = getTestInboundEndpoint("in", "test://in",null,null,null,connector);
+            assertEquals(0, connector.receivers.size());
 
-            assertThat(connector.receivers.isEmpty(), is(true));
+            try
+            {
+                connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), service);
+            }
+            catch (RetryPolicyExhaustedException e)
+            {
+                // Since the policy would have executed, an exhaustion exception will be raised
+                assertEquals(RetryPolicyExhaustedException.class, e.getClass());
+            }
 
-            connector.registerListener(testEndpoint, getSensingNullMessageProcessor(), service);
-
-            // Verify that retry policy was enforced when connecting receivers
-            verify(connectorRetryPolicy, times(1))
-                    .execute(any(RetryCallback.class), eq(connector.getMuleContext().getWorkManager()));
-
-            // Registered receiver was connected and started correctly
-            assertThat(connector.receivers.size(), equalTo(1));
-            assertThat(connector.receivers.get("in").isConnected(), is(true));
-            assertThat(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted(), is(true));
+            assertEquals(1, connector.receivers.size());
+            assertTrue((connector.receivers.get("in")).isConnected());
+            assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
         }
         finally
         {
