@@ -284,9 +284,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     assertThat(desc.getPlugins(), hasSize(2));
 
-    Iterator<ArtifactPluginDescriptor> pluginDescriptorIterator = desc.getPlugins().iterator();
-
-    ArtifactPluginDescriptor testEmptyPluginDescriptor = pluginDescriptorIterator.next();
+    ArtifactPluginDescriptor testEmptyPluginDescriptor = desc.getPlugins().stream()
+        .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("test-empty-plugin")).findFirst().get();
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getUrls().length, is(3));
     assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url).getName()).collect(
                                                                                                                                  toList()),
@@ -295,7 +294,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
 
-    ArtifactPluginDescriptor dependantPluginDescriptor = pluginDescriptorIterator.next();
+    ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
+        .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getUrls().length, is(1));
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
   }

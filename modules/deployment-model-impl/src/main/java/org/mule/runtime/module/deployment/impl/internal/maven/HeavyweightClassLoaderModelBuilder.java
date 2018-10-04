@@ -62,7 +62,8 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   protected void doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
-      appClassLoaderModel.getAdditionalPluginDependencies().ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
+      appClassLoaderModel.getAdditionalPluginDependencies()
+          .ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
     }
   }
 
