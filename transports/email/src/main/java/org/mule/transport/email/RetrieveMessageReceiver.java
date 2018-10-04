@@ -62,6 +62,17 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     // A lock to protect concurrent access to the folder.
     private final Object folderLock = new Object();
 
+
+    private boolean connectionEstablished = false;
+
+    // Overriding method to prevent start() call in case the connection is performed with an asynchronous
+    // retry policy. For an example, see MULE-15769
+    @Override
+    public boolean isStarting()
+    {
+        return super.isStarting() || !isConnectionEstablished();
+    }
+
     public RetrieveMessageReceiver(Connector connector,
                                    FlowConstruct flowConstruct,
                                    InboundEndpoint endpoint,
@@ -83,6 +94,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     protected void doConnect() throws Exception
     {
+        // Execute listener connection with connector's retry policy
         getConnector().getRetryPolicyTemplate().execute(new RetryCallback()
         {
             @Override
@@ -104,19 +116,22 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 if (StringUtils.isEmpty(backupFolder))
                 {
                     RetrieveMessageReceiver.this.backupFolder = getEndpoint().getMuleContext().getConfiguration().getWorkingDirectory()
-                                        + "/mail/" + folder.getName();
+                                                                + "/mail/" + folder.getName();
                 }
 
                 if (RetrieveMessageReceiver.this.backupFolder != null && !RetrieveMessageReceiver.this.backupFolder.endsWith(File.separator))
                 {
                     RetrieveMessageReceiver.this.backupFolder += File.separator;
                 }
+
+                // Once all connection has been established, reply isStarting with true
+                RetrieveMessageReceiver.this.connectionEstablished = true;
             }
 
             @Override
             public String getWorkDescription()
             {
-                return getWorkDescription();
+                return "Trying to connect to email server: " + RetrieveMessageReceiver.this.getConnectionDescription();
             }
 
             @Override
@@ -510,5 +525,10 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             }
         }
         return message;
+    }
+
+    public boolean isConnectionEstablished()
+    {
+        return connectionEstablished;
     }
 }
