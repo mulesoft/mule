@@ -10,6 +10,8 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
+
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -19,13 +21,13 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +64,18 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
+    descriptor.setLogConfigFile(getLogConfigFile(artifactModel));
+  }
+
+
+  protected File getLogConfigFile(M artifactModel) {
+    File logConfigFile = null;
+    if (artifactModel.getLogConfigFile() != null) {
+      Path logConfigFilePath = new File(artifactModel.getLogConfigFile()).toPath();
+      Path muleHomeFolderPath = getMuleHomeFolder().toPath();
+      logConfigFile = muleHomeFolderPath.resolve(logConfigFilePath).toFile();
+    }
+    return logConfigFile;
   }
 
   protected abstract String getDefaultConfigurationResource();

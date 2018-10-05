@@ -7,14 +7,9 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.util.Optional.empty;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
-import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
@@ -24,17 +19,13 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-
-import org.junit.Test;
 
 public class DomainDescriptorFactoryTestCase
     extends DeployableArtifactDescriptorFactoryTestCase<DomainDescriptor, DomainFileBuilder> {
 
   @Override
   protected DomainDescriptor createArtifactDescriptor(String domainPath) throws URISyntaxException {
-    final DomainDescriptorFactory DomainDescriptorFactory = createDomainDescriptorFactory();
-
+    final DomainDescriptorFactory DomainDescriptorFactory = createDeployableDescriptorFactory();
     return DomainDescriptorFactory.create(getArtifact(domainPath), empty());
   }
 
@@ -65,23 +56,13 @@ public class DomainDescriptorFactoryTestCase
 
   @Override
   protected DomainDescriptor createArtifactDescriptor() {
-    final DomainDescriptorFactory artifactDescriptorFactory = createDomainDescriptorFactory();
-
+    final DomainDescriptorFactory artifactDescriptorFactory = createDeployableDescriptorFactory();
     return artifactDescriptorFactory.create(getArtifactFolder(), empty());
   }
 
-  private DomainDescriptorFactory createDomainDescriptorFactory() {
+  @Override
+  protected DomainDescriptorFactory createDeployableDescriptorFactory() {
     return new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                        createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
-  }
-
-  @Test
-  public void getLogConfigFileFromFullFilePath() {
-    MuleDomainModel deployableModel = mock(MuleDomainModel.class);
-    File logConfigFile = Paths.get("custom-log4j2.xml").toAbsolutePath().toFile();
-    when(deployableModel.getLogConfigFile()).thenReturn(logConfigFile.getAbsolutePath());
-
-    File resolvedFile = createDomainDescriptorFactory().getLogConfigFile(deployableModel);
-    assertThat(resolvedFile.toPath(), is(logConfigFile.toPath()));
   }
 }

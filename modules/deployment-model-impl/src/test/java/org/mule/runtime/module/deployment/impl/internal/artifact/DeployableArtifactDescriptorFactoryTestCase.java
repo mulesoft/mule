@@ -27,6 +27,8 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.test.MavenTestUtils.getMavenProjectVersion;
 import static org.mule.maven.client.test.MavenTestUtils.mavenPomFinder;
@@ -35,6 +37,8 @@ import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
+
+import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -54,6 +58,7 @@ import org.mule.tck.util.CompilerUtils;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 import org.apache.commons.io.FileUtils;
@@ -329,6 +334,16 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     createArtifactDescriptor(getArtifactRootFolder() + separator + "no-revision-artifact");
   }
 
+  @Test
+  public void getLogConfigFileFromFullFilePath() {
+    MuleDeployableModel deployableModel = mock(MuleDeployableModel.class);
+    File logConfigFile = Paths.get("custom-log4j2.xml").toAbsolutePath().toFile();
+    when(deployableModel.getLogConfigFile()).thenReturn(logConfigFile.getAbsolutePath());
+
+    File resolvedFile = createDeployableDescriptorFactory().getLogConfigFile(deployableModel);
+    assertThat(resolvedFile.toPath(), is(logConfigFile.toPath()));
+  }
+
   private void requiredProductValidationExpectedException(String appName) {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(Matchers
@@ -349,6 +364,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   protected abstract D createArtifactDescriptor(String appPath) throws URISyntaxException;
 
   protected abstract String getDefaultConfigurationResourceLocation();
+
+  protected abstract <T extends DeployableArtifactDescriptor> AbstractDeployableDescriptorFactory createDeployableDescriptorFactory();
 
   protected ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
     return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
