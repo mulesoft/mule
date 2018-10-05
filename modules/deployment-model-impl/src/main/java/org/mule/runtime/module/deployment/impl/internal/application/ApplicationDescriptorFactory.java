@@ -45,9 +45,6 @@ public class ApplicationDescriptorFactory
   protected void doDescriptorConfig(MuleApplicationModel artifactModel, ApplicationDescriptor descriptor,
                                     File artifactLocation) {
     super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
-    if (artifactModel.getLogConfigFile() != null) {
-      descriptor.setLogConfigFile(new File(artifactModel.getLogConfigFile()));
-    }
   }
 
   @Override

@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
@@ -24,10 +25,7 @@ public class ApplicationDescriptorFactoryTestCase
 
   @Override
   protected ApplicationDescriptor createArtifactDescriptor(String appPath) throws URISyntaxException {
-    final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
-
+    final ApplicationDescriptorFactory applicationDescriptorFactory = createDeployableDescriptorFactory();
     return applicationDescriptorFactory.create(getArtifact(appPath), empty());
   }
 
@@ -58,10 +56,13 @@ public class ApplicationDescriptorFactoryTestCase
 
   @Override
   protected ApplicationDescriptor createArtifactDescriptor() {
-    final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
-
+    final ApplicationDescriptorFactory applicationDescriptorFactory = createDeployableDescriptorFactory();
     return applicationDescriptorFactory.create(getArtifactFolder(), empty());
+  }
+
+  @Override
+  protected ApplicationDescriptorFactory createDeployableDescriptorFactory() {
+    return new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+                                            createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
   }
 }

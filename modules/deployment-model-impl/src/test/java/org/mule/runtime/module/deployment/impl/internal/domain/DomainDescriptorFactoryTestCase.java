@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
@@ -24,10 +25,7 @@ public class DomainDescriptorFactoryTestCase
 
   @Override
   protected DomainDescriptor createArtifactDescriptor(String domainPath) throws URISyntaxException {
-    final DomainDescriptorFactory DomainDescriptorFactory =
-        new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                    createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
-
+    final DomainDescriptorFactory DomainDescriptorFactory = createDeployableDescriptorFactory();
     return DomainDescriptorFactory.create(getArtifact(domainPath), empty());
   }
 
@@ -58,10 +56,13 @@ public class DomainDescriptorFactoryTestCase
 
   @Override
   protected DomainDescriptor createArtifactDescriptor() {
-    final DomainDescriptorFactory artifactDescriptorFactory =
-        new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                    createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
-
+    final DomainDescriptorFactory artifactDescriptorFactory = createDeployableDescriptorFactory();
     return artifactDescriptorFactory.create(getArtifactFolder(), empty());
+  }
+
+  @Override
+  protected DomainDescriptorFactory createDeployableDescriptorFactory() {
+    return new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+                                       createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
   }
 }
