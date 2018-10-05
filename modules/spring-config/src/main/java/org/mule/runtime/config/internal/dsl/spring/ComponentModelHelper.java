@@ -17,6 +17,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
@@ -63,6 +64,9 @@ public class ComponentModelHelper {
   }
 
   public static boolean isProcessor(ComponentModel componentModel) {
+    if (componentModel.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER)) {
+      return false;
+    }
     return isOfType(componentModel, Processor.class)
         || isOfType(componentModel, InterceptingMessageProcessor.class)
         || componentModel.getComponentType().map(type -> type.equals(OPERATION)).orElse(false)
