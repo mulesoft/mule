@@ -7,8 +7,14 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.util.Optional.empty;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+
+import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
@@ -18,16 +24,16 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
+
+import org.junit.Test;
 
 public class ApplicationDescriptorFactoryTestCase
     extends DeployableArtifactDescriptorFactoryTestCase<ApplicationDescriptor, ApplicationFileBuilder> {
 
   @Override
   protected ApplicationDescriptor createArtifactDescriptor(String appPath) throws URISyntaxException {
-    final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
-
+    final ApplicationDescriptorFactory applicationDescriptorFactory = createApplicationDescriptorFactory();
     return applicationDescriptorFactory.create(getArtifact(appPath), empty());
   }
 
@@ -58,10 +64,25 @@ public class ApplicationDescriptorFactoryTestCase
 
   @Override
   protected ApplicationDescriptor createArtifactDescriptor() {
-    final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
+    final ApplicationDescriptorFactory applicationDescriptorFactory = createApplicationDescriptorFactory();
 
     return applicationDescriptorFactory.create(getArtifactFolder(), empty());
   }
+
+  private ApplicationDescriptorFactory createApplicationDescriptorFactory() {
+    return new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+                                            createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
+  }
+
+  @Test
+  public void getLogConfigFileFromFullFilePath() {
+    MuleApplicationModel deployableModel = mock(MuleApplicationModel.class);
+    File logConfigFile = Paths.get("custom-log4j2.xml").toAbsolutePath().toFile();
+    when(deployableModel.getLogConfigFile()).thenReturn(logConfigFile.getAbsolutePath());
+
+    File resolvedFile = createApplicationDescriptorFactory().getLogConfigFile(deployableModel);
+    assertThat(resolvedFile.toPath(), is(logConfigFile.toPath()));
+  }
+
+
 }

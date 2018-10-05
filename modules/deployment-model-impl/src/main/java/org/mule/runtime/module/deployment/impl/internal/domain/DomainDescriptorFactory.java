@@ -55,11 +55,17 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   @Override
   protected void doDescriptorConfig(MuleDomainModel artifactModel, DomainDescriptor descriptor, File artifactLocation) {
     super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
+    descriptor.setLogConfigFile(getLogConfigFile(artifactModel));
+  }
+
+  protected File getLogConfigFile(MuleDomainModel artifactModel) {
+    File logConfigFile = null;
     if (artifactModel.getLogConfigFile() != null) {
       Path logConfigFilePath = new File(artifactModel.getLogConfigFile()).toPath();
       Path muleHomeFolderPath = getMuleHomeFolder().toPath();
-      descriptor.setLogConfigFile(muleHomeFolderPath.resolve(logConfigFilePath).toFile());
+      logConfigFile = muleHomeFolderPath.resolve(logConfigFilePath).toFile();
     }
+    return logConfigFile;
   }
 
   @Override
