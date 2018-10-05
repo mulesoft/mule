@@ -47,7 +47,6 @@ public class HeisenbergScopes implements Initialisable {
     chain.process(cb::success, (t, e) -> cb.error(t));
   }
 
-  @MediaType(value = TEXT_PLAIN, strict = false)
   public void payloadModifier(Chain chain,
                               CompletionCallback<Object, Object> cb,
                               Object payload,

@@ -85,7 +85,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MetadataR
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.tck.core.streaming.SimpleByteBufferManager;
 
 import java.util.ArrayList;

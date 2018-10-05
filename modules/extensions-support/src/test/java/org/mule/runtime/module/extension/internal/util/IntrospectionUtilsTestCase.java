@@ -160,13 +160,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getObjectMethodReturnType() throws Exception {
-    MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod("methodReturnObject"));
-
-    assertThat(metadataType, is(instanceOf(AnyType.class)));
-  }
-
-  @Test
   public void getGenericsFromReturnType() throws Exception {
     OperationElement listResultStringObject = getMethod(LIST_RESULT_STRING, null);
     Type returnType = listResultStringObject.getReturnType();
@@ -479,10 +472,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   public Map<String, Apple> foo() {
     return new HashMap<>();
-  }
-
-  public Object methodReturnObject() {
-    return this;
   }
 
   public List<Result<String, Object>> listResultStringObject() {

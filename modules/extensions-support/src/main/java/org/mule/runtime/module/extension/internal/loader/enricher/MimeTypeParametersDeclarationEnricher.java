@@ -17,12 +17,10 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeAnnotation;
-import org.mule.metadata.api.builder.AnyTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.BinaryTypeBuilder;
 import org.mule.metadata.api.builder.StringTypeBuilder;
 import org.mule.metadata.api.builder.WithAnnotation;
-import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -180,26 +178,6 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
             return builder.build();
           });
-        }
-
-        @Override
-        public void visitAnyType(AnyType anyType) {
-          if (property == null) {
-            return;
-          }
-
-          if (!property.isStrict()) {
-            ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
-            declareOutputMimeTypeParameter(group);
-            declareOutputEncodingParameter(group);
-          }
-
-          replaceOutputType(declaration, property, format -> {
-            AnyTypeBuilder anyTypeBuilder = BaseTypeBuilder.create(format).anyType();
-            enrichWithAnnotations(anyTypeBuilder, declaration.getOutput().getType().getAnnotations());
-            return anyTypeBuilder.build();
-          });
-
         }
 
         private void enrichWithAnnotations(WithAnnotation withAnnotationBuilder, Set<TypeAnnotation> annotations) {

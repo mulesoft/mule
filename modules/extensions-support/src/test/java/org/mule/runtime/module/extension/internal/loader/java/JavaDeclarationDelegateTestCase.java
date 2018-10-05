@@ -85,8 +85,6 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.AsyncHeisenbergSource;
@@ -752,11 +750,9 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     final MetadataType outputType = source.getOutput().getType();
     assertThat(outputType, is(instanceOf(ArrayType.class)));
 
-    MetadataType outputMetadataType = IntrospectionUtils.getReturnType(new TypeWrapper(Object.class, TYPE_LOADER));
-
     assertMessageType(((ArrayType) outputType).getType(), STRING_TYPE,
                       TYPE_LOADER.load(DEAOfficerAttributes.class));
-    assertThat(source.getOutputAttributes().getType(), equalTo(outputMetadataType));
+    assertThat(source.getOutputAttributes().getType(), equalTo(TYPE_LOADER.load(Object.class)));
 
     ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
     assertThat(config.getMessageSources(), hasSize(3));
