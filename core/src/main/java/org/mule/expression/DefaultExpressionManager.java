@@ -103,7 +103,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     /**
      * Checks whether an evaluator is registered with the manager
-     * 
+     *
      * @param name the name of the expression evaluator
      * @return true if the evaluator is registered with the manager, false otherwise
      */
@@ -114,7 +114,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     /**
      * Checks whether an enricher is registered with the manager
-     * 
+     *
      * @param name the name of the expression enricher
      * @return true if the enricher is registered with the manager, false otherwise
      */
@@ -125,7 +125,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     /**
      * Removes the evaluator with the given name
-     * 
+     *
      * @param name the name of the evaluator to remove
      */
     public ExpressionEvaluator unregisterEvaluator(String name)
@@ -145,7 +145,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     /**
      * Removes the evaluator with the given name
-     * 
+     *
      * @param name the name of the evaluator to remove
      */
     public ExpressionEnricher unregisterEnricher(String name)
@@ -169,7 +169,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
      * situations where one or more expressions need to be parsed within a single text, the
      * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
      * should be used since it will iterate through all expressions in a string.
-     * 
+     *
      * @param expression a single expression i.e. xpath://foo
      * @param message the current message to process. The expression will evaluata on the message.
      * @return the result of the evaluation. Expressions that return collection will return an empty
@@ -193,7 +193,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
      * situations where one or more expressions need to be parsed within a single text, the
      * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
      * should be used since it will iterate through all expressions in a string.
-     * 
+     *
      * @param expression a single expression i.e. xpath://foo
      * @param message the current message to process. The expression will evaluata on the message.
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
@@ -296,7 +296,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
      * situations where one or more expressions need to be parsed within a single text, the
      * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
      * should be used since it will iterate through all expressions in a string.
-     * 
+     *
      * @param expression a single expression i.e. xpath://foo
      * @param evaluator the evaluator to use when executing the expression
      * @param message the current message to process. The expression will evaluata on the message.
@@ -458,7 +458,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
      * it. If a user needs to evaluate a single expression they can use
      * {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
-     * 
+     *
      * @param expression a single expression i.e. xpath://foo
      * @param message the current message to process. The expression will evaluata on the message.
      * @return the result of the evaluation. Expressions that return collection will return an empty
@@ -481,7 +481,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
      * it. If a user needs to evaluate a single expression they can use
      * {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
-     * 
+     *
      * @param expression a single expression i.e. xpath://foo
      * @param message the current message to process. The expression will evaluata on the message.
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
@@ -584,7 +584,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     /**
      * Determines if the expression is valid or not. This method will validate a single expression or
      * expressions embedded in a string. the expression must be well formed i.e. #[bean:user]
-     * 
+     *
      * @param expression the expression to validate
      * @return true if the expression evaluator is recognised
      */
@@ -598,6 +598,9 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         catch (InvalidExpressionException e)
         {
             logger.warn(e.getMessage());
+            if (logger.isDebugEnabled()) {
+            	logger.debug("Exception when checking '"+expression+"'", e);
+            }
             return false;
         }
     }
@@ -656,7 +659,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         else if (!match.get())
         {
             throw new InvalidExpressionException(expression,
-                "Expression string is not an expression.  Use isExpression(String) to validate first");
+                "Expression '"+expression+"' is not an expression.  Use isExpression(String) to validate first");
         }
     }
 
