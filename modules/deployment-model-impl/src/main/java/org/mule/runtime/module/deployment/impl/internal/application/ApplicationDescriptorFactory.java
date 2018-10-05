@@ -47,7 +47,6 @@ public class ApplicationDescriptorFactory
     super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
   }
 
-
   @Override
   protected ApplicationDescriptor createArtifactDescriptor(File artifactLocation, String name,
                                                            Optional<Properties> deploymentProperties) {

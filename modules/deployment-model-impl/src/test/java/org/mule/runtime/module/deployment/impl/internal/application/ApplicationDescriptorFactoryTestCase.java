@@ -65,5 +65,4 @@ public class ApplicationDescriptorFactoryTestCase
     return new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                             createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
   }
-
 }

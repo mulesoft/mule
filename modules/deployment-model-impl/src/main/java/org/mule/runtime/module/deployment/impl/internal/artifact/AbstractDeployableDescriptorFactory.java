@@ -67,7 +67,6 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     descriptor.setLogConfigFile(getLogConfigFile(artifactModel));
   }
 
-
   protected File getLogConfigFile(M artifactModel) {
     File logConfigFile = null;
     if (artifactModel.getLogConfigFile() != null) {
