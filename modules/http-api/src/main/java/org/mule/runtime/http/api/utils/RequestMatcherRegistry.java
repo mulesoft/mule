@@ -86,7 +86,7 @@ public interface RequestMatcherRegistry<T> {
 
     /**
      * Determines which item should be returned if a method mismatch occurs, meaning a path match was found but the method
-     * was not valid.
+     * was not valid. If not set, {@code null} will be returned by default.
      *
      * @param itemSupplier a supplier of the value to return
      * @return this builder
@@ -94,7 +94,7 @@ public interface RequestMatcherRegistry<T> {
     RequestMatcherRegistryBuilder<T> onMethodMismatch(Supplier<T> itemSupplier);
 
     /**
-     * Determines which item should be returned if no match is found.
+     * Determines which item should be returned if no match is found. If not set, {@code null} will be returned by default.
      *
      * @param itemSupplier a supplier of the value to return
      * @return this builder
@@ -102,7 +102,8 @@ public interface RequestMatcherRegistry<T> {
     RequestMatcherRegistryBuilder<T> onNotFound(Supplier<T> itemSupplier);
 
     /**
-     * Determines which item should be returned if a match is found but the entry is disabled.
+     * Determines which item should be returned if a match is found but the entry is disabled. If not set, {@code null} will be
+     * returned by default.
      *
      * @param itemSupplier a supplier of the value to return
      * @return this builder
