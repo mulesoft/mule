@@ -18,6 +18,12 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.MultiMapTestCase;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -26,9 +32,17 @@ import io.qameta.allure.Story;
 @Story(MULTI_MAP)
 public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
-  @Override
-  protected MultiMap<String, String> getMultiMap() {
-    return new CaseInsensitiveMultiMap(new MultiMap<>());
+  public CaseInsensitiveMultiMapTestCase(Supplier<MultiMap<String, String>> mapSupplier,
+                                         Function<MultiMap<String, String>, MultiMap<String, String>> mapCopier) {
+    super(mapSupplier, mapCopier);
+  }
+
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        {(Supplier<MultiMap<String, String>>) (() -> new CaseInsensitiveMultiMap(new MultiMap<>())),
+            (Function<MultiMap<String, String>, MultiMap<String, String>>) (m -> new CaseInsensitiveMultiMap(m))}
+    });
   }
 
   @Test

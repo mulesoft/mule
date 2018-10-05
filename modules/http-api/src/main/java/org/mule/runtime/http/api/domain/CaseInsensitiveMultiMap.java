@@ -8,8 +8,11 @@
 package org.mule.runtime.http.api.domain;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.metadata.DataType.MULTI_MAP_STRING_STRING;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.el.DataTypeAware;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -21,7 +24,7 @@ import java.util.LinkedHashMap;
  * @since 4.0
  */
 @NoExtend
-public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
+public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements DataTypeAware {
 
   private static final long serialVersionUID = -3754163327838153655L;
 
@@ -63,5 +66,10 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
       super(caseInsensitiveMultiMap, caseInsensitiveMultiMap.optimized);
       this.paramsMap = unmodifiableMap(paramsMap);
     }
+  }
+
+  @Override
+  public DataType getDataType() {
+    return MULTI_MAP_STRING_STRING;
   }
 }

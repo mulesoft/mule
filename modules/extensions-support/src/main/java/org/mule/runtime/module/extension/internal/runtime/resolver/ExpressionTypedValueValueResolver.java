@@ -21,7 +21,7 @@ import javax.inject.Inject;
  * A {@link ValueResolver} implementation and extension of {@link TypeSafeExpressionValueResolver } which evaluates expressions
  * and tries to ensure that the output is always of a certain type.
  * <p>
- * This {@link ValueResolver} will return the {@link TypedValue} of the MEL evaluation result.
+ * This {@link ValueResolver} will return the {@link TypedValue} of the expression evaluation result.
  *
  * @param <T>
  * @since 4.0

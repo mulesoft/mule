@@ -10,7 +10,6 @@ import static com.google.common.cache.CacheBuilder.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getCollectionType;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getMapKeyType;
@@ -116,7 +115,7 @@ public class DefaultDataTypeBuilder
   public DataTypeParamsBuilder type(Class<?> type) {
     validateAlreadyBuilt();
 
-    checkNotNull(type, "'type' cannot be null.");
+    requireNonNull(type, "'type' cannot be null.");
     this.typeRef = new WeakReference<>(handleProxy(type));
 
     return this;
@@ -208,7 +207,7 @@ public class DefaultDataTypeBuilder
   public DataTypeCollectionTypeBuilder streamType(Class<? extends Iterator> iteratorType) {
     validateAlreadyBuilt();
 
-    checkNotNull(iteratorType, "'iteratorType' cannot be null.");
+    requireNonNull(iteratorType, "'iteratorType' cannot be null.");
     if (!Iterator.class.isAssignableFrom(iteratorType)) {
       throw new IllegalArgumentException("iteratorType " + iteratorType.getName() + " is not an Iterator type");
     }
@@ -233,7 +232,7 @@ public class DefaultDataTypeBuilder
   public DataTypeCollectionTypeBuilder collectionType(Class<? extends Collection> collectionType) {
     validateAlreadyBuilt();
 
-    checkNotNull(collectionType, "'collectionType' cannot be null.");
+    requireNonNull(collectionType, "'collectionType' cannot be null.");
     if (!Collection.class.isAssignableFrom(collectionType)) {
       throw new IllegalArgumentException("collectionType " + collectionType.getName() + " is not a Collection type");
     }
@@ -260,7 +259,7 @@ public class DefaultDataTypeBuilder
   public DataTypeFunctionTypeBuilder functionType(Class<? extends ExpressionFunction> functionType) {
     validateAlreadyBuilt();
 
-    checkNotNull(functionType, "'functionType' cannot be null.");
+    requireNonNull(functionType, "'functionType' cannot be null.");
     if (!ExpressionFunction.class.isAssignableFrom(functionType)) {
       throw new IllegalArgumentException("functionType " + functionType.getName() + " is not an ExpressionFunction type");
     }
@@ -279,7 +278,7 @@ public class DefaultDataTypeBuilder
   public DataTypeMapTypeBuilder mapType(Class<? extends Map> mapType) {
     validateAlreadyBuilt();
 
-    checkNotNull(mapType, "'mapType' cannot be null.");
+    requireNonNull(mapType, "'mapType' cannot be null.");
     if (!Map.class.isAssignableFrom(mapType)) {
       throw new IllegalArgumentException("mapType " + mapType.getName() + " is not a Map type");
     }
@@ -321,7 +320,7 @@ public class DefaultDataTypeBuilder
   public DataTypeCollectionTypeBuilder itemType(Class<?> itemType) {
     validateAlreadyBuilt();
 
-    checkNotNull(itemType, "'itemTypeBuilder' cannot be null.");
+    requireNonNull(itemType, "'itemTypeBuilder' cannot be null.");
 
     if (this.itemTypeBuilder == null) {
       this.itemTypeBuilder = DataType.builder();
@@ -346,7 +345,7 @@ public class DefaultDataTypeBuilder
   public DataTypeMapTypeBuilder keyType(Class<?> keyType) {
     validateAlreadyBuilt();
 
-    checkNotNull(keyType, "'keyType' cannot be null.");
+    requireNonNull(keyType, "'keyType' cannot be null.");
 
     if (this.keyTypeBuilder == null) {
       this.keyTypeBuilder = DataType.builder();
@@ -359,7 +358,7 @@ public class DefaultDataTypeBuilder
   public DataTypeMapTypeBuilder valueType(Class<?> valueType) {
     validateAlreadyBuilt();
 
-    checkNotNull(valueType, "'valueType' cannot be null.");
+    requireNonNull(valueType, "'valueType' cannot be null.");
 
     if (this.valueTypeBuilder == null) {
       this.valueTypeBuilder = DataType.builder();
