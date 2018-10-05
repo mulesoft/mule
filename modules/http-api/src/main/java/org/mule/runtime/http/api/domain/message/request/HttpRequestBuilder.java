@@ -11,6 +11,7 @@ import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.api.util.MultiMap.StringMultiMap;
 import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessage;
@@ -30,7 +31,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   private String path;
   private URI uri;
   private String method = GET.name();
-  private MultiMap<String, String> queryParams = new MultiMap<>();
+  private MultiMap<String, String> queryParams = new StringMultiMap();
 
   HttpRequestBuilder(boolean preserveHeadersCase) {
     headers = new CaseInsensitiveMultiMap(!preserveHeadersCase);

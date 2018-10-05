@@ -44,6 +44,28 @@ public class MultiMapBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
+  public MultiMap<String, String> copyWithKeySet() {
+    MultiMap<String, String> targetMap = new MultiMap<>();
+
+    for (String key : multiMap.keySet()) {
+      targetMap.put(key, multiMap.getAll(key));
+    }
+
+    return targetMap;
+  }
+
+  @Benchmark
+  public MultiMap<String, String> copyWithEntryList() {
+    MultiMap<String, String> targetMap = new MultiMap<>();
+
+    for (Entry<String, String> entry : multiMap.entryList()) {
+      targetMap.put(entry.getKey(), entry.getValue());
+    }
+
+    return targetMap;
+  }
+
+  @Benchmark
   public CaseInsensitiveMultiMap copy() {
     return new CaseInsensitiveMultiMap(multiMap);
   }

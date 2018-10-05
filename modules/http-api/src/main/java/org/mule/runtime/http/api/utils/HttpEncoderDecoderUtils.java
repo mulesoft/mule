@@ -11,6 +11,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.api.util.MultiMap.StringMultiMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -98,7 +99,7 @@ public final class HttpEncoderDecoderUtils {
    * @return a map representation of the {@code queryString}
    */
   public static MultiMap<String, String> decodeUrlEncodedBody(String queryString, Charset encoding) {
-    MultiMap<String, String> queryParams = new MultiMap<>();
+    MultiMap<String, String> queryParams = new StringMultiMap();
     if (queryString != null && queryString.trim().length() > 0) {
       String[] pairs = queryString.split("&");
       for (String pair : pairs) {
