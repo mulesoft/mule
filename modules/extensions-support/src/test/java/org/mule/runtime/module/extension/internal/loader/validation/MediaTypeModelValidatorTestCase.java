@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
+import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricherTestCase;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
@@ -186,7 +187,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException
         .expectMessage("Operation 'operation' is declaring both a custom output Type using a Static MetadataResolver, and a custom media type through the @MediaType annotation.");
     mockExtensionOperationDescriptorModelProperty("returnsString");
-    mockMediaTypeAnnotation(operationModel, "*/*", true);
+    mockMediaTypeAnnotation(operationModel, "*/*", false);
     when(operationOutputModel.getType()).thenReturn(operationOutputType);
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
@@ -199,7 +200,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException
         .expectMessage("Source 'source' is declaring both a custom output Type using a Static MetadataResolver, and a custom media type through the @MediaType annotation.");
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
-    mockMediaTypeAnnotation(sourceModel, "*/*", true);
+    mockMediaTypeAnnotation(sourceModel, "*/*", false);
     when(sourceOutputModel.getType()).thenReturn(sourceOutputType);
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
@@ -236,7 +237,6 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
   public void mediaTypeAnnotationWithDefaultValueAndStaticResolverOnOperation() throws Exception {
     mockExtensionOperationDescriptorModelProperty("returnsString");
     mockMediaTypeAnnotation(operationModel, EMPTY, false);
-    mockMediaTypeAnnotation(sourceModel, "*/*", false);
     when(operationOutputModel.getType()).thenReturn(operationOutputType);
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
@@ -248,7 +248,6 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
   public void mediaTypeAnnotationWithDefaultValueAndStaticResolverOnSource() throws Exception {
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
     mockMediaTypeAnnotation(sourceModel, EMPTY, false);
-    mockMediaTypeAnnotation(operationModel, "*/*", false);
     when(sourceOutputModel.getType()).thenReturn(sourceOutputType);
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
@@ -280,8 +279,6 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sourceAndOperationReturnsAnObject() throws Exception {
-    mockMediaTypeAnnotation(operationModel, "*/*", false);
-    mockMediaTypeAnnotation(sourceModel, "*/*", false);
     validate(extensionModel, validator);
   }
 
