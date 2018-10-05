@@ -3472,7 +3472,7 @@
           "outputAttributes": {
             "type": {
               "format": "java",
-              "type": "Object",
+              "type": "Any",
               "annotations": {
                 "typeId": "java.lang.Object",
                 "classInformation": {
@@ -3490,8 +3490,7 @@
                 "typeAlias": {
                   "value": "Object"
                 }
-              },
-              "fields": []
+              }
             },
             "hasDynamicType": false,
             "description": "",
@@ -3977,7 +3976,7 @@
           "outputAttributes": {
             "type": {
               "format": "java",
-              "type": "Object",
+              "type": "Any",
               "annotations": {
                 "typeId": "java.lang.Object",
                 "classInformation": {
@@ -3995,8 +3994,7 @@
                 "typeAlias": {
                   "value": "Object"
                 }
-              },
-              "fields": []
+              }
             },
             "hasDynamicType": false,
             "description": "",

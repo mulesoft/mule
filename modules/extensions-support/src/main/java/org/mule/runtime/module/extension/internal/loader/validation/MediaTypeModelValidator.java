@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
@@ -32,22 +37,17 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 
 import java.util.Optional;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
-
 /**
  * {@link ExtensionModelValidator} which verifies if a {@link org.mule.runtime.extension.api.annotation.param.MediaType} is
  * missing or if a {@link org.mule.runtime.extension.api.annotation.param.MediaType} is present with a value, and a value is not
- * permited in such case.
+ * permitted in such case.
  *
  * <p>
  * This validator goes through all operations and sources and verifies that:
  * <ul>
- * <li>If no OutputStaticResolver is given and the outputType is a String Type or Binary Type, it must have the MediaType
- * annotation with a valid value</li>
- * <li>If it has an OutputStaticResolver it must NOT have the MediaType annotation with a value</li>
+ * <li>If no OutputStaticResolver is given and the outputType is a String Type, Binary Type, or Any Type it must have
+ * the MediaType annotation with a valid value</li>
+ * <li>If it has an OutputStaticResolver it must NOT have the MediaType annotation with a value and strict</li>
  * </ul>
  *
  * @since 4.2.0

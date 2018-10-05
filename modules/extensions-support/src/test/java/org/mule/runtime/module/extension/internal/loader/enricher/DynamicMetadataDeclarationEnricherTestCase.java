@@ -29,7 +29,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -99,7 +98,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
 
     operations = declaration.getOperations();
     OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
-    assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
+    assertOutputType(dynamicOutputAndAttributes.getOutput(), outputMetadataType, true);
     assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
     params = dynamicOutputAndAttributes.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));

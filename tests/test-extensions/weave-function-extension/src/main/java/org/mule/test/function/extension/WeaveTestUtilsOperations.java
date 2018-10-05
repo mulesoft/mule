@@ -6,12 +6,16 @@
  */
 package org.mule.test.function.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 
 public class WeaveTestUtilsOperations {
 
   @OutputResolver(output = AnyTypeResolver.class)
+  @MediaType(value = TEXT_PLAIN, strict = false)
   public Object evaluate(@Content Object payload) {
     return payload;
   }
