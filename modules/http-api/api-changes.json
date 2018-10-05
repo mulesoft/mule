@@ -312,6 +312,22 @@
           "classSimpleName": "WebSocketRequest",
           "elementKind": "interface",
           "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.utils.MatcherCollisionException",
+          "package": "org.mule.runtime.http.api.utils",
+          "classSimpleName": "MatcherCollisionException",
+          "elementKind": "class",
+          "justification": "Revapi over reacting"
+        },
+        {
+          "code": "java.class.added",
+          "new": "enum org.mule.runtime.http.api.ws.WebSocketCloseCode",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketCloseCode",
+          "elementKind": "enum",
+          "justification": "@Experimental feature. Feature flagged by default"
         }
       ]
     }
