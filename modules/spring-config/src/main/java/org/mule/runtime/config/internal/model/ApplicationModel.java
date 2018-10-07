@@ -59,8 +59,6 @@ import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesP
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
-import org.mule.runtime.config.api.dsl.processor.ConfigFile;
-import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
@@ -77,13 +75,14 @@ import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
+import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -113,9 +112,8 @@ import org.w3c.dom.Node;
  * This model is represented by a set of {@link ComponentModel}. Each {@code ComponentModel} holds a piece of configuration and
  * may have children {@code ComponentModel}s as defined in the artifact configuration.
  * <p/>
- * Once the set of {@code ComponentModel} gets created from the application
- * {@link org.mule.runtime.config.api.dsl.processor.ConfigFile}s the {@code ApplicationModel} executes a set of common validations
- * dictated by the configuration semantics.
+ * Once the set of {@code ComponentModel} gets created from the application {@link ConfigFile}s the {@code ApplicationModel}
+ * executes a set of common validations dictated by the configuration semantics.
  *
  * @since 4.0
  */
@@ -351,7 +349,10 @@ public class ApplicationModel {
     // and crafted declared extesion models)
     resolveComponentTypes();
     resolveTypedComponentIdentifier(extensionModelHelper);
-    executeOnEveryMuleComponentTree(new ComponentLocationVisitor(extensionModelHelper));
+    executeOnEveryMuleComponentTree(componentModel -> {
+      new ComponentLocationVisitor(extensionModelHelper);
+      componentModel.getCustomAttributes().clear();
+    });
   }
 
   private void indexComponentModels() {
@@ -944,7 +945,7 @@ public class ApplicationModel {
   private void validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice() {
     executeOnEveryMuleComponentTree(component -> {
       if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)) {
-        Node componentNode = XmlCustomAttributeHandler.from(component).getNode();
+        Node componentNode = ComponentCustomAttributeRetrieve.from(component).getNode();
         if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
             && !componentNode.getParentNode().getLocalName().equals(ERROR_HANDLER)
             && !componentNode.getParentNode().getLocalName().equals(MULE_ROOT_ELEMENT)) {
@@ -1019,7 +1020,7 @@ public class ApplicationModel {
 
   private ComponentModel innerFindComponentDefinitionModel(Node element, List<ComponentModel> componentModels) {
     for (ComponentModel componentModel : componentModels) {
-      if (XmlCustomAttributeHandler.from(componentModel).getNode().equals(element)) {
+      if (ComponentCustomAttributeRetrieve.from(componentModel).getNode().equals(element)) {
         return componentModel;
       }
       ComponentModel childComponentModel = innerFindComponentDefinitionModel(element, componentModel.getInnerComponents());

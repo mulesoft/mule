@@ -10,7 +10,7 @@ import static java.util.Collections.emptyList;
 
 import java.util.List;
 
-import org.mule.runtime.config.api.XmlGathererErrorHandler;
+import org.mule.runtime.dsl.internal.xml.parser.XmlGathererErrorHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

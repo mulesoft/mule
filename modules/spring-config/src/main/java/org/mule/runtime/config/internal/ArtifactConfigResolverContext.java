@@ -7,9 +7,9 @@
 package org.mule.runtime.config.internal;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
+import org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser;
+import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.util.Map;
 import java.util.Set;

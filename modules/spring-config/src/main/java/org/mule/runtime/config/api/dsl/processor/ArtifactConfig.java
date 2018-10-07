@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.api.dsl.processor;
 
+import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

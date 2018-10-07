@@ -42,7 +42,7 @@ import org.mule.runtime.config.internal.dsl.model.MinimalApplicationModelGenerat
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.core.api.config.MuleDeploymentProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;

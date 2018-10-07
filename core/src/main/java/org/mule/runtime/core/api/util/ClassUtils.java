@@ -14,12 +14,16 @@ import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+
+import com.google.common.primitives.Primitives;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -44,12 +48,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-
-import com.google.common.primitives.Primitives;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -116,21 +114,7 @@ public class ClassUtils {
    * @return A URL pointing to the resource to load or null if the resource is not found
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
-    URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
-      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      return cl != null ? cl.getResource(resourceName) : null;
-    });
-
-    if (url == null) {
-      url = AccessController
-          .doPrivileged((PrivilegedAction<URL>) () -> ClassUtils.class.getClassLoader().getResource(resourceName));
-    }
-
-    if (url == null) {
-      url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> callingClass.getClassLoader().getResource(resourceName));
-    }
-
-    return url;
+    return org.mule.runtime.internal.util.ClassUtils.getResource(resourceName, callingClass);
   }
 
   /**
