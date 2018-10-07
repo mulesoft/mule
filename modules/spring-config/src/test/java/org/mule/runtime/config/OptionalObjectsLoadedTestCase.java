@@ -8,6 +8,7 @@ package org.mule.runtime.config;
 
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -28,10 +29,10 @@ import org.slf4j.Logger;
 
 import java.util.Calendar;
 
-public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
+public class OptionalObjectsLoadedTestCase extends AbstractMuleTestCase {
 
-  private static final Logger LOGGER = getLogger(OptionalObjectsIgnoredTestCase.class);
-  private static final String OPTIONAL_OBJECT_KEY = "problematic";
+  private static final Logger LOGGER = getLogger(OptionalObjectsLoadedTestCase.class);
+  private static final String OPTIONAL_OBJECT_KEY = "optional";
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
@@ -50,14 +51,14 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
   }
 
   @After
-  public void after() throws Exception {
+  public void after() {
     if (muleContext != null) {
       disposeIfNeeded(muleContext, LOGGER);
     }
   }
 
   @Test
-  public void optionalObjectSafelyIgnored() {
-    assertThat(muleContext.getRegistry().lookupObject(OPTIONAL_OBJECT_KEY), is(nullValue()));
+  public void optionalObjectSafelyLoaded() {
+    assertThat(muleContext.getRegistry().lookupObject(OPTIONAL_OBJECT_KEY), is(not(nullValue())));
   }
 }
