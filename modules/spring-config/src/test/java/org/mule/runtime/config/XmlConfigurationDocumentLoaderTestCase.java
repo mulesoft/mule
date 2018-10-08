@@ -20,7 +20,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
-import org.mule.runtime.dsl.internal.xml.parser.XmlGathererErrorHandler;
+import org.mule.runtime.dsl.api.xml.parser.XmlGathererErrorHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;

@@ -83,10 +83,9 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
-import org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
+import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor;
 import org.mule.runtime.dsl.api.xml.parser.XmlParsingConfiguration;
-import org.mule.runtime.dsl.internal.xml.parser.XmlConfigurationProcessor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -151,7 +150,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private ConfigResource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-  protected final XmlApplicationParser xmlApplicationParser;
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
@@ -226,7 +224,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           .forEach(componentBuildingDefinitionRegistry::register);
     }
 
-    xmlApplicationParser = createApplicationParser();
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
@@ -241,12 +238,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private static Optional<Set<ExtensionModel>> getExtensionModels(ExtensionManager extensionManager) {
     return ofNullable(extensionManager == null ? null
         : extensionManager.getExtensions());
-  }
-
-  private XmlApplicationParser createApplicationParser() {
-    ExtensionManager extensionManager = muleContext.getExtensionManager();
-    return new XmlApplicationParser(XmlNamespaceInfoProviderSupplier.createFromExtensionModels(extensionManager.getExtensions(),
-                                                                                               empty()));
   }
 
   private void validateAllConfigElementHaveParsers() {
@@ -304,15 +295,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         }
       });
 
-      ArtifactConfig.Builder builder = new ArtifactConfig.Builder()
+      ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
           .setApplicationName(getArtifactName())
-          .setArtifactProperties(getArtifactProperties());
-      configFiles.forEach(builder::addConfigFile);
+          .addConfigFiles(configFiles).build();
 
       Set<ExtensionModel> extensions =
           muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions() : emptySet();
       ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
-      applicationModel = new ApplicationModel(builder.build(), artifactDeclaration, extensions,
+      applicationModel = new ApplicationModel(artifactConfig, artifactDeclaration, extensions,
                                               artifactProperties, parentConfigurationProperties,
                                               of(componentBuildingDefinitionRegistry),
                                               true, externalResourceProvider);
@@ -732,11 +722,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public Set<ExtensionModel> getExtensions() {
     return muleContext.getExtensionManager() == null ? emptySet() : muleContext.getExtensionManager().getExtensions();
-  }
-
-  @Override
-  public XmlApplicationParser getXmlApplicationParser() {
-    return xmlApplicationParser;
   }
 
   @Override
