@@ -5,8 +5,8 @@
       xmlns:util="http://www.springframework.org/schema/util"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-                          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-                          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
+                          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
                           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <heisenberg:config name="heisenberg"
