@@ -7,6 +7,7 @@
 package org.mule.transport;
 
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -16,8 +17,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -25,12 +31,15 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequester;
 import org.mule.retry.RetryPolicyExhaustedException;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
@@ -39,9 +48,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
+import org.junit.Test;
 
 /**
  * Tests that lifecycle methods on a connector are not processed more than once. (@see MULE-3062)
@@ -356,6 +364,51 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
             service.dispose();
         }
     }
+
+    /**
+     * This test verifies that once a connector is started, and a listener is registered for it, its connection is
+     * executed with a RetryPolicy, that could be either the one from the endpoint, or the connector.
+     * @throws Exception
+     */
+    @Test
+    public void testReceiverConnectionIsExecutedWithRetryPolicyOnceConnectorIsStarted() throws Exception{
+        Service service = getTestService();
+        service.start();
+
+        try
+        {
+            connector.start();
+            connector.connect();
+
+            // Mock retry policy template, in order to be able to check if it was executed
+            RetryPolicyTemplate connectorRetryPolicy = mock(NoRetryPolicyTemplate.class);
+            when(connectorRetryPolicy.execute(any(RetryCallback.class), eq(connector.getMuleContext().getWorkManager()))).
+                    thenCallRealMethod();
+
+            connector.setRetryPolicyTemplate(connectorRetryPolicy);
+            InboundEndpoint testEndpoint = getTestInboundEndpoint("in", "test://in",null,null,null,connector);
+
+            assertThat(connector.receivers.isEmpty(), is(true));
+
+            connector.registerListener(testEndpoint, getSensingNullMessageProcessor(), service);
+
+            // Verify that retry policy was enforced when connecting receivers
+            verify(connectorRetryPolicy, times(1))
+                    .execute(any(RetryCallback.class), eq(connector.getMuleContext().getWorkManager()));
+
+            // Registered receiver was connected and started correctly
+            assertThat(connector.receivers.size(), equalTo(1));
+            assertThat(connector.receivers.get("in").isConnected(), is(true));
+            assertThat(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted(), is(true));
+        }
+        finally
+        {
+            service.dispose();
+        }
+    }
+
+
+
 
     @Test
     public void testReceiversServiceLifecycle() throws Exception

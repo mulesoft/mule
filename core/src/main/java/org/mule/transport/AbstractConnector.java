@@ -1278,14 +1278,14 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             }
 
             logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
-                    + endpointUri.toString());
+                        + endpointUri.toString());
 
             if (getReceiver(flowConstruct, endpoint) != null)
             {
                 throw new ConnectorException(CoreMessages.listenerAlreadyRegistered(endpointUri), this);
             }
 
-            MessageReceiver receiver = createReceiver(flowConstruct, endpoint);
+            final MessageReceiver receiver = createReceiver(flowConstruct, endpoint);
             receiver.setListener(messageProcessorChain);
 
             Object receiverKey = getReceiverKey(flowConstruct, endpoint);
@@ -1293,6 +1293,53 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             // Since we're managing the creation we also need to initialise
             receiver.initialise();
             receivers.put(receiverKey, receiver);
+
+            // Embed the actual connection into a RetryCallback, to be able to perform it
+            // through the configured retry policy
+            RetryCallback performEndpointConnectionCallback = new RetryCallback()
+            {
+                @Override
+                public void doWork(RetryContext context) throws Exception
+                {
+                    doConnectAndStartReceiver(receiver);
+                }
+
+                @Override
+                public String getWorkDescription()
+                {
+                    return AbstractConnector.this.getConnectionDescription();
+                }
+
+                @Override
+                public Object getWorkOwner()
+                {
+                    return AbstractConnector.this;
+                }
+            };
+
+            logger.info("Executing listener startup with endpoint retry policy");
+
+            // Use endpoint retry policy to perform actual connection
+            endpoint.getRetryPolicyTemplate().execute(performEndpointConnectionCallback,
+                                                      endpoint.getMuleContext().getWorkManager());
+
+        }
+        finally
+        {
+            connectionLock.unlock();
+        }
+    }
+
+    private void doConnectAndStartReceiver(MessageReceiver receiver) throws Exception
+    {
+        logger.info("Acquiring connector connection lock");
+
+        // This will lock until the lock is released by the connector object,
+        // passing it to the RetryWorker in charge of executing the endpoint's retry policy
+        AbstractConnector.this.connectionLock.lock();
+        try
+        {
+            logger.debug("Connection lock acquired");
 
             if (isConnected())
             {
@@ -1303,10 +1350,12 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             {
                 receiver.start();
             }
+
         }
         finally
         {
-            connectionLock.unlock();
+            logger.debug("Could not perform receiver startup. Releasing connector connection lock");
+            AbstractConnector.this.connectionLock.unlock();
         }
     }
 

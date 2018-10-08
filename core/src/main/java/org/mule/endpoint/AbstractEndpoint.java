@@ -475,7 +475,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
 
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
-        return retryPolicyTemplate;
+        return retryPolicyTemplate != null ? retryPolicyTemplate : connector.getRetryPolicyTemplate();
     }
 
     public AbstractRedeliveryPolicy getRedeliveryPolicy()
