@@ -252,7 +252,7 @@
         <!-- Test Extensions -->
         <muleMetadataExtensionTestVersion>4.1.4</muleMetadataExtensionTestVersion>
         <muleVeganExtensionTestVersion>4.1.4</muleVeganExtensionTestVersion>
-        <muleHeisenbergExtensionTestVersion>4.1.4-SNAPSHOT</muleHeisenbergExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.1.4</muleHeisenbergExtensionTestVersion>
         <muleMarvelExtensionTestVersion>4.1.4-SNAPSHOT</muleMarvelExtensionTestVersion>
         <mulePetstoreExtensionTestVersion>4.1.4-SNAPSHOT</mulePetstoreExtensionTestVersion>
         <muleSubtypesExtensionTestVersion>4.1.4-SNAPSHOT</muleSubtypesExtensionTestVersion>
