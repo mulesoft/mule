@@ -597,7 +597,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
         catch (InvalidExpressionException e)
         {
-            logger.warn("Expression '" + expression + "' is invalid: " + e.getMessage());
+            logger.warn(e.getMessage());
             if (logger.isDebugEnabled())
             {
             	logger.debug("Expression '" + expression + "' is invalid.", e);
