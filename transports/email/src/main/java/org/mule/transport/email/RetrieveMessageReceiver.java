@@ -94,7 +94,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     protected void doConnect() throws Exception
     {
-        // Execute listener connection with connector's retry policy
+        // Execute listener connection with the connector's retry policy
         getConnector().getRetryPolicyTemplate().execute(new RetryCallback()
         {
             @Override
