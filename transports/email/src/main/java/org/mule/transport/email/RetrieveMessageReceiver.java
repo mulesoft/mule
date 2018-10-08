@@ -8,6 +8,7 @@ package org.mule.transport.email;
 
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.SEEN;
+import static javax.mail.Folder.READ_WRITE;
 import static org.mule.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -109,7 +110,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 if (castConnector().getMoveToFolder() != null)
                 {
                     RetrieveMessageReceiver.this.moveToFolder = store.getFolder(castConnector().getMoveToFolder());
-                    RetrieveMessageReceiver.this.moveToFolder.open(Folder.READ_WRITE);
+                    RetrieveMessageReceiver.this.moveToFolder.open(READ_WRITE);
                 }
 
                 // set default value if empty/null
