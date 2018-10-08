@@ -280,7 +280,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
         @Override
         public XmlConfigurationDocumentLoader getXmlConfigurationDocumentLoader() {
-          return XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader();
+          return xmlConfigurationDocumentLoader;
         }
 
         @Override
@@ -712,11 +712,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public ConfigResource[] getArtifactConfigResources() {
     return artifactConfigResources;
-  }
-
-  @Override
-  public XmlConfigurationDocumentLoader getXmlConfigurationDocumentLoader() {
-    return xmlConfigurationDocumentLoader;
   }
 
   @Override

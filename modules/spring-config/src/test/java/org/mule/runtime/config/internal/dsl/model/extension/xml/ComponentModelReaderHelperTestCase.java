@@ -23,7 +23,7 @@ import org.mule.runtime.config.internal.dsl.model.config.ConfigurationProperties
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
-import org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser;
+import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
 import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 
 import java.io.InputStream;
@@ -165,7 +165,8 @@ public class ComponentModelReaderHelperTestCase {
         xmlConfigurationDocumentLoader.loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(),
                                                     new ModuleDelegatingEntityResolver(emptySet()), filename, inputStream);
 
-    XmlApplicationParser xmlApplicationParser = new XmlApplicationParser(XmlNamespaceInfoProviderSupplier.createFromExtensionModels(emptySet(), empty()));
+    XmlApplicationParser xmlApplicationParser =
+        new XmlApplicationParser(XmlNamespaceInfoProviderSupplier.createFromExtensionModels(emptySet(), empty()));
     Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
     if (!parseModule.isPresent()) {
       throw new IllegalArgumentException("There was an issue trying to read the stream of the test");

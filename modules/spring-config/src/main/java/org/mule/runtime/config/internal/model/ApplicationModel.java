@@ -350,8 +350,7 @@ public class ApplicationModel {
     resolveComponentTypes();
     resolveTypedComponentIdentifier(extensionModelHelper);
     executeOnEveryMuleComponentTree(componentModel -> {
-      new ComponentLocationVisitor(extensionModelHelper);
-      componentModel.getCustomAttributes().clear();
+      new ComponentLocationVisitor(extensionModelHelper).accept(componentModel);
     });
   }
 

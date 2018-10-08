@@ -12,8 +12,6 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
-import org.mule.runtime.dsl.api.xml.parser.StaticXmlNamespaceInfo;
-import org.mule.runtime.dsl.api.xml.parser.StaticXmlNamespaceInfoProvider;
 
 import com.google.common.collect.ImmutableList;
 

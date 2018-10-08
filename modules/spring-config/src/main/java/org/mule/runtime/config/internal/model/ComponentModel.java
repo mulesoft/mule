@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.model;
 
-import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
@@ -115,7 +114,7 @@ public abstract class ComponentModel {
    * @return a {@code java.util.Map} with all the custom attributes.
    */
   public Map<String, Object> getCustomAttributes() {
-    return copyOf(customAttributes);
+    return customAttributes;
   }
 
   /**

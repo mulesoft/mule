@@ -28,6 +28,7 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -57,6 +58,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
@@ -79,9 +81,15 @@ import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.core.internal.util.DefaultResourceLocator;
+import org.mule.runtime.dsl.api.ConfigResource;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
+import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
-import org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser;
+import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
+import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor;
+import org.mule.runtime.dsl.api.xml.parser.XmlParsingConfiguration;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -100,6 +108,7 @@ import com.google.common.collect.Sets;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -109,11 +118,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -125,6 +138,7 @@ import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.w3c.dom.Document;
+import org.xml.sax.EntityResolver;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -370,17 +384,74 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private ComponentModel getModuleComponentModel(URL resource, Document moduleDocument, Set<ExtensionModel> extensions) {
-    XmlApplicationParser xmlApplicationParser =
-        new XmlApplicationParser(XmlNamespaceInfoProviderSupplier.createFromExtensionModels(extensions, empty()));
-    Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
-    if (!parseModule.isPresent()) {
-      // This happens in org.mule.runtime.config.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
+    ConfigResource moduleConfigResource = createConfigResourceFromModuleDocument(resource, moduleDocument);
+    List<ConfigFile> configFiles =
+        XmlConfigurationProcessor.processXmlConfiguration(createXmlParsingConfiguration(moduleConfigResource, extensions));
+    if (configFiles.isEmpty()) {
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
-    final ConfigLine configLine = parseModule.get();
+    if (configFiles.size() > 1) {
+      throw new IllegalArgumentException(format("Modules only support a single file '%s'", resource.getFile()));
+    }
+    final ConfigLine configLine = configFiles.get(0).getConfigLines().get(0);
     final ConfigurationPropertiesResolver externalPropertiesResolver = getConfigurationPropertiesResolver(configLine);
     final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
     return componentModelReader.extractComponentDefinitionModel(configLine, modulePath);
+  }
+
+  private ConfigResource createConfigResourceFromModuleDocument(URL resource, Document moduleDocument) {
+    try {
+      DOMSource domSource = new DOMSource(moduleDocument);
+      StringWriter writer = new StringWriter();
+      StreamResult result = new StreamResult(writer);
+      TransformerFactory tf = TransformerFactory.newInstance();
+      Transformer transformer = tf.newTransformer();
+      transformer.transform(domSource, result);
+      return new ConfigResource(resource.getFile(), new ByteArrayInputStream(writer.toString().getBytes()));
+    } catch (TransformerException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  private XmlParsingConfiguration createXmlParsingConfiguration(ConfigResource moduleConfigResource,
+                                                                Set<ExtensionModel> extensions) {
+    return new XmlParsingConfiguration() {
+
+      @Override
+      public ParsingPropertyResolver getParsingPropertyResolver() {
+        return propertyKey -> null;
+      }
+
+      @Override
+      public ConfigResource[] getArtifactConfigResources() {
+        return new ConfigResource[] {moduleConfigResource};
+      }
+
+      @Override
+      public ResourceLocator getResourceLocator() {
+        return new DefaultResourceLocator();
+      }
+
+      @Override
+      public Supplier<SAXParserFactory> getSaxParserFactory() {
+        return () -> XMLSecureFactories.createDefault().getSAXParserFactory();
+      }
+
+      @Override
+      public XmlConfigurationDocumentLoader getXmlConfigurationDocumentLoader() {
+        return noValidationDocumentLoader();
+      }
+
+      @Override
+      public EntityResolver getEntityResolver() {
+        return new ModuleDelegatingEntityResolver(extensions);
+      }
+
+      @Override
+      public List<XmlNamespaceInfoProvider> getXmlNamespaceInfoProvider() {
+        return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(extensions, empty());
+      }
+    };
   }
 
   private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ConfigLine configLine) {
