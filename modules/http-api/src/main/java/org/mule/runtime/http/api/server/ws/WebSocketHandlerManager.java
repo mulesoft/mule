@@ -9,6 +9,11 @@ package org.mule.runtime.http.api.server.ws;
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 
+/**
+ * Object to manage a {@link WebSocketHandler} for a server.
+ *
+ * @since 4.1.5 as experimental
+ */
 @NoImplement
 @Experimental
 public interface WebSocketHandlerManager {

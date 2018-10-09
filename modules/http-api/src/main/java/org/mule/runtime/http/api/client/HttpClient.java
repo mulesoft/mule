@@ -42,12 +42,12 @@ public interface HttpClient {
   /**
    * Sends a HttpRequest blocking the current thread until a response is available or the request times out.
    *
-   * @param request the {@link HttpRequest} to send
+   * @param request         the {@link HttpRequest} to send
    * @param responseTimeout the time (in milliseconds) to wait for a response
    * @param followRedirects whether or not to follow redirect responses
-   * @param authentication the optional {@link HttpAuthentication} to use
+   * @param authentication  the optional {@link HttpAuthentication} to use
    * @return the received {@link HttpResponse}
-   * @throws IOException if an error occurs while executing
+   * @throws IOException      if an error occurs while executing
    * @throws TimeoutException if {@code responseTimeout} is exceeded
    */
   HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication)
@@ -62,15 +62,24 @@ public interface HttpClient {
    * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they guarantee
    * executing on a different thread.
    *
-   * @param request the {@link HttpRequest} to send
+   * @param request         the {@link HttpRequest} to send
    * @param responseTimeout the time (in milliseconds) to wait for a response
    * @param followRedirects whether or not to follow redirect responses
-   * @param authentication the optional {@link HttpAuthentication} to use
+   * @param authentication  the optional {@link HttpAuthentication} to use
    * @return a {@link CompletableFuture} that will complete once the {@link HttpResponse} is available
    */
   CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
                                             HttpAuthentication authentication);
 
+  /**
+   * Opens a new WebSocket by adding the proper upgrade header to the given {@code request}
+   *
+   * @param request        a {@link HttpRequest} to the target WebSocket endpoint
+   * @param requestOptions the request options
+   * @param socketId       the id of the obtained socket
+   * @param callback       the callback that will receive the associated  socket events
+   * @return a future {@link WebSocket}
+   */
   @Experimental
   default CompletableFuture<WebSocket> openWebSocket(HttpRequest request,
                                                      HttpRequestOptions requestOptions,

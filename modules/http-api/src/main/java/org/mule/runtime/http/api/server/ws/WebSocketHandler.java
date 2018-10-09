@@ -8,12 +8,26 @@ package org.mule.runtime.http.api.server.ws;
 
 import org.mule.api.annotation.Experimental;
 
+/**
+ * Handler for an inbound WebSocket requests
+ *
+ * @since 4.1.5 as experimental
+ */
 @Experimental
 public interface WebSocketHandler {
 
+  /**
+   * @return The path of the WebSocket endpoint
+   */
   String getPath();
 
+  /**
+   * @return The {@link WebSocketConnectionHandler} for the {@link #getPath()}
+   */
   WebSocketConnectionHandler getConnectionHandler();
 
+  /**
+   * @return The {@link WebSocketMessageHandler} for the {@link #getPath()}
+   */
   WebSocketMessageHandler getMessageHandler();
 }

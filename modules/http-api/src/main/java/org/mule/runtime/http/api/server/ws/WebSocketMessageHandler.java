@@ -7,10 +7,20 @@
 package org.mule.runtime.http.api.server.ws;
 
 import org.mule.api.annotation.Experimental;
-import org.mule.runtime.http.api.ws.WebSocketMessage;
+import org.mule.runtime.http.api.ws.WebSocket;
 
+/**
+ * Handles the arrival of a message into an inbound {@link WebSocket}
+ *
+ * @since 4.1.5 as experimental
+ */
 @Experimental
 public interface WebSocketMessageHandler {
 
+  /**
+   * This method is invoked when a new message is received
+   *
+   * @param message the message
+   */
   void onMessage(WebSocketMessage message);
 }

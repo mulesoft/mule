@@ -6,9 +6,17 @@
  */
 package org.mule.runtime.http.api.ws;
 
+import org.mule.api.annotation.Experimental;
+
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The codes of the close frame that will be sent (or has been received) when closing a {@link WebSocket}
+ *
+ * @since 4.1.5 as experimental
+ */
+@Experimental
 public enum WebSocketCloseCode {
 
   /**
@@ -42,6 +50,13 @@ public enum WebSocketCloseCode {
     }
   }
 
+  /**
+   * Returns the {@link WebSocketCloseCode} that matches the given raw {@code protocolCode}
+   *
+   * @param protocolCode a protocol level code
+   * @return a {@link WebSocketCloseCode}
+   * @throws IllegalArgumentException if the {@code protocolCode} doesn't match any of the items in this enum
+   */
   public static WebSocketCloseCode fromProtocolCode(int protocolCode) {
     WebSocketCloseCode code = CODES.get(protocolCode);
     if (code == null) {

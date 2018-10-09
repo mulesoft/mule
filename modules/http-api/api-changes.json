@@ -291,8 +291,8 @@
         },
         {
           "code": "java.class.added",
-          "new": "interface org.mule.runtime.http.api.ws.WebSocketMessage",
-          "package": "org.mule.runtime.http.api.ws",
+          "new": "interface org.mule.runtime.http.api.server.ws.WebSocketMessage",
+          "package": "org.mule.runtime.http.api.server.ws",
           "classSimpleName": "WebSocketMessage",
           "elementKind": "interface",
           "justification": "@Experimental feature. Feature flagged by default"
@@ -307,8 +307,8 @@
         },
         {
           "code": "java.class.added",
-          "new": "interface org.mule.runtime.http.api.ws.WebSocketRequest",
-          "package": "org.mule.runtime.http.api.ws",
+          "new": "interface org.mule.runtime.http.api.server.ws.WebSocketRequest",
+          "package": "org.mule.runtime.http.api.server.ws",
           "classSimpleName": "WebSocketRequest",
           "elementKind": "interface",
           "justification": "@Experimental feature. Feature flagged by default"

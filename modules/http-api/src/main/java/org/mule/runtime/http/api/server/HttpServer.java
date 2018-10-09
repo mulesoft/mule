@@ -71,8 +71,8 @@ public interface HttpServer {
   /**
    * Adds a {@link RequestHandler} on the given path and for the given methods.
    *
-   * @param methods a list of methods to match
-   * @param path the path to match
+   * @param methods        a list of methods to match
+   * @param path           the path to match
    * @param requestHandler the handler to execute upon a matching request
    * @return a {@link RequestHandlerManager} for the handler
    */
@@ -82,12 +82,19 @@ public interface HttpServer {
   /**
    * Adds a {@link RequestHandler} on the given path and for all methods.
    *
-   * @param path the path to match
+   * @param path           the path to match
    * @param requestHandler the handler to execute upon a matching request
    * @return a {@link RequestHandlerManager} for the handler
    */
   RequestHandlerManager addRequestHandler(final String path, final RequestHandler requestHandler);
 
+  /**
+   * Adds a {@link WebSocketHandler}
+   *
+   * @param handler the handler
+   * @return a {@link WebSocketHandlerManager}
+   * @since 4.1.5 as experimental
+   */
   @Experimental
   default WebSocketHandlerManager addWebSocketHandler(WebSocketHandler handler) {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");

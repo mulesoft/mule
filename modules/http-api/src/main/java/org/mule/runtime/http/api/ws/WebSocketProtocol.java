@@ -8,13 +8,31 @@ package org.mule.runtime.http.api.ws;
 
 import org.mule.api.annotation.Experimental;
 
+/**
+ * The supported protocols
+ */
 @Experimental
 public enum WebSocketProtocol {
 
-  WS("ws"), WSS("wss");
+  /**
+   * {@code ws} protocol. Used then the Upgrade request was sent over standard HTTP
+   */
+  WS("ws"),
+
+  /**
+   * {@code wss} protocol. Used then the Upgrade request was sent over standard HTTPS
+   */
+  WSS("wss");
 
   private final String scheme;
 
+  /**
+   * Returns the {@link WebSocketProtocol} that corresponds to the given {@code scheme}
+   *
+   * @param scheme a scheme
+   * @return a {@link WebSocketProtocol}
+   * @throws IllegalArgumentException if the scheme doesn't match any of the items in this enum
+   */
   public static WebSocketProtocol forScheme(String scheme) {
     if ("ws".equals(scheme)) {
       return WS;

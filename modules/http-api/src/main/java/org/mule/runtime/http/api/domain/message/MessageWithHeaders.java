@@ -6,10 +6,17 @@
  */
 package org.mule.runtime.http.api.domain.message;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.util.Collection;
 
+/**
+ * Generic contract for a message which contains headers
+ *
+ * @since 4.1.5 as experimental
+ */
+@Experimental
 public interface MessageWithHeaders {
 
   /**
