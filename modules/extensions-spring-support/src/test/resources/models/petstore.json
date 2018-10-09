@@ -8838,7 +8838,12 @@
           ],
           "name": "ConnectedPetAdoptionSource",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "PetStore",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "source"
         },
         {
@@ -11796,7 +11801,12 @@
       ],
       "name": "getPetCorrelation",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "correlationInfo",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -17977,7 +17987,12 @@
       ],
       "name": "NumberPetAdoptionSource",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "PetStore",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "source"
     },
     {
@@ -18341,7 +18356,12 @@
       ],
       "name": "PartialPetAdoptionSource",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "PetStore",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "source"
     },
     {
@@ -18705,7 +18725,12 @@
       ],
       "name": "PetAdoptionSource",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "PetStore",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "source"
     },
     {
@@ -18964,7 +18989,12 @@
       ],
       "name": "SentientSource",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "PetstoreResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "source"
     },
     {

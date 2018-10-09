@@ -520,7 +520,12 @@
           ],
           "name": "getConnection",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "TransactionalResolver",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "operation"
         },
         {
@@ -3949,7 +3954,12 @@
           ],
           "name": "TransactionalSource",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "TransactionalResolver",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "source"
         },
         {

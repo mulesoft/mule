@@ -1026,7 +1026,12 @@
           ],
           "name": "configRetriever",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "SubtypesOutputResolver",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "operation"
         },
         {
@@ -1307,7 +1312,12 @@
           ],
           "name": "connectionRetriever",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "SubtypesOutputResolver",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "operation"
         }
       ],
@@ -1806,7 +1816,12 @@
       ],
       "name": "doorRetriever",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "SubtypesOutputResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -1972,7 +1987,12 @@
       ],
       "name": "noGlobalPojo",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "SubtypesOutputResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -2228,7 +2248,12 @@
       ],
       "name": "processDoor",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "SubtypesOutputResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -2394,7 +2419,12 @@
       ],
       "name": "shapeRetriever",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "SubtypesOutputResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -2762,7 +2792,12 @@
       ],
       "name": "subtypedAndConcreteParameters",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "SubtypesOutputResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     }
   ],
