@@ -19,13 +19,17 @@ import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClass
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
 import org.slf4j.Logger;
+import sun.net.www.protocol.jar.Handler;
 
 /**
  * Defines a {@link ClassLoader} which enables the control of the class loading lookup mode.
@@ -47,7 +51,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
   private final boolean verboseLogging;
 
   public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
-    super(urls, parent);
+    super(urls, parent, new NonCachingURLStreamHandlerFactory());
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
     verboseLogging = LOGGER.isDebugEnabled() || isVerboseLoggingEnabled();
@@ -198,4 +202,30 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     }
   }
 
+  protected static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory {
+
+    @Override
+    public URLStreamHandler createURLStreamHandler(String protocol) {
+      return new NonCachingJarResourceURLStreamHandler();
+    }
+  }
+
+  /**
+   * Prevents jar caching for this classloader, mainly to fix the static ResourceBundle mess/cache that keeps connections open no
+   * matter what.
+   * It also prevents file descriptor leaks when accessing through SPI to implementations bundled in the application.
+   */
+  private static class NonCachingJarResourceURLStreamHandler extends Handler {
+
+    public NonCachingJarResourceURLStreamHandler() {
+      super();
+    }
+
+    @Override
+    protected java.net.URLConnection openConnection(URL u) throws IOException {
+      JarURLConnection c = new sun.net.www.protocol.jar.JarURLConnection(u, this);
+      c.setUseCaches(false);
+      return c;
+    }
+  }
 }
