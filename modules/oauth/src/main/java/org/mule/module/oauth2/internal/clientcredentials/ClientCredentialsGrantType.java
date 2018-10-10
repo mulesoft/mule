@@ -71,6 +71,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
         {
             throw new InitialisationException(e, this);
         }
+        tokenRequestHandler.initialise();
     }
 
     @Override
