@@ -75,6 +75,7 @@ public class DefaultXMLSecureFactories {
       factory.setFeature("http://xml.org/sax/features/external-parameter-entities", externalEntities);
       factory.setExpandEntityReferences(expandEntities);
       factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", !expandEntities);
+      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", expandEntities);
     } catch (Exception e) {
       logConfigurationWarning(DocumentBuilderFactory.class.getName(), factory.getClass().getName(), e);
     }
@@ -100,6 +101,7 @@ public class DefaultXMLSecureFactories {
       factory.setFeature("http://xml.org/sax/features/external-general-entities", externalEntities);
       factory.setFeature("http://xml.org/sax/features/external-parameter-entities", externalEntities);
       factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", !expandEntities);
+      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", expandEntities);
     } catch (Exception e) {
       logConfigurationWarning(SAXParserFactory.class.getName(), factory.getClass().getName(), e);
     }
