@@ -1,4 +1,18 @@
 {
+  "4.1.5": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader.NonCachingURLStreamHandlerFactory",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "NonCachingURLStreamHandlerFactory",
+          "elementKind": "class",
+          "justification": "Undo remove of this handler for JarUrlConnection as useCache should be false when loading resources from application to prevent file descriptor leaks"
+        }
+      ]
+    }
+  },
   "4.1.4": {
     "revapi": {
       "ignore": [
