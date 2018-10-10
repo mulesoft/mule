@@ -47,6 +47,10 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
+  /**
+   * Test to validate that we DO set useCache to false when loading resources from application, plugins as this could generate
+   * file descriptor leaks once the application is undeployed.
+   */
   @Test
   public void useCacheSetToFalseForJarUrlConnection() throws Exception {
     URLClassLoader parent = new URLClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
