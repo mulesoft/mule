@@ -21,7 +21,10 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputResolverWithKeyResolver.TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestInputResolverWithoutKeyResolver.TEST_INPUT_RESOLVER_WITHOUT_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.TEST_MULTI_LEVEL_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver.METADATA_EXTENSION_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver.TEST_OUTPUT_ANY_TYPE_RESOLVER;
@@ -166,6 +169,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     assertCategoryInfo(dynamicOutput, METADATA_EXTENSION_RESOLVER);
     assertOutputResolverInfo(dynamicOutput, of(TEST_OUTPUT_RESOLVER_WITH_KEY_RESOLVER));
     assertAttributesResolverInfo(dynamicOutput, empty());
+    assertKeysResolverInfo(dynamicOutput, of(TEST_OUTPUT_RESOLVER_WITH_KEY_RESOLVER));
     assertParamResolverInfo(dynamicOutput, "type", empty());
     assertParamResolverInfo(dynamicOutput, "content", empty());
 
@@ -183,10 +187,25 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     assertCategoryInfo(simpleMultiLevelKeyResolver, METADATA_EXTENSION_RESOLVER);
     assertOutputResolverInfo(simpleMultiLevelKeyResolver, empty());
     assertAttributesResolverInfo(simpleMultiLevelKeyResolver, empty());
+    assertKeysResolverInfo(simpleMultiLevelKeyResolver, of(TEST_MULTI_LEVEL_KEY_RESOLVER));
     assertParamResolverInfo(simpleMultiLevelKeyResolver, "content", of(TEST_MULTI_LEVEL_KEY_RESOLVER));
     assertParamResolverInfo(simpleMultiLevelKeyResolver, "continent", empty());
     assertParamResolverInfo(simpleMultiLevelKeyResolver, "country", empty());
     assertParamResolverInfo(simpleMultiLevelKeyResolver, "city", empty());
+
+    OperationDeclaration withoutKeysWithKeyId = getDeclaration(operations, "contentMetadataWithoutKeysWithKeyId");
+    assertCategoryInfo(withoutKeysWithKeyId, METADATA_EXTENSION_RESOLVER);
+    assertOutputResolverInfo(withoutKeysWithKeyId, empty());
+    assertAttributesResolverInfo(withoutKeysWithKeyId, empty());
+    assertKeysResolverInfo(withoutKeysWithKeyId, empty());
+    assertParamResolverInfo(withoutKeysWithKeyId, "content", of(TEST_INPUT_RESOLVER_WITHOUT_KEY_RESOLVER));
+
+    List<SourceDeclaration> messageSources = declaration.getConfigurations().get(0).getMessageSources();
+    SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
+    assertCategoryInfo(sourceDynamicAttributes, METADATA_EXTENSION_RESOLVER);
+    assertOutputResolverInfo(sourceDynamicAttributes, of(TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER));
+    assertAttributesResolverInfo(sourceDynamicAttributes, empty());
+    assertKeysResolverInfo(sourceDynamicAttributes, of(TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER));
   }
 
   @Test
@@ -238,6 +257,10 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
 
   private void assertAttributesResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
     assertResolverInfo(declaration, info -> info.getAttributesResolverName(), "AttributesResolver", expectedName);
+  }
+
+  private void assertKeysResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
+    assertResolverInfo(declaration, info -> info.getKeysResolverName(), "KeysResolver", expectedName);
   }
 
   private void assertCategoryInfo(ComponentDeclaration declaration, String expectedName) {

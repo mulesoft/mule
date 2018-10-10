@@ -684,7 +684,8 @@
               "category": "BooleanMetadataResolver",
               "inputResolvers": {
                 "content": "INPUT"
-              }
+              },
+              "keysResolver": "keys"
             },
             "metadataKeyId": {
               "type": {
@@ -1507,7 +1508,8 @@
               "inputResolvers": {
                 "content": "TestInputAndOutputResolverWithKeyResolver"
               },
-              "outputResolver": "TestInputAndOutputResolverWithKeyResolver"
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -2287,7 +2289,8 @@
               "inputResolvers": {
                 "content": "TestInputResolverWithKeyResolver"
               },
-              "outputResolver": "TestOutputAnyTypeResolver"
+              "outputResolver": "TestOutputAnyTypeResolver",
+              "keysResolver": "TestInputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -3691,7 +3694,8 @@
               "category": "MetadataExtensionResolver",
               "inputResolvers": {
                 "content": "TestInputAndOutputResolverWithKeyResolver"
-              }
+              },
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -4103,7 +4107,8 @@
               "category": "EnumMetadataResolver",
               "inputResolvers": {
                 "content": "INPUT"
-              }
+              },
+              "keysResolver": "keys"
             },
             "metadataKeyId": {
               "type": {
@@ -4524,7 +4529,8 @@
               "inputResolvers": {
                 "content": "TestMetadataResolverMetadataResolvingFailure"
               },
-              "outputResolver": "TestMetadataResolverMetadataResolvingFailure"
+              "outputResolver": "TestMetadataResolverMetadataResolvingFailure",
+              "keysResolver": "TestMetadataResolverMetadataResolvingFailure"
             },
             "metadataKeyId": {
               "type": {
@@ -4934,7 +4940,8 @@
               "inputResolvers": {
                 "content": "TestMetadataResolverRuntimeExceptionFailure"
               },
-              "outputResolver": "TestMetadataResolverRuntimeExceptionFailure"
+              "outputResolver": "TestMetadataResolverRuntimeExceptionFailure",
+              "keysResolver": "TestMetadataResolverRuntimeExceptionFailure"
             },
             "metadataKeyId": {
               "type": {
@@ -5341,7 +5348,8 @@
           "modelProperties": {
             "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
               "category": "MetadataExtensionResolver",
-              "outputResolver": "TestOutputResolverWithKeyResolver"
+              "outputResolver": "TestOutputResolverWithKeyResolver",
+              "keysResolver": "TestOutputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -5701,7 +5709,8 @@
           "modelProperties": {
             "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
               "category": "MetadataExtensionResolver",
-              "outputResolver": "TestResolverWithCache"
+              "outputResolver": "TestResolverWithCache",
+              "keysResolver": "TestResolverWithCache"
             },
             "metadataKeyId": {
               "type": {
@@ -6157,7 +6166,8 @@
                 "otherPerson": "TestInputAndOutputResolverWithKeyResolver",
                 "firstPerson": "TestInputAndOutputResolverWithKeyResolver"
               },
-              "outputResolver": "TestInputAndOutputResolverWithKeyResolver"
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -6563,7 +6573,8 @@
           "modelProperties": {
             "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
               "category": "MetadataExtensionResolver",
-              "outputResolver": "TestOutputResolverWithKeyResolver"
+              "outputResolver": "TestOutputResolverWithKeyResolver",
+              "keysResolver": "TestOutputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -7649,7 +7660,8 @@
           "modelProperties": {
             "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
               "category": "MetadataExtensionResolver",
-              "outputResolver": "TestInputAndOutputResolverWithKeyResolver"
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -9770,7 +9782,8 @@
               "category": "MetadataExtensionResolver",
               "inputResolvers": {
                 "content": "TestMultiLevelKeyResolver"
-              }
+              },
+              "keysResolver": "PartialTestMultiLevelKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -10480,7 +10493,8 @@
           "modelProperties": {
             "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
               "category": "MetadataExtensionResolver",
-              "outputResolver": "TestInputAndOutputResolverWithKeyResolver"
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -10952,7 +10966,8 @@
               "category": "MetadataExtensionResolver",
               "inputResolvers": {
                 "content": "TestMultiLevelKeyResolver"
-              }
+              },
+              "keysResolver": "TestMultiLevelKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -11641,7 +11656,8 @@
           "modelProperties": {
             "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
               "category": "MetadataExtensionResolver",
-              "outputResolver": "TestInputAndOutputWithAttributesResolverWithKeyResolver"
+              "outputResolver": "TestInputAndOutputWithAttributesResolverWithKeyResolver",
+              "keysResolver": "TestInputOutputSourceResolverWithKeyResolver"
             },
             "metadataKeyId": {
               "type": {
@@ -16624,7 +16640,8 @@
         "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
           "category": "MetadataExtensionResolver",
           "outputResolver": "TestOutputAttributesResolverWithKeyResolver",
-          "attributesResolver": "TestOutputAttributesResolverWithKeyResolver"
+          "attributesResolver": "TestOutputAttributesResolverWithKeyResolver",
+          "keysResolver": "TestOutputAttributesResolverWithKeyResolver"
         },
         "metadataKeyId": {
           "type": {
@@ -17166,7 +17183,8 @@
           "category": "MetadataExtensionResolver",
           "inputResolvers": {
             "content": "TestThreadContextClassLoaderResolver"
-          }
+          },
+          "keysResolver": "TestThreadContextClassLoaderResolver"
         },
         "metadataKeyId": {
           "type": {
@@ -19030,7 +19048,8 @@
       "modelProperties": {
         "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
           "category": "MetadataExtensionResolver",
-          "outputResolver": "TestOutputAnyTypeResolver"
+          "outputResolver": "TestOutputAnyTypeResolver",
+          "keysResolver": "TestMultiLevelKeyResolver"
         },
         "metadataKeyId": {
           "type": {

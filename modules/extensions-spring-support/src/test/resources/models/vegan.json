@@ -2778,7 +2778,8 @@
           "modelProperties": {
             "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
               "category": "HarvestedKeys",
-              "outputResolver": "HarvestAppleKeyResolver"
+              "outputResolver": "HarvestAppleKeyResolver",
+              "keysResolver": "HarvestAppleKeyResolver"
             },
             "metadataKeyId": {
               "type": {

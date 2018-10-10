@@ -26,6 +26,7 @@ public class TestInputOutputSourceResolverWithKeyResolver
     implements TypeKeysResolver, InputTypeResolver<String>, OutputTypeResolver<String> {
 
   public static final String STARTED_KEY_MASK = "Source Started = [%s]";
+  public static final String TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER = "TestInputOutputSourceResolverWithKeyResolver";
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
@@ -52,6 +53,6 @@ public class TestInputOutputSourceResolverWithKeyResolver
 
   @Override
   public String getResolverName() {
-    return "TestInputOutputSourceResolverWithKeyResolver";
+    return TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER;
   }
 }

@@ -21,6 +21,9 @@ import java.util.Set;
 public class TestInputAndOutputWithAttributesResolverWithKeyResolver implements TypeKeysResolver,
     InputTypeResolver<String>, OutputTypeResolver<String>, AttributesTypeResolver<String> {
 
+  public static final String TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER =
+      "TestInputAndOutputWithAttributesResolverWithKeyResolver";
+
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     return TestMetadataResolverUtils.getKeys(context);
@@ -49,6 +52,6 @@ public class TestInputAndOutputWithAttributesResolverWithKeyResolver implements 
 
   @Override
   public String getResolverName() {
-    return "TestInputAndOutputWithAttributesResolverWithKeyResolver";
+    return TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER;
   }
 }
