@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.util;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -199,8 +198,7 @@ public class IOUtils {
   }
 
   /**
-   * Similar to {@link #toByteArray(InputStream)} but obtaining the stream from the given
-   * {@code cursorStreamProvider}
+   * Similar to {@link #toByteArray(InputStream)} but obtaining the stream from the given {@code cursorStreamProvider}
    */
   public static String toString(CursorStreamProvider cursorStreamProvider) {
     try (InputStream input = cursorStreamProvider.openCursor()) {
@@ -225,6 +223,7 @@ public class IOUtils {
   /**
    * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code> method but catches any
    * {@link IOException} and wraps it into a {@link RuntimeException}.
+   * 
    * @deprecated Use {@link org.mule.runtime.api.util.IOUtils}
    */
   public static byte[] toByteArray(CursorStreamProvider cursorStreamProvider) {
@@ -259,8 +258,7 @@ public class IOUtils {
   }
 
   /**
-   * Copies the data read from the {@link InputStream} into the {@link OutputStream}
-   * using a buffer of size {@code bufferSize}
+   * Copies the data read from the {@link InputStream} into the {@link OutputStream} using a buffer of size {@code bufferSize}
    */
   public static long copyLarge(InputStream input, OutputStream output, int bufferSize) throws IOException {
     byte[] buffer = new byte[bufferSize];

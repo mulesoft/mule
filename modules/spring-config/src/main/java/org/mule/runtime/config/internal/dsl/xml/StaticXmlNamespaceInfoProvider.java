@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.xml;
+package org.mule.runtime.config.internal.dsl.xml;
 
 import static com.google.common.collect.ImmutableList.copyOf;
-
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
@@ -24,7 +23,7 @@ public final class StaticXmlNamespaceInfoProvider implements XmlNamespaceInfoPro
   private final Collection<XmlNamespaceInfo> namespaceInfos;
 
   /**
-   * Creates a new instance
+   * Creates a new instanceXmlApplicationParser
    *
    * @param namespaceInfos the {@link Collection} to be returned by {@link #getXmlNamespacesInfo()}
    */

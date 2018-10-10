@@ -90,6 +90,27 @@
           "fieldName": "OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE",
           "elementKind": "field",
           "justification": "Reconnection strategies cannot be configured globally in Mule 4"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.config.ConfigResource",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "ConfigResource",
+          "elementKind": "class",
+          "justification": "not used by others"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder::<init>(===org.mule.runtime.core.api.config.ConfigResource[]===, java.util.Map<java.lang.String, java.lang.String>)",
+          "new": "parameter void org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder::<init>(===org.mule.runtime.dsl.api.ConfigResource[]===, java.util.Map<java.lang.String, java.lang.String>)",
+          "oldType": "org.mule.runtime.core.api.config.ConfigResource[]",
+          "newType": "org.mule.runtime.dsl.api.ConfigResource[]",
+          "package": "org.mule.runtime.core.api.config.builders",
+          "classSimpleName": "AbstractResourceConfigurationBuilder",
+          "methodName": "<init>",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "not used by others"
         }
       ]
     }

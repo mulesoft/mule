@@ -22,9 +22,10 @@ import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.DATETI
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.STRING;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.TIME;
-import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
-import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
+import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+import static org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser.IS_CDATA;
+import static org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier.createFromPluginClassloaders;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
@@ -101,12 +102,15 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterizedElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.RouteElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.SimpleValueType;
 import org.mule.runtime.app.declaration.api.fluent.TopLevelParameterDeclarer;
-import org.mule.runtime.config.api.dsl.processor.ConfigLine;
-import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
-import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegistry;
+import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
+import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
+import org.mule.runtime.dsl.api.xml.parser.SimpleConfigAttribute;
+import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -175,12 +179,18 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private ConfigLine loadArtifactConfig(String name, InputStream resource) {
     checkArgument(resource != null, "The given application was not found as resource");
 
-    Document document = noValidationDocumentLoader().loadDocument(context.getExtensions(), name, resource);
+    Document document =
+        noValidationDocumentLoader().loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(),
+                                                  new ModuleDelegatingEntityResolver(context.getExtensions()), name, resource);
 
-    return new XmlApplicationParser(new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context),
-                                    resolveContextArtifactPluginClassLoaders()).parse(document.getDocumentElement())
-                                        .orElseThrow(
-                                                     () -> new MuleRuntimeException(createStaticMessage("Could not load load a Configuration from the given resource")));
+    XmlApplicationServiceRegistry xmlApplicationServiceRegistry =
+        new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context);
+    return new XmlApplicationParser(createFromPluginClassloaders(cl -> xmlApplicationServiceRegistry.lookupProviders(
+                                                                                                                     XmlNamespaceInfoProvider.class,
+                                                                                                                     cl)
+        .stream().collect(Collectors.toList()), resolveContextArtifactPluginClassLoaders())).parse(document.getDocumentElement())
+            .orElseThrow(
+                         () -> new MuleRuntimeException(createStaticMessage("Could not load load a Configuration from the given resource")));
   }
 
   private ArtifactDeclaration declareArtifact(ConfigLine configLine) {

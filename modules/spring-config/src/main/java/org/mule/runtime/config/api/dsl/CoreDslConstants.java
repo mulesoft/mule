@@ -23,7 +23,6 @@ public interface CoreDslConstants {
 
   String MULE_ROOT_ELEMENT = "mule";
   String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
-  String IMPORT_ELEMENT = "import";
   String RAISE_ERROR = "raise-error";
   String FLOW_ELEMENT = "flow";
   String FLOW_REF_ELEMENT = "flow-ref";

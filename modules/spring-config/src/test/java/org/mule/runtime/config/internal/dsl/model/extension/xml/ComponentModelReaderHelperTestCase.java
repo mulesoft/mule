@@ -6,29 +6,36 @@
  */
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Test;
-import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.api.dsl.processor.ConfigLine;
-import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
+import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.custommonkey.xmlunit.XMLUnit.setIgnoreAttributeOrder;
+import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
+import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
+import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
+import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.PASSWORD_MASK;
+import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
+import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.ComponentModel;
-import org.w3c.dom.Document;
+import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
+import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
+import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptySet;
-import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.custommonkey.xmlunit.XMLUnit.*;
-import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.PASSWORD_MASK;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
+import org.w3c.dom.Document;
 
 
 public class ComponentModelReaderHelperTestCase {
@@ -154,9 +161,12 @@ public class ComponentModelReaderHelperTestCase {
     String filename = "file-app-config-name.xml";
     InputStream inputStream = toInputStream(applicationXml, UTF_8);
     XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = noValidationDocumentLoader();
-    Document moduleDocument = xmlConfigurationDocumentLoader.loadDocument(emptySet(), filename, inputStream);
+    Document moduleDocument =
+        xmlConfigurationDocumentLoader.loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(),
+                                                    new ModuleDelegatingEntityResolver(emptySet()), filename, inputStream);
 
-    XmlApplicationParser xmlApplicationParser = XmlApplicationParser.createFromExtensionModels(emptySet());
+    XmlApplicationParser xmlApplicationParser =
+        new XmlApplicationParser(XmlNamespaceInfoProviderSupplier.createFromExtensionModels(emptySet(), empty()));
     Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
     if (!parseModule.isPresent()) {
       throw new IllegalArgumentException("There was an issue trying to read the stream of the test");

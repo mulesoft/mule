@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.config.api.dsl.processor;
 
+import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents the application configuration files that describe the integrations. It does not include resource files or
@@ -24,7 +26,6 @@ public final class ArtifactConfig {
 
   private String artifactName;
   private List<ConfigFile> configFiles = new ArrayList<>();
-  private Map<String, String> artifactProperties;
 
   private ArtifactConfig() {}
 
@@ -34,13 +35,6 @@ public final class ArtifactConfig {
 
   public List<ConfigFile> getConfigFiles() {
     return Collections.unmodifiableList(configFiles);
-  }
-
-  /**
-   * @return properties associated to the configuration.
-   */
-  public Map<String, String> getArtifactProperties() {
-    return artifactProperties;
   }
 
   /**
@@ -69,11 +63,11 @@ public final class ArtifactConfig {
     }
 
     /**
-     * @param artifactProperties properties associated to the configuration.
+     * @param configFiles a collection of {@code ConfigFile} to be added to the application.
      * @return the builder
      */
-    public Builder setArtifactProperties(Map<String, String> artifactProperties) {
-      this.applicationConfig.artifactProperties = artifactProperties;
+    public Builder addConfigFiles(Collection<ConfigFile> configFiles) {
+      this.applicationConfig.configFiles.addAll(configFiles);
       return this;
     }
 

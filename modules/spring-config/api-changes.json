@@ -1,4 +1,150 @@
 {
+  "4.2.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.config.api.dsl.processor.ArtifactConfig.Builder org.mule.runtime.config.api.dsl.processor.ArtifactConfig.Builder::addConfigFile(===org.mule.runtime.config.api.dsl.processor.ConfigFile===)",
+          "new": "parameter org.mule.runtime.config.api.dsl.processor.ArtifactConfig.Builder org.mule.runtime.config.api.dsl.processor.ArtifactConfig.Builder::addConfigFile(===org.mule.runtime.dsl.api.xml.parser.ConfigFile===)",
+          "oldType": "org.mule.runtime.config.api.dsl.processor.ConfigFile",
+          "newType": "org.mule.runtime.dsl.api.xml.parser.ConfigFile",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "Builder",
+          "methodName": "addConfigFile",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.config.api.dsl.processor.ConfigFile> org.mule.runtime.config.api.dsl.processor.ArtifactConfig::getConfigFiles()",
+          "new": "method java.util.List<org.mule.runtime.dsl.api.xml.parser.ConfigFile> org.mule.runtime.config.api.dsl.processor.ArtifactConfig::getConfigFiles()",
+          "oldType": "java.util.List<org.mule.runtime.config.api.dsl.processor.ConfigFile>",
+          "newType": "java.util.List<org.mule.runtime.dsl.api.xml.parser.ConfigFile>",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ArtifactConfig",
+          "methodName": "getConfigFiles",
+          "elementKind": "method",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.processor.ConfigFile",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ConfigFile",
+          "elementKind": "class",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.processor.ConfigLine",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ConfigLine",
+          "elementKind": "class",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.processor.ConfigLineProvider",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ConfigLineProvider",
+          "elementKind": "interface",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "SimpleConfigAttribute",
+          "elementKind": "class",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser",
+          "package": "org.mule.runtime.config.api.dsl.processor.xml",
+          "classSimpleName": "XmlApplicationParser",
+          "elementKind": "class",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfo",
+          "package": "org.mule.runtime.config.api.dsl.xml",
+          "classSimpleName": "StaticXmlNamespaceInfo",
+          "elementKind": "class",
+          "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfoProvider",
+          "package": "org.mule.runtime.config.api.dsl.xml",
+          "classSimpleName": "StaticXmlNamespaceInfoProvider",
+          "elementKind": "class",
+          "justification": "not used by users"
+        },
+        {
+         "code": "java.class.removed",
+         "old": "class org.mule.runtime.config.api.XmlConfigurationDocumentLoader",
+         "package": "org.mule.runtime.config.api",
+         "classSimpleName": "XmlConfigurationDocumentLoader",
+         "elementKind": "class",
+         "justification": "not used by users"
+        },
+        {
+         "code": "java.class.removed",
+         "old": "interface org.mule.runtime.config.api.XmlGathererErrorHandler",
+         "package": "org.mule.runtime.config.api",
+         "classSimpleName": "XmlGathererErrorHandler",
+         "elementKind": "interface",
+         "justification": "not used by users"
+        },
+        {
+         "code": "java.class.removed",
+         "old": "interface org.mule.runtime.config.api.XmlGathererErrorHandlerFactory",
+         "package": "oStaticXmlNamespaceInfoProviderrg.mule.runtime.config.api",
+         "classSimpleName": "XmlGathererErrorHandlerFactory",
+         "elementKind": "interface",
+         "justification": "not used by users"
+        },
+        {
+         "code": "java.field.removedWithConstant",
+         "old": "field org.mule.runtime.config.api.dsl.CoreDslConstants.IMPORT_ELEMENT",
+         "package": "org.mule.runtime.config.api.dsl",
+         "classSimpleName": "CoreDslConstants",
+         "fieldName": "IMPORT_ELEMENT",
+         "elementKind": "field",
+         "justification": "not used by users"
+        },
+        {
+         "code": "java.method.removed",
+         "old": "method org.mule.runtime.config.api.dsl.processor.ArtifactConfig.Builder org.mule.runtime.config.api.dsl.processor.ArtifactConfig.Builder::setArtifactProperties(java.util.Map<java.lang.String, java.lang.String>)",
+         "package": "org.mule.runtime.config.api.dsl.processor",
+         "classSimpleName": "Builder",
+         "methodName": "setArtifactProperties",
+         "elementKind": "method",
+         "justification": "not used by users"
+        },
+        {
+         "code": "java.method.removed",
+         "old": "method java.util.Map<java.lang.String, java.lang.String> org.mule.runtime.config.api.dsl.processor.ArtifactConfig::getArtifactProperties()",
+         "package": "org.mule.runtime.config.api.dsl.processor",
+         "classSimpleName": "ArtifactConfig",
+         "methodName": "getArtifactProperties",
+         "elementKind": "method",
+         "justification": "not used by users"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.XmlGathererErrorHandlerFactory",
+          "package": "org.mule.runtime.config.api",
+          "classSimpleName": "XmlGathererErrorHandlerFactory",
+          "elementKind": "interface",
+          "justification": "not used by users"
+        }
+      ]
+    }
+  },
   "4.1.2": {
     "revapi": {
       "ignore": [

@@ -31,15 +31,13 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
  * Custom implementation of resolver for schemas where it will delegate to our custom resolver, then if not found will try to
- * generate the XSDs from the extensions (through {@link }), and finally fall back to Spring's
- * {@link DelegatingEntityResolver}.
+ * generate the XSDs from the extensions (through {@link }).
  *
  * @since 4.0
  */

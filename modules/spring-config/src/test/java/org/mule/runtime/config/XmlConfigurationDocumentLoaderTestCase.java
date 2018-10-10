@@ -8,17 +8,19 @@ package org.mule.runtime.config;
 
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isNull;
-import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
-
+import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.api.XmlGathererErrorHandler;
+import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
+import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
+import org.mule.runtime.dsl.api.xml.parser.XmlGathererErrorHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
@@ -27,21 +29,23 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase {
 
   /**
-   * The following {@link #LINE_NUMBER_ERROR} and {@link #COLUMN_NUMBER_ERROR} are directly related to the mule-config-malformed.xml
-   * document. Any change in that file will directly impact these tests as we assert on the file to be sure the errors
-   * reading is properly done.
+   * The following {@link #LINE_NUMBER_ERROR} and {@link #COLUMN_NUMBER_ERROR} are directly related to the
+   * mule-config-malformed.xml document. Any change in that file will directly impact these tests as we assert on the file to be
+   * sure the errors reading is properly done.
    */
   private static final int LINE_NUMBER_ERROR = 6;
   private static final int COLUMN_NUMBER_ERROR = 12;
@@ -131,7 +135,8 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
 
   private Document getDocument(String filename, XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader) {
     final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
-    return xmlConfigurationDocumentLoader.loadDocument(filename, inputStream);
+    return xmlConfigurationDocumentLoader.loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(), filename,
+                                                       inputStream, new ModuleDelegatingEntityResolver(emptySet()));
   }
 
   /**
@@ -158,8 +163,8 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
 
     /**
      * @return {@link Collections#emptyList()} always. We want to make the
-     * {@link XmlConfigurationDocumentLoader#loadDocument(java.lang.String, java.io.InputStream)}
-     * method believe there was no errors while working with the current file.
+     *         {@link XmlConfigurationDocumentLoader#loadDocument(Supplier, EntityResolver, String, InputStream)} method believe
+     *         there was no errors while working with the current file.
      */
     @Override
     public List<SAXParseException> getErrors() {

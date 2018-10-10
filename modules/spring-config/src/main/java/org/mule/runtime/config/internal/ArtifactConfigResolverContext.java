@@ -7,9 +7,8 @@
 package org.mule.runtime.config.internal;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.dsl.api.ConfigResource;
+import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
 
 import java.util.Map;
 import java.util.Set;
@@ -37,19 +36,9 @@ public interface ArtifactConfigResolverContext {
   String getArtifactName();
 
   /**
-   * @return {@link XmlConfigurationDocumentLoader} to load configuration resources documents.
-   */
-  XmlConfigurationDocumentLoader getXmlConfigurationDocumentLoader();
-
-  /**
    * @return {@link ExtensionModel ExtensionModels} to parse the configuration files.
    */
   Set<ExtensionModel> getExtensions();
-
-  /**
-   * @return {@link XmlApplicationParser} to parse the configuration files.
-   */
-  XmlApplicationParser getXmlApplicationParser();
 
   /**
    * @return {@link ClassLoader} to load imported configuration files as resource.

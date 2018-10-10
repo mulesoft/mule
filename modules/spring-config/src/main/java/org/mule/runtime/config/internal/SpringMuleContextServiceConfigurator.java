@@ -61,7 +61,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -87,6 +86,7 @@ import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.config.internal.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
@@ -128,7 +128,6 @@ import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
-import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
@@ -137,11 +136,6 @@ import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -153,6 +147,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 
 /**
@@ -173,6 +172,7 @@ class SpringMuleContextServiceConfigurator {
   private final OptionalObjectsController optionalObjectsController;
   private final CustomServiceRegistry customServiceRegistry;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
+  private final ResourceLocator resourceLocator;
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
@@ -241,7 +241,6 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class))
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))
       .put(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, getBeanDefinition(NoOpLazyComponentInitializer.class))
-      .put(OBJECT_RESOURCE_LOCATOR, getBeanDefinition(DefaultResourceLocator.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;
@@ -255,7 +254,8 @@ class SpringMuleContextServiceConfigurator {
                                               BeanDefinitionRegistry beanDefinitionRegistry,
                                               SpringConfigurationComponentLocator componentLocator,
                                               Registry serviceLocator,
-                                              org.mule.runtime.core.internal.registry.Registry originalRegistry) {
+                                              org.mule.runtime.core.internal.registry.Registry originalRegistry,
+                                              ResourceLocator resourceLocator) {
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
     this.customServiceRegistry = (CustomServiceRegistry) muleContext.getCustomizationService();
@@ -265,6 +265,7 @@ class SpringMuleContextServiceConfigurator {
     this.componentLocator = componentLocator;
     this.serviceLocator = serviceLocator;
     this.originalRegistry = originalRegistry;
+    this.resourceLocator = resourceLocator;
   }
 
   void createArtifactServices() {
@@ -278,6 +279,7 @@ class SpringMuleContextServiceConfigurator {
     registerBeanDefinition(OBJECT_NOTIFICATION_HANDLER, getConstantObjectBeanDefinition(muleContext.getNotificationManager()));
     registerBeanDefinition(OBJECT_REGISTRY, getConstantObjectBeanDefinition(serviceLocator));
     registerBeanDefinition(OBJECT_STATISTICS, getConstantObjectBeanDefinition(muleContext.getStatistics()));
+    registerBeanDefinition(OBJECT_RESOURCE_LOCATOR, getConstantObjectBeanDefinition(resourceLocator));
     loadServiceConfigurators();
 
     defaultContextServices.entrySet().stream()

@@ -4,8 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.xml;
+package org.mule.runtime.config.internal.dsl.xml;
 
+import org.mule.api.annotation.NoExtend;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 
 /**
@@ -13,6 +15,8 @@ import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
  *
  * @since 4.0
  */
+@NoExtend
+@NoInstantiate
 public final class StaticXmlNamespaceInfo implements XmlNamespaceInfo {
 
   private final String namespaceUriPrefix;
