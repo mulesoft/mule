@@ -120,7 +120,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   }
 
   private boolean isMySqlDriver(Driver driver) {
-    return isDriver(driver, "com.mysql.jdbc.Driver");
+    return isDriver(driver, "com.mysql.jdbc.Driver") || isDriver(driver, "com.mysql.cj.jdbc.Driver");
   }
 
   private boolean isDerbyEmbeddedDriver(Driver driver) {
