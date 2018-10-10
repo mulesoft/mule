@@ -240,7 +240,12 @@
       ],
       "name": "evaluate",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "AnyTypeResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     }
   ],

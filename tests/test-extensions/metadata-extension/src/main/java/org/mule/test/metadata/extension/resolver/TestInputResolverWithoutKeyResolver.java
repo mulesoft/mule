@@ -14,6 +14,8 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 
 public class TestInputResolverWithoutKeyResolver implements InputTypeResolver<String> {
 
+  public static final String TEST_INPUT_RESOLVER_WITHOUT_KEY_RESOLVER = "TestInputResolverWithoutKeyResolver";
+
   @Override
   public MetadataType getInputMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
@@ -27,6 +29,6 @@ public class TestInputResolverWithoutKeyResolver implements InputTypeResolver<St
 
   @Override
   public String getResolverName() {
-    return "TestInputResolverWithoutKeyResolver";
+    return TEST_INPUT_RESOLVER_WITHOUT_KEY_RESOLVER;
   }
 }

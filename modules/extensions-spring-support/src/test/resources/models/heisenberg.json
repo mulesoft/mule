@@ -16102,7 +16102,12 @@
       ],
       "name": "byPassWeapon",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "Heisenberg",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -18851,7 +18856,12 @@
       ],
       "name": "getInjectedExtensionManager",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "Heisenberg",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -23183,7 +23193,12 @@
       ],
       "name": "processWeapon",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "Heisenberg",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -23387,7 +23402,12 @@
       ],
       "name": "processWeaponList",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "Heisenberg",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -23592,7 +23612,12 @@
       ],
       "name": "processWeaponListWithDefaultValue",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "Heisenberg",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -23755,7 +23780,12 @@
       ],
       "name": "processWeaponWithDefaultValue",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "Heisenberg",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {

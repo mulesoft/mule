@@ -1034,7 +1034,12 @@
       ],
       "name": "mixedTypedValues",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "typed-value",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -1632,7 +1637,12 @@
       ],
       "name": "typedValueForObject",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "typed-value",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {

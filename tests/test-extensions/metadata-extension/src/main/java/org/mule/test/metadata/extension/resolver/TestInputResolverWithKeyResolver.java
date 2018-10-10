@@ -18,6 +18,8 @@ import java.util.Set;
 
 public class TestInputResolverWithKeyResolver implements TypeKeysResolver, InputTypeResolver<String> {
 
+  public static final String TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER = "TestInputResolverWithKeyResolver";
+
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     return TestMetadataResolverUtils.getKeys(context);
@@ -35,6 +37,6 @@ public class TestInputResolverWithKeyResolver implements TypeKeysResolver, Input
 
   @Override
   public String getResolverName() {
-    return "TestInputResolverWithKeyResolver";
+    return TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER;
   }
 }

@@ -16,6 +16,9 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 public class TestOutputAnyTypeResolver implements OutputTypeResolver<String> {
 
+  public static final String TEST_OUTPUT_ANY_TYPE_RESOLVER = "TestOutputAnyTypeResolver";
+  public static final String METADATA_EXTENSION_RESOLVER = "MetadataExtensionResolver";
+
   @Override
   public MetadataType getOutputType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
@@ -24,11 +27,11 @@ public class TestOutputAnyTypeResolver implements OutputTypeResolver<String> {
 
   @Override
   public String getCategoryName() {
-    return "MetadataExtensionResolver";
+    return METADATA_EXTENSION_RESOLVER;
   }
 
   @Override
   public String getResolverName() {
-    return "TestOutputAnyTypeResolver";
+    return TEST_OUTPUT_ANY_TYPE_RESOLVER;
   }
 }

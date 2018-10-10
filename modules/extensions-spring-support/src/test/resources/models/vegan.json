@@ -741,6 +741,10 @@
           "name": "eatApple",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "AppleKeys",
+              "outputResolver": "AppleTypesResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -2209,7 +2213,12 @@
           ],
           "name": "PaulMcCartneySource",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "FruitResolver",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "source"
         },
         {
@@ -2767,6 +2776,11 @@
           "name": "harvest-apples",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "HarvestedKeys",
+              "outputResolver": "HarvestAppleKeyResolver",
+              "keysResolver": "HarvestAppleKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -3959,7 +3973,12 @@
           ],
           "name": "getLunch",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "FruitResolver",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "operation"
         },
         {
@@ -5296,7 +5315,12 @@
           ],
           "name": "PaulMcCartneySource",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "FruitResolver",
+              "outputResolver": "OUTPUT_PAYLOAD"
+            }
+          },
           "kind": "source"
         }
       ],
@@ -7922,7 +7946,12 @@
       ],
       "name": "consumingGroupedFood",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "FruitResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -8748,7 +8777,12 @@
       ],
       "name": "getHealthyFood",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "FruitResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -8966,7 +9000,12 @@
       ],
       "name": "getProduction",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "FruitResolver",
+          "outputResolver": "OUTPUT_PAYLOAD"
+        }
+      },
       "kind": "operation"
     },
     {

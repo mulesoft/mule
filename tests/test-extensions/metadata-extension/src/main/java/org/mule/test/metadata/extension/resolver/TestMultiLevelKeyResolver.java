@@ -44,6 +44,7 @@ public class TestMultiLevelKeyResolver implements TypeKeysResolver, InputTypeRes
   public static final String LA_PLATA = "LPLT";
   public static final String PARIS = "PRS";
   public static final String SAN_FRANCISCO = "SFO";
+  public static final String TEST_MULTI_LEVEL_KEY_RESOLVER = "TestMultiLevelKeyResolver";
 
 
   @Override
@@ -53,7 +54,7 @@ public class TestMultiLevelKeyResolver implements TypeKeysResolver, InputTypeRes
 
   @Override
   public String getResolverName() {
-    return "TestMultiLevelKeyResolver";
+    return TEST_MULTI_LEVEL_KEY_RESOLVER;
   }
 
   @Override

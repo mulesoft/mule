@@ -680,6 +680,13 @@
           "name": "booleanMetadataKey",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "BooleanMetadataResolver",
+              "inputResolvers": {
+                "content": "INPUT"
+              },
+              "keysResolver": "keys"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -1086,6 +1093,13 @@
           "name": "contentAndOutputCacheResolver",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestResolverWithCache"
+              },
+              "outputResolver": "TestResolverWithCache"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -1489,6 +1503,14 @@
           "name": "contentAndOutputMetadataWithKeyId",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestInputAndOutputResolverWithKeyResolver"
+              },
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -1859,7 +1881,15 @@
           ],
           "name": "contentAndOutputMetadataWithoutKeyId",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam"
+              },
+              "outputResolver": "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam"
+            }
+          },
           "kind": "operation"
         },
         {
@@ -2254,6 +2284,14 @@
           "name": "contentMetadataWithKeyId",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestInputResolverWithKeyResolver"
+              },
+              "outputResolver": "TestOutputAnyTypeResolver",
+              "keysResolver": "TestInputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -2624,7 +2662,15 @@
           ],
           "name": "contentMetadataWithoutKeyId",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam"
+              },
+              "outputResolver": "TestOutputAnyTypeResolver"
+            }
+          },
           "kind": "operation"
         },
         {
@@ -2922,6 +2968,12 @@
           "name": "contentMetadataWithoutKeysWithKeyId",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestInputResolverWithoutKeyResolver"
+              }
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -3325,6 +3377,13 @@
           "name": "contentOnlyCacheResolver",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestResolverWithCache"
+              },
+              "outputResolver": "TestOutputAnyTypeResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -3631,6 +3690,13 @@
           "name": "contentOnlyIgnoresOutput",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestInputAndOutputResolverWithKeyResolver"
+              },
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -4037,6 +4103,13 @@
           "name": "enumMetadataKey",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "EnumMetadataResolver",
+              "inputResolvers": {
+                "content": "INPUT"
+              },
+              "keysResolver": "keys"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -4451,6 +4524,14 @@
           "name": "failWithResolvingException",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestMetadataResolverMetadataResolvingFailure"
+              },
+              "outputResolver": "TestMetadataResolverMetadataResolvingFailure",
+              "keysResolver": "TestMetadataResolverMetadataResolvingFailure"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -4854,6 +4935,14 @@
           "name": "failWithRuntimeException",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestMetadataResolverRuntimeExceptionFailure"
+              },
+              "outputResolver": "TestMetadataResolverRuntimeExceptionFailure",
+              "keysResolver": "TestMetadataResolverRuntimeExceptionFailure"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -5257,6 +5346,11 @@
           "name": "metadataKeyWithDefaultValue",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestOutputResolverWithKeyResolver",
+              "keysResolver": "TestOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -5613,6 +5707,11 @@
           "name": "outputAndMetadataKeyCacheResolver",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestResolverWithCache",
+              "keysResolver": "TestResolverWithCache"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -6061,6 +6160,15 @@
           "name": "outputAndMultipleInputWithKeyId",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "otherPerson": "TestInputAndOutputResolverWithKeyResolver",
+                "firstPerson": "TestInputAndOutputResolverWithKeyResolver"
+              },
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -6463,6 +6571,11 @@
           "name": "outputMetadataWithKeyId",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestOutputResolverWithKeyResolver",
+              "keysResolver": "TestOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -6832,7 +6945,12 @@
           ],
           "name": "outputMetadataWithoutKeyId",
           "description": "",
-          "modelProperties": {},
+          "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam"
+            }
+          },
           "kind": "operation"
         },
         {
@@ -7180,6 +7298,10 @@
           "name": "outputMetadataWithoutKeysWithKeyId",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestOutputResolverWithoutKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -7536,6 +7658,11 @@
           "name": "outputOnlyWithoutContentParam",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -8598,6 +8725,10 @@
           "name": "pagedOperationResult",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestOutputResolverWithoutKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -9176,6 +9307,11 @@
           "name": "pagedOperationResultWithAttributesResolver",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestOutputResolverWithoutKeyResolver",
+              "attributesResolver": "TestOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -9642,6 +9778,13 @@
           "name": "partialMultiLevelKeyResolver",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestMultiLevelKeyResolver"
+              },
+              "keysResolver": "PartialTestMultiLevelKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -10348,6 +10491,11 @@
           "name": "shouldInheritOperationParentResolvers",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestInputAndOutputResolverWithKeyResolver",
+              "keysResolver": "TestInputAndOutputResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -10814,6 +10962,13 @@
           "name": "simpleMultiLevelKeyResolver",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "inputResolvers": {
+                "content": "TestMultiLevelKeyResolver"
+              },
+              "keysResolver": "TestMultiLevelKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -11499,6 +11654,11 @@
           "name": "MetadataSource",
           "description": "",
           "modelProperties": {
+            "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": "TestInputAndOutputWithAttributesResolverWithKeyResolver",
+              "keysResolver": "TestInputOutputSourceResolverWithKeyResolver"
+            },
             "metadataKeyId": {
               "type": {
                 "format": "java",
@@ -11624,7 +11784,14 @@
       ],
       "name": "contentParameterShouldNotGenerateListChildElement",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "inputResolvers": {
+            "contents": "TestInputResolverWithoutKeyResolver"
+          }
+        }
+      },
       "kind": "operation"
     },
     {
@@ -11753,7 +11920,14 @@
       ],
       "name": "contentParameterShouldNotGenerateMapChildElement",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "inputResolvers": {
+            "mapContent": "TestInputResolverWithoutKeyResolver"
+          }
+        }
+      },
       "kind": "operation"
     },
     {
@@ -11842,7 +12016,14 @@
       ],
       "name": "contentParameterShouldNotGeneratePojoChildElement",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "inputResolvers": {
+            "animalContent": "TestInputResolverWithoutKeyResolver"
+          }
+        }
+      },
       "kind": "operation"
     },
     {
@@ -12433,7 +12614,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -12447,7 +12627,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -13238,6 +13419,10 @@
       "name": "dynamicListOfMessages",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "outputResolver": "TestOutputResolverWithoutKeyResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -13506,6 +13691,10 @@
       "name": "dynamicListOfObjects",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "outputResolver": "TestOutputResolverWithoutKeyResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -13918,7 +14107,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13932,7 +14120,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -14141,7 +14330,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -14153,7 +14341,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -14359,7 +14548,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -14373,7 +14561,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -14540,7 +14729,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -14554,7 +14742,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -15631,7 +15820,12 @@
       ],
       "name": "messageAttributesAnyTypeMetadata",
       "description": "",
-      "modelProperties": {},
+      "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "outputResolver": "TestOutputAnyTypeResolver"
+        }
+      },
       "kind": "operation"
     },
     {
@@ -15822,6 +16016,10 @@
       "name": "messageAttributesPersonTypeMetadata",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "outputResolver": "TestOutputResolverWithoutKeyResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -16109,6 +16307,13 @@
       "name": "objectListAsInput",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "inputResolvers": {
+            "objects": "TestInputResolverWithKeyResolver"
+          },
+          "outputResolver": "TestOutputResolverWithKeyResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -16432,6 +16637,12 @@
       "name": "outputAttributesWithDynamicMetadata",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "outputResolver": "TestOutputAttributesResolverWithKeyResolver",
+          "attributesResolver": "TestOutputAttributesResolverWithKeyResolver",
+          "keysResolver": "TestOutputAttributesResolverWithKeyResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -16968,6 +17179,13 @@
       "name": "resolverContentWithContextClassLoader",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "inputResolvers": {
+            "content": "TestThreadContextClassLoaderResolver"
+          },
+          "keysResolver": "TestThreadContextClassLoaderResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -17167,6 +17385,10 @@
       "name": "resolverOutputWithContextClassLoader",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "outputResolver": "TestThreadContextClassLoaderResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -18824,6 +19046,11 @@
       "name": "MetadataSourceWithMultilevel",
       "description": "",
       "modelProperties": {
+        "org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty": {
+          "category": "MetadataExtensionResolver",
+          "outputResolver": "TestOutputAnyTypeResolver",
+          "keysResolver": "TestMultiLevelKeyResolver"
+        },
         "metadataKeyId": {
           "type": {
             "format": "java",
@@ -18890,7 +19117,6 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
-                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -18904,7 +19130,8 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "label": "Person"
                   },
                   "open": {
                     "type": "Any"
@@ -19677,6 +19904,7 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
+        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -19690,8 +19918,7 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "csv-object"
+        }
       },
       "fields": []
     },
@@ -19699,6 +19926,7 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -19710,8 +19938,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "custom-java"
+        }
       },
       "fields": []
     },
@@ -19719,6 +19946,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
+        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -19732,8 +19960,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "json-object"
+        }
       },
       "fields": [
         {
@@ -20603,6 +20830,7 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
+        "typeId": "shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -20616,8 +20844,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "shiporder"
+        }
       },
       "fields": [
         {
