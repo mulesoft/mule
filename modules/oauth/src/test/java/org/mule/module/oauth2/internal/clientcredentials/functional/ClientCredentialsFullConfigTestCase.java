@@ -12,11 +12,27 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+
+import org.hamcrest.core.Is;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mule.api.MuleRuntimeException;
 import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
@@ -26,16 +42,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import com.google.common.collect.ImmutableMap;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.hamcrest.core.Is;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizationTestCase
@@ -127,6 +133,64 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
                                     .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
     }
 
+    @Test
+    public void authenticationFailedTriggersRefreshAccessTokenOnceAtATime() throws Exception
+    {
+        configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(NEW_ACCESS_TOKEN);
+        
+        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
+                .withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
+                .willReturn(aResponse()
+                        .withStatus(500).withHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"myRealm\"")));
+        
+        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
+                .withHeader(HttpHeaders.Names.AUTHORIZATION, containing(NEW_ACCESS_TOKEN))
+                .willReturn(aResponse()
+                        .withBody(TEST_MESSAGE)
+                        .withStatus(200)));
+        
+        final Flow testFlow = (Flow) getFlowConstruct("testFlow");
+        
+        ExecutorService executor = newFixedThreadPool(2);
+        try
+        {
+            List<Future<?>> futures = new ArrayList<>();
+            
+            for (int i = 0; i < 2; ++i)
+            {
+                futures.add(executor.submit(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            testFlow.process(getTestEvent(TEST_MESSAGE));
+                        }
+                        catch (Exception e)
+                        {
+                            throw new MuleRuntimeException(e);
+                        }
+                    }
+                }));
+            }
+            
+            for (Future<?> future : futures)
+            {
+                future.get(RECEIVE_TIMEOUT, MILLISECONDS);
+            }
+            
+            verifyRequestDoneToTokenUrlForClientCredentials();
+            
+            // 2 from the app start, only 1 for the 2 flows
+            wireMockRule.verify(3, postRequestedFor(urlEqualTo(TOKEN_PATH)));
+        }
+        finally
+        {
+            executor.shutdownNow();
+        }
+    }
+    
     @Override
     protected String getProtocol()
     {

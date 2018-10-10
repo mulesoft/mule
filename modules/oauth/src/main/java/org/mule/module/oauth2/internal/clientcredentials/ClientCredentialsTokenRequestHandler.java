@@ -13,6 +13,8 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
@@ -28,13 +30,14 @@ import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.codec.binary.Base64;
 
 /**
  * Handler for calling the token url, parsing the response and storing the oauth context data.
  */
-public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHandler
+public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHandler implements Initialisable
 {
 
     private String scopes;
@@ -42,6 +45,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     private TokenResponseConfiguration tokenResponseConfiguration = new TokenResponseConfiguration();
     private TokenManagerConfig tokenManager;
     private boolean encodeClientCredentialsInBody = false;
+    private Lock refreshLock;
     private MuleEventLogger muleEventLogger = new MuleEventLogger(logger);
 
     public void setApplicationCredentials(ApplicationCredentials applicationCredentials)
@@ -59,15 +63,9 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
         this.tokenResponseConfiguration = tokenResponseConfiguration;
     }
 
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        super.setMuleContext(muleContext);
-    }
-
     private void setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException
     {
-        final HashMap<String, String> formData = new HashMap<String, String>();
+        final Map<String, String> formData = new HashMap<String, String>();
         formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
         String clientId = applicationCredentials.getClientId();
         String clientSecret = applicationCredentials.getClientSecret();
@@ -89,6 +87,36 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     }
 
     public void refreshAccessToken() throws MuleException
+    {
+        final boolean lockWasAcquired = refreshLock.tryLock();
+        try
+        {
+            if (lockWasAcquired)
+            {
+                doRefreshAccessToken();
+            }
+        }
+        finally
+        {
+            if (lockWasAcquired)
+            {
+                refreshLock.unlock();
+            }
+        }
+        if (!lockWasAcquired)
+        {
+            //if we couldn't acquire the lock then we wait until the other thread updates the token.
+            waitUntilLockGetsReleased();
+        }
+    }
+
+    private void waitUntilLockGetsReleased()
+    {
+        refreshLock.lock();
+        refreshLock.unlock();
+    }
+
+    public void doRefreshAccessToken() throws MuleException
     {
         try
         {
@@ -150,5 +178,11 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     public void setEncodeClientCredentialsInBody(boolean encodeClientCredentialsInBody)
     {
         this.encodeClientCredentialsInBody = encodeClientCredentialsInBody;
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        refreshLock = getMuleContext().getLockFactory().createLock(ClientCredentialsGrantType.class.getSimpleName() + "#refreshAccessToken_" + hashCode());
     }
 }
