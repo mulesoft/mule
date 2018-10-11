@@ -34,7 +34,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.internal.model.ComponentCustomAttributeRetrieve;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -43,7 +42,6 @@ import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.internal.xml.parser.XmlMetadataAnnotations;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -62,8 +60,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
@@ -126,17 +122,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     return beanDefinitionBuilder;
   }
 
-  private void processAnnotationParameters(ComponentModel componentModel, Map<QName, Object> annotations) {
-    componentModel.getParameters().entrySet().stream()
-        .filter(entry -> entry.getKey().contains(":"))
-        .forEach(annotationKey -> {
-          Node attribute = from(componentModel).getNode().getAttributes().getNamedItem(annotationKey.getKey());
-          if (attribute != null) {
-            annotations.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), annotationKey.getValue());
-          }
-        });
-  }
-
   private void processNestedAnnotations(ComponentModel componentModel, Map<QName, Object> previousAnnotations) {
     componentModel.getInnerComponents().stream()
         .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
@@ -153,10 +138,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
     if (Component.class.isAssignableFrom(componentModel.getType())) {
-      ComponentCustomAttributeRetrieve customAttributeRetrieve = from(componentModel);
       Map<QName, Object> annotations =
-          processMetadataAnnotationsHelper((Element) customAttributeRetrieve.getNode(), null, beanDefinitionBuilder);
-      processAnnotationParameters(componentModel, annotations);
+          processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel);
       processNestedAnnotations(componentModel, annotations);
       processMacroExpandedAnnotations(componentModel, annotations);
       if (!annotations.isEmpty()) {
@@ -186,15 +169,16 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     }
   }
 
-  private Map<QName, Object> processMetadataAnnotationsHelper(Element element, String configFileIdentifier,
-                                                              BeanDefinitionBuilder builder) {
+  private Map<QName, Object> processMetadataAnnotationsHelper(BeanDefinitionBuilder builder, ComponentModel componentModel) {
     Map<QName, Object> annotations = new HashMap<>();
-    if (element == null) {
+    if (componentModel == null) {
       return annotations;
     } else {
       if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
-        XmlMetadataAnnotations elementMetadata = (XmlMetadataAnnotations) element.getUserData("metadataAnnotations");
-        addMetadataAnnotationsFromXml(annotations, elementMetadata.getElementString());
+        if (componentModel.getSourceCode() != null) {
+          addMetadataAnnotationsFromXml(annotations, componentModel.getSourceCode(), (String) componentModel.getCustomAttributes()
+              .get(Component.Annotations.NAME_ANNOTATION_KEY.toString()));
+        }
         builder.getBeanDefinition().getPropertyValues().addPropertyValue("annotations", annotations);
       }
 

@@ -8,6 +8,8 @@ package org.mule.runtime.core.privileged.execution;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
+import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
+import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.ComponentLocationProvider;
@@ -27,8 +29,7 @@ import javax.xml.namespace.QName;
 @NoExtend
 public abstract class LocationExecutionContextProvider extends ComponentLocationProvider implements ExceptionContextProvider {
 
-  protected static final QName SOURCE_ELEMENT_ANNOTATION_KEY =
-      new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceElement");
+
 
   private static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
   private static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
@@ -40,10 +41,13 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    * Populates the passed beanAnnotations with the other passed parameters.
    *
    * @param beanAnnotations the map with annotations to populate
-   * @param xmlContent the xml representation of the element definition.
+   * @param sourceCode the source code representation of the element definition.
+   * @param documentationName the documentation name attribute of the element definition.
    */
-  public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String xmlContent) {
-    beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, xmlContent);
+  public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String sourceCode,
+                                                   String documentationName) {
+    beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
+    beanAnnotations.put(NAME_ANNOTATION_KEY, documentationName);
   }
 
   protected static String getSourceXML(Component element) {
