@@ -64,6 +64,7 @@ public abstract class ComponentModel {
   private Integer lineNumber;
   private Integer startColumn;
   private String configFileName;
+  private String sourceCode;
   private boolean enabled = true;
 
   /**
@@ -286,6 +287,13 @@ public abstract class ComponentModel {
   }
 
   /**
+   * @return the source code associated with this component.
+   */
+  public String getSourceCode() {
+    return sourceCode;
+  }
+
+  /**
    * Builder to create instances of {@code ComponentModel}.
    */
   public static class Builder {
@@ -410,6 +418,16 @@ public abstract class ComponentModel {
     public Builder setStartColumn(int startColumn) {
       checkIsNotBuildingFromRootComponentModel("startColumn");
       this.model.startColumn = startColumn;
+      return this;
+    }
+
+    /**
+     * @param sourceCode the source code associated with this component.
+     * @return the builder.
+     */
+    public Builder setSourceCode(String sourceCode) {
+      checkIsNotBuildingFromRootComponentModel("sourceCode");
+      this.model.sourceCode = sourceCode;
       return this;
     }
 

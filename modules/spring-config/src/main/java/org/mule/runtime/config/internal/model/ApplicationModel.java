@@ -103,7 +103,6 @@ import java.util.function.Consumer;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
-import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -694,15 +693,6 @@ public class ApplicationModel {
     return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 
-  /**
-   * @param element element which was the source of the {@code ComponentModel}.
-   * @return the {@code ComponentModel} created from the element.
-   */
-  // TODO MULE-9638: remove once the old parsing mechanism is not needed anymore
-  public ComponentModel findComponentDefinitionModel(Node element) {
-    return innerFindComponentDefinitionModel(element, muleComponentModels);
-  }
-
   public Optional<ComponentModel> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
     if (muleComponentModels.isEmpty()) {
       return empty();
@@ -944,10 +934,9 @@ public class ApplicationModel {
   private void validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice() {
     executeOnEveryMuleComponentTree(component -> {
       if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)) {
-        Node componentNode = ComponentCustomAttributeRetrieve.from(component).getNode();
         if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
-            && !componentNode.getParentNode().getLocalName().equals(ERROR_HANDLER)
-            && !componentNode.getParentNode().getLocalName().equals(MULE_ROOT_ELEMENT)) {
+            && !component.getParent().getIdentifier().getName().equals(ERROR_HANDLER)
+            && !component.getParent().getIdentifier().getName().equals(MULE_ROOT_ELEMENT)) {
           throw new MuleRuntimeException(
                                          createStaticMessage("Only handlers within an error-handler can have when attribute specified"));
         }
@@ -1015,19 +1004,6 @@ public class ApplicationModel {
     component.getInnerComponents().forEach((innerComponent) -> {
       executeOnComponentTree(innerComponent, task);
     });
-  }
-
-  private ComponentModel innerFindComponentDefinitionModel(Node element, List<ComponentModel> componentModels) {
-    for (ComponentModel componentModel : componentModels) {
-      if (ComponentCustomAttributeRetrieve.from(componentModel).getNode().equals(element)) {
-        return componentModel;
-      }
-      ComponentModel childComponentModel = innerFindComponentDefinitionModel(element, componentModel.getInnerComponents());
-      if (childComponentModel != null) {
-        return childComponentModel;
-      }
-    }
-    return null;
   }
 
   private void validateSingleElementsExistence() {

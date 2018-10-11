@@ -84,12 +84,11 @@ import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
-import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
-import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor;
 import org.mule.runtime.dsl.api.xml.parser.XmlParsingConfiguration;
+import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -108,7 +107,6 @@ import com.google.common.collect.Sets;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -123,10 +121,8 @@ import java.util.stream.Collectors;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -384,33 +380,17 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private ComponentModel getModuleComponentModel(URL resource, Document moduleDocument, Set<ExtensionModel> extensions) {
-    ConfigResource moduleConfigResource = createConfigResourceFromModuleDocument(resource, moduleDocument);
-    List<ConfigFile> configFiles =
-        XmlConfigurationProcessor.processXmlConfiguration(createXmlParsingConfiguration(moduleConfigResource, extensions));
-    if (configFiles.isEmpty()) {
+    XmlApplicationParser xmlApplicationParser =
+        new XmlApplicationParser(XmlNamespaceInfoProviderSupplier.createFromExtensionModels(extensions, Optional.empty()));
+    Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
+    if (!parseModule.isPresent()) {
+      // This happens in org.mule.runtime.config.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
-    if (configFiles.size() > 1) {
-      throw new IllegalArgumentException(format("Modules only support a single file '%s'", resource.getFile()));
-    }
-    final ConfigLine configLine = configFiles.get(0).getConfigLines().get(0);
+    final ConfigLine configLine = parseModule.get();
     final ConfigurationPropertiesResolver externalPropertiesResolver = getConfigurationPropertiesResolver(configLine);
     final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
     return componentModelReader.extractComponentDefinitionModel(configLine, modulePath);
-  }
-
-  private ConfigResource createConfigResourceFromModuleDocument(URL resource, Document moduleDocument) {
-    try {
-      DOMSource domSource = new DOMSource(moduleDocument);
-      StringWriter writer = new StringWriter();
-      StreamResult result = new StreamResult(writer);
-      TransformerFactory tf = TransformerFactory.newInstance();
-      Transformer transformer = tf.newTransformer();
-      transformer.transform(domSource, result);
-      return new ConfigResource(resource.getFile(), new ByteArrayInputStream(writer.toString().getBytes()));
-    } catch (TransformerException e) {
-      throw new MuleRuntimeException(e);
-    }
   }
 
   private XmlParsingConfiguration createXmlParsingConfiguration(ConfigResource moduleConfigResource,

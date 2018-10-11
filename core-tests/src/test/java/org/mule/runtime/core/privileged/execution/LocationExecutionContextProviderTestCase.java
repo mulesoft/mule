@@ -9,7 +9,7 @@ package org.mule.runtime.core.privileged.execution;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.getSourceXML;
 import org.mule.runtime.api.component.Component;
 import org.mule.tck.junit4.AbstractMuleTestCase;

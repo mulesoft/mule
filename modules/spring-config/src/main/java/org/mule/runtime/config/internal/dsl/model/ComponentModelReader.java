@@ -10,8 +10,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.model.ApplicationModel.POLICY_ROOT_ELEMENT;
-import static org.mule.runtime.config.internal.model.ComponentCustomAttributeStore.to;
-import static org.mule.runtime.dsl.internal.xml.parser.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -47,8 +45,14 @@ public class ComponentModelReader {
         .setTextContent(resolveValueIfIsPlaceHolder(configLine.getTextContent()))
         .setConfigFileName(configFileName)
         .setLineNumber(configLine.getLineNumber())
-        .setStartColumn(configLine.getStartColumn());
-    to(builder).addNode(from(configLine).getNode());
+        .setStartColumn(configLine.getStartColumn())
+        .setSourceCode(configLine.getSourceCode());
+
+    configLine.getCustomAttributes()
+        .forEach((key, value) -> {
+          builder.addCustomAttribute(key, value);
+        });
+
     for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
       builder.addParameter(simpleConfigAttribute.getName(), resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()),
                            simpleConfigAttribute.isValueFromSchema());

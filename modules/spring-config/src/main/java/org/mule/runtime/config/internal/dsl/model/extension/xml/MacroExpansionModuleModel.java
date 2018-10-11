@@ -143,15 +143,15 @@ public class MacroExpansionModuleModel {
   }
 
   /**
-   * Returns the rootest flow/subflow/munit:test/etc.'s name for the module chain that will be macro expanded.
-   * By default, it will assume it's a flow or even an already macro expanded element, but if not it will ask for the parent
-   * component model, making any scope (such as foreach, async, etc.) look for the flow in which is contained.
+   * Returns the rootest flow/subflow/munit:test/etc.'s name for the module chain that will be macro expanded. By default, it will
+   * assume it's a flow or even an already macro expanded element, but if not it will ask for the parent component model, making
+   * any scope (such as foreach, async, etc.) look for the flow in which is contained.
    *
    * @param containerComponentModel container element to look for the root element that contains it
    * @param operationModel the operation just to log if something went bad
    * @return the name of the root element that contains the {@code containerComponentModel}. Not null.
    * @throws MuleRuntimeException if it cannot find the root element. It should never happen, as the macro expansion for
-   * operations ONLY happens when being consumed from within a flow/subflow/etc.
+   *         operations ONLY happens when being consumed from within a flow/subflow/etc.
    */
   private String calculateContainerRootName(ComponentModel containerComponentModel, OperationModel operationModel) {
     String nameAttribute;
@@ -189,7 +189,7 @@ public class MacroExpansionModuleModel {
   }
 
   private void addDefaultGlobalElements(Set<String> moduleGlobalElementsNames) {
-    //scenario where it will macro expand the default elements of a <module/>
+    // scenario where it will macro expand the default elements of a <module/>
     String defaultGlobalElementSuffix = defaultGlobalElementName().get();
     ComponentModel rootComponentModel = applicationModel.getRootComponentModel();
     List<ComponentModel> globalElements =
@@ -206,7 +206,7 @@ public class MacroExpansionModuleModel {
   }
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
-    //scenario where it will macro expand as many times as needed all the references of the smart connector configurations
+    // scenario where it will macro expand as many times as needed all the references of the smart connector configurations
     applicationModel.executeOnEveryMuleComponentTree(muleRootComponentModel -> {
       HashMap<ComponentModel, List<ComponentModel>> componentModelsToReplaceByIndex = new HashMap<>();
       for (ComponentModel configRefModel : muleRootComponentModel.getInnerComponents()) {
@@ -298,6 +298,7 @@ public class MacroExpansionModuleModel {
         getParameterChild(parametersMap, "module-operation-parameters", "module-operation-parameter-entry");
     processorChainBuilder.addChildComponentModel(propertiesComponentModel);
     processorChainBuilder.addChildComponentModel(parametersComponentModel);
+    processorChainBuilder.setSourceCode(operationRefModel.getSourceCode());
 
     for (ComponentModel bodyProcessor : bodyProcessors) {
       ComponentModel childMPcomponentModel =
@@ -330,12 +331,14 @@ public class MacroExpansionModuleModel {
   /**
    * Looks for the value of the {@link #MODULE_OPERATION_CONFIG_REF} in the current <operation/>, if not found then tries to
    * fallback to the default global element name. See {@link #defaultGlobalElementName()} method.
+   * 
    * @param operationRefModel <operaton/> to lookup the expected string reference, if exists.
    * @return the suffix needed to be used when macro expanding elements, or {@link Optional#empty()} otherwise.
    */
   private Optional<String> getConfigRefName(ComponentModel operationRefModel) {
     return operationRefModel.getParameters().containsKey(MODULE_OPERATION_CONFIG_REF)
-        ? of(operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF)) : defaultGlobalElementName();
+        ? of(operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF))
+        : defaultGlobalElementName();
   }
 
   /**
@@ -643,7 +646,8 @@ public class MacroExpansionModuleModel {
   private Optional<ConfigurationModel> looForConfiguration(ComponentModel componentModel) {
     final ComponentIdentifier identifier = componentModel.getIdentifier();
     return identifier.getNamespace().equals(extensionModel.getXmlDslModel().getPrefix())
-        ? extensionModel.getConfigurationModel(identifier.getName()) : empty();
+        ? extensionModel.getConfigurationModel(identifier.getName())
+        : empty();
   }
 
   /**
