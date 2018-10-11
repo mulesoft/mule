@@ -723,7 +723,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         try
         {
-            return getPayloadAsString();
+            return new String(getPayloadAsBytes(), getEncoding());
         }
         catch (Exception e)
         {
