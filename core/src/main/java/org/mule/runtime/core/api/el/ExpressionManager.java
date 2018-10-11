@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.el;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -234,5 +235,34 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    */
   String parseLogTemplate(String template, CoreEvent event, ComponentLocation componentLocation, BindingContext bindingContext)
       throws ExpressionRuntimeException;
+
+  /**
+   * Returns an object that caches computation results. Provides better performance when evaluation multiple expressions on the
+   * same bindings.
+   * <p>
+   * Sessions obtained through this method have to be explicitly {@link ExpressionLanguageSession#close() closed}.
+   *
+   * @since 4.2
+   *
+   * @param context the current dynamic binding context to consider
+   * @return a session associated to the provided {@code context}
+   */
+  @Override
+  ExpressionManagerSession openSession(BindingContext context);
+
+  /**
+   * Returns an object that caches computation results. Provides better performance when evaluation multiple expressions on the
+   * same bindings.
+   * <p>
+   * Sessions obtained through this method have to be explicitly {@link ExpressionLanguageSession#close() closed}.
+   *
+   * @since 4.2
+   *
+   * @param componentLocation the location of the component where the event is being processed
+   * @param event the current event being processed
+   * @param context the current dynamic binding context to consider
+   * @return a session associated to the provided {@code context}
+   */
+  ExpressionManagerSession openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context);
 
 }

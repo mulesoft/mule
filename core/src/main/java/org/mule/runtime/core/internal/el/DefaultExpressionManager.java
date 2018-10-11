@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.el;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
@@ -30,6 +31,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
@@ -67,7 +69,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private StreamingManager streamingManager;
   private Registry registry;
 
-  private ExpressionLanguageAdaptorHandler expressionLanguage;
+  private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private boolean melDefault;
@@ -81,9 +83,14 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       MVELExpressionLanguage mvelExpressionLanguage = null;
       if (registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
         mvelExpressionLanguage = registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
+
+        ExpressionLanguageAdaptorHandler exprLangAdaptorHandler =
+            new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
+        this.melDefault = exprLangAdaptorHandler.isMelDefault();
+        this.expressionLanguage = exprLangAdaptorHandler;
+      } else {
+        this.expressionLanguage = dwExpressionLanguage;
       }
-      this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
-      this.melDefault = expressionLanguage.isMelDefault();
 
       BindingContext.Builder contextBuilder = BindingContext.builder();
 
@@ -219,7 +226,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                           expression);
   }
 
-  protected boolean resolveBoolean(Object result, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue, String expression) {
+  protected static boolean resolveBoolean(Object result, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue,
+                                          String expression) {
     if (result == null) {
       return nullReturnsTrue;
     } else {
@@ -386,6 +394,18 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
    */
   public static boolean hasDwExpression(String expression) {
     return expression.contains(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX + PREFIX_EXPR_SEPARATOR);
+  }
+
+  @Override
+  public ExpressionManagerSession openSession(BindingContext context) {
+    return new DefaultExpressionManagerSession(expressionLanguage.openSession(null, null, context),
+                                               currentThread().getContextClassLoader());
+  }
+
+  @Override
+  public ExpressionManagerSession openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context) {
+    return new DefaultExpressionManagerSession(expressionLanguage.openSession(componentLocation, event, context),
+                                               currentThread().getContextClassLoader());
   }
 
   @Inject

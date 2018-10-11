@@ -23,6 +23,7 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
 import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -39,6 +40,7 @@ import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -413,6 +415,30 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     assertThat((String) typedValue.getValue(), equalTo(TEST_MESSAGE));
     assertThat(typedValue.getDataType(), like(String.class, JSON, UTF_16));
   }
+
+  @Test
+  public void sessionWithEventAndLocation() throws MuleException {
+    ExpressionLanguageSession session = mvel.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT);
+
+    assertThat(session.evaluate("payload").getValue(), is("test"));
+    assertThat(session.evaluate("flow.name").getValue(), is("test"));
+  }
+
+  @Test
+  public void sessionWithoutLocation() throws MuleException {
+    ExpressionLanguageSession session = mvel.openSession(null, testEvent(), NULL_BINDING_CONTEXT);
+
+    assertThat(session.evaluate("payload").getValue(), is("test"));
+  }
+
+  @Test
+  public void sessionWithEventBindingContextAndLocation() throws MuleException {
+    ExpressionLanguageSession session = mvel.openSession(TEST_CONNECTOR_LOCATION, testEvent(), testEvent().asBindingContext());
+
+    assertThat(session.evaluate("payload").getValue(), is("test"));
+    assertThat(session.evaluate("flow.name").getValue(), is("test"));
+  }
+
 
   protected Object evaluate(String expression) {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {

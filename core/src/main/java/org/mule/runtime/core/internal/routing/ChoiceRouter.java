@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
@@ -28,10 +31,12 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
 
   @Override
   protected Optional<Processor> selectProcessor(CoreEvent event) {
-    return getConditionalMessageProcessors().stream()
-        .filter(cmp -> expressionManager.evaluateBoolean(cmp.getExpression(), event, getLocation(), false, true))
-        .findFirst()
-        .map(cmp -> cmp.getMessageProcessor());
+    try (ExpressionManagerSession emSession = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT)) {
+      return getConditionalMessageProcessors().stream()
+          .filter(cmp -> emSession.evaluateBoolean(cmp.getExpression(), false, true))
+          .findFirst()
+          .map(cmp -> cmp.getMessageProcessor());
+    }
   }
 
   @Override

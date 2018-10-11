@@ -58,6 +58,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -387,5 +388,15 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
 
     assertThat(expressionManager.isValid("#[mel:1]"), is(true));
     expressionManager.evaluate("#[mel:1]");
+  }
+
+  @Test
+  public void session() throws MuleException {
+    Object object = new Object();
+    BindingContext context = builder().addBinding(MY_VAR, new TypedValue(object, OBJECT)).build();
+
+    ExpressionManagerSession session = expressionManager.openSession(context);
+
+    assertThat(session.evaluate("#[myVar]").getValue(), equalTo(object));
   }
 }

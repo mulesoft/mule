@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -354,20 +355,35 @@ public final class StreamingUtils {
    * @param event            the current event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
+   *
+   * @deprecated Use {@link #updateTypedValueWithCursorProvider(TypedValue, StreamingManager)}.
    */
+  @Deprecated
   public static TypedValue updateTypedValueWithCursorProvider(final TypedValue value, final CoreEvent event,
                                                               final StreamingManager streamingManager) {
     if (event == null) {
       return value;
     } else {
-      Object payload = value.getValue();
-      if (payload instanceof CursorStream) {
-        CursorProvider provider = ((CursorStream) value.getValue()).getProvider();
-        DataType dataType = DataType.builder(value.getDataType()).type(provider.getClass()).build();
-        return new TypedValue(provider, dataType, value.getByteLength());
-      } else {
-        return value;
-      }
+      return updateTypedValueWithCursorProvider(value, streamingManager);
+    }
+  }
+
+  /**
+   * Updates the {@link Cursor} value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
+   *
+   * @param value            the typed value to update
+   * @param streamingManager the streaming manager
+   * @return updated {@link TypedValue instance}
+   */
+  public static TypedValue updateTypedValueWithCursorProvider(final TypedValue value,
+                                                              final StreamingManager streamingManager) {
+    Object payload = value.getValue();
+    if (payload instanceof CursorStream) {
+      CursorProvider provider = ((CursorStream) payload).getProvider();
+      DataType dataType = DataType.builder(value.getDataType()).type(provider.getClass()).build();
+      return new TypedValue(provider, dataType, value.getByteLength());
+    } else {
+      return value;
     }
   }
 
