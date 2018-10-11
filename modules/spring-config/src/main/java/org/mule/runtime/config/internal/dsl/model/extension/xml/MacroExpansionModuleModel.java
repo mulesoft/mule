@@ -626,6 +626,7 @@ public class MacroExpansionModuleModel {
     componentModelOrigin.getConfigFileName().ifPresent(operationReplacementModel::setConfigFileName);
     componentModelOrigin.getLineNumber().ifPresent(operationReplacementModel::setLineNumber);
     componentModelOrigin.getStartColumn().ifPresent(operationReplacementModel::setStartColumn);
+    operationReplacementModel.setSourceCode(componentModelOrigin.getSourceCode());
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {
       child.setParent(componentModel);
