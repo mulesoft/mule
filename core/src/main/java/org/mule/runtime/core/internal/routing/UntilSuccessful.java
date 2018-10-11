@@ -103,7 +103,11 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
       Throwable cause = getMessagingExceptionCause(throwable);
-      return new MessagingException(event,
+      CoreEvent exceptionEvent = event;
+      if (throwable instanceof MessagingException) {
+        exceptionEvent = ((MessagingException) throwable).getEvent();
+      }
+      return new MessagingException(exceptionEvent,
                                     new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
                                                                                           cause.getMessage()),
                                                                       cause, this),
