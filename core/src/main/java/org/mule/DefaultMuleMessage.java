@@ -727,7 +727,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         catch (Exception e)
         {
-            return  "[Message could not be converted to string]";
+            return  "[Message could not be converted for logging]";
         }
     }
 
