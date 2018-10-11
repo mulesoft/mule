@@ -95,7 +95,9 @@ import java.util.function.Function;
 import javax.annotation.processing.ProcessingEnvironment;
 
 import com.google.testing.compile.CompilationRule;
+import io.qameta.allure.Issue;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -428,7 +430,10 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(itemType, is(instanceOf(StringType.class)));
   }
 
+
   @Test
+  @Ignore("Enable this test once MULE-15837 is in place")
+  @Issue("MULE-15837")
   public void getByteArrayOutputType() throws Exception {
     OperationElement operation = getMethod("byteArray");
     MetadataType metadataType = operation.getOperationReturnMetadataType();
