@@ -11,7 +11,7 @@ import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
- * Exception thrown when a reference to a server fails.
+ * Exception thrown when a reference to a client fails.
  *
  * @since 4.1.5 as Experimental
  */

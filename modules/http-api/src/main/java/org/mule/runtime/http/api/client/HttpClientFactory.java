@@ -25,11 +25,11 @@ public interface HttpClientFactory {
 
   /**
    * Allows to retrieve a previously created {@link HttpClient}, if used from the same context. Keep in mind lifecycle changes to
-   * the retrieved instance won't take effect since only the owner of the server can modify it's status.
+   * the retrieved instance won't take effect since only the owner of the client can modify it's status.
    *
    * @param name the name the desired {@link HttpClient} was given when created (see {@link HttpClientConfiguration#getName()})
-   * @return the server found
-   * @throws ClientNotFoundException when the desired server was not found
+   * @return the client found
+   * @throws ClientNotFoundException when the desired client was not found
    * @since 4.1.5 as experimental.
    */
   @Experimental

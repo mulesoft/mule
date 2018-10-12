@@ -15,12 +15,12 @@ import org.mule.api.annotation.Experimental;
 public enum WebSocketProtocol {
 
   /**
-   * {@code ws} protocol. Used then the Upgrade request was sent over standard HTTP
+   * {@code ws} protocol. Used when the Upgrade request was sent over standard HTTP
    */
   WS("ws"),
 
   /**
-   * {@code wss} protocol. Used then the Upgrade request was sent over standard HTTPS
+   * {@code wss} protocol. Used when the Upgrade request was sent over standard HTTPS
    */
   WSS("wss");
 
