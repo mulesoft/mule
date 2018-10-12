@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 public class BundlePluginDependenciesResolver implements PluginDependenciesResolver {
 
   private static final Logger logger = LoggerFactory.getLogger(BundlePluginDependenciesResolver.class);
+  protected static final String MULE_HTTP_CONNECTOR_ARTIFACT_ID = "mule-http-connector";
+  protected static final String MULE_HTTP_CONNECTOR_GROUP_ID = "org.mule.modules";
 
   private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
 
@@ -82,8 +84,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
 
       if (!pluginDescriptor.isPresent()) {
         filteredPluginDescriptors.add(appPluginDescriptor);
-      } else if (!isCompatibleVersion(pluginDescriptor.get().getBundleDescriptor().getVersion(),
-                                      appPluginDescriptor.getBundleDescriptor().getVersion())) {
+      } else if (pluginDescriptor.get().getBundleDescriptor().getArtifactId().equals(MULE_HTTP_CONNECTOR_ARTIFACT_ID) &&
+          pluginDescriptor.get().getBundleDescriptor().getGroupId().equals(MULE_HTTP_CONNECTOR_GROUP_ID)
+          && !isCompatibleVersion(pluginDescriptor.get().getBundleDescriptor().getVersion(),
+                                  appPluginDescriptor.getBundleDescriptor().getVersion())) {
         throw new IllegalStateException(
                                         format("Incompatible version of plugin '%s' (%s:%s) found. Artifact requires version '%s' but context provides version '%s'",
                                                appPluginDescriptor.getName(),
