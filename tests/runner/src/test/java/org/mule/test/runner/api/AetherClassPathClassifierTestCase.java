@@ -95,6 +95,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   private Artifact rootArtifact;
   private Artifact serviceArtifact;
+  private Artifact serviceArtifactV2;
   private Dependency loggingDep;
   private Dependency fooCoreDep;
   private Dependency fooToolsArtifactDep;
@@ -103,6 +104,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   private Dependency derbyDriverDep;
 
   private Dependency fooServiceDep;
+  private Dependency fooServiceDepV2;
   private List<Dependency> directDependencies;
 
   @Before
@@ -117,8 +119,10 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     this.fooTestsSupportDep = new Dependency(new DefaultArtifact("org.foo.tests:foo-tests-support:1.0-SNAPSHOT"), TEST);
     this.derbyDriverDep = new Dependency(new DefaultArtifact("org.apache.derby:derby:10.11.1.1"), TEST);
     this.guavaDep = new Dependency(new DefaultArtifact("org.google:guava:18.0"), COMPILE);
-    serviceArtifact = new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0-SNAPSHOT");
+    serviceArtifact = new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0.1-SNAPSHOT");
     this.fooServiceDep = new Dependency(serviceArtifact, PROVIDED);
+    serviceArtifactV2 = new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0.0-SNAPSHOT");
+    this.fooServiceDepV2 = new Dependency(serviceArtifactV2, PROVIDED);
 
     this.dependencyResolver = mock(DependencyResolver.class);
     this.context = mock(ClassPathClassifierContext.class);
@@ -341,7 +345,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   @Test
   public void serviceClassification() throws Exception {
     this.directDependencies =
-        newArrayList(fooCoreDep, fooToolsArtifactDep, fooTestsSupportDep, derbyDriverDep, guavaDep, fooServiceDep);
+        newArrayList(fooCoreDep, fooToolsArtifactDep, fooTestsSupportDep, derbyDriverDep, guavaDep, fooServiceDep,
+                     fooServiceDepV2);
     when(dependencyResolver.getDirectDependencies(rootArtifact)).thenReturn(directDependencies);
 
     ArtifactDescriptorResult artifactDescriptorResult = mock(ArtifactDescriptorResult.class);
