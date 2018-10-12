@@ -86,6 +86,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         filteredPluginDescriptors.add(appPluginDescriptor);
       } else {
         BundleDescriptor foundPluginBundleDescriptor = pluginDescriptor.get().getBundleDescriptor();
+        // TODO MULE-15842: remove hardcoded HTTP artifact GAs.
         if (foundPluginBundleDescriptor.getArtifactId().equals(MULE_HTTP_CONNECTOR_ARTIFACT_ID) &&
             foundPluginBundleDescriptor.getGroupId().equals(MULE_HTTP_CONNECTOR_GROUP_ID)
             && !isCompatibleVersion(foundPluginBundleDescriptor.getVersion(),
