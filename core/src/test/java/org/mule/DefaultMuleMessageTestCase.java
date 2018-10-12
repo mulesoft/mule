@@ -9,7 +9,10 @@ package org.mule;
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static java.nio.charset.StandardCharsets.UTF_16BE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -29,6 +32,8 @@ import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -39,12 +44,16 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsArray;
+import org.hamcrest.collection.IsArrayContaining;
 import org.junit.Test;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
 
     public static final String FOO_PROPERTY = "foo";
+    public static final String TEST_PAYLOAD = "aTestPayload";
 
     //
     // corner cases/errors
@@ -538,5 +547,32 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = createMuleMessage();
         message.setProperty(CONTENT_TYPE_PROPERTY, new Object());
+    }
+
+    @Test
+    public void consumablePayloadConvertedToByteArrayWhenAskedForLogging()
+    {
+        MuleMessage message = createMuleMessage();
+
+        InputStream testConsumablePayload = new ByteArrayInputStream(TEST_PAYLOAD.getBytes());
+        message.setPayload(testConsumablePayload);
+
+        String payloadForLogging = message.getPayloadForLogging();
+
+        assertThat(payloadForLogging, isA(String.class));
+        assertThat(message.getPayload(), instanceOf(byte[].class));
+    }
+
+    @Test
+    public void notConsumablePayloadRemainsUnchangedInMessage()
+    {
+        MuleMessage message = createMuleMessage();
+
+        message.setPayload(TEST_PAYLOAD);
+
+        String payloadForLogging = message.getPayloadForLogging();
+
+        assertThat(payloadForLogging, isA(String.class));
+        assertThat(message.getPayload(), instanceOf(String.class));
     }
 }
