@@ -94,7 +94,6 @@ import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.internal.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.factories.OnErrorFactoryBean;
-import org.mule.runtime.config.internal.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.internal.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.internal.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.factories.TryProcessorFactoryBean;
@@ -142,7 +141,6 @@ import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.internal.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
-import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
@@ -238,7 +236,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String CUSTOM_PROCESSOR = "custom-processor";
   private static final String CLASS_ATTRIBUTE = "class";
   private static final String SUB_FLOW = "sub-flow";
-  private static final String RESPONSE = "response";
   private static final String FLOW = "flow";
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
@@ -364,11 +361,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).asPrototype().build());
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(RESPONSE).withTypeDefinition(fromType(ResponseMessageProcessorAdapter.class))
-            .withObjectFactoryType(ResponseMessageProcessorsFactoryBean.class)
-            .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(FLOW).withTypeDefinition(fromType(Flow.class))
             .withObjectFactoryType(DefaultFlowFactoryBean.class)

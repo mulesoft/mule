@@ -72,7 +72,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory;
@@ -655,52 +654,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   }
 
   @Test
-  public void testResponseProcessor() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    final ResponseMessageProcessorAdapter responseMessageProcessorAdapter =
-        new ResponseMessageProcessorAdapter(getAppendingMP("3"));
-    responseMessageProcessorAdapter.setMuleContext(muleContext);
-    builder.chain(getAppendingMP("1"), responseMessageProcessorAdapter, getAppendingMP("2"));
-    assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("0123"));
-  }
-
-  @Test
-  public void testResponseProcessorInNestedChain() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    final ResponseMessageProcessorAdapter responseMessageProcessorAdapter =
-        new ResponseMessageProcessorAdapter(getAppendingMP("c"));
-    responseMessageProcessorAdapter.setMuleContext(muleContext);
-    builder.chain(
-                  getAppendingMP("1"), newChain(empty(), getAppendingMP("a"),
-                                                responseMessageProcessorAdapter, getAppendingMP("b")),
-                  getAppendingMP("2"));
-    assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01abc2"));
-  }
-
-  @Test
-  public void testNestedResponseProcessor() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    final ResponseMessageProcessorAdapter innerResponseMessageProcessorAdapter =
-        new ResponseMessageProcessorAdapter(getAppendingMP("4"));
-    final ResponseMessageProcessorAdapter responseMessageProcessorAdapter =
-        new ResponseMessageProcessorAdapter(newChain(empty(), innerResponseMessageProcessorAdapter, getAppendingMP("3")));
-    builder.chain(getAppendingMP("1"), responseMessageProcessorAdapter, getAppendingMP("2"));
-    process(builder.build(), getTestEventUsingFlow("0"));
-    assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01234"));
-  }
-
-  @Test
-  public void testNestedResponseProcessorEndOfChain() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    final MessageProcessorChain chain = newChain(empty(), singletonList(getAppendingMP("1")));
-    final ResponseMessageProcessorAdapter responseMessageProcessorAdapter = new ResponseMessageProcessorAdapter(chain);
-    responseMessageProcessorAdapter.setMuleContext(muleContext);
-    builder.chain(responseMessageProcessorAdapter);
-    process(builder.build(), getTestEventUsingFlow("0"));
-    assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01"));
-  }
-
-  @Test
   public void testAll() throws Exception {
     createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
@@ -761,15 +714,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void testExceptionBetween() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("2"));
-    expectedException.expect(is(illegalStateException));
-    process(builder.build(), getTestEventUsingFlow("0"));
-  }
-
-  @Test
-  public void testExceptionInResponse() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.chain(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor(illegalStateException)),
-                  getAppendingMP("1"));
     expectedException.expect(is(illegalStateException));
     process(builder.build(), getTestEventUsingFlow("0"));
   }
