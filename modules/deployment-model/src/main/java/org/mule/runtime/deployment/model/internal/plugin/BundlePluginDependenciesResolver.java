@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 public class BundlePluginDependenciesResolver implements PluginDependenciesResolver {
 
   private static final Logger logger = LoggerFactory.getLogger(BundlePluginDependenciesResolver.class);
+  protected static final String MULE_HTTP_CONNECTOR_ARTIFACT_ID = "mule-http-connector";
+  protected static final String MULE_HTTP_CONNECTOR_GROUP_ID = "org.mule.modules";
 
   private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
 
@@ -82,15 +84,21 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
 
       if (!pluginDescriptor.isPresent()) {
         filteredPluginDescriptors.add(appPluginDescriptor);
-      } else if (!isCompatibleVersion(pluginDescriptor.get().getBundleDescriptor().getVersion(),
-                                      appPluginDescriptor.getBundleDescriptor().getVersion())) {
-        throw new IllegalStateException(
-                                        format("Incompatible version of plugin '%s' (%s:%s) found. Artifact requires version '%s' but context provides version '%s'",
-                                               appPluginDescriptor.getName(),
-                                               appPluginDescriptor.getBundleDescriptor().getGroupId(),
-                                               appPluginDescriptor.getBundleDescriptor().getArtifactId(),
-                                               appPluginDescriptor.getBundleDescriptor().getVersion(),
-                                               pluginDescriptor.get().getBundleDescriptor().getVersion()));
+      } else {
+        BundleDescriptor foundPluginBundleDescriptor = pluginDescriptor.get().getBundleDescriptor();
+        // TODO MULE-15842: remove hardcoded HTTP artifact GAs.
+        if (foundPluginBundleDescriptor.getArtifactId().equals(MULE_HTTP_CONNECTOR_ARTIFACT_ID) &&
+            foundPluginBundleDescriptor.getGroupId().equals(MULE_HTTP_CONNECTOR_GROUP_ID)
+            && !isCompatibleVersion(foundPluginBundleDescriptor.getVersion(),
+                                    appPluginDescriptor.getBundleDescriptor().getVersion())) {
+          throw new IllegalStateException(
+                                          format("Incompatible version of plugin '%s' (%s:%s) found. Artifact requires version '%s' but context provides version '%s'",
+                                                 appPluginDescriptor.getName(),
+                                                 appPluginDescriptor.getBundleDescriptor().getGroupId(),
+                                                 appPluginDescriptor.getBundleDescriptor().getArtifactId(),
+                                                 appPluginDescriptor.getBundleDescriptor().getVersion(),
+                                                 foundPluginBundleDescriptor.getVersion()));
+        }
       }
     }
     return filteredPluginDescriptors;

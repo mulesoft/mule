@@ -17,12 +17,15 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_ARTIFACT_ID;
+import static org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_GROUP_ID;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -31,6 +34,9 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -127,7 +133,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   private ArtifactDescriptorFactory artifactDescriptorFactory;
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
   @Before
   public void setUp() throws Exception {
@@ -383,6 +389,34 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     this.expectedException.expect(DuplicateExportedPackageException.class);
     this.expectedException.expectMessage(expectedErrorMessage);
     dependenciesResolver.resolve(emptySet(), pluginDescriptors);
+  }
+
+  @Test
+  public void providedPluginsHaveOldestVersionOfSamePlugin() {
+    dependenciesResolver.resolve(ImmutableSet.of(bazPlugin), ImmutableList.of(latestBazPlugin));
+  }
+
+  @Test
+  public void providedPluginsHaveOldestVersionOfSameHttpPlugin() {
+    BundleDescriptor httpDescriptor1_0 = new BundleDescriptor.Builder()
+        .setGroupId(MULE_HTTP_CONNECTOR_GROUP_ID)
+        .setArtifactId(MULE_HTTP_CONNECTOR_ARTIFACT_ID)
+        .setVersion("1.0.0")
+        .build();
+    BundleDescriptor httpDescriptor1_1 = new BundleDescriptor.Builder()
+        .setGroupId(MULE_HTTP_CONNECTOR_GROUP_ID)
+        .setArtifactId(MULE_HTTP_CONNECTOR_ARTIFACT_ID)
+        .setVersion("1.1.0")
+        .build();
+    ArtifactPluginDescriptor httpPluginDescriptor1_0 = newArtifactPluginDescriptor("HTTP");
+    httpPluginDescriptor1_0.setBundleDescriptor(httpDescriptor1_0);
+    ArtifactPluginDescriptor httpPluginDescriptor1_1 = newArtifactPluginDescriptor("HTTP");
+    httpPluginDescriptor1_1.setBundleDescriptor(httpDescriptor1_1);
+
+    expectedException.expect(IllegalStateException.class);
+    expectedException
+        .expectMessage("Incompatible version of plugin 'HTTP' (org.mule.modules:mule-http-connector) found. Artifact requires version '1.1.0' but context provides version '1.0.0'");
+    dependenciesResolver.resolve(ImmutableSet.of(httpPluginDescriptor1_0), ImmutableList.of(httpPluginDescriptor1_1));
   }
 
   private Set<String> getBarExportedPackages() {
