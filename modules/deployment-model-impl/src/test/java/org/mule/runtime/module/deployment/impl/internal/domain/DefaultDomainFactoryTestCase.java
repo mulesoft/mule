@@ -13,19 +13,13 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -36,6 +30,12 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilde
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
@@ -60,7 +60,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   @Before
   public void setUp() throws Exception {
-    when(pluginDependenciesResolver.resolve(argThat(is(emptySet())), anyList())).thenReturn(emptyList());
+    when(pluginDependenciesResolver.resolve(argThat(is(emptySet())), anyList(), anyBoolean())).thenReturn(emptyList());
   }
 
   @Test

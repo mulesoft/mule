@@ -158,7 +158,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, barPlugin, fooPlugin);
   }
@@ -170,7 +170,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, fooPlugin, barPlugin);
   }
@@ -182,7 +182,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, fooPlugin, barPlugin);
   }
@@ -199,7 +199,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, updatedFooPlugin, barPlugin);
   }
@@ -216,7 +216,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, updatedFooPlugin, barPlugin);
   }
@@ -234,7 +234,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, updatedFooPlugin, barPlugin);
   }
@@ -248,7 +248,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder()
         .dependingOn(singleton(createBundleDependency(FOO_BUNDLE_DESCRIPTOR))).build());
 
-    dependenciesResolver.resolve(emptySet(), pluginDescriptors);
+    dependenciesResolver.resolve(emptySet(), pluginDescriptors, true);
   }
 
 
@@ -262,7 +262,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder()
         .dependingOn(singleton(createBundleDependency(majorUpdatedFooPlugin.getBundleDescriptor()))).build());
 
-    dependenciesResolver.resolve(emptySet(), pluginDescriptors);
+    dependenciesResolver.resolve(emptySet(), pluginDescriptors, true);
   }
 
   @Test
@@ -272,7 +272,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     expectedException.expect(PluginResolutionError.class);
     expectedException.expectMessage(format(DEPENDENCY_PROVIDER_ERROR_MESSAGE, BAR_BUNDLE_DESCRIPTOR));
-    dependenciesResolver.resolve(emptySet(), pluginDescriptors);
+    dependenciesResolver.resolve(emptySet(), pluginDescriptors, true);
   }
 
   @Test
@@ -283,7 +283,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, fooPlugin, bazPlugin, barPlugin);
   }
@@ -296,7 +296,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, fooPlugin, bazPlugin, barPlugin);
   }
@@ -314,7 +314,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, fooPlugin, bazPlugin, barPlugin);
   }
@@ -328,7 +328,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, bazPlugin, latestEchoPlugin, fooPlugin);
   }
@@ -344,7 +344,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, fooPlugin, barPlugin);
     assertPluginExportedPackages(fooPlugin, "org.foo", "org.foo.mule");
@@ -365,7 +365,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),
-                                                                                                  pluginDescriptors);
+                                                                                                  pluginDescriptors, true);
 
     assertResolvedPlugins(resolvedPluginDescriptors, fooPlugin, bazPlugin, barPlugin);
     assertPluginExportedPackages(fooPlugin, "org.foo", "org.foo.mule");
@@ -388,16 +388,22 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     this.expectedException.expect(DuplicateExportedPackageException.class);
     this.expectedException.expectMessage(expectedErrorMessage);
-    dependenciesResolver.resolve(emptySet(), pluginDescriptors);
+    dependenciesResolver.resolve(emptySet(), pluginDescriptors, true);
   }
 
   @Test
-  public void providedPluginsHaveOldestVersionOfSamePlugin() {
-    dependenciesResolver.resolve(ImmutableSet.of(bazPlugin), ImmutableList.of(latestBazPlugin));
+  public void providedPluginsHaveOldestVersionOfSamePluginInPolicy() {
+    dependenciesResolver.resolve(ImmutableSet.of(bazPlugin), ImmutableList.of(latestBazPlugin), false);
   }
 
   @Test
-  public void providedPluginsHaveOldestVersionOfSameHttpPlugin() {
+  public void providedPluginsHaveOldestVersionOfSamePluginInDomain() {
+    expectedException.expect(IllegalStateException.class);
+    dependenciesResolver.resolve(ImmutableSet.of(bazPlugin), ImmutableList.of(latestBazPlugin), true);
+  }
+
+  @Test
+  public void providedPluginsHaveOldestVersionOfSameHttpPluginInPolicy() {
     BundleDescriptor httpDescriptor1_0 = new BundleDescriptor.Builder()
         .setGroupId(MULE_HTTP_CONNECTOR_GROUP_ID)
         .setArtifactId(MULE_HTTP_CONNECTOR_ARTIFACT_ID)
@@ -416,7 +422,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     expectedException.expect(IllegalStateException.class);
     expectedException
         .expectMessage("Incompatible version of plugin 'HTTP' (org.mule.modules:mule-http-connector) found. Artifact requires version '1.1.0' but context provides version '1.0.0'");
-    dependenciesResolver.resolve(ImmutableSet.of(httpPluginDescriptor1_0), ImmutableList.of(httpPluginDescriptor1_1));
+    dependenciesResolver.resolve(ImmutableSet.of(httpPluginDescriptor1_0), ImmutableList.of(httpPluginDescriptor1_1), false);
   }
 
   private Set<String> getBarExportedPackages() {
