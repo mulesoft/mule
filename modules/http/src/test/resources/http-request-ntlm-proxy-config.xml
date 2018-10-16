@@ -10,7 +10,8 @@
         <http:ntlm-proxy host="localhost" port="${httpPort}" username="Zaphod" password="Beeblebrox" ntlmDomain="Ursa-Minor" />
     </http:request-config>
     <flow name="ntlmFlow">
-        <http:request config-ref="ntlmProxy" path="requestPath" />
+        <set-payload value="Test Message" />
+        <http:request config-ref="ntlmProxy" path="requestPath" method="POST"/>
     </flow>
 
 </mule>
