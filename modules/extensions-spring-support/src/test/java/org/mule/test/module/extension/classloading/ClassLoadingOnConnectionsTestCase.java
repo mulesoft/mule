@@ -10,6 +10,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mule.tck.util.TestConnectivityUtils.disableAutomaticTestConnectivity;
@@ -17,19 +18,20 @@ import static org.mule.test.classloading.CLNoneConnectionProvider.CONNECT;
 import static org.mule.test.classloading.CLNoneConnectionProvider.DISCONNECT;
 import static org.mule.test.classloading.CLPoolingConnectionProvider.ON_BORROW;
 import static org.mule.test.classloading.CLPoolingConnectionProvider.ON_RETURN;
+
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.classloading.api.ClassLoadingHelper;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.core.StringContains;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -69,7 +71,8 @@ public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunction
     List<ClassLoader> collect = createdClassLoaders.values().stream().distinct().collect(toList());
     assertThat(collect.size(), is(1));
     ClassLoader classLoader = collect.get(0);
-    assertThat(classLoader.toString(), containsString("classloading-extension"));
+    assertThat(classLoader.toString(), not(containsString("classloading-extension")));
+    assertThat(classLoader.toString(), containsString(".MuleApplicationClassLoader[app]@"));
     Set<String> executedPhases = createdClassLoaders.keySet();
     assertThat(executedPhases, is(hasItems(stream(phasesToExecute).map(StringContains::containsString).toArray(Matcher[]::new))));
   }
