@@ -275,8 +275,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -328,10 +328,11 @@
               "isConfigOverride": false,
               "isComponentId": false,
               "expressionSupport": "SUPPORTED",
+              "defaultValue": "false",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -371,8 +372,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -411,8 +412,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -451,8 +452,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -492,8 +493,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -532,8 +533,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -623,7 +624,7 @@
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
+                "allowsInlineDefinition": false,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
@@ -650,8 +651,8 @@
               "defaultValue": "prefix_",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -803,7 +804,7 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
+                "allowsInlineDefinition": false,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
@@ -844,8 +845,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -908,53 +909,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.function.extension.SimplePojo",
-                  "classInformation": {
-                    "classname": "org.mule.test.function.extension.SimplePojo",
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "typeAlias": {
-                    "value": "SimplePojo"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "user"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "pass"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.test.function.extension.SimplePojo"
               },
               "hasDynamicType": false,
               "required": true,
@@ -1047,8 +1002,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -1158,7 +1113,7 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
+                "allowsInlineDefinition": false,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
@@ -1184,8 +1139,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -1226,8 +1181,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -1243,70 +1198,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-                  "classInformation": {
-                    "classname": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "typeDsl": {
-                    "allowInlineDefinition": true,
-                    "allowTopLevelDefinition": true
-                  },
-                  "typeAlias": {
-                    "value": "door"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "victim",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "address",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "previous"
-                    },
-                    "model": "#..",
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1371,6 +1263,9 @@
         "description": "",
         "modelProperties": {}
       },
+      "deprecatedModel": {
+        "message": "The case of use of this function is covered within the echoWithDefault function"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1386,8 +1281,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -1429,8 +1324,8 @@
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -1455,8 +1350,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -1514,5 +1409,123 @@
     }
   ],
   "modelProperties": {},
-  "types": []
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.function.extension.SimplePojo",
+        "classInformation": {
+          "classname": "org.mule.test.function.extension.SimplePojo",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "SimplePojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "user"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "pass"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "door"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "victim",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "address",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "previous"
+          },
+          "model": "#..",
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }

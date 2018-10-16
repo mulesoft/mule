@@ -19,6 +19,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -77,6 +78,7 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
     callback.success(Result.builder().output("SUCCESS").build());
   }
 
+  @Deprecated(message = "Simple routers are too simple, we will no longer suport them.")
   public void simpleRouter(WhenRoute when, RouterCompletionCallback callback) {
     when.getChain()
         .process(callback::success,

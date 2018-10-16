@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -75,6 +76,7 @@ import javax.inject.Inject;
     nameRegexpMatcher = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME,
     requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME, type = NATIVE,
     coordinates = "org.mule.libs:this-is-a-lib:dll:1.0.0")
+@Deprecated(message = "This extension has been deprecated because Breaking Bad has ended, use Better Call Saul extension.")
 @ErrorTypes(HeisenbergErrors.class)
 @NotificationActions(HeisenbergNotificationAction.class)
 public class HeisenbergExtension implements Lifecycle {

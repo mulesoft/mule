@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParamet
 import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupportEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.DeprecatedModelDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
@@ -51,25 +52,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclar
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.MediaTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OAuthConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OperationParametersTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PagedOperationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterPluralNameModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.SourceCallbacksModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -83,6 +66,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
                                                                                          new ConfigurationModelValidator(),
                                                                                          new ConnectionProviderModelValidator(),
+                                                                                         new DeprecatedModelValidator(),
                                                                                          new InputParametersTypeModelValidator(),
                                                                                          new JavaSubtypesModelValidator(),
                                                                                          new MediaTypeModelValidator(),
@@ -106,6 +90,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new BooleanParameterDeclarationEnricher(),
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new DefaultEncodingDeclarationEnricher(),
+                                                                                               new DeprecatedModelDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new NotificationsDeclarationEnricher(),

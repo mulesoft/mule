@@ -16,6 +16,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -33,6 +34,8 @@ import org.slf4j.LoggerFactory;
     nameRegexpMatcher = HEISENBERG_LIB_FILE_NAME,
     requiredClassName = HEISENBERG_LIB_CLASS_NAME,
     type = NATIVE)
+@Deprecated(
+    message = "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA")
 public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergConnection> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeisenbergConnectionProvider.class);

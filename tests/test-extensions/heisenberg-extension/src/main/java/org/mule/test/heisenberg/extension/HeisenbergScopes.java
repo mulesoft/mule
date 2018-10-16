@@ -10,6 +10,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -43,6 +44,7 @@ public class HeisenbergScopes implements Initialisable {
     cb.success(Result.<Chain, Void>builder().output(chain).build());
   }
 
+  @Deprecated(message = "All usages of this scope are covered by the payload-modifier scope.")
   public void executeAnything(Chain chain, CompletionCallback<Void, Void> cb) {
     chain.process(cb::success, (t, e) -> cb.error(t));
   }

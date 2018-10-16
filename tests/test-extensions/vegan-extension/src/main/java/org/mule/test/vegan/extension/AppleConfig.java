@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.test.vegan.extension.stereotype.AppleStereotype;
@@ -26,6 +27,7 @@ import java.util.Map;
 @Sources({HarvestApplesSource.class, PaulMcCartneySource.class})
 @ConnectionProviders(VeganAppleConnectionProvider.class)
 @Stereotype(AppleStereotype.class)
+@Deprecated(message = "This configuration overlaps with the BananaConfig, use that one instead.")
 public class AppleConfig extends EasyToEatConfig {
 
   @Parameter

@@ -516,7 +516,7 @@ final class ObjectTypeSchemaDelegate {
                                        false,
                                        getExpressionSupport(field), getDefaultValue(field).orElse(null),
                                        BEHAVIOUR, ParameterDslConfiguration.getDefaultInstance(),
-                                       null, getLayoutModel(field).orElse(null), null, emptyList(), emptySet());
+                                       null, getLayoutModel(field).orElse(null), null, emptyList(), emptySet(), null);
   }
 
 

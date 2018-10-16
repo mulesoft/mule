@@ -30,6 +30,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -272,9 +273,13 @@ public class HeisenbergOperations implements Disposable {
     return enemies;
   }
 
+  @Deprecated(message = "The usage of this operation must be replaced by the knock operation.")
   @Stereotype(KillingStereotype.class)
   @MediaType(TEXT_PLAIN)
-  public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {
+  public String kill(@Optional(defaultValue = PAYLOAD) String victim, @Deprecated(
+      message = "There is now a standarized way to say goodbye to your enemies before knocking them up, using a different message will only be supported until the next mayor release") @Optional(
+          defaultValue = "We are done") String goodbyeMessage)
+      throws Exception {
     KillParameters killParameters = new KillParameters(victim, goodbyeMessage);
     return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
   }

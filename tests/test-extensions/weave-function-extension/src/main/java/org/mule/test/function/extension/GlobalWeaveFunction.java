@@ -15,6 +15,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
@@ -84,6 +85,7 @@ public class GlobalWeaveFunction implements Initialisable {
     return ImmutableMap.of("user", pojo.getUser(), "pass", pojo.getPass());
   }
 
+  @Deprecated(message = "The case of use of this function is covered within the echoWithDefault function")
   public Object xpath(String expression,
                       @Optional(defaultValue = PAYLOAD) InputStream item,
                       @Optional String returnType) {

@@ -40,6 +40,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
+import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
@@ -78,6 +79,7 @@ import javax.inject.Inject;
 @Streaming
 @MediaType(TEXT_PLAIN)
 @BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
+@Deprecated(message = "This source is being tapped by the DEA, it's usage is discouraged.")
 public class HeisenbergSource extends Source<String, Object> {
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
