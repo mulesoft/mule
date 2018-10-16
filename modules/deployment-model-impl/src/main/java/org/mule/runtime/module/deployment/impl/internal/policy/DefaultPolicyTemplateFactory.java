@@ -91,7 +91,8 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     Set<ArtifactPluginDescriptor> providedArtifactPluginsDescriptors =
         providedArtifactPlugins.stream().map(Artifact::getDescriptor).collect(toSet());
 
-    return pluginDependenciesResolver.resolve(providedArtifactPluginsDescriptors, new ArrayList<>(descriptor.getPlugins()));
+    return pluginDependenciesResolver.resolve(providedArtifactPluginsDescriptors, new ArrayList<>(descriptor.getPlugins()),
+                                              false);
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader policyClassLoader,
