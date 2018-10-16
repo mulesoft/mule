@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utils to manage request resources
  * 
- * @since 3.9.10
+ * @since 3.10.0
  *
  */
 public class RequestResourcesUtils
