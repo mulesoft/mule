@@ -11,7 +11,8 @@
     </http:request-config>
 
     <flow name="ntlmAuthRequestWithDomain">
-        <http:request config-ref="ntlmConfigWithDomain" path="" method="GET"/>
+        <set-payload value="Test Message" />
+        <http:request config-ref="ntlmConfigWithDomain" path="" method="POST"/>
     </flow>
 
     <http:request-config name="ntlmConfigWithoutDomain" host="localhost" port="${httpPort}">
@@ -19,7 +20,8 @@
     </http:request-config>
 
     <flow name="ntlmAuthRequestWithoutDomain">
-        <http:request config-ref="ntlmConfigWithoutDomain" path="" method="GET"/>
+        <set-payload value="Test Message" />
+        <http:request config-ref="ntlmConfigWithoutDomain" path="" method="POST"/>
     </flow>
 
     <http:request-config name="ntlmConfigWithWorkstation" host="localhost" port="${httpPort}">
@@ -27,7 +29,8 @@
     </http:request-config>
 
     <flow name="ntlmAuthRequestWithWorkstation">
-        <http:request config-ref="ntlmConfigWithWorkstation" path="" method="GET"/>
+        <set-payload value="Test Message" />
+        <http:request config-ref="ntlmConfigWithWorkstation" path="" method="POST"/>
     </flow>
 
 </mule>

@@ -22,6 +22,8 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.module.http.internal.request.RequestResourcesUtils.closeResources;
+
 import org.mule.api.CompletionHandler;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -45,12 +47,15 @@ import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
 import org.mule.module.http.internal.request.HttpClientConfiguration;
+import org.mule.module.http.internal.request.MuleBodyDeferringAsyncHandler;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHandler;
@@ -103,8 +108,7 @@ public class GrizzlyHttpClient implements HttpClient
             CONTENT_DISPOSITION.toLowerCase(),
             CONTENT_TRANSFER_ENCODING.toLowerCase(),
             CONTENT_TYPE.toLowerCase(),
-            CONTENT_ID.toLowerCase()
-    );
+            CONTENT_ID.toLowerCase());
 
     private final TlsContextFactory tlsContextFactory;
     private final TlsContextFactory defaultTlsContextFactory;
@@ -319,7 +323,7 @@ public class GrizzlyHttpClient implements HttpClient
         Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
         PipedOutputStream outPipe = new PipedOutputStream();
         PipedInputStream inPipe = new PipedInputStream(outPipe, responseBufferSize);
-        BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
+        BodyDeferringAsyncHandler asyncHandler = new MuleBodyDeferringAsyncHandler(outPipe, request);
         asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
         try
         {
@@ -391,6 +395,10 @@ public class GrizzlyHttpClient implements HttpClient
                 throw new IOException(e);
             }
         }
+        finally
+        {
+            closeResources(request);
+        }
     }
 
     @Override
@@ -402,11 +410,11 @@ public class GrizzlyHttpClient implements HttpClient
             AsyncHandler handler;
             if (streaming)
             {
-                handler = new WorkManagerBodyDeferringAsyncHandler(completionHandler, workManager, new PipedOutputStream());
+                handler = new WorkManagerBodyDeferringAsyncHandler(completionHandler, workManager, new PipedOutputStream(), request);
             }
             else
             {
-                handler = new WorkManagerAsyncCompletionHandler(completionHandler, workManager);
+                handler = new WorkManagerAsyncCompletionHandler(completionHandler, workManager, request);
             }
             asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication), handler);
         }
@@ -631,12 +639,14 @@ public class GrizzlyHttpClient implements HttpClient
 
         private CompletionHandler<HttpResponse, Exception> completionHandler;
         private WorkManager workManager;
+        private HttpRequest request;
 
         WorkManagerAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception> completionHandler,
-                                          WorkManager workManager)
+                WorkManager workManager, HttpRequest request)
         {
             this.completionHandler = completionHandler;
             this.workManager = workManager;
+            this.request = request;
         }
 
         @Override
@@ -654,6 +664,10 @@ public class GrizzlyHttpClient implements HttpClient
                     catch (IOException e)
                     {
                         completionHandler.onFailure(e);
+                    }
+                    finally
+                    {
+                        closeResources(request);
                     }
                 }
             });
@@ -678,6 +692,7 @@ public class GrizzlyHttpClient implements HttpClient
     private class WorkManagerBodyDeferringAsyncHandler implements AsyncHandler<Response>
     {
         private volatile Response response;
+        private final HttpRequest request;
         private final OutputStream output;
         private final InputStream input;
         private final WorkManager workManager;
@@ -685,12 +700,14 @@ public class GrizzlyHttpClient implements HttpClient
         private final Response.ResponseBuilder responseBuilder = new Response.ResponseBuilder();
         private final AtomicBoolean handled = new AtomicBoolean(false);
 
-        public WorkManagerBodyDeferringAsyncHandler(CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager, PipedOutputStream output) throws IOException
+        public WorkManagerBodyDeferringAsyncHandler(CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager, PipedOutputStream output, HttpRequest request)
+                throws IOException
         {
             this.output = output;
             this.workManager = workManager;
             this.completionHandler = completionHandler;
             this.input = new PipedInputStream(output, responseBufferSize);
+            this.request = request;
         }
 
         public void onThrowable(final Throwable t)
@@ -739,6 +756,8 @@ public class GrizzlyHttpClient implements HttpClient
 
         protected void closeOut() throws IOException
         {
+            closeResources(request);
+            
             try
             {
                 output.flush();
