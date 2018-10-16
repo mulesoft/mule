@@ -15,13 +15,14 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.config.MuleProperties.isMelDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
@@ -45,12 +46,12 @@ import org.mule.runtime.core.internal.util.OneTimeWarning;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 
-import org.slf4j.Logger;
-
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
@@ -77,18 +78,27 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public void initialise() throws InitialisationException {
     if (!initialized.getAndSet(true)) {
+
       final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage =
-          DataWeaveExpressionLanguageAdaptor.create(muleContext, registry);
+          registry.lookupByType(DefaultExpressionLanguageFactoryService.class)
+              .map(s -> new DataWeaveExpressionLanguageAdaptor(muleContext, registry, s))
+              .orElse(null);
 
-      MVELExpressionLanguage mvelExpressionLanguage = null;
+
       if (registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
-        mvelExpressionLanguage = registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
+        MVELExpressionLanguage mvelExpressionLanguage =
+            registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
 
-        ExpressionLanguageAdaptorHandler exprLangAdaptorHandler =
-            new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
-        this.melDefault = exprLangAdaptorHandler.isMelDefault();
+        ExtendedExpressionLanguageAdaptor exprLangAdaptorHandler = dwExpressionLanguage != null
+            ? new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage)
+            : mvelExpressionLanguage;
+
+        this.melDefault = dwExpressionLanguage == null || isMelDefault();
         this.expressionLanguage = exprLangAdaptorHandler;
       } else {
+        if (dwExpressionLanguage == null) {
+          throw new IllegalStateException("No expression language installed");
+        }
         this.expressionLanguage = dwExpressionLanguage;
       }
 
@@ -96,7 +106,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
       registry.lookupAllByType(GlobalBindingContextProvider.class).stream()
           .map(GlobalBindingContextProvider::getBindingContext)
-          .forEach(ctx -> contextBuilder.addAll(ctx));
+          .forEach(contextBuilder::addAll);
 
       expressionLanguage.addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
           ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()

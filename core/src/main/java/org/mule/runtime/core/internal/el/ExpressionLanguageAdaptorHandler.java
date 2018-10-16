@@ -7,17 +7,13 @@
 package org.mule.runtime.core.internal.el;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
-import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
@@ -25,6 +21,7 @@ import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
@@ -74,7 +71,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
     exprPrefixPattern = compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
 
-    melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
+    melDefault = MuleProperties.isMelDefault();
     if (isMelDefault() && mvelExpressionLanguage == null) {
       throw new IllegalStateException(MVEL_NOT_INSTALLED_ERROR);
     }

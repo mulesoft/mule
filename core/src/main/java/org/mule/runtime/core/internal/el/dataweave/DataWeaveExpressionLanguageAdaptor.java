@@ -52,11 +52,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private ExpressionLanguage expressionExecutor;
   private MuleContext muleContext;
 
-  public static DataWeaveExpressionLanguageAdaptor create(MuleContext muleContext, Registry registry) {
-    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry,
-                                                  registry.lookupByType(DefaultExpressionLanguageFactoryService.class).get());
-  }
-
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service) {
