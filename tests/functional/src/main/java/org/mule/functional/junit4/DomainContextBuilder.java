@@ -9,11 +9,15 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 
@@ -24,6 +28,8 @@ public class DomainContextBuilder {
 
   private String contextId;
   private String[] domainConfig = new String[0];
+
+  private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
   private MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(DOMAIN);
 
@@ -42,6 +48,7 @@ public class DomainContextBuilder {
     ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
     builders.add(new MockExtensionManagerConfigurationBuilder());
     builders.add(cfgBuilder);
+    testServicesConfigBuilder = new TestServicesConfigurationBuilder();
     addBuilders(builders);
     final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
     if (contextId != null) {
@@ -51,11 +58,21 @@ public class DomainContextBuilder {
     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     domainContext.start();
+
+    MuleContextNotificationListener listener = notification -> {
+      try {
+        testServicesConfigBuilder.stopServices();
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    };
+    domainContext.getNotificationManager().addListener(listener);
+
     return domainContext;
   }
 
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    builders.add(new TestServicesConfigurationBuilder());
+    builders.add(testServicesConfigBuilder);
   }
 
   protected ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
