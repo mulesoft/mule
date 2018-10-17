@@ -419,8 +419,18 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       }
 
       @Override
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+        return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+        return mvel.evaluateLogExpression(expression, event, componentLocation, context);
+      }
+
+      @Override
       public Iterator<TypedValue<?>> split(String expression) {
-        return mvel.split(expression, event, componentLocation, context);
+        return mvel.split(removeExpressionMarker(expression), event, componentLocation, context);
       }
 
       @Override

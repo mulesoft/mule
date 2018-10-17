@@ -268,6 +268,16 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       }
 
       @Override
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+        String sanitized = sanitize(expression);
+        if (isPayloadExpression(sanitized)) {
+          return resolvePayload(event, context);
+        } else {
+          return session.evaluate(sanitized, timeout);
+        }
+      }
+
+      @Override
       public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionExecutionException {
         String sanitized = sanitize(expression);
         if (isPayloadExpression(sanitized)) {
@@ -278,8 +288,13 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       }
 
       @Override
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+        return session.evaluateLogExpression(sanitize(expression));
+      }
+
+      @Override
       public Iterator<TypedValue<?>> split(String expression) {
-        return session.split(expression);
+        return session.split(sanitize(expression));
       }
 
       @Override

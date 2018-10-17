@@ -54,9 +54,33 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
   }
 
   @Override
+  public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+    ClassLoader originalLoader = currentThread().getContextClassLoader();
+
+    try {
+      currentThread().setContextClassLoader(evaluationClassLoader);
+      return session.evaluate(expression, timeout);
+    } finally {
+      currentThread().setContextClassLoader(originalLoader);
+    }
+  }
+
+  @Override
   public boolean evaluateBoolean(String expression, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
     return resolveBoolean(evaluate(expression, DataType.BOOLEAN).getValue(), nullReturnsTrue, nonBooleanReturnsTrue, expression);
+  }
+
+  @Override
+  public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+    ClassLoader originalLoader = currentThread().getContextClassLoader();
+
+    try {
+      currentThread().setContextClassLoader(evaluationClassLoader);
+      return session.evaluateLogExpression(expression);
+    } finally {
+      currentThread().setContextClassLoader(originalLoader);
+    }
   }
 
   @Override

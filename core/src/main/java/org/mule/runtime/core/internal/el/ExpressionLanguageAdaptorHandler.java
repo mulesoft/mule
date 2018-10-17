@@ -205,6 +205,16 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
       }
 
       @Override
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+        return resolveSessionForLanguage(sessions, expression).evaluate(expression, timeout);
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+        return resolveSessionForLanguage(sessions, expression).evaluateLogExpression(expression);
+      }
+
+      @Override
       public Iterator<TypedValue<?>> split(String expression) {
         return resolveSessionForLanguage(sessions, expression).split(expression);
       }
