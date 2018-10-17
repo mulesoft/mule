@@ -14,19 +14,18 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
@@ -55,6 +54,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
@@ -62,7 +63,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -78,7 +78,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final MessageSource source;
   private final List<Processor> processors;
   private MessageProcessorChain pipeline;
-  private final ErrorType overloadErrorType;
 
   private final ProcessingStrategyFactory processingStrategyFactory;
   private final ProcessingStrategy processingStrategy;
@@ -115,7 +114,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     processingStrategy = this.processingStrategyFactory.create(muleContext, getName());
-    overloadErrorType = muleContext.getErrorTypeRepository().getErrorType(OVERLOAD).orElse(null);
   }
 
   /**
@@ -216,7 +214,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .doOnNext(assertStarted())
         .flatMap(source.getBackPressureStrategy() == WAIT
             ? flowWaitMapper(identity(), (result, event) -> result)
-            : flowFailDropMapper(identity(), (result, event) -> result, overloadErrorType));
+            : flowFailDropMapper(identity(), (result, event) -> result));
   }
 
   /**
@@ -229,8 +227,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
    */
   protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper(Function<CoreEvent, CoreEvent> eventForFlowMapper,
-                                                                                               BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper,
-                                                                                               ErrorType overloadErrorType);
+                                                                                               BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper);
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
