@@ -43,10 +43,14 @@ import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.util.BeanUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.Connection;
@@ -125,6 +129,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      * Whether to create a consumer on connect.
      */
     private boolean eagerConsumer = true;
+
+    private AtomicBoolean shouldRetryBrokerConnection = new AtomicBoolean(false);
 
     ////////////////////////////////////////////////////////////////////////
     // JMS Connection
@@ -537,9 +543,19 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+
     @Override
     public void onException(JMSException jmsException)
     {
+        // In case the original exception cause is an IOException, it means something went
+        // wrong with the actual transport that connects to the broker. Since the receiver runs
+        // with a retryPolicy, the re-connection should be delegated to it.
+        if (jmsException.getCause() instanceof IOException)
+        {
+            shouldRetryBrokerConnection.set(true);
+        }
+
+        // FIXME: I think this should be an else case to if above. Since this will deadlock with the retry policy, in case both have acquire the receiver intrinsic lock.
         if (!disconnecting)
         {
             Map<Object, MessageReceiver> receivers = getReceivers();
@@ -1578,5 +1594,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public void setRedeliveryDelay(int redeliveryDelay)
     {
         this.redeliveryDelay = redeliveryDelay;
+    }
+
+    public boolean shouldRetryBrokerConnection()
+    {
+        return shouldRetryBrokerConnection.get();
     }
 }

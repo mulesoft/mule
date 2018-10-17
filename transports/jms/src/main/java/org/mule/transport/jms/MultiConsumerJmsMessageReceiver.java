@@ -23,6 +23,7 @@ import org.mule.transaction.TransactionCollection;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
 import org.mule.transport.ConnectException;
+import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.transport.jms.reconnect.ReconnectWorkManager;
 import org.mule.transport.jms.redelivery.RedeliveryHandler;
@@ -42,6 +43,7 @@ import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jms.connection.CachingConnectionFactory;
 
 /**
  * In Mule an endpoint corresponds to a single receiver. It's up to the receiver to do multithreaded consumption and
@@ -152,6 +154,17 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 try
                 {
+
+                    JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
+                    if (connector.shouldRetryBrokerConnection())
+                    {
+                        connector.doDisconnect();
+                        connector.doConnect();
+                    }
+
+                    ((JmsConnector) MultiConsumerJmsMessageReceiver.this.connector).createConnection();
+                    ((JmsConnector) MultiConsumerJmsMessageReceiver.this.connector).createConnection();
+
                     logger.debug("doConnect()");
                     if (!consumers.isEmpty())
                     {
