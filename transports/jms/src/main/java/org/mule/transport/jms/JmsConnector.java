@@ -552,6 +552,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         // with a retryPolicy, the re-connection should be delegated to it.
         if (jmsException.getCause() instanceof IOException)
         {
+            logger.error("The transport connecting to the JMS Broker failed. If a retry policy was configured, it should attempt to reconnect.");
             shouldRetryBrokerConnection.set(true);
         }
 
@@ -590,6 +591,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     @Override
     protected void doConnect() throws Exception
+
     {
         connection = createConnection();
         if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())

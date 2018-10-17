@@ -154,16 +154,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 try
                 {
-
                     JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
                     if (connector.shouldRetryBrokerConnection())
                     {
-                        connector.doDisconnect();
-                        connector.doConnect();
+                        logger.info("It seems there was a failure in previous connection with the broker. Trying to re create it.");
+                        connector.setConnection(connector.createConnection());
                     }
-
-                    ((JmsConnector) MultiConsumerJmsMessageReceiver.this.connector).createConnection();
-                    ((JmsConnector) MultiConsumerJmsMessageReceiver.this.connector).createConnection();
 
                     logger.debug("doConnect()");
                     if (!consumers.isEmpty())
