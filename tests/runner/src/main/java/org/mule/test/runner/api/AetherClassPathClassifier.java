@@ -52,8 +52,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
@@ -430,7 +432,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     List<URL> containerUrls;
     try {
-      containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, newArrayList(managedDependencies),
+      containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, managedDependencies,
                                                                    dependencyFilter,
                                                                    rootArtifactRemoteRepositories));
     } catch (Exception e) {
@@ -465,7 +467,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories repositories to be used when reading artifact descriptors
-   * @return {@link Set} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies
+   * @return {@link List} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies
    */
   private List<Dependency> selectContainerManagedDependencies(ClassPathClassifierContext context,
                                                               List<Dependency> directDependencies,
@@ -473,7 +475,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                               List<RemoteRepository> rootArtifactRemoteRepositories) {
     List<Dependency> managedDependencies;
     if (!rootArtifactType.equals(MODULE)) {
-      managedDependencies = directDependencies.stream()
+      managedDependencies = newArrayList(directDependencies.stream()
           .map(directDep -> {
             try {
               ArtifactDescriptorResult readArtifactDescriptor =
@@ -486,7 +488,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
             }
           })
           .flatMap(l -> l.stream())
-          .sorted((d1, d2) -> {
+          .collect(Collectors.toCollection(() -> new TreeSet<>((d1, d2) -> {
             if (toVersionlessId(d1.getArtifact()).equals(toVersionlessId(d2.getArtifact()))) {
               try {
                 return versionScheme.parseVersion(d1.getArtifact().getVersion())
@@ -497,8 +499,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
               }
             }
             return 1;
-          })
-          .collect(toList());
+          }))));
     } else {
       try {
         managedDependencies = newArrayList(dependencyResolver.readArtifactDescriptor(context.getRootArtifact())
