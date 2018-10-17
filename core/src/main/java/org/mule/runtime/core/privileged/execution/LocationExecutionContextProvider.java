@@ -42,16 +42,24 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    *
    * @param beanAnnotations the map with annotations to populate
    * @param sourceCode the source code representation of the element definition.
-   * @param documentationName the documentation name attribute of the element definition.
+   * @param customAttributes the custom attributes of the element definition.
    */
   public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String sourceCode,
-                                                   String documentationName) {
+                                                   Map<String, Object> customAttributes) {
     if (sourceCode != null) {
       beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
     }
+
+    String documentationName = (String) customAttributes
+        .get(Component.Annotations.NAME_ANNOTATION_KEY.toString());
     if (documentationName != null) {
       beanAnnotations.put(NAME_ANNOTATION_KEY, documentationName);
     }
+    customAttributes.forEach((key, value) -> {
+      if (!key.equals(NAME_ANNOTATION_KEY.toString())) {
+        beanAnnotations.put(QName.valueOf(key), value);
+      }
+    });
   }
 
   protected static String getSourceXML(Component element) {
