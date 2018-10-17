@@ -121,6 +121,16 @@
           "methodName": "addMetadataAnnotationsFromXml",
           "elementKind": "method",
           "justification": "not used by others"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider::addMetadataAnnotationsFromXml(java.util.Map<javax.xml.namespace.QName, java.lang.Object>, java.lang.String)",
+          "new": "method void org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider::addMetadataAnnotationsFromXml(java.util.Map<javax.xml.namespace.QName, java.lang.Object>, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>)",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "LocationExecutionContextProvider",
+          "methodName": "addMetadataAnnotationsFromXml",
+          "elementKind": "method",
+          "justification": "not used by users"
         }
       ]
     }
