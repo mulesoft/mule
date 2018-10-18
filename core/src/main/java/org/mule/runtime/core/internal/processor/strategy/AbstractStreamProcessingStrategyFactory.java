@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
@@ -160,14 +161,17 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
-      WorkQueueProcessor<CoreEvent> processor =
-          WorkQueueProcessor.<CoreEvent>builder().executor(ringBufferSchedulerSupplier.get()).bufferSize(bufferSize)
+      WorkQueueProcessor<EventWrapper> processor =
+          WorkQueueProcessor.<EventWrapper>builder().executor(ringBufferSchedulerSupplier.get()).bufferSize(bufferSize)
               .waitStrategy(waitStrategy.getReactorWaitStrategy()).build();
       int subscriberCount = maxConcurrency < subscribers ? maxConcurrency : subscribers;
       CountDownLatch completionLatch = new CountDownLatch(subscriberCount);
       for (int i = 0; i < subscriberCount; i++) {
-        processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader)).transform(function)
-            .doFinally(s -> completionLatch.countDown()).subscribe();
+        processor
+            .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
+            .map(ew -> ew.getWrappedEvent())
+            .transform(function)
+            .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
       }
       return new ReactorSink(processor.sink(), () -> {
         long start = currentTimeMillis();
@@ -186,7 +190,13 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
           throw new MuleRuntimeException(e);
         }
 
-      }, createOnEventConsumer(), bufferSize);
+      }, createOnEventConsumer(), bufferSize) {
+
+        @Override
+        protected EventWrapper intoSink(CoreEvent event) {
+          return new EventWrapper(event);
+        }
+      };
     }
 
     protected enum WaitStrategy {
@@ -212,6 +222,22 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
 
       reactor.util.concurrent.WaitStrategy getReactorWaitStrategy() {
         return reactorWaitStrategy;
+      }
+    }
+
+    private static final class EventWrapper {
+
+      CoreEvent wrappedEvent;
+
+      public EventWrapper(CoreEvent event) {
+        this.wrappedEvent = event;
+        ((BaseEventContext) (wrappedEvent.getContext())).getRootContext().onTerminated((e, t) -> {
+          wrappedEvent = null;
+        });
+      }
+
+      public CoreEvent getWrappedEvent() {
+        return wrappedEvent;
       }
     }
 

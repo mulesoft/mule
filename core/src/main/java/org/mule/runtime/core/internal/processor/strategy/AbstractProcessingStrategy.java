@@ -57,14 +57,14 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
   /**
    * Implementation of {@link Sink} using Reactor's {@link FluxSink} to accept events.
    */
-  static final class ReactorSink implements Sink, Disposable {
+  static class ReactorSink<E> implements Sink, Disposable {
 
-    private final FluxSink<CoreEvent> fluxSink;
+    private final FluxSink<E> fluxSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
     private final int bufferSize;
 
-    ReactorSink(FluxSink<CoreEvent> fluxSink, reactor.core.Disposable disposable,
+    ReactorSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
                 Consumer<CoreEvent> onEventConsumer, int bufferSize) {
       this.fluxSink = fluxSink;
       this.disposable = disposable;
@@ -73,13 +73,13 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     }
 
     @Override
-    public void accept(CoreEvent event) {
+    public final void accept(CoreEvent event) {
       onEventConsumer.accept(event);
-      fluxSink.next(event);
+      fluxSink.next(intoSink(event));
     }
 
     @Override
-    public boolean emit(CoreEvent event) {
+    public final boolean emit(CoreEvent event) {
       onEventConsumer.accept(event);
       // Optimization to avoid using synchronized block for all emissions.
       // See: https://github.com/reactor/reactor-core/issues/1037
@@ -89,13 +89,13 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
       } else if (remainingCapacity > (bufferSize > CORES * 4 ? CORES : 0)) {
         // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
         // emit without synchronized block.
-        fluxSink.next(event);
+        fluxSink.next(intoSink(event));
         return true;
       } else {
         // If there is very little room in buffer also emit but synchronized.
         synchronized (fluxSink) {
           if (remainingCapacity > 0) {
-            fluxSink.next(event);
+            fluxSink.next(intoSink(event));
             return true;
           } else {
             return false;
@@ -104,8 +104,12 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
       }
     }
 
+    protected E intoSink(CoreEvent event) {
+      return (E) event;
+    }
+
     @Override
-    public void dispose() {
+    public final void dispose() {
       fluxSink.complete();
       disposable.dispose();
     }
