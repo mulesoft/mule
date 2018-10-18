@@ -159,6 +159,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                     {
                         logger.info("It seems there was a failure in previous connection with the broker. Trying to re create it.");
                         connector.setConnection(connector.createConnection());
+                        connector.start();
+                        logger.info("Connection creation and startup succeeded. Continuing with listener startup.");
                         // Skip connection recreation if another retry is needed
                         connector.setShouldRetryBrokerConnection(false);
                     }
