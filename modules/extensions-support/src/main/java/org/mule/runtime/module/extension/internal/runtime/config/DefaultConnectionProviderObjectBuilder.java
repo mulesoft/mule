@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -108,7 +107,11 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
    */
   private ConnectionProvider<C> applyExtensionClassLoaderProxy(ConnectionProvider provider) {
     Enhancer enhancer = new Enhancer();
-    ClassLoader classLoader = getClassLoader(extensionModel);
+
+    // Use the classloader from the app instead of the extension for calling the provider methods.
+    // The provider may need to access resources from the application defined in its config. To do so, it needs the app
+    // classloader set as the TCCL.
+    ClassLoader classLoader = muleContext.getExecutionClassLoader();
 
     Class[] proxyInterfaces = getProxyInterfaces(provider);
     enhancer.setInterfaces(proxyInterfaces);

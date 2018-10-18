@@ -68,7 +68,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
       HttpResponse response = client.send(request, DEFAULT_TIMEOUT_MILLIS, false, null);
       return new DispatchingResponse(logIfNeeded("Soap Response", response.getEntity().getContent()), toHeadersMap(response));
     } catch (IOException e) {
-      throw new DispatchingException("An error occurred while sending the SOAP request");
+      throw new DispatchingException("An error occurred while sending the SOAP request", e);
     } catch (TimeoutException e) {
       throw new DispatchingException("The SOAP request timed out", e);
     }
