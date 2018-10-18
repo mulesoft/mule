@@ -27,12 +27,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -48,17 +47,10 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
-import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiFunction;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -68,6 +60,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiFunction;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -106,9 +103,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     sensingMessageProcessor = getSensingNullMessageProcessor();
 
     List<Processor> processors = new ArrayList<>();
-    processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
-    processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
-    processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("d")));
     processors.add(new StringAppendTransformer("a"));
     processors.add(new StringAppendTransformer("b"));
     processors.add(new StringAppendTransformer("c"));
@@ -150,36 +144,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     if (stoppedFlow.getLifecycleState().isInitialised()) {
       stoppedFlow.dispose();
     }
-  }
-
-  @Test
-  public void testProcessOneWayEndpoint() throws Exception {
-    flow.initialise();
-    flow.start();
-    CoreEvent event = eventBuilder(muleContext)
-        .message(of(TEST_PAYLOAD))
-        .build();
-    CoreEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
-
-    assertSucessfulProcessing((PrivilegedEvent) response);
-  }
-
-  @Test
-  public void testProcessRequestResponseEndpoint() throws Exception {
-    flow.initialise();
-    flow.start();
-    CoreEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
-
-    assertSucessfulProcessing((PrivilegedEvent) response);
-  }
-
-  private void assertSucessfulProcessing(PrivilegedEvent response) throws MuleException {
-    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
-    assertThat(response.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
-
-    assertThat(((PrivilegedEvent) sensingMessageProcessor.event).getMessageAsString(muleContext),
-               equalTo(TEST_PAYLOAD + "abc"));
-    assertThat(sensingMessageProcessor.event.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
   }
 
   @Test
