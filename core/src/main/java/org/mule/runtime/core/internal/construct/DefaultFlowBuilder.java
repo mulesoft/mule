@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -17,7 +16,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUG
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.BACK_PRESSURE_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -26,7 +24,6 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -39,11 +36,11 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
@@ -296,7 +293,9 @@ public class DefaultFlowBuilder implements Builder {
         } catch (RejectedExecutionException ree) {
           Throwable overloadException = new FlowBackPressureException(ree.getMessage(), ree);
           MessagingException me = new MessagingException(request, overloadException, this);
-          ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
+          ((BaseEventContext) request.getContext())
+              .error(exceptionResolver.resolve(me, ((PrivilegedMuleContext) getMuleContext()).getErrorTypeLocator(),
+                                               getMuleContext().getExceptionContextProviders()));
         }
         return flowResponse(request, responsePublisher, returnEventFromFlowMapper);
       };
@@ -304,8 +303,7 @@ public class DefaultFlowBuilder implements Builder {
 
     @Override
     protected Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper(Function<CoreEvent, CoreEvent> eventForFlowMapper,
-                                                                                        BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper,
-                                                                                        ErrorType overloadErrorType) {
+                                                                                        BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper) {
       return event -> {
         CoreEvent request = eventForFlowMapper.apply(event);
         Publisher<CoreEvent> responsePublisher = ((BaseEventContext) request.getContext()).getResponsePublisher();
@@ -313,18 +311,12 @@ public class DefaultFlowBuilder implements Builder {
         if (getSink().emit(request)) {
           return flowResponse(request, responsePublisher, returnEventFromFlowMapper);
         } else {
-          // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
+          // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with a FLOW_BACK_PRESSURE
+          // error.
           FlowBackPressureException rejectedExecutionException = new FlowBackPressureException(getName());
-          PrivilegedEvent result = (PrivilegedEvent) returnEventFromFlowMapper.apply(PrivilegedEvent
-              .builder(request)
-              .error(ErrorBuilder.builder().errorType(overloadErrorType)
-                  .description(format("Flow '%s' Busy.", getName()))
-                  .detailedDescription(format(BACK_PRESSURE_ERROR_MESSAGE, getName()))
-                  .exception(rejectedExecutionException)
-                  .build())
-              .build(), request);
-          return Mono
-              .error(exceptionResolver.resolve(new MessagingException(result, rejectedExecutionException, this), muleContext));
+          return Mono.error(exceptionResolver.resolve(new MessagingException(request, rejectedExecutionException, this),
+                                                      ((PrivilegedMuleContext) getMuleContext()).getErrorTypeLocator(),
+                                                      getMuleContext().getExceptionContextProviders()));
         }
       };
     }
