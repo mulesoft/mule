@@ -556,7 +556,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             shouldRetryBrokerConnection.set(true);
         }
 
-        // FIXME: I think this should be an else case to if above. Since this will deadlock with the retry policy, in case both have acquire the receiver intrinsic lock.
         if (!disconnecting && !shouldRetryBrokerConnection.get())
         {
             Map<Object, MessageReceiver> receivers = getReceivers();
@@ -1601,5 +1600,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public boolean shouldRetryBrokerConnection()
     {
         return shouldRetryBrokerConnection.get();
+    }
+
+    public void setShouldRetryBrokerConnection(boolean aBoolean)
+    {
+        this.shouldRetryBrokerConnection.set(aBoolean);
     }
 }
