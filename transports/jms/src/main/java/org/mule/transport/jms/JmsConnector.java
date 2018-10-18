@@ -557,7 +557,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
 
         // FIXME: I think this should be an else case to if above. Since this will deadlock with the retry policy, in case both have acquire the receiver intrinsic lock.
-        if (!disconnecting)
+        if (!disconnecting && !shouldRetryBrokerConnection.get())
         {
             Map<Object, MessageReceiver> receivers = getReceivers();
             boolean isMultiConsumerReceiver = false;
