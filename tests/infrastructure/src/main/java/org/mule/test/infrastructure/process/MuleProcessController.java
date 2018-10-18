@@ -81,6 +81,10 @@ public class MuleProcessController {
     return getController().isDeployed(appName);
   }
 
+  public boolean wasRemoved(String appName) {
+    return getController().wasRemoved(appName);
+  }
+
   public File getArtifactInternalRepository(String artifactName) {
     return getController().getArtifactInternalRepository(artifactName);
   }
