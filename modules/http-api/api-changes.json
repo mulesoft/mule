@@ -215,6 +215,21 @@
       ]
     }
   },
+  "4.1.5": {
+    "revapi": {
+      "ignore": [
+         {
+           "code": "java.method.defaultMethodAddedToInterface",
+           "new": "method java.lang.ClassLoader org.mule.runtime.http.api.server.RequestHandler::getContextClassLoader()",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "RequestHandler",
+           "methodName": "getContextClassLoader",
+           "elementKind": "method",
+           "justification": "Added to provide a fix for a logging issue."
+        }         
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
