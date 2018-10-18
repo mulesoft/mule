@@ -6,6 +6,13 @@
  */
 package org.mule.test.usecases.routing.response;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+
 import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -14,13 +21,6 @@ import org.mule.api.client.MuleClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 
 public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCase
 {
