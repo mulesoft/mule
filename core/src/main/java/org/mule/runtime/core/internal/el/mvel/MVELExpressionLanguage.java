@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.el.mvel;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
@@ -27,6 +28,8 @@ import org.mule.mvel2.util.CompilerTools;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionExecutionException;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -397,5 +400,43 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       expression = expression + "=" + OBJECT_FOR_ENRICHMENT;
     }
     return expression;
+  }
+
+  @Override
+  public ExpressionLanguageSession openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context) {
+    requireNonNull(event);
+    MVELExpressionLanguage mvel = this;
+    return new ExpressionLanguageSession() {
+
+      @Override
+      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionExecutionException {
+        return mvel.evaluate(removeExpressionMarker(expression), expectedOutputType, event, componentLocation, context, false);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(String expression) throws ExpressionExecutionException {
+        return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+        return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+        return mvel.evaluateLogExpression(expression, event, componentLocation, context);
+      }
+
+      @Override
+      public Iterator<TypedValue<?>> split(String expression) {
+        return mvel.split(removeExpressionMarker(expression), event, componentLocation, context);
+      }
+
+      @Override
+      public void close() {
+        // Nothing to do
+      }
+    };
   }
 }

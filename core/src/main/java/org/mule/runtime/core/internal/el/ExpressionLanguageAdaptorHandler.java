@@ -13,12 +13,15 @@ import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionExecutionException;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -30,6 +33,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,22 +54,12 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   private Map<String, ExtendedExpressionLanguageAdaptor> expressionLanguages;
   private LoadingCache<String, ExtendedExpressionLanguageAdaptor> expressionLanguagesByExpressionCache =
       newBuilder().build(expression -> {
-        final String languagePrefix = getLanguagePrefix(expression);
-        if (isEmpty(languagePrefix)) {
-          if (isMelDefault()) {
-            return expressionLanguages.get(MEL_PREFIX);
-          } else {
-            return expressionLanguages.get(DW_PREFIX);
-          }
-        } else if (expressionLanguages.size() == 1) {
-          return expressionLanguages.values().iterator().next();
-        } else {
-          ExtendedExpressionLanguageAdaptor extendedExpressionLanguageAdaptor = expressionLanguages.get(languagePrefix);
-          if (extendedExpressionLanguageAdaptor == null) {
-            throw new IllegalStateException(format("There is no expression language registered for '%s'", languagePrefix));
-          }
-          return extendedExpressionLanguageAdaptor;
+        final String languagePrefix = resolveLanguagePrefix(expression);
+        ExtendedExpressionLanguageAdaptor extendedExpressionLanguageAdaptor = expressionLanguages.get(languagePrefix);
+        if (extendedExpressionLanguageAdaptor == null) {
+          throw new IllegalStateException(format("There is no expression language registered for '%s'", languagePrefix));
         }
+        return extendedExpressionLanguageAdaptor;
       });
 
   private boolean melDefault = false;
@@ -185,6 +179,75 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
       return currentGroup;
     } else {
       return null;
+    }
+  }
+
+  @Override
+  public ExpressionLanguageSession openSession(ComponentLocation componentLocation, CoreEvent event,
+                                               BindingContext bindingContext) {
+    Map<String, ExpressionLanguageSession> sessions = new HashMap<>();
+    for (Entry<String, ExtendedExpressionLanguageAdaptor> exprLangEntry : expressionLanguages.entrySet()) {
+      if (!MEL_PREFIX.equals(exprLangEntry.getKey()) || event != null) {
+        sessions.put(exprLangEntry.getKey(), exprLangEntry.getValue().openSession(componentLocation, event, bindingContext));
+      }
+    }
+
+    return new ExpressionLanguageSession() {
+
+      @Override
+      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionExecutionException {
+        return resolveSessionForLanguage(sessions, expression).evaluate(expression, expectedOutputType);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(String expression) throws ExpressionExecutionException {
+        return resolveSessionForLanguage(sessions, expression).evaluate(expression);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+        return resolveSessionForLanguage(sessions, expression).evaluate(expression, timeout);
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+        return resolveSessionForLanguage(sessions, expression).evaluateLogExpression(expression);
+      }
+
+      @Override
+      public Iterator<TypedValue<?>> split(String expression) {
+        return resolveSessionForLanguage(sessions, expression).split(expression);
+      }
+
+      protected ExpressionLanguageSession resolveSessionForLanguage(Map<String, ExpressionLanguageSession> sessions,
+                                                                    String expression) {
+        ExpressionLanguageSession elSession = sessions.get(resolveLanguagePrefix(expression));
+        if (elSession == null) {
+          throw new ExpressionExecutionException(createStaticMessage("This sessions was not created with an event, so '"
+              + resolveLanguagePrefix(expression) + "' languge cannot be used in this session."));
+        }
+        return elSession;
+      }
+
+      @Override
+      public void close() {
+        sessions.values().forEach(es -> es.close());
+      }
+    };
+  }
+
+  private String resolveLanguagePrefix(String expression) {
+    final String languagePrefix = getLanguagePrefix(expression);
+    if (isEmpty(languagePrefix)) {
+      if (isMelDefault()) {
+        return MEL_PREFIX;
+      } else {
+        return DW_PREFIX;
+      }
+    } else if (expressionLanguages.size() == 1) {
+      return expressionLanguages.keySet().iterator().next();
+    } else {
+      return languagePrefix;
     }
   }
 

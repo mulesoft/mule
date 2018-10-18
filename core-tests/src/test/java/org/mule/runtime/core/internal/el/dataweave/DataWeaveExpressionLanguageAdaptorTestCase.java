@@ -65,6 +65,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -544,6 +545,33 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
       assertThat(bindingValueRef.isEnqueued(), is(true));
       return true;
     }, "A hard reference is being mantained to the bindingValue."));
+  }
+
+  @Test
+  public void sessionWithEventAndLocation() throws MuleException {
+    ExpressionLanguageSession session =
+        expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT);
+
+    assertThat(session.evaluate("payload").getValue(), is("test"));
+    assertThat(session.evaluate("flow.name").getValue(), is("test"));
+  }
+
+  @Test
+  public void sessionWithBindingContext() throws MuleException {
+    ExpressionLanguageSession session = expressionLanguage.openSession(null, null, testEvent().asBindingContext());
+
+    assertThat(session.evaluate("payload").getValue(), is("test"));
+    expectedEx.expect(ExpressionExecutionException.class);
+    assertThat(session.evaluate("flow.name").getValue(), is(nullValue()));
+  }
+
+  @Test
+  public void sessionWithBindingContextAndLocation() throws MuleException {
+    ExpressionLanguageSession session =
+        expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, null, testEvent().asBindingContext());
+
+    assertThat(session.evaluate("payload").getValue(), is("test"));
+    assertThat(session.evaluate("flow.name").getValue(), is("test"));
   }
 
   private CoreEvent getEventWithError(Optional<Error> error) {

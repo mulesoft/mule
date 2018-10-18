@@ -10,6 +10,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -139,4 +140,6 @@ public interface ExpressionLanguageAdaptor {
    */
   Iterator<TypedValue<?>> split(String expression, CoreEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException;
+
+  ExpressionLanguageSession openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context);
 }

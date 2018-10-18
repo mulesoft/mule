@@ -26,6 +26,7 @@ import org.mule.runtime.api.el.BindingContext.Builder;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -131,12 +132,19 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
                              BindingContext context) {
     String sanitized = sanitize(expression);
     if (isPayloadExpression(sanitized)) {
-      return event != null ? event.getMessage().getPayload()
-          : context != null ? context.lookup(PAYLOAD).orElse(null) : null;
+      return resolvePayload(event, context);
     } else {
       BindingContext newContext = bindingContextFor(componentLocation, event, context);
       return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, newContext));
     }
+  }
+
+  /**
+   * This provides an optimization to avoid going to DW for evaluationg just the payload, which is there at hand already.
+   */
+  protected static TypedValue resolvePayload(CoreEvent event, BindingContext context) {
+    return event != null ? event.getMessage().getPayload()
+        : context != null ? context.lookup(PAYLOAD).orElse(null) : null;
   }
 
   @Override
@@ -243,4 +251,56 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     return sanitizedExpression;
   }
 
+  @Override
+  public ExpressionLanguageSession openSession(ComponentLocation componentLocation, CoreEvent event,
+                                               BindingContext context) {
+    ExpressionLanguageSession session = expressionExecutor.openSession(bindingContextFor(componentLocation, event, context));
+    return new ExpressionLanguageSession() {
+
+      @Override
+      public TypedValue<?> evaluate(String expression) throws ExpressionExecutionException {
+        String sanitized = sanitize(expression);
+        if (isPayloadExpression(sanitized)) {
+          return resolvePayload(event, context);
+        } else {
+          return session.evaluate(sanitized);
+        }
+      }
+
+      @Override
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+        String sanitized = sanitize(expression);
+        if (isPayloadExpression(sanitized)) {
+          return resolvePayload(event, context);
+        } else {
+          return session.evaluate(sanitized, timeout);
+        }
+      }
+
+      @Override
+      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionExecutionException {
+        String sanitized = sanitize(expression);
+        if (isPayloadExpression(sanitized)) {
+          return resolvePayload(event, context);
+        } else {
+          return session.evaluate(sanitized, expectedOutputType);
+        }
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+        return session.evaluateLogExpression(sanitize(expression));
+      }
+
+      @Override
+      public Iterator<TypedValue<?>> split(String expression) {
+        return session.split(sanitize(expression));
+      }
+
+      @Override
+      public void close() {
+        session.close();
+      }
+    };
+  }
 }
