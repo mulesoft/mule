@@ -77,32 +77,6 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.po
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -168,6 +142,32 @@ import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @RunWith(Parameterized.class)
 /**
@@ -241,6 +241,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File echoTestClassFile;
 
   protected static File loadsAppResourceCallbackClassFile;
+  protected static File loadsAppResourceCallbackJarFile;
   protected static File pluginEcho1TestClassFile;
 
   private static Boolean internalIsRunningTests;
@@ -286,6 +287,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     loadsAppResourceCallbackClassFile =
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));
+    loadsAppResourceCallbackJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/LoadsAppResourceCallback.java"))
+        .compile("loadsAppResourceCallback.jar");
     pluginEcho1TestClassFile =
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
 
