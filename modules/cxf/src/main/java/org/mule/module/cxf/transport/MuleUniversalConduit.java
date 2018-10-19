@@ -6,8 +6,27 @@
  */
 package org.mule.module.cxf.transport;
 
+import static org.mule.module.cxf.CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR;
+import static org.mule.module.cxf.CxfConstants.MULE_EVENT;
 import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
+import static org.mule.module.cxf.support.CxfUtils.resolveEncoding;
+import static org.mule.transformer.types.DataTypeFactory.XML_STRING;
+import static org.mule.transport.http.HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
+import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static java.lang.Boolean.TRUE;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static javax.xml.ws.BindingProvider.PASSWORD_PROPERTY;
+import static javax.xml.ws.BindingProvider.USERNAME_PROPERTY;
+import static org.apache.cxf.message.Message.ASYNC_POST_RESPONSE_DISPATCH;
+import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.apache.cxf.message.Message.ENCODING;
+import static org.apache.cxf.message.Message.ENDPOINT_ADDRESS;
+import static org.apache.cxf.message.Message.PATH_INFO;
+import static org.apache.cxf.message.Message.QUERY_STRING;
+import static org.apache.cxf.message.Message.RESPONSE_CODE;
+import static org.apache.cxf.phase.Phase.PRE_STREAM;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -32,21 +51,17 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -57,7 +72,6 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.MessageObserver;
@@ -152,7 +166,7 @@ public class MuleUniversalConduit extends AbstractConduit
             }
         };
 
-        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT);
         // are we sending an out of band response for a server side request?
         boolean decoupled = event != null && message.getExchange().getInMessage() != null;
         
@@ -178,18 +192,18 @@ public class MuleUniversalConduit extends AbstractConduit
         }
         else 
         {
-            event.getMessage().setPayload(handler, DataTypeFactory.XML_STRING);
+            event.getMessage().setPayload(handler, XML_STRING);
         }
 
         if (!decoupled)
         {
-            message.getExchange().put(CxfConstants.MULE_EVENT, event);
+            message.getExchange().put(MULE_EVENT, event);
         }
-        message.put(CxfConstants.MULE_EVENT, event);
+        message.put(MULE_EVENT, event);
         
         final MuleEvent finalEvent = event;
         final OutboundEndpoint finalEndpoint = ep;
-        AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
+        AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(PRE_STREAM)
         {
             public void handleMessage(Message m) throws Fault
             {
@@ -220,11 +234,11 @@ public class MuleUniversalConduit extends AbstractConduit
     
     public String setupURL(Message message) throws MalformedURLException
     {
-        String value = (String) message.get(Message.ENDPOINT_ADDRESS);
-        String pathInfo = (String) message.get(Message.PATH_INFO);
-        String queryString = (String) message.get(Message.QUERY_STRING);
-        String username = (String) message.get(BindingProvider.USERNAME_PROPERTY);
-        String password = (String) message.get(BindingProvider.PASSWORD_PROPERTY);
+        String value = (String) message.get(ENDPOINT_ADDRESS);
+        String pathInfo = (String) message.get(PATH_INFO);
+        String queryString = (String) message.get(QUERY_STRING);
+        String username = (String) message.get(USERNAME_PROPERTY);
+        String password = (String) message.get(PASSWORD_PROPERTY);
 
         String result = value != null ? value : getTargetOrEndpoint();
 
@@ -251,7 +265,7 @@ public class MuleUniversalConduit extends AbstractConduit
         try
         {
             MuleMessage req = reqEvent.getMessage();
-            req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
+            req.setOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
 
             if (reqEvent.isAllowNonBlocking())
             {
@@ -313,16 +327,18 @@ public class MuleUniversalConduit extends AbstractConduit
             if (is != null)
             {
                 Message inMessage = new MessageImpl();
+                
+                String contentType = result.getInboundProperty(HEADER_CONTENT_TYPE, "text/xml");
 
-                String encoding = result.getEncoding();
-                inMessage.put(Message.ENCODING, encoding);
+                String encoding = resolveEncoding(result, contentType);
 
-                String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-                if (encoding != null && contentType.indexOf("charset") < 0)
+                if (encoding != null)
                 {
-                    contentType += "; charset=" + result.getEncoding();
+                    contentType += "; charset=" + encoding;
                 }
-                inMessage.put(Message.CONTENT_TYPE, contentType);
+
+                inMessage.put(ENCODING, encoding);
+                inMessage.put(CONTENT_TYPE, contentType);
                 inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);
@@ -347,7 +363,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // we want to act appropriately. E.g. one way invocations over a proxy
             InputStream is = result.getPayload(DataTypeFactory.create(InputStream.class));
             PushbackInputStream pb = new PushbackInputStream(is);
-            result.setPayload(pb, DataTypeFactory.XML_STRING);
+            result.setPayload(pb, XML_STRING);
 
             int b = pb.read();
             if (b != -1)
@@ -383,7 +399,7 @@ public class MuleUniversalConduit extends AbstractConduit
     protected MuleEvent processNext(MuleEvent event,
                                     Exchange exchange, OutboundEndpoint endpoint) throws MuleException
     {
-        CxfOutboundMessageProcessor processor = (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
+        CxfOutboundMessageProcessor processor = (CxfOutboundMessageProcessor) exchange.get(CXF_OUTBOUND_MESSAGE_PROCESSOR);
         MuleEvent response;
         if (processor == null)
         {
@@ -450,9 +466,9 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             // disposable exchange, swapped with real Exchange on correlation
             inMessage.setExchange(new ExchangeImpl());
-            inMessage.put(DECOUPLED_CHANNEL_MESSAGE, Boolean.TRUE);
-            inMessage.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
-            inMessage.remove(Message.ASYNC_POST_RESPONSE_DISPATCH);
+            inMessage.put(DECOUPLED_CHANNEL_MESSAGE, TRUE);
+            inMessage.put(RESPONSE_CODE, HTTP_OK);
+            inMessage.remove(ASYNC_POST_RESPONSE_DISPATCH);
 
             incomingObserver.onMessage(inMessage);
             clearClientContextIfNeeded(getMessageObserver());
