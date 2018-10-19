@@ -131,14 +131,7 @@ public final class CxfUtils
     public static String resolveEncoding(MuleMessage result, String contentType)
     {
         final MediaType mediaType = MediaType.parse(contentType);
-        String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
-
-        if (encoding == null)
-        {
-            encoding = result.getEncoding();
-        }
-
-        return encoding;
+        return mediaType.charset().isPresent() ? mediaType.charset().get().name() : result.getEncoding();
     }
 
 }
