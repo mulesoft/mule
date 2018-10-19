@@ -6,11 +6,20 @@
  */
 package org.mule.module.cxf.support;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointNotFoundException;
 
+import com.google.common.net.MediaType;
+
+import static java.util.regex.Pattern.compile;
+import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
+
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.SoapVersionFactory;
@@ -117,6 +126,12 @@ public final class CxfUtils
             url = url.replace("jetty-ssl://", "https://");
         }
         return url;
+    }
+
+    public static String resolveEncoding(MuleMessage result, String contentType)
+    {
+        final MediaType mediaType = MediaType.parse(contentType);
+        return mediaType.charset().isPresent() ? mediaType.charset().get().name() : result.getEncoding();
     }
 
 }
