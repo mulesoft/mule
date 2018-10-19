@@ -9,6 +9,8 @@ package org.mule.transport.jms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mule.context.notification.ConnectionNotification.CONNECTION_CONNECTED;
+import static org.mule.context.notification.ConnectionNotification.CONNECTION_FAILED;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.context.notification.ConnectionNotification;
@@ -72,7 +74,7 @@ public class BrokerReconnectionWithNonExistingQueuesTestCase extends FunctionalT
 
         // Connection listener used to be notified of JMS connector failures
         jmsConnectionListener = new ConnectionListener(muleContext)
-                .setExpectedAction(ConnectionNotification.CONNECTION_FAILED)
+                .setExpectedAction(CONNECTION_FAILED)
                 .setNumberOfExecutionsRequired(1);
     }
 
@@ -99,7 +101,7 @@ public class BrokerReconnectionWithNonExistingQueuesTestCase extends FunctionalT
         // Create queue, and test message receiver connectivity.
         createTestQueue();
         jmsConnectionListener
-                .setExpectedAction(ConnectionNotification.CONNECTION_CONNECTED)
+                .setExpectedAction(CONNECTION_CONNECTED)
                 .setNumberOfExecutionsRequired(1)
                 .waitUntilNotificationsAreReceived();
 

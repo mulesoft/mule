@@ -158,6 +158,15 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                     JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
                     if (connector.shouldRetryBrokerConnection())
                     {
+                        try
+                        {
+                            connector.getConnection().close();
+                        }
+                        catch (Exception e)
+                        {
+                            logger.error("An exception was thrown while silently stopping the previous connection. Continuing.");
+                        }
+
                         logger.info("It seems there was a failure in previous connection with the broker. Trying to re create it.");
                         connector.setConnection(connector.createConnection());
                         connector.getConnection().start();
