@@ -1784,11 +1784,6 @@
                     <artifactId>revapi-maven-plugin</artifactId>
                     <version>${revapi-maven-plugin.version}</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${source.plugin.version}</version>
-                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1946,7 +1941,6 @@
                 <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>${source.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

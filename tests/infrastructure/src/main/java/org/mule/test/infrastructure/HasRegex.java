@@ -6,12 +6,10 @@
  */
 package org.mule.test.infrastructure;
 
-import java.lang.String;
-
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 
 public class HasRegex extends TypeSafeMatcher<String> {
@@ -28,12 +26,13 @@ public class HasRegex extends TypeSafeMatcher<String> {
   }
 
 
+  @Override
   public boolean matchesSafely(String s) {
     return s.matches(regex);
   }
 
   @Override
   public void describeTo(Description description) {
-    description.appendText("matches the regex: " + regex);
+    description.appendText("matches the regex: /" + regex + "/");
   }
 }

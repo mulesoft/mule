@@ -87,7 +87,16 @@
            "classSimpleName": "MatcherCollisionException",
            "elementKind": "class",
            "justification": "@Experimental feature. Feature flagged by default"
-         }
+         },
+         {
+           "code": "java.method.defaultMethodAddedToInterface",
+           "new": "method java.lang.ClassLoader org.mule.runtime.http.api.server.RequestHandler::getContextClassLoader()",
+           "package": "org.mule.runtime.http.api.server",
+           "classSimpleName": "RequestHandler",
+           "methodName": "getContextClassLoader",
+           "elementKind": "method",
+           "justification": "Added to provide a fix for a logging issue."
+        }         
       ]
     }
   },

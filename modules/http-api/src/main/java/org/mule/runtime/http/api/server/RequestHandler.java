@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.api.server;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 
@@ -23,5 +25,14 @@ public interface RequestHandler {
    * @param responseCallback callback to call when the response content is ready.
    */
   void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback);
+
+  /**
+   * @return the classloader for the artifact that owns this {@link RequestHandler}.
+   *
+   * @since 4.1.5
+   */
+  default ClassLoader getContextClassLoader() {
+    return currentThread().getContextClassLoader();
+  }
 
 }
