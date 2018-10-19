@@ -10,14 +10,12 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
@@ -54,8 +52,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
@@ -68,6 +68,9 @@ import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +108,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  private VersionScheme versionScheme = new GenericVersionScheme();
 
   private final String muleVersion;
 
@@ -243,7 +248,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                                  muleServiceClassifiedDependencyFilter, servicesClassified,
                                                                  rootArtifactRemoteRepositories));
 
-    return toServiceUrlClassification(servicesClassified);
+    return toServiceUrlClassification(resolveArtifactsUsingSemanticVersioning(servicesClassified));
 
   }
 
@@ -380,7 +385,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           Artifact artifact = dependency.getArtifact();
           String artifactId = toId(artifact);
           return (!serviceUrlClassifications.stream()
-              .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId().equals(artifactId))
+              // Services may have ended up with a highest version due to transitive dependencies... therefore comparing without version
+              .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
+                  .equals(toVersionlessId(artifact)))
               && !pluginUrlClassifications.stream()
                   // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing without version 
                   .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
@@ -400,7 +407,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
 
-    Set<Dependency> managedDependencies =
+    List<Dependency> managedDependencies =
         selectContainerManagedDependencies(context, directDependencies, rootArtifactType, rootArtifactRemoteRepositories);
 
     logger.debug("Collected managed dependencies from direct provided dependencies to be used for resolving container "
@@ -425,7 +432,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     List<URL> containerUrls;
     try {
-      containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, newArrayList(managedDependencies),
+      containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, managedDependencies,
                                                                    dependencyFilter,
                                                                    rootArtifactRemoteRepositories));
     } catch (Exception e) {
@@ -460,15 +467,15 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories repositories to be used when reading artifact descriptors
-   * @return {@link Set} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies
+   * @return {@link List} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies
    */
-  private Set<Dependency> selectContainerManagedDependencies(ClassPathClassifierContext context,
-                                                             List<Dependency> directDependencies,
-                                                             ArtifactClassificationType rootArtifactType,
-                                                             List<RemoteRepository> rootArtifactRemoteRepositories) {
-    Set<Dependency> managedDependencies;
+  private List<Dependency> selectContainerManagedDependencies(ClassPathClassifierContext context,
+                                                              List<Dependency> directDependencies,
+                                                              ArtifactClassificationType rootArtifactType,
+                                                              List<RemoteRepository> rootArtifactRemoteRepositories) {
+    List<Dependency> managedDependencies;
     if (!rootArtifactType.equals(MODULE)) {
-      managedDependencies = directDependencies.stream()
+      managedDependencies = newArrayList(directDependencies.stream()
           .map(directDep -> {
             try {
               ArtifactDescriptorResult readArtifactDescriptor =
@@ -481,10 +488,21 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
             }
           })
           .flatMap(l -> l.stream())
-          .collect(toSet());
+          .collect(Collectors.toCollection(() -> new TreeSet<>((d1, d2) -> {
+            if (toVersionlessId(d1.getArtifact()).equals(toVersionlessId(d2.getArtifact()))) {
+              try {
+                return versionScheme.parseVersion(d1.getArtifact().getVersion())
+                    .compareTo(versionScheme.parseVersion(d2.getArtifact().getVersion()));
+              } catch (InvalidVersionSpecificationException e) {
+                logger.warn("Cannot parse version: " + e.getMessage());
+                return 1;
+              }
+            }
+            return 1;
+          }))));
     } else {
       try {
-        managedDependencies = newHashSet(dependencyResolver.readArtifactDescriptor(context.getRootArtifact())
+        managedDependencies = newArrayList(dependencyResolver.readArtifactDescriptor(context.getRootArtifact())
             .getManagedDependencies());
       } catch (ArtifactDescriptorException e) {
         throw new IllegalStateException("Couldn't collect managed dependencies for rootArtifact (" + context.getRootArtifact()
@@ -614,9 +632,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private List<ArtifactUrlClassification> toServiceUrlClassification(Collection<ArtifactClassificationNode> classificationNodes) {
     return classificationNodes.stream().map(node -> {
-      final String classifierLessId = toId(node.getArtifact());
+      final String versionLessId = toVersionlessId(node.getArtifact());
       return serviceResourcesResolver
-          .resolveServiceResourcesFor(new ArtifactUrlClassification(classifierLessId, node.getArtifact().getArtifactId(),
+          .resolveServiceResourcesFor(new ArtifactUrlClassification(versionLessId, node.getArtifact().getArtifactId(),
                                                                     node.getUrls()));
     }).collect(toList());
   }
@@ -635,14 +653,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       final List<String> pluginDependencies = node.getArtifactDependencies().stream()
           .map(dependency -> toVersionlessId(dependency.getArtifact()))
           .collect(toList());
-      final String classifierLessId = toVersionlessId(node.getArtifact());
+      final String versionLessId = toVersionlessId(node.getArtifact());
       final PluginUrlClassification pluginUrlClassification =
           pluginResourcesResolver.resolvePluginResourcesFor(
-                                                            new PluginUrlClassification(classifierLessId, node.getUrls(),
+                                                            new PluginUrlClassification(versionLessId, node.getUrls(),
                                                                                         node.getExportClasses(),
                                                                                         pluginDependencies));
 
-      classifiedPluginUrls.put(classifierLessId, pluginUrlClassification);
+      classifiedPluginUrls.put(versionLessId, pluginUrlClassification);
     }
 
     for (PluginUrlClassification pluginUrlClassification : classifiedPluginUrls.values()) {
