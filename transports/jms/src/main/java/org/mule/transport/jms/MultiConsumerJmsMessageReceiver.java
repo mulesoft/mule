@@ -145,6 +145,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             return;
         }
         reconnecting = true;
+        ((JmsConnector) this.getConnector()).setConnecting(true);
 
         reconnectWorkManager.startIfNotStarted();
         retryTemplate.execute(new RetryCallback()
@@ -191,6 +192,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                     context.setOk();
                     logger.info("Endpoint " + endpoint.getEndpointURI() + " has been successfully reconnected.");
                     reconnecting = false;
+                    connector.setConnecting(false);
                 }
                 catch (Exception e)
                 {

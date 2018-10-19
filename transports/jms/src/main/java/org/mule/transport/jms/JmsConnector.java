@@ -550,7 +550,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         // In case the original exception cause is an IOException, it means something went
         // wrong with the actual transport that connects to the broker. Since the receiver runs
         // with a retryPolicy, the re-connection should be delegated to it.
-        if (jmsException.getCause() instanceof IOException)
+        if (jmsException.getCause() instanceof IOException && connecting.get())
         {
             logger.error("The transport connecting to the JMS Broker failed. If a retry policy was configured, it should attempt to reconnect.");
             shouldRetryBrokerConnection.set(true);
