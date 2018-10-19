@@ -9,9 +9,13 @@ package org.mule.module.cxf.support;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointNotFoundException;
 
+import com.google.common.net.MediaType;
+
 import static java.util.regex.Pattern.compile;
+import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,9 +37,6 @@ import org.apache.cxf.transport.MessageObserver;
 public final class CxfUtils
 {
 
-
-    private static Pattern CHARSET_PATTERN = compile("charset=([^\"]*)");
-    
     /**
      * Clear observer contexts if needed
      * 
@@ -126,20 +127,17 @@ public final class CxfUtils
         }
         return url;
     }
-    
 
     public static String resolveEncoding(MuleMessage result, String contentType)
     {
-        String encoding;
-        Matcher matcher = CHARSET_PATTERN.matcher(contentType);
-        if (matcher.find() && matcher.groupCount() > 0)
-        {
-            encoding = matcher.group(1);
-        }
-        else
+        final MediaType mediaType = MediaType.parse(contentType);
+        String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
+
+        if (encoding == null)
         {
             encoding = result.getEncoding();
         }
+
         return encoding;
     }
 
