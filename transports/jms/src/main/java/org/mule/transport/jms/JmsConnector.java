@@ -132,6 +132,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private AtomicBoolean shouldRetryBrokerConnection = new AtomicBoolean(false);
 
+    private AtomicBoolean stillConnectingReceivers = new AtomicBoolean(false);
+
     ////////////////////////////////////////////////////////////////////////
     // JMS Connection
     ////////////////////////////////////////////////////////////////////////
@@ -550,7 +552,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         // In case the original exception cause is an IOException, it means something went
         // wrong with the actual transport that connects to the broker. Since the receiver runs
         // with a retryPolicy, the re-connection should be delegated to it.
-        if (jmsException.getCause() instanceof IOException && connecting.get())
+        if (jmsException.getCause() instanceof IOException && this.stillConnectingReceivers())
         {
             logger.error("The transport connecting to the JMS Broker failed. If a retry policy was configured, it should attempt to reconnect.");
             shouldRetryBrokerConnection.set(true);
@@ -1605,5 +1607,15 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public void setShouldRetryBrokerConnection(boolean aBoolean)
     {
         this.shouldRetryBrokerConnection.set(aBoolean);
+    }
+
+    public boolean stillConnectingReceivers()
+    {
+        return stillConnectingReceivers.get();
+    }
+
+    public void setStillConnectingReceivers(boolean aBoolean)
+    {
+        this.stillConnectingReceivers.set(aBoolean);
     }
 }

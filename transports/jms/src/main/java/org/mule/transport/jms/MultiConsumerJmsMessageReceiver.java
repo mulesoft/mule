@@ -145,7 +145,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             return;
         }
         reconnecting = true;
-        ((JmsConnector) this.getConnector()).setConnecting(true);
+        ((JmsConnector) this.getConnector()).setStillConnectingReceivers(true);
 
         reconnectWorkManager.startIfNotStarted();
         retryTemplate.execute(new RetryCallback()
@@ -182,6 +182,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                         {
                             context.setOk();
                             reconnecting = false;
+                            connector.setStillConnectingReceivers(false);
                             return;
                         }
                         throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
@@ -201,7 +202,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                     context.setOk();
                     logger.info("Endpoint " + endpoint.getEndpointURI() + " has been successfully reconnected.");
                     reconnecting = false;
-                    connector.setConnecting(false);
+                    connector.setStillConnectingReceivers(false);
                 }
                 catch (Exception e)
                 {
