@@ -6,11 +6,13 @@
  */
 package org.mule.transport.jms;
 
+import static javax.jms.Session.AUTO_ACKNOWLEDGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.context.notification.ConnectionNotification.CONNECTION_CONNECTED;
 import static org.mule.context.notification.ConnectionNotification.CONNECTION_FAILED;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.context.notification.ConnectionNotification;
@@ -126,7 +128,7 @@ public class BrokerReconnectionWithNonExistingQueuesTestCase extends FunctionalT
         connection.start();
 
         // Create admin session for further queue creation and connection testing
-        adminSession = (ActiveMQSession) connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        adminSession = (ActiveMQSession) connection.createSession(false, AUTO_ACKNOWLEDGE);
         testQueue = adminSession.createQueue("test");
     }
 

@@ -158,15 +158,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                     JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
                     if (connector.shouldRetryBrokerConnection())
                     {
-                        try
-                        {
-                            connector.getConnection().close();
-                        }
-                        catch (Exception e)
-                        {
-                            logger.error("An exception was thrown while silently stopping the previous connection. Continuing.");
-                        }
-
+                        MultiConsumerJmsMessageReceiver.this.closeConnectorSilently();
                         logger.info("It seems there was a failure in previous connection with the broker. Trying to re create it.");
                         connector.setConnection(connector.createConnection());
                         connector.getConnection().start();
@@ -222,6 +214,19 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 return jmsConnector;
             }
         }, reconnectWorkManager);
+    }
+
+    private void closeConnectorSilently()
+    {
+        JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
+        try
+        {
+            connector.getConnection().close();
+        }
+        catch (Exception e)
+        {
+            logger.error("An exception was thrown while silently stopping the previous connection. Continuing.");
+        }
     }
 
     @Override
