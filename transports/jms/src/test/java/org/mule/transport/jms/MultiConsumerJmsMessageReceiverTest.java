@@ -70,6 +70,7 @@ public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
     {
         when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(false);
         when(mockJmsConnector.getNumberOfConsumers()).thenReturn(1);
+        when(mockJmsConnector.shouldRetryBrokerConnection()).thenReturn(false);
 
         MessageConsumer mockMessageConsumer = mock(TestMessageConsumer.class, CALLS_REAL_METHODS);
         when(mockJmsConnector.getJmsSupport()

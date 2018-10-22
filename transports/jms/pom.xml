@@ -117,5 +117,19 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Used for broker reconnection with non existing queue tests -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-jaas</artifactId>
+            <version>${activemqVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>${activemqVersion}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
