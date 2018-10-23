@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
@@ -111,7 +112,9 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     // Use the classloader from the app instead of the extension for calling the provider methods.
     // The provider may need to access resources from the application defined in its config. To do so, it needs the app
     // classloader set as the TCCL.
-    ClassLoader classLoader = muleContext.getExecutionClassLoader();
+    final ClassLoader extensionClassLoader = currentThread().getContextClassLoader();
+    final ClassLoader appClassLoader = muleContext.getExecutionClassLoader();
+    ClassLoader classLoader = new CompositeClassLoader(extensionClassLoader, appClassLoader);
 
     Class[] proxyInterfaces = getProxyInterfaces(provider);
     enhancer.setInterfaces(proxyInterfaces);
@@ -153,9 +156,9 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     enhancer.setCallbackFilter(callbackHelper);
     enhancer.setCallbacks(callbackHelper.getCallbacks());
 
-    if (Enhancer.class.getClassLoader() != classLoader) {
+    if (Enhancer.class.getClassLoader() != extensionClassLoader) {
       enhancer.setClassLoader(new CompositeClassLoader(DefaultConnectionProviderObjectBuilder.class.getClassLoader(),
-                                                       classLoader));
+                                                       extensionClassLoader));
       enhancer.setUseCache(false);
     }
 

@@ -10,7 +10,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mule.tck.util.TestConnectivityUtils.disableAutomaticTestConnectivity;
@@ -71,8 +71,8 @@ public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunction
     List<ClassLoader> collect = createdClassLoaders.values().stream().distinct().collect(toList());
     assertThat(collect.size(), is(1));
     ClassLoader classLoader = collect.get(0);
-    assertThat(classLoader.toString(), not(containsString("classloading-extension")));
-    assertThat(classLoader.toString(), containsString(".MuleApplicationClassLoader[app]@"));
+    assertThat(classLoader.toString(),
+               allOf(containsString("classloading-extension"), containsString(".MuleApplicationClassLoader[app]@")));
     Set<String> executedPhases = createdClassLoaders.keySet();
     assertThat(executedPhases, is(hasItems(stream(phasesToExecute).map(StringContains::containsString).toArray(Matcher[]::new))));
   }
