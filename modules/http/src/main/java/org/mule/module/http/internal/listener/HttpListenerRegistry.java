@@ -6,7 +6,9 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.internal.HttpParser.getDecodedPathIfDecodable;
 import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -27,6 +29,7 @@ import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Registry of servers and its handlers, which allows searching for handlers and introducing new ones (while allowing them to be
@@ -213,11 +216,16 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          */
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
-            final String pathName = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
-            Preconditions.checkArgument(pathName.startsWith(SLASH), "path parameter must start with /");
+            Preconditions.checkArgument( request.getPath().startsWith(SLASH), "path parameter must start with /");
+            final String pathName = getDecodedPathIfDecodable(request.getPath());
+            if (pathName.isEmpty())
+            {
+                return MalformedUrlRequestHandler.getInstance();
+            }
             Stack<Path> foundPaths = findPossibleRequestHandlers(pathName);
             boolean methodNotAllowed = false;
             RequestHandlerMatcherPair requestHandlerMatcherPair = null;
+
             while (!foundPaths.empty())
             {
                 final Path path = foundPaths.pop();
