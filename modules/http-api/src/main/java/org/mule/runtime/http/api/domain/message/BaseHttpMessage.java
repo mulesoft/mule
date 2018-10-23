@@ -6,24 +6,21 @@
  */
 package org.mule.runtime.http.api.domain.message;
 
-import java.util.Collection;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Base implementation for {@HttpMessage} that handles ignore case header operations. The lower case version is attempted first.
  *
  * @since 3.9
  */
-public abstract class BaseHttpMessage implements HttpMessage {
+public abstract class BaseHttpMessage extends BaseMessageWithHeaders implements HttpMessage {
 
-  @Override
-  public String getHeaderValueIgnoreCase(String headerName) {
-    String lowerCaseValue = getHeaderValue(headerName.toLowerCase());
-    return lowerCaseValue != null ? lowerCaseValue : getHeaderValue(headerName);
+  public BaseHttpMessage() {
+    this(emptyMultiMap());
   }
 
-  @Override
-  public Collection<String> getHeaderValuesIgnoreCase(String headerName) {
-    Collection<String> lowerCaseValue = getHeaderValues(headerName.toLowerCase());
-    return lowerCaseValue != null ? lowerCaseValue : getHeaderValues(headerName);
+  public BaseHttpMessage(MultiMap<String, String> headers) {
+    super(headers);
   }
 }

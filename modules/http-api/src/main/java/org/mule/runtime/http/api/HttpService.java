@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientFactory;
@@ -35,6 +36,7 @@ public interface HttpService extends Service {
    * @return a fresh builder of {@link RequestMatcherRegistry RequestMatcherRegistries}.
    * @since 4.1.5
    */
+  @Experimental
   RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder();
 
 }
