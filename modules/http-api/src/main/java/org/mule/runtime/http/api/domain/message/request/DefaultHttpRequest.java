@@ -7,14 +7,12 @@
 package org.mule.runtime.http.api.domain.message.request;
 
 import static java.lang.System.lineSeparator;
-
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.BaseHttpMessage;
 
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * Basic implementation of {@link HttpRequest}. Instances can only be obtained through an {@link HttpRequestBuilder}.
@@ -23,25 +21,25 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
 
   private final URI uri;
   private final String path;
+  private final HttpProtocol protocol;
   private final String method;
-  private HttpProtocol version;
-  private final MultiMap<String, String> headers;
   private final MultiMap<String, String> queryParams;
   private final HttpEntity entity;
 
-  DefaultHttpRequest(URI uri, String path, String method, MultiMap<String, String> headers,
+  DefaultHttpRequest(URI uri, String path, String method, HttpProtocol protocol, MultiMap<String, String> headers,
                      MultiMap<String, String> queryParams, HttpEntity entity) {
+    super(headers);
     this.uri = uri;
     this.path = path;
+    this.protocol = protocol;
     this.method = method;
-    this.headers = headers;
     this.queryParams = queryParams;
     this.entity = entity;
   }
 
   @Override
   public HttpProtocol getProtocol() {
-    return this.version;
+    return protocol;
   }
 
   @Override
@@ -52,27 +50,6 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
   @Override
   public String getMethod() {
     return method;
-  }
-
-
-  @Override
-  public Collection<String> getHeaderNames() {
-    return headers.keySet();
-  }
-
-  @Override
-  public String getHeaderValue(String headerName) {
-    return headers.get(headerName);
-  }
-
-  @Override
-  public Collection<String> getHeaderValues(String headerName) {
-    return headers.getAll(headerName);
-  }
-
-  @Override
-  public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
   }
 
   @Override

@@ -8,8 +8,10 @@ package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.ws.WebSocket;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -133,4 +135,19 @@ public interface HttpClient {
    */
   CompletableFuture<HttpResponse> sendAsync(HttpRequest request, HttpRequestOptions options);
 
+  /**
+   * Opens a new WebSocket by adding the proper upgrade header to the given {@code request}
+   *
+   * @param request        a {@link HttpRequest} to the target WebSocket endpoint
+   * @param requestOptions the request options
+   * @param socketId       the id of the obtained socket
+   * @param callback       the callback that will receive the associated  socket events
+   * @return a future {@link WebSocket}
+   */
+  default CompletableFuture<WebSocket> openWebSocket(HttpRequest request,
+                                                     HttpRequestOptions requestOptions,
+                                                     String socketId,
+                                                     WebSocketCallback callback) {
+    throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
 }
