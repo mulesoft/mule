@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api.config;
 
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 
@@ -317,6 +319,14 @@ public class MuleProperties {
   @Deprecated
   public static final String MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT =
       MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
+
+  /**
+   * @return Whether MEL is set as the default EL according to {@link #MULE_MEL_AS_DEFAULT}
+   * @since 4.2.0
+   */
+  public static boolean isMelDefault() {
+    return valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
+  }
 
   private MuleProperties() {}
 }
