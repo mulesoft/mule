@@ -92,4 +92,8 @@ public class CompositeClassLoader extends ClassLoader {
     return new CompoundEnumeration<>(tmp);
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + delegates.toString();
+  }
 }
