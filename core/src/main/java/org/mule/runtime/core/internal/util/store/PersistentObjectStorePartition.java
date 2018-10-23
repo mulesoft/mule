@@ -139,7 +139,7 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     synchronized (realKeyToUUIDIndex) {
       try {
         cleanDirectory(this.partitionDirectory);
-        open();
+        createOrRetrievePartitionDescriptorFile();
       } catch (IOException e) {
         throw new ObjectStoreException(createStaticMessage("Could not clear ObjectStore"), e);
       }
