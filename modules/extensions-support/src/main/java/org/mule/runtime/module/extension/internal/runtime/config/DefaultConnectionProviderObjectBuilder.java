@@ -67,7 +67,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     ConnectionProvider<C> provider = doBuild(result);
 
     muleContext.getInjector().inject(provider);
-    provider = applyExtensionClassLoaderProxy(provider);
+    provider = applyConnectionProviderClassLoaderProxy(provider);
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);
 
@@ -95,8 +95,9 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   }
 
   /**
-   * Wraps the {@link ConnectionProvider} inside of a dynamic proxy which changes the current {@link ClassLoader} to the the
-   * extension's {@link ClassLoader} when executing any method of this wrapped {@link ConnectionProvider}
+   * Wraps the {@link ConnectionProvider} inside of a dynamic proxy which changes the current {@link ClassLoader} to a composition
+   * of the extension's {@link ClassLoader} and the app classloader when executing any method of this wrapped
+   * {@link ConnectionProvider}
    * <p>
    * This ensures that every time that the {@link ConnectionProvider} is used, it will work in the correct classloader.
    * <p>
@@ -106,15 +107,15 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
    * @param provider The {@link ConnectionProvider} to wrap
    * @return The wrapped {@link ConnectionProvider}
    */
-  private ConnectionProvider<C> applyExtensionClassLoaderProxy(ConnectionProvider provider) {
+  private ConnectionProvider<C> applyConnectionProviderClassLoaderProxy(ConnectionProvider provider) {
     Enhancer enhancer = new Enhancer();
 
-    // Use the classloader from the app instead of the extension for calling the provider methods.
-    // The provider may need to access resources from the application defined in its config. To do so, it needs the app
+    // Use the classloader from the app also instead of just the extension for calling the provider methods.
+    // The provider may need to access exported resources from the application defined in its config. To do so, it needs the app
     // classloader set as the TCCL.
     final ClassLoader extensionClassLoader = currentThread().getContextClassLoader();
-    final ClassLoader appClassLoader = muleContext.getExecutionClassLoader();
-    ClassLoader classLoader = new CompositeClassLoader(extensionClassLoader, appClassLoader);
+    final ClassLoader appRegionClassLoader = muleContext.getExecutionClassLoader().getParent();
+    ClassLoader classLoader = new CompositeClassLoader(extensionClassLoader, appRegionClassLoader);
 
     Class[] proxyInterfaces = getProxyInterfaces(provider);
     enhancer.setInterfaces(proxyInterfaces);

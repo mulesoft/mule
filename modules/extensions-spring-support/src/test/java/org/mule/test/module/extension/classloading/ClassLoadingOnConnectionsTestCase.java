@@ -72,7 +72,7 @@ public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunction
     assertThat(collect.size(), is(1));
     ClassLoader classLoader = collect.get(0);
     assertThat(classLoader.toString(),
-               allOf(containsString("classloading-extension"), containsString(".MuleApplicationClassLoader[app]@")));
+               allOf(containsString("classloading-extension"), containsString(".TestRegionClassLoader[Region] @")));
     Set<String> executedPhases = createdClassLoaders.keySet();
     assertThat(executedPhases, is(hasItems(stream(phasesToExecute).map(StringContains::containsString).toArray(Matcher[]::new))));
   }
