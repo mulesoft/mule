@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method java.lang.ClassLoader org.mule.runtime.http.api.server.RequestHandler::getContextClassLoader()",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "RequestHandler",
+          "methodName": "getContextClassLoader",
+          "elementKind": "method",
+          "justification": "Added to provide a fix for a logging issue."
+        },
+        {
           "code": "java.method.addedToInterface",
           "new": "method org.mule.runtime.http.api.utils.RequestMatcherRegistry.RequestMatcherRegistryBuilder org.mule.runtime.http.api.HttpService::getRequestMatcherRegistryBuilder()",
           "package": "org.mule.runtime.http.api",
