@@ -12,11 +12,12 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
+import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -100,6 +101,23 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     // assert is reusable
     this.storeInPartitions(OBJECT_KEY, OBJECT_BASE_VALUE);
     this.assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
+  }
+
+  @Test
+  public void clearDoesntBreakPartition() throws ObjectStoreException {
+    String partitionName = "custom";
+    String key = "key";
+    String value = "value";
+
+    os.open(partitionName);
+    os.clear(partitionName);
+    os.store(key, value, partitionName);
+
+    PartitionedPersistentObjectStore newOS = new PartitionedPersistentObjectStore<>(mockMuleContext);
+
+    newOS.open(partitionName);
+    Serializable retrieve = newOS.retrieve(key, partitionName);
+    assertThat(retrieve, is(value));
   }
 
   @Test
