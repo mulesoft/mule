@@ -7,8 +7,9 @@
 
 package org.mule.runtime.core.internal.util.store;
 
-import static junit.framework.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,8 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,8 +33,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.File;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -100,11 +101,13 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
 
 
     partition.store(KEY, VALUE);
-    assertTrue(partition.contains(KEY));
-    assertEquals(VALUE, partition.retrieve(KEY));
+    assertThat(partition.contains(KEY), is(true));
+    assertThat(VALUE, is(partition.retrieve(KEY)));
 
     partition.clear();
-    assertFalse(partition.contains(KEY));
+    assertThat(partition.contains(KEY), is(false));
+    assertThat("Partition descriptor doesn't exists", new File(objectStoreFolder.getRoot(), "partition-descriptor").exists(),
+               is(true));
   }
 
   @Test
