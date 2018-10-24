@@ -6,17 +6,17 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.mule.module.http.api.HttpConstants.HttpStatus;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 
 import org.mule.module.http.utils.SocketRequester;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
 
 import com.google.common.base.Charsets;
 
@@ -28,11 +28,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mule.util.IOUtils;
 
 public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
 {
 
     public static final String TEST_MALFORMED = "api/ping%";
+    public static final String TEST_MALFORMED_SCRIPT = "<script></script>%";
     public static final String TEST_ENCODED_SPACE = "test/foo 1 %";
     public static final String TEST_ENCODED_HASHTAG = "test/foo 1 #";
     public static final String TEST_ENCODED_PERCENT2 = "test/%24";
@@ -54,9 +56,29 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
         {
             socketRequester.initialize();
             socketRequester.doRequest("GET /" + TEST_MALFORMED + " HTTP/1.1");
-            String r = socketRequester.getResponse();
-            assertThat(r, containsString(Integer.toString(BAD_REQUEST.getStatusCode())));
-            assertThat(r, containsString(BAD_REQUEST.getReasonPhrase()));
+            String response = socketRequester.getResponse();
+            assertThat(response, containsString(Integer.toString(BAD_REQUEST.getStatusCode())));
+            assertThat(response, containsString(BAD_REQUEST.getReasonPhrase()));
+            assertThat(response, containsString("Unable to parse request: /"+TEST_MALFORMED));
+        }
+        finally
+        {
+            socketRequester.finalizeGracefully();
+        }
+    }
+
+    @Test
+    public void returnsBadRequestOnMalformedUrlWithInvalidContentTypeWithScript() throws Exception
+    {
+        SocketRequester socketRequester = new SocketRequester("localhost", httpPort.getNumber());;
+        try
+        {
+            socketRequester.initialize();
+            socketRequester.doRequest("POST /"+TEST_MALFORMED_SCRIPT+" HTTP/1.1");
+            String response = socketRequester.getResponse();
+            assertThat(response, containsString(Integer.toString(BAD_REQUEST.getStatusCode())));
+            assertThat(response, containsString(BAD_REQUEST.getReasonPhrase()));
+            assertThat(response, containsString(escapeHtml(TEST_MALFORMED_SCRIPT)));
         }
         finally
         {
@@ -67,35 +89,35 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
     @Test
     public void returnsOKWithEndocodedPathForSpecificEndpointSpace() throws Exception
     {
-        assertPostRequestGetsExpectedResponseStatusAndPayload(TEST_ENCODED_SPACE, OK, "specific");
+        assertPostRequestGetsOKResponseStatusAndPayload(TEST_ENCODED_SPACE, "specific");
     }
 
     @Test
     public void returnsOKWithEndocodedPathForSpecificEndpointHashtag() throws Exception
     {
-        assertPostRequestGetsExpectedResponseStatusAndPayload(TEST_ENCODED_HASHTAG, OK, "specific2");
+        assertPostRequestGetsOKResponseStatusAndPayload(TEST_ENCODED_HASHTAG, "specific2");
     }
 
     @Test
     public void returnsOKWithEndocodedPathForSpecificEndpointPercent() throws Exception
     {
-        assertPostRequestGetsExpectedResponseStatusAndPayload(TEST_ENCODED_PERCENT2, OK, "specific3");
+        assertPostRequestGetsOKResponseStatusAndPayload(TEST_ENCODED_PERCENT2, "specific3");
     }
 
-    public void assertPostRequestGetsExpectedResponseStatusAndPayload(String endpoint, HttpStatus status, String payload) throws Exception
+    public void assertPostRequestGetsOKResponseStatusAndPayload(String endpoint, String payload) throws Exception
     {
         Request request = Request.Post(getUrl(endpoint));
 
         HttpResponse response = request.execute().returnResponse();
         StatusLine statusLine = response.getStatusLine();
 
-        assertThat(statusLine.getStatusCode(), is(status.getStatusCode()));
+        assertThat(statusLine.getStatusCode(), is(OK.getStatusCode()));
         assertThat(IOUtils.toString(response.getEntity().getContent()), is(payload));
     }
 
     protected String getUrl(String path) throws UnsupportedEncodingException
     {
-        return String.format("http://localhost:%s/%s", httpPort.getValue(), URLEncoder.encode(path, Charsets.UTF_8.displayName()));
+        return format("http://localhost:%s/%s", httpPort.getValue(), URLEncoder.encode(path, Charsets.UTF_8.displayName()));
     }
 
 }

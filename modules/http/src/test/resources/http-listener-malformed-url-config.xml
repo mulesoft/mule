@@ -23,6 +23,8 @@
         <set-payload value="specific3" mimeType="text/plain" encoding="UTF-8"/>
     </flow>
 
+    <!--Wildcard endpoint must be tested to ensure invalid content is not
+    routed here-->
     <flow name="listenerAll" >
         <http:listener config-ref="httpConf" path="/*" allowedMethods="GET"/>
         <set-payload value="wildcard" mimeType="text/plain" encoding="UTF-8"/>

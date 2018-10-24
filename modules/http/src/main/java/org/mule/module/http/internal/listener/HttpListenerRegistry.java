@@ -6,9 +6,10 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static org.mule.module.http.internal.HttpParser.getDecodedPathIfDecodable;
+import static org.mule.module.http.internal.HttpParser.decode;
 import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 
+import com.google.common.base.Charsets;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -216,11 +217,15 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          */
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
+            final String pathName;
             Preconditions.checkArgument( request.getPath().startsWith(SLASH), "path parameter must start with /");
-            final String pathName = getDecodedPathIfDecodable(request.getPath());
-            if (pathName.isEmpty())
+            try
             {
-                return MalformedUrlRequestHandler.getInstance();
+                pathName = decode(request.getPath(), Charsets.UTF_8.displayName());
+            }
+            catch (IllegalArgumentException | MuleRuntimeException e)
+            {
+                return BadRequestHandler.getInstance();
             }
             Stack<Path> foundPaths = findPossibleRequestHandlers(pathName);
             boolean methodNotAllowed = false;

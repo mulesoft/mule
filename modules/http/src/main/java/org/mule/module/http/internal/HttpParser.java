@@ -256,7 +256,7 @@ public class HttpParser
         return uriParams;
     }
 
-    private static String decode(String text, String encoding)
+    public static String decode(String text, String encoding)
     {
         if(text == null)
         {
@@ -321,26 +321,6 @@ public class HttpParser
     public static String normalizePathWithSpacesOrEncodedSpaces(String path)
     {
         return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
-    }
-
-    /**
-     * Return decoded path if correctness verification succeeds.
-     *
-     * @param path request path.
-     * @return decoded path or empty string if path is not valid.
-     */
-    public static String getDecodedPathIfDecodable(String path)
-    {
-        try
-        {
-            //Attempt to decode path:
-            return decode(path, Charsets.UTF_8.displayName());
-        }
-        catch(IllegalArgumentException | MuleRuntimeException e)
-        {
-            //If path cannot be decoded, return empty string:
-            return "";
-        }
     }
 
     /**
