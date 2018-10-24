@@ -42,14 +42,14 @@ public final class FlowStackElement implements Serializable {
   public String getFlowName() {
     return flowName;
   }
-  
+
   /**
    * @return the time when the flow stack was created.
    */
   public Long getCreationTime() {
     return creationTime;
   }
-  
+
   /**
    * @return the milliseconds elapsed between its creation and now.
    */
