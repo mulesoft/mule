@@ -17,7 +17,7 @@ import java.io.Serializable;
  */
 public final class FlowStackElement implements Serializable {
 
-  private static final long serialVersionUID = -851491195125245390L;
+  private static final long serialVersionUID = 192333659386101806L;
 
   private String flowName;
   private String processorPath;
