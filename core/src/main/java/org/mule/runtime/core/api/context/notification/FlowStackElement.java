@@ -17,14 +17,16 @@ import java.io.Serializable;
  */
 public final class FlowStackElement implements Serializable {
 
-  private static final long serialVersionUID = -851491195125245390L;
+  private static final long serialVersionUID = 192333659386101806L;
 
   private String flowName;
   private String processorPath;
+  private Long creationTime;
 
   public FlowStackElement(String flowName, String processorPath) {
     this.flowName = flowName;
     this.processorPath = processorPath;
+    this.creationTime = System.currentTimeMillis();
   }
 
   /**
@@ -41,12 +43,26 @@ public final class FlowStackElement implements Serializable {
     return flowName;
   }
 
+  /**
+   * @return the time when the flow stack was created.
+   */
+  public Long getCreationTime() {
+    return creationTime;
+  }
+
+  /**
+   * @return the milliseconds elapsed between its creation and now.
+   */
+  public Long getElapsedTime() {
+    return System.currentTimeMillis() - creationTime;
+  }
+
   @Override
   public String toString() {
     if (processorPath == null) {
-      return format("%s", flowName);
+      return format("%s %d ms", flowName, getElapsedTime());
     } else {
-      return format("%s(%s)", flowName, processorPath);
+      return format("%s(%s) %d ms", flowName, processorPath, getElapsedTime());
     }
   }
 }
