@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -747,10 +748,13 @@ public final class SchemaBuilder {
         .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
         .sorted(comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
         .forEach(parameter -> {
+          boolean isParameterRequired = parameter.isRequired() &&
+              !parameter.getDslConfiguration().allowsReferences() &&
+              !parameter.getDslConfiguration().allowTopLevelDefinition();
           parameter.getModelProperty(QNameModelProperty.class)
               .map(QNameModelProperty::getValue)
-              .ifPresent(qName -> sequence.getParticle()
-                  .add(objectFactory.createElement(createRefElement(qName, false))));
+              .ifPresent(qName -> addParameterToSequence(asList(createRefElement(qName, isParameterRequired)), sequence));
+
           if (parameter.getName().equals(TLS_PARAMETER_NAME)) {
             addTlsSupport(extensionType);
           }
