@@ -6,11 +6,14 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static java.net.URLEncoder.encode;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+import static com.google.common.base.Charsets.UTF_8;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 
@@ -18,10 +21,7 @@ import org.mule.module.http.utils.SocketRequester;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import com.google.common.base.Charsets;
-
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 import org.apache.http.client.fluent.Request;
 import org.apache.http.HttpResponse;
@@ -59,7 +59,7 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
             String response = socketRequester.getResponse();
             assertThat(response, containsString(Integer.toString(BAD_REQUEST.getStatusCode())));
             assertThat(response, containsString(BAD_REQUEST.getReasonPhrase()));
-            assertThat(response, containsString("Unable to parse request: /"+TEST_MALFORMED));
+            assertThat(response, endsWith("Unable to parse request: /" + TEST_MALFORMED + getRequestEnding()));
         }
         finally
         {
@@ -74,11 +74,11 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
         try
         {
             socketRequester.initialize();
-            socketRequester.doRequest("POST /"+TEST_MALFORMED_SCRIPT+" HTTP/1.1");
+            socketRequester.doRequest("POST /" + TEST_MALFORMED_SCRIPT + " HTTP/1.1");
             String response = socketRequester.getResponse();
             assertThat(response, containsString(Integer.toString(BAD_REQUEST.getStatusCode())));
             assertThat(response, containsString(BAD_REQUEST.getReasonPhrase()));
-            assertThat(response, containsString(escapeHtml(TEST_MALFORMED_SCRIPT)));
+            assertThat(response, endsWith(escapeHtml(TEST_MALFORMED_SCRIPT + getRequestEnding())));
         }
         finally
         {
@@ -117,7 +117,12 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
 
     protected String getUrl(String path) throws UnsupportedEncodingException
     {
-        return format("http://localhost:%s/%s", httpPort.getValue(), URLEncoder.encode(path, Charsets.UTF_8.displayName()));
+        return format("http://localhost:%s/%s", httpPort.getValue(), encode(path, UTF_8.displayName()));
+    }
+
+    protected String getRequestEnding()
+    {
+        return System.getProperty("line.separator") + "0" + System.getProperty("line.separator");
     }
 
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
 import static org.mule.transformer.types.MimeTypes.MULTIPART_RELATED;
@@ -15,7 +16,6 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.util.StringUtils;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
@@ -144,12 +144,12 @@ public class HttpParser
 
     public static ParameterMap decodeQueryString(String queryString)
     {
-        return decodeUrlEncodedBody(queryString, Charsets.UTF_8.name());
+        return decodeUrlEncodedBody(queryString, UTF_8.name());
     }
 
     public static String encodeQueryString(Map parameters)
     {
-        return encodeString(Charsets.UTF_8.name(), parameters);
+        return encodeString(UTF_8.name(), parameters);
     }
 
     public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, String encoding)
@@ -249,7 +249,7 @@ public class HttpParser
                 {
                     String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
                     String parameterValue = requestPathParts[i];
-                    uriParams.put(parameterName, decode(parameterValue, Charsets.UTF_8.displayName()));
+                    uriParams.put(parameterName, decode(parameterValue, UTF_8.displayName()));
                 }
             }
         }
@@ -347,7 +347,7 @@ public class HttpParser
         try
         {
             String urlPreparedForNewParameter = url.contains("?") ? url + "&" : url + "?";
-            return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, Charsets.UTF_8.name()) + "=" + URLEncoder.encode(queryParamValue, Charsets.UTF_8.name());
+            return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, UTF_8.name()) + "=" + URLEncoder.encode(queryParamValue, UTF_8.name());
         }
         catch (UnsupportedEncodingException e)
         {

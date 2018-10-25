@@ -6,10 +6,11 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static com.google.common.base.Charsets.UTF_8;
+import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.module.http.internal.HttpParser.decode;
 import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 
-import com.google.common.base.Charsets;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -218,10 +219,10 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
             final String pathName;
-            Preconditions.checkArgument( request.getPath().startsWith(SLASH), "path parameter must start with /");
+            checkArgument(request.getPath().startsWith(SLASH), "path parameter must start with /");
             try
             {
-                pathName = decode(request.getPath(), Charsets.UTF_8.displayName());
+                pathName = decode(request.getPath(), UTF_8.displayName());
             }
             catch (IllegalArgumentException | MuleRuntimeException e)
             {

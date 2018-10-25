@@ -9,7 +9,7 @@ package org.mule.module.http.internal.listener;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 
 /**
- * Request handle for invalid requests (Bad Request).
+ * Request handler for invalid requests (Bad Request).
  */
 public class BadRequestHandler extends ErrorRequestHandler
 {

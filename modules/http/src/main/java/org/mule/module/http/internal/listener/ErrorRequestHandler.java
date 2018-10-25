@@ -8,7 +8,8 @@ package org.mule.module.http.internal.listener;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
+
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
@@ -41,7 +42,7 @@ public class ErrorRequestHandler implements RequestHandler
         responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
                                                .setStatusCode(statusCode)
                                                .setReasonPhrase(reasonPhrase)
-                                               .setEntity(new ByteArrayHttpEntity(resolvedEntity.getBytes()))
+                                               .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(resolvedEntity.getBytes())))
                                                .build(), new ResponseStatusCallback()
         {
             @Override
