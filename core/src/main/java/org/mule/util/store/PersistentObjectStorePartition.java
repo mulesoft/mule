@@ -156,6 +156,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
             try
             {
                 cleanDirectory(this.partitionDirectory);
+                createOrRetrievePartitionDescriptorFile();
             }
             catch (IOException e)
             {

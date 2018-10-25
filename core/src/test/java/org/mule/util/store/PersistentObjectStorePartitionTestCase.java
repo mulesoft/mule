@@ -7,12 +7,14 @@
 
 package org.mule.util.store;
 
-import static junit.framework.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.store.ObjectDoesNotExistException;
@@ -22,6 +24,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -103,18 +106,18 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void clear() throws Exception
-    {
+    public void clear() throws Exception {
         final String KEY = "key";
         final String VALUE = "value";
 
 
         partition.store(KEY, VALUE);
-        assertTrue(partition.contains(KEY));
-        assertEquals(VALUE, partition.retrieve(KEY));
+        assertThat(partition.contains(KEY), is(true));
+        assertThat(partition.retrieve(KEY), is((Serializable) VALUE));
 
         partition.clear();
-        assertFalse(partition.contains(KEY));
+        assertThat(partition.contains(KEY), is(false));
+        assertThat("Partition descriptor doesn't exist", new File(objectStoreFolder.getRoot(), "partition-descriptor").exists(), is(true));
     }
 
     @Test
