@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
@@ -34,7 +35,13 @@ public class ContainerServicesMuleContextConfigurator implements ServiceConfigur
 
   @Override
   public void configure(CustomizationService customizationService) {
-    serviceRepository.getServices()
-        .forEach(service -> customizationService.registerCustomServiceImpl(service.getName(), service));
+    serviceRepository.getServices().forEach(service -> {
+      String name = service.getName();
+      String contract = service.getContractName();
+      if (!isEmpty(contract)) {
+        name += " - " + contract;
+      }
+      customizationService.registerCustomServiceImpl(name, service);
+    });
   }
 }

@@ -109,6 +109,8 @@ public class LazyServiceProxy implements InvocationHandler {
       return method.invoke(this, args);
     } else if (methodClass == NamedObject.class) {
       return assembly.getName();
+    } else if (methodClass == Service.class) {
+      return assembly.getServiceContract().getSimpleName();
     } else if (methodClass == Startable.class) {
       return handleStart();
     } else if (methodClass == Stoppable.class) {
