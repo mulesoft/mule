@@ -24,6 +24,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -112,11 +113,11 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
 
         partition.store(KEY, VALUE);
         assertThat(partition.contains(KEY), is(true));
-        assertThat(VALUE, is(partition.retrieve(KEY)));
+        assertThat(partition.retrieve(KEY), is((Serializable) VALUE));
 
         partition.clear();
         assertThat(partition.contains(KEY), is(false));
-        assertThat("Partition descriptor doesn't exists", new File(objectStoreFolder.getRoot(), "partition-descriptor").exists(), is(true));
+        assertThat("Partition descriptor doesn't exist", new File(objectStoreFolder.getRoot(), "partition-descriptor").exists(), is(true));
     }
 
     @Test
