@@ -41,7 +41,7 @@ public class HttpRetryRequestTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty retryAttemptsSystemProperty;
 
-    private int retryAttempts;
+    protected int retryAttempts;
 
     @Parameters
     public static Object[] data()
@@ -64,10 +64,15 @@ public class HttpRetryRequestTestCase extends FunctionalTestCase
         this.retryAttempts = retryAttempts;
     }
 
+    protected int getIdempotentMethodExpectedRetries()
+    {
+        return 0;
+    }
+
     @Test
     public void nonIdempotentMethod() throws Exception
     {
-        runRetryPolicyTest("POST", 0);
+        runRetryPolicyTest("POST", getIdempotentMethodExpectedRetries());
     }
 
     @Test
