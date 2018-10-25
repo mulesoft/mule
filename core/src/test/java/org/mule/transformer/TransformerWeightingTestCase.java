@@ -21,6 +21,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.transformer.builder.MockConverterBuilder;
 
+import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -123,7 +124,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         assertThat(weighting1.isNotMatch(), equalTo(true));
         assertThat(weighting2.isNotMatch(), equalTo(true));
                 
-        assertThat(weighting1.compareTo(weighting2), equalTo(1));
+        assertThat(weighting1.compareTo(weighting2), equalTo(-1));
         assertThat(weighting2.compareTo(weighting1), equalTo(1));
     }
     
@@ -148,4 +149,21 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         assertEquals(0, weighting1.getOutputWeighting());
         assertEquals(0, weighting2.getOutputWeighting());
     }
+
+    @Test
+    public void testComparableContractHonored()
+    {
+        Transformer trans1 = new MockConverterBuilder().from(create(Object.class)).to(create(byte[].class)).build();
+        Transformer trans2 = new MockConverterBuilder().from(create(FruitBowl.class)).to(create(String.class)).build();
+
+        TransformerWeighting weighting1 = new TransformerWeighting(ByteArrayInputStream.class, String.class, trans1);
+        TransformerWeighting weighting2 = new TransformerWeighting(ByteArrayInputStream.class, String.class, trans2);
+
+        assertThat(weighting1.compareTo(weighting2), equalTo(1));
+        assertThat(weighting2.compareTo(weighting1), equalTo(-1));
+
+        assertThat(weighting1.compareTo(weighting1), equalTo(0));
+        assertThat(weighting2.compareTo(weighting2), equalTo(0));
+    }
+    
 }
