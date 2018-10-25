@@ -104,12 +104,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.error = event.getError().orElse(null);
     this.notificationsEnabled = event.isNotificationsEnabled();
 
-    this.flowVariables.putAll(event.getVariables());
-    if (event instanceof InternalEventImplementation) {
-      this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) ((InternalEventImplementation) event).getVariables();
-    } else {
-      varsModified = true;
-    }
+    this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.internalParameters.putAll(event.getInternalParameters());
   }
 
@@ -137,6 +132,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder variables(Map<String, ?> flowVariables) {
+    initVariables();
+
     copyFromTo(flowVariables, this.flowVariables);
     this.varsModified = true;
     return this;
@@ -144,6 +141,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder addVariable(String key, Object value) {
+    initVariables();
+
     flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
     this.varsModified = true;
     this.modified = true;
@@ -153,6 +152,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder addVariable(String key, Object value, DataType dataType) {
+    initVariables();
+
     flowVariables.put(key, new TypedValue<>(value, dataType));
     this.varsModified = true;
     this.modified = true;
@@ -161,6 +162,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder removeVariable(String key) {
+    initVariables();
+
     this.modified = flowVariables.remove(key) != null || modified;
     this.varsModified = this.varsModified || modified;
     return this;
@@ -255,12 +258,19 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
+      initVariables();
       return new InternalEventImplementation(context, requireNonNull(messageFactory.apply(context)),
                                              varsModified ? flowVariables : originalVars,
                                              internalParameters, session, securityContext, replyToDestination,
                                              replyToHandler, itemSequenceInfo, error,
                                              legacyCorrelationId,
                                              notificationsEnabled);
+    }
+  }
+
+  protected void initVariables() {
+    if (!this.varsModified) {
+      this.flowVariables.putAll(originalVars);
     }
   }
 
