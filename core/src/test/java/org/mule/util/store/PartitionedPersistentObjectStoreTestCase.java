@@ -107,6 +107,20 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     }
 
     @Test
+    public void clearDoesntBreakPartition() throws ObjectStoreException {
+        String partitionName = "custom";
+        String key = "key";
+        String value = "value";
+        os.open(partitionName);
+        os.clear(partitionName);
+        os.store(key, value, partitionName);
+        PartitionedPersistentObjectStore newOS = new PartitionedPersistentObjectStore<>(mockMuleContext);
+        newOS.open(partitionName);
+        Serializable retrieve = newOS.retrieve(key, partitionName);
+        assertThat(retrieve, is((Serializable) value));
+    }
+
+    @Test
     public void allowsAnyPartitionName() throws Exception
     {
         os.open("asdfsadfsa#$%@#$@#$@$%$#&8******ASDFWER??!?!");
