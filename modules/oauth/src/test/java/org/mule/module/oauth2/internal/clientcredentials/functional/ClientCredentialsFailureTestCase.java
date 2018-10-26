@@ -85,16 +85,8 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
             public void run() throws Exception
             {
                 ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
-                MuleContext muleContext = applicationContextBuilder.build();
-
-                try
-                {
-                    ((Flow)(muleContext.getRegistry().lookupFlowConstruct("testFlow"))).process(MuleTestUtils.getTestEvent("", muleContext));
-                    fail();
-                }
-                catch (Exception e) {
-                    assertThat(e.getCause().getCause(), instanceOf(TokenNotFoundException.class));
-                }
+                expectedException.expectCause(isA(TokenNotFoundException.class));
+                applicationContextBuilder.build();
             }
         });
     }
