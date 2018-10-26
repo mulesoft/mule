@@ -47,26 +47,48 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory;
   private final DescriptorLoaderRepository descriptorLoaderRepository;
   private final ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder;
+  private final File targetServicesFolder;
 
   /**
    * Creates a new instance.
    *
-   * @param containerClassLoader container artifact classLoader. Non null.
-   * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param containerClassLoader               container artifact classLoader. Non null.
+   * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
+   * @param targetServicesFolder               {@link File} where services are exploded and would be discovered. Non null.
+   */
+  public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
+                                             ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
+                                             DescriptorLoaderRepository descriptorLoaderRepository,
+                                             ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
+                                             File targetServicesFolder) {
+    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
+    checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
+    checkArgument(artifactDescriptorValidatorBuilder != null, "artifactDescriptorValidatorBuilder cannot be null");
+    checkArgument(targetServicesFolder != null, "targetServicesFolder cannot be null");
+
+    this.descriptorLoaderRepository = descriptorLoaderRepository;
+    this.apiClassLoader = containerClassLoader;
+    this.serviceClassLoaderFactory = serviceClassLoaderFactory;
+    this.artifactDescriptorValidatorBuilder = artifactDescriptorValidatorBuilder;
+    this.targetServicesFolder = targetServicesFolder;
+  }
+
+  /**
+   * Creates a new instance that discover services from Mule Runtime services folder.
+   *
+   * @param containerClassLoader               container artifact classLoader. Non null.
+   * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
                                              ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
                                              DescriptorLoaderRepository descriptorLoaderRepository,
                                              ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
-    this.descriptorLoaderRepository = descriptorLoaderRepository;
-    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-    checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
-    checkArgument(artifactDescriptorValidatorBuilder != null, "artifactDescriptorValidatorBuilder cannot be null");
-    this.apiClassLoader = containerClassLoader;
-    this.serviceClassLoaderFactory = serviceClassLoaderFactory;
-    this.artifactDescriptorValidatorBuilder = artifactDescriptorValidatorBuilder;
+    this(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository, artifactDescriptorValidatorBuilder,
+         MuleFoldersUtil.getServicesFolder());
   }
 
   @Override
@@ -84,7 +106,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   private List<ServiceDescriptor> getServiceDescriptors(ServiceDescriptorFactory serviceDescriptorFactory)
       throws ServiceResolutionError {
     List<ServiceDescriptor> foundServices = new LinkedList<>();
-    for (String serviceFile : getServicesFolder().list(new SuffixFileFilter(".jar"))) {
+    for (String serviceFile : this.targetServicesFolder.list(new SuffixFileFilter(".jar"))) {
       final File tempFolder = new File(getServicesTempFolder(), getBaseName(serviceFile));
       try {
         unzip(new File(getServicesFolder(), serviceFile), tempFolder);
