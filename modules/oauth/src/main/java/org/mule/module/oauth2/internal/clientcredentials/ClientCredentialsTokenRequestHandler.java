@@ -21,6 +21,7 @@ import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.module.oauth2.internal.ApplicationCredentials;
 import org.mule.module.oauth2.internal.MuleEventLogger;
 import org.mule.module.oauth2.internal.OAuthConstants;
+import org.mule.module.oauth2.internal.OAuthTokenMuleException;
 import org.mule.module.oauth2.internal.TokenNotFoundException;
 import org.mule.module.oauth2.internal.TokenResponseProcessor;
 import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
@@ -155,13 +156,13 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
             logger.error(String.format("Could not extract access token or refresh token from token URL. Access token is %s, Refresh token is %s",
                                        e.getTokenResponseProcessor().getAccessToken(), e.getTokenResponseProcessor().getRefreshToken()));
             muleEventLogger.logContent(e.getTokenUrlResponse());
-            throw new DefaultMuleException(e);
+            throw new OAuthTokenMuleException(e);
         }
         catch (TokenUrlResponseException e)
         {
             logger.error((String.format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
             muleEventLogger.logContent(e.getTokenUrlResponse());
-            throw new DefaultMuleException(e);
+            throw new OAuthTokenMuleException(e);
         }
     }
 
