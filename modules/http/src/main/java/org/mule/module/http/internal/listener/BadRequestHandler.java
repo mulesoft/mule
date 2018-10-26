@@ -10,8 +10,10 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 
 /**
  * Request handler for invalid requests (Bad Request).
+ *
+ * @since 3.10
  */
-public class BadRequestHandler extends ErrorRequestHandler
+class BadRequestHandler extends ErrorRequestHandler
 {
 
     public static final String BAD_REQUEST_ENTITY_FORMAT = "Unable to parse request: %s";

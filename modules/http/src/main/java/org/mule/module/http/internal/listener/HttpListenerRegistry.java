@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static com.google.common.base.Charsets.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.module.http.internal.HttpParser.decode;
 import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;

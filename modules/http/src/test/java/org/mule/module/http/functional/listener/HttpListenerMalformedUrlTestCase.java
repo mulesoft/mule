@@ -33,11 +33,12 @@ import org.mule.util.IOUtils;
 public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
 {
 
-    public static final String TEST_MALFORMED = "api/ping%";
-    public static final String TEST_MALFORMED_SCRIPT = "<script></script>%";
-    public static final String TEST_ENCODED_SPACE = "test/foo 1 %";
-    public static final String TEST_ENCODED_HASHTAG = "test/foo 1 #";
-    public static final String TEST_ENCODED_PERCENT2 = "test/%24";
+    public static final String LINE_SEPARATOR = System.lineSeparator();
+    public static final String MALFORMED = "api/ping%";
+    public static final String MALFORMED_SCRIPT = "<script></script>%";
+    public static final String ENCODED_SPACE = "test/foo 1 %";
+    public static final String ENCODED_HASHTAG = "test/foo 1 #";
+    public static final String ENCODED_PERCENT2 = "test/%24";
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
@@ -55,11 +56,11 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
         try
         {
             socketRequester.initialize();
-            socketRequester.doRequest("GET /" + TEST_MALFORMED + " HTTP/1.1");
+            socketRequester.doRequest("GET /" + MALFORMED + " HTTP/1.1");
             String response = socketRequester.getResponse();
             assertThat(response, containsString(Integer.toString(BAD_REQUEST.getStatusCode())));
             assertThat(response, containsString(BAD_REQUEST.getReasonPhrase()));
-            assertThat(response, endsWith("Unable to parse request: /" + TEST_MALFORMED + getRequestEnding()));
+            assertThat(response, endsWith("Unable to parse request: /" + MALFORMED + getRequestEnding()));
         }
         finally
         {
@@ -74,11 +75,11 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
         try
         {
             socketRequester.initialize();
-            socketRequester.doRequest("POST /" + TEST_MALFORMED_SCRIPT + " HTTP/1.1");
+            socketRequester.doRequest("POST /" + MALFORMED_SCRIPT + " HTTP/1.1");
             String response = socketRequester.getResponse();
             assertThat(response, containsString(Integer.toString(BAD_REQUEST.getStatusCode())));
             assertThat(response, containsString(BAD_REQUEST.getReasonPhrase()));
-            assertThat(response, endsWith(escapeHtml(TEST_MALFORMED_SCRIPT + getRequestEnding())));
+            assertThat(response, endsWith(escapeHtml(MALFORMED_SCRIPT + getRequestEnding())));
         }
         finally
         {
@@ -89,19 +90,19 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
     @Test
     public void returnsOKWithEndocodedPathForSpecificEndpointSpace() throws Exception
     {
-        assertPostRequestGetsOKResponseStatusAndPayload(TEST_ENCODED_SPACE, "specific");
+        assertPostRequestGetsOKResponseStatusAndPayload(ENCODED_SPACE, "specific");
     }
 
     @Test
     public void returnsOKWithEndocodedPathForSpecificEndpointHashtag() throws Exception
     {
-        assertPostRequestGetsOKResponseStatusAndPayload(TEST_ENCODED_HASHTAG, "specific2");
+        assertPostRequestGetsOKResponseStatusAndPayload(ENCODED_HASHTAG, "specific2");
     }
 
     @Test
     public void returnsOKWithEndocodedPathForSpecificEndpointPercent() throws Exception
     {
-        assertPostRequestGetsOKResponseStatusAndPayload(TEST_ENCODED_PERCENT2, "specific3");
+        assertPostRequestGetsOKResponseStatusAndPayload(ENCODED_PERCENT2, "specific3");
     }
 
     public void assertPostRequestGetsOKResponseStatusAndPayload(String endpoint, String payload) throws Exception
@@ -122,7 +123,7 @@ public class HttpListenerMalformedUrlTestCase extends FunctionalTestCase
 
     protected String getRequestEnding()
     {
-        return System.getProperty("line.separator") + "0" + System.getProperty("line.separator");
+        return LINE_SEPARATOR + "0" + LINE_SEPARATOR;
     }
 
 }

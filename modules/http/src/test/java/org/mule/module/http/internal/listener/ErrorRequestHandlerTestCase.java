@@ -31,7 +31,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,13 +57,12 @@ public class ErrorRequestHandlerTestCase extends AbstractMuleTestCase
     @Parameters(name = "{0}")
     public static Collection<Object[]> parameters()
     {
-        final List<Object[]> objects = asList(new Object[][]{
+        return asList(new Object[][]{
                 {NoListenerRequestHandler.getInstance(), NO_LISTENER_ENTITY_FORMAT},
                 {NoMethodRequestHandler.getInstance(), METHOD_NOT_ALLOWED_FORMAT},
                 {BadRequestHandler.getInstance(), BAD_REQUEST_ENTITY_FORMAT},
                 {ServiceTemporarilyUnavailableListenerRequestHandler.getInstance(), SERVICE_NOT_AVAILABLE_FORMAT}
         });
-        return objects;
     }
 
     @Before

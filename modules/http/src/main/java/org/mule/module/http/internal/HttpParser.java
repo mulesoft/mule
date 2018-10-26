@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal;
 
-import static com.google.common.base.Charsets.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
 import static org.mule.transformer.types.MimeTypes.MULTIPART_RELATED;
