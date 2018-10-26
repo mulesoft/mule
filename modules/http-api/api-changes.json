@@ -337,6 +337,42 @@
           "classSimpleName": "WebSocketCloseCode",
           "elementKind": "enum",
           "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.OptionalLong org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity::getBytesLength()",
+          "package": "org.mule.runtime.http.api.domain.entity",
+          "classSimpleName": "ByteArrayHttpEntity",
+          "methodName": "getBytesLength",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.OptionalLong org.mule.runtime.http.api.domain.entity.EmptyHttpEntity::getBytesLength()",
+          "package": "org.mule.runtime.http.api.domain.entity",
+          "classSimpleName": "EmptyHttpEntity",
+          "methodName": "getBytesLength",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method java.util.OptionalLong org.mule.runtime.http.api.domain.entity.HttpEntity::getBytesLength()",
+          "package": "org.mule.runtime.http.api.domain.entity",
+          "classSimpleName": "HttpEntity",
+          "methodName": "getBytesLength",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.OptionalLong org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity::getBytesLength()",
+          "package": "org.mule.runtime.http.api.domain.entity.multipart",
+          "classSimpleName": "MultipartHttpEntity",
+          "methodName": "getBytesLength",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
         }
       ]
     }

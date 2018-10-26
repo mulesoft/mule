@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.http.api.domain.entity;
 
+import static java.util.OptionalLong.empty;
+import static java.util.OptionalLong.of;
+
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * An entity that can be sent or received via an {@link org.mule.runtime.http.api.domain.message.request.HttpRequest} or
@@ -78,7 +82,22 @@ public interface HttpEntity {
    * messages that carried a 'Content-Length' header will return a length.
    *
    * @return an {@link Optional} with the length (in bytes) or an empty one if unknown
+   *
+   * @deprecated Use {@link #getBytesLength()} instead.
    */
+  @Deprecated
   Optional<Long> getLength();
+
+  /**
+   * Provides the length (in bytes) of the {@link HttpEntity}, if known. For the most part, only received entities from HTTP
+   * messages that carried a 'Content-Length' header will return a length.
+   *
+   * @return an {@link Optional} with the length (in bytes) or an empty one if unknown
+   *
+   * @since 4.2
+   */
+  default OptionalLong getBytesLength() {
+    return getLength().map(l -> of(l)).orElse(empty());
+  }
 
 }

@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -47,12 +48,13 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 
 @NoExtend
@@ -244,8 +246,7 @@ public class DefaultPolicyInstance extends AbstractComponent
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (isExecuteNext(processor)) {
-        return publisher -> Flux.from(publisher)
-            .transform(processor);
+        return super.onProcessor(processor);
       } else if (processor.getProcessingType() == CPU_LITE_ASYNC) {
         return publisher -> Flux.from(publisher)
             .transform(processor)
@@ -259,8 +260,7 @@ public class DefaultPolicyInstance extends AbstractComponent
             .publishOn(fromExecutor(cpuIntensiveScheduler))
             .transform(processor);
       } else {
-        return publisher -> Flux.from(publisher)
-            .transform(processor);
+        return super.onProcessor(processor);
       }
     }
 

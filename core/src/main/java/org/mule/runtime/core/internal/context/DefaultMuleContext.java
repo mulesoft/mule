@@ -46,6 +46,7 @@ import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -124,6 +125,8 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -134,7 +137,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
@@ -208,6 +210,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   private SchedulerController schedulerController = new DefaultSchedulerController();
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
+  private String clusterNodeIdPrefix = "";
 
   private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
       new SingleResourceTransactionFactoryManager();
@@ -833,7 +836,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   @Override
   public String getUniqueIdString() {
-    return getClusterUUID(clusterConfiguration.getClusterNodeId());
+    return getClusterUUID(clusterNodeIdPrefix);
   }
 
   @Override
@@ -921,6 +924,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
     ClusterConfiguration overriddenClusterConfiguration = getRegistry().get(OBJECT_CLUSTER_CONFIGURATION);
     if (overriddenClusterConfiguration != null) {
       this.clusterConfiguration = overriddenClusterConfiguration;
+      this.clusterNodeIdPrefix = overriddenClusterConfiguration.getClusterNodeId() + "-";
     }
   }
 

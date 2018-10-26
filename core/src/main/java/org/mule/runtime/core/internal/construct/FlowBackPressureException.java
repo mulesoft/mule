@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.exception.MuleException;
 
 import java.util.concurrent.RejectedExecutionException;
 
@@ -15,27 +17,27 @@ import java.util.concurrent.RejectedExecutionException;
  *
  * @since 4.1
  */
-public class FlowBackPressureException extends Exception {
+public class FlowBackPressureException extends MuleException {
 
   static String BACK_PRESSURE_ERROR_MESSAGE = "Flow '%s' is unable to accept new events at this time";
-  private static final long serialVersionUID = 2992038225993918910L;
+  private static final long serialVersionUID = -4973370165925845336L;
 
   /**
    * Create a new {@link FlowBackPressureException} with no cause. This is typically use when a stream based processing exerts
    * back-pressure without throwing an exception.
-   * 
+   *
    */
   public FlowBackPressureException(String flowName) {
-    super(format(BACK_PRESSURE_ERROR_MESSAGE, flowName));
+    super(createStaticMessage(BACK_PRESSURE_ERROR_MESSAGE, flowName));
   }
 
   /**
    * Create a new {@link FlowBackPressureException} with a cause. This is typically use when a non-stream based processing
-   * strategy is in use and back-pressure is identified by a a {@link RejectedExecutionException}.
+   * strategy is in use and back-pressure is identified by a {@link RejectedExecutionException}.
    *
    */
   public FlowBackPressureException(String flowName, Throwable cause) {
-    super(format(BACK_PRESSURE_ERROR_MESSAGE, flowName), cause);
+    super(createStaticMessage(BACK_PRESSURE_ERROR_MESSAGE, flowName), cause);
   }
 
 }

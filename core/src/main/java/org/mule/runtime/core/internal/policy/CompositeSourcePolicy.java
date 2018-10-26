@@ -116,7 +116,7 @@ public class CompositeSourcePolicy extends
           }
           return flowExecutionException;
         })
-        .doOnError(e -> LOGGER.error(e.getMessage(), e));
+        .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e));
   }
 
   /**
@@ -157,7 +157,8 @@ public class CompositeSourcePolicy extends
           return right(new SourcePolicySuccessResult(policiesResultEvent, responseParameters, getParametersProcessor()));
         }).doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
 
-        .doOnError(e -> LOGGER.error(e.getMessage(), e))
+        .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
+                   e -> LOGGER.error(e.getMessage(), e))
         .onErrorResume(FlowExecutionException.class, e -> {
           Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer

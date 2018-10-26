@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -40,6 +41,10 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,9 +52,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 /**
@@ -230,15 +232,17 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
 
   private void intercept(List<Interceptor> interceptors, Consumer<Interceptor> closure,
                          Function<Interceptor, String> exceptionMessageFunction) {
-    interceptors.forEach(interceptor -> {
-      try {
-        closure.accept(interceptor);
-      } catch (Exception e) {
-        if (LOGGER.isDebugEnabled()) {
+    if (!LOGGER.isDebugEnabled()) {
+      interceptors.forEach(closure);
+    } else {
+      interceptors.forEach(interceptor -> {
+        try {
+          closure.accept(interceptor);
+        } catch (Exception e) {
           LOGGER.debug(exceptionMessageFunction.apply(interceptor), e);
         }
-      }
-    });
+      });
+    }
   }
 
   private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<ComponentModel> context) {

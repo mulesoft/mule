@@ -34,5 +34,14 @@ public final class UUID {
         .toAppendable(new StringBuilder(38).append(clusterId).append('-')).toString();
   }
 
+  /**
+   * @param clusterIdPrefix cluster id prefix, ending in a `-` separator
+   * @return time-based UUID prefixed with the cluster id so as to ensure uniqueness within cluster.
+   */
+  public static String getClusterUUID(String clusterIdPrefix) {
+    return new com.eaio.uuid.UUID()
+        .toAppendable(new StringBuilder(38).append(clusterIdPrefix)).toString();
+  }
+
 
 }

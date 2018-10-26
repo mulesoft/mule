@@ -22,7 +22,7 @@ public abstract class BaseMessageWithHeaders implements MessageWithHeaders {
   protected MultiMap<String, String> headers;
 
   public BaseMessageWithHeaders(MultiMap<String, String> headers) {
-    this.headers = headers;
+    this.headers = headers != null ? headers.toImmutableMultiMap() : null;
   }
 
   @Override
@@ -42,7 +42,7 @@ public abstract class BaseMessageWithHeaders implements MessageWithHeaders {
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
+    return headers;
   }
 
   @Override

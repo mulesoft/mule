@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.util.Collections.unmodifiableMap;
+
+import org.apache.commons.collections.map.AbstractHashedMap;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,8 +17,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.collections.map.AbstractHashedMap;
 
 /**
  * A case-insensitive <code>Map</code>.
@@ -31,20 +33,44 @@ import org.apache.commons.collections.map.AbstractHashedMap;
  *
  * @since 3.0.0
  */
-public final class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
+public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
 
   /**
    * Serialisation version
    */
   private static final long serialVersionUID = -7074633917369299456L;
 
-  private final InternalCaseInsensitiveHashMap delegate;
+  @SuppressWarnings("rawtypes")
+  private static final CaseInsensitiveHashMap EMPTY_MAP = new CaseInsensitiveHashMap<>().toImmutableCaseInsensitiveMap();
+
+  /**
+   * Returns an empty CaseInsensitiveHashMap (immutable). This map is serializable.
+   *
+   * <p>
+   * This example illustrates the type-safe way to obtain an empty map:
+   *
+   * <pre>
+   *
+   * CaseInsensitiveHashMap&lt;String, String&gt; s = CaseInsensitiveHashMap.emptyCaseInsensitiveMap();
+   * </pre>
+   *
+   * @param <K> the class of the map keys
+   * @param <V> the class of the map values
+   * @return an empty multi-map
+   * @since 1.1.1
+   */
+  @SuppressWarnings("unchecked")
+  public static <K, V> CaseInsensitiveHashMap<K, V> emptyCaseInsensitiveMap() {
+    return EMPTY_MAP;
+  }
+
+  private final Map<K, V> delegate;
 
   /**
    * Constructs a new empty map with default size and load factor.
    */
   public CaseInsensitiveHashMap() {
-    delegate = new InternalCaseInsensitiveHashMap();
+    delegate = wrap(new InternalCaseInsensitiveHashMap());
   }
 
   /**
@@ -57,7 +83,11 @@ public final class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializab
    * @throws NullPointerException if the map is null
    */
   public CaseInsensitiveHashMap(Map map) {
-    delegate = new InternalCaseInsensitiveHashMap(map);
+    delegate = wrap(new InternalCaseInsensitiveHashMap(map));
+  }
+
+  protected Map wrap(InternalCaseInsensitiveHashMap map) {
+    return map;
   }
 
   // -----------------------------------------------------------------------
@@ -69,7 +99,7 @@ public final class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializab
    */
   @Override
   public Object clone() {
-    return new CaseInsensitiveHashMap((Map) delegate.clone());
+    return new CaseInsensitiveHashMap<K, V>(delegate);
   }
 
   @Override
@@ -94,17 +124,17 @@ public final class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializab
 
   @Override
   public V get(Object key) {
-    return (V) delegate.get(key);
+    return delegate.get(key);
   }
 
   @Override
   public V put(K key, V value) {
-    return (V) delegate.put(key, value);
+    return delegate.put(key, value);
   }
 
   @Override
   public V remove(Object key) {
-    return (V) delegate.remove(key);
+    return delegate.remove(key);
   }
 
   @Override
@@ -212,5 +242,30 @@ public final class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializab
   @Override
   public String toString() {
     return delegate.toString();
+  }
+
+  /**
+   * @return an immutable version of this map.
+   *
+   * @since 4.1.5
+   */
+  public CaseInsensitiveHashMap<K, V> toImmutableCaseInsensitiveMap() {
+    if (this instanceof ImmutableCaseInsensitiveHashMap) {
+      return this;
+    }
+    return new ImmutableCaseInsensitiveHashMap<>(this);
+  }
+
+  private static class ImmutableCaseInsensitiveHashMap<K, V> extends CaseInsensitiveHashMap<K, V> {
+
+    private ImmutableCaseInsensitiveHashMap(CaseInsensitiveHashMap<K, V> caseInsensitiveHashMap) {
+      super(caseInsensitiveHashMap);
+    }
+
+    @Override
+    protected Map<K, V> wrap(InternalCaseInsensitiveHashMap map) {
+      return unmodifiableMap(map);
+    }
+
   }
 }

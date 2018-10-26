@@ -8,12 +8,14 @@ package org.mule.runtime.http.api.domain.entity;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
+
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * Represents an HTTP empty body.
@@ -54,4 +56,8 @@ public final class EmptyHttpEntity implements HttpEntity {
     return of(0L);
   }
 
+  @Override
+  public OptionalLong getBytesLength() {
+    return OptionalLong.of(0L);
+  }
 }
