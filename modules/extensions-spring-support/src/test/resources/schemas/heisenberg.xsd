@@ -2548,6 +2548,16 @@
         <xs:attribute type="xs:string" use="required" name="payload"></xs:attribute>
         <xs:attribute type="mule:expressionMap" use="required" name="attributes"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+          <xs:annotation>
+            <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
