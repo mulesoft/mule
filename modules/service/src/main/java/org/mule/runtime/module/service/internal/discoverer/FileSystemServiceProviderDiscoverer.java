@@ -9,7 +9,6 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.service.ServiceProvider;
@@ -41,7 +40,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory;
   private final DescriptorLoaderRepository descriptorLoaderRepository;
   private final ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder;
-  private final File servicesFolder;
+  private final File targetServicesFolder;
 
   /**
    * Creates a new instance.
@@ -50,23 +49,23 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
    * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
-   * @param servicesFolder                     {@link File} where services are exploded and would be discovered. Non null.
+   * @param targetServicesFolder               {@link File} where services are exploded and would be discovered. Non null.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
                                              ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
                                              DescriptorLoaderRepository descriptorLoaderRepository,
                                              ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
-                                             File servicesFolder) {
+                                             File targetServicesFolder) {
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
     checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
     checkArgument(artifactDescriptorValidatorBuilder != null, "artifactDescriptorValidatorBuilder cannot be null");
-    checkArgument(servicesFolder != null, "servicesFolder cannot be null");
+    checkArgument(targetServicesFolder != null, "targetServicesFolder cannot be null");
 
     this.descriptorLoaderRepository = descriptorLoaderRepository;
     this.apiClassLoader = containerClassLoader;
     this.serviceClassLoaderFactory = serviceClassLoaderFactory;
     this.artifactDescriptorValidatorBuilder = artifactDescriptorValidatorBuilder;
-    this.servicesFolder = servicesFolder;
+    this.targetServicesFolder = targetServicesFolder;
   }
 
   /**
@@ -82,7 +81,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
                                              DescriptorLoaderRepository descriptorLoaderRepository,
                                              ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     this(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository, artifactDescriptorValidatorBuilder,
-         getServicesFolder());
+         MuleFoldersUtil.getServicesFolder());
   }
 
   @Override
@@ -98,7 +97,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   private List<ServiceDescriptor> getServiceDescriptors(ServiceDescriptorFactory serviceDescriptorFactory)
       throws ServiceResolutionError {
 
-    final File[] serviceDirectories = this.servicesFolder.listFiles(File::isDirectory);
+    final File[] serviceDirectories = this.targetServicesFolder.listFiles(File::isDirectory);
     List<ServiceDescriptor> foundServices = new ArrayList<>(serviceDirectories.length);
 
     for (File serviceDirectory : serviceDirectories) {
