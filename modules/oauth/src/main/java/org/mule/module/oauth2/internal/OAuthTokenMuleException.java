@@ -13,12 +13,12 @@ import org.mule.api.DefaultMuleException;
  * 
  * @since 3.10
  */
-public class OAuthTokenMuleExeption extends DefaultMuleException
+public class OAuthTokenMuleException extends DefaultMuleException
 {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4742375792184017374L;
 
-    public OAuthTokenMuleExeption(Throwable cause)
+    public OAuthTokenMuleException(Throwable cause)
     {
         super(cause);
     }
