@@ -61,9 +61,9 @@ public class BrokerReconnectionWithNonExistingQueuesTestCase extends FunctionalT
     {
         url = "tcp://localhost:" + this.port.getValue();
 
-        System.setProperty("java.security.auth.login.config", "src/test/resources/JassBrokerAuthPluginConfigs/login.config");
+        System.setProperty("java.security.auth.login.config", getClasspathResourceFilename("JaasBrokerAuthPluginConfigs/login.config"));
+        broker = BrokerFactory.createBroker("xbean:" + getClasspathResourceFilename("JaasBrokerAuthPluginConfigs/jaas-authenticated-broker-configuration.xml"));
 
-        broker = BrokerFactory.createBroker("xbean:src/test/resources/JassBrokerAuthPluginConfigs/jaas-authenticated-broker-configuration.xml");
         transportConnector = broker.addConnector(this.url);
 
         startBrokerAndAdminSession();
@@ -170,6 +170,9 @@ public class BrokerReconnectionWithNonExistingQueuesTestCase extends FunctionalT
         assertThat((String) message.getPayload(), is(TEST_MESSAGE));
     }
 
-
+    private String getClasspathResourceFilename(String s)
+    {
+        return getClass().getClassLoader().getResource(s).getFile();
+    }
 }
 
