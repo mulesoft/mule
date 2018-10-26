@@ -65,7 +65,7 @@ public abstract class AbstractHttpClientTestCase extends AbstractMuleContextTest
         httpClient.stop();
     }
 
-    private void createClient() throws MuleException
+    protected void createClient() throws MuleException
     {
         TlsContextFactory defaultTlsContextFactory = new TlsContextFactoryBuilder(muleContext).buildDefault();
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setUsePersistentConnections(true)

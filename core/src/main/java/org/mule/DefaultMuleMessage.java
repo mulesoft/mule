@@ -723,11 +723,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         try
         {
-            return getPayloadAsString();
+            return new String(getPayloadAsBytes(), getEncoding());
         }
         catch (Exception e)
         {
-            return  "[Message could not be converted to string]";
+            return  "[Message could not be converted for logging]";
         }
     }
 

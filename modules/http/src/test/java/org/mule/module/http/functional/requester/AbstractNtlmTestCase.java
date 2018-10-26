@@ -33,7 +33,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
 
     protected String requestUrl;
 
-    private TestAuthorizer authorizer;
+    private NtlmProxyTestAuthorizer authorizer;
 
     public void setupTestAuthorizer(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader)
     {
@@ -58,11 +58,11 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
         }
     }
 
-    private TestAuthorizer createTestAuthorizer(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader)
+    private NtlmProxyTestAuthorizer createTestAuthorizer(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader)
     {
         try
         {
-            TestAuthorizer testAuthorizer = new NtlmProxyTestAuthorizer.Builder().setClientAuthHeader(clientAuthHeader)
+            NtlmProxyTestAuthorizer testAuthorizer = new NtlmProxyTestAuthorizer.Builder().setClientAuthHeader(clientAuthHeader)
                                                                                  .setServerAuthHeader(serverAuthHeader)
                                                                                  .setUnauthorizedHeader(unauthorizedHeader)
                                                                                  .setUser(USER)
@@ -91,6 +91,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
         MuleEvent event = runFlow(getFlowName());
 
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
+        assertThat(authorizer.getPayloadAfterDancing(), equalTo(TEST_MESSAGE));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));
     }
 

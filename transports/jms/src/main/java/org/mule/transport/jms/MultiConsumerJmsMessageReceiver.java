@@ -23,6 +23,7 @@ import org.mule.transaction.TransactionCollection;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
 import org.mule.transport.ConnectException;
+import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.transport.jms.reconnect.ReconnectWorkManager;
 import org.mule.transport.jms.redelivery.RedeliveryHandler;
@@ -42,6 +43,7 @@ import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jms.connection.CachingConnectionFactory;
 
 /**
  * In Mule an endpoint corresponds to a single receiver. It's up to the receiver to do multithreaded consumption and
@@ -143,6 +145,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             return;
         }
         reconnecting = true;
+        ((JmsConnector) this.getConnector()).setStillConnectingReceivers(true);
 
         reconnectWorkManager.startIfNotStarted();
         retryTemplate.execute(new RetryCallback()
@@ -152,6 +155,18 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 try
                 {
+                    JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
+                    if (connector.shouldRetryBrokerConnection())
+                    {
+                        MultiConsumerJmsMessageReceiver.this.closeConnectorSilently();
+                        logger.info("It seems there was a failure in previous connection with the broker. Trying to re create it.");
+                        connector.setConnection(connector.createConnection());
+                        connector.getConnection().start();
+                        logger.info("Connection creation and startup succeeded. Continuing with listener startup.");
+                        // Skip connection recreation if another retry is needed
+                        connector.setShouldRetryBrokerConnection(false);
+                    }
+
                     logger.debug("doConnect()");
                     if (!consumers.isEmpty())
                     {
@@ -159,6 +174,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                         {
                             context.setOk();
                             reconnecting = false;
+                            connector.setStillConnectingReceivers(false);
                             return;
                         }
                         throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
@@ -178,6 +194,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                     context.setOk();
                     logger.info("Endpoint " + endpoint.getEndpointURI() + " has been successfully reconnected.");
                     reconnecting = false;
+                    connector.setStillConnectingReceivers(false);
                 }
                 catch (Exception e)
                 {
@@ -197,6 +214,19 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 return jmsConnector;
             }
         }, reconnectWorkManager);
+    }
+
+    private void closeConnectorSilently()
+    {
+        JmsConnector connector = (JmsConnector) MultiConsumerJmsMessageReceiver.this.connector;
+        try
+        {
+            connector.getConnection().close();
+        }
+        catch (Exception e)
+        {
+            logger.error("An exception was thrown while silently stopping the previous connection. Continuing.");
+        }
     }
 
     @Override

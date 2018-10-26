@@ -209,6 +209,18 @@ public class TransformerWeighting implements Comparable
             {
                 return -1;
             }
+            
+            else if (weighting.getInputWeighting() < getInputWeighting() &&
+                    weighting.getOutputWeighting() > getOutputWeighting())
+            {
+                return 1;
+            }
+            else if (weighting.getInputWeighting() > getInputWeighting() &&
+                    weighting.getOutputWeighting() < getOutputWeighting())
+            {
+                return -1;
+            }
+            
             return 1;
         }
     }
