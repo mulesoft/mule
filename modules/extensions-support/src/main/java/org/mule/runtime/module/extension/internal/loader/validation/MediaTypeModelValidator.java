@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -31,15 +37,10 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 
 import java.util.Optional;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
-
 /**
  * {@link ExtensionModelValidator} which verifies if a {@link org.mule.runtime.extension.api.annotation.param.MediaType} is
  * missing or if a {@link org.mule.runtime.extension.api.annotation.param.MediaType} is present with a value, and a value is not
- * permited in such case.
+ * permitted in such case.
  *
  * <p>
  * This validator goes through all operations and sources and verifies that:
@@ -125,6 +126,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
         MediaTypeModelProperty mediaTypeModelProperty = model.getModelProperty(MediaTypeModelProperty.class).orElse(null);
         return outputTypeNeedsMediaTypeAnnotation(outputMetadataType) &&
             hasMediaTypeModelProperty(model) &&
+            mediaTypeModelPropertyIsStrict(mediaTypeModelProperty) &&
             !mediaTypeModelPropertyHasDefaultValue(mediaTypeModelProperty) &&
             hasStaticMetadataDefined(model, mediaTypeModelProperty.getMediaType().get());
       }
@@ -162,12 +164,17 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
       }
 
       private boolean mediaTypeModelPropertyHasDefaultValue(MediaTypeModelProperty mediaTypeModelProperty) {
-        return !mediaTypeModelProperty.getMediaType().isPresent();
+        return mediaTypeModelProperty != null && !mediaTypeModelProperty.getMediaType().isPresent();
+      }
+
+      private boolean mediaTypeModelPropertyIsStrict(MediaTypeModelProperty mediaTypeModelProperty) {
+        return mediaTypeModelProperty != null && mediaTypeModelProperty.isStrict();
       }
 
       private boolean outputTypeNeedsMediaTypeAnnotation(MetadataType metadataType) {
         return (metadataType instanceof StringType && !metadataType.getAnnotation(EnumAnnotation.class).isPresent())
-            || metadataType instanceof BinaryType;
+            || metadataType instanceof BinaryType
+            || metadataType instanceof AnyType;
       }
 
     }.walk(extensionModel);

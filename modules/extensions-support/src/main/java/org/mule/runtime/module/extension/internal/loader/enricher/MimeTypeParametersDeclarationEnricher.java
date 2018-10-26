@@ -14,20 +14,22 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toM
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeAnnotation;
+import org.mule.metadata.api.builder.AnyTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.BinaryTypeBuilder;
 import org.mule.metadata.api.builder.StringTypeBuilder;
 import org.mule.metadata.api.builder.WithAnnotation;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -52,8 +54,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -178,6 +178,26 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
             return builder.build();
           });
+        }
+
+        @Override
+        public void visitAnyType(AnyType anyType) {
+          if (property == null) {
+            return;
+          }
+
+          if (!property.isStrict()) {
+            ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
+            declareOutputMimeTypeParameter(group);
+            declareOutputEncodingParameter(group);
+          }
+
+          replaceOutputType(declaration, property, format -> {
+            AnyTypeBuilder anyTypeBuilder = BaseTypeBuilder.create(format).anyType();
+            enrichWithAnnotations(anyTypeBuilder, declaration.getOutput().getType().getAnnotations());
+            return anyTypeBuilder.build();
+          });
+
         }
 
         private void enrichWithAnnotations(WithAnnotation withAnnotationBuilder, Set<TypeAnnotation> annotations) {
