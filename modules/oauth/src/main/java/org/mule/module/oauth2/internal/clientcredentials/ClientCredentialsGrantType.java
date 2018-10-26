@@ -22,6 +22,7 @@ import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.oauth2.api.RequestAuthenticationException;
 import org.mule.module.oauth2.internal.AbstractGrantType;
+import org.mule.module.oauth2.internal.OAuthTokenMuleException;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 
@@ -47,6 +48,10 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
         try {
             tokenRequestHandler.refreshAccessToken();
             accessTokenRefreshedOnStart = true;
+        }
+        catch(OAuthTokenMuleException e)
+        {
+            throw e;
         }
         catch (MessagingException | DefaultMuleException e)
         {
