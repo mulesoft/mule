@@ -19,7 +19,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.http.internal.listener.NoListenerRequestHandler.NO_LISTENER_ENTITY_FORMAT;
 import static org.mule.module.http.internal.listener.NoMethodRequestHandler.METHOD_NOT_ALLOWED_FORMAT;
+import static org.mule.module.http.internal.listener.BadRequestHandler.BAD_REQUEST_ENTITY_FORMAT;
 import static org.mule.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler.SERVICE_NOT_AVAILABLE_FORMAT;
+
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -55,10 +57,11 @@ public class ErrorRequestHandlerTestCase extends AbstractMuleTestCase
     @Parameters(name = "{0}")
     public static Collection<Object[]> parameters()
     {
-        return asList(new Object[][] {
-          {NoListenerRequestHandler.getInstance(), NO_LISTENER_ENTITY_FORMAT},
-          {NoMethodRequestHandler.getInstance(), METHOD_NOT_ALLOWED_FORMAT},
-          {ServiceTemporarilyUnavailableListenerRequestHandler.getInstance(), SERVICE_NOT_AVAILABLE_FORMAT}
+        return asList(new Object[][]{
+                {NoListenerRequestHandler.getInstance(), NO_LISTENER_ENTITY_FORMAT},
+                {NoMethodRequestHandler.getInstance(), METHOD_NOT_ALLOWED_FORMAT},
+                {BadRequestHandler.getInstance(), BAD_REQUEST_ENTITY_FORMAT},
+                {ServiceTemporarilyUnavailableListenerRequestHandler.getInstance(), SERVICE_NOT_AVAILABLE_FORMAT}
         });
     }
 
