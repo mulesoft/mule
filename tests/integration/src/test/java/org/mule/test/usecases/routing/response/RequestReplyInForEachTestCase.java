@@ -25,7 +25,7 @@ import org.junit.Test;
 public abstract class RequestReplyInForEachTestCase extends FunctionalTestCase
 {
 
-    protected static final int TIMEOUT = 5000;
+    private static final int TIMEOUT = 5000;
     private final List<String> values = new ArrayList<>();
 
     @Before
