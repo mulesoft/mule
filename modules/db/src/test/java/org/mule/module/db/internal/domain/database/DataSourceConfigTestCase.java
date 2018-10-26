@@ -7,11 +7,7 @@
 
 package org.mule.module.db.internal.domain.database;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
@@ -19,7 +15,11 @@ import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SmallTest
 public class DataSourceConfigTestCase extends AbstractMuleTestCase
@@ -141,7 +141,7 @@ public class DataSourceConfigTestCase extends AbstractMuleTestCase
     public void resolvesDynamicPassword() throws Exception
     {
         MuleEvent muleEvent = mock(MuleEvent.class);
-            mockDynamicDataSourceConfigEvaluation(muleEvent);
+        mockDynamicDataSourceConfigEvaluation(muleEvent);
         dataSourceConfig.setPassword(MULE_EXPRESSION);
 
         DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
@@ -153,6 +153,7 @@ public class DataSourceConfigTestCase extends AbstractMuleTestCase
         MuleContext context = mock(MuleContext.class);
         ExpressionManager expressionManager = mock(ExpressionManager.class);
         when(context.getExpressionManager()).thenReturn(expressionManager);
+        when(expressionManager.isExpression(MULE_EXPRESSION)).thenReturn(true);
         when(expressionManager.isValidExpression(MULE_EXPRESSION)).thenReturn(true);
         dataSourceConfig.setMuleContext(context);
     }
@@ -162,6 +163,7 @@ public class DataSourceConfigTestCase extends AbstractMuleTestCase
         ExpressionManager expressionManager = mock(ExpressionManager.class);
         MuleContext context = mock(MuleContext.class);
         when(context.getExpressionManager()).thenReturn(expressionManager);
+        when(expressionManager.isExpression(MULE_EXPRESSION)).thenReturn(true);
         when(expressionManager.isValidExpression(MULE_EXPRESSION)).thenReturn(true);
         when(expressionManager.parse(MULE_EXPRESSION, muleEvent)).thenReturn(RESOLVED_EXPRESSION);
         dataSourceConfig.setMuleContext(context);
