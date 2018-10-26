@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.transformer;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.registry.TransformerWeighting;
@@ -17,11 +20,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 
+import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-
-import org.junit.Test;
 
 @SmallTest
 public class TransformerWeightingTestCase extends AbstractMuleTestCase {
@@ -102,6 +106,23 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void testOrderInNoMatchWhenDifferenceBetweenInputAndOutputWeightings() {
+    Transformer trans1 =
+        new MockConverterBuilder().from(DataType.fromType(IOException.class)).to(DataType.fromType(IOException.class)).build();
+    Transformer trans2 =
+        new MockConverterBuilder().from(DataType.fromType(IOException.class)).to(DataType.fromType(IOException.class)).build();
+
+    TransformerWeighting weighting1 = new TransformerWeighting(byte[].class, IOException.class, trans1);
+    TransformerWeighting weighting2 = new TransformerWeighting(IOException.class, byte[].class, trans2);
+
+    assertThat(weighting1.isNotMatch(), equalTo(true));
+    assertThat(weighting2.isNotMatch(), equalTo(true));
+
+    assertThat(weighting1.compareTo(weighting2), equalTo(-1));
+    assertThat(weighting2.compareTo(weighting1), equalTo(1));
+  }
+
+  @Test
   public void testCompareWeightingWithNoMatch() throws Exception {
     Transformer trans1 = new MockConverterBuilder().from(DataType.fromType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
     Transformer trans2 = new MockConverterBuilder().from(DataType.fromType(FruitBowl.class)).to(DataType.BYTE_ARRAY).build();
@@ -120,5 +141,22 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase {
     assertEquals(-1, weighting2.getInputWeighting());
     assertEquals(0, weighting1.getOutputWeighting());
     assertEquals(0, weighting2.getOutputWeighting());
+  }
+
+  @Test
+  public void testComparableContractHonored() {
+    Transformer trans1 =
+        new MockConverterBuilder().from(DataType.fromType(Object.class)).to(DataType.fromType(byte[].class)).build();
+    Transformer trans2 =
+        new MockConverterBuilder().from(DataType.fromType(FruitBowl.class)).to(DataType.fromType(String.class)).build();
+
+    TransformerWeighting weighting1 = new TransformerWeighting(ByteArrayInputStream.class, String.class, trans1);
+    TransformerWeighting weighting2 = new TransformerWeighting(ByteArrayInputStream.class, String.class, trans2);
+
+    assertThat(weighting1.compareTo(weighting2), equalTo(1));
+    assertThat(weighting2.compareTo(weighting1), equalTo(-1));
+
+    assertThat(weighting1.compareTo(weighting1), equalTo(0));
+    assertThat(weighting2.compareTo(weighting2), equalTo(0));
   }
 }

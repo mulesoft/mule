@@ -10,9 +10,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 
-import java.util.List;
-
 import org.apache.commons.beanutils.MethodUtils;
+
+import java.util.List;
 
 /**
  * Given a {@link org.mule.runtime.core.api.transformer.Transformer} instance, an input class and output class this object will
@@ -147,7 +147,7 @@ public class TransformerWeighting implements Comparable {
         return 0;
       }
     } else {
-      if (isNotMatch()) {
+      if (!weighting.isNotMatch() && isNotMatch()) {
         return -1;
       } else if (weighting.isNotMatch() && !isNotMatch()) {
         return 1;
@@ -164,6 +164,13 @@ public class TransformerWeighting implements Comparable {
       else if (weighting.getInputWeighting() < getInputWeighting() && weighting.getOutputWeighting() == getOutputWeighting()) {
         return -1;
       }
+
+      else if (weighting.getInputWeighting() < getInputWeighting() && weighting.getOutputWeighting() > getOutputWeighting()) {
+        return 1;
+      } else if (weighting.getInputWeighting() > getInputWeighting() && weighting.getOutputWeighting() < getOutputWeighting()) {
+        return -1;
+      }
+
       return 1;
     }
   }
