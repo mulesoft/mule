@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="httpConf" host="localhost" port="${httpPort}"/>
+
+    <flow name="listenerTest" >
+        <http:listener config-ref="httpConf" path="/test/foo 1 %" allowedMethods="POST"/>
+        <set-payload value="specific" mimeType="text/plain" encoding="UTF-8"/>
+    </flow>
+
+    <flow name="listenerTest2" >
+        <http:listener config-ref="httpConf" path="test/foo 1 #" allowedMethods="POST"/>
+        <set-payload value="specific2" mimeType="text/plain" encoding="UTF-8"/>
+    </flow>
+
+    <flow name="listenerTest3" >
+        <http:listener config-ref="httpConf" path="test/%24" allowedMethods="POST"/>
+        <set-payload value="specific3" mimeType="text/plain" encoding="UTF-8"/>
+    </flow>
+
+    <!--Wildcard endpoint must be tested to ensure invalid content is not
+    routed here-->
+    <flow name="listenerAll" >
+        <http:listener config-ref="httpConf" path="/*" allowedMethods="GET"/>
+        <set-payload value="wildcard" mimeType="text/plain" encoding="UTF-8"/>
+    </flow>
+</mule>
