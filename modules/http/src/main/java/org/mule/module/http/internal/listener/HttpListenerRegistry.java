@@ -6,7 +6,11 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.module.http.internal.HttpParser.decode;
 import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.request.HttpRequest;
@@ -27,6 +31,7 @@ import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Registry of servers and its handlers, which allows searching for handlers and introducing new ones (while allowing them to be
@@ -213,11 +218,20 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          */
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
-            final String pathName = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
-            Preconditions.checkArgument(pathName.startsWith(SLASH), "path parameter must start with /");
+            final String pathName;
+            checkArgument(request.getPath().startsWith(SLASH), "path parameter must start with /");
+            try
+            {
+                pathName = decode(request.getPath(), UTF_8.displayName());
+            }
+            catch (IllegalArgumentException | MuleRuntimeException e)
+            {
+                return BadRequestHandler.getInstance();
+            }
             Stack<Path> foundPaths = findPossibleRequestHandlers(pathName);
             boolean methodNotAllowed = false;
             RequestHandlerMatcherPair requestHandlerMatcherPair = null;
+
             while (!foundPaths.empty())
             {
                 final Path path = foundPaths.pop();
