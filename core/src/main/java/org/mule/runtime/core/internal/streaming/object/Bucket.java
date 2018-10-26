@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.streaming.object;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,7 @@ import java.util.Optional;
  * @param <T> the generic type of the items
  * @since 4.0
  */
-public class Bucket<T> {
+public class Bucket<T> implements Serializable {
 
   private final List<T> items;
   private final int capacity;
