@@ -131,6 +131,15 @@
           "methodName": "addMetadataAnnotationsFromXml",
           "elementKind": "method",
           "justification": "not used by users"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.api.el.ExtendedExpressionManager::enrich(java.lang.String, org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.event.CoreEvent.Builder, org.mule.runtime.api.component.location.ComponentLocation, org.mule.runtime.api.metadata.TypedValue)",
+          "package": "org.mule.runtime.core.api.el",
+          "classSimpleName": "ExtendedExpressionManager",
+          "methodName": "enrich",
+          "elementKind": "method",
+          "justification": "method was deprecated and only used internally"
         }
       ]
     }

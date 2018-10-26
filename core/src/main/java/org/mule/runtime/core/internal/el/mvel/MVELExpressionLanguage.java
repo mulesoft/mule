@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
@@ -152,31 +151,6 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       context.setNextFactory(delegate);
     }
     return evaluateInternal(expression, context);
-  }
-
-  @Override
-  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                     ComponentLocation componentLocation,
-                     Object object) {
-    expression = removeExpressionMarker(expression);
-    expression = createEnrichmentExpression(expression);
-    evaluateUntyped(expression, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder, componentLocation,
-                    singletonMap(OBJECT_FOR_ENRICHMENT, object));
-  }
-
-  @Override
-  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                     ComponentLocation componentLocation,
-                     TypedValue typedValue) {
-    expression = removeExpressionMarker(expression);
-    expression = createEnrichmentExpression(expression);
-    evaluateUntyped(expression, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder, componentLocation,
-                    singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
-
-    final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
-
-    event = eventBuilder.build();
-    dataTypePropagator.propagate(typedValue, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder, compiledExpression);
   }
 
   @Override

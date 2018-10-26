@@ -207,36 +207,6 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
                                        emptyBindingContext);
   }
 
-  @Test
-  @Description("Verifies that enrichment using an Object only works for MVEL.")
-  public void enrichObjectCompatibility() throws MuleException {
-    CoreEvent event = testEvent();
-    CoreEvent.Builder builder = builder(event);
-    String myPayload = "myPayload";
-    String expression = "payload";
-    expressionLanguageAdapter.enrich(melify(expression), event, builder, TEST_CONNECTOR_LOCATION, myPayload);
-    assertThat(builder.build().getMessage().getPayload().getValue(), is(myPayload));
-
-    expectedException.expect(UnsupportedOperationException.class);
-    expressionLanguageAdapter.enrich(expression, event, builder, TEST_CONNECTOR_LOCATION, myPayload);
-  }
-
-  @Test
-  @Description("Verifies that enrichment using a TypedValue only works for MVEL.")
-  public void enrichTypedValueCompatibility() throws MuleException {
-    CoreEvent event = testEvent();
-    CoreEvent.Builder builder = builder(event);
-    TypedValue myPayload = new TypedValue("myPayload", STRING);
-    String expression = "payload";
-    expressionLanguageAdapter.enrich(melify(expression), event, builder, TEST_CONNECTOR_LOCATION, myPayload);
-    CoreEvent enrichedEvent = builder.build();
-    assertThat(enrichedEvent.getMessage().getPayload().getValue(), is(myPayload.getValue()));
-    assertThat(enrichedEvent.getMessage().getPayload().getDataType(), is(myPayload.getDataType()));
-
-    expectedException.expect(UnsupportedOperationException.class);
-    expressionLanguageAdapter.enrich(expression, event, builder, TEST_CONNECTOR_LOCATION, myPayload);
-  }
-
   private String melify(String expression) {
     return format("mel:%s", expression);
   }

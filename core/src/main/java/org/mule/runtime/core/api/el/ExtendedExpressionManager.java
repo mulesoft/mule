@@ -46,24 +46,6 @@ public interface ExtendedExpressionManager extends ExpressionManager {
       throws ExpressionRuntimeException;
 
   /**
-   * Enriches an event using a typed value.
-   * <p>
-   * This version of {@code enrich} allows {@link CoreEvent} or {@link InternalMessage} mutation performed within the expression to be
-   * maintained post-evaluation via the use of a result {@link CoreEvent.Builder} which should be created
-   * from the original event before being passed and then used to construct the post-evaluation event.
-   *
-   * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-   * @param event The event to be enriched
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param componentLocation the location of the component where the event is being processed
-   * @param value The typed value used for enrichment
-   * @deprecated Mutation via expressions is deprecated.
-   */
-  @Deprecated
-  void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder, ComponentLocation componentLocation,
-              TypedValue value);
-
-  /**
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
    * evaluate a single expression they can use {@link #evaluate(String, CoreEvent, FlowConstruct, BindingContext)}.
    * <p>

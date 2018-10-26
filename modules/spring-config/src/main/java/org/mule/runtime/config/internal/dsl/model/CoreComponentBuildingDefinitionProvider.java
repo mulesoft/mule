@@ -83,7 +83,6 @@ import org.mule.runtime.config.internal.dsl.processor.CustomSecurityFilterObject
 import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
-import org.mule.runtime.config.internal.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.internal.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.internal.factories.ChoiceRouterObjectFactory;
 import org.mule.runtime.config.internal.factories.DefaultFlowFactoryBean;
@@ -134,7 +133,6 @@ import org.mule.runtime.core.internal.el.mvel.configuration.AliasEntry;
 import org.mule.runtime.core.internal.el.mvel.configuration.ImportEntry;
 import org.mule.runtime.core.internal.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
 import org.mule.runtime.core.internal.el.mvel.configuration.MVELGlobalFunctionsConfig;
-import org.mule.runtime.core.internal.enricher.MessageEnricher;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
@@ -243,7 +241,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String SPLIT_AGGREGATE = "split-aggregate";
   private static final String FORK_JOIN_STRATEGY = "forkJoinStrategyFactory";
   private static final String COLLECT_LIST = "collect-list";
-  private static final String ENRICHER = "enricher";
   private static final String ASYNC = "async";
   private static final String TRY = "try";
   private static final String UNTIL_SUCCESSFUL = "until-successful";
@@ -421,17 +418,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asScope().build());
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("collection").withTypeDefinition(fromType(String.class)).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ENRICHER)
-        .withObjectFactoryType(MessageEnricherObjectFactory.class).withTypeDefinition(fromType(MessageEnricher.class))
-        .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
-        .withSetterParameterDefinition("enrichExpressionPairs",
-                                       fromChildCollectionConfiguration(MessageEnricher.EnrichExpressionPair.class).build())
-        .withSetterParameterDefinition("source", fromSimpleParameter("source").build())
-        .withSetterParameterDefinition("target", fromSimpleParameter("target").build()).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("enrich")
-        .withTypeDefinition(fromType(MessageEnricher.EnrichExpressionPair.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("source").build())
-        .withConstructorParameterDefinition(fromSimpleParameter("target").build()).build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(ASYNC).withTypeDefinition(fromType(AsyncDelegateMessageProcessor.class))
             .withObjectFactoryType(AsyncMessageProcessorsFactoryBean.class)
@@ -556,8 +542,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("useExtendedTransformations", fromSimpleParameter("useExtendedTransformations").build())
         .withSetterParameterDefinition("flowEndingWithOneWayEndpointReturnsNull",
                                        fromSimpleParameter("flowEndingWithOneWayEndpointReturnsNull").build())
-        .withSetterParameterDefinition("enricherPropagatesSessionVariableChanges",
-                                       fromSimpleParameter("enricherPropagatesSessionVariableChanges").build())
         .withSetterParameterDefinition("defaultObjectSerializer",
                                        fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())

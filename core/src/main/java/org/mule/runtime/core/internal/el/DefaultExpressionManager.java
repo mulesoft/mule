@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.isMelDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -46,12 +47,12 @@ import org.mule.runtime.core.internal.util.OneTimeWarning;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 
+import org.slf4j.Logger;
+
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
@@ -204,13 +205,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     } else {
       return target;
     }
-  }
-
-  @Override
-  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                     ComponentLocation componentLocation,
-                     TypedValue value) {
-    expressionLanguage.enrich(expression, event, eventBuilder, componentLocation, value);
   }
 
   @Override

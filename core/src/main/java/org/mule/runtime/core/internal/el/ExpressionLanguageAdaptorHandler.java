@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
@@ -132,20 +133,6 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
                              BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).evaluate(expression, event, eventBuilder, componentLocation, bindingContext);
-  }
-
-  @Override
-  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                     ComponentLocation componentLocation,
-                     Object object) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, componentLocation, object);
-  }
-
-  @Override
-  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                     ComponentLocation componentLocation,
-                     TypedValue value) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, componentLocation, value);
   }
 
   @Override

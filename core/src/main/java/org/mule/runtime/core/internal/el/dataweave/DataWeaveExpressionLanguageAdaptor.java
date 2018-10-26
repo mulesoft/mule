@@ -174,20 +174,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, context));
   }
 
-  @Override
-  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                     ComponentLocation componentLocation,
-                     Object object) {
-    throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
-  }
-
-  @Override
-  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
-                     ComponentLocation componentLocation,
-                     TypedValue value) {
-    throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
-  }
-
   /**
    * Sanitizes the expression by removing the expression brackets and then evaluates it, handling any exceptions accordingly. All
    * evaluations should be done in this way.

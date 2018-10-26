@@ -47,40 +47,4 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
                       BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
-  /**
-   * Enriches an event.
-   *
-   * This version of {@code enrich} allows {@link CoreEvent} or {@link InternalMessage} mutation performed within the expression to be
-   * maintained post-evaluation via the use of a result {@link CoreEvent.Builder} which should be created
-   * from the original event before being passed and then used to construct the post-evaluation event.
-   *
-   * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-   * @param event The event to be enriched
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param componentLocation the location of the component where the event is being processed
-   * @param object The object used for enrichment
-   * @deprecated Mutation via expressions is deprecated.
-   */
-  @Deprecated
-  void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder, ComponentLocation componentLocation,
-              Object object);
-
-  /**
-   * Enriches an event using a typed value.
-   *
-   * This version of {@code enrich} allows {@link CoreEvent} or {@link InternalMessage} mutation performed within the expression to be
-   * maintained post-evaluation via the use of a result {@link CoreEvent.Builder} which should be created
-   * from the original event before being passed and then used to construct the post-evaluation event.
-   *
-   * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-   * @param event The event to be enriched
-   * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param componentLocation the location of the component where the event is being processed
-   * @param value The typed value used for enrichment
-   * @deprecated Mutation via expressions is deprecated.
-   */
-  @Deprecated
-  void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder, ComponentLocation componentLocation,
-              TypedValue value);
-
 }
