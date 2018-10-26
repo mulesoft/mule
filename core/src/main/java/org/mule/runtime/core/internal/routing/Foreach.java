@@ -29,6 +29,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
@@ -53,6 +54,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.inject.Inject;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -73,6 +76,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   static final String DEFAULT_COUNTER_VARIABLE = "counter";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
+
+  @Inject
+  protected ExpressionManager expressionManager;
 
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
@@ -238,7 +244,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   public void initialise() throws InitialisationException {
     Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
     nestedChain = newChain(processingStrategy, messageProcessors);
-    splittingStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), expression);
+    splittingStrategy = new ExpressionSplittingStrategy(expressionManager, expression);
     super.initialise();
   }
 

@@ -8,16 +8,18 @@ package org.mule.runtime.http.api.domain.entity;
 
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
+import static java.util.OptionalLong.empty;
+import static java.util.OptionalLong.of;
+import static org.mule.runtime.api.util.IOUtils.toByteArray;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.util.IOUtils;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * Representation of a stream HTTP body.
@@ -27,15 +29,37 @@ import java.util.Optional;
 @NoExtend
 public class InputStreamHttpEntity implements HttpEntity {
 
-  private Long contentLength;
+  private OptionalLong contentLength;
   private InputStream inputStream;
 
   public InputStreamHttpEntity(InputStream inputStream) {
     requireNonNull(inputStream, "HTTP entity stream cannot be null.");
     this.inputStream = inputStream;
+    this.contentLength = empty();
   }
 
+  /**
+   * @deprecated Use {@link #InputStreamHttpEntity(InputStream, OptionalLong)} or
+   *             {@link #InputStreamHttpEntity(InputStream, long)} instead.
+   */
+  @Deprecated
   public InputStreamHttpEntity(InputStream inputStream, Long contentLength) {
+    this(inputStream);
+    this.contentLength = contentLength == null ? empty() : of(contentLength);
+  }
+
+  /**
+   * @since 4.2
+   */
+  public InputStreamHttpEntity(InputStream inputStream, long contentLength) {
+    this(inputStream);
+    this.contentLength = of(contentLength);
+  }
+
+  /**
+   * @since 4.2
+   */
+  public InputStreamHttpEntity(InputStream inputStream, OptionalLong contentLength) {
     this(inputStream);
     this.contentLength = contentLength;
   }
@@ -57,7 +81,7 @@ public class InputStreamHttpEntity implements HttpEntity {
 
   @Override
   public byte[] getBytes() throws IOException {
-    return IOUtils.toByteArray(this.inputStream);
+    return toByteArray(this.inputStream);
   }
 
   @Override
@@ -67,7 +91,12 @@ public class InputStreamHttpEntity implements HttpEntity {
 
   @Override
   public Optional<Long> getLength() {
-    return ofNullable(contentLength);
+    return contentLength.isPresent() ? Optional.of(contentLength.getAsLong()) : Optional.empty();
+  }
+
+  @Override
+  public OptionalLong getBytesLength() {
+    return contentLength;
   }
 
 }

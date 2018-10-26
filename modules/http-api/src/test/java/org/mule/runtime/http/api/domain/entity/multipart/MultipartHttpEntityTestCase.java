@@ -13,13 +13,15 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
+
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -61,7 +63,7 @@ public class MultipartHttpEntityTestCase {
 
   @Test
   public void hasNoSize() {
-    assertThat(entity.getLength().isPresent(), is(false));
+    assertThat(entity.getBytesLength().isPresent(), is(false));
   }
 
 }

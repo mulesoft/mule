@@ -25,7 +25,7 @@ class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
 
   DefaultHttpResponse(ResponseStatus responseStatus, MultiMap<String, String> headers, HttpEntity body) {
     this.responseStatus = responseStatus;
-    this.headers = headers;
+    this.headers = headers != null ? headers.toImmutableMultiMap() : null;
     this.body = body;
   }
 
@@ -49,8 +49,9 @@ class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
     return headers.getAll(headerName);
   }
 
+  @Override
   public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
+    return headers;
   }
 
   @Override
