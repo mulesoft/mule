@@ -12,6 +12,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
+import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.getBundleDescriptor;
@@ -35,10 +37,13 @@ import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -55,7 +60,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
   private static final String VERSION = "version";
-  private static final String MULE_PLUGIN = "mule-plugin";
+  protected static final String MULE_PLUGIN = "mule-plugin";
 
   private boolean processSharedLibraries = false;
   private boolean processAdditionalPluginLibraries = false;
@@ -73,6 +78,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   /**
    * Sets a flag to export the configured shared libraries when building the ClassLoaderModel
+   * 
    * @return this builder
    * @since 4.2.0
    */
@@ -83,6 +89,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   /**
    * Sets a flag to include additional dependencies for each plugin if the deployable artifact defines them.
+   * 
    * @since 4.2.0
    */
   public ClassLoaderModel.ClassLoaderModelBuilder additionalPluginLibraries() {
@@ -111,13 +118,19 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   private Optional<Plugin> findMuleMavenPluginDeclaration() {
     Model model = getPomModelFolder(artifactFolder);
+    return findArtifactPackagerPlugin(model);
+  }
+
+  protected Optional<Plugin> findArtifactPackagerPlugin(Model model) {
     Build build = model.getBuild();
     if (build != null) {
       List<Plugin> plugins = build.getPlugins();
       if (plugins != null) {
-        return plugins.stream().filter(plugin -> plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
-            && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)).findFirst();
-
+        return plugins.stream().filter(plugin -> (plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
+            && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)) ||
+            (plugin.getArtifactId().equals(MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID) &&
+                plugin.getGroupId().equals(MULE_EXTENSIONS_PLUGIN_GROUP_ID)))
+            .findFirst();
       }
     }
     return empty();
@@ -128,10 +141,27 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   }
 
   private void processAdditionalPluginLibraries(Plugin packagingPlugin) {
-    doProcessAdditionalPluginLibraries(packagingPlugin);
+    Map<BundleDescriptor, Set<BundleDescriptor>> pluginsWithAdditionalLibraries =
+        doProcessAdditionalPluginLibraries(packagingPlugin);
+    pluginsWithAdditionalLibraries.entrySet()
+        .forEach(entry -> {
+          BundleDescriptor pluginBundleDescriptor = entry.getKey();
+          Set<BundleDescriptor> pluginAdditionalLibraries = entry.getValue();
+          findBundleDependency(pluginBundleDescriptor.getGroupId(), pluginBundleDescriptor.getArtifactId(), of(MULE_PLUGIN))
+              .ifPresent(pluginArtifactBundleDependency -> {
+                replaceBundleDependency(pluginArtifactBundleDependency,
+                                        new BundleDependency.Builder(pluginArtifactBundleDependency)
+                                            .setAdditionalDependencies(pluginAdditionalLibraries.stream()
+                                                .map(additionalDependency -> new BundleDependency.Builder()
+                                                    .setDescriptor(additionalDependency).build())
+                                                .collect(Collectors.toSet()))
+                                            .build());
+              });
+        });
   }
 
-  protected void doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
+  protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
+    Map<BundleDescriptor, Set<BundleDescriptor>> pluginsAdditionalLibraries = new HashMap<>();
     Object configuration = packagingPlugin.getConfiguration();
     if (configuration != null) {
       Xpp3Dom additionalPluginDependenciesDom = ((Xpp3Dom) configuration).getChild(ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD);
@@ -141,32 +171,31 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
           for (Xpp3Dom plugin : plugins) {
             String pluginGroupId = getAttribute(plugin, GROUP_ID);
             String pluginArtifactId = getAttribute(plugin, ARTIFACT_ID);
-            findBundleDependency(pluginGroupId, pluginArtifactId, of(MULE_PLUGIN)).ifPresent(bundleDependency -> {
-              Xpp3Dom dependenciesDom = plugin.getChild(PLUGIN_DEPENDENCIES_FIELD);
-              if (dependenciesDom != null) {
-                Set<BundleDependency> additionalDependencies = new HashSet<>();
-                for (Xpp3Dom dependency : dependenciesDom.getChildren(PLUGIN_DEPENDENCY_FIELD)) {
-                  String dependencyGroupId = getAttribute(dependency, GROUP_ID);
-                  String dependencyArtifactId = getAttribute(dependency, ARTIFACT_ID);
-                  String dependencyVersion = getAttribute(dependency, VERSION);
-                  additionalDependencies.add(new BundleDependency.Builder()
-                      .setDescriptor(new BundleDescriptor.Builder()
-                          .setGroupId(dependencyGroupId)
-                          .setArtifactId(dependencyArtifactId)
-                          .setVersion(dependencyVersion)
-                          .build())
-                      .build());
-                }
-                replaceBundleDependency(bundleDependency, new BundleDependency.Builder(bundleDependency)
-                    .setAdditionalDependencies(additionalDependencies)
+            BundleDescriptor mulePluginDescriptor = new BundleDescriptor.Builder()
+                .setGroupId(pluginGroupId)
+                .setArtifactId(pluginArtifactId)
+                .setVersion("-")
+                .build();
+            Set<BundleDescriptor> mulePluginAdditionalLibraries = new HashSet<>();
+            Xpp3Dom dependenciesDom = plugin.getChild(PLUGIN_DEPENDENCIES_FIELD);
+            if (dependenciesDom != null) {
+              for (Xpp3Dom dependency : dependenciesDom.getChildren(PLUGIN_DEPENDENCY_FIELD)) {
+                String dependencyGroupId = getAttribute(dependency, GROUP_ID);
+                String dependencyArtifactId = getAttribute(dependency, ARTIFACT_ID);
+                String dependencyVersion = getAttribute(dependency, VERSION);
+                mulePluginAdditionalLibraries.add(new BundleDescriptor.Builder()
+                    .setGroupId(dependencyGroupId)
+                    .setArtifactId(dependencyArtifactId)
+                    .setVersion(dependencyVersion)
                     .build());
               }
-            });
+            }
+            pluginsAdditionalLibraries.put(mulePluginDescriptor, mulePluginAdditionalLibraries);
           }
         }
       }
     }
-
+    return pluginsAdditionalLibraries;
   }
 
   protected void replaceBundleDependency(BundleDependency original, BundleDependency modified) {
@@ -175,8 +204,8 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   }
 
   /**
-   * Template method for exporting shared libraries and packages.
-   * By default, the pom needs to be parsed again to find which dependencies need to be shared.
+   * Template method for exporting shared libraries and packages. By default, the pom needs to be parsed again to find which
+   * dependencies need to be shared.
    */
   protected void doExportSharedLibrariesResourcesAndPackages(Plugin packagingPlugin) {
     Object configuration = packagingPlugin.getConfiguration();

@@ -11,6 +11,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
@@ -20,6 +21,7 @@ import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLo
 
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +67,10 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   @Override
   protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
-                                                                                     Map<String, Object> attributes) {
+                                                                                     Map<String, Object> attributes,
+                                                                                     Set<BundleDependency> nonProvidedDependencies) {
     final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
-        new LightweightClassLoaderModelBuilder(artifactFile, mavenClient);
+        new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, nonProvidedDependencies);
     configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }
