@@ -11,6 +11,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
@@ -18,8 +19,8 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ import java.util.Set;
 public class TestServicesMuleContextConfigurator implements ServiceConfigurator {
 
   private final ServiceRepository serviceRepository;
-  private Collection<Service> testServices;
+  private List<Service> testServices;
 
   /**
    * Creates a new instance.
@@ -61,11 +62,21 @@ public class TestServicesMuleContextConfigurator implements ServiceConfigurator 
     Map<String, Service> servicesByName = new HashMap<>();
 
     // First, load any services from the classpath. This will be mock/test implementations
-    testServices.forEach(service -> servicesByName.put(service.getName(), service));
+    testServices.forEach(service -> servicesByName.put(getServiceName(service), service));
 
     // Then, lookup any actual service implementations and replace any mocked with these ones.
-    serviceRepository.getServices().forEach(service -> servicesByName.put(service.getName(), service));
+    serviceRepository.getServices().forEach(service -> servicesByName.put(getServiceName(service), service));
 
-    servicesByName.values().forEach(service -> customizationService.registerCustomServiceImpl(service.getName(), service));
+    servicesByName.entrySet().stream()
+        .forEach(entry -> customizationService.registerCustomServiceImpl(entry.getKey(), entry.getValue()));
+  }
+
+  public String getServiceName(Service service) {
+    String name = service.getName();
+    String contract = service.getContractName();
+    if (!isEmpty(contract)) {
+      name += " - " + contract;
+    }
+    return name;
   }
 }

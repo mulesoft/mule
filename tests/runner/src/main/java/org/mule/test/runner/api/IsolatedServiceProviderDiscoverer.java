@@ -65,13 +65,11 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
           serviceModel = serializer.deserialize(IOUtils.toString(descriptor));
         }
 
-        //TODO: MULE-15471: to fix one service per artifact assumption
-        //  /      for (MuleServiceContractModel contract : serviceModel.getContracts()) {
-        MuleServiceContractModel contract = serviceModel.getContracts().get(0);
-        ServiceProvider serviceProvider = instantiateServiceProvider(classLoader, contract.getServiceProviderClassName());
-        locators.add(new ImmutableServiceAssembly(serviceModel.getName(), serviceProvider, classLoader,
-                                                  loadClass(contract.getContractClassName(), getClass().getClassLoader())));
-        //        }
+        for (MuleServiceContractModel contract : serviceModel.getContracts()) {
+          ServiceProvider serviceProvider = instantiateServiceProvider(classLoader, contract.getServiceProviderClassName());
+          locators.add(new ImmutableServiceAssembly(serviceModel.getName(), serviceProvider, classLoader,
+                                                    loadClass(contract.getContractClassName(), getClass().getClassLoader())));
+        }
       } catch (Exception e) {
         throw new IllegalStateException("Couldn't discover service from class loader: " + serviceArtifactClassLoader, e);
       }
