@@ -204,11 +204,14 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                    Scheduler processorScheduler, CoreEvent event) {
       return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
-          .doOnError(RejectedExecutionException.class,
-                     throwable -> LOGGER
-                         .trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                                processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS))
-          .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
+          .retryWhen(onlyIf(ctx -> {
+            final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
+            if (schedulerBusy) {
+              LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                           processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+            }
+            return schedulerBusy;
+          })
               .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }
