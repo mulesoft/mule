@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
@@ -16,6 +15,7 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -23,8 +23,11 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 import java.util.Collection;
 import java.util.Set;
@@ -43,9 +46,15 @@ public class CursorManager {
   private static Logger LOGGER = LoggerFactory.getLogger(CursorManager.class);
 
   private final LoadingCache<String, EventStreamingState> registry =
-      newBuilder()
-          .removalListener((key, value, cause) -> ((EventStreamingState) value).dispose())
-          .build((key) -> new EventStreamingState());
+      CacheBuilder.newBuilder()
+          .removalListener((RemovalNotification<String, EventStreamingState> notification) -> notification.getValue().dispose())
+          .build(new CacheLoader<String, EventStreamingState>() {
+
+            @Override
+            public EventStreamingState load(String key) throws Exception {
+              return new EventStreamingState();
+            }
+          });
 
   private final MutableStreamingStatistics statistics;
   private final Scheduler disposalScheduler;
@@ -71,7 +80,7 @@ public class CursorManager {
    */
   public CursorProvider manage(CursorProvider provider, BaseEventContext ownerContext) {
     registerEventContext(ownerContext);
-    registry.get(ownerContext.getId()).addProvider(provider);
+    registry.getUnchecked(ownerContext.getId()).addProvider(provider);
 
     final CursorContext context = new CursorContext(provider, ownerContext);
     if (provider instanceof CursorStreamProvider) {
@@ -90,7 +99,7 @@ public class CursorManager {
    * @param providerHandle the handle for the provider that generated it
    */
   public void onOpen(Cursor cursor, CursorContext providerHandle) {
-    registry.get(providerHandle.getOwnerContext().getId()).addCursor(providerHandle.getCursorProvider(), cursor);
+    registry.getUnchecked(providerHandle.getOwnerContext().getId()).addCursor(providerHandle.getCursorProvider(), cursor);
     statistics.incrementOpenCursors();
   }
 
@@ -132,31 +141,35 @@ public class CursorManager {
     private AtomicBoolean disposed = new AtomicBoolean(false);
     private AtomicInteger cursorCount = new AtomicInteger(0);
 
-    private final LoadingCache<CursorProvider, Set<Cursor>> cursors = Caffeine.newBuilder()
-        .removalListener((key, value, cause) -> {
+    private final LoadingCache<CursorProvider, Set<Cursor>> cursors = CacheBuilder.newBuilder()
+        .removalListener((RemovalListener<CursorProvider, Set<Cursor>>) notification -> {
           try {
-            closeProvider((CursorProvider) key);
-            releaseAll((Set<Cursor>) value);
+            closeProvider(notification.getKey());
+            releaseAll(notification.getValue());
           } finally {
-            ((CursorProvider) key).releaseResources();
+            notification.getKey().releaseResources();
           }
         })
-        .build(key -> {
-          statistics.incrementOpenProviders();
-          return newSetFromMap(new ConcurrentHashMap<>());
+        .build(new CacheLoader<CursorProvider, Set<Cursor>>() {
+
+          @Override
+          public Set<Cursor> load(CursorProvider key) throws Exception {
+            statistics.incrementOpenProviders();
+            return newSetFromMap(new ConcurrentHashMap<>());
+          }
         });
 
     private synchronized void addProvider(CursorProvider adapter) {
-      cursors.get(adapter);
+      cursors.getUnchecked(adapter);
     }
 
     private void addCursor(CursorProvider provider, Cursor cursor) {
-      cursors.get(provider).add(cursor);
+      cursors.getUnchecked(provider).add(cursor);
       cursorCount.incrementAndGet();
     }
 
     private boolean removeCursor(CursorProvider provider, Cursor cursor) {
-      Set<Cursor> openCursors = cursors.get(provider);
+      Set<Cursor> openCursors = cursors.getUnchecked(provider);
       if (openCursors.remove(cursor)) {
         statistics.decrementOpenCursors();
         if (cursorCount.decrementAndGet() <= 0 && provider.isClosed()) {
