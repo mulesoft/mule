@@ -15,7 +15,6 @@ import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -34,7 +33,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
 
 import reactor.retry.BackoffDelay;
@@ -183,10 +181,14 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
           .publishOn(eventLoopScheduler)
           .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)))
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
-          .doOnError(RejectedExecutionException.class, throwable -> LOGGER
-              .trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                     processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS))
-          .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
+          .retryWhen(onlyIf(ctx -> {
+            final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
+            if (schedulerBusy) {
+              LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                           processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+            }
+            return schedulerBusy;
+          })
               .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }

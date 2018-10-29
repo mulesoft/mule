@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import static java.time.Duration.ofMillis;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -15,9 +16,12 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.retry.Retry.onlyIf;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -26,6 +30,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
@@ -40,6 +45,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor;
@@ -48,12 +54,14 @@ import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrat
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 
 import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
+import reactor.retry.BackoffDelay;
 
 @NoExtend
 public class DefaultPolicyInstance extends AbstractComponent
@@ -200,6 +208,9 @@ public class DefaultPolicyInstance extends AbstractComponent
   private static final class PolicyProcessingStrategy extends AbstractProcessingStrategy
       implements ProcessingStrategy, Startable, Stoppable {
 
+    private static Logger LOGGER = getLogger(PolicyProcessingStrategy.class);
+    private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+
     private SchedulerService schedulerService;
     private SchedulerConfig schedulerBaseConfig;
     private String schedulersNamePrefix;
@@ -247,17 +258,11 @@ public class DefaultPolicyInstance extends AbstractComponent
         return publisher -> Flux.from(publisher)
             .transform(processor);
       } else if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> Flux.from(publisher)
-            .transform(processor)
-            .publishOn(fromExecutor(cpuLiteScheduler));
+        return switchBackThreadPool(processor, cpuLiteScheduler);
       } else if (processor.getProcessingType() == IO_RW || processor.getProcessingType() == BLOCKING) {
-        return publisher -> Flux.from(publisher)
-            .publishOn(fromExecutor(ioScheduler))
-            .transform(processor);
+        return switchThreadPool(processor, ioScheduler);
       } else if (processor.getProcessingType() == CPU_INTENSIVE) {
-        return publisher -> Flux.from(publisher)
-            .publishOn(fromExecutor(cpuIntensiveScheduler))
-            .transform(processor);
+        return switchThreadPool(processor, cpuIntensiveScheduler);
       } else {
         return publisher -> Flux.from(publisher)
             .transform(processor);
@@ -268,6 +273,38 @@ public class DefaultPolicyInstance extends AbstractComponent
       return (processor instanceof PolicyNextActionMessageProcessor)
           || (processor instanceof InterceptedReactiveProcessor
               && ((InterceptedReactiveProcessor) processor).getProcessor() instanceof PolicyNextActionMessageProcessor);
+    }
+
+    private ReactiveProcessor switchBackThreadPool(ReactiveProcessor processor, Scheduler targetScheduler) {
+      return publisher -> Flux.from(publisher)
+          .transform(processor)
+          .publishOn(fromExecutor(targetScheduler))
+          .retryWhen(onlyIf(ctx -> {
+            final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
+            if (schedulerBusy) {
+              LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                           targetScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+            }
+            return schedulerBusy;
+          })
+              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
+              .withBackoffScheduler(fromExecutorService(cpuLiteScheduler)));
+    }
+
+    private ReactiveProcessor switchThreadPool(ReactiveProcessor processor, Scheduler targetScheduler) {
+      return publisher -> Flux.from(publisher)
+          .publishOn(fromExecutor(targetScheduler))
+          .transform(processor)
+          .retryWhen(onlyIf(ctx -> {
+            final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
+            if (schedulerBusy) {
+              LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                           targetScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+            }
+            return schedulerBusy;
+          })
+              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
+              .withBackoffScheduler(fromExecutorService(cpuLiteScheduler)));
     }
 
   }
