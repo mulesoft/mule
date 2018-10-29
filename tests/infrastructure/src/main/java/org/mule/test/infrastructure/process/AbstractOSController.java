@@ -27,7 +27,7 @@ public abstract class AbstractOSController {
   private static Logger logger = getLogger(AbstractOSController.class);
 
   protected static final String STATUS =
-      "Mule(\\sEnterprise Edition \\(not installed\\))? is running(\\s|:\\sPID:)?\\(?([0-9]+)\\)?.*";
+      "Mule(\\sEnterprise Edition \\(standalone\\))? is running(\\s|:\\sPID:)?\\(?([0-9]+)\\)?.*";
   protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
   private static final int DEFAULT_TIMEOUT = 30000;
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
