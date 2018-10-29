@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +67,13 @@ public class SummaryLogChecker extends AbstractLogChecker {
                              format("\"%s\" has the wrong info:", expectedInfoElement.getKey()),
                              errors);
         }
+
+        if (expectedInfoElement.getValueStartsWith() != null) {
+          assertAndSaveError(actualInfo.get(expectedInfoElement.getKey()),
+                             startsWith(expectedInfoElement.getValueStartsWith()),
+                             format("\"%s\" has the wrong info:", expectedInfoElement.getKey()),
+                             errors);
+        }
       }
     }
   }
@@ -108,6 +116,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
 
     private String key;
     private String value = null;
+    private String valueStartsWith = null;
 
     public SummaryInfo() {}
 
@@ -134,6 +143,14 @@ public class SummaryLogChecker extends AbstractLogChecker {
 
     public void setValue(String value) {
       this.value = value;
+    }
+
+    public String getValueStartsWith() {
+      return valueStartsWith;
+    }
+
+    public void setValueStartsWith(String valueStartsWith) {
+      this.valueStartsWith = valueStartsWith;
     }
 
   }

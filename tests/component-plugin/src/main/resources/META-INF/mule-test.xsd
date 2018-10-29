@@ -538,6 +538,7 @@
     <xsd:complexType name="summaryInfoType">
         <xsd:attribute name="key" type="xsd:string" use="required"/>
         <xsd:attribute name="value" type="xsd:string" use="optional"/>
+        <xsd:attribute name="valueStartsWith" type="xsd:string" use="optional"/>
     </xsd:complexType>
 
 </xsd:schema>
