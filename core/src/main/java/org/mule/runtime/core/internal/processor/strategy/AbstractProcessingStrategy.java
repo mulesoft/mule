@@ -7,22 +7,29 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.FluxSink;
@@ -52,6 +59,29 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
 
   protected ExecutorService decorateScheduler(Scheduler scheduler) {
     return scheduler;
+  }
+
+  /**
+   * Checks whether an error indicates that a thread pool is full.
+   * 
+   * @param t the thrown error to analyze
+   * @return {@code true} if {@code t} indicates that a thread pool needed for the processing strategy owner rejected a task.
+   */
+  protected boolean isSchedulerBusy(Throwable t) {
+    final Throwable cause = unwrap(t);
+    return RejectedExecutionException.class.isAssignableFrom(cause.getClass()) || isOverloadError(cause);
+  }
+
+  private boolean isOverloadError(final Throwable cause) {
+    if (cause instanceof MessagingException) {
+      return ((MessagingException) cause).getEvent().getError()
+          .map(e -> e.getErrorType())
+          .filter(errorType -> OVERLOAD.getName().equals(errorType.getIdentifier())
+              && OVERLOAD.getNamespace().equals(errorType.getNamespace()))
+          .isPresent();
+    } else {
+      return false;
+    }
   }
 
   /**
