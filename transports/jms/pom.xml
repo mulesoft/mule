@@ -127,7 +127,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-all</artifactId>
+            <artifactId>activemq-spring</artifactId>
             <version>${activemqVersion}</version>
             <scope>test</scope>
         </dependency>
