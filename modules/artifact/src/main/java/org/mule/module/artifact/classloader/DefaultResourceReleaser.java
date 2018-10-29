@@ -235,7 +235,9 @@ public class DefaultResourceReleaser implements ResourceReleaser {
 
     } catch (ClassNotFoundException e) {
       if (logger.isDebugEnabled()) {
-        logger.debug("No AWS's IdleConnectionReaperThread found in current classpath", e);
+        logger.debug(format("AWS's IdleConnectionReaperThread not found in current classloader: %s",
+                            Thread.currentThread().getContextClassLoader().toString()),
+                     e);
       }
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
