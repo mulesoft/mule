@@ -11,10 +11,10 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -72,7 +72,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    File temporaryPomFolder = new File(MuleFoldersUtil.getExecutionFolder(), "mavenTemp");
+    File temporaryPomFolder = new File(getExecutionFolder(), "mavenTemp");
     if (!temporaryPomFolder.exists() && !temporaryPomFolder.mkdir()) {
       throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
           + temporaryPomFolder.getAbsolutePath()));

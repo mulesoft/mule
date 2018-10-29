@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
@@ -154,7 +155,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                                             .setAdditionalDependencies(pluginAdditionalLibraries.stream()
                                                 .map(additionalDependency -> new BundleDependency.Builder()
                                                     .setDescriptor(additionalDependency).build())
-                                                .collect(Collectors.toSet()))
+                                                .collect(toSet()))
                                             .build());
               });
         });

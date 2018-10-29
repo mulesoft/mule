@@ -21,5 +21,4 @@ public interface MuleExtensionsMavenPlugin {
 
   String MULE_EXTENSIONS_PLUGIN_GROUP_ID = "org.mule.runtime.plugins";
   String MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID = "mule-extensions-maven-plugin";
-
 }
