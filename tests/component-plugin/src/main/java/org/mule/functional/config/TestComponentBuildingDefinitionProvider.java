@@ -229,7 +229,9 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier("summary-info").withTypeDefinition(fromType(SummaryLogChecker.SummaryInfo.class))
             .withSetterParameterDefinition("key", fromSimpleParameter("key").build())
-            .withSetterParameterDefinition("value", fromSimpleParameter("value").build()).build());
+            .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
+            .withSetterParameterDefinition("valueStartsWith", fromSimpleParameter("valueStartsWith").build())
+            .build());
 
 
   }
