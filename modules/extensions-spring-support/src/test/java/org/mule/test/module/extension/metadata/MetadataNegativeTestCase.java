@@ -23,6 +23,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONEN
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.INPUT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.KEYS;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_ATTRIBUTES;
+import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
@@ -75,7 +76,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertThat(metadata.isSuccess(), is(false));
     assertFailureResult(metadata, 2);
     List<MetadataFailure> failures = metadata.getFailures();
-    assertMetadataFailure(failures.get(0), "", CONNECTION_FAILURE, "", OUTPUT_ATTRIBUTES, "");
+    assertMetadataFailure(failures.get(0), "", CONNECTION_FAILURE, "", OUTPUT_PAYLOAD, "");
     assertMetadataFailure(failures.get(1), "", CONNECTION_FAILURE, "", INPUT, "content");
   }
 
@@ -92,7 +93,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     location = builder().globalName(FAIL_WITH_RUNTIME_EXCEPTION).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertFailureResult(metadata, 2);
-    assertMetadataFailure(metadata.getFailures().get(0), "", UNKNOWN, "", OUTPUT_ATTRIBUTES);
+    assertMetadataFailure(metadata.getFailures().get(0), "", UNKNOWN, "", OUTPUT_PAYLOAD);
     assertMetadataFailure(metadata.getFailures().get(1), "", UNKNOWN, "", INPUT, "content");
   }
 

@@ -136,7 +136,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
           .onOutputPayload();
       return failure(output.getType(), failure);
     } catch (Exception e) {
-      return failure(output.getType(), newFailure(e).onOutputAttributes());
+      return failure(output.getType(), newFailure(e).onOutputPayload());
     }
   }
 
