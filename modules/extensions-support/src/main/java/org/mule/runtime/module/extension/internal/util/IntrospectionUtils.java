@@ -165,6 +165,22 @@ public final class IntrospectionUtils {
     return typeLoader.load(ResolvableType.forClass(type).getType());
   }
 
+  public static MetadataType getMetadataType(Type type) {
+    MetadataType metadataType = type.asMetadataType();
+
+    if (type.isSameType(Object.class) ||
+        type.isAssignableTo(InputStream.class) ||
+        type.isAssignableTo(Byte[].class) ||
+        type.isAssignableTo(byte[].class)) {
+
+      MetadataTypeEnricher enricher = new MetadataTypeEnricher();
+
+      return enricher.enrich(typeBuilder().anyType().build(), metadataType.getAnnotations());
+    }
+
+    return metadataType;
+  }
+
   /**
    * Transforms a {@link MetadataType} and generates the correspondent {@link DataType}
    *

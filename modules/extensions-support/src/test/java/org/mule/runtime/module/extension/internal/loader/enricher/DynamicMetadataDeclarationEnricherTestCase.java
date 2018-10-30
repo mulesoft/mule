@@ -46,6 +46,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -92,27 +93,28 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     List<ParameterDeclaration> params;
     List<OperationDeclaration> operations = declaration.getConfigurations().get(0).getOperations();
     MetadataType outputMetadataType = IntrospectionUtils.getReturnType(new TypeWrapper(Object.class, TYPE_LOADER));
+    MetadataType objectParameterMetadataType = (new ParameterTypeWrapper(Object.class, TYPE_LOADER)).asMetadataType();
 
     OperationDeclaration dynamicContent = getDeclaration(operations, "contentMetadataWithKeyId");
     assertOutputType(dynamicContent.getOutput(), outputMetadataType, true);
     assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
     params = dynamicContent.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));
-    assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class));
+    assertParameterType(getDeclaration(params, "content"), objectParameterMetadataType);
 
     OperationDeclaration dynamicOutput = getDeclaration(operations, "outputMetadataWithKeyId");
     assertOutputType(dynamicOutput.getOutput(), outputMetadataType, true);
     assertOutputType(dynamicOutput.getOutputAttributes(), toMetadataType(void.class), false);
     params = dynamicOutput.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));
-    assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class));
+    assertParameterType(getDeclaration(params, "content"), objectParameterMetadataType);
 
     OperationDeclaration dynamicContentAndOutput = getDeclaration(operations, "contentAndOutputMetadataWithKeyId");
     assertOutputType(dynamicContentAndOutput.getOutput(), outputMetadataType, true);
     assertOutputType(dynamicContentAndOutput.getOutputAttributes(), toMetadataType(void.class), false);
     params = dynamicContentAndOutput.getAllParameters();
     assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class));
-    assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class));
+    assertParameterType(getDeclaration(params, "content"), objectParameterMetadataType);
 
     operations = declaration.getOperations();
     OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
