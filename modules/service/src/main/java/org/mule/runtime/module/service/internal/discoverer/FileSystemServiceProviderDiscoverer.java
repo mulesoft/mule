@@ -76,6 +76,8 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
          () -> MuleFoldersUtil.getServicesFolder());
   }
 
+  // Supplier in order to resolve the services folder after initialization due use MULE_HOME and tests set
+  // this value after these discoverer is created
   private FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
                                               ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
                                               DescriptorLoaderRepository descriptorLoaderRepository,
