@@ -73,7 +73,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   @Override
   protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
     File temporaryPomFolder = new File(getExecutionFolder(), "mavenTemp");
-    if (!temporaryPomFolder.exists() && !temporaryPomFolder.mkdir()) {
+    if (!temporaryPomFolder.exists() && !temporaryPomFolder.mkdirs()) {
       throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
           + temporaryPomFolder.getAbsolutePath()));
     }
