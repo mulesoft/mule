@@ -77,7 +77,9 @@ public abstract class AbstractLogChecker implements LogChecker {
   }
 
   protected List<String> splitLines(String wholeMessage) {
-    return asList(wholeMessage.split(lineSeparator()));
+    // The following approach is required until the usage of line separators get fixed at
+    // org.mule.runtime.api.exception.MuleException#getSummaryMessage. More info at: MULE-15932
+    return asList(wholeMessage.replaceAll("\r", "").split("\n"));
   }
 
   protected <T> boolean assertAndSaveError(T checkedValue, Matcher<T> comparison, String failureMessagePrefix,
