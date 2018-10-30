@@ -36,6 +36,7 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
 
   public static final String INTERCEPTION_RESOLVED_PARAMS = "core:interceptionResolvedParams";
   public static final String INTERCEPTION_RESOLVED_CONTEXT = "core:interceptionResolvedContext";
+  public static final String INTERCEPTION_COMPONENT = "core:interceptionComponent";
 
   private InternalEvent interceptedInput;
   private InternalEvent.Builder interceptedOutput;

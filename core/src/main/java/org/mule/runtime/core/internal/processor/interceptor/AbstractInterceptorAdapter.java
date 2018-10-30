@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
+import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
 
@@ -35,8 +36,6 @@ import javax.inject.Inject;
 class AbstractInterceptorAdapter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractInterceptorAdapter.class);
-
-  protected static final String INTERCEPTION_COMPONENT = "core:interceptionComponent";
 
   @Inject
   private MuleContext muleContext;

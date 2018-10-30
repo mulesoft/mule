@@ -39,6 +39,8 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
@@ -90,10 +92,12 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -427,9 +431,31 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   @Test
-  public void precalculateExecutionContext() throws MuleException {
+  public void precalculateExecutionContextForInterceptedProcessor() throws MuleException {
     final AtomicReference<PrecalculatedExecutionContextAdapter> context = new AtomicReference<>();
 
+    messageProcessor.resolveParameters(CoreEvent.builder(event), (params, ctx) -> {
+      assertThat(ctx, instanceOf(PrecalculatedExecutionContextAdapter.class));
+      context.set(spy((PrecalculatedExecutionContextAdapter) ctx));
+    });
+
+    messageProcessor.process(InternalEvent.builder(event)
+        .internalParameters(ImmutableMap.of(INTERCEPTION_RESOLVED_CONTEXT, context.get(),
+                                            "core:interceptionComponent", messageProcessor))
+        .build());
+
+    verify(operationExecutor).execute(context.get());
+    messageProcessor.disposeResolvedParameters(context.get());
+  }
+
+  @Test
+  public void newExecutionContextForNonInterceptedProcessor() throws MuleException {
+    final AtomicReference<PrecalculatedExecutionContextAdapter> context = new AtomicReference<>();
+
+    Map<String, String> newContextParameters = ImmutableMap.of(MIME_TYPE_PARAMETER_NAME, MediaType.ANY.toRfcString(),
+                                                               ENCODING_PARAMETER_NAME, Charset.defaultCharset().name());
+    doReturn(newContextParameters).when(parameters).asMap();
+    doReturn(parameters).when(resolverSet).resolve(any(ValueResolvingContext.class));
     messageProcessor.resolveParameters(CoreEvent.builder(event), (params, ctx) -> {
       assertThat(ctx, instanceOf(PrecalculatedExecutionContextAdapter.class));
       context.set(spy((PrecalculatedExecutionContextAdapter) ctx));
@@ -439,6 +465,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .internalParameters(singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context.get()))
         .build());
 
+    verify(operationExecutor, never()).execute(context.get());
     verify(operationExecutor).execute(any(ExecutionContext.class));
     messageProcessor.disposeResolvedParameters(context.get());
   }
