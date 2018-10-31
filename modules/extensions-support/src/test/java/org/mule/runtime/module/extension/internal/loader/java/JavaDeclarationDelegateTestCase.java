@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -518,6 +519,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(withOperationsDeclaration, GET_ALL_ENEMIES_OPERATION);
     assertThat(operation, is(notNullValue()));
+    assertFalse(operation.getDeprecation().isPresent());
     assertThat(operation.getAllParameters(), hasSize(0));
     assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
     assertMessageType(((ArrayType) operation.getOutput().getType()).getType(), STRING_TYPE,
@@ -532,7 +534,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation.getOutput().getType(), equalTo(STRING_TYPE));
     assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
     assertParameter(operation.getAllParameters(), "victim", "", STRING_TYPE, false, SUPPORTED, "#[payload]");
-    assertParameter(operation.getAllParameters(), "goodbyeMessage", "", STRING_TYPE, true, SUPPORTED, null);
+    assertParameter(operation.getAllParameters(), "goodbyeMessage", "", STRING_TYPE, false, SUPPORTED, "We are done");
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
