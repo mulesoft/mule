@@ -128,15 +128,14 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
 
     static class TestProcessor implements MessageProcessor
     {
-        private int count;
+        private AtomicInteger count = new AtomicInteger(0);
         private List<Object> payloads = new ArrayList<Object>();
 
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             payloads.add(event.getMessage().getPayload());
-            count++;
-            if (count % 3 == 0)
+            if (count.incrementAndGet() % 3 == 0)
             {
                 throw new DefaultMuleException("Mule Exception!");
             }
@@ -145,7 +144,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
 
         public int getCount()
         {
-            return count;
+            return count.get();
         }
     }
 }
