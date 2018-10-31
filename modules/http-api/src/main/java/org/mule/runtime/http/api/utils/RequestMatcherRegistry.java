@@ -103,7 +103,7 @@ public interface RequestMatcherRegistry<T> {
 
 
     /**
-     * Determines which item should be returned if an invalid method is provided. If not set, {@code null} will be returned by default.
+     * Determines which item should be returned if an invalid request is provided. If not set, {@code null} will be returned by default.
      *
      * @param itemSupplier a supplier of the value to return
      * @return this builder

@@ -12,7 +12,7 @@ package org.mule.runtime.http.api.server;
  *
  * @since 1.2
  */
-public class DecodingException extends HttpRequestParsingException {
+public class DecodingException extends Exception {
 
   public DecodingException(String message, Throwable cause) {
     super(message, cause);
