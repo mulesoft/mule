@@ -496,12 +496,21 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
         if (connection != null)
         {
+            postCreationSetup(connection);
+        }
+        return connection;
+    }
+
+    protected void postCreationSetup(Connection connection) throws JMSException
+    {
+        try
+        {
             // EE-1901: only sets the clientID if it was not already set
             if (clientId != null && !clientId.equals(connection.getClientID()))
             {
                 connection.setClientID(getClientId());
             }
-            // Only set the exceptionListener if one isn't already set.  This is because the CachingConnectionFactory
+            // Only set the exceptionListener if one isn't already set. This is because the CachingConnectionFactory
             // which may be in use doesn't permit exception strategy to be set, rather it is set on the ConnectionFactory
             // itself in this case.
             if (!embeddedMode && connection.getExceptionListener() == null)
@@ -509,7 +518,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 connection.setExceptionListener(this);
             }
         }
-        return connection;
+        catch (JMSException e)
+        {
+            silentlyCloseConnection(connection, connectionFactory);
+            throw e;
+        }
     }
 
     @Override
@@ -615,7 +628,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 // If connection throws an exception on start and connection is cached in ConnectionFactory then
                 // close/reset connection now.
-                silentlyCloseConnection();
+                silentlyCloseConnection(connection, connectionFactory);
                 throw e;
             }
         }
@@ -629,7 +642,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             if (connection != null)
             {
                 disconnecting = true;
-                closeConnection();
+                closeConnection(connection, connectionFactory);
             }
         }
         finally
@@ -639,11 +652,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
-    private void silentlyCloseConnection()
+    protected void silentlyCloseConnection(Connection connection, ConnectionFactory connectionFactory)
     {
         try
         {
-            closeConnection();
+            closeConnection(connection, connectionFactory);
         }
         catch (Exception e)
         {
@@ -651,10 +664,14 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
     
-    private void closeConnection() throws JMSException, MuleException
+    private void closeConnection(Connection connection, ConnectionFactory connectionFactory) throws JMSException, MuleException
     {
-        connection.close();
-        if (connectionFactory instanceof Closeable)
+        if (connection != null)
+        {
+            connection.close();
+        }
+
+        if (connectionFactory != null && connectionFactory instanceof Closeable)
         {
             ((Closeable) connectionFactory).close();
         }
