@@ -6,21 +6,17 @@
  */
 package org.mule.test.integration.domain.tls;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 public class TlsCustomTruststoreTestCase extends FunctionalTestCase
 {
-
-    private static final String URL = "http://localhost:";
 
     private static final String RESPONSE = "test";
 
@@ -31,7 +27,7 @@ public class TlsCustomTruststoreTestCase extends FunctionalTestCase
     public DynamicPort portSsl = new DynamicPort("portSsl");
 
     @Rule
-    public SystemProperty flowTraceEnabled = new SystemProperty("javax.net.ssl.trustStore", "src/test/resources/tls/cacerts");
+    public SystemProperty customTrustStoreEnabled = new SystemProperty("javax.net.ssl.trustStore", "src/test/resources/chain-cert-truststore.jks");
 
     @Override
     protected String getConfigFile()
@@ -42,16 +38,14 @@ public class TlsCustomTruststoreTestCase extends FunctionalTestCase
     @Test
     public void testUsingCustomTlsTrustManager() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send(URL + port.getValue() + "/custom", "", null);
-        assertThat(message.getPayloadAsString(), equalTo(RESPONSE));
+        MuleMessage message = runFlow("flow-custom").getMessage();
+        assertEquals(RESPONSE, message.getPayloadAsString());
     }
 
     @Test
     public void testUsingDefaultTlsTrustManager() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send(URL + port.getValue() + "/default", "", null);
-        assertThat(message.getPayloadAsString(), equalTo(RESPONSE));
+        MuleMessage message = runFlow("flow-default").getMessage();
+        assertEquals(RESPONSE, message.getPayloadAsString());
     }
 }
