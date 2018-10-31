@@ -101,7 +101,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
     setArtifactDescriptor(new ArtifactDescriptor(TOOLING_EXTENSION_MODEL));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver
-            .resolve(emptySet(), ImmutableList.<ArtifactPluginDescriptor>builder().add(artifactPluginDescriptor).build());
+            .resolve(emptySet(), ImmutableList.<ArtifactPluginDescriptor>builder().add(artifactPluginDescriptor).build(), true);
     this.addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
         .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]));
     ArtifactClassLoader ownerArtifactClassLoader = super.build();
@@ -118,7 +118,8 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
 
   /**
    * @param artifactPluginDescriptor to look for within the collection of {@link ArtifactClassLoader}s
-   * @param artifactPluginClassLoaders plugins class loaders to look for, at least one of them must contain the {@code pluginDescriptor}.
+   * @param artifactPluginClassLoaders plugins class loaders to look for, at least one of them must contain the
+   *        {@code pluginDescriptor}.
    * @return the {@link ArtifactClassLoader} that was generated for the {@code artifactPluginDescriptor}
    * @throws PluginResolutionError if the plugin wasn't found in the collection of {@code artifactPluginClassLoaders}
    */

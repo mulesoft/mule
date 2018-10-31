@@ -22,9 +22,10 @@ public interface PluginDependenciesResolver {
    *
    * @param providedPluginDescriptors plugins descriptors provided by a parent Mule artifact if it exists.
    * @param descriptors plugins descriptors to resolve.
+   * @param isDomain
    * @return a non null list containing the plugins in resolved order.
    * @throws PluginResolutionError if at least a plugin cannot be resolved.
    */
   List<ArtifactPluginDescriptor> resolve(Set<ArtifactPluginDescriptor> providedPluginDescriptors,
-                                         List<ArtifactPluginDescriptor> descriptors);
+                                         List<ArtifactPluginDescriptor> descriptors, boolean isDomain);
 }

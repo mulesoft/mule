@@ -736,6 +736,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertThat(invocationCount, equalTo(1));
   }
 
+  @Ignore("MULE-15842: fix once we support declaring share objects plugins in policies")
   @Test
   public void failsToApplyApplicationPolicyWithDomainPluginVersionMismatch() throws Exception {
     installEchoService();
