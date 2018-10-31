@@ -23,7 +23,6 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODI
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.module.http.internal.request.RequestResourcesUtils.closeResources;
-
 import org.mule.api.CompletionHandler;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -54,8 +53,6 @@ import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHandler;
@@ -71,6 +68,7 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+import com.ning.http.client.generators.InputStreamBlockingBodyGenerator;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
@@ -101,6 +99,8 @@ public class GrizzlyHttpClient implements HttpClient
     public static final String CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE = SYSTEM_PROPERTY_PREFIX + "http.client.headerSectionSize";
 
     public static final String AVOID_ZERO_CONTENT_LENGTH = SYSTEM_PROPERTY_PREFIX + "http.client.avoidZeroContentLength";
+
+    private static final String STREAM_REQUEST = SYSTEM_PROPERTY_PREFIX + ".http.client.streamRequest";
 
     private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
@@ -133,6 +133,7 @@ public class GrizzlyHttpClient implements HttpClient
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
     private boolean avoidZeroContentLength = getBoolean(AVOID_ZERO_CONTENT_LENGTH);
+    private boolean streamRequest = getBoolean(STREAM_REQUEST);
 
     public GrizzlyHttpClient(HttpClientConfiguration config)
     {
@@ -521,7 +522,17 @@ public class GrizzlyHttpClient implements HttpClient
                 {
                     if (request.getEntity() instanceof InputStreamHttpEntity)
                     {
-                        builder.setBody(new InputStreamBodyGenerator(((InputStreamHttpEntity) request.getEntity()).getInputStream()));
+                        InputStreamBodyGenerator bodyGenerator;
+                        InputStream inputStream = ((InputStreamHttpEntity) request.getEntity()).getInputStream();
+                        if (streamRequest)
+                        {
+                            bodyGenerator = new InputStreamBlockingBodyGenerator(inputStream);
+                        }
+                        else
+                        {
+                            bodyGenerator = new InputStreamBodyGenerator(inputStream);
+                        }
+                        builder.setBody(bodyGenerator);
                     }
                     else if (request.getEntity() instanceof ByteArrayHttpEntity)
                     {
