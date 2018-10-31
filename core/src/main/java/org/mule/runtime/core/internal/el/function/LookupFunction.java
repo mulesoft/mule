@@ -126,7 +126,7 @@ public class LookupFunction implements ExpressionFunction {
                     if (schedulerService.isCurrentThreadForCpuWork()) {
                       return 2000;
                     } else {
-                      return SECONDS.toMillis(60);
+                      return (int) SECONDS.toMillis(60);
                     }
                   }));
   }
