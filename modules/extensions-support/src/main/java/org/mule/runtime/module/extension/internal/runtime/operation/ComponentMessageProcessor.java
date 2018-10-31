@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
@@ -37,6 +38,8 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.subscriberContext;
 
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -192,7 +195,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             final Scheduler currentScheduler =
                 ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
 
-            if (getLocation() != null
+            if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
                 && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
               ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
@@ -517,5 +520,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     return resolverSet.resolve(from(event, configuration)).asMap();
+  }
+
+  private boolean isInterceptedComponent(ComponentLocation location, InternalEvent event) {
+    if (event.getInternalParameters().containsKey(INTERCEPTION_COMPONENT)) {
+      Component component = (Component) event.getInternalParameters().get(INTERCEPTION_COMPONENT);
+      return location.equals(component.getLocation());
+    }
+    return false;
   }
 }
