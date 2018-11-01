@@ -10,12 +10,11 @@ import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -23,16 +22,12 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,18 +41,11 @@ public class CursorManager {
   private static Logger LOGGER = LoggerFactory.getLogger(CursorManager.class);
 
   private final LoadingCache<String, EventStreamingState> registry =
-      CacheBuilder.newBuilder()
-          .removalListener((RemovalNotification<String, EventStreamingState> notification) -> notification.getValue().dispose())
-          .build(new CacheLoader<String, EventStreamingState>() {
-
-            @Override
-            public EventStreamingState load(String key) throws Exception {
-              return new EventStreamingState();
-            }
-          });
+      Caffeine.newBuilder()
+          .removalListener((key, value, cause) -> ((EventStreamingState) value).dispose())
+          .build(key -> new EventStreamingState());
 
   private final MutableStreamingStatistics statistics;
-  private final Scheduler disposalScheduler;
 
   /**
    * Creates a new instance
@@ -65,9 +53,8 @@ public class CursorManager {
    * @param statistics statistics which values should be kept updated
    * @param disposalScheduler where to run the disposal
    */
-  public CursorManager(MutableStreamingStatistics statistics, Scheduler disposalScheduler) {
+  public CursorManager(MutableStreamingStatistics statistics) {
     this.statistics = statistics;
-    this.disposalScheduler = disposalScheduler;
   }
 
   /**
@@ -80,7 +67,7 @@ public class CursorManager {
    */
   public CursorProvider manage(CursorProvider provider, BaseEventContext ownerContext) {
     registerEventContext(ownerContext);
-    registry.getUnchecked(ownerContext.getId()).addProvider(provider);
+    registry.get(ownerContext.getId()).addProvider(provider);
 
     final CursorContext context = new CursorContext(provider, ownerContext);
     if (provider instanceof CursorStreamProvider) {
@@ -99,7 +86,7 @@ public class CursorManager {
    * @param providerHandle the handle for the provider that generated it
    */
   public void onOpen(Cursor cursor, CursorContext providerHandle) {
-    registry.getUnchecked(providerHandle.getOwnerContext().getId()).addCursor(providerHandle.getCursorProvider(), cursor);
+    registry.get(providerHandle.getOwnerContext().getId()).addCursor(providerHandle.getCursorProvider(), cursor);
     statistics.incrementOpenCursors();
   }
 
@@ -141,35 +128,31 @@ public class CursorManager {
     private AtomicBoolean disposed = new AtomicBoolean(false);
     private AtomicInteger cursorCount = new AtomicInteger(0);
 
-    private final LoadingCache<CursorProvider, Set<Cursor>> cursors = CacheBuilder.newBuilder()
-        .removalListener((RemovalListener<CursorProvider, Set<Cursor>>) notification -> {
+    private final LoadingCache<CursorProvider, Set<Cursor>> cursors = Caffeine.newBuilder()
+        .removalListener((key, value, cause) -> {
           try {
-            closeProvider(notification.getKey());
-            releaseAll(notification.getValue());
+            closeProvider((CursorProvider) key);
+            releaseAll((Collection<Cursor>) value);
           } finally {
-            notification.getKey().releaseResources();
+            ((CursorProvider<CursorStream>) key).releaseResources();
           }
         })
-        .build(new CacheLoader<CursorProvider, Set<Cursor>>() {
-
-          @Override
-          public Set<Cursor> load(CursorProvider key) throws Exception {
-            statistics.incrementOpenProviders();
-            return newSetFromMap(new ConcurrentHashMap<>());
-          }
+        .build(key -> {
+          statistics.incrementOpenProviders();
+          return newSetFromMap(new ConcurrentHashMap<>());
         });
 
     private synchronized void addProvider(CursorProvider adapter) {
-      cursors.getUnchecked(adapter);
+      cursors.get(adapter);
     }
 
     private void addCursor(CursorProvider provider, Cursor cursor) {
-      cursors.getUnchecked(provider).add(cursor);
+      cursors.get(provider).add(cursor);
       cursorCount.incrementAndGet();
     }
 
     private boolean removeCursor(CursorProvider provider, Cursor cursor) {
-      Set<Cursor> openCursors = cursors.getUnchecked(provider);
+      Set<Cursor> openCursors = cursors.get(provider);
       if (openCursors.remove(cursor)) {
         statistics.decrementOpenCursors();
         if (cursorCount.decrementAndGet() <= 0 && provider.isClosed()) {
@@ -183,14 +166,7 @@ public class CursorManager {
 
     private void dispose() {
       if (disposed.compareAndSet(false, true)) {
-        try {
-          disposalScheduler.execute(() -> {
-            cursors.invalidateAll();
-          });
-        } catch (RejectedExecutionException e) {
-          // If the Scheduler is busy and can't accept the task, we perform it in the current thread.
-          cursors.invalidateAll();
-        }
+        cursors.invalidateAll();
       }
     }
 

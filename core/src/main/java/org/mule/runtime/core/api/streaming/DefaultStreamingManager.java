@@ -52,7 +52,6 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private boolean initialised = false;
 
   private Scheduler allocationScheduler;
-  private Scheduler disposalScheduler;
 
   @Inject
   private MuleContext muleContext;
@@ -69,9 +68,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
       statistics = new MutableStreamingStatistics();
       allocationScheduler =
           schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-allocate"));
-      disposalScheduler =
-          schedulerService.cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-dispose"));
-      cursorManager = new CursorManager(statistics, disposalScheduler);
+      cursorManager = new CursorManager(statistics);
       bufferManager = new PoolingByteBufferManager(allocationScheduler);
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
@@ -99,7 +96,6 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     disposeIfNeeded(objectStreamingManager, LOGGER);
     disposeIfNeeded(bufferManager, LOGGER);
     disposeIfNeeded(cursorManager, LOGGER);
-    disposalScheduler.stop();
     allocationScheduler.stop();
 
     initialised = false;
