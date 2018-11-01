@@ -85,14 +85,14 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void stopsCoreExtensionsBeforeDeploymentService() throws Exception
+    public void stopsCoreExtensionsAfterDeploymentService() throws Exception
     {
         container.start(false);
         container.stop();
 
         InOrder inOrder = inOrder(coreExtensionManager, deploymentService);
-        inOrder.verify(coreExtensionManager).stop();
         inOrder.verify(deploymentService).stop();
+        inOrder.verify(coreExtensionManager).stop();
     }
 
     @Test
