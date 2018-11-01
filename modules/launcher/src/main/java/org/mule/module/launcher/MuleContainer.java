@@ -234,13 +234,13 @@ public class MuleContainer
 
     public void stop() throws MuleException
     {
-        coreExtensionManager.stop();
-
         if (deploymentService != null)
         {
             deploymentService.stop();
         }
 
+        coreExtensionManager.stop();
+        
         coreExtensionManager.dispose();
         if (LogManager.getFactory() instanceof MuleLog4jContextFactory)
         {

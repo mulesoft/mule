@@ -54,11 +54,13 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     @Override
     public void dispose()
     {
+        logger.debug("Disposing core extensions");
         for (MuleCoreExtension extension : coreExtensions)
         {
             try
             {
                 extension.dispose();
+                logger.debug("Core extension '" + extension.toString() + "' disposed");
             }
             catch (Exception ex)
             {
@@ -92,6 +94,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
         for (MuleCoreExtension extension : orderedCoreExtensions)
         {
             extension.start();
+            logger.debug("Core extension '" + extension.toString() + "' started");
         }
     }
 
@@ -103,6 +106,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
             return;
         }
 
+        logger.info("Stopping core extensions");
         for (int i = orderedCoreExtensions.size() - 1; i >= 0; i--)
         {
             MuleCoreExtension extension = orderedCoreExtensions.get(i);
@@ -110,6 +114,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
             try
             {
                 extension.stop();
+                logger.debug("Core extension '" + extension.toString() + "' stopped");
             }
             catch (Throwable e)
             {
@@ -151,6 +156,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
             }
 
             extension.initialise();
+            logger.debug("Core extension '" + extension.toString() + "' initialized");
         }
     }
 
