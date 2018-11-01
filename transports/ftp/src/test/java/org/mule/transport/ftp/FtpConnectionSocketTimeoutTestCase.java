@@ -68,7 +68,7 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
     public SystemProperty systemProperty = new SystemProperty("connectionTimeout", CONNECTION_TIMEOUT);
 
     @Rule
-    public SystemProperty xmlFtpMessageReceiverSystemProperty = new SystemProperty("ftpMessageReceiverClasspath", FTP_MESSAGE_RECEIVER_CLASS);
+    public SystemProperty xmlFtpMessageReceiverSystemProperty = new SystemProperty("ftpMessageReceiverClass", FTP_MESSAGE_RECEIVER_CLASS);
 
     private Ftplet ftplet;
 

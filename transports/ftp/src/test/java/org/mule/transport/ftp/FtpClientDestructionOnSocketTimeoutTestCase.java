@@ -11,6 +11,7 @@ import static org.apache.commons.net.ftp.FTPCmd.LIST;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mockito.Mockito.*;
 import static org.mule.context.notification.ConnectionNotification.CONNECTION_FAILED;
 import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.FLOW;
 import org.mule.api.construct.FlowConstruct;
@@ -43,7 +44,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -59,7 +59,7 @@ public class FtpClientDestructionOnSocketTimeoutTestCase extends AbstractFtpServ
     public SystemProperty systemProperty = new SystemProperty("connectionTimeout", CONNECTION_TIMEOUT);
 
     @Rule
-    public SystemProperty xmlAppConfigSystemProperty = new SystemProperty("ftpMessageReceiverClasspath", FTP_MESSAGE_RECEIVER_CLASS);
+    public SystemProperty xmlAppConfigSystemProperty = new SystemProperty("ftpMessageReceiverClass", FTP_MESSAGE_RECEIVER_CLASS);
 
     private static int TEST_DELTA = 500;
 
@@ -121,7 +121,7 @@ public class FtpClientDestructionOnSocketTimeoutTestCase extends AbstractFtpServ
 
         // Intercept releaseFtp method invocation on FtpConnector object, in order to verify that
         // the FtpClient is destroyed
-        Mockito.doAnswer(new Answer()
+        doAnswer(new Answer()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -130,7 +130,7 @@ public class FtpClientDestructionOnSocketTimeoutTestCase extends AbstractFtpServ
                 ftpClientWasReleased = invocation.getArgumentAt(2, boolean.class);
                 return null;
             }
-        }).when(connectorSpy).releaseFtp(Mockito.any(DefaultInboundEndpoint.class), Mockito.any(FTPClient.class), Mockito.anyBoolean());
+        }).when(connectorSpy).releaseFtp(any(DefaultInboundEndpoint.class), any(FTPClient.class), anyBoolean());
 
         // Since already a LIST command was seen, in the second one, the socket timeout should occur
         new ConnectionListener(muleContext)
@@ -213,7 +213,7 @@ public class FtpClientDestructionOnSocketTimeoutTestCase extends AbstractFtpServ
 
     private static Connector setAndReturnConnectorSpy(Connector connector)
     {
-        connectorSpy = Mockito.spy((FtpConnector) connector);
+        connectorSpy = spy((FtpConnector) connector);
         return connectorSpy;
     }
 
