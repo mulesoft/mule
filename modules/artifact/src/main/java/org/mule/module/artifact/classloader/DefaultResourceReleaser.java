@@ -220,13 +220,17 @@ public class DefaultResourceReleaser implements ResourceReleaser {
           return;
         }
 
-        Class<?> httpClientConnectionManagerClass = this.getClass().getClassLoader().loadClass("org.apache.http.conn.HttpClientConnectionManager");
-        Method removeConnectionManager = idleConnectionReaperClass.getMethod("removeConnectionManager", httpClientConnectionManagerClass);
+        Class<?> httpClientConnectionManagerClass =
+            this.getClass().getClassLoader().loadClass("org.apache.http.conn.HttpClientConnectionManager");
+        Method removeConnectionManager =
+            idleConnectionReaperClass.getMethod("removeConnectionManager", httpClientConnectionManagerClass);
         for (Object connectionManager : httpClientConnectionManagers) {
           boolean removed = (boolean) removeConnectionManager.invoke(null, connectionManager);
           if (!removed && logger.isDebugEnabled()) {
-            logger.debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread", connectionManager));
-            }
+            logger
+                .debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
+                              connectionManager));
+          }
         }
 
       } finally {
