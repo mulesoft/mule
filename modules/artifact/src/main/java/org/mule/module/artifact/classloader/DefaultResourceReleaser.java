@@ -233,10 +233,9 @@ public class DefaultResourceReleaser implements ResourceReleaser {
         shutdown.invoke(null);
       }
 
-    } catch (ClassNotFoundException e) {
-      // If the class is not found, there is nothing to dispose
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException e) {
+      // If the class or method is not found, there is nothing to dispose
+    } catch (SecurityException | IllegalAccessException | InvocationTargetException e) {
       logger.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getMessage(), e);
     }
   }
