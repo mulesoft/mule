@@ -197,13 +197,13 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         return client;
     }
 
-    public void releaseFtp(ImmutableEndpoint endpoint, FTPClient client) throws Exception
+    public void releaseFtp(ImmutableEndpoint endpoint, FTPClient client, boolean disposeFtpClient) throws Exception
     {
         if (logger.isDebugEnabled())
         {
             logger.debug("<<< releasing client for " + endpoint.getEndpointURI());
         }
-        if (dispatcherFactory.isCreateDispatcherPerRequest())
+        if (dispatcherFactory.isCreateDispatcherPerRequest() || disposeFtpClient)
         {
             destroyFtp(endpoint, client);
         }
@@ -211,6 +211,11 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         {
             getFtpPool(endpoint).returnObject(client);
         }
+    }
+
+    public void releaseFtp(ImmutableEndpoint endpoint, FTPClient client) throws Exception
+    {
+        releaseFtp(endpoint, client, false);
     }
 
     public void destroyFtp(ImmutableEndpoint endpoint, FTPClient client) throws Exception
