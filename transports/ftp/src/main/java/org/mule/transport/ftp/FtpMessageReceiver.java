@@ -184,6 +184,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
     private FTPFile [] filesToFTPArray (FTPClient client) throws Exception
     {
+        boolean disposeFtpClient = false;
         try
         {
             FTPListParseEngine engine = client.initiateListParsing();
@@ -219,15 +220,17 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
             return v.toArray(new FTPFile[v.size()]);
         }
-        catch (FTPConnectionClosedException e)
+        catch (IOException e)
         {
+            // If the connection was aborted by the FTP server, or there was a failure in it, the client should be destroyed to avoid leaks.
+            disposeFtpClient = true;
             throw new ConnectException(e, this.connector);
         }
         finally
         {
             if (client != null)
             {
-                connector.releaseFtp(endpoint, client);
+                connector.releaseFtp(endpoint, client, disposeFtpClient);
             }
         }
     }
