@@ -101,6 +101,15 @@ public interface RequestMatcherRegistry<T> {
      */
     RequestMatcherRegistryBuilder<T> onNotFound(Supplier<T> itemSupplier);
 
+
+    /**
+     * Determines which item should be returned if an invalid request is provided. If not set, {@code null} will be returned by default.
+     *
+     * @param itemSupplier a supplier of the value to return
+     * @return this builder
+     */
+    RequestMatcherRegistryBuilder<T> onInvalidRequest(Supplier<T> itemSupplier);
+
     /**
      * Determines which item should be returned if a match is found but the entry is disabled. If not set, {@code null} will be
      * returned by default.
