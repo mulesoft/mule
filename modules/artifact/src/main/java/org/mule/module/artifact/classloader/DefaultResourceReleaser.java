@@ -227,33 +227,37 @@ public class DefaultResourceReleaser implements ResourceReleaser {
    */
   private void shutdownAwsIdleConnectionReaperThread() {
 
-    Class<?> idleConnectionReaper;
+    Class<?> idleConnectionReaperClass;
     try {
-      idleConnectionReaper = this.getClass().getClassLoader().loadClass("com.amazonaws.http.IdleConnectionReaper");
+      idleConnectionReaperClass = this.getClass().getClassLoader().loadClass("com.amazonaws.http.IdleConnectionReaper");
       try {
-        Method registeredManagers = idleConnectionReaper.getMethod("getRegisteredConnectionManagers");
-        List<Object> httpClientConnectionManagers = (List<Object>) registeredManagers.invoke(null);
-        if (!httpClientConnectionManagers.isEmpty()) {
-          Method removeConnectionManager = idleConnectionReaper.getMethod("removeConnectionManager");
-          for (Object connectionManager : httpClientConnectionManagers) {
-            boolean removed = (boolean) removeConnectionManager.invoke(null, connectionManager);
-            if (!removed && logger.isDebugEnabled()) {
-              logger
-                  .debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
-                                connectionManager));
-            }
+        Method registeredManagersMethod = idleConnectionReaperClass.getMethod("getRegisteredConnectionManagers");
+        List<Object> httpClientConnectionManagers = (List<Object>) registeredManagersMethod.invoke(null);
+        if (httpClientConnectionManagers.isEmpty()) {
+          return;
+        }
+
+        Class<?> httpClientConnectionManagerClass =
+            this.getClass().getClassLoader().loadClass("org.apache.http.conn.HttpClientConnectionManager");
+        Method removeConnectionManager =
+            idleConnectionReaperClass.getMethod("removeConnectionManager", httpClientConnectionManagerClass);
+        for (Object connectionManager : httpClientConnectionManagers) {
+          boolean removed = (boolean) removeConnectionManager.invoke(null, connectionManager);
+          if (!removed && logger.isDebugEnabled()) {
+            logger
+                .debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
+                              connectionManager));
           }
         }
 
       } finally {
-        Method shutdown = idleConnectionReaper.getMethod("shutdown");
+        Method shutdown = idleConnectionReaperClass.getMethod("shutdown");
         shutdown.invoke(null);
       }
 
-    } catch (ClassNotFoundException e) {
-      // If the class is not found, there is nothing to dispose
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException e) {
+      // If the class or method is not found, there is nothing to dispose
+    } catch (SecurityException | IllegalAccessException | InvocationTargetException e) {
       logger.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getMessage(), e);
     }
   }
