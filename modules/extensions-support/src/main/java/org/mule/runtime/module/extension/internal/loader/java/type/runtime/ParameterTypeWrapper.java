@@ -14,6 +14,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 
 import java.io.InputStream;
+import java.io.Serializable;
 
 import org.springframework.core.ResolvableType;
 
@@ -38,6 +39,7 @@ public class ParameterTypeWrapper extends TypeWrapper {
     MetadataType metadataType = typeLoader.load(type);
 
     if (this.isSameType(Object.class) ||
+        this.isSameType(Serializable.class) ||
         this.isAssignableTo(InputStream.class) ||
         this.isAssignableTo(Byte[].class) ||
         this.isAssignableTo(byte[].class)) {

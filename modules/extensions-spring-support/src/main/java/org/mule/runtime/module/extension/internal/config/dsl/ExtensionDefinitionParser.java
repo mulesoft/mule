@@ -126,6 +126,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import com.google.common.collect.ImmutableList;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -326,7 +327,8 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitAnyType(AnyType anyType) {
-          if (JavaTypeUtils.getType(anyType).equals(Object.class)) {
+          if (JavaTypeUtils.getType(anyType).equals(Object.class) ||
+              JavaTypeUtils.getType(anyType).equals(Serializable.class)) {
 
             if (!parseAsContent(anyType)) {
               parseAttributeParameter(getKey(parameter),

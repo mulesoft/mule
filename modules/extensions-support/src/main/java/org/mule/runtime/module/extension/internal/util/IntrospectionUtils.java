@@ -111,6 +111,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
@@ -309,6 +310,7 @@ public final class IntrospectionUtils {
     }
 
     if ((returnType.isSameType(Object.class) ||
+        returnType.isSameType(Serializable.class) ||
         returnType.isAssignableTo(InputStream.class) ||
         returnType.isAssignableTo(Byte[].class) ||
         returnType.isAssignableTo(byte[].class)) && type != null) {

@@ -9382,7 +9382,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
+                "type": "Any",
                 "annotations": {
                   "typeId": "java.io.Serializable",
                   "classInformation": {
@@ -9400,8 +9400,7 @@
                   "typeAlias": {
                     "value": "Serializable"
                   }
-                },
-                "fields": []
+                }
               },
               "hasDynamicType": false,
               "required": true,
