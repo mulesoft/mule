@@ -10,6 +10,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
@@ -35,12 +36,16 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class PetStoreOperations {
+
+  public static boolean shouldFailWithConnectionException;
 
   public List<String> getPets(@Connection PetStoreClient client,
                               @Config PetStoreConnector config,
@@ -51,6 +56,26 @@ public class PetStoreOperations {
       ownerName += IOUtils.toString(ownerSignature);
     }
 
+    return client.getPets(ownerName, config);
+  }
+
+  public InputStream getStreamedSignature(String signature) {
+    return new ByteArrayInputStream(signature.getBytes());
+  }
+
+  public List<String> getPetsWithIntermitentConnectionProblemAndClosingStream(@Connection PetStoreClient client,
+                                                                              @Config PetStoreConnector config,
+                                                                              String ownerName,
+                                                                              @Optional InputStream ownerSignature)
+      throws IOException {
+    if (ownerSignature != null) {
+      ownerName += IOUtils.toString(ownerSignature);
+    }
+    shouldFailWithConnectionException = !shouldFailWithConnectionException;
+    if (!shouldFailWithConnectionException) {
+      ownerSignature.close();
+      throw new RuntimeException(new ConnectionException("kaboom"));
+    }
     return client.getPets(ownerName, config);
   }
 

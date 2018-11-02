@@ -16,6 +16,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.test.petstore.extension.PetStoreOperations.shouldFailWithConnectionException;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -50,6 +52,13 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
   public void standaloneCursorIsResetOnReconnection() throws Exception {
     CursorStream cursorStream = createMockCursor();
     assertReconnection(cursorStream, cursorStream);
+  }
+
+  @Test
+  public void cursorIsNotAffectedIfCloseIsCalled() throws Exception {
+    shouldFailWithConnectionException = true;
+    CoreEvent response = flowRunner("streamingReconnectWithClosedStream").withVariable("signature", "hn").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
   }
 
   private void assertReconnection(CursorStream cursor, Object container) throws Exception {
