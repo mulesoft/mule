@@ -8,6 +8,8 @@ package org.mule.runtime.http.api.server;
 
 import org.mule.api.annotation.NoImplement;
 
+import java.net.InetAddress;
+
 /**
  * Representation of a server's address.
  *
@@ -22,9 +24,14 @@ public interface ServerAddress {
   int getPort();
 
   /**
-   * @return the IP for this server.
+   * @return the IP for this server as a String.
    */
   String getIp();
+
+  /**
+   * @return the address for this server.
+   */
+  InetAddress getAddress();
 
   /**
    * @param serverAddress another {@link ServerAddress}.
