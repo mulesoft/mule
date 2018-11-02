@@ -24,7 +24,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 /**
- * ADD JAVA DOC
+ * Enriches all the models that are annotatied with {@link Deprecated}. This is applicable to parameters, operations, sources,
+ * functions, scopes, routers, configurations, connection providers and extensions.
  *
  * @since 4.2.0
  */
