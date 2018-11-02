@@ -222,7 +222,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void appTakesPrecedenceOverEverything() throws Exception {
     mvel.setAliases(singletonMap("app", "'other1'"));
-    PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of("")).addVariable("app", "otherb").build();
+    PrivilegedEvent event =
+        this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of("")).addVariable("app", "otherb").build();
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("foo",
                                                                          (ExpressionLanguageExtension) context -> context
                                                                              .addVariable("app", "otherc"));
@@ -244,7 +245,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void extensionTakesPrecedenceOverAutoResolved() throws Exception {
-    PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of("")).addVariable("foo", "other").build();
+    PrivilegedEvent event =
+        this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of("")).addVariable("foo", "other").build();
     ((MuleContextWithRegistry) muleContext).getRegistry()
         .registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "bar"));
     mvel.initialise();
@@ -565,7 +567,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of(""))
         .addVariable("test", value.getValue(), value.getDataType())
         .build();
-    
+
     TypedValue<String> result = mvel.evaluate("#[vars.test]", null, mock(ComponentLocation.class), event.asBindingContext());
     assertThat(result.getValue(), is(equalTo(value.getValue())));
     assertThat(result.getDataType(), is(sameInstance(value.getDataType())));
