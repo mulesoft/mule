@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static com.google.common.collect.ImmutableList.of;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -30,9 +31,11 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.client.api.model.RemoteRepository;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -41,11 +44,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

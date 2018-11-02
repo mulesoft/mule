@@ -17,10 +17,10 @@
           "artifactCoordinates": {
             "groupId": "commons-io",
             "artifactId": "commons-io",
-            "version": "2.6",
+            "version": "2.4",
             "type": "jar"
           },
-          "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+          "uri": "repository/commons-io/commons-io/2.4/commons-io-2.4.jar"
         }
       ]
     }

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +54,11 @@ public class MavenClassLoaderModelLoaderTestCase {
   public void before() throws URISyntaxException {
     mavenClassLoaderModelLoader = new MavenClassLoaderModelLoader();
     artifactFile = getApplicationFolder("apps/single-dependency");
+  }
+
+  @After
+  public void after() {
+    GlobalConfigLoader.reset();
   }
 
   @Test
