@@ -81,19 +81,24 @@ public class MavenClassLoaderModelLoaderTestCase {
       // It is should fail
     }
     properties.put("muleRuntimeConfig.maven.repositories.mavenCentral.url", "https://repo.maven.apache.org/maven2/");
-    range(1, 10).parallel().forEach(number -> {
-      try {
-        testWithSystemProperties(properties,
-                                 () -> {
-                                   GlobalConfigLoader.reset();
-                                   assertThat(mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP).getDependencies(),
-                                              hasItem(hasProperty("descriptor",
-                                                                  (hasProperty("artifactId", equalTo("commons-collections"))))));
-                                 });
-      } catch (Exception e) {
-        fail(e.getMessage());
-      }
-    });
+    try {
+      testWithSystemProperties(properties, () -> range(1, 10).parallel().forEach(
+                                                                                 number -> {
+                                                                                   GlobalConfigLoader.reset();
+                                                                                   try {
+                                                                                     assertThat(mavenClassLoaderModelLoader
+                                                                                         .load(artifactFile, emptyMap(), APP)
+                                                                                         .getDependencies(),
+                                                                                                hasItem(hasProperty("descriptor",
+                                                                                                                    (hasProperty("artifactId",
+                                                                                                                                 equalTo("commons-collections"))))));
+                                                                                   } catch (Exception e) {
+                                                                                     throw new RuntimeException(e);
+                                                                                   }
+                                                                                 }));
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
   }
 
   private Map<String, String> getMuleFreeSystemProperties() {
