@@ -13,7 +13,6 @@ import static org.mule.runtime.core.internal.context.thread.notification.ThreadN
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -25,11 +24,13 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 /**
  * Creates {@link WorkQueueStreamProcessingStrategy} instances that de-multiplexes incoming messages using a ring-buffer but
@@ -87,11 +88,11 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       if (maxConcurrency > subscribers) {
         if (isThreadLoggingEnabled) {
-          return publisher -> from(publisher).flatMap(event -> Mono.subscriberContext()
-              .flatMap(ctx -> Mono.just(event).transform(pipeline)
-                  .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
-                      .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(blockingScheduler),
-                                                                                             event.getContext().getId())))));
+          Context ctx = Mono.subscriberContext().block();
+          return publisher -> from(publisher).flatMap(event -> Mono.just(event).transform(pipeline)
+              .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
+                  .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(blockingScheduler),
+                                                                                         event.getContext().getId()))));
         } else {
           return publisher -> from(publisher)
               .flatMap(event -> just(event).transform(pipeline)

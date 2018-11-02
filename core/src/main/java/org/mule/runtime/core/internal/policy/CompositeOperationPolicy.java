@@ -70,21 +70,18 @@ public class CompositeOperationPolicy extends
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-        return from(publisher).handle((event, sink) -> {
+        return from(publisher).flatMap(event -> {
           Map<String, Object> parametersMap = new HashMap<>();
           try {
             parametersMap.putAll(operationParametersProcessor.getOperationParameters());
           } catch (Exception e) {
-            sink.error(e);
+            return error(e);
           }
           if (operationPolicyParametersTransformer.isPresent()) {
             parametersMap
                 .putAll(operationPolicyParametersTransformer.get().fromMessageToParameters(event.getMessage()));
           }
-          from(operationExecutionFunction.execute(parametersMap, event))
-              .doOnSuccess(sink::next)
-              .doOnError(sink::error)
-          .subscribe();
+          return from(operationExecutionFunction.execute(parametersMap, event));
         });
       }
     };

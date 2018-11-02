@@ -37,7 +37,6 @@ import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.subscriberContext;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -88,9 +87,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +95,10 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 /**
  * A {@link Processor} capable of executing extension components.
@@ -190,42 +189,42 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
           final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
 
-          return subscriberContext().flatMap(ctx -> {
-            OperationExecutionFunction operationExecutionFunction;
-            final Scheduler currentScheduler =
-                ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
+          Context ctx = subscriberContext().block();
 
-            if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
-                && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-              ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
+          OperationExecutionFunction operationExecutionFunction;
+          final Scheduler currentScheduler =
+              ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
 
-              operationExecutionFunction = (parameters, operationEvent) -> {
-                operationContext.setCurrentScheduler(currentScheduler);
-                return doProcessWithErrorMapping(operationEvent, operationContext);
-              };
-            } else {
-              operationExecutionFunction = (parameters, operationEvent) -> {
-                ExecutionContextAdapter<T> operationContext;
-                try {
-                  operationContext = createExecutionContext(configuration, parameters, operationEvent, currentScheduler);
-                } catch (MuleException e) {
-                  return error(e);
-                }
-                return doProcessWithErrorMapping(operationEvent, operationContext);
-              };
-            }
+          if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
+              && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+            ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
-            if (getLocation() != null) {
-              ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolvedProcessorRepresentation);
-              return Mono.from(policyManager
-                  .createOperationPolicy(this, event, resolutionResult,
-                                         operationExecutionFunction)
-                  .process(event));
-            } else {
-              // If this operation has no component location then it is internal. Don't apply policies on internal operations.
-              return Mono.from(operationExecutionFunction.execute(resolutionResult, event));
-            }
-          });
+            operationExecutionFunction = (parameters, operationEvent) -> {
+              operationContext.setCurrentScheduler(currentScheduler);
+              return doProcessWithErrorMapping(operationEvent, operationContext);
+            };
+          } else {
+            operationExecutionFunction = (parameters, operationEvent) -> {
+              ExecutionContextAdapter<T> operationContext;
+              try {
+                operationContext = createExecutionContext(configuration, parameters, operationEvent, currentScheduler);
+              } catch (MuleException e) {
+                return error(e);
+              }
+              return doProcessWithErrorMapping(operationEvent, operationContext);
+            };
+          }
+
+          if (getLocation() != null) {
+            ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolvedProcessorRepresentation);
+            return Mono.from(policyManager
+                .createOperationPolicy(this, event, resolutionResult,
+                                       operationExecutionFunction)
+                .process(event));
+          } else {
+            // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+            return Mono.from(operationExecutionFunction.execute(resolutionResult, event));
+          }
         }));
   }
 
