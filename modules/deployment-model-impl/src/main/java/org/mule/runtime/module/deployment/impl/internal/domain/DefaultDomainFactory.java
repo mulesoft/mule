@@ -145,7 +145,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-        pluginDependenciesResolver.resolve(emptySet(), domainDescriptor.getPlugins().stream().collect(toList()));
+        pluginDependenciesResolver.resolve(emptySet(), domainDescriptor.getPlugins().stream().collect(toList()), true);
 
     DomainClassLoaderBuilder artifactClassLoaderBuilder =
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();

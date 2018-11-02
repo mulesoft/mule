@@ -63,12 +63,12 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   @Override
   public List<ArtifactPluginDescriptor> resolve(
                                                 Set<ArtifactPluginDescriptor> providedPluginDescriptors,
-                                                List<ArtifactPluginDescriptor> descriptors) {
+                                                List<ArtifactPluginDescriptor> descriptors, boolean isDomain) {
 
     List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
 
     List<ArtifactPluginDescriptor> filteredPluginDescriptors =
-        getArtifactPluginDescriptors(providedPluginDescriptors, resolvedPlugins);
+        getArtifactPluginDescriptors(providedPluginDescriptors, resolvedPlugins, isDomain);
 
     verifyPluginExportedPackages(filteredPluginDescriptors);
 
@@ -76,7 +76,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> domainPlugins,
-                                                                      List<ArtifactPluginDescriptor> resolvedPlugins) {
+                                                                      List<ArtifactPluginDescriptor> resolvedPlugins,
+                                                                      boolean isDomain) {
     List<ArtifactPluginDescriptor> filteredPluginDescriptors = new ArrayList<>();
 
     for (ArtifactPluginDescriptor appPluginDescriptor : resolvedPlugins) {
@@ -87,8 +88,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       } else {
         BundleDescriptor foundPluginBundleDescriptor = pluginDescriptor.get().getBundleDescriptor();
         // TODO MULE-15842: remove hardcoded HTTP artifact GAs.
-        if (foundPluginBundleDescriptor.getArtifactId().equals(MULE_HTTP_CONNECTOR_ARTIFACT_ID) &&
-            foundPluginBundleDescriptor.getGroupId().equals(MULE_HTTP_CONNECTOR_GROUP_ID)
+        if ((isDomain || (foundPluginBundleDescriptor.getArtifactId().equals(MULE_HTTP_CONNECTOR_ARTIFACT_ID) &&
+            foundPluginBundleDescriptor.getGroupId().equals(MULE_HTTP_CONNECTOR_GROUP_ID)))
             && !isCompatibleVersion(foundPluginBundleDescriptor.getVersion(),
                                     appPluginDescriptor.getBundleDescriptor().getVersion())) {
           throw new IllegalStateException(

@@ -6,6 +6,7 @@
 
     <groupId>test</groupId>
     <artifactId>plugin-dependency-with-another-plugin</artifactId>
+    <packaging>mule-application</packaging>
     <version>1.0.0</version>
 
     <dependencies>

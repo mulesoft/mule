@@ -88,7 +88,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       routes.add(new TestProcessor());
     }
-    roundRobin.setRoutes(new ArrayList<Processor>(routes));
+    roundRobin.setRoutes(new ArrayList<>(routes));
     initialiseIfNeeded(roundRobin, muleContext);
 
     List<Thread> threads = new ArrayList<>(NUMBER_OF_ROUTES);
@@ -159,21 +159,20 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
   static class TestProcessor implements Processor {
 
-    private int count;
+    private AtomicInteger count = new AtomicInteger(0);
     private List<Object> payloads = new ArrayList<>();
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       payloads.add(event.getMessage().getPayload().getValue());
-      count++;
-      if (count % 3 == 0) {
+      if (count.incrementAndGet() % 3 == 0) {
         throw new DefaultMuleException("Mule Exception!");
       }
       return null;
     }
 
     public int getCount() {
-      return count;
+      return count.get();
     }
   }
 }

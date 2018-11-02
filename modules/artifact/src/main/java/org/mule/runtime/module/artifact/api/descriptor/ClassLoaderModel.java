@@ -107,7 +107,7 @@ public final class ClassLoaderModel {
     private Set<String> packages = new HashSet<>();
     private Set<String> resources = new HashSet<>();
     private List<URL> urls = new ArrayList<>();
-    private Set<BundleDependency> dependencies = new HashSet<>();
+    protected Set<BundleDependency> dependencies = new HashSet<>();
     private Set<String> privilegedExportedPackages = new HashSet<>();
     private Set<String> privilegedArtifacts = new HashSet<>();
     private Boolean includeTestDependencies = FALSE;
