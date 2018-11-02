@@ -6,7 +6,8 @@
  */
 package org.mule.test.integration.domain.tls;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,16 +37,16 @@ public class TlsCustomTruststoreTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testUsingCustomTlsTrustManager() throws Exception
+    public void usingCustomTlsTrustManager() throws Exception
     {
         MuleMessage message = runFlow("flow-custom").getMessage();
-        assertEquals(RESPONSE, message.getPayloadAsString());
+        assertThat(RESPONSE, equalTo(message.getPayloadAsString()));
     }
 
     @Test
-    public void testUsingDefaultTlsTrustManager() throws Exception
+    public void usingDefaultTlsTrustManager() throws Exception
     {
         MuleMessage message = runFlow("flow-default").getMessage();
-        assertEquals(RESPONSE, message.getPayloadAsString());
+        assertThat(RESPONSE, equalTo(message.getPayloadAsString()));
     }
 }
