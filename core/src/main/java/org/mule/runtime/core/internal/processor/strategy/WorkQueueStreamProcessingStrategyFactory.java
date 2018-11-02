@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -88,7 +89,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       if (maxConcurrency > subscribers) {
         if (isThreadLoggingEnabled) {
-          Context ctx = Mono.subscriberContext().block();
+          Context ctx = subscriberContext().block();
           return publisher -> from(publisher).flatMap(event -> Mono.just(event).transform(pipeline)
               .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
                   .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(blockingScheduler),
