@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.util.Collections.emptySet;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+
 import org.junit.Test;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -23,18 +31,13 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 
-import static java.util.Collections.emptySet;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 
-public class DeprecatedDeclarationEnricherTestCase {
+
+public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private DeprecatedModelDeclarationEnricher enricher = new DeprecatedModelDeclarationEnricher();
 
