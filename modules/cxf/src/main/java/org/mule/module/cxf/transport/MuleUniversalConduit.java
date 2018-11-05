@@ -51,6 +51,10 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpClientMessageDispatcher;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpResponseException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -344,6 +348,18 @@ public class MuleUniversalConduit extends AbstractConduit
                 getMessageObserver().onMessage(inMessage);
                 clearClientContextIfNeeded(getMessageObserver());
                 return;
+            }
+            // If this branch is reached, it means that the message payload is empty.
+            // By asserting that the inboundProperty 'http.status' exists, I'm verifying that
+            // the last inbound endpoint used was HTTP, and that it set the property correctly.
+            else if (resEvent.getMessage().getInboundPropertyNames().contains("http.status"))
+            {
+                int httpResponseStatusCode = resEvent.getMessage().getInboundProperty("http.status");
+                if (httpResponseStatusCode > HttpClientMessageDispatcher.ERROR_STATUS_CODE_RANGE_START)
+                {
+                    HttpResponseException httpErrorException = new HttpResponseException("HTTP Response payload empty and error status code was returned", httpResponseStatusCode);
+                    throw new IOException(httpErrorException);
+                }
             }
         }
 
