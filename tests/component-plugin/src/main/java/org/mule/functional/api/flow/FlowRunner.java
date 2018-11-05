@@ -9,16 +9,23 @@ package org.mule.functional.api.flow;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
@@ -50,6 +57,8 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private CompletableFuture<Void> externalCompletionCallback = new CompletableFuture<>();
 
+  private boolean wasFlowOriginallyStopped = false;
+
   /**
    * Initializes this flow runner.
    *
@@ -59,6 +68,16 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   public FlowRunner(Registry registry, String flowName) {
     super(registry);
     this.flowName = flowName;
+
+    final FlowConstruct flow = getFlowConstruct();
+    if (((LifecycleStateEnabled) flow).getLifecycleState().isStopped()) {
+      wasFlowOriginallyStopped = true;
+      try {
+        startIfNeeded(flow);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
   }
 
   /**
@@ -333,5 +352,14 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
     externalCompletionCallback.complete(null);
     super.dispose();
+
+    if (wasFlowOriginallyStopped) {
+      final FlowConstruct flow = getFlowConstruct();
+      try {
+        stopIfNeeded(flow);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
   }
 }

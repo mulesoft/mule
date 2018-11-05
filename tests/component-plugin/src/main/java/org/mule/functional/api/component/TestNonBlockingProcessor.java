@@ -20,12 +20,15 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
-import org.reactivestreams.Publisher;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Test async non-blocking {@link Processor} implementation that will return control to the Flow in a custom {@link Scheduler}
@@ -39,7 +42,7 @@ public class TestNonBlockingProcessor extends AbstractComponent
   @Inject
   private SchedulerService schedulerService;
 
-  private Scheduler customScheduler;
+  private LazyValue<Scheduler> customScheduler;
 
   /**
    * Force the proactor to change the thread.
@@ -60,18 +63,21 @@ public class TestNonBlockingProcessor extends AbstractComponent
       if (isTransactionActive()) {
         return publisher;
       } else {
-        return just(event).publishOn(fromExecutorService(customScheduler));
+        return just(event).publishOn(fromExecutorService(customScheduler.get()));
       }
     });
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    customScheduler = schedulerService.customScheduler(config().withWaitAllowed(true).withMaxConcurrentTasks(MAX_THREADS));
+    customScheduler = new LazyValue<>(() -> schedulerService.customScheduler(config()
+        .withName("TestNonBlockingProcessor[" + getLocation().getLocation() + "]")
+        .withWaitAllowed(true)
+        .withMaxConcurrentTasks(MAX_THREADS)));
   }
 
   @Override
   public void dispose() {
-    customScheduler.stop();
+    customScheduler.ifComputed(sch -> sch.stop());
   }
 }

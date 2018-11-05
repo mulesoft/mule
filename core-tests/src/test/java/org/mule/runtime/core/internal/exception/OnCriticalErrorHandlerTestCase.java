@@ -22,7 +22,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.junit4.rule.VerboseExceptions;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class OnCriticalErrorHandlerTestCase extends AbstractErrorHandlerTestCase
   private Error error;
 
 
-  public OnCriticalErrorHandlerTestCase(SystemProperty verbose) {
+  public OnCriticalErrorHandlerTestCase(VerboseExceptions verbose) {
     super(verbose);
   }
 

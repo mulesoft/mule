@@ -141,21 +141,7 @@ public class HeisenbergSource extends Source<String, Object> {
   private HeisenbergConnection connection;
 
   public HeisenbergSource() {
-    receivedGroupOnSource = false;
-    receivedInlineOnSuccess = false;
-    receivedInlineOnError = false;
-
-    receivedDebtProperties = null;
-    receivedUsableWeapons = null;
-
-    terminateStatus = NONE;
-
-    executedOnSuccess = false;
-    executedOnError = false;
-    executedOnTerminate = false;
-    gatheredMoney = 0;
-    location = null;
-    configName = null;
+    resetHeisenbergSource();
   }
 
   @Override
@@ -276,5 +262,24 @@ public class HeisenbergSource extends Source<String, Object> {
 
   public enum TerminateStatus {
     SUCCESS, ERROR_INVOKE, ERROR_BODY, NONE
+  }
+
+  public static void resetHeisenbergSource() {
+    receivedGroupOnSource = false;
+    receivedInlineOnSuccess = false;
+    receivedInlineOnError = false;
+
+    receivedDebtProperties = null;
+    receivedUsableWeapons = null;
+
+    terminateStatus = NONE;
+    error = null;
+
+    executedOnSuccess = false;
+    executedOnError = false;
+    executedOnTerminate = false;
+    gatheredMoney = 0;
+    location = null;
+    configName = null;
   }
 }

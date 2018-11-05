@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Before;
@@ -59,7 +59,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   private OnErrorContinueHandler onErrorContinueHandler;
 
-  public OnErrorContinueHandlerTestCase(SystemProperty verbose) {
+  public OnErrorContinueHandlerTestCase(VerboseExceptions verbose) {
     super(verbose);
   }
 
