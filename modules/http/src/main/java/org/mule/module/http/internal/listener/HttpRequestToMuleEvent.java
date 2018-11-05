@@ -18,10 +18,12 @@ import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.endpoint.URIBuilder;
 import org.mule.module.http.api.HttpHeaders;
@@ -95,7 +97,15 @@ public class HttpRequestToMuleEvent
         Object payload = NullPayload.getInstance();
         if (parseRequest)
         {
-            final HttpEntity entity = request.getEntity();
+            final HttpEntity entity;
+            try
+            {
+                entity = request.getEntity();
+            }
+            catch (MuleRuntimeException e)
+            {
+                throw new HttpRequestParsingException("Unable to parse request multitype content!",e);
+            }
             if (entity != null && !(entity instanceof EmptyHttpEntity))
             {
                 if (entity instanceof MultipartHttpEntity)
