@@ -36,7 +36,7 @@ public final class InternalExceptionUtils {
   /**
    * Create new {@link CoreEvent} with {@link org.mule.runtime.api.message.Error} instance set.
    *
-   * @param currentEvent event when error occured.
+   * @param currentEvent event when error occurred.
    * @param obj message processor/source.
    * @param me messaging exception.
    * @param locator the mule context.

@@ -28,11 +28,14 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
   protected final boolean optimized;
 
   public CaseInsensitiveMultiMap() {
-    this(new MultiMap<>());
+    this(true);
   }
 
   public CaseInsensitiveMultiMap(boolean optimized) {
-    this(new MultiMap<>(), optimized);
+    this.optimized = optimized;
+    this.paramsMap = optimized
+        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
+        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
   }
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap) {

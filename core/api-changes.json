@@ -59,6 +59,15 @@
           "methodName": "getClusterUUID",
           "elementKind": "method",
           "justification": "Added for performance"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.net.InetAddress org.mule.runtime.core.api.util.NetworkUtils::getLocalHostAddress(java.lang.String) throws java.net.UnknownHostException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "NetworkUtils",
+          "methodName": "getLocalHostAddress",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
         }
       ]
     }

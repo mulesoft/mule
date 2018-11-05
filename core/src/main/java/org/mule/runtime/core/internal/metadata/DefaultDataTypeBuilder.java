@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import static com.google.common.cache.CacheBuilder.newBuilder;
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
@@ -29,8 +29,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.util.ClassUtils;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -63,13 +62,7 @@ public class DefaultDataTypeBuilder
   private static ConcurrentHashMap<String, ProxyIndicator> cglibClassCache = new ConcurrentHashMap<>();
 
   private static LoadingCache<DefaultDataTypeBuilder, DataType> dataTypeCache =
-      newBuilder().weakValues().build(new CacheLoader<DefaultDataTypeBuilder, DataType>() {
-
-        @Override
-        public DataType load(DefaultDataTypeBuilder key) throws Exception {
-          return key.doBuild();
-        }
-      });
+      newBuilder().weakValues().build(key -> key.doBuild());
 
   private Reference<Class<?>> typeRef = new WeakReference<>(Object.class);
   private DataTypeBuilder itemTypeBuilder;
@@ -516,7 +509,7 @@ public class DefaultDataTypeBuilder
       return new DefaultFunctionDataType(type, returnType, parametersType != null ? parametersType : newArrayList(), mediaType,
                                          isConsumable(type));
     }
-    return dataTypeCache.getUnchecked(this);
+    return dataTypeCache.get(this);
   }
 
   protected DataType doBuild() {

@@ -373,7 +373,25 @@
           "methodName": "getBytesLength",
           "elementKind": "method",
           "justification": "This enables a performance optimization. It doesn't break the API"
-        }
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.http.api.HttpConstants.ALL_INTERFACES_ADDRESS",
+          "package": "org.mule.runtime.http.api",
+          "classSimpleName": "HttpConstants",
+          "fieldName": "ALL_INTERFACES_ADDRESS",
+          "elementKind": "field",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method java.net.InetAddress org.mule.runtime.http.api.server.ServerAddress::getAddress()",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "ServerAddress",
+          "methodName": "getAddress",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        }        
       ]
     }
   },

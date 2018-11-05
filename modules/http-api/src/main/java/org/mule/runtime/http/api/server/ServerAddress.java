@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.api.server;
 
+import java.net.InetAddress;
+
 /**
  * Representation of a server's address.
  *
@@ -19,9 +21,16 @@ public interface ServerAddress {
   int getPort();
 
   /**
-   * @return the IP for this server.
+   * @return the IP for this server as a String.
    */
   String getIp();
+
+  /**
+   * @return the address for this server.
+   */
+  default InetAddress getAddress() {
+    return null;
+  }
 
   /**
    * @param serverAddress another {@link ServerAddress}.
