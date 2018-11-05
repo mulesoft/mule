@@ -17,10 +17,12 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -29,19 +31,21 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.nio.charset.Charset;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.nio.charset.Charset;
+
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleContextTestCase {
 
   private static final String TARGET = "myFlowVar";
+
+  private ExpressionManager expressionManager;
 
   @Mock
   protected ExecutionContextAdapter operationContext;
@@ -62,6 +66,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   @Before
   public void before() throws MuleException {
+    expressionManager = muleContext.getExpressionManager();
     event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getMuleContext()).thenReturn(muleContext);
@@ -69,7 +74,8 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
   }
 
   private TargetReturnDelegate createDelegate(String expression) {
-    return new TargetReturnDelegate(TARGET, expression, componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
+    return new TargetReturnDelegate(TARGET, expression, componentModel, expressionManager,
+                                    getDefaultCursorStreamProviderFactory(), muleContext);
   }
 
   @Test

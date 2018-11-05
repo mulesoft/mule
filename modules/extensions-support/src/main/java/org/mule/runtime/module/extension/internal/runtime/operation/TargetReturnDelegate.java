@@ -12,6 +12,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -28,6 +29,8 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
  */
 final class TargetReturnDelegate extends AbstractReturnDelegate {
 
+  private final ExpressionManager expressionManager;
+
   private final String target;
   private final String targetValue;
 
@@ -39,18 +42,19 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   TargetReturnDelegate(String target,
                        String targetValue,
                        ComponentModel componentModel,
+                       ExpressionManager expressionManager,
                        CursorProviderFactory cursorProviderFactory,
                        MuleContext muleContext) {
     super(componentModel, cursorProviderFactory, muleContext);
+    this.expressionManager = expressionManager;
     this.target = target;
     this.targetValue = targetValue;
   }
 
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    TypedValue result =
-        operationContext.getMuleContext().getExpressionManager()
-            .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
+    TypedValue result = expressionManager
+        .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
     return CoreEvent.builder(operationContext.getEvent())
         .securityContext(operationContext.getSecurityContext())
         .addVariable(this.target, result.getValue(), result.getDataType())

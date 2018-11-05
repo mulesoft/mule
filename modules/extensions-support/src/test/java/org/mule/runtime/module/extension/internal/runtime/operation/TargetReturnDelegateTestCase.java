@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.size.SmallTest;
@@ -26,7 +27,9 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new TargetReturnDelegate(TARGET, "#[message]", componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
+    return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
+                                    getDefaultCursorStreamProviderFactory(),
+                                    muleContext);
   }
 
   @After
