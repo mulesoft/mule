@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveToUnclosableCursor;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -74,6 +76,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -246,6 +249,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       Object parameterValue = valueSupplier.get();
       if (parameterValue == null) {
         return resolvePrimitiveTypeDefaultValue(parameterType);
+      } else if (parameterType.equals(InputStream.class) && parameterValue instanceof CursorStream) {
+        return resolveToUnclosableCursor((CursorStream) parameterValue);
       } else {
         return resolveCursor(parameterValue);
       }

@@ -26,9 +26,11 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -95,8 +97,7 @@ public class ResolverUtils {
   }
 
   /**
-   * Executes the {@code resolver} using the given {@code context},
-   * applying all the required resolution rules that may apply for
+   * Executes the {@code resolver} using the given {@code context}, applying all the required resolution rules that may apply for
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
@@ -137,6 +138,92 @@ public class ResolverUtils {
     }
 
     return value;
+  }
+
+  /**
+   * Obtains a {@link CursorStream} that cannot be closed based on the {@code value}, if one is available.
+   *
+   * @return the given {@code value}, but wrapped in a way that it is not posible to close it.
+   */
+  public static Object resolveToUnclosableCursor(CursorStream value) {
+    return new UnclosableCursorStream(value);
+  }
+
+  private static class UnclosableCursorStream extends CursorStream {
+
+    private CursorStream delegate;
+
+    public UnclosableCursorStream(CursorStream delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public int read() throws IOException {
+      return delegate.read();
+    }
+
+    @Override
+    public int read(byte[] b) throws IOException {
+      return delegate.read(b);
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+      return delegate.read(b, off, len);
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+      return delegate.skip(n);
+    }
+
+    @Override
+    public int available() throws IOException {
+      return delegate.available();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+      delegate.mark(readlimit);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+      delegate.reset();
+    }
+
+    @Override
+    public boolean markSupported() {
+      return super.markSupported();
+    }
+
+    @Override
+    public long getPosition() {
+      return delegate.getPosition();
+    }
+
+    @Override
+    public void seek(long position) throws IOException {
+      delegate.seek(position);
+    }
+
+    @Override
+    public void release() {
+      delegate.release();
+    }
+
+    @Override
+    public boolean isReleased() {
+      return delegate.isReleased();
+    }
+
+    @Override
+    public CursorProvider getProvider() {
+      return delegate.getProvider();
+    }
+
+    @Override
+    public void close() throws IOException {}
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,

@@ -59,6 +59,7 @@ public class PetStoreOperations {
     return client.getPets(ownerName, config);
   }
 
+  @MediaType(TEXT_PLAIN)
   public InputStream getStreamedSignature(String signature) {
     return new ByteArrayInputStream(signature.getBytes());
   }
