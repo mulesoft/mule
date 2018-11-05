@@ -56,17 +56,17 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
   }
 
   @OnSuccess
-  public void onSuccess() {
+  public synchronized void onSuccess() {
     ADOPTED_PET_COUNT++;
   }
 
   @OnError
-  public void onError() {
+  public synchronized void onError() {
     FAILED_ADOPTION_COUNT++;
   }
 
   @OnTerminate
-  public void onTerminate() {
+  public synchronized void onTerminate() {
     COMPLETED_POLLS++;
   }
 
@@ -93,7 +93,7 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
     REJECTED_ADOPTIONS++;
   }
 
-  private void resetCounters() {
+  private synchronized void resetCounters() {
     ADOPTED_PET_COUNT = FAILED_ADOPTION_COUNT = COMPLETED_POLLS = REJECTED_ADOPTIONS = 0;
   }
 }
