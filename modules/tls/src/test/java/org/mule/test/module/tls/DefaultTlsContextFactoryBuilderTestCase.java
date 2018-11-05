@@ -23,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,7 +68,7 @@ public class DefaultTlsContextFactoryBuilderTestCase extends AbstractMuleTestCas
     assertThat(trustStoreConfiguration.getPath(), endsWith("trustStore"));
     assertThat(trustStoreConfiguration.getPassword(), is("mulepassword"));
     assertThat(trustStoreConfiguration.getType(), is("jceks"));
-    assertThat(trustStoreConfiguration.getAlgorithm(), is(KeyManagerFactory.getDefaultAlgorithm()));
+    assertThat(trustStoreConfiguration.getAlgorithm(), is(TrustManagerFactory.getDefaultAlgorithm()));
   }
 
   @Test
