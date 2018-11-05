@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -72,8 +73,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultA
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.streaming.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -246,6 +249,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       Object parameterValue = valueSupplier.get();
       if (parameterValue == null) {
         return resolvePrimitiveTypeDefaultValue(parameterType);
+      } else if (parameterValue instanceof CursorStream) {
+        return new UnclosableCursorStream((CursorStream) parameterValue);
       } else {
         return resolveCursor(parameterValue);
       }
