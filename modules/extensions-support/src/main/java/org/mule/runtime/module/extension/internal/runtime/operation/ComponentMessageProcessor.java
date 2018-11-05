@@ -37,6 +37,7 @@ import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.subscriberContext;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -87,6 +88,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -95,8 +99,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
@@ -389,7 +391,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
 
   protected TargetReturnDelegate getTargetReturnDelegate() {
-    return new TargetReturnDelegate(target, targetValue, componentModel, cursorProviderFactory, muleContext);
+    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
