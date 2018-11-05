@@ -131,6 +131,7 @@ public final class TlsConfiguration extends AbstractComponent
   public static final String DEFAULT_KEYSTORE = ".keystore";
   public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
   public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
+  private static final String DEFAULT_TRUSTMANAGER_ALGORITHM = TrustManagerFactory.getDefaultAlgorithm();
   public static final String REVOCATION_KEYSTORE_ALGORITHM = "PKIX";
   public static final String INVALID_CRL_ALGORITHM =
       "TLS Context: certificate revocation checking is only available for algorithm %s (current value is %s)";
@@ -168,7 +169,7 @@ public final class TlsConfiguration extends AbstractComponent
   private String trustStoreName = null;
   private String trustStorePassword = null;
   private String trustStoreType = DEFAULT_KEYSTORE_TYPE;
-  private String trustManagerAlgorithm = DEFAULT_KEYMANAGER_ALGORITHM;
+  private String trustManagerAlgorithm = DEFAULT_TRUSTMANAGER_ALGORITHM;
   private TrustManagerFactory trustManagerFactory = null;
   private boolean explicitTrustStoreOnly = false;
   private boolean requireClientAuthentication = false;
@@ -564,7 +565,7 @@ public final class TlsConfiguration extends AbstractComponent
 
   @Override
   public void setTrustManagerAlgorithm(String trustManagerAlgorithm) {
-    this.trustManagerAlgorithm = defaultForNull(trustManagerAlgorithm, DEFAULT_KEYMANAGER_ALGORITHM);
+    this.trustManagerAlgorithm = defaultForNull(trustManagerAlgorithm, DEFAULT_TRUSTMANAGER_ALGORITHM);
   }
 
   @Override
