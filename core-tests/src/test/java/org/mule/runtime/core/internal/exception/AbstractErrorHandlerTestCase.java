@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -20,7 +17,9 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.junit4.rule.VerboseExceptions;
+
+import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,22 +28,20 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.Collection;
-
 @RunWith(Parameterized.class)
 public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTestCase {
 
   @Rule
-  public SystemProperty verbose;
+  public VerboseExceptions verbose;
 
-  public AbstractErrorHandlerTestCase(SystemProperty verbose) {
+  public AbstractErrorHandlerTestCase(VerboseExceptions verbose) {
     this.verbose = verbose;
   }
 
   @Parameters
   public static Collection<Object> data() {
-    return asList(new SystemProperty(MULE_VERBOSE_EXCEPTIONS, TRUE.toString()),
-                  new SystemProperty(MULE_VERBOSE_EXCEPTIONS, FALSE.toString()));
+    return asList(new VerboseExceptions(true),
+                  new VerboseExceptions(false));
   }
 
   protected MessagingException mockException = mock(MessagingException.class);

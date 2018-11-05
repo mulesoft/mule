@@ -9,7 +9,7 @@ package org.mule.tck.junit4.rule;
 import org.junit.rules.ExternalResource;
 
 /**
- * Sets up a system property before a test and guaranties to tear it down afterward.
+ * Sets up a system property before a test and guarantees to tear it down afterward.
  */
 public class SystemProperty extends ExternalResource {
 
