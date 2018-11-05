@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.message.ErrorType;
@@ -70,6 +71,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(MessageTransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION).get())
             .addExceptionMapping(TransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION).get())
             .addExceptionMapping(ExpressionRuntimeException.class, errorTypeRepository.lookupErrorType(EXPRESSION).get())
+            .addExceptionMapping(ExpressionExecutionException.class, errorTypeRepository.lookupErrorType(EXPRESSION).get())
             .addExceptionMapping(RoutingException.class, errorTypeRepository.lookupErrorType(ROUTING).get())
             .addExceptionMapping(CompositeRoutingException.class, errorTypeRepository.getErrorType(COMPOSITE_ROUTING).get())
             .addExceptionMapping(ConnectionException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
