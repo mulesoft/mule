@@ -13,6 +13,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Preconditions;
 
 import java.util.Collection;
@@ -39,7 +40,7 @@ public final class CollectionReturnHandler implements ReturnHandler<Collection> 
    */
   @Override
   public Message.Builder toMessageBuilder(Collection value) {
-    return Message.builder().collectionValue(value, dataType.getItemDataType().getType());
+    return Message.builder().payload(new TypedValue<>(value, getDataType()));
   }
 
   /**

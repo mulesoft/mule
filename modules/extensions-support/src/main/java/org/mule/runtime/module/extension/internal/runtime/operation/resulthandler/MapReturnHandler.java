@@ -14,6 +14,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Preconditions;
 
 import java.util.Map;
@@ -28,28 +29,26 @@ import java.util.Map;
  */
 public final class MapReturnHandler implements ReturnHandler<Map> {
 
-  private final Class<?> mapKeyType;
-  private final Class<?> mapValueType;
   private final MapDataType mapDataType;
 
   public MapReturnHandler(HasOutputModel hasOutputModel) {
     MetadataType type = hasOutputModel.getOutput().getType();
     Preconditions.checkArgument(isMap(type), "The given output type is not a Map");
     mapDataType = (MapDataType) toDataType(type);
-    mapKeyType = mapDataType.getKeyDataType().getType();
-    mapValueType = mapDataType.getValueDataType().getType();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Message.Builder toMessageBuilder(Map value) {
-    return Message.builder().mapValue(value, mapKeyType, mapValueType);
+    return Message.builder().payload(new TypedValue<>(value, getDataType()));
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public DataType getDataType() {
     return mapDataType;
   }
