@@ -58,7 +58,7 @@ public class HttpListenerIncompleteMultipartRequestTestCase extends FunctionalTe
     public void returnsBadRequestOnMultipartFormDataWithNoBoundariesAndNoValue() throws Exception
     {
         String body = "emptyContent=";
-        sendPostByteArrayRequestAndValidateStatusCode(body, BAD_REQUEST, BAD_REQUEST.getReasonPhrase(),"HTTP request parsing failed with error: \"Unable to parse request multitype content!\"");
+        sendPostByteArrayRequestAndValidateStatusCode(body, BAD_REQUEST, BAD_REQUEST.getReasonPhrase(),"HTTP request parsing failed with error: \"Unable to parse multipart payload\"");
     }
 
     protected String getUrl(String path)

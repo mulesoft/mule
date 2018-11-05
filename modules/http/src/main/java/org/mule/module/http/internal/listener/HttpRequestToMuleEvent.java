@@ -104,7 +104,9 @@ public class HttpRequestToMuleEvent
             }
             catch (MuleRuntimeException e)
             {
-                throw new HttpRequestParsingException("Unable to parse request multitype content!",e);
+                //Catch generic MuleRuntimeException, but this will only be raised if internal parsing for multipart
+                //content failed at getEntity(). Throw specific HttpRequestParsingException:
+                throw new HttpRequestParsingException("Unable to parse multipart payload", e);
             }
             if (entity != null && !(entity instanceof EmptyHttpEntity))
             {
