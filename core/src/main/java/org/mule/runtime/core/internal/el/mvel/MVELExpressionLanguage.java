@@ -220,7 +220,8 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   @Override
   public TypedValue evaluate(String expression, CoreEvent event, ComponentLocation componentLocation,
                              BindingContext bindingContext) {
-    return evaluate(expression, event, CoreEvent.builder(event), componentLocation, bindingContext);
+    final CoreEvent.Builder builder = event != null ? CoreEvent.builder(event) : null;
+    return evaluate(expression, event, builder, componentLocation, bindingContext);
   }
 
   @Override

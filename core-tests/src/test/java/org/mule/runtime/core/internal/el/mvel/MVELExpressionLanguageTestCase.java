@@ -6,43 +6,26 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
-import static java.nio.charset.StandardCharsets.UTF_16;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
-import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
-import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_STRAIGHT_UP;
-import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_WITH_DELIMITER;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -59,14 +42,8 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
+import javax.activation.DataHandler;
+import javax.activation.MimeType;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,20 +51,29 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import javax.activation.DataHandler;
-import javax.activation.MimeType;
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.util.Collections.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
+import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_STRAIGHT_UP;
+import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_WITH_DELIMITER;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase {
@@ -531,4 +517,15 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
                                            ((Component) flowConstruct).getLocation(), null));
   }
 
+  @Test
+  public void eventlessExpression() throws Exception {
+    TypedValue<String> value = new TypedValue<>("Hello", STRING);
+    PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of(""))
+        .addVariable("test", value.getValue(), value.getDataType())
+        .build();
+
+    TypedValue<String> result = mvel.evaluate("#[vars.test]", null, mock(ComponentLocation.class), event.asBindingContext());
+    assertThat(result.getValue(), is(equalTo(value.getValue())));
+    assertThat(result.getDataType(), is(sameInstance(value.getDataType())));
+  }
 }
