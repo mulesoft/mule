@@ -204,7 +204,7 @@ public class MessagingException extends EventProcessingException {
     if (e == null) {
       throw new IllegalArgumentException("Class cannot be null");
     }
-    return (ExceptionHelper.traverseCauseHierarchy(this, causeException -> {
+    return (traverseCauseHierarchy(this, causeException -> {
       if (e.isAssignableFrom(causeException.getClass())) {
         return causeException;
       }

@@ -63,7 +63,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
   private transient final List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>();
+  private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
   private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
   private ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();

@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.http.api;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
 /**
  * General purpose HTTP constants
  */
@@ -36,6 +39,8 @@ public class HttpConstants {
       return defaultPort;
     }
   }
+
+  public static final InetAddress ALL_INTERFACES_ADDRESS = new InetSocketAddress(0).getAddress();
 
   public static final String ALL_INTERFACES_IP = "0.0.0.0";
 

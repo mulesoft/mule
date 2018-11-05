@@ -233,7 +233,13 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   private void intercept(List<Interceptor> interceptors, Consumer<Interceptor> closure,
                          Function<Interceptor, String> exceptionMessageFunction) {
     if (!LOGGER.isDebugEnabled()) {
-      interceptors.forEach(closure);
+      interceptors.forEach(interceptor -> {
+        try {
+          closure.accept(interceptor);
+        } catch (Exception e) {
+          // Nothing to do
+        }
+      });
     } else {
       interceptors.forEach(interceptor -> {
         try {
