@@ -26,11 +26,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -97,7 +95,8 @@ public class ResolverUtils {
   }
 
   /**
-   * Executes the {@code resolver} using the given {@code context}, applying all the required resolution rules that may apply for
+   * Executes the {@code resolver} using the given {@code context},
+   * applying all the required resolution rules that may apply for
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
