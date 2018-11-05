@@ -42,10 +42,12 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PetStoreOperations {
 
   public static boolean shouldFailWithConnectionException;
+  public static AtomicInteger operationExecutionCounter = new AtomicInteger(0);
 
   public List<String> getPets(@Connection PetStoreClient client,
                               @Config PetStoreConnector config,
@@ -69,6 +71,7 @@ public class PetStoreOperations {
                                                                               String ownerName,
                                                                               @Optional InputStream ownerSignature)
       throws IOException {
+    operationExecutionCounter.incrementAndGet();
     if (ownerSignature != null) {
       ownerName += IOUtils.toString(ownerSignature);
     }

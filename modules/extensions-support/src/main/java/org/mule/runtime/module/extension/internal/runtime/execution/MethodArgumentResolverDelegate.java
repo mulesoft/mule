@@ -11,7 +11,6 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveToUnclosableCursor;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
@@ -74,6 +73,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultA
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.streaming.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.io.InputStream;
@@ -249,8 +249,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       Object parameterValue = valueSupplier.get();
       if (parameterValue == null) {
         return resolvePrimitiveTypeDefaultValue(parameterType);
-      } else if (parameterType.equals(InputStream.class) && parameterValue instanceof CursorStream) {
-        return resolveToUnclosableCursor((CursorStream) parameterValue);
+      } else if (parameterValue instanceof CursorStream) {
+        return new UnclosableCursorStream((CursorStream) parameterValue);
       } else {
         return resolveCursor(parameterValue);
       }
