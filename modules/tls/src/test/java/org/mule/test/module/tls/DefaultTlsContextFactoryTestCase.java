@@ -7,10 +7,12 @@
 package org.mule.test.module.tls;
 
 import static java.util.Collections.emptyMap;
+import static javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
@@ -19,12 +21,6 @@ import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMes
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +34,12 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
@@ -111,6 +113,12 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
     assertThat(tlsContextFactory.getEnabledCipherSuites(), is(StringUtils.splitAndTrim(getFileEnabledCipherSuites(), ",")));
     assertThat(tlsContextFactory.getEnabledProtocols(), is(StringUtils.splitAndTrim(getFileEnabledProtocols(), ",")));
+  }
+
+  @Test
+  public void trustStoreAlgorithmInTlsContextIsDefaultTrustManagerAlgorithm() {
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
+    assertThat(tlsContextFactory.getTrustManagerAlgorithm(), equalTo(getDefaultAlgorithm()));
   }
 
   @Test
