@@ -94,6 +94,12 @@
             <artifactId>mule-service-soap-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-javaee</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         
     </dependencies>
 </project>
