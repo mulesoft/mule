@@ -22,9 +22,9 @@
 
     <flow name="testProxy">
         <http:listener config-ref="http-listener-config" path="/*" parseRequest="false" />
-        <cxf:proxy-service port="![wsdl(${wsdl.uri}).services[0].preferredPort.name]"
-                           namespace="![wsdl(${wsdl.uri}]).targetNamespace]"
-                           service="![wsdl(${wsdl.uri}).services[0].name]"
+        <cxf:proxy-service port="HelloServicePort"
+                           namespace="http://test.Pablo.name/"
+                           service="HelloServiceService"
                            payload="envelope" enableMuleSoapHeaders="false"
                            soapVersion="1.2"
                            wsdlLocation="${wsdl.uri}"  />
