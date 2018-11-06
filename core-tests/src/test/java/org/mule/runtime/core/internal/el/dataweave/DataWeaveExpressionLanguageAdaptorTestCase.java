@@ -65,7 +65,6 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -562,7 +561,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     ExpressionLanguageSessionAdaptor session = expressionLanguage.openSession(null, null, testEvent().asBindingContext());
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
-    expectedEx.expect(ExpressionExecutionException.class);
+    expectedEx.expect(ExpressionRuntimeException.class);
     assertThat(session.evaluate("flow.name").getValue(), is(nullValue()));
   }
 
