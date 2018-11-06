@@ -327,6 +327,9 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitAnyType(AnyType anyType) {
+          // In case that the anyType was assigned to a Java Object or a Java Serializable, handle it as a ObjectType as it
+          // used to be done before we assigned AnyType to this kind of parameters. This is done because the Object or
+          // Serializable can accept references.
           if (JavaTypeUtils.getType(anyType).equals(Object.class) ||
               JavaTypeUtils.getType(anyType).equals(Serializable.class)) {
 
