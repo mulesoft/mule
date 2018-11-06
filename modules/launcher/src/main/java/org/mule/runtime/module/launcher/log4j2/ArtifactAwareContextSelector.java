@@ -11,6 +11,7 @@ import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -115,6 +116,10 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   }
 
   private static ClassLoader getLoggerClassLoader(ClassLoader loggerClassLoader) {
+    if (loggerClassLoader instanceof CompositeClassLoader) {
+      return getLoggerClassLoader(((CompositeClassLoader) loggerClassLoader).getDelegates().get(0));
+    }
+
     // Obtains the first artifact class loader in the hierarchy
     while (!(loggerClassLoader instanceof ArtifactClassLoader) && loggerClassLoader != null) {
       loggerClassLoader = loggerClassLoader.getParent();

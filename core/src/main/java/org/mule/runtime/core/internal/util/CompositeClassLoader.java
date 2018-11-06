@@ -7,12 +7,14 @@
 package org.mule.runtime.core.internal.util;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class CompositeClassLoader extends ClassLoader {
       delegates.add(first);
     }
     delegates.addAll(asList(others).stream().filter(o -> o != null).collect(toList()));
+    delegates = unmodifiableList(delegates);
   }
 
   @Override
@@ -90,6 +93,10 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     return new CompoundEnumeration<>(tmp);
+  }
+
+  public List<ClassLoader> getDelegates() {
+    return delegates;
   }
 
   @Override
