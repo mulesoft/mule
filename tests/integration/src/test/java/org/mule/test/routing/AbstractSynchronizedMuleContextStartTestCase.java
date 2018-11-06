@@ -7,6 +7,7 @@
 
 package org.mule.test.routing;
 
+import org.junit.Before;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -33,6 +34,12 @@ public abstract class AbstractSynchronizedMuleContextStartTestCase extends Funct
     public AbstractSynchronizedMuleContextStartTestCase()
     {
         setStartContext(false);
+    }
+
+    @Before
+    public void setUp()
+    {
+        processedMessageCounter = 0;
     }
 
     @Test

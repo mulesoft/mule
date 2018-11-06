@@ -159,7 +159,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-validation-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-017.jar
+/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-019.jar
 /mule-standalone-${productVersion}/lib/mule/mule-pattern-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar
@@ -287,10 +287,10 @@
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/j2objc-annotations-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.9.0.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.6.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.7.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.14-MULE-002.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.5.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.7.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.9.7.jar
@@ -394,7 +394,7 @@
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-3.8.8-+
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-0.9-+
-/mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.28-+
+/mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.29-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
@@ -450,7 +450,7 @@
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.2.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
-/mule-standalone-${productVersion}/lib/opt/yagi-1.0.28-+
+/mule-standalone-${productVersion}/lib/opt/yagi-1.0.29-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
