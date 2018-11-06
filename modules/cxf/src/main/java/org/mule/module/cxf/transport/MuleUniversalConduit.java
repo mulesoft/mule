@@ -12,6 +12,7 @@ import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
 import static org.mule.module.cxf.support.CxfUtils.resolveEncoding;
 import static org.mule.transformer.types.DataTypeFactory.XML_STRING;
 import static org.mule.transport.http.HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
+import static org.mule.transport.http.HttpConstants.*;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static java.lang.Boolean.TRUE;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -356,7 +357,7 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty("http.status").toString());
                 // Fail for any status code, but an Accepted (202) one.
-                if (httpResponseStatusCode != HttpConstants.SC_ACCEPTED)
+                if (httpResponseStatusCode != SC_ACCEPTED)
                 {
                     throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
                 }
