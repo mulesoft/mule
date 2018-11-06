@@ -104,9 +104,9 @@ public class HttpRequestToMuleEvent
             }
             catch (MuleRuntimeException e)
             {
-                //If this point is reached, it can only be because a multipart
-                //content type request was received and failure occurred while
-                //attempting to parse its contents.
+                //Because request.getEntity() will attempt to lazily parse
+                //multipart request payloads, if this point is reached it can
+                //only be because an error occurred at the parsing stage.
                 throw new HttpRequestParsingException("Unable to parse multipart payload", e);
             }
             if (entity != null && !(entity instanceof EmptyHttpEntity))
