@@ -26,6 +26,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.XAConnectionFactory;
@@ -191,6 +192,24 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         try
         {
             spy.doConnect();
+        }
+        catch (JMSException e)
+        {
+            // A JMS Exception should be raised.
+        }
+        verify(connection).close();
+    }
+    
+    @Test
+    public void testCloseConnectionOnErroOnPostCreationSetup() throws Exception
+    {
+        Connection connection = mock(Connection.class);
+        doThrow(new JMSException("Error on post creation processing")).when(connection).setExceptionListener(any(ExceptionListener.class));
+        JmsConnector connector = new JmsConnector(muleContext);
+
+        try
+        {
+            connector.postCreationSetup(connection);
         }
         catch (JMSException e)
         {

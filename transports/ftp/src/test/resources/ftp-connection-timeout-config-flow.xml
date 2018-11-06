@@ -9,7 +9,7 @@
            http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
 
     <ftp:connector name="FTP" pollingFrequency="1000" validateConnections="true" connectionTimeout="${connectionTimeout}" streaming="false">
-        <service-overrides messageReceiver="org.mule.transport.ftp.FtpConnectionSocketTimeoutTestCase$TestFtpMessageReceiver"/>
+        <service-overrides messageReceiver="${ftpMessageReceiverClass}"/>
     </ftp:connector>
 
     <flow name="flowDispatcher">

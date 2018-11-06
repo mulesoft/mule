@@ -49,6 +49,7 @@ import org.junit.runners.Parameterized;
 public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCase
 {
 
+    public static final String FTP_MESSAGE_RECEIVER_CLASS = "org.mule.transport.ftp.FtpConnectionSocketTimeoutTestCase$TestFtpMessageReceiver";
     private static String CONNECTION_TIMEOUT = "1000";
 
     private static int TEST_DELTA = 500;
@@ -65,6 +66,9 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     @Rule
     public SystemProperty systemProperty = new SystemProperty("connectionTimeout", CONNECTION_TIMEOUT);
+
+    @Rule
+    public SystemProperty xmlFtpMessageReceiverSystemProperty = new SystemProperty("ftpMessageReceiverClass", FTP_MESSAGE_RECEIVER_CLASS);
 
     private Ftplet ftplet;
 
