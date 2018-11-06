@@ -390,7 +390,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionRuntimeException {
         try {
           return mvel.evaluate(removeExpressionMarker(expression), expectedOutputType, event, componentLocation, context, false);
-        } catch (ExpressionExecutionException e) {
+        } catch (Exception e) {
           throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }
       }
@@ -399,7 +399,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       public TypedValue<?> evaluate(String expression) throws ExpressionRuntimeException {
         try {
           return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
-        } catch (ExpressionExecutionException e) {
+        } catch (Exception e) {
           throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }
       }
@@ -408,7 +408,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionRuntimeException {
         try {
           return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
-        } catch (ExpressionExecutionException e) {
+        } catch (Exception e) {
           throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }
       }
@@ -417,7 +417,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionRuntimeException {
         try {
           return mvel.evaluateLogExpression(expression, event, componentLocation, context);
-        } catch (ExpressionExecutionException e) {
+        } catch (Exception e) {
           throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }
       }
