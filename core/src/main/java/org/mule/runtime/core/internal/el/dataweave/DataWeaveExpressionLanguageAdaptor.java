@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
+import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
 import org.mule.runtime.core.internal.el.context.ServerContext;
@@ -233,44 +234,58 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public ExpressionLanguageSession openSession(ComponentLocation componentLocation, CoreEvent event,
-                                               BindingContext context) {
+  public ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event,
+                                                      BindingContext context) {
     ExpressionLanguageSession session = expressionExecutor.openSession(bindingContextFor(componentLocation, event, context));
-    return new ExpressionLanguageSession() {
+    return new ExpressionLanguageSessionAdaptor() {
 
       @Override
-      public TypedValue<?> evaluate(String expression) throws ExpressionExecutionException {
+      public TypedValue<?> evaluate(String expression) throws ExpressionRuntimeException {
         String sanitized = sanitize(expression);
         if (isPayloadExpression(sanitized)) {
           return resolvePayload(event, context);
-        } else {
+        }
+
+        try {
           return session.evaluate(sanitized);
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }
       }
 
       @Override
-      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionRuntimeException {
         String sanitized = sanitize(expression);
         if (isPayloadExpression(sanitized)) {
           return resolvePayload(event, context);
-        } else {
+        }
+        try {
           return session.evaluate(sanitized, timeout);
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }
       }
 
       @Override
-      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionExecutionException {
+      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionRuntimeException {
         String sanitized = sanitize(expression);
         if (isPayloadExpression(sanitized)) {
           return resolvePayload(event, context);
-        } else {
+        }
+        try {
           return session.evaluate(sanitized, expectedOutputType);
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }
       }
 
       @Override
-      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
-        return session.evaluateLogExpression(sanitize(expression));
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionRuntimeException {
+        try {
+          return session.evaluateLogExpression(sanitize(expression));
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+        }
       }
 
       @Override

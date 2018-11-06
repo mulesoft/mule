@@ -167,34 +167,34 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public ExpressionLanguageSession openSession(ComponentLocation componentLocation, CoreEvent event,
-                                               BindingContext bindingContext) {
-    Map<String, ExpressionLanguageSession> sessions = new HashMap<>();
+  public ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event,
+                                                      BindingContext bindingContext) {
+    Map<String, ExpressionLanguageSessionAdaptor> sessions = new HashMap<>();
     for (Entry<String, ExtendedExpressionLanguageAdaptor> exprLangEntry : expressionLanguages.entrySet()) {
       if (!MEL_PREFIX.equals(exprLangEntry.getKey()) || event != null) {
         sessions.put(exprLangEntry.getKey(), exprLangEntry.getValue().openSession(componentLocation, event, bindingContext));
       }
     }
 
-    return new ExpressionLanguageSession() {
+    return new ExpressionLanguageSessionAdaptor() {
 
       @Override
-      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionExecutionException {
+      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionRuntimeException {
         return resolveSessionForLanguage(sessions, expression).evaluate(expression, expectedOutputType);
       }
 
       @Override
-      public TypedValue<?> evaluate(String expression) throws ExpressionExecutionException {
+      public TypedValue<?> evaluate(String expression) throws ExpressionRuntimeException {
         return resolveSessionForLanguage(sessions, expression).evaluate(expression);
       }
 
       @Override
-      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionRuntimeException {
         return resolveSessionForLanguage(sessions, expression).evaluate(expression, timeout);
       }
 
       @Override
-      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionRuntimeException {
         return resolveSessionForLanguage(sessions, expression).evaluateLogExpression(expression);
       }
 
@@ -203,11 +203,11 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
         return resolveSessionForLanguage(sessions, expression).split(expression);
       }
 
-      protected ExpressionLanguageSession resolveSessionForLanguage(Map<String, ExpressionLanguageSession> sessions,
-                                                                    String expression) {
-        ExpressionLanguageSession elSession = sessions.get(resolveLanguagePrefix(expression));
+      protected ExpressionLanguageSessionAdaptor resolveSessionForLanguage(Map<String, ExpressionLanguageSessionAdaptor> sessions,
+                                                                           String expression) {
+        ExpressionLanguageSessionAdaptor elSession = sessions.get(resolveLanguagePrefix(expression));
         if (elSession == null) {
-          throw new ExpressionExecutionException(createStaticMessage("This sessions was not created with an event, so '"
+          throw new ExpressionRuntimeException(createStaticMessage("This sessions was not created with an event, so '"
               + resolveLanguagePrefix(expression) + "' languge cannot be used in this session."));
         }
         return elSession;

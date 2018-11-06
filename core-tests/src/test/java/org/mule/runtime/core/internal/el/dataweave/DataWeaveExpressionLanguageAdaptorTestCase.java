@@ -81,6 +81,7 @@ import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
+import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.message.BaseAttributes;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -549,7 +550,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void sessionWithEventAndLocation() throws MuleException {
-    ExpressionLanguageSession session =
+    ExpressionLanguageSessionAdaptor session =
         expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT);
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
@@ -558,7 +559,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void sessionWithBindingContext() throws MuleException {
-    ExpressionLanguageSession session = expressionLanguage.openSession(null, null, testEvent().asBindingContext());
+    ExpressionLanguageSessionAdaptor session = expressionLanguage.openSession(null, null, testEvent().asBindingContext());
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
     expectedEx.expect(ExpressionExecutionException.class);
@@ -567,7 +568,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void sessionWithBindingContextAndLocation() throws MuleException {
-    ExpressionLanguageSession session =
+    ExpressionLanguageSessionAdaptor session =
         expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, null, testEvent().asBindingContext());
 
     assertThat(session.evaluate("payload").getValue(), is("test"));

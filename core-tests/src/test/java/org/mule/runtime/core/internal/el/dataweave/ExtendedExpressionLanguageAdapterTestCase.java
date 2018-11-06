@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptorHandler;
+import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 
@@ -214,7 +215,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Test
   @Description("Verifies that the Event variable still works for MVEL but that it fails for DW.")
   public void sessionEventCompatibilityVariables() throws MuleException {
-    ExpressionLanguageSession session = expressionLanguageAdapter.openSession(null, testEvent(), emptyBindingContext);
+    ExpressionLanguageSessionAdaptor session = expressionLanguageAdapter.openSession(null, testEvent(), emptyBindingContext);
 
     String expression = "_muleEvent";
     Object mvelFlowResult = session.evaluate(melify(expression)).getValue();
@@ -228,7 +229,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Description("Verifies that the Flow name variable works for MVEL and DW.")
   public void sessionFlowNameVariable() throws MuleException {
     String myFlowName = "myFlowName";
-    ExpressionLanguageSession session =
+    ExpressionLanguageSessionAdaptor session =
         expressionLanguageAdapter.openSession(fromSingleComponent(myFlowName), testEvent(), emptyBindingContext);
 
     String expression = "flow.name";

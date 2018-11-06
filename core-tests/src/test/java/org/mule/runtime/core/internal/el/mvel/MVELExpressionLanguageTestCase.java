@@ -54,6 +54,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -421,7 +422,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void sessionWithEventAndLocation() throws MuleException {
-    ExpressionLanguageSession session = mvel.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT);
+    ExpressionLanguageSessionAdaptor session = mvel.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT);
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
     assertThat(session.evaluate("flow.name").getValue(), is("test"));
@@ -429,14 +430,15 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void sessionWithoutLocation() throws MuleException {
-    ExpressionLanguageSession session = mvel.openSession(null, testEvent(), NULL_BINDING_CONTEXT);
+    ExpressionLanguageSessionAdaptor session = mvel.openSession(null, testEvent(), NULL_BINDING_CONTEXT);
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
   }
 
   @Test
   public void sessionWithEventBindingContextAndLocation() throws MuleException {
-    ExpressionLanguageSession session = mvel.openSession(TEST_CONNECTOR_LOCATION, testEvent(), testEvent().asBindingContext());
+    ExpressionLanguageSessionAdaptor session =
+        mvel.openSession(TEST_CONNECTOR_LOCATION, testEvent(), testEvent().asBindingContext());
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
     assertThat(session.evaluate("flow.name").getValue(), is("test"));

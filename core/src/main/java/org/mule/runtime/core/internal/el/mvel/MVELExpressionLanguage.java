@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
@@ -40,6 +41,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelEnricherDataTypePropagator;
@@ -378,29 +380,46 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   }
 
   @Override
-  public ExpressionLanguageSession openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context) {
+  public ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event,
+                                                      BindingContext context) {
     requireNonNull(event);
     MVELExpressionLanguage mvel = this;
-    return new ExpressionLanguageSession() {
+    return new ExpressionLanguageSessionAdaptor() {
 
       @Override
-      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionExecutionException {
-        return mvel.evaluate(removeExpressionMarker(expression), expectedOutputType, event, componentLocation, context, false);
+      public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionRuntimeException {
+        try {
+          return mvel.evaluate(removeExpressionMarker(expression), expectedOutputType, event, componentLocation, context, false);
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+        }
       }
 
       @Override
-      public TypedValue<?> evaluate(String expression) throws ExpressionExecutionException {
-        return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
+      public TypedValue<?> evaluate(String expression) throws ExpressionRuntimeException {
+        try {
+          return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+        }
       }
 
       @Override
-      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionExecutionException {
-        return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
+      public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionRuntimeException {
+        try {
+          return mvel.evaluate(removeExpressionMarker(expression), event, componentLocation, context);
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+        }
       }
 
       @Override
-      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionExecutionException {
-        return mvel.evaluateLogExpression(expression, event, componentLocation, context);
+      public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionRuntimeException {
+        try {
+          return mvel.evaluateLogExpression(expression, event, componentLocation, context);
+        } catch (ExpressionExecutionException e) {
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+        }
       }
 
       @Override
