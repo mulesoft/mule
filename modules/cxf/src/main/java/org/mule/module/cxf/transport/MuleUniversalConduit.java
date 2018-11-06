@@ -355,10 +355,8 @@ public class MuleUniversalConduit extends AbstractConduit
             else if (resEvent.getMessage().getInboundPropertyNames().contains("http.status"))
             {
                 int httpResponseStatusCode = Integer.valueOf( (String) resEvent.getMessage().getInboundProperty("http.status"));
-                if (httpResponseStatusCode > HttpClientMessageDispatcher.ERROR_STATUS_CODE_RANGE_START)
-                {
-                    throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
-                }
+                // Fail despite the status code. If not, the request will be silently ignore, and never be replied
+                throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
             }
         }
 
