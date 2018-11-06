@@ -76,7 +76,8 @@ import javax.inject.Inject;
     nameRegexpMatcher = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME,
     requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME, type = NATIVE,
     coordinates = "org.mule.libs:this-is-a-lib:dll:1.0.0")
-@Deprecated(message = "This extension has been deprecated because Breaking Bad has ended, use Better Call Saul extension.")
+@Deprecated(message = "This extension has been deprecated because Breaking Bad has ended, use Better Call Saul extension.",
+    since = "1.4.0")
 @ErrorTypes(HeisenbergErrors.class)
 @NotificationActions(HeisenbergNotificationAction.class)
 public class HeisenbergExtension implements Lifecycle {

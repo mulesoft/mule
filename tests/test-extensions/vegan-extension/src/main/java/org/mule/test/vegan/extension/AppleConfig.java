@@ -27,7 +27,7 @@ import java.util.Map;
 @Sources({HarvestApplesSource.class, PaulMcCartneySource.class})
 @ConnectionProviders(VeganAppleConnectionProvider.class)
 @Stereotype(AppleStereotype.class)
-@Deprecated(message = "This configuration overlaps with the BananaConfig, use that one instead.")
+@Deprecated(message = "This configuration overlaps with the BananaConfig, use that one instead.", since = "1.2.0")
 public class AppleConfig extends EasyToEatConfig {
 
   @Parameter

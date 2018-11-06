@@ -35,7 +35,8 @@ import org.slf4j.LoggerFactory;
     requiredClassName = HEISENBERG_LIB_CLASS_NAME,
     type = NATIVE)
 @Deprecated(
-    message = "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA")
+    message = "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA",
+    since = "1.3.0", removedIn = "2.0.0")
 public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergConnection> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeisenbergConnectionProvider.class);

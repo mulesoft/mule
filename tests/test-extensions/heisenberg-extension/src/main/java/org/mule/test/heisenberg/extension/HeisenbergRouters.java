@@ -78,7 +78,7 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
     callback.success(Result.builder().output("SUCCESS").build());
   }
 
-  @Deprecated(message = "Simple routers are too simple, we will no longer suport them.")
+  @Deprecated(message = "Simple routers are too simple, we will no longer suport them.", since = "1.2.2")
   public void simpleRouter(WhenRoute when, RouterCompletionCallback callback) {
     when.getChain()
         .process(callback::success,

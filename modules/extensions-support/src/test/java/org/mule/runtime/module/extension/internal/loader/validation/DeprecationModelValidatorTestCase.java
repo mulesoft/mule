@@ -32,9 +32,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DeprecatedModelValidatorTestCase extends AbstractMuleTestCase {
+public class DeprecationModelValidatorTestCase extends AbstractMuleTestCase {
 
-  private DeprecatedModelValidator validator = new DeprecatedModelValidator();
+  private DeprecationModelValidator validator = new DeprecationModelValidator();
 
   @Mock
   private ParameterModel parameterModel;

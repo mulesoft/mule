@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
  *
  * @since 4.2.0
  */
-public class DeprecatedModelValidator implements ExtensionModelValidator {
+public class DeprecationModelValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {

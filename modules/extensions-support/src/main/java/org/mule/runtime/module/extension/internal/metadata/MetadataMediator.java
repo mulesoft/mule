@@ -230,7 +230,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        constructModel.getErrorModels(),
                                                        constructModel.getStereotype(),
                                                        constructModel.getModelProperties(),
-                                                       constructModel.getDeprecatedModel().orElse(null)));
+                                                       constructModel.getDeprecationModel().orElse(null)));
       }
 
       @Override
@@ -255,7 +255,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.getStereotype(),
                                                        operationModel.getModelProperties(),
                                                        operationModel.getNotificationModels(),
-                                                       operationModel.getDeprecatedModel().orElse(null)));
+                                                       operationModel.getDeprecationModel().orElse(null)));
       }
 
       @Override
@@ -285,7 +285,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.getStereotype(),
                                                     sourceModel.getErrorModels(), sourceModel.getModelProperties(),
                                                     sourceModel.getNotificationModels(),
-                                                    sourceModel.getDeprecatedModel().orElse(null)));
+                                                    sourceModel.getDeprecationModel().orElse(null)));
       }
     });
 
@@ -350,7 +350,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                         parameterModel.getValueProviderModel().orElse(null),
                                         parameterModel.getAllowedStereotypes(),
                                         parameterModel.getModelProperties(),
-                                        parameterModel.getDeprecatedModel().orElse(null));
+                                        parameterModel.getDeprecationModel().orElse(null));
         parameters.add(typedParameterModel);
       });
 

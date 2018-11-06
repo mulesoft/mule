@@ -273,11 +273,13 @@ public class HeisenbergOperations implements Disposable {
     return enemies;
   }
 
-  @Deprecated(message = "The usage of this operation must be replaced by the knock operation.")
+  @Deprecated(message = "The usage of this operation must be replaced by the knock operation.", since = "1.5.0",
+      removedIn = "2.0.0")
   @Stereotype(KillingStereotype.class)
   @MediaType(TEXT_PLAIN)
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, @Deprecated(
-      message = "There is now a standarized way to say goodbye to your enemies before knocking them up, using a different message will only be supported until the next mayor release") @Optional(
+      message = "There is now a standarized way to say goodbye to your enemies before knocking them up, using a different message will only be supported until the next mayor release",
+      since = "1.4.0") @Optional(
           defaultValue = "We are done") String goodbyeMessage)
       throws Exception {
     KillParameters killParameters = new KillParameters(victim, goodbyeMessage);

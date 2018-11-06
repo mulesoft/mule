@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -21,11 +22,12 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithDeprecatedDeclaration;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecatedModel;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -41,7 +43,7 @@ import java.util.function.Function;
  *
  * @since 4.2.0
  */
-public class DeprecatedModelDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+public class DeprecationModelDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   private final Map<Class<? extends ModelProperty>, Function<ModelProperty, Optional<Deprecated>>> modelPropertiesClasses =
       createModelPropertiesClassesMap();
@@ -119,7 +121,13 @@ public class DeprecatedModelDeclarationEnricher extends AbstractAnnotatedDeclara
     }
 
     getDeprecatedAnnotation(declaration, modelPropertyClass)
-        .ifPresent(deprecated -> withDeprecatedDeclaration.withDeprecation(new ImmutableDeprecatedModel(deprecated.message())));
+        .ifPresent(deprecationAnnotation -> withDeprecatedDeclaration
+            .withDeprecation(createDeprecationModel(deprecationAnnotation)));
+  }
+
+  private DeprecationModel createDeprecationModel(Deprecated deprecationAnnotation) {
+    return new ImmutableDeprecationModel(deprecationAnnotation.message(), deprecationAnnotation.since(),
+                                         isBlank(deprecationAnnotation.removedIn()) ? null : deprecationAnnotation.removedIn());
   }
 
   private Optional<Deprecated> getDeprecatedAnnotation(BaseDeclaration<?> declaration,

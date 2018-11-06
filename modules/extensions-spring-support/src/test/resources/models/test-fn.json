@@ -1372,8 +1372,10 @@
         "description": "",
         "modelProperties": {}
       },
-      "deprecatedModel": {
-        "message": "The case of use of this function is covered within the echoWithDefault function"
+      "deprecationModel": {
+        "message": "The case of use of this function is covered within the echoWithDefault function",
+        "deprecatedSince": "2.2.0",
+        "removedIn": "3.0.0"
       },
       "parameterGroupModels": [
         {

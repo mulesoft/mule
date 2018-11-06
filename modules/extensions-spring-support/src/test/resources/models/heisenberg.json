@@ -8130,8 +8130,10 @@
               "namespace": "MULE"
             }
           },
-          "deprecatedModel": {
-            "message": "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA"
+          "deprecationModel": {
+            "message": "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA",
+            "deprecatedSince": "1.3.0",
+            "removedIn": "2.0.0"
           },
           "parameterGroupModels": [
             {
@@ -12297,8 +12299,10 @@
               }
             }
           },
-          "deprecatedModel": {
-            "message": "This source is being tapped by the DEA, it\u0027s usage is discouraged."
+          "deprecationModel": {
+            "message": "This source is being tapped by the DEA, it\u0027s usage is discouraged.",
+            "deprecatedSince": "1.6.0",
+            "removedIn": "3.0.0"
           },
           "parameterGroupModels": [
             {
@@ -15056,8 +15060,9 @@
           "kind": "source"
         }
       ],
-      "deprecatedModel": {
-        "message": "This extension has been deprecated because Breaking Bad has ended, use Better Call Saul extension."
+      "deprecationModel": {
+        "message": "This extension has been deprecated because Breaking Bad has ended, use Better Call Saul extension.",
+        "deprecatedSince": "1.4.0"
       },
       "name": "config",
       "description": "Default configuration",
@@ -17495,8 +17500,10 @@
           }
         }
       },
-      "deprecatedModel": {
-        "message": "All usages of this scope are covered by the payload-modifier scope."
+      "deprecationModel": {
+        "message": "All usages of this scope are covered by the payload-modifier scope.",
+        "deprecatedSince": "1.3.0",
+        "removedIn": "2.0.0"
       },
       "parameterGroupModels": [
         {
@@ -19743,8 +19750,10 @@
           }
         }
       },
-      "deprecatedModel": {
-        "message": "The usage of this operation must be replaced by the knock operation."
+      "deprecationModel": {
+        "message": "The usage of this operation must be replaced by the knock operation.",
+        "deprecatedSince": "1.5.0",
+        "removedIn": "2.0.0"
       },
       "parameterGroupModels": [
         {
@@ -19801,8 +19810,9 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
-              "deprecatedModel": {
-                "message": "There is now a standarized way to say goodbye to your enemies before knocking them up, using a different message will only be supported until the next mayor release"
+              "deprecationModel": {
+                "message": "There is now a standarized way to say goodbye to your enemies before knocking them up, using a different message will only be supported until the next mayor release",
+                "deprecatedSince": "1.4.0"
               },
               "name": "goodbyeMessage",
               "description": "",
@@ -25200,8 +25210,9 @@
           }
         }
       },
-      "deprecatedModel": {
-        "message": "Simple routers are too simple, we will no longer suport them."
+      "deprecationModel": {
+        "message": "Simple routers are too simple, we will no longer suport them.",
+        "deprecatedSince": "1.2.2"
       },
       "parameterGroupModels": [
         {
@@ -26125,8 +26136,10 @@
           "namespace": "MULE"
         }
       },
-      "deprecatedModel": {
-        "message": "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA"
+      "deprecationModel": {
+        "message": "Usages of this connection provider must be change to the secure option, this will lower the chances of getting caught by the DEA",
+        "deprecatedSince": "1.3.0",
+        "removedIn": "2.0.0"
       },
       "parameterGroupModels": [
         {
