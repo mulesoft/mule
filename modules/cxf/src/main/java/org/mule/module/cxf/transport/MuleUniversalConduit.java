@@ -354,7 +354,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // the last inbound endpoint used was HTTP, and that it set the property correctly.
             else if (resEvent.getMessage().getInboundPropertyNames().contains("http.status"))
             {
-                int httpResponseStatusCode = resEvent.getMessage().getInboundProperty("http.status");
+                int httpResponseStatusCode = Integer.valueOf( (String) resEvent.getMessage().getInboundProperty("http.status"));
                 if (httpResponseStatusCode > HttpClientMessageDispatcher.ERROR_STATUS_CODE_RANGE_START)
                 {
                     throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
