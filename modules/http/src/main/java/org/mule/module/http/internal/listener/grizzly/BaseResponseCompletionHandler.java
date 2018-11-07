@@ -11,10 +11,12 @@ import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.glassfish.grizzly.EmptyCompletionHandler;
 import org.glassfish.grizzly.WriteResult;
+import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.slf4j.Logger;
@@ -25,6 +27,42 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
+    protected final FilterChainContext ctx;
+    
+    /**
+     * Implicit constructor for compatibility purposes
+     */
+    public BaseResponseCompletionHandler()
+    {
+        this.ctx = null;
+    }
+    
+    protected BaseResponseCompletionHandler(FilterChainContext ctx)
+    {
+        this.ctx = ctx;
+    }
+    
+    public void start() throws IOException
+    {
+        // TODO MULE-16020: verify root cause for reset filter chain.
+        if (ctx.getFilterChain() == null)
+        {
+            logger.warn("Filter chain context already reset. Not sending response.");
+            return;
+        }
+        
+        doStart();
+    }
+    
+    /**
+     * Operations to be performed on starting. This method must be overridden and it is left for compatibility purposes.
+     * 
+     * @throws IOException an error during start phase.
+     */
+    protected void doStart() throws IOException
+    {
+    }
 
     protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse)
     {
