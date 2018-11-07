@@ -11,6 +11,7 @@ import static org.mule.module.cxf.CxfConstants.MULE_EVENT;
 import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
 import static org.mule.module.cxf.support.CxfUtils.resolveEncoding;
 import static org.mule.transformer.types.DataTypeFactory.XML_STRING;
+import static org.mule.transformer.types.DataTypeFactory.createFromParameterType;
 import static org.mule.transport.http.HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static java.lang.Boolean.TRUE;
@@ -70,6 +71,7 @@ import java.util.logging.Logger;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -352,17 +354,15 @@ public class MuleUniversalConduit extends AbstractConduit
                 clearClientContextIfNeeded(getMessageObserver());
                 return;
             }
-            // If this branch is reached, it means that the message payload is empty.
-            // By asserting that the inboundProperty 'http.status' exists, I'm verifying that
-            // the last inbound endpoint used was HTTP, and that it set the property correctly.
-            else if (resEvent.getMessage().getInboundPropertyNames().contains("http.status"))
+            /*
+                If this branch is reached, it means that the message payload is empty. By asserting that a ClientCallback is defined in the message exchange, I'm certain that
+                the message processing is being executed in a non-blocking fashion. So, the only way it is going to be replied, is through that callback. To avoid the flow
+                from finishing execution silently, an exception is thrown with the SOAP service response status code.
+            */
+            else if (m.getExchange().get(ClientCallback.class) != null && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS))
             {
                 int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS).toString());
-                // Fail for any status code, but an Accepted (202) one.
-                if (httpResponseStatusCode != SC_ACCEPTED)
-                {
-                    throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
-                }
+                throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
             }
         }
 
