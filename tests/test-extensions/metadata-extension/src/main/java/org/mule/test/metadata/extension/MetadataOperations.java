@@ -8,6 +8,7 @@ package org.mule.test.metadata.extension;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
@@ -62,6 +63,7 @@ import java.util.Map;
 public class MetadataOperations {
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object contentMetadataWithKeyId(@Config Object object, @Connection MetadataConnection connection,
                                          @MetadataKeyId(TestInputResolverWithKeyResolver.class) String type,
                                          @Content @TypeResolver(TestInputResolverWithKeyResolver.class) Object content) {
@@ -69,6 +71,7 @@ public class MetadataOperations {
   }
 
   @OutputResolver(output = TestOutputResolverWithKeyResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object outputMetadataWithKeyId(@Connection MetadataConnection connection,
                                         @MetadataKeyId(TestOutputResolverWithKeyResolver.class) String type,
                                         @Optional @Content Object content) {
@@ -76,6 +79,7 @@ public class MetadataOperations {
   }
 
   @OutputResolver(output = TestOutputResolverWithKeyResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object metadataKeyWithDefaultValue(@Connection MetadataConnection connection,
                                             @Optional(
                                                 defaultValue = CAR) @MetadataKeyId(TestOutputResolverWithKeyResolver.class) String type,
@@ -84,6 +88,7 @@ public class MetadataOperations {
   }
 
   @OutputResolver(output = TestInputAndOutputResolverWithKeyResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object contentAndOutputMetadataWithKeyId(@Connection MetadataConnection connection,
                                                   @MetadataKeyId(TestInputAndOutputResolverWithKeyResolver.class) String type,
                                                   @Content @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {
@@ -92,6 +97,7 @@ public class MetadataOperations {
 
 
   @OutputResolver(output = TestInputAndOutputResolverWithKeyResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object outputAndMultipleInputWithKeyId(@Connection MetadataConnection connection,
                                                 @MetadataKeyId(TestInputAndOutputResolverWithKeyResolver.class) String type,
                                                 @Optional @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object firstPerson,
@@ -101,6 +107,7 @@ public class MetadataOperations {
 
 
   @OutputResolver(output = TestInputAndOutputResolverWithKeyResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object outputOnlyWithoutContentParam(@Connection MetadataConnection connection,
                                               @MetadataKeyId(TestInputAndOutputResolverWithKeyResolver.class) String type) {
     return type;
@@ -121,17 +128,20 @@ public class MetadataOperations {
                                        @Content @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {}
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object contentMetadataWithoutKeyId(@Connection MetadataConnection connection,
                                             @Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
     return null;
   }
 
   @OutputResolver(output = TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class)
+  @MediaType(value = ANY, strict = false)
   public Object outputMetadataWithoutKeyId(@Connection MetadataConnection connection, @Optional @Content Object content) {
     return null;
   }
 
   @OutputResolver(output = TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class)
+  @MediaType(value = ANY, strict = false)
   public Object contentAndOutputMetadataWithoutKeyId(@Connection MetadataConnection connection,
                                                      @Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
     return null;
@@ -141,23 +151,27 @@ public class MetadataOperations {
                                                   @Content @TypeResolver(TestInputResolverWithoutKeyResolver.class) Object content) {}
 
   @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object outputMetadataWithoutKeysWithKeyId(@Connection MetadataConnection connection, @MetadataKeyId String type) {
     return null;
   }
 
   @OutputResolver(output = TestResolverWithCache.class)
+  @MediaType(value = ANY, strict = false)
   public Object contentAndOutputCacheResolver(@Connection MetadataConnection connection, @MetadataKeyId String type,
                                               @Content @TypeResolver(TestResolverWithCache.class) Object content) {
     return null;
   }
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object contentOnlyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyId String type,
                                          @Content @TypeResolver(TestResolverWithCache.class) Object content) {
     return null;
   }
 
   @OutputResolver(output = TestResolverWithCache.class)
+  @MediaType(value = ANY, strict = false)
   public Object outputAndMetadataKeyCacheResolver(@Connection MetadataConnection connection,
                                                   @MetadataKeyId(TestResolverWithCache.class) String type) {
     return null;
@@ -186,6 +200,7 @@ public class MetadataOperations {
   }
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Result<?, ?> messageAttributesAnyTypeMetadata() {
     return null;
   }
@@ -199,6 +214,7 @@ public class MetadataOperations {
                                                     @MetadataKeyId(TestThreadContextClassLoaderResolver.class) String type) {}
 
   @OutputResolver(output = TestThreadContextClassLoaderResolver.class)
+  @MediaType(value = ANY, strict = false)
   public Object resolverOutputWithContextClassLoader(@MetadataKeyId String type) {
     return null;
   }

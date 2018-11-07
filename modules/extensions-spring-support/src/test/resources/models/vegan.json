@@ -401,8 +401,14 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
-              "type": "Object",
+              "format": {
+                "id": "*/*",
+                "label": "*/*",
+                "validMimeTypes": [
+                  "*/*"
+                ]
+              },
+              "type": "Any",
               "annotations": {
                 "typeId": "java.lang.Object",
                 "classInformation": {
@@ -420,8 +426,7 @@
                 "typeAlias": {
                   "value": "Object"
                 }
-              },
-              "fields": []
+              }
             },
             "hasDynamicType": true,
             "description": "",
@@ -491,6 +496,62 @@
                       "providedByKeyResolver": false
                     }
                   }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "outputMimeType",
+                  "description": "The mime type of the payload that this operation outputs.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "outputEncoding",
+                  "description": "The encoding of the payload that this operation outputs.",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -527,7 +588,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -559,7 +620,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -705,7 +766,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1972,7 +2033,7 @@
           "outputAttributes": {
             "type": {
               "format": "java",
-              "type": "Object",
+              "type": "Any",
               "annotations": {
                 "typeId": "java.lang.Object",
                 "classInformation": {
@@ -1990,8 +2051,7 @@
                 "typeAlias": {
                   "value": "Object"
                 }
-              },
-              "fields": []
+              }
             },
             "hasDynamicType": false,
             "description": "",
@@ -5074,7 +5134,7 @@
           "outputAttributes": {
             "type": {
               "format": "java",
-              "type": "Object",
+              "type": "Any",
               "annotations": {
                 "typeId": "java.lang.Object",
                 "classInformation": {
@@ -5092,8 +5152,7 @@
                 "typeAlias": {
                   "value": "Object"
                 }
-              },
-              "fields": []
+              }
             },
             "hasDynamicType": false,
             "description": "",
@@ -9340,7 +9399,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
+                "type": "Any",
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "classInformation": {
@@ -9358,8 +9417,7 @@
                   "typeAlias": {
                     "value": "Object"
                   }
-                },
-                "fields": []
+                }
               },
               "hasDynamicType": false,
               "required": true,

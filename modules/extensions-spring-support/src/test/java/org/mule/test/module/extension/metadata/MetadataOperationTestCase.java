@@ -17,7 +17,9 @@ import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.Is.isA;
 import static org.mockito.Mockito.mock;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -36,6 +38,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 
 import org.mule.functional.listener.Callback;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -51,6 +54,9 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterTypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -65,6 +71,7 @@ import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderRes
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -227,8 +234,10 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName(OUTPUT_METADATA_WITHOUT_KEY_PARAM).addProcessorsPart().addIndexPart(0).build();
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
+    MetadataType objectMetadataType = (new ParameterTypeWrapper(Object.class, typeLoader)).asMetadataType();
+
     assertExpectedOutput(typedModel, personType, void.class);
-    assertExpectedType(getParameter(typedModel, "content"), Object.class);
+    assertExpectedType(getParameter(typedModel, "content"), objectMetadataType, false);
 
   }
 
@@ -337,9 +346,11 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
+    MetadataType objectMetadataType = (new ParameterTypeWrapper(Object.class, typeLoader)).asMetadataType();
+
     assertExpectedOutput(typedModel, personType, void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
-    assertExpectedType(getParameter(typedModel, "content"), Object.class);
+    assertExpectedType(getParameter(typedModel, "content"), objectMetadataType, false);
   }
 
   @Test
@@ -356,8 +367,10 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName(OUTPUT_METADATA_WITHOUT_KEY_PARAM).addProcessorsPart().addIndexPart(0).build();
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
+    MetadataType objectMetadataType = (new ParameterTypeWrapper(Object.class, typeLoader)).asMetadataType();
+
     assertExpectedOutput(typedModel, personType, void.class);
-    assertExpectedType(getParameter(typedModel, "content"), Object.class);
+    assertExpectedType(getParameter(typedModel, "content"), objectMetadataType, false);
   }
 
   @Test

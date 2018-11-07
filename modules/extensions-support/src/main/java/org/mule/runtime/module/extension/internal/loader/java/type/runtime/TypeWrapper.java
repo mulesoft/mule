@@ -49,7 +49,7 @@ import org.springframework.core.ResolvableType;
  */
 public class TypeWrapper implements Type {
 
-  private final java.lang.reflect.Type type;
+  final java.lang.reflect.Type type;
   final Class<?> aClass;
   private List<TypeGeneric> generics = emptyList();
   private ResolvableType[] resolvableTypeGenerics = new ResolvableType[] {};

@@ -55,7 +55,7 @@ public final class ParameterWrapper implements ParameterElement {
    */
   @Override
   public TypeWrapper getType() {
-    return new TypeWrapper(forMethodParameter(owner, index), typeLoader);
+    return new ParameterTypeWrapper(forMethodParameter(owner, index), typeLoader);
   }
 
   /**

@@ -97,6 +97,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
@@ -109,6 +110,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.RequireNa
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
@@ -161,6 +164,22 @@ public final class IntrospectionUtils {
    */
   public static MetadataType getMetadataType(Class<?> type, ClassTypeLoader typeLoader) {
     return typeLoader.load(ResolvableType.forClass(type).getType());
+  }
+
+  public static MetadataType getMetadataType(Type type) {
+    MetadataType metadataType = type.asMetadataType();
+
+    if (type.isSameType(Object.class) ||
+        type.isAssignableTo(InputStream.class) ||
+        type.isAssignableTo(Byte[].class) ||
+        type.isAssignableTo(byte[].class)) {
+
+      MetadataTypeEnricher enricher = new MetadataTypeEnricher();
+
+      return enricher.enrich(typeBuilder().anyType().build(), metadataType.getAnnotations());
+    }
+
+    return metadataType;
   }
 
   /**
@@ -288,6 +307,18 @@ public final class IntrospectionUtils {
       if (itemType.isAssignableTo(Result.class)) {
         return returnListOfMessagesType(returnType, itemType);
       }
+    }
+
+    if ((returnType.isSameType(Object.class) ||
+        returnType.isSameType(Serializable.class) ||
+        returnType.isAssignableTo(InputStream.class) ||
+        returnType.isAssignableTo(Byte[].class) ||
+        returnType.isAssignableTo(byte[].class)) && type != null) {
+
+      MetadataType metadataType = typeBuilder().anyType().build();
+      MetadataTypeEnricher enricher = new MetadataTypeEnricher();
+
+      return enricher.enrich(metadataType, type.asMetadataType().getAnnotations());
     }
 
     return type != null ? type.asMetadataType() : typeBuilder().anyType().build();

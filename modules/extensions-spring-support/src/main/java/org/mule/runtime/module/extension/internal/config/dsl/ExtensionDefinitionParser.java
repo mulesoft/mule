@@ -46,7 +46,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -56,6 +58,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -76,7 +79,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -124,6 +126,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import com.google.common.collect.ImmutableList;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -178,7 +181,6 @@ public abstract class ExtensionDefinitionParser {
           new DefaultObjectParsingDelegate());
   protected final DslSyntaxResolver dslResolver;
   protected final Builder baseDefinitionBuilder;
-  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private final ConversionService conversionService = new DefaultConversionService();
   private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
   private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
@@ -321,7 +323,31 @@ public abstract class ExtensionDefinitionParser {
                         parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
                         paramDsl, parameter.getModelProperties(), parameter.getAllowedStereotypes());
           }
+        }
 
+        @Override
+        public void visitAnyType(AnyType anyType) {
+          // In case that the anyType was assigned to a Java Object or a Java Serializable, handle it as a ObjectType as it
+          // used to be done before we assigned AnyType to this kind of parameters. This is done because the Object or
+          // Serializable can accept references.
+          if (JavaTypeUtils.getType(anyType).equals(Object.class) ||
+              JavaTypeUtils.getType(anyType).equals(Serializable.class)) {
+
+            if (!parseAsContent(anyType)) {
+              parseAttributeParameter(getKey(parameter),
+                                      parameter.getName(),
+                                      parameter.getType(),
+                                      parameter.getDefaultValue(),
+                                      parameter.getExpressionSupport(),
+                                      parameter.isRequired(),
+                                      acceptsReferences(parameter),
+                                      parameter.getModelProperties(),
+                                      parameter.getAllowedStereotypes());
+            }
+
+          } else {
+            defaultVisit(anyType);
+          }
         }
 
         @Override

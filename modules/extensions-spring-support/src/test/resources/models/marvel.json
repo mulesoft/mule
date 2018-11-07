@@ -355,7 +355,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Binary",
+                    "type": "Any",
                     "annotations": {
                       "classInformation": {
                         "classname": "java.io.InputStream",
@@ -1296,7 +1296,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Binary",
+                    "type": "Any",
                     "annotations": {
                       "classInformation": {
                         "classname": "java.io.InputStream",
@@ -1642,7 +1642,7 @@
                   "text/plain"
                 ]
               },
-              "type": "Binary",
+              "type": "Any",
               "annotations": {
                 "classInformation": {
                   "classname": "java.io.InputStream",
@@ -3036,7 +3036,7 @@
                   "text/plain"
                 ]
               },
-              "type": "Binary",
+              "type": "Any",
               "annotations": {
                 "classInformation": {
                   "classname": "java.io.InputStream",
