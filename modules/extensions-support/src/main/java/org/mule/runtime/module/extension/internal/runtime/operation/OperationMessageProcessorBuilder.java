@@ -12,6 +12,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -32,8 +33,8 @@ public final class OperationMessageProcessorBuilder
                                           MuleContext muleContext,
                                           Registry registry) {
 
-    super(extensionModel, operationModel, policyManager, registry.lookupByType(ReflectionCache.class).get(), muleContext,
-          registry);
+    super(extensionModel, operationModel, policyManager, registry.lookupByType(ReflectionCache.class).get(),
+          registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
   }
 
   @Override
@@ -42,19 +43,19 @@ public final class OperationMessageProcessorBuilder
       return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments,
                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                reflectionCache, extensionConnectionSupplier);
+                                                reflectionCache, expressionManager, extensionConnectionSupplier);
     }
 
     if (supportsOAuth(extensionModel)) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments,
                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                reflectionCache, oauthManager);
+                                                reflectionCache, expressionManager, oauthManager);
     }
     return new OperationMessageProcessor(extensionModel, operationModel,
                                          configurationProvider, target, targetValue,
                                          arguments,
                                          cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                         policyManager, reflectionCache);
+                                         policyManager, reflectionCache, expressionManager);
   }
 }

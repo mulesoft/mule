@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -50,6 +51,7 @@ public final class ConfigurationInstanceFactory<T> {
   private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
   private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory;
   private final boolean requiresConnection;
+  private final ExpressionManager expressionManager;
   private final MuleContext muleContext;
 
   /**
@@ -60,14 +62,22 @@ public final class ConfigurationInstanceFactory<T> {
    * @param resolverSet        the {@link ResolverSet} which provides the values for the configuration's parameters
    * @param muleContext        the current {@link MuleContext}
    */
-  public ConfigurationInstanceFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
-                                      ResolverSet resolverSet, ReflectionCache reflectionCache, MuleContext muleContext) {
+  public ConfigurationInstanceFactory(ExtensionModel extensionModel,
+                                      ConfigurationModel configurationModel,
+                                      ResolverSet resolverSet,
+                                      ReflectionCache reflectionCache,
+                                      ExpressionManager expressionManager,
+                                      MuleContext muleContext) {
     this.configurationModel = configurationModel;
+    this.expressionManager = expressionManager;
     this.muleContext = muleContext;
-    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
+    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet, muleContext);
     requiresConnection = supportsConnectivity(extensionModel, configurationModel);
-    implicitConnectionProviderFactory =
-        new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, reflectionCache, muleContext);
+    implicitConnectionProviderFactory = new DefaultImplicitConnectionProviderFactory(extensionModel,
+                                                                                     configurationModel,
+                                                                                     reflectionCache,
+                                                                                     expressionManager,
+                                                                                     muleContext);
   }
 
   /**
@@ -91,7 +101,7 @@ public final class ConfigurationInstanceFactory<T> {
 
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, event);
     if (requiresConnection) {
-      connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(from(event)));
+      connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(from(event, expressionManager)));
     } else {
       connectionProvider = empty();
     }
@@ -125,7 +135,7 @@ public final class ConfigurationInstanceFactory<T> {
     Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider;
 
     if (requiresConnection && connectionProviderResolver.isPresent()) {
-      connectionProvider = ofNullable(connectionProviderResolver.get().resolve(from(event)));
+      connectionProvider = ofNullable(connectionProviderResolver.get().resolve(from(event, expressionManager)));
     } else {
       connectionProvider = empty();
     }
@@ -166,7 +176,7 @@ public final class ConfigurationInstanceFactory<T> {
       }
 
       if (!connectionProvider.isPresent()) {
-        connectionProvider = ofNullable(connectionProviderResolver.resolve(from(event)));
+        connectionProvider = ofNullable(connectionProviderResolver.resolve(from(event, expressionManager)));
       }
     }
 
@@ -186,8 +196,9 @@ public final class ConfigurationInstanceFactory<T> {
     return config;
   }
 
-  private Pair<T, ResolverSetResult> createConfigurationInstance(String name, CoreEvent event) throws MuleException {
-    Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(from(event));
+  private Pair<T, ResolverSetResult> createConfigurationInstance(String name,
+                                                                 CoreEvent event) throws MuleException {
+    Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(from(event, expressionManager));
     injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding());
 
     return config;

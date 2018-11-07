@@ -38,6 +38,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -71,6 +72,7 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHan
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -104,6 +106,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ReflectionCache reflectionCache;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -562,8 +567,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-
-      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), from(initialiserEvent, this.getConfigurationInstance())));
+      ValueResolvingContext resolvingContext = from(initialiserEvent, expressionManager, this.getConfigurationInstance());
+      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), resolvingContext));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not resolve parameters message source at location '%s'",
                                                                 getLocation().toString()),

@@ -74,31 +74,31 @@ public class TypeSafeExpressionValueResolverMelDefaultTestCase extends AbstractM
   @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
     assertResolved(getResolver("#['Hello ' + payload]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build())), HELLO_WORLD, never());
+        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build(), expressionManager)), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionTemplateWithoutTransformation() throws Exception {
     assertResolved(getResolver("Hello #[payload]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build())), HELLO_WORLD, times(1));
+        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build(), expressionManager)), HELLO_WORLD, times(1));
   }
 
   @Test
   public void constant() throws Exception {
     assertResolved(getResolver("Hello World!", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())), HELLO_WORLD, never());
+        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionWithTransformation() throws Exception {
     assertResolved(getResolver("#[true]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())), "true", never());
+        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), "true", never());
   }
 
   @Test
   public void templateWithTransformation() throws Exception {
     assertResolved(getResolver("tru#['e']", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())), "true", times(1));
+        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), "true", times(1));
   }
 
   @Test

@@ -134,6 +134,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                     cursorProviderFactory,
                                     backPressureStrategy,
                                     reflectionCache,
+                                    expressionManager,
                                     properties,
                                     muleContext);
   }

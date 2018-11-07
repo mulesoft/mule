@@ -19,6 +19,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
@@ -58,6 +59,12 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
   @Mock
   private CoreEvent event;
 
+  @Mock
+  private ExpressionManager expressionManager;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleContext context;
+
   private ConfigurationObjectBuilder<TestConfig> configurationObjectBuilder;
   private ResolverSet resolverSet;
 
@@ -70,12 +77,12 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
 
     resolverSet = createResolverSet();
 
-    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
+    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet, context);
   }
 
   @Test
   public void build() throws Exception {
-    TestConfig testConfig = configurationObjectBuilder.build(from(event)).getFirst();
+    TestConfig testConfig = configurationObjectBuilder.build(from(event, expressionManager)).getFirst();
     assertThat(testConfig.getName(), is(NAME_VALUE));
     assertThat(testConfig.getDescription(), is(DESCRIPTION_VALUE));
   }

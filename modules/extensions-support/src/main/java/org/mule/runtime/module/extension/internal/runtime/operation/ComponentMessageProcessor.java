@@ -51,6 +51,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -128,21 +129,24 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     implements Processor, ParametersResolverProcessor<T>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
+
   static final String INVALID_TARGET_MESSAGE =
-      "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
+    "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   protected final ExtensionModel extensionModel;
   protected final ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
-
   protected final RetryPolicyTemplate retryPolicyTemplate;
+
+  private final ExpressionManager expressionManager;
+  private final ReflectionCache reflectionCache;
 
   protected ExecutionMediator executionMediator;
   protected ComponentExecutor componentExecutor;
-  protected PolicyManager policyManager;
-  private final ReflectionCache reflectionCache;
   protected ReturnDelegate returnDelegate;
+  protected PolicyManager policyManager;
+
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
 
@@ -156,7 +160,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache) {
+                                   ReflectionCache reflectionCache,
+                                   ExpressionManager expressionManager) {
     super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.resolverSet = resolverSet;
@@ -165,6 +170,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
   }
 
   @Override
@@ -304,7 +310,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           CoreEvent initialiserEvent = null;
           try {
             initialiserEvent = getInitialiserEvent();
-            return from(initialiserEvent, staticConfiguration.get());
+            return from(initialiserEvent, expressionManager, staticConfiguration.get());
           } finally {
             if (initialiserEvent != null) {
               ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -453,10 +459,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     CoreEvent event = null;
     try {
       event = getInitialiserEvent(muleContext);
-      return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, componentModel, extensionModel,
-                                                                            from(event)),
-                                                 resolverSet,
-                                                 reflectionCache);
+      ValueResolvingContext ctx = from(event, expressionManager);
+      LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
+      return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);
     } finally {
       if (event != null) {
         ((BaseEventContext) event.getContext()).success();
@@ -473,19 +478,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                 BiConsumer<Map<String, Supplier<Object>>, ExecutionContext> afterConfigurer)
       throws MuleException {
     if (componentExecutor instanceof OperationArgumentResolverFactory) {
-      PrecalculatedExecutionContextAdapter executionContext =
-          new PrecalculatedExecutionContextAdapter(createExecutionContext(eventBuilder.build()), componentExecutor);
+      ExecutionContextAdapter<T> delegateExecutionContext = createExecutionContext(eventBuilder.build());
+      PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext,
+                                                                                                       componentExecutor);
 
       final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-
-      List<Interceptor> interceptors =
-          mediator.collectInterceptors(executionContext.getConfiguration(), executionContext.getOperationExecutor());
+      List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
+                                                                    executionContext.getOperationExecutor());
       InterceptorsExecutionResult beforeExecutionResult = mediator.before(executionContext, interceptors);
-
       if (beforeExecutionResult.isOk()) {
         final Map<String, Supplier<Object>> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
-            .createArgumentResolver(componentModel).apply(executionContext);
-
+                                                                                          .createArgumentResolver(componentModel)
+                                                                                          .apply(executionContext);
         afterConfigurer.accept(resolvedArguments, executionContext);
         executionContext.changeEvent(eventBuilder.build());
       } else {
@@ -520,7 +524,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
-    return resolverSet.resolve(from(event, configuration)).asMap();
+    return resolverSet.resolve(from(event, expressionManager, configuration)).asMap();
   }
 
   private boolean isInterceptedComponent(ComponentLocation location, InternalEvent event) {

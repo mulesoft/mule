@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.route.Chain;
@@ -37,6 +38,9 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   @Mock
   private MessageProcessorChain messageProcessor;
 
+  @Mock
+  private ExpressionManager expressionManager;
+
   @Before
   public void before() throws Exception {
     final CoreEvent testEvent = testEvent();
@@ -49,7 +53,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
     final CoreEvent event = testEvent();
 
-    Chain nestedProcessor = resolver.resolve(ValueResolvingContext.from(event));
+    Chain nestedProcessor = resolver.resolve(ValueResolvingContext.from(event, expressionManager));
     nestedProcessor.process(result -> {
       assertThat(result.getOutput(), is(TEST_PAYLOAD));
 
@@ -68,8 +72,8 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
     ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
-    Chain resolved1 = resolver.resolve(ValueResolvingContext.from(testEvent()));
-    Chain resolved2 = resolver.resolve(ValueResolvingContext.from(testEvent()));
+    Chain resolved1 = resolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    Chain resolved2 = resolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
 
     assertThat(resolved1, is(not(sameInstance(resolved2))));
   }
@@ -78,7 +82,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   public void chainIsCalledAsNonBlocking() throws Exception {
     ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
 
-    Chain resolve = resolver.resolve(ValueResolvingContext.from(testEvent()));
+    Chain resolve = resolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
 
     resolve.process(result -> {
     }, (t, r) -> {

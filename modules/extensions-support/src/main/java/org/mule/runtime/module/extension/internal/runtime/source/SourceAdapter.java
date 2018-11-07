@@ -46,6 +46,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -123,6 +124,9 @@ public class SourceAdapter implements Lifecycle {
 
   @Inject
   private ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   @Inject
   private MuleContext muleContext;
@@ -334,7 +338,7 @@ public class SourceAdapter implements Lifecycle {
     public Map<String, Object> createResponseParameters(CoreEvent event) throws MessagingException {
       try {
         ResolverSetResult parameters =
-            SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance, false));
+            SourceAdapter.this.successCallbackParameters.resolve(from(event, expressionManager, configurationInstance, false));
         return parameters.asMap();
       } catch (Exception e) {
         throw createSourceException(event, e);
@@ -345,7 +349,7 @@ public class SourceAdapter implements Lifecycle {
     public Map<String, Object> createFailureResponseParameters(CoreEvent event) throws MessagingException {
       try {
         ResolverSetResult parameters =
-            SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance, false));
+            SourceAdapter.this.errorCallbackParameters.resolve(from(event, expressionManager, configurationInstance, false));
         return parameters.asMap();
       } catch (Exception e) {
         throw createSourceException(event, e);
@@ -501,7 +505,7 @@ public class SourceAdapter implements Lifecycle {
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
-      object = valueResolver.resolve(from(initialiserEvent));
+      object = valueResolver.resolve(from(initialiserEvent, expressionManager));
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage("Unable to get the " + type.getSimpleName()
           + " value for Message Source"), e);

@@ -10,6 +10,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
@@ -43,6 +44,7 @@ public interface ConfigurationProviderFactory {
                                                            ConnectionProviderValueResolver connectionProviderResolver,
                                                            ExpirationPolicy expirationPolicy,
                                                            ReflectionCache reflectionCache,
+                                                           ExpressionManager expressionManager,
                                                            MuleContext muleContext)
       throws Exception;
 
@@ -65,6 +67,7 @@ public interface ConfigurationProviderFactory {
                                                           ResolverSet resolverSet,
                                                           ConnectionProviderValueResolver connectionProviderResolver,
                                                           ReflectionCache reflectionCache,
+                                                          ExpressionManager expressionManager,
                                                           MuleContext muleContext)
       throws Exception;
 }

@@ -17,6 +17,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -41,6 +42,7 @@ public class SourceAdapterFactory {
   private final CursorProviderFactory cursorProviderFactory;
   private final Optional<BackPressureAction> backPressureAction;
   private final ReflectionCache reflectionCache;
+  private final ExpressionManager expressionManager;
   private ConfigurationProperties properties;
   private final MuleContext muleContext;
 
@@ -52,6 +54,7 @@ public class SourceAdapterFactory {
                               CursorProviderFactory cursorProviderFactory,
                               BackPressureStrategy backPressureStrategy,
                               ReflectionCache reflectionCache,
+                              ExpressionManager expressionManager,
                               ConfigurationProperties properties,
                               MuleContext muleContext) {
     this.extensionModel = extensionModel;
@@ -62,6 +65,7 @@ public class SourceAdapterFactory {
     this.cursorProviderFactory = cursorProviderFactory;
     this.backPressureAction = toBackPressureAction(backPressureStrategy);
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
     this.properties = properties;
     this.muleContext = muleContext;
   }
@@ -80,10 +84,9 @@ public class SourceAdapterFactory {
                                      MessagingExceptionResolver exceptionResolver) {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
-      source =
-          new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters, reflectionCache, properties, muleContext)
-              .configure(source, configurationInstance);
-
+      SourceConfigurer sourceConfigurer = new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters,
+                                                               reflectionCache, expressionManager, properties, muleContext);
+      source = sourceConfigurer.configure(source, configurationInstance);
       return new SourceAdapter(extensionModel,
                                sourceModel,
                                source,
@@ -98,9 +101,7 @@ public class SourceAdapterFactory {
                                exceptionResolver,
                                backPressureAction);
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",
-                                                                sourceModel.getName())),
-                                     e);
+      throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'", sourceModel.getName())), e);
     }
   }
 

@@ -20,6 +20,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -48,6 +49,9 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   @Mock
   private ObjectTypeParametersResolver objectTypeParametersResolver;
+
+  @Mock
+  private ExpressionManager expressionManager;
 
   private ReflectionCache reflectionCache = new ReflectionCache();
 
@@ -91,7 +95,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     ValueResolver resolver =
         NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache, muleContext, objectTypeParametersResolver);
     assertThat(resolver.isDynamic(), is(isDynamic));
-    assertThat(resolver.resolve(ValueResolvingContext.from(event)), is(expected));
+    assertThat(resolver.resolve(ValueResolvingContext.from(event, expressionManager)), is(expected));
   }
 
   public static class DynamicPojo {

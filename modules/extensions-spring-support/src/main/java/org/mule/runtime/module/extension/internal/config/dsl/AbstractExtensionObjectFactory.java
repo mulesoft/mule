@@ -19,6 +19,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
@@ -48,6 +49,9 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
 
   @Inject
   protected ReflectionCache reflectionCache;
+
+  @Inject
+  protected ExpressionManager expressionManager;
 
   protected final MuleContext muleContext;
   protected Map<String, Object> parameters = new HashMap<>();

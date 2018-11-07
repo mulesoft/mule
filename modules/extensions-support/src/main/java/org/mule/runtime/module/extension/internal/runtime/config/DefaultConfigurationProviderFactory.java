@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -47,11 +48,11 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                   ConnectionProviderValueResolver connectionProviderResolver,
                                                                   ExpirationPolicy expirationPolicy,
                                                                   ReflectionCache reflectionCache,
-                                                                  MuleContext muleContext)
-      throws Exception {
+                                                                  ExpressionManager expressionManager,
+                                                                  MuleContext muleContext) {
     configureConnectionProviderResolver(name, connectionProviderResolver);
     return new DynamicConfigurationProvider(name, extensionModel, configurationModel, resolverSet, connectionProviderResolver,
-                                            expirationPolicy, reflectionCache, muleContext);
+                                            expirationPolicy, reflectionCache, expressionManager, muleContext);
   }
 
   /**
@@ -64,6 +65,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                  ResolverSet resolverSet,
                                                                  ConnectionProviderValueResolver connectionProviderResolver,
                                                                  ReflectionCache reflectionCache,
+                                                                 ExpressionManager expressionManager,
                                                                  MuleContext muleContext)
       throws Exception {
     return withExtensionClassLoader(extensionModel, () -> {
@@ -73,9 +75,13 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
         initialiseIfNeeded(resolverSet, true, muleContext);
-        configuration =
-            new ConfigurationInstanceFactory(extensionModel, configurationModel, resolverSet, reflectionCache, muleContext)
-                .createConfiguration(name, initialiserEvent, connectionProviderResolver);
+        ConfigurationInstanceFactory configurationFactory = new ConfigurationInstanceFactory(extensionModel,
+                                                                                             configurationModel,
+                                                                                             resolverSet,
+                                                                                             reflectionCache,
+                                                                                             expressionManager,
+                                                                                             muleContext);
+        configuration = configurationFactory.createConfiguration(name, initialiserEvent, connectionProviderResolver);
       } catch (MuleException e) {
         throw new ConfigurationException(createStaticMessage(format("Could not create configuration '%s' for the '%s'", name,
                                                                     extensionModel.getName())),
@@ -86,8 +92,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
         }
       }
 
-      return new ConfigurationProviderToolingAdapter(name, extensionModel, configurationModel, configuration, reflectionCache,
-                                                     muleContext);
+      return new ConfigurationProviderToolingAdapter(name, extensionModel, configurationModel, configuration, reflectionCache, muleContext);
     });
   }
 

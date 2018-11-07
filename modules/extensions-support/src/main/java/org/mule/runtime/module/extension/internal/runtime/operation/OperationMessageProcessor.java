@@ -23,6 +23,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -55,9 +56,10 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache) {
+                                   ReflectionCache reflectionCache,
+                                   ExpressionManager expressionManager) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
+          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache, expressionManager);
 
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
   }

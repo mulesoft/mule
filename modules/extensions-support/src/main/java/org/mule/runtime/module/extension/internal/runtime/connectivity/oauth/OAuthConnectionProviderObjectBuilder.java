@@ -38,6 +38,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -52,6 +53,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -72,6 +75,9 @@ import java.util.function.BiConsumer;
  * @since 4.0
  */
 public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionProviderObjectBuilder<C> implements Startable {
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   private final ExtensionsOAuthManager oauthManager;
   private final AuthorizationCodeGrantType grantType;
@@ -142,8 +148,8 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   private AuthCodeConfig buildAuthCodeConfig(CoreEvent event) throws MuleException {
-    Map<String, Object> map =
-        (Map<String, Object>) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME).resolve(from(event));
+    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
+    Map<String, Object> map = (Map<String, Object>) valueResolver.resolve(from(event, expressionManager));
     return buildAuthCodeConfig(map);
   }
 
@@ -160,7 +166,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
 
   private OAuthCallbackConfig buildOAuthCallbackConfig(CoreEvent event) throws MuleException {
     Map<String, Object> map =
-        (Map<String, Object>) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME).resolve(from(event));
+        (Map<String, Object>) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME).resolve(from(event, expressionManager));
     return buildOAuthCallbackConfig(map);
   }
 
@@ -182,7 +188,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
       return empty();
     }
 
-    Map<String, Object> map = (Map<String, Object>) resolver.resolve(from(event));
+    Map<String, Object> map = (Map<String, Object>) resolver.resolve(from(event, expressionManager));
     return map != null
         ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME)))
         : empty();
@@ -237,7 +243,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   private String resolveString(CoreEvent event, ValueResolver resolver) throws MuleException {
-    Object value = resolver.resolve(from(event));
+    Object value = resolver.resolve(from(event, expressionManager));
     return value != null ? StringMessageUtils.toString(value) : null;
   }
 
@@ -257,11 +263,11 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
       initialiserEvent = getInitialiserEvent(muleContext);
       MapValueResolver mapResolver =
           staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME));
-      AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(from(initialiserEvent)));
+      AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(from(initialiserEvent, expressionManager)));
       Optional<OAuthObjectStoreConfig> storeConfig = buildOAuthObjectStoreConfig(initialiserEvent);
 
       mapResolver = staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME));
-      OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(from(initialiserEvent)));
+      OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(from(initialiserEvent, expressionManager)));
 
       return new OAuthConfig(ownerConfigName,
                              authCodeConfig,

@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -38,9 +39,10 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache) {
-    super(extensionModel, constructModel, configurationProvider, target, targetValue,
-          resolverSet, cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
+                                   ReflectionCache reflectionCache,
+                                   ExpressionManager expressionManager) {
+    super(extensionModel, constructModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, expressionManager);
   }
 
   @Override

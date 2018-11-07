@@ -46,6 +46,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
+import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
@@ -88,14 +89,7 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.weave.v2.model.structure.QualifiedName;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -105,11 +99,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.xml.namespace.QName;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_DW)
@@ -414,7 +412,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void accessRegistryAnnotatedBean() throws MuleException {
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyAnnotatedBean("DataWeave")));
-    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", DataType.fromType(MyBean.class), event,
+    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
                                                       fromSingleComponent("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyAnnotatedBean.class)));
   }
@@ -426,7 +424,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     MyBean annotatedMyBean = (MyBean) addAnnotationsToClass(MyBean.class).newInstance();
     annotatedMyBean.setName("DataWeave");
     when(registry.lookupByName("myBean")).thenReturn(of(annotatedMyBean));
-    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", DataType.fromType(MyBean.class), event,
+    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
                                                       fromSingleComponent("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyBean.class)));
   }
@@ -572,6 +570,15 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
     assertThat(session.evaluate("flow.name").getValue(), is("test"));
+  }
+
+  @Test
+  public void sessionEvaluatesPayloadExpressionWithExpectedDataType() throws MuleException {
+    TypedValue<String> stringJsonPayload = new TypedValue<>("\"string\"", JSON_STRING);
+    CoreEvent eventWithJsonPayload = CoreEvent.builder(testEvent()).message(Message.of(stringJsonPayload)).build();
+    BindingContext bindingContext = eventWithJsonPayload.asBindingContext();
+    ExpressionLanguageSession session = expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, null, bindingContext);
+    assertThat(session.evaluate("payload", STRING).getValue(), is("string"));
   }
 
   private CoreEvent getEventWithError(Optional<Error> error) {

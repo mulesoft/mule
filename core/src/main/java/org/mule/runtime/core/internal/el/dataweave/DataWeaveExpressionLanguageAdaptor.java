@@ -234,9 +234,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event,
-                                                      BindingContext context) {
-    ExpressionLanguageSession session = expressionExecutor.openSession(bindingContextFor(componentLocation, event, context));
+  public ExpressionLanguageSessionAdaptor openSession(ComponentLocation location, CoreEvent event, BindingContext context) {
+    ExpressionLanguageSession session = expressionExecutor.openSession(bindingContextFor(location, event, context));
     return new ExpressionLanguageSessionAdaptor() {
 
       @Override
@@ -268,12 +267,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
       @Override
       public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionRuntimeException {
-        String sanitized = sanitize(expression);
-        if (isPayloadExpression(sanitized)) {
-          return resolvePayload(event, context);
-        }
         try {
-          return session.evaluate(sanitized, expectedOutputType);
+          return session.evaluate(sanitize(expression), expectedOutputType);
         } catch (ExpressionExecutionException e) {
           throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
         }

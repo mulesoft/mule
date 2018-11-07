@@ -17,6 +17,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -64,9 +65,10 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
+                                        ExpressionManager expressionManager,
                                         ExtensionsOAuthManager oauthManager) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, expressionManager);
     this.oauthManager = oauthManager;
   }
 

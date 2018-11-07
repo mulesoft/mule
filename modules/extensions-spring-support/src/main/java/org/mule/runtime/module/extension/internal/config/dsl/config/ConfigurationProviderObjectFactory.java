@@ -92,6 +92,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                                               connectionProviderResolver,
                                                                               expirationPolicy,
                                                                               reflectionCache,
+                                                                              expressionManager,
                                                                               muleContext);
         } else {
           configurationProvider = configurationProviderFactory
@@ -101,6 +102,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                  resolverSet,
                                                  connectionProviderResolver,
                                                  reflectionCache,
+                                                 expressionManager,
                                                  muleContext);
         }
 
@@ -120,11 +122,10 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
   private ConnectionProviderValueResolver getConnectionProviderResolver() {
     return connectionProviderResolver.orElseGet(() -> {
-      if (requiresConnection) {
-        return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, reflectionCache,
-                                                           muleContext);
+      if (!requiresConnection) {
+        return new StaticConnectionProviderResolver<>(null, null);
       }
-      return new StaticConnectionProviderResolver(null, null);
+      return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, reflectionCache, expressionManager, muleContext);
     });
   }
 

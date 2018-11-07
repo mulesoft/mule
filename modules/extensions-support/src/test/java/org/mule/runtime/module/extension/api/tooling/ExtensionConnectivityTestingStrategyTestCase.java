@@ -19,6 +19,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -29,11 +31,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.tck.util.MuleContextUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTestCase {
 
-  private ExtensionConnectivityTestingStrategy extensionConnectivityTestingStrategy;
+  private ExtensionConnectivityTestingStrategy connectivityTestingStrategy;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
@@ -44,11 +47,15 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConnectionProvider connectionProvider;
 
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtendedExpressionManager expressionManager;
+
   private ConnectionManager connectionManager = new DefaultConnectionManager(muleContext);
 
   @Before
-  public void createTestingInstance() {
-    extensionConnectivityTestingStrategy = new ExtensionConnectivityTestingStrategy(connectionManager, muleContext);
+  public void createTestingInstance() throws MuleException {
+    connectivityTestingStrategy = new ExtensionConnectivityTestingStrategy(connectionManager, muleContext);
+    MuleContextUtils.mockContextWithServices().getInjector().inject(connectivityTestingStrategy);
   }
 
   @Test
@@ -67,8 +74,7 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
   public void connectionProviderThrowsException() throws MuleException {
     final Exception e = new RuntimeException();
     when(connectionProviderResolver.resolve(any())).thenThrow(e);
-    ConnectionValidationResult connectionResult =
-        extensionConnectivityTestingStrategy.testConnectivity(connectionProviderResolver);
+    ConnectionValidationResult connectionResult = connectivityTestingStrategy.testConnectivity(connectionProviderResolver);
     assertThat(connectionResult.isValid(), is(false));
     assertThat(connectionResult.getException(), is(sameInstance(e)));
   }
@@ -84,7 +90,7 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
     when(connectionProvider.validate(any())).thenReturn(validationResult);
 
     ConnectionValidationResult connectionResult =
-        extensionConnectivityTestingStrategy.testConnectivity(connectionProviderResolver);
+        connectivityTestingStrategy.testConnectivity(connectionProviderResolver);
     return connectionResult;
   }
 }

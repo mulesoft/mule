@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -43,6 +44,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected final PolicyManager policyManager;
   protected final ReflectionCache reflectionCache;
   protected final MuleContext muleContext;
+  protected final ExpressionManager expressionManager;
   protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
   protected final ExtensionsOAuthManager oauthManager;
@@ -59,9 +61,9 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
                                           M operationModel,
                                           PolicyManager policyManager,
                                           ReflectionCache reflectionCache,
+                                          ExpressionManager expressionManager,
                                           MuleContext muleContext,
                                           Registry registry) {
-
     checkArgument(extensionModel != null, "ExtensionModel cannot be null");
     checkArgument(operationModel != null, "OperationModel cannot be null");
     checkArgument(policyManager != null, "PolicyManager cannot be null");
@@ -75,6 +77,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
     this.oauthManager = registry.lookupByType(ExtensionsOAuthManager.class).get();
+    this.expressionManager = expressionManager;
   }
 
   public P build() {

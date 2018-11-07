@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
@@ -30,6 +31,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -96,6 +98,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
 
   private ResolverSet resolverSet;
   private ConfigurationInstanceFactory<TestConfig> factory;
+  private ExpressionManager expressionManager;
 
   @Before
   public void before() throws Exception {
@@ -112,9 +115,16 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
     when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(ENCODING);
+
+
+    // TODO fix me
+    this.expressionManager = mock(ExpressionManager.class);
+
+
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
     factory =
-        new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, new ReflectionCache(), muleContext);
+        new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, new ReflectionCache(),
+                                           expressionManager, muleContext);
   }
 
   @Test

@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.Objects.requireNonNull;
 
+import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
@@ -22,26 +24,46 @@ import java.util.Optional;
  */
 public class ValueResolvingContext {
 
+  private static final ValueResolvingContext NULL_CONTEXT = new ValueResolvingContext(null, null, null, true);
+
   private CoreEvent event;
   private final ConfigurationInstance config;
+  private ExpressionManagerSession session;
   private final boolean resolveCursors;
 
-  private ValueResolvingContext(CoreEvent event, ConfigurationInstance config, boolean resolveCursors) {
+  private ValueResolvingContext(CoreEvent event,
+                                ExpressionManagerSession session,
+                                ConfigurationInstance config,
+                                boolean resolveCursors) {
     this.event = event;
+    this.session = session;
     this.config = config;
     this.resolveCursors = resolveCursors;
   }
 
   public static ValueResolvingContext from(CoreEvent event) {
-    return new ValueResolvingContext(event, null, true);
+    return new ValueResolvingContext(event, null, null, true);
   }
 
-  public static ValueResolvingContext from(CoreEvent event, Optional<ConfigurationInstance> config) {
-    return new ValueResolvingContext(event, config.orElse(null), true);
+  public static ValueResolvingContext from(CoreEvent event, ExpressionManager expressionManager) {
+    return from(event, expressionManager, Optional.empty(), true);
   }
 
-  public static ValueResolvingContext from(CoreEvent event, Optional<ConfigurationInstance> config, boolean resolveCursors) {
-    return new ValueResolvingContext(event, config.orElse(null), resolveCursors);
+  public static ValueResolvingContext from(CoreEvent event,
+                                           ExpressionManager expressionManager,
+                                           Optional<ConfigurationInstance> config) {
+    return from(event, expressionManager, config, true);
+  }
+
+  public static ValueResolvingContext from(CoreEvent event,
+                                           ExpressionManager expressionManager,
+                                           Optional<ConfigurationInstance> config,
+                                           boolean resolveCursors) {
+    if (event == null) {
+      return NULL_CONTEXT;
+    }
+    ExpressionManagerSession session = expressionManager.openSession(event.asBindingContext());
+    return new ValueResolvingContext(event, session, config.orElse(null), resolveCursors);
   }
 
   /**
@@ -89,4 +111,7 @@ public class ValueResolvingContext {
     return resolveCursors;
   }
 
+  public Optional<ExpressionManagerSession> getSession() {
+    return Optional.ofNullable(session);
+  }
 }

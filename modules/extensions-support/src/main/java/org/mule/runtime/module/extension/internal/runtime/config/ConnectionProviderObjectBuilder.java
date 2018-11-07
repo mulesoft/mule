@@ -40,7 +40,8 @@ public abstract class ConnectionProviderObjectBuilder<C>
    * @param providerModel     the {@link ConnectionProviderModel} which describes the instances to be produced
    * @param resolverSet       a {@link ResolverSet} to populate the values
    */
-  public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
+  public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
+                                         ResolverSet resolverSet,
                                          ExtensionModel extensionModel,
                                          MuleContext muleContext) {
     this(providerModel, resolverSet, null, null, extensionModel, muleContext);
@@ -50,8 +51,9 @@ public abstract class ConnectionProviderObjectBuilder<C>
                                          ResolverSet resolverSet,
                                          PoolingProfile poolingProfile,
                                          ReconnectionConfig reconnectionConfig,
-                                         ExtensionModel extensionModel, MuleContext muleContext) {
-    super(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet);
+                                         ExtensionModel extensionModel,
+                                         MuleContext muleContext) {
+    super(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet, muleContext);
     this.providerModel = providerModel;
     this.poolingProfile = poolingProfile;
     this.extensionModel = extensionModel;
@@ -70,7 +72,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
                                          ReconnectionConfig reconnectionConfig,
                                          ExtensionModel extensionModel,
                                          MuleContext muleContext) {
-    super(prototypeClass, providerModel, resolverSet);
+    super(prototypeClass, providerModel, resolverSet, muleContext);
     this.providerModel = providerModel;
     this.poolingProfile = poolingProfile;
     this.extensionModel = extensionModel;

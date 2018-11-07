@@ -126,9 +126,6 @@ public class MuleExtensionUtils {
     return false;
   }
 
-  public static Map<String, Object> toMap(ResolverSet resolverSet, CoreEvent event) throws MuleException {
-    return toMap(resolverSet, from(event));
-  }
 
   public static Map<String, Object> toMap(ResolverSet resolverSet, ValueResolvingContext ctx) throws MuleException {
     ImmutableMap.Builder<String, Object> map = ImmutableMap.builder();

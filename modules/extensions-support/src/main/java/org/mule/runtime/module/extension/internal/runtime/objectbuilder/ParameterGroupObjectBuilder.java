@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.springframework.util.ReflectionUtils.setField;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -39,6 +40,7 @@ import java.util.function.Predicate;
 public class ParameterGroupObjectBuilder<T> {
 
   private final Class<T> prototypeClass;
+  private ExpressionManager expressionManager;
   private final List<FieldElement> groupDescriptorFields;
 
   /**
@@ -47,16 +49,19 @@ public class ParameterGroupObjectBuilder<T> {
    * @param groupDescriptor the descriptor for the group being built
    * @param reflectionCache the cache for expensive reflection lookups
    */
-  public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor, ReflectionCache reflectionCache) {
+  public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor,
+                                     ReflectionCache reflectionCache,
+                                     ExpressionManager expressionManager) {
     this.prototypeClass = (Class<T>) groupDescriptor.getType().getDeclaringClass().get();
     checkInstantiable(prototypeClass, reflectionCache);
+    this.expressionManager = expressionManager;
     this.groupDescriptorFields = reflectionCache.fieldElementsFor(groupDescriptor);
     this.groupDescriptorFields.forEach(f -> f.getField().ifPresent(field -> field.setAccessible(true)));
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
-    return doBuild(executionContext::hasParameter, executionContext::getParameter,
-                   from(executionContext.getEvent(), executionContext.getConfiguration()));
+    ValueResolvingContext ctx = from(executionContext.getEvent(), expressionManager, executionContext.getConfiguration());
+    return doBuild(executionContext::hasParameter, executionContext::getParameter, ctx);
   }
 
   public T build(ResolverSetResult result) throws MuleException {

@@ -80,7 +80,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       CoreEvent initialiserEvent = null;
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
-        staticProduct = resolver.resolve(from(initialiserEvent));
+        staticProduct = resolver.resolve(from(initialiserEvent, expressionManager));
         muleContext.getInjector().inject(staticProduct);
         return staticProduct;
       } finally {

@@ -20,11 +20,13 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import javax.inject.Inject;
 
@@ -43,6 +45,9 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
 
   @Inject
   private ConnectionManager connectionManager;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   public ExtensionConnectivityTestingStrategy() {}
 
@@ -67,9 +72,9 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
       if (connectivityTestingObject instanceof ConnectionProviderResolver) {
-        ConnectionProvider<Object> connectionProvider =
-            ((ConnectionProviderResolver<Object>) connectivityTestingObject).resolve(from(initialiserEvent))
-                .getFirst();
+        ConnectionProviderResolver<?> connectionProviderResolver = (ConnectionProviderResolver<?>) connectivityTestingObject;
+        ValueResolvingContext resolvingCtx = from(initialiserEvent, expressionManager);
+        ConnectionProvider connectionProvider = connectionProviderResolver.resolve(resolvingCtx).getFirst();
         return connectionManager.testConnectivity(connectionProvider);
       } else if (connectivityTestingObject instanceof ConfigurationProvider) {
         ConfigurationProvider configurationProvider = (ConfigurationProvider) connectivityTestingObject;

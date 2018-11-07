@@ -19,6 +19,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
@@ -48,6 +49,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                    ConfigurationModel implicitConfigurationModel,
                                                                    CoreEvent event,
                                                                    ReflectionCache reflectionCache,
+                                                                   ExpressionManager expressionManager,
                                                                    MuleContext muleContext) {
     if (implicitConfigurationModel == null || !canBeUsedImplicitly(implicitConfigurationModel)) {
       throw new IllegalStateException("Could not find a config for extension '" + extensionModel.getName()
@@ -62,14 +64,16 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
     try {
       ImplicitConnectionProviderValueResolver implicitConnectionProviderValueResolver =
           new ImplicitConnectionProviderValueResolver(implicitConfigurationModel.getName(), extensionModel,
-                                                      implicitConfigurationModel, reflectionCache, muleContext);
+                                                      implicitConfigurationModel, reflectionCache, expressionManager, muleContext);
 
-      ConfigurationInstance configurationInstance =
-          withContextClassLoader(pluginClassloader,
-                                 () -> new ConfigurationInstanceFactory(extensionModel, implicitConfigurationModel, resolverSet,
-                                                                        reflectionCache, muleContext)
-                                                                            .createConfiguration(providerName, event,
-                                                                                                 implicitConnectionProviderValueResolver));
+      ConfigurationInstance configurationInstance = withContextClassLoader(pluginClassloader, () ->
+        new ConfigurationInstanceFactory(extensionModel,
+                                         implicitConfigurationModel,
+                                         resolverSet,
+                                         reflectionCache,
+                                         expressionManager,
+                                         muleContext)
+          .createConfiguration(providerName, event, implicitConnectionProviderValueResolver));
 
       if (resolverSet.isDynamic() || needsDynamicConnectionProvider(extensionModel, implicitConfigurationModel,
                                                                     implicitConnectionProviderValueResolver)) {
@@ -77,7 +81,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                 resolverSet,
                                                 implicitConnectionProviderValueResolver,
                                                 ImmutableExpirationPolicy.getDefault(new LocalTimeSupplier()), reflectionCache,
-                                                muleContext);
+                                                expressionManager, muleContext);
       }
 
       return new ConfigurationProviderToolingAdapter(providerName, extensionModel,

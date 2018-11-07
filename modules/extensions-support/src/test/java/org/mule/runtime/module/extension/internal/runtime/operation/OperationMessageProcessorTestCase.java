@@ -48,6 +48,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
+import org.mockito.Mock;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -65,6 +66,7 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
@@ -117,12 +119,15 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   private ReflectionCache reflectionCache = new ReflectionCache();
 
+  @Mock
+  private ExpressionManager expressionManager;
+
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     OperationMessageProcessor operationMessageProcessor =
         new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
                                       cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
-                                      mockPolicyManager, reflectionCache);
+                                      mockPolicyManager, reflectionCache, expressionManager);
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     return operationMessageProcessor;
   }

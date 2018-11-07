@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.rx.Exceptions;
@@ -80,6 +81,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
 
   @Inject
   private ReflectionCache reflectionCache;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   private final CoreEvent event;
 
@@ -179,7 +183,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
           }
         });
         try {
-          values.put(name, new StaticValueResolver<>(builder.build(from(event))));
+          values.put(name, new StaticValueResolver<>(builder.build(from(event, expressionManager))));
         } catch (MuleException e) {
           throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", name)), e);
         }

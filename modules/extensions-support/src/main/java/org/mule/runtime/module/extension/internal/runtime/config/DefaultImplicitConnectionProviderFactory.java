@@ -20,6 +20,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -37,15 +38,19 @@ import javax.inject.Provider;
 public final class DefaultImplicitConnectionProviderFactory<T> implements ImplicitConnectionProviderFactory {
 
   private final ExtensionModel extensionModel;
+  private final ExpressionManager expressionManager;
   private final MuleContext muleContext;
   private Provider<ResolverSet> resolverSetProvider;
   private ConnectionProviderModel connectionProviderModel = null;
   private ResolverSet resolverSet = null;
 
   public DefaultImplicitConnectionProviderFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
-                                                  ReflectionCache reflectionCache, MuleContext muleContext) {
+                                                  ReflectionCache reflectionCache,
+                                                  ExpressionManager expressionManager,
+                                                  MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.muleContext = muleContext;
+    this.expressionManager = expressionManager;
 
     resolverSetProvider = () -> {
       synchronized (this) {
@@ -76,7 +81,7 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
         new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, extensionModel, muleContext);
     builder.setOwnerConfigName(configName);
     try {
-      return builder.build(from(event));
+      return builder.build(from(event, expressionManager));
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }

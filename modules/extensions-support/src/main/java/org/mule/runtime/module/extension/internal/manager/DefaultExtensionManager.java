@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import afu.org.checkerframework.checker.igj.qual.I;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +74,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   @Inject
   private ReflectionCache reflectionCache;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
@@ -219,6 +224,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                                                                  implicitConfigurationModel,
                                                                                                                  muleEvent,
                                                                                                                  getReflectionCache(),
+                                                                                                                 expressionManager,
                                                                                                                  muleContext));
         }
       }

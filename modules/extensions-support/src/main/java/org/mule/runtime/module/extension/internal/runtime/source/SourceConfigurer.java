@@ -21,6 +21,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -50,6 +51,7 @@ public final class SourceConfigurer {
   private final ResolverSet resolverSet;
   private final ComponentLocation componentLocation;
   private final ReflectionCache reflectionCache;
+  private final ExpressionManager expressionManager;
   private final ConfigurationProperties properties;
   private final MuleContext muleContext;
 
@@ -64,11 +66,13 @@ public final class SourceConfigurer {
    * @param muleContext     the current {@link MuleContext}
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
-                          ReflectionCache reflectionCache, ConfigurationProperties properties, MuleContext muleContext) {
+                          ReflectionCache reflectionCache, ExpressionManager expressionManager,
+                          ConfigurationProperties properties, MuleContext muleContext) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
     this.properties = properties;
     this.muleContext = muleContext;
   }
@@ -83,7 +87,7 @@ public final class SourceConfigurer {
    */
   public Source configure(Source source, Optional<ConfigurationInstance> config) throws MuleException {
     ResolverSetBasedObjectBuilder<Source> builder =
-        new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet) {
+        new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet, muleContext) {
 
           @Override
           protected Source instantiateObject() {
@@ -104,7 +108,7 @@ public final class SourceConfigurer {
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
-      Source configuredSource = builder.build(from(initialiserEvent, config));
+      Source configuredSource = builder.build(from(initialiserEvent, expressionManager, config));
 
       if (configuredSource instanceof PollingSource) {
         ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME);
@@ -114,7 +118,7 @@ public final class SourceConfigurer {
           }
         } else {
           Scheduler scheduler = (Scheduler) valueResolver
-              .resolve(ValueResolvingContext.from(initialiserEvent));
+              .resolve(ValueResolvingContext.from(initialiserEvent, expressionManager));
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }

@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
@@ -22,7 +23,9 @@ import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.api.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -43,17 +46,21 @@ import javax.inject.Inject;
  */
 public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable, ParameterValueResolver {
 
-  private static final ValueResolvingContext RESOLVING_CONTEXT =
-      ValueResolvingContext.from(MuleExtensionUtils.getInitialiserEvent());
+  @Inject
+  private ExpressionManager expressionManager;
+
+  @Inject
+  private MuleContext muleContext;
+
+  private final LazyValue<ValueResolvingContext> RESOLVING_CONTEXT =
+    new LazyValue<>(() -> from(MuleExtensionUtils.getInitialiserEvent(), expressionManager));
+
   protected final Class<T> prototypeClass;
   protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
   protected final Map<String, ValueResolver<? extends Object>> resolverByFieldName = new HashMap<>();
   protected ReflectionCache reflectionCache;
   private String name = null;
   private String encoding = null;
-
-  @Inject
-  private MuleContext muleContext;
 
   /**
    * Creates a new instance that will build instances of {@code prototypeClass}.
@@ -147,7 +154,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
       return null;
     }
     try {
-      return valueResolver.resolve(RESOLVING_CONTEXT);
+      return valueResolver.resolve(RESOLVING_CONTEXT.get());
     } catch (Exception e) {
       throw new ValueResolvingException(format("An error occurred trying to resolve value for parameter [%s]", parameterName), e);
     }

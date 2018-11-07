@@ -13,6 +13,7 @@ import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
@@ -42,14 +43,16 @@ public final class GroupValueSetter implements ValueSetter {
    * @param reflectionCache the cache for expensive reflection lookups
    * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
    */
-  public static List<ValueSetter> settersFor(ParameterizedModel model, Supplier<ReflectionCache> reflectionCache) {
+  public static List<ValueSetter> settersFor(ParameterizedModel model,
+                                             Supplier<ReflectionCache> reflectionCache,
+                                             Supplier<ExpressionManager> expressionManager) {
     ImmutableList.Builder<ValueSetter> setters = ImmutableList.builder();
     model.getParameterGroupModels().stream()
         .filter(group -> !group.isShowInDsl())
         .filter(group -> !group.getName().equals(DEFAULT_GROUP_NAME))
         .forEach(group -> group.getModelProperty(ParameterGroupModelProperty.class).ifPresent(property -> {
           if (property.getDescriptor().getContainer() instanceof Field) {
-            setters.add(new GroupValueSetter(property.getDescriptor(), reflectionCache));
+            setters.add(new GroupValueSetter(property.getDescriptor(), reflectionCache, expressionManager));
           }
         }));
 
@@ -59,6 +62,7 @@ public final class GroupValueSetter implements ValueSetter {
   private final ParameterGroupDescriptor groupDescriptor;
   private final Field container;
   private final Supplier<ReflectionCache> reflectionCache;
+  private final Supplier<ExpressionManager> expressionManager;
 
   /**
    * Creates a new instance that can set values defined in the given {@code group}
@@ -66,16 +70,22 @@ public final class GroupValueSetter implements ValueSetter {
    * @param groupDescriptor a {@link ParameterGroupDescriptor}
    * @param reflectionCache the cache for expensive reflection lookups
    */
-  public GroupValueSetter(ParameterGroupDescriptor groupDescriptor, Supplier<ReflectionCache> reflectionCache) {
+  public GroupValueSetter(ParameterGroupDescriptor groupDescriptor,
+                          Supplier<ReflectionCache> reflectionCache,
+                          Supplier<ExpressionManager> expressionManager) {
     this.groupDescriptor = groupDescriptor;
     checkArgument(groupDescriptor.getContainer() instanceof Field, "Only field contained parameter groups are allowed");
     container = (Field) groupDescriptor.getContainer();
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
   }
 
   @Override
   public void set(Object target, ResolverSetResult result) throws MuleException {
     container.setAccessible(true);
-    setField(container, target, new ParameterGroupObjectBuilder<>(groupDescriptor, reflectionCache.get()).build(result));
+    ParameterGroupObjectBuilder<?> parameterGroupObjectBuilder = new ParameterGroupObjectBuilder<>(groupDescriptor,
+                                                                                                   reflectionCache.get(),
+                                                                                                   expressionManager.get());
+    setField(container, target, parameterGroupObjectBuilder.build(result));
   }
 }

@@ -7,9 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.api.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -33,13 +36,18 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
   private ResolverSet resolverSet;
   private ParameterizedModel parameterizedModel;
   private ReflectionCache reflectionCache;
-  private ValueResolvingContext resolvingContext = ValueResolvingContext.from(MuleExtensionUtils.getInitialiserEvent());
+  private ExpressionManager expressionManager;
+  private LazyValue<ValueResolvingContext> resolvingContext =
+    new LazyValue<>(() -> from(MuleExtensionUtils.getInitialiserEvent(), expressionManager));
 
-  public ResolverSetBasedParameterResolver(ResolverSet resolverSet, ParameterizedModel parameterizedModel,
-                                           ReflectionCache reflectionCache) {
+  public ResolverSetBasedParameterResolver(ResolverSet resolverSet,
+                                           ParameterizedModel parameterizedModel,
+                                           ReflectionCache reflectionCache,
+                                           ExpressionManager expressionManager) {
     this.resolverSet = resolverSet;
     this.parameterizedModel = parameterizedModel;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
   }
 
   @Override
@@ -48,7 +56,7 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
     try {
       ValueResolver<?> valueResolver = resolverSet.getResolvers().get(parameterName);
       if (valueResolver != null) {
-        return valueResolver.resolve(resolvingContext);
+        return valueResolver.resolve(resolvingContext.get());
       } else {
         return resolveFromParameterGroup(parameterName);
       }
@@ -87,7 +95,7 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
 
   private Object resolveStaticGroup(String parameterName, ValueResolver<?> paramGroup)
       throws MuleException, ValueResolvingException {
-    Object resolve = paramGroup.resolve(resolvingContext);
+    Object resolve = paramGroup.resolve(resolvingContext.get());
     return new ObjectBasedParameterValueResolver(resolve, parameterizedModel, reflectionCache)
         .getParameterValue(parameterName);
   }
