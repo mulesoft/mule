@@ -12,7 +12,6 @@ import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
 import static org.mule.module.cxf.support.CxfUtils.resolveEncoding;
 import static org.mule.transformer.types.DataTypeFactory.XML_STRING;
 import static org.mule.transport.http.HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
-import static org.mule.transport.http.HttpConstants.*;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static java.lang.Boolean.TRUE;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -27,6 +26,7 @@ import static org.apache.cxf.message.Message.PATH_INFO;
 import static org.apache.cxf.message.Message.QUERY_STRING;
 import static org.apache.cxf.message.Message.RESPONSE_CODE;
 import static org.apache.cxf.phase.Phase.PRE_STREAM;
+import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -93,6 +93,8 @@ public class MuleUniversalConduit extends AbstractConduit
 {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(MuleUniversalConduit.class);
+
+    public static final String HTTP_STATUS = "http.status";
 
     private EndpointInfo endpoint;
 
@@ -355,7 +357,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // the last inbound endpoint used was HTTP, and that it set the property correctly.
             else if (resEvent.getMessage().getInboundPropertyNames().contains("http.status"))
             {
-                int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty("http.status").toString());
+                int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS).toString());
                 // Fail for any status code, but an Accepted (202) one.
                 if (httpResponseStatusCode != SC_ACCEPTED)
                 {
