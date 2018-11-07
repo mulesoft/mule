@@ -61,6 +61,12 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
 
   public void start() throws IOException
   {
+    if (ctx.getConnection() == null)
+    {
+        logger.warn("Filter chain context already reset. Not sending response.");
+        return;
+    }
+    
     try
     {
       outputHandler.write(null, outputStream);

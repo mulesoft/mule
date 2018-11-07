@@ -84,6 +84,12 @@ public class ResponseCompletionHandler
      */
     public void start() throws IOException
     {
+        if (ctx.getConnection() == null)
+        {
+            logger.warn("Filter chain context already reset. Not sending response.");
+            return;
+        }
+        
         sendResponse();
     }
 

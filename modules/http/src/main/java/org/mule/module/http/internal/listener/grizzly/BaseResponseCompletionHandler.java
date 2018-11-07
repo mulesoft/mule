@@ -11,6 +11,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.glassfish.grizzly.EmptyCompletionHandler;
@@ -26,6 +27,8 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    public abstract void start() throws IOException;
+    
     protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse)
     {
         final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(sourceRequest)
