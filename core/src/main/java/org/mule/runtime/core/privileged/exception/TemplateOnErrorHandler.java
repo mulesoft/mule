@@ -17,6 +17,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -24,8 +25,9 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.newCh
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -63,6 +65,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Inject
   protected ConfigurationComponentLocator locator;
+
+  @Inject
+  private ConfigurationProperties configurationProperties;
 
   private MessageProcessorChain configuredMessageProcessors;
   private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
@@ -207,19 +212,26 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       configuredMessageProcessors.setMuleContext(muleContext);
     }
 
-    errorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), errorType);
+    errorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), errorType, configurationProperties);
   }
 
-  public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
+  public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames,
+                                                 ConfigurationProperties configurationProperties) {
     if (errorTypeNames == null) {
       return null;
     }
     String[] errorTypeIdentifiers = errorTypeNames.split(",");
     List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
       String parsedIdentifier = identifier.trim();
-      return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(buildFromStringRepresentation(parsedIdentifier))
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
-                                                                          parsedIdentifier))));
+      final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
+      return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
+          .orElseGet(() -> {
+            if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
+              return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
+            }
+            throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
+                                                               parsedIdentifier));
+          }));
     }).collect(toList());
     return new DisjunctiveErrorTypeMatcher(matchers);
   }
