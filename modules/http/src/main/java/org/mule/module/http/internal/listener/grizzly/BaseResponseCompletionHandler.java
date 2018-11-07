@@ -45,7 +45,7 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
     
     public void start() throws IOException
     {
-        // TODO: verify root cause for reset filter chain.
+        // TODO MULE-16020: verify root cause for reset filter chain.
         if (ctx.getFilterChain() == null)
         {
             logger.warn("Filter chain context already reset. Not sending response.");
