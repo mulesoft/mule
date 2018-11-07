@@ -30,8 +30,22 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
     
     protected final FilterChainContext ctx;
     
+    /**
+     * Implicit constructor for compatibility purposes
+     */
+    public BaseResponseCompletionHandler()
+    {
+        this.ctx = null;
+    }
+    
+    protected BaseResponseCompletionHandler(FilterChainContext ctx)
+    {
+        this.ctx = ctx;
+    }
+    
     public void start() throws IOException
     {
+        // TODO: verify root cause for reset filter chain.
         if (ctx.getFilterChain() == null)
         {
             logger.warn("Filter chain context already reset. Not sending response.");
@@ -41,23 +55,15 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
         doStart();
     }
     
+    /**
+     * Operations to be performed on starting. This method must be overridden and it is left for compatibility purposes.
+     * 
+     * @throws IOException an error during start phase.
+     */
     protected void doStart() throws IOException
     {
-        // OVERRIDE. Not abstract for compatibility purposes.
-        
     }
 
-    public BaseResponseCompletionHandler()
-    {
-        // Implicit constructor for compatibility purposes.
-        this.ctx = null;
-    }
-    
-    protected BaseResponseCompletionHandler(FilterChainContext ctx)
-    {
-        this.ctx = ctx;
-    }
-    
     protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse)
     {
         final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(sourceRequest)
