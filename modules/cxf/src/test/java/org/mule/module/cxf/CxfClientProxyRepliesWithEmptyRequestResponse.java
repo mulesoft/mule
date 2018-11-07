@@ -27,14 +27,12 @@ import java.util.Collection;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpClientParams;
-import org.apache.http.client.utils.URIBuilder;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -123,7 +121,7 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
         clientParams.setSoTimeout(1000);
         client.setParams(clientParams);
 
-        PostMethod soapRequestPostMethod = new PostMethod(new URIBuilder("http://localhost:" + listenerDynamicPort.getNumber() + "/").build().toString());
+        PostMethod soapRequestPostMethod = new PostMethod("http://localhost:" + listenerDynamicPort.getNumber() + "/");
         StringRequestEntity soapPayload = new StringRequestEntity(soapRequestBody, "application/xml", "UTF-8");
         soapRequestPostMethod.setRequestEntity(soapPayload);
 
