@@ -236,10 +236,30 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return new DisjunctiveErrorTypeMatcher(matchers);
   }
 
+  // Just keep previous implementation in order to avoid breaking API as it can be used by privileged artifacts.
+  public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
+    return createErrorType(errorTypeRepository, errorTypeNames, new ConfigurationProperties() {
+
+      @Override
+      public <T> Optional<T> resolveProperty(String propertyKey) {
+        return Optional.empty();
+      }
+
+      @Override
+      public Optional<Boolean> resolveBooleanProperty(String property) {
+        return Optional.empty();
+      }
+
+      @Override
+      public Optional<String> resolveStringProperty(String property) {
+        return Optional.empty();
+      }
+    });
+  }
+
   public void setWhen(String when) {
     this.when = when;
   }
-
 
   @Override
   public boolean accept(CoreEvent event) {
