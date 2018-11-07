@@ -26,6 +26,7 @@ import static org.apache.cxf.message.Message.PATH_INFO;
 import static org.apache.cxf.message.Message.QUERY_STRING;
 import static org.apache.cxf.message.Message.RESPONSE_CODE;
 import static org.apache.cxf.phase.Phase.PRE_STREAM;
+import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -51,6 +52,10 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpClientMessageDispatcher;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpResponseException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -88,6 +93,8 @@ public class MuleUniversalConduit extends AbstractConduit
 {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(MuleUniversalConduit.class);
+
+    public static final String HTTP_STATUS = "http.status";
 
     private EndpointInfo endpoint;
 
@@ -282,7 +289,7 @@ public class MuleUniversalConduit extends AbstractConduit
                             holder.value = event;
                             sendResultBackToCxf(m, event);
                         }
-                        catch (IOException e)
+                        catch (IOException | HttpResponseException e)
                         {
                             processExceptionReplyTo(new MessagingException(event, e), replyTo);
                         }
@@ -315,7 +322,7 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
 
-    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException
+    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException, HttpResponseException
     {
         if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
         {
@@ -344,6 +351,18 @@ public class MuleUniversalConduit extends AbstractConduit
                 getMessageObserver().onMessage(inMessage);
                 clearClientContextIfNeeded(getMessageObserver());
                 return;
+            }
+            // If this branch is reached, it means that the message payload is empty.
+            // By asserting that the inboundProperty 'http.status' exists, I'm verifying that
+            // the last inbound endpoint used was HTTP, and that it set the property correctly.
+            else if (resEvent.getMessage().getInboundPropertyNames().contains("http.status"))
+            {
+                int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS).toString());
+                // Fail for any status code, but an Accepted (202) one.
+                if (httpResponseStatusCode != SC_ACCEPTED)
+                {
+                    throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
+                }
             }
         }
 
