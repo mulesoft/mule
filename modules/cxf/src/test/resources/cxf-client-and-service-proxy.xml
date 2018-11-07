@@ -3,25 +3,19 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:expression-language="http://www.mulesoft.org/schema/mule/expression-language-gw"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-              http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-              http://www.mulesoft.org/schema/mule/expression-language-gw
-              http://www.mulesoft.org/schema/mule/expression-language-gw/current/mule-expression-language-gw.xsd">
+              http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
     <configuration defaultProcessingStrategy="non-blocking"/>
-
-<!--    <expression-language:property-placeholder location="cxf-client-and-service-proxy-config.properties"/>-->
 
     <http:listener-config name="http-listener-config" host="localhost" port="${listenerPort}" protocol="HTTP"/>
 
     <http:request-config name="http-request-config" host="localhost" port="${requesterPort}" basePath="" />
 
-    <http:request-config name="HTTP_test_CXF_statusCodes" host="localhost" port="8084" basePath="/"/>
-
     <flow name="testProxy">
         <http:listener config-ref="http-listener-config" path="/*" parseRequest="false" />
+        <set-session-variable variableName="soapServiceResponseCode" value="#[message.inboundProperties.'http.query.params'.soapServiceResponseCode]"/>
         <cxf:proxy-service port="HelloServicePort"
                            namespace="http://test.Pablo.name/"
                            service="HelloServiceService"
@@ -32,13 +26,5 @@
         <http:request config-ref="http-request-config" path="/test" method="POST" parseResponse="false" >
             <http:success-status-code-validator values="0..599"/>
         </http:request>
-    </flow>
-
-    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${requesterPort}"/>
-
-    <flow name="fixedFailureReponse">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/test" allowedMethods="POST"/>
-        <set-property propertyName="http.status" value="${soapRequestResponseCode}"/>
-        <set-payload value=""/>
     </flow>
 </mule>
