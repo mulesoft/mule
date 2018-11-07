@@ -226,6 +226,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
       return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
           .orElseGet(() -> {
+            // When lazy init deployment is used an error-mapping may not be initialized due to the component that declares it
+            // could not be part of the minimal application model. So, whenever we found that scenario we have to create the
+            // errorType if not present in the repository already.
             if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
               return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
             }
@@ -236,7 +239,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return new DisjunctiveErrorTypeMatcher(matchers);
   }
 
-  // Just keep previous implementation in order to avoid breaking API as it can be used by privileged artifacts.
+  /**
+   * @deprecated Use {@link #createErrorType(ErrorTypeRepository, String, ConfigurationProperties)} which handles correctly
+   * lazy mule artifact contexts.
+   */
+  @Deprecated
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
     return createErrorType(errorTypeRepository, errorTypeNames, new ConfigurationProperties() {
 
