@@ -38,7 +38,6 @@ import org.glassfish.grizzly.memory.MemoryManager;
 public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHandler
 {
   private final MemoryManager memoryManager;
-  private final FilterChainContext ctx;
   private final HttpResponsePacket httpResponsePacket;
   private final OutputHandler outputHandler;
   private final ResponseStatusCallback responseStatusCallback;
@@ -50,8 +49,8 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   public ResponseDeferringCompletionHandler(final FilterChainContext ctx,
                                             final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
   {
+    super(ctx);
     Preconditions.checkArgument((httpResponse.getEntity() instanceof OutputHandlerHttpEntity), "http response must have an output handler entity");
-    this.ctx = ctx;
     httpResponsePacket = buildHttpResponsePacket(request, httpResponse);
     outputHandler = ((OutputHandlerHttpEntity) httpResponse.getEntity()).getOutputHandler();
     memoryManager = ctx.getConnection().getTransport().getMemoryManager();
@@ -59,26 +58,27 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
     outputStream = new CompletionOutputStream(this);
   }
 
-  public void start() throws IOException
-  {
-    try
+    @Override
+    protected void doStart() throws IOException
     {
-      outputHandler.write(null, outputStream);
+        try
+        {
+            outputHandler.write(null, outputStream);
+        }
+        catch (IOException e)
+        {
+            // Check whether a 200 has already gone through
+            if (outputStream.isWritten())
+            {
+                logger.warn("Failure while processing HTTP response body. Cancelling.", e);
+                outputStream.close();
+            }
+            else
+            {
+                throw e;
+            }
+        }
     }
-    catch (IOException e)
-    {
-      // Check whether a 200 has already gone through
-      if (outputStream.isWritten())
-      {
-        logger.warn("Failure while processing HTTP response body. Cancelling.", e);
-        outputStream.close();
-      }
-      else
-      {
-        throw e;
-      }
-    }
-  }
 
   /**
    * Method gets called, when file chunk was successfully sent.

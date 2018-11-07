@@ -67,6 +67,16 @@ public abstract class BaseResponseCompletionHandlerTestCase extends AbstractMule
         getHandler().cancelled();
         verify(callback, atLeastOnce()).responseSendFailure(any(Throwable.class));
     }
+    
+    @Test
+    public void alreadyResetFilterContext() throws IOException
+    {
+        when(ctx.getFilterChain()).thenReturn(null);
+        // In case the context filter was already reset
+        // nothing is performed and no exception is thrown.
+        // An exception would result in a StackOverflowException.
+        getHandler().start();
+    }
 
 
 
