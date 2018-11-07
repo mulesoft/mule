@@ -86,7 +86,7 @@ public class GlobalWeaveFunction implements Initialisable {
   }
 
   @Deprecated(message = "The case of use of this function is covered within the echoWithDefault function", since = "2.2.0",
-      removedIn = "3.0.0")
+      toRemoveIn = "3.0.0")
   public Object xpath(String expression,
                       @Optional(defaultValue = PAYLOAD) InputStream item,
                       @Optional String returnType) {

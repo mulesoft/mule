@@ -57,7 +57,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(operationDeclaration.getDeprecation().isPresent());
     assertThat(operationDeclaration.getDeprecation().get().getMessage(), is("Use nonDeprecatedOperation instead."));
     assertThat(operationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.2.0"));
-    assertFalse(operationDeclaration.getDeprecation().get().getRemovedIn().isPresent());
+    assertFalse(operationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
   }
 
   @Test
@@ -76,8 +76,8 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(sourceDeclaration.getDeprecation().isPresent());
     assertThat(sourceDeclaration.getDeprecation().get().getMessage(), is("Use NonDeprecatedSource instead"));
     assertThat(sourceDeclaration.getDeprecation().get().getDeprecatedSince(), is("2.4.0"));
-    assertTrue(sourceDeclaration.getDeprecation().get().getRemovedIn().isPresent());
-    assertThat(sourceDeclaration.getDeprecation().get().getRemovedIn().get(), is("3.0.0"));
+    assertTrue(sourceDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(sourceDeclaration.getDeprecation().get().getToRemoveIn().get(), is("3.0.0"));
   }
 
   @Test
@@ -100,7 +100,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(parameterDeclaration.getDeprecation().isPresent());
     assertThat(parameterDeclaration.getDeprecation().get().getMessage(), is("This parameter was made redundant"));
     assertThat(parameterDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.1.0"));
-    assertFalse(parameterDeclaration.getDeprecation().get().getRemovedIn().isPresent());
+    assertFalse(parameterDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
   }
 
   @Test
@@ -119,7 +119,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(operationDeclaration.getDeprecation().isPresent());
     assertThat(operationDeclaration.getDeprecation().get().getMessage(), is("Use nonDeprecatedScope instead."));
     assertThat(operationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.7.0"));
-    assertFalse(operationDeclaration.getDeprecation().get().getRemovedIn().isPresent());
+    assertFalse(operationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
   }
 
   @Test
@@ -138,8 +138,8 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(constructDeclaration.getDeprecation().isPresent());
     assertThat(constructDeclaration.getDeprecation().get().getMessage(), is("Use nonDeprecatedRouter instead."));
     assertThat(constructDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
-    assertTrue(constructDeclaration.getDeprecation().get().getRemovedIn().isPresent());
-    assertThat(constructDeclaration.getDeprecation().get().getRemovedIn().get(), is("2.0.0"));
+    assertTrue(constructDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(constructDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
   }
 
   @Test
@@ -158,7 +158,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(functionDeclaration.getDeprecation().isPresent());
     assertThat(functionDeclaration.getDeprecation().get().getMessage(), is("Use nonDeprecatedFunction instead."));
     assertThat(functionDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
-    assertFalse(functionDeclaration.getDeprecation().get().getRemovedIn().isPresent());
+    assertFalse(functionDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
   }
 
   @Test
@@ -173,7 +173,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(extensionDeclaration.getDeprecation().isPresent());
     assertThat(extensionDeclaration.getDeprecation().get().getMessage(), is("This extension is deprecated"));
     assertThat(extensionDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.2.0"));
-    assertFalse(extensionDeclaration.getDeprecation().get().getRemovedIn().isPresent());
+    assertFalse(extensionDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
   }
 
   @Test
@@ -190,7 +190,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertTrue(configurationDeclaration.getDeprecation().isPresent());
     assertThat(configurationDeclaration.getDeprecation().get().getMessage(), is("This configuration is deprecated."));
     assertThat(configurationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.3.0"));
-    assertFalse(configurationDeclaration.getDeprecation().get().getRemovedIn().isPresent());
+    assertFalse(configurationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
   }
 
   @Test
@@ -210,8 +210,8 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
     assertThat(connectionProviderDeclaration.getDeprecation().get().getMessage(),
                is("You should use the new connection provider"));
     assertThat(connectionProviderDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
-    assertTrue(connectionProviderDeclaration.getDeprecation().get().getRemovedIn().isPresent());
-    assertThat(connectionProviderDeclaration.getDeprecation().get().getRemovedIn().get(), is("2.0.0"));
+    assertTrue(connectionProviderDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(connectionProviderDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
   }
 
   private ExtensionDeclaration getEnrichedExtensionDeclaration(Class<?> extensionClass) {
@@ -255,7 +255,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
   }
 
 
-  @Deprecated(message = "You should use the new connection provider", since = "1.4.0", removedIn = "2.0.0")
+  @Deprecated(message = "You should use the new connection provider", since = "1.4.0", toRemoveIn = "2.0.0")
   public static class DeprecatedConnectionProvider implements ConnectionProvider<Connection> {
 
     @Override
@@ -327,7 +327,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
     public void nonDeprecatedScope(Chain chain, CompletionCallback<Void, Void> cb) {}
 
-    @Deprecated(message = "Use nonDeprecatedRouter instead.", since = "1.4.0", removedIn = "2.0.0")
+    @Deprecated(message = "Use nonDeprecatedRouter instead.", since = "1.4.0", toRemoveIn = "2.0.0")
     public void deprecatedRouter(Route route, RouterCompletionCallback callback) {}
 
     public void nonDeprecatedRouter(Route route, RouterCompletionCallback callback) {}
@@ -349,7 +349,7 @@ public class DeprecatedDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   }
 
-  @Deprecated(message = "Use NonDeprecatedSource instead", since = "2.4.0", removedIn = "3.0.0")
+  @Deprecated(message = "Use NonDeprecatedSource instead", since = "2.4.0", toRemoveIn = "3.0.0")
   public static class DeprecatedSource extends Source<String, String> {
 
     @Override

@@ -45,7 +45,7 @@ public class HeisenbergScopes implements Initialisable {
   }
 
   @Deprecated(message = "All usages of this scope are covered by the payload-modifier scope.", since = "1.3.0",
-      removedIn = "2.0.0")
+      toRemoveIn = "2.0.0")
   public void executeAnything(Chain chain, CompletionCallback<Void, Void> cb) {
     chain.process(cb::success, (t, e) -> cb.error(t));
   }

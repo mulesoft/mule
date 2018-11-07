@@ -127,7 +127,7 @@ public class DeprecationModelDeclarationEnricher extends AbstractAnnotatedDeclar
 
   private DeprecationModel createDeprecationModel(Deprecated deprecationAnnotation) {
     return new ImmutableDeprecationModel(deprecationAnnotation.message(), deprecationAnnotation.since(),
-                                         isBlank(deprecationAnnotation.removedIn()) ? null : deprecationAnnotation.removedIn());
+                                         isBlank(deprecationAnnotation.toRemoveIn()) ? null : deprecationAnnotation.toRemoveIn());
   }
 
   private Optional<Deprecated> getDeprecatedAnnotation(BaseDeclaration<?> declaration,

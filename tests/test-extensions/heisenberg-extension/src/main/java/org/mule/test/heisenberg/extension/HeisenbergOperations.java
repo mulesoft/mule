@@ -274,7 +274,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @Deprecated(message = "The usage of this operation must be replaced by the knock operation.", since = "1.5.0",
-      removedIn = "2.0.0")
+      toRemoveIn = "2.0.0")
   @Stereotype(KillingStereotype.class)
   @MediaType(TEXT_PLAIN)
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, @Deprecated(

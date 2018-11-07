@@ -79,7 +79,7 @@ import javax.inject.Inject;
 @Streaming
 @MediaType(TEXT_PLAIN)
 @BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
-@Deprecated(message = "This source is being tapped by the DEA, it's usage is discouraged.", since = "1.6.0", removedIn = "3.0.0")
+@Deprecated(message = "This source is being tapped by the DEA, it's usage is discouraged.", since = "1.6.0", toRemoveIn = "3.0.0")
 public class HeisenbergSource extends Source<String, Object> {
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
