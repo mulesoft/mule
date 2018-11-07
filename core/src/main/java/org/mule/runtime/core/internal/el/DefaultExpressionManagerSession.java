@@ -21,10 +21,10 @@ import java.util.Iterator;
 
 class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
-  private ExpressionLanguageSession session;
+  private ExpressionLanguageSessionAdaptor session;
   private ClassLoader evaluationClassLoader;
 
-  public DefaultExpressionManagerSession(ExpressionLanguageSession session, ClassLoader evaluationClassLoader) {
+  public DefaultExpressionManagerSession(ExpressionLanguageSessionAdaptor session, ClassLoader evaluationClassLoader) {
     this.session = session;
     this.evaluationClassLoader = evaluationClassLoader;
   }
