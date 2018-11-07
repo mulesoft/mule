@@ -35,7 +35,6 @@ public class ResponseStreamingCompletionHandler
 {
 
     private final MemoryManager memoryManager;
-    private final FilterChainContext ctx;
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
     private final ResponseStatusCallback responseStatusCallback;
@@ -45,15 +44,17 @@ public class ResponseStreamingCompletionHandler
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
                                               final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
     {
+
+        super(ctx);
         Preconditions.checkArgument((httpResponse.getEntity() instanceof InputStreamHttpEntity), "http response must have an input stream entity");
-        this.ctx = ctx;
         httpResponsePacket = buildHttpResponsePacket(request, httpResponse);
         inputStream = ((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream();
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
     }
 
-    public void start() throws IOException
+    @Override
+    protected void doStart() throws IOException
     {
         sendInputStreamChunk();
     }

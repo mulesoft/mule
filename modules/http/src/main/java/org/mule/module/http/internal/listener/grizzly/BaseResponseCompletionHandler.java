@@ -11,10 +11,12 @@ import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.glassfish.grizzly.EmptyCompletionHandler;
 import org.glassfish.grizzly.WriteResult;
+import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.slf4j.Logger;
@@ -25,7 +27,37 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
+    protected final FilterChainContext ctx;
+    
+    public void start() throws IOException
+    {
+        if (ctx.getFilterChain() == null)
+        {
+            logger.warn("Filter chain context already reset. Not sending response.");
+            return;
+        }
+        
+        doStart();
+    }
+    
+    protected void doStart() throws IOException
+    {
+        // OVERRIDE. Not abstract for compatibility purposes.
+        
+    }
 
+    public BaseResponseCompletionHandler()
+    {
+        // Implicit constructor for compatibility purposes.
+        this.ctx = null;
+    }
+    
+    protected BaseResponseCompletionHandler(FilterChainContext ctx)
+    {
+        this.ctx = ctx;
+    }
+    
     protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse)
     {
         final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(sourceRequest)
