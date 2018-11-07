@@ -37,7 +37,6 @@ public class ResponseCompletionHandler
         extends BaseResponseCompletionHandler
 {
 
-    private final FilterChainContext ctx;
     private final HttpResponsePacket httpResponsePacket;
     private final HttpContent httpResponseContent;
     private final ResponseStatusCallback responseStatusCallback;
@@ -46,8 +45,8 @@ public class ResponseCompletionHandler
 
     public ResponseCompletionHandler(final FilterChainContext ctx, final HttpRequestPacket httpRequestPacket, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
     {
+        super(ctx);
         Preconditions.checkArgument((!(httpResponse.getEntity() instanceof InputStreamHttpEntity)), "response entity cannot be input stream");
-        this.ctx = ctx;
         this.httpResponsePacket = buildHttpResponsePacket(httpRequestPacket, httpResponse);
         this.httpResponseContent = buildResponseContent(httpResponse);
         this.responseStatusCallback = responseStatusCallback;
@@ -82,7 +81,8 @@ public class ResponseCompletionHandler
      *
      * @throws java.io.IOException
      */
-    public void start() throws IOException
+    @Override
+    protected void doStart() throws IOException
     {
         sendResponse();
     }
