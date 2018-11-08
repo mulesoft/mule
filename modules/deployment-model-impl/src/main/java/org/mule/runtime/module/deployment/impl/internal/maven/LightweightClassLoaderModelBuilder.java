@@ -20,6 +20,8 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,15 +63,19 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   // TODO: MULE-15768
   private List<org.mule.maven.client.api.model.BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
     return additionalDependencies.stream()
-        .map(dependency -> dependency.getDescriptor())
-        .map(descriptor -> new org.mule.maven.client.api.model.BundleDescriptor.Builder()
-            .setGroupId(descriptor.getGroupId())
-            .setArtifactId(descriptor.getArtifactId())
-            .setVersion(descriptor.getVersion())
-            .setType(descriptor.getType())
-            .setClassifier(descriptor.getClassifier().orElse(null)).build())
-        .map(bundleDescriptor -> mavenClient.resolveBundleDescriptor(bundleDescriptor))
-        .collect(toList());
+            .map(dependency -> dependency.getDescriptor())
+            .map(descriptor -> new org.mule.maven.client.api.model.BundleDescriptor.Builder()
+                    .setGroupId(descriptor.getGroupId())
+                    .setArtifactId(descriptor.getArtifactId())
+                    .setVersion(descriptor.getVersion())
+                    .setType(descriptor.getType())
+                    .setClassifier(descriptor.getClassifier().orElse(null)).build())
+            .map(bundleDescriptor -> {
+              List<org.mule.maven.client.api.model.BundleDependency> dependencies = new ArrayList<>();
+              dependencies.add(mavenClient.resolveBundleDescriptor(bundleDescriptor));
+              dependencies.addAll(mavenClient.resolveBundleDescriptorDependencies(false, false, bundleDescriptor));
+              return dependencies;
+            }).flatMap(Collection::stream).collect(toList());
   }
 
   @Override
