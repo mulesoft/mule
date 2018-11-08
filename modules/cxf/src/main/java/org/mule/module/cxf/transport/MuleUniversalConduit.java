@@ -29,6 +29,7 @@ import static org.apache.cxf.message.Message.QUERY_STRING;
 import static org.apache.cxf.message.Message.RESPONSE_CODE;
 import static org.apache.cxf.phase.Phase.PRE_STREAM;
 import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
+import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -363,13 +364,16 @@ public class MuleUniversalConduit extends AbstractConduit
                 the message processing is being executed in a non-blocking fashion. So, the only way it is going to be replied, is through that callback. To avoid the flow
                 from finishing execution silently, an exception is thrown with the SOAP service response status code.
             */
-            else if (resEvent.getMessageSourceURI().getScheme() != null &&
-                     resEvent.getMessageSourceURI().getScheme().equals(HttpConnector.HTTP) &&
-                     resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
+            else if (resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
             {
-                Integer httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-                resEvent.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, httpResponseStatusCode);
-                throw new CxfCannotProcessEmptyPayloadException(httpResponseStatusCode);
+                // Handle differently the case in which the SOAP service responds an ACCEPTED status code. In any other case,
+                // return a 500, according to SOAP specification.
+                Integer soapServiceResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+                Integer resolvedHttpStatusCode = soapServiceResponseStatusCode.equals(SC_ACCEPTED) ? SC_ACCEPTED : SC_INTERNAL_SERVER_ERROR;
+
+                resEvent.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, resolvedHttpStatusCode);
+
+                throw new CxfCannotProcessEmptyPayloadException(soapServiceResponseStatusCode);
             }
         }
 
