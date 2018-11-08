@@ -80,13 +80,6 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
         assertThat(resultStatusCode, is(SC_INTERNAL_SERVER_ERROR));
     }
 
-    @Test(expected = SocketTimeoutException.class)
-    public void testCxfProxyTimeoutsOnAcceptedStatusCodeResponseAndEmptyResponse() throws Exception
-    {
-        startSoapServiceResponding(SC_ACCEPTED);
-        makeSoapRequest();
-    }
-
     private void startSoapServiceResponding(Integer responseStatusCode) throws IOException
     {
         server = new HttpServer();
