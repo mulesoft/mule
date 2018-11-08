@@ -99,7 +99,6 @@ public class QuartzConnector extends AbstractConnector
     {
         SchedulerFactory factory = createSchedulerFactory();
         quartzScheduler = factory.getScheduler();
-        quartzScheduler.getContext().put(MULE_CONTEXT_PROPERTY, muleContext); 
     }
 
     @Override
@@ -129,6 +128,7 @@ public class QuartzConnector extends AbstractConnector
             {
                 initializeScheduler();
             }
+            quartzScheduler.getContext().put(MULE_CONTEXT_PROPERTY, muleContext); 
         }
         catch (Exception e)
         {
