@@ -62,34 +62,35 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   @Test
   public void staticValueIsTransformed() throws MuleException {
-    Integer resolve = staticResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    Integer resolve = staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
     assertThat(resolve, is(123));
   }
 
   @Test
   public void staticValueIsTransformedOnlyOnce() throws MuleException {
-    staticResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    staticResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    staticResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    staticResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    staticResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
 
     verify(staticValueResolver, times(1)).resolve(any(ValueResolvingContext.class));
   }
 
   @Test
   public void dynamicValueIsTransformed() throws MuleException {
-    Integer resolve = dynamicResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build();
+    Integer resolve = dynamicResolver.resolve(ctx);
     assertThat(resolve, is(123));
   }
 
   @Test
   public void dynamicValueIsTransformedOnlyOnce() throws MuleException {
-    dynamicResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    dynamicResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    dynamicResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    dynamicResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
-    dynamicResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    dynamicResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    dynamicResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    dynamicResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    dynamicResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    dynamicResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
 
     verify(dynamicValueResolver, times(5)).resolve(any(ValueResolvingContext.class));
   }
@@ -97,7 +98,7 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Test
   public void transformNullValue() throws MuleException {
     when(staticValueResolver.resolve(any(ValueResolvingContext.class))).thenReturn(null);
-    Integer value = staticResolver.resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    Integer value = staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
 
     assertThat(value, is(nullValue()));
   }

@@ -42,8 +42,7 @@ public final class ConstructMessageProcessorBuilder
                                          cursorProviderFactory, retryPolicyTemplate,
                                          extensionManager,
                                          policyManager,
-                                         reflectionCache,
-                                         expressionManager);
+                                         reflectionCache);
   }
 
 }

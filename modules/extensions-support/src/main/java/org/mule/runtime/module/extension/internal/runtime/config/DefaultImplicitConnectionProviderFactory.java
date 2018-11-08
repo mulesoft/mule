@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstImplicit;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -24,6 +23,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Optional;
@@ -74,14 +74,18 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
    * {@inheritDoc}
    */
   @Override
-  public <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName,
-                                                                                             CoreEvent event) {
+  public <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, CoreEvent event) {
     ResolverSet resolverSet = resolverSetProvider.get();
-    ConnectionProviderObjectBuilder<T> builder =
-        new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, extensionModel, muleContext);
+    ConnectionProviderObjectBuilder<T> builder = new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel,
+                                                                                              resolverSet,
+                                                                                              extensionModel,
+                                                                                              muleContext);
     builder.setOwnerConfigName(configName);
     try {
-      return builder.build(from(event, expressionManager));
+      return builder.build(ValueResolvingContext.builder(event)
+                             .withExpressionManager(expressionManager)
+                             .dynamic(resolverSet.isDynamic())
+                             .build());
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }

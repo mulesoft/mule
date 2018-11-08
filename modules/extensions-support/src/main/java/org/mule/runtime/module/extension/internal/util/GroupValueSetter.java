@@ -69,6 +69,7 @@ public final class GroupValueSetter implements ValueSetter {
    *
    * @param groupDescriptor a {@link ParameterGroupDescriptor}
    * @param reflectionCache the cache for expensive reflection lookups
+   * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
    */
   public GroupValueSetter(ParameterGroupDescriptor groupDescriptor,
                           Supplier<ReflectionCache> reflectionCache,

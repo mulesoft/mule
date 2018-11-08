@@ -56,11 +56,9 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache,
-                                   ExpressionManager expressionManager) {
+                                   ReflectionCache reflectionCache) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache, expressionManager);
-
+          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
   }
 

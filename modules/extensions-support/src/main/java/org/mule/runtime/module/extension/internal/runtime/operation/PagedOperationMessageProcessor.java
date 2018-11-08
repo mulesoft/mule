@@ -47,10 +47,9 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
-                                        ExpressionManager expressionManager,
                                         ExtensionConnectionSupplier connectionSupplier) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, expressionManager);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
     this.connectionSupplier = connectionSupplier;
   }
 

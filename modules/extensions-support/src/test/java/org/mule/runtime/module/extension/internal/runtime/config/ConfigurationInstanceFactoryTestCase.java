@@ -94,11 +94,13 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   private ConnectionProviderValueResolver<Object> connectionProviderValueResolver;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExpressionManager expressionManager;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
   private ResolverSet resolverSet;
   private ConfigurationInstanceFactory<TestConfig> factory;
-  private ExpressionManager expressionManager;
 
   @Before
   public void before() throws Exception {
@@ -116,15 +118,9 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
     when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(ENCODING);
 
-
-    // TODO fix me
-    this.expressionManager = mock(ExpressionManager.class);
-
-
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
-    factory =
-        new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, new ReflectionCache(),
-                                           expressionManager, muleContext);
+    factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, new ReflectionCache(),
+                                                 expressionManager, muleContext);
   }
 
   @Test

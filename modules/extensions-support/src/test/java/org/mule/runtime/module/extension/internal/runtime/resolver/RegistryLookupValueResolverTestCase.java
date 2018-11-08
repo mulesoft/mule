@@ -61,7 +61,8 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void cache() throws Exception {
-    Object value = resolver.resolve(ValueResolvingContext.from(event, expressionManager));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    Object value = resolver.resolve(ctx);
     assertThat(value, is(HELLO_WORLD));
     verify(registry).lookupByName(KEY);
   }
@@ -73,18 +74,21 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void nullKey() throws MuleException {
-    new RegistryLookupValueResolver(null).resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    new RegistryLookupValueResolver(null).resolve(ctx);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void blankKey() throws MuleException {
-    new RegistryLookupValueResolver("").resolve(ValueResolvingContext.from(testEvent(), expressionManager));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    new RegistryLookupValueResolver("").resolve(ctx);
   }
 
   @Test(expected = ConfigurationException.class)
   public void nonExistingKey() throws Exception {
     RegistryLookupValueResolver<Object> valueResolver = new RegistryLookupValueResolver<>(FAKE_KEY);
     valueResolver.setRegistry(registry);
-    valueResolver.resolve(ValueResolvingContext.from(event, expressionManager));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    valueResolver.resolve(ctx);
   }
 }

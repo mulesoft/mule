@@ -27,7 +27,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
@@ -139,7 +138,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
-  private final ExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
 
   protected ExecutionMediator executionMediator;
@@ -160,8 +158,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache,
-                                   ExpressionManager expressionManager) {
+                                   ReflectionCache reflectionCache) {
     super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.resolverSet = resolverSet;
@@ -170,7 +167,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.reflectionCache = reflectionCache;
-    this.expressionManager = expressionManager;
   }
 
   @Override
@@ -310,7 +306,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           CoreEvent initialiserEvent = null;
           try {
             initialiserEvent = getInitialiserEvent();
-            return from(initialiserEvent, expressionManager, staticConfiguration.get());
+            return ValueResolvingContext.builder(initialiserEvent)
+              .withExpressionManager(expressionManager)
+              .withConfig(staticConfiguration.get())
+              .dynamic(resolverSet.isDynamic())
+              .build();
           } finally {
             if (initialiserEvent != null) {
               ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -459,7 +459,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     CoreEvent event = null;
     try {
       event = getInitialiserEvent(muleContext);
-      ValueResolvingContext ctx = from(event, expressionManager);
+      ValueResolvingContext ctx = ValueResolvingContext.builder(event)
+        .withExpressionManager(expressionManager)
+        .dynamic(resolverSet.isDynamic())
+        .build();
       LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
       return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);
     } finally {
@@ -524,7 +527,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
-    return resolverSet.resolve(from(event, expressionManager, configuration)).asMap();
+    return resolverSet.resolve(ValueResolvingContext.builder(event)
+                                 .withExpressionManager(expressionManager)
+                                 .dynamic(resolverSet.isDynamic())
+                                 .withConfig(configuration)
+                                 .build()).asMap();
   }
 
   private boolean isInterceptedComponent(ComponentLocation location, InternalEvent event) {

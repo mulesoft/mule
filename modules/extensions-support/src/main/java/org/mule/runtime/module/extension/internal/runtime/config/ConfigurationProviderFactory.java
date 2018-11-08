@@ -32,8 +32,12 @@ public interface ConfigurationProviderFactory {
    * @param extensionModel             the {@link ExtensionModel} which owns the {@code configurationModel}
    * @param configurationModel         the {@link ConfigurationModel} that describes the configuration instances to be returned
    * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
-   * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
-   * @param expirationPolicy        An {@link ExpirationPolicy} in case the configuration is dynamic
+   * @param connectionProviderResolver a {@link ValueResolver} to obtain a {@link ConnectionProvider}
+   * @param expirationPolicy           an {@link ExpirationPolicy} in case the configuration is dynamic
+   * @param reflectionCache            the {@link ReflectionCache} used to improve reflection lookups performance
+   * @param expressionManager          the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param muleContext                the {@link MuleContext} that will own the configuration instances
+   *
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
    */
@@ -46,7 +50,7 @@ public interface ConfigurationProviderFactory {
                                                            ReflectionCache reflectionCache,
                                                            ExpressionManager expressionManager,
                                                            MuleContext muleContext)
-      throws Exception;
+    throws Exception;
 
 
   /**
@@ -69,5 +73,5 @@ public interface ConfigurationProviderFactory {
                                                           ReflectionCache reflectionCache,
                                                           ExpressionManager expressionManager,
                                                           MuleContext muleContext)
-      throws Exception;
+    throws Exception;
 }

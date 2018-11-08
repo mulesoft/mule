@@ -65,10 +65,9 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
-                                        ExpressionManager expressionManager,
                                         ExtensionsOAuthManager oauthManager) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, expressionManager);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
     this.oauthManager = oauthManager;
   }
 

@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -51,6 +50,6 @@ public class StaticValueResolverTestCase extends AbstractMuleTestCase {
 
   private void assertExpected(Object expected) throws Exception {
     resolver = new StaticValueResolver(expected);
-    assertThat(resolver.resolve(ValueResolvingContext.from(event, expressionManager)), is(expected));
+    assertThat(resolver.resolve(ValueResolvingContext.builder(event).dynamic(resolver.isDynamic()).build()), is(expected));
   }
 }

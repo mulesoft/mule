@@ -10,7 +10,6 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.springframework.util.ReflectionUtils.setField;
 
@@ -60,8 +59,11 @@ public class ParameterGroupObjectBuilder<T> {
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
-    ValueResolvingContext ctx = from(executionContext.getEvent(), expressionManager, executionContext.getConfiguration());
-    return doBuild(executionContext::hasParameter, executionContext::getParameter, ctx);
+    ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
+      .withExpressionManager(expressionManager)
+      .withConfig(executionContext.getConfiguration())
+      .build();
+    return doBuild(executionContext::hasParameter, executionContext::getParameter, context);
   }
 
   public T build(ResolverSetResult result) throws MuleException {
@@ -69,7 +71,8 @@ public class ParameterGroupObjectBuilder<T> {
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-      return doBuild(resultMap::containsKey, resultMap::get, from(initialiserEvent));
+      ValueResolvingContext context = ValueResolvingContext.builder(initialiserEvent).dynamic(false).build();
+      return doBuild(resultMap::containsKey, resultMap::get, context);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();

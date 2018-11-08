@@ -21,7 +21,6 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.F
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -71,6 +70,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveR
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
@@ -337,8 +337,14 @@ public class SourceAdapter implements Lifecycle {
     @Override
     public Map<String, Object> createResponseParameters(CoreEvent event) throws MessagingException {
       try {
-        ResolverSetResult parameters =
-            SourceAdapter.this.successCallbackParameters.resolve(from(event, expressionManager, configurationInstance, false));
+        ResolverSet resolverSet = SourceAdapter.this.successCallbackParameters;
+        ValueResolvingContext context = ValueResolvingContext.builder(event)
+          .withExpressionManager(expressionManager)
+          .dynamic(resolverSet.isDynamic())
+          .withConfig(configurationInstance)
+          .resolveCursors(false)
+          .build();
+        ResolverSetResult parameters = resolverSet.resolve(context);
         return parameters.asMap();
       } catch (Exception e) {
         throw createSourceException(event, e);
@@ -348,8 +354,14 @@ public class SourceAdapter implements Lifecycle {
     @Override
     public Map<String, Object> createFailureResponseParameters(CoreEvent event) throws MessagingException {
       try {
-        ResolverSetResult parameters =
-            SourceAdapter.this.errorCallbackParameters.resolve(from(event, expressionManager, configurationInstance, false));
+        ResolverSet resolverSet = SourceAdapter.this.errorCallbackParameters;
+        ValueResolvingContext ctx = ValueResolvingContext.builder(event)
+          .withExpressionManager(expressionManager)
+          .withConfig(configurationInstance)
+          .dynamic(resolverSet.isDynamic())
+          .resolveCursors(false)
+          .build();
+        ResolverSetResult parameters = resolverSet.resolve(ctx);
         return parameters.asMap();
       } catch (Exception e) {
         throw createSourceException(event, e);
@@ -505,7 +517,10 @@ public class SourceAdapter implements Lifecycle {
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
-      object = valueResolver.resolve(from(initialiserEvent, expressionManager));
+      object = valueResolver.resolve(ValueResolvingContext.builder(initialiserEvent)
+                                       .withExpressionManager(expressionManager)
+                                       .dynamic(valueResolver.isDynamic())
+                                       .build());
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage("Unable to get the " + type.getSimpleName()
           + " value for Message Source"), e);

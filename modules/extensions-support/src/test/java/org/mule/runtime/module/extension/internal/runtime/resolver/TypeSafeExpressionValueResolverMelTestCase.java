@@ -69,32 +69,32 @@ public class TypeSafeExpressionValueResolverMelTestCase extends AbstractMuleCont
 
   @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
-    assertResolved(getResolver("#[mel:'Hello ' + payload]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build(), expressionManager)), HELLO_WORLD, never());
+    ValueResolvingContext context = buildContext(eventBuilder(muleContext).message(of("World!")).build());
+    assertResolved(getResolver("#[mel:'Hello ' + payload]", STRING).resolve(context), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionTemplateWithoutTransformation() throws Exception {
     assertResolved(getResolver("Hello #[mel:payload]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build(), expressionManager)), HELLO_WORLD, times(1));
+        .resolve(buildContext(eventBuilder(muleContext).message(of("World!")).build())), HELLO_WORLD, times(1));
   }
 
   @Test
   public void constant() throws Exception {
     assertResolved(getResolver("Hello World!", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), HELLO_WORLD, never());
+        .resolve(buildContext(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionWithTransformation() throws Exception {
     assertResolved(getResolver("#[mel:true]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), "true", never());
+        .resolve(buildContext(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())), "true", never());
   }
 
   @Test
   public void templateWithTransformation() throws Exception {
     assertResolved(getResolver("tru#[mel:'e']", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), "true", times(1));
+        .resolve(buildContext(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())), "true", times(1));
   }
 
   @Test
@@ -116,6 +116,10 @@ public class TypeSafeExpressionValueResolverMelTestCase extends AbstractMuleCont
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("expected type cannot be null");
     getResolver("#[mel:payload]", null);
+  }
+
+  private ValueResolvingContext buildContext(CoreEvent event)  {
+    return ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
   }
 
   private void assertResolved(Object resolvedValue, Object expected, VerificationMode expressionManagerVerificationMode) {

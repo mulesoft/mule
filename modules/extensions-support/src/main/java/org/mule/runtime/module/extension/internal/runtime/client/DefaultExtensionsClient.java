@@ -11,7 +11,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.artifact.Registry;
@@ -41,6 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.LinkedHashMap;
@@ -183,7 +183,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
           }
         });
         try {
-          values.put(name, new StaticValueResolver<>(builder.build(from(event, expressionManager))));
+          values.put(name, new StaticValueResolver<>(builder.build(ValueResolvingContext.builder(event).build())));
         } catch (MuleException e) {
           throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", name)), e);
         }

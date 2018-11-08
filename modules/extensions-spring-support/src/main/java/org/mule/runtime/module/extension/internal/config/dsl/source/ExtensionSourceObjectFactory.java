@@ -65,7 +65,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   @Override
-  public ExtensionMessageSource doGetObject() throws ConfigurationException, InitialisationException {
+  public ExtensionMessageSource doGetObject() {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
       getParametersResolver().checkParameterGroupExclusiveness(Optional.of(sourceModel),
                                                                sourceModel.getParameterGroupModels(),

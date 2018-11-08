@@ -18,12 +18,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -72,6 +72,7 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHan
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -91,7 +92,7 @@ import reactor.core.publisher.Mono;
  * @since 4.0
  */
 public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource,
-    ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent, LifecycleStateEnabled {
+  ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent, LifecycleStateEnabled {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -155,11 +156,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
         sourceAdapter =
-            sourceAdapterFactory.createAdapter(getConfiguration(initialiserEvent),
-                                               createSourceCallbackFactory(),
-                                               this,
-                                               sourceConnectionManager,
-                                               new MessagingExceptionResolver(this));
+          sourceAdapterFactory.createAdapter(getConfiguration(initialiserEvent),
+                                             createSourceCallbackFactory(),
+                                             this,
+                                             sourceConnectionManager,
+                                             new MessagingExceptionResolver(this));
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
         initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
@@ -185,9 +186,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private RetryPolicyTemplate createRetryPolicyTemplate(RetryPolicyTemplate customTemplate) {
     return this.getConfigurationInstance()
-        .map(config -> config.getConnectionProvider().orElse(null))
-        .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(customTemplate))
-        .orElseGet(() -> customTemplate != null ? customTemplate : ReconnectionConfig.getDefault().getRetryPolicyTemplate());
+      .map(config -> config.getConnectionProvider().orElse(null))
+      .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(customTemplate))
+      .orElseGet(() -> customTemplate != null ? customTemplate : ReconnectionConfig.getDefault().getRetryPolicyTemplate());
   }
 
   private void stopSource() throws MuleException {
@@ -213,30 +214,30 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private SourceCallbackFactory createSourceCallbackFactory() {
     return completionHandlerFactory -> DefaultSourceCallback.builder()
-        .setExceptionCallback(this)
-        .setSourceModel(sourceModel)
-        .setConfigurationInstance(getConfigurationInstance().orElse(null))
-        .setTransactionConfig(transactionConfig.get())
-        .setSource(this)
-        .setListener(messageProcessor)
-        .setProcessingManager(messageProcessingManager)
-        .setMuleContext(muleContext)
-        .setProcessContextSupplier(this::createProcessingContext)
-        .setCursorStreamProviderFactory(getCursorProviderFactory())
-        .setCompletionHandlerFactory(completionHandlerFactory)
-        .build();
+      .setExceptionCallback(this)
+      .setSourceModel(sourceModel)
+      .setConfigurationInstance(getConfigurationInstance().orElse(null))
+      .setTransactionConfig(transactionConfig.get())
+      .setSource(this)
+      .setListener(messageProcessor)
+      .setProcessingManager(messageProcessingManager)
+      .setMuleContext(muleContext)
+      .setProcessContextSupplier(this::createProcessingContext)
+      .setCursorStreamProviderFactory(getCursorProviderFactory())
+      .setCompletionHandlerFactory(completionHandlerFactory)
+      .build();
   }
 
   @Override
   public void onException(ConnectionException exception) {
     if (!reconnecting.compareAndSet(false, true)) {
       throw new MuleRuntimeException(
-                                     createStaticMessage(format("Message source '%s' on root component '%s' failed to reconnect. Error was: %s",
-                                                                // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
-                                                                sourceModel.getName(),
-                                                                getLocation().getRootContainerName(),
-                                                                exception.getMessage())),
-                                     exception);
+        createStaticMessage(format("Message source '%s' on root component '%s' failed to reconnect. Error was: %s",
+                                   // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
+                                   sourceModel.getName(),
+                                   getLocation().getRootContainerName(),
+                                   exception.getMessage())),
+        exception);
     }
 
     LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
@@ -244,22 +245,22 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                 exception);
 
     Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
-        .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
-        .orElseGet(() -> create(sink -> {
-          try {
-            exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
-            restart();
-            sink.success();
-          } catch (Exception e) {
-            sink.error(e);
-          }
-        }));
+      .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
+      .orElseGet(() -> create(sink -> {
+        try {
+          exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+          restart();
+          sink.success();
+        } catch (Exception e) {
+          sink.error(e);
+        }
+      }));
 
     reconnectionAction
-        .doOnSuccess(v -> onReconnectionSuccessful())
-        .doOnError(this::onReconnectionFailed)
-        .doAfterTerminate(() -> reconnecting.set(false))
-        .subscribe();
+      .doOnSuccess(v -> onReconnectionSuccessful())
+      .doOnError(this::onReconnectionFailed)
+      .doAfterTerminate(() -> reconnecting.set(false))
+      .subscribe();
   }
 
   private void onReconnectionSuccessful() {
@@ -381,8 +382,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       stopIfNeeded(this);
     } catch (Exception e) {
       LOGGER
-          .error(format("Failed to stop source '%s' on flow '%s'", sourceAdapter.getName(), getLocation().getRootContainerName()),
-                 e);
+        .error(format("Failed to stop source '%s' on flow '%s'", sourceAdapter.getName(), getLocation().getRootContainerName()),
+               e);
     }
     disposeIfNeeded(this, LOGGER);
   }
@@ -415,9 +416,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     transactionConfig.setMuleContext(muleContext);
     TransactionType transactionalType = sourceAdapter.getTransactionalType();
     transactionConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(transactionalType)
-        .orElseThrow(() -> new IllegalStateException(format(
-                                                            "Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
-                                                            transactionalType))));
+                                   .orElseThrow(() -> new IllegalStateException(format(
+                                     "Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
+                                     transactionalType))));
 
     return transactionConfig;
   }
@@ -515,12 +516,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
     ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
     if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent()
-        && !configurationProvider.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
+      && !configurationProvider.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
       throw new IllegalSourceException(format(
-                                              "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
-                                                  + "The selected config does not support that operation.",
-                                              getLocation().getRootContainerName(), sourceModel.getName(),
-                                              configurationProvider.getName()));
+        "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+          + "The selected config does not support that operation.",
+        getLocation().getRootContainerName(), sourceModel.getName(),
+        configurationProvider.getName()));
     }
   }
 
@@ -567,8 +568,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-      ValueResolvingContext resolvingContext = from(initialiserEvent, expressionManager, this.getConfigurationInstance());
-      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), resolvingContext));
+      ResolverSet sourceParameters = sourceAdapterFactory.getSourceParameters();
+      return copyOf(toMap(sourceParameters, ValueResolvingContext.builder(initialiserEvent)
+        .withExpressionManager(expressionManager)
+        .dynamic(sourceParameters.isDynamic())
+        .withConfig(getConfigurationInstance())
+        .build()));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not resolve parameters message source at location '%s'",
                                                                 getLocation().toString()),
@@ -585,12 +590,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return backPressureStrategy;
   }
 
-  private boolean shouldRunOnThisNode() {
-    return primaryNodeOnly ? muleContext.isPrimaryPollingInstance() : true;
-  }
-
   @Override
   public LifecycleState getLifecycleState() {
     return lifecycleManager.getState();
+  }
+
+  private boolean shouldRunOnThisNode() {
+    return primaryNodeOnly ? muleContext.isPrimaryPollingInstance() : true;
   }
 }

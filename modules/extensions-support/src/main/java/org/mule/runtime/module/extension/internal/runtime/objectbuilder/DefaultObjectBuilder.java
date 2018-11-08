@@ -11,22 +11,20 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.module.extension.api.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -47,13 +45,7 @@ import javax.inject.Inject;
 public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable, ParameterValueResolver {
 
   @Inject
-  private ExpressionManager expressionManager;
-
-  @Inject
   private MuleContext muleContext;
-
-  private final LazyValue<ValueResolvingContext> RESOLVING_CONTEXT =
-    new LazyValue<>(() -> from(MuleExtensionUtils.getInitialiserEvent(), expressionManager));
 
   protected final Class<T> prototypeClass;
   protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
@@ -78,7 +70,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
    * @param propertyName the name of the property in which the value is to be assigned
-   * @param resolver a {@link ValueResolver} used to provide the actual value
+   * @param resolver     a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
    */
@@ -86,8 +78,8 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
     checkArgument(!isBlank(propertyName), "property name cannot be blank");
 
     Field field = getField(prototypeClass, propertyName, reflectionCache)
-        .orElseThrow(() -> new IllegalArgumentException(format("Class '%s' does not contain property '%s'",
-                                                               prototypeClass.getName(), propertyName)));
+      .orElseThrow(() -> new IllegalArgumentException(format("Class '%s' does not contain property '%s'",
+                                                             prototypeClass.getName(), propertyName)));
 
     return addPropertyResolver(field, resolver);
   }
@@ -95,7 +87,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   /**
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
-   * @param field the property in which the value is to be assigned
+   * @param field    the property in which the value is to be assigned
    * @param resolver a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
@@ -125,7 +117,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
     for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet()) {
       setField(entry.getKey(), object,
                context == null || context.resolveCursors() ? resolveCursor(resolveValue(entry.getValue(), context))
-                   : resolveValue(entry.getValue(), context));
+                 : resolveValue(entry.getValue(), context));
     }
 
     injectFields(object, name, encoding, reflectionCache);
@@ -154,7 +146,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
       return null;
     }
     try {
-      return valueResolver.resolve(RESOLVING_CONTEXT.get());
+      return valueResolver.resolve(ValueResolvingContext.builder(getInitialiserEvent()).build());
     } catch (Exception e) {
       throw new ValueResolvingException(format("An error occurred trying to resolve value for parameter [%s]", parameterName), e);
     }

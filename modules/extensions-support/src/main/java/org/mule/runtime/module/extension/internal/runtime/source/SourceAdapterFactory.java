@@ -85,7 +85,7 @@ public class SourceAdapterFactory {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
       SourceConfigurer sourceConfigurer = new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters,
-                                                               reflectionCache, expressionManager, properties, muleContext);
+                                                               expressionManager, properties, muleContext);
       source = sourceConfigurer.configure(source, configurationInstance);
       return new SourceAdapter(extensionModel,
                                sourceModel,

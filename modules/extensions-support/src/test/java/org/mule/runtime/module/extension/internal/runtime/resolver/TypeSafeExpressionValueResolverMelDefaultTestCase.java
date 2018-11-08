@@ -73,32 +73,36 @@ public class TypeSafeExpressionValueResolverMelDefaultTestCase extends AbstractM
 
   @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
-    assertResolved(getResolver("#['Hello ' + payload]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build(), expressionManager)), HELLO_WORLD, never());
+    ValueResolvingContext context = buildContext(eventBuilder(muleContext).message(of("World!")).build());
+    assertResolved(getResolver("#['Hello ' + payload]", STRING).resolve(context), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionTemplateWithoutTransformation() throws Exception {
-    assertResolved(getResolver("Hello #[payload]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of("World!")).build(), expressionManager)), HELLO_WORLD, times(1));
+    ValueResolvingContext context = buildContext(eventBuilder(muleContext).message(of("World!")).build());
+    assertResolved(getResolver("Hello #[payload]", STRING).resolve(context), HELLO_WORLD, times(1));
   }
 
   @Test
   public void constant() throws Exception {
-    assertResolved(getResolver("Hello World!", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), HELLO_WORLD, never());
+    ValueResolvingContext context = buildContext(eventBuilder(muleContext).message(of(HELLO_WORLD)).build());
+    assertResolved(getResolver("Hello World!", STRING).resolve(context), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionWithTransformation() throws Exception {
-    assertResolved(getResolver("#[true]", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), "true", never());
+    ValueResolvingContext context = buildContext(eventBuilder(muleContext).message(of(HELLO_WORLD)).build());
+    assertResolved(getResolver("#[true]", STRING).resolve(context), "true", never());
   }
 
   @Test
   public void templateWithTransformation() throws Exception {
-    assertResolved(getResolver("tru#['e']", STRING)
-        .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build(), expressionManager)), "true", times(1));
+    ValueResolvingContext context = buildContext(eventBuilder(muleContext).message(of(HELLO_WORLD)).build());
+    assertResolved(getResolver("tru#['e']", STRING).resolve(context), "true", times(1));
+  }
+
+  private ValueResolvingContext buildContext(CoreEvent event) {
+    return ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
   }
 
   @Test

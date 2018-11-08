@@ -92,10 +92,13 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   private void assertExpected(ValueResolver valueResolver, MetadataType type, boolean isDynamic, Object expected)
       throws Exception {
-    ValueResolver resolver =
-        NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache, muleContext, objectTypeParametersResolver);
+    ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache,
+                                                             muleContext, objectTypeParametersResolver);
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event)
+      .withExpressionManager(expressionManager)
+      .build();
     assertThat(resolver.isDynamic(), is(isDynamic));
-    assertThat(resolver.resolve(ValueResolvingContext.from(event, expressionManager)), is(expected));
+    assertThat(resolver.resolve(ctx), is(expected));
   }
 
   public static class DynamicPojo {

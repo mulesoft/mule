@@ -43,19 +43,19 @@ public final class OperationMessageProcessorBuilder
       return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments,
                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                reflectionCache, expressionManager, extensionConnectionSupplier);
+                                                reflectionCache, extensionConnectionSupplier);
     }
 
     if (supportsOAuth(extensionModel)) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments,
                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                reflectionCache, expressionManager, oauthManager);
+                                                reflectionCache, oauthManager);
     }
     return new OperationMessageProcessor(extensionModel, operationModel,
                                          configurationProvider, target, targetValue,
                                          arguments,
                                          cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                         policyManager, reflectionCache, expressionManager);
+                                         policyManager, reflectionCache);
   }
 }

@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -98,6 +97,9 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    * @param resolverSet                the {@link ResolverSet} that provides the configuration's parameter values
    * @param connectionProviderResolver a {@link ValueResolver} used to obtain a {@link ConnectionProvider}
    * @param expirationPolicy           the {@link ExpirationPolicy} for the unused instances
+   * @param reflectionCache            the {@link ReflectionCache} used to improve reflection lookups performance
+   * @param expressionManager          the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param muleContext                the {@link MuleContext} that will own the configuration instances
    */
   public DynamicConfigurationProvider(String name,
                                       ExtensionModel extension,
@@ -107,10 +109,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                       ExpirationPolicy expirationPolicy,
                                       ReflectionCache reflectionCache,
                                       ExpressionManager expressionManager,
-                                      MuleContext ctx) {
-    super(name, extension, config, ctx);
-    this.configurationInstanceFactory = new ConfigurationInstanceFactory<>(extension, config, resolverSet,
-                                                                           reflectionCache, expressionManager, ctx);
+                                      MuleContext muleContext) {
+    super(name, extension, config, muleContext);
+    this.configurationInstanceFactory = new ConfigurationInstanceFactory<>(extension, config, resolverSet, reflectionCache,
+                                                                           expressionManager, muleContext);
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
     this.resolverSet = resolverSet;
@@ -128,7 +130,9 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   @Override
   public ConfigurationInstance get(Event event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ValueResolvingContext resolvingContext = from((CoreEvent) event, expressionManager);
+      ValueResolvingContext resolvingContext = ValueResolvingContext.builder(((CoreEvent) event))
+        .withExpressionManager(expressionManager)
+        .build();
       ResolverSetResult result = resolverSet.resolve(resolvingContext);
       ResolverSetResult providerResult = null;
       if (connectionProviderResolver.getResolverSet().isPresent()) {

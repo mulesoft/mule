@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -20,6 +19,7 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Method;
@@ -42,7 +42,6 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
 
     this.implementationClass = implementationClass;
     this.operationMethod = operationMethod;
-
   }
 
   @Override
@@ -53,7 +52,7 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-      delegate = objectBuilder.build(from(initialiserEvent));
+      delegate = objectBuilder.build(ValueResolvingContext.builder(initialiserEvent).dynamic(false).build());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
           + implementationClass.getName()), e);

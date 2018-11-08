@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.api.annotation.NoInstantiate;
@@ -49,7 +48,8 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
   @Inject
   private ExpressionManager expressionManager;
 
-  public ExtensionConnectivityTestingStrategy() {}
+  public ExtensionConnectivityTestingStrategy() {
+  }
 
   /**
    * Used for testing purposes
@@ -72,9 +72,11 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
       if (connectivityTestingObject instanceof ConnectionProviderResolver) {
-        ConnectionProviderResolver<?> connectionProviderResolver = (ConnectionProviderResolver<?>) connectivityTestingObject;
-        ValueResolvingContext resolvingCtx = from(initialiserEvent, expressionManager);
-        ConnectionProvider connectionProvider = connectionProviderResolver.resolve(resolvingCtx).getFirst();
+        ConnectionProviderResolver<?> resolver = (ConnectionProviderResolver<?>) connectivityTestingObject;
+        ConnectionProvider connectionProvider = resolver.resolve(ValueResolvingContext.builder(initialiserEvent)
+                                                                                     .withExpressionManager(expressionManager)
+                                                                                     .dynamic(resolver.isDynamic())
+                                                                                     .build()).getFirst();
         return connectionManager.testConnectivity(connectionProvider);
       } else if (connectivityTestingObject instanceof ConfigurationProvider) {
         ConfigurationProvider configurationProvider = (ConfigurationProvider) connectivityTestingObject;
@@ -82,8 +84,8 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
         return connectionManager.testConnectivity(configurationInstance);
       } else {
         throw new MuleRuntimeException(createStaticMessage(
-                                                           format("testConnectivity was invoked with an object type %s not supported.",
-                                                                  connectivityTestingObject.getClass().getName())));
+          format("testConnectivity was invoked with an object type %s not supported.",
+                 connectivityTestingObject.getClass().getName())));
       }
     } catch (Exception e) {
       return failure("Failed to obtain connectivity testing object", e);
@@ -100,7 +102,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
   @Override
   public boolean accepts(Object connectivityTestingObject) {
     return connectivityTestingObject instanceof ConnectionProviderResolver
-        || connectivityTestingObject instanceof ConfigurationProvider;
+      || connectivityTestingObject instanceof ConfigurationProvider;
   }
 
 }
