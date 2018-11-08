@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.createErrorType;
 
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -16,6 +17,8 @@ import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.privileged.processor.Router;
+
+import javax.inject.Inject;
 
 /**
  * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload or an expression that resolves to some of
@@ -29,6 +32,9 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
   private String expression = "#[payload]";
   private SplittingStrategy<CoreEvent, MessageSequence<?>> strategy;
   private String filterOnErrorType = null;
+
+  @Inject
+  private ConfigurationProperties configurationProperties;
 
   public Splitter() {
     // Used by spring
@@ -52,7 +58,8 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
     strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(muleContext.getExpressionManager(),
                                                                                            expression));
     filterOnErrorTypeAcceptor =
-        createFilterOnErrorTypeAcceptor(createErrorType(muleContext.getErrorTypeRepository(), filterOnErrorType));
+        createFilterOnErrorTypeAcceptor(createErrorType(muleContext.getErrorTypeRepository(), filterOnErrorType,
+                                                        configurationProperties));
   }
 
   private Acceptor createFilterOnErrorTypeAcceptor(ErrorTypeMatcher filterOnErrorTypeMatcher) {

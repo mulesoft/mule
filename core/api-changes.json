@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.exception.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String, org.mule.runtime.api.component.ConfigurationProperties)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "createErrorType",
+          "elementKind": "method",
+          "justification": "Adding method to support lazy contexts"
+        },
+        {
           "code": "java.class.nonPublicPartOfAPI",
           "old": "class org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap",
           "new": "class org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap",
