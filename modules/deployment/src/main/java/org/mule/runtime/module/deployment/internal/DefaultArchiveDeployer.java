@@ -337,7 +337,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
         final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
-        final File tmpDir = new File(dataFolder,APP_TMP_DIR);
+        final File tmpDir = new File(dataFolder, APP_TMP_DIR);
         try {
           deleteDirectory(tmpDir);
         } catch (IOException e) {
