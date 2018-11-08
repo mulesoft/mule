@@ -77,7 +77,15 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
     {
         startSoapServiceResponding(SC_GATEWAY_TIMEOUT);
         int resultStatusCode = makeSoapRequest();
-        assertThat(resultStatusCode, is(SC_GATEWAY_TIMEOUT));
+        assertThat(resultStatusCode, is(SC_INTERNAL_SERVER_ERROR));
+    }
+
+    @Test
+    public void testCxfProxyBypasssesAcceptedStatusCode() throws IOException
+    {
+        startSoapServiceResponding(SC_ACCEPTED);
+        int resultStatusCode = makeSoapRequest();
+        assertThat(resultStatusCode, is(SC_ACCEPTED));
     }
 
     private void startSoapServiceResponding(Integer responseStatusCode) throws IOException
@@ -111,7 +119,6 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
 
         HttpClient client = new HttpClient();
         HttpClientParams clientParams = new HttpClientParams();
-        clientParams.setSoTimeout(1000);
         client.setParams(clientParams);
 
         PostMethod soapRequestPostMethod = new PostMethod("http://localhost:" + listenerDynamicPort.getNumber() + "/");
