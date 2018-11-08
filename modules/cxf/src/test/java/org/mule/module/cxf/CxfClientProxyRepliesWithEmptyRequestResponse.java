@@ -77,7 +77,7 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
     {
         startSoapServiceResponding(SC_GATEWAY_TIMEOUT);
         int resultStatusCode = makeSoapRequest();
-        assertThat(resultStatusCode, is(SC_INTERNAL_SERVER_ERROR));
+        assertThat(resultStatusCode, is(SC_GATEWAY_TIMEOUT));
     }
 
     private void startSoapServiceResponding(Integer responseStatusCode) throws IOException
@@ -100,7 +100,7 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
     }
 
 
-    private int makeSoapRequest() throws IOException, URISyntaxException
+    private int makeSoapRequest() throws IOException
     {
         String soapRequestBody = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:test=\"http://test.Pablo.name/\">"
                                  + "<soapenv:Header/>"
