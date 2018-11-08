@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
-public class QuartzStatefulEndpointPollingTestCase extends AbstractQuartzStatefulTestCase
+public class QuartzSpringSchedulerFactoryPollingTestCase extends AbstractQuartzStatefulTestCase
 {
     private static final String VM_TEST_INPUT = "vm://testInput";
     private static final List<String> messages = new LinkedList<String>();
@@ -23,7 +23,7 @@ public class QuartzStatefulEndpointPollingTestCase extends AbstractQuartzStatefu
     @Override
     protected String getConfigFile()
     {
-        return "quartz-spring-scheduler-factory-config.xml";
+        return "quartz-stateful-endpoint-polling-config.xml";
     }
 
     @Test
