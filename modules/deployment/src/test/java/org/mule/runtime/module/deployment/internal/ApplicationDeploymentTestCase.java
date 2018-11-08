@@ -1933,7 +1933,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
 
     File appTemporaryFolder = new File(app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION)
-        .get().getWorkingDirectory());
+        .get().getWorkingDirectory(), "/temp");
 
     // As this app has a plugin, the tmp directory must exist
     assertThat(appTemporaryFolder.exists(), is(true));

@@ -37,7 +37,6 @@ import java.util.Properties;
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 
-import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -59,7 +58,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
-  private static final String APP_TMP_DIR = "/tmp";
+  private static final String APP_TMP_DIR = "/temp";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
   private final ArtifactDeployer<T> deployer;
