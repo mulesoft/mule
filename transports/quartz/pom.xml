@@ -57,5 +57,12 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-extras</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
