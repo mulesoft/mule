@@ -323,7 +323,7 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
 
-    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException, HttpResponseException
+    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException, HttpResponseException, MessagingException
     {
         if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
         {
@@ -361,6 +361,7 @@ public class MuleUniversalConduit extends AbstractConduit
             else if (m.getExchange().get(ClientCallback.class) != null && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
             {
                 int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+                resEvent.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, httpResponseStatusCode);
                 throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
             }
         }
