@@ -90,7 +90,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   public void createDefaultProcessingStrategyIfNoneSpecified() throws Exception {
     flow.initialise();
     assertThat(flow.getProcessingStrategy(),
-               is(instanceOf(new TransactionAwareProactorStreamProcessingStrategyFactory().getProcessingStrategyType())));
+               is(instanceOf(new TransactionAwareProactorStreamEmitterProcessingStrategyFactory().getProcessingStrategyType())));
   }
 
   @Test
