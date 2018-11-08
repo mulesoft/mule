@@ -33,6 +33,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -50,6 +51,7 @@ import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
@@ -218,7 +220,8 @@ public class BeanDefinitionFactory {
             if (!errorMappingComponents.isEmpty()) {
               addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
                 Map<String, String> parameters = innerComponent.getParameters();
-                ComponentIdentifier source = buildFromStringRepresentation(parameters.get(SOURCE_TYPE));
+                ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
+                    ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
 
                 ErrorType errorType = errorTypeRepository
                     .lookupErrorType(source)
