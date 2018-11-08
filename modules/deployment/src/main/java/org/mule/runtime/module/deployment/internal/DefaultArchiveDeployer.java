@@ -59,6 +59,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
+  private static final String APP_TMP_DIR = "/tmp";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
   private final ArtifactDeployer<T> deployer;
@@ -336,8 +337,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
         final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
+        final File tmpDir = new File(dataFolder,APP_TMP_DIR);
         try {
-          deleteDirectory(dataFolder);
+          deleteDirectory(tmpDir);
         } catch (IOException e) {
           logger.warn(
                       format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
