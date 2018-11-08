@@ -48,6 +48,7 @@ import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.cxf.CxfCannotProcessEmptyPayloadException;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -290,7 +291,7 @@ public class MuleUniversalConduit extends AbstractConduit
                             holder.value = event;
                             sendResultBackToCxf(m, event);
                         }
-                        catch (IOException | HttpResponseException e)
+                        catch (IOException | CxfCannotProcessEmptyPayloadException e)
                         {
                             processExceptionReplyTo(new MessagingException(event, e), replyTo);
                         }
@@ -317,13 +318,17 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             throw me;
         }
+        catch (CxfCannotProcessEmptyPayloadException e)
+        {
+            throw new DefaultMuleException(e);
+        }
         catch (Exception e)
         {
             throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
         }
     }
 
-    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException, HttpResponseException, MessagingException
+    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException, CxfCannotProcessEmptyPayloadException
     {
         if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
         {
@@ -358,11 +363,13 @@ public class MuleUniversalConduit extends AbstractConduit
                 the message processing is being executed in a non-blocking fashion. So, the only way it is going to be replied, is through that callback. To avoid the flow
                 from finishing execution silently, an exception is thrown with the SOAP service response status code.
             */
-            else if (m.getExchange().get(ClientCallback.class) != null && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
+            else if (resEvent.getMessageSourceURI().getScheme() != null &&
+                     resEvent.getMessageSourceURI().getScheme().equals(HttpConnector.HTTP) &&
+                     resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
             {
-                int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+                Integer httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
                 resEvent.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, httpResponseStatusCode);
-                throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
+                throw new CxfCannotProcessEmptyPayloadException(httpResponseStatusCode);
             }
         }
 
