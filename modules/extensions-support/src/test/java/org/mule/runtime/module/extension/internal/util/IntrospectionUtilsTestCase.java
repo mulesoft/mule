@@ -439,8 +439,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
 
   @Test
-  @Ignore("Enable this test once MULE-15837 is in place")
-  @Issue("MULE-15837")
   public void getByteArrayOutputType() throws Exception {
     OperationElement operation = getMethod("byteArray");
     MetadataType metadataType = operation.getOperationReturnMetadataType();
