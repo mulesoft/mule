@@ -12,6 +12,7 @@ import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
 import static org.mule.module.cxf.support.CxfUtils.resolveEncoding;
 import static org.mule.transformer.types.DataTypeFactory.XML_STRING;
 import static org.mule.transformer.types.DataTypeFactory.createFromParameterType;
+import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.transport.http.HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static java.lang.Boolean.TRUE;
@@ -95,8 +96,6 @@ public class MuleUniversalConduit extends AbstractConduit
 {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(MuleUniversalConduit.class);
-
-    public static final String HTTP_STATUS = "http.status";
 
     private EndpointInfo endpoint;
 
@@ -359,9 +358,9 @@ public class MuleUniversalConduit extends AbstractConduit
                 the message processing is being executed in a non-blocking fashion. So, the only way it is going to be replied, is through that callback. To avoid the flow
                 from finishing execution silently, an exception is thrown with the SOAP service response status code.
             */
-            else if (m.getExchange().get(ClientCallback.class) != null && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS))
+            else if (m.getExchange().get(ClientCallback.class) != null && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
             {
-                int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS).toString());
+                int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
                 throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
             }
         }
