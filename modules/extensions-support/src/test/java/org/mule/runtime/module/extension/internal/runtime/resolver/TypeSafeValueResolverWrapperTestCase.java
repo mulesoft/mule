@@ -62,7 +62,8 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   @Test
   public void staticValueIsTransformed() throws MuleException {
-    Integer resolve = staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    Integer resolve =
+        staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
     assertThat(resolve, is(123));
   }
 
@@ -98,7 +99,8 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Test
   public void transformNullValue() throws MuleException {
     when(staticValueResolver.resolve(any(ValueResolvingContext.class))).thenReturn(null);
-    Integer value = staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
+    Integer value =
+        staticResolver.resolve(ValueResolvingContext.builder(testEvent()).withExpressionManager(expressionManager).build());
 
     assertThat(value, is(nullValue()));
   }

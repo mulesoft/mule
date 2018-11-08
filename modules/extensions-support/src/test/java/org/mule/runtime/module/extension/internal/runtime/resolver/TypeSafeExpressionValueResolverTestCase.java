@@ -62,8 +62,8 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   public void expressionLanguageWithoutTransformation() throws Exception {
     ValueResolver<Object> resolver = getResolver("#['Hello ' ++ payload]", STRING);
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of("World!")).build())
-      .withExpressionManager(expressionManager)
-      .build();
+        .withExpressionManager(expressionManager)
+        .build();
     assertResolved(resolver.resolve(ctx), HELLO_WORLD, times(1));
   }
 
@@ -71,8 +71,8 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   public void expressionTemplateWithoutTransformation() throws Exception {
     ValueResolver<Object> resolver = getResolver("#['Hello $(payload)']", STRING);
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of("World!")).build())
-      .withExpressionManager(expressionManager)
-      .build();
+        .withExpressionManager(expressionManager)
+        .build();
     assertResolved(resolver.resolve(ctx), HELLO_WORLD, times(1));
   }
 
@@ -85,9 +85,9 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
     when(expressionManager.openSession(anyObject(), anyObject(), anyObject())).thenReturn(session);
 
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())
-      .dynamic(resolver.isDynamic())
-      .withExpressionManager(expressionManager)
-      .build();
+        .dynamic(resolver.isDynamic())
+        .withExpressionManager(expressionManager)
+        .build();
 
     Object resolvedValue = resolver.resolve(ctx);
     assertResolved(resolvedValue, HELLO_WORLD, never());
@@ -98,8 +98,8 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   public void expressionWithTransformation() throws Exception {
     ValueResolver<Object> resolver = getResolver("#[true]", STRING);
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())
-      .withExpressionManager(expressionManager)
-      .build();
+        .withExpressionManager(expressionManager)
+        .build();
     assertResolved(resolver.resolve(ctx), "true", times(1));
   }
 
@@ -107,8 +107,8 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   public void templateWithTransformation() throws Exception {
     ValueResolver<Object> resolver = getResolver("#['tru$('e')']", STRING);
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())
-      .withExpressionManager(expressionManager)
-      .build();
+        .withExpressionManager(expressionManager)
+        .build();
     assertResolved(resolver.resolve(ctx), "true", times(1));
   }
 

@@ -83,9 +83,9 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
     builder.setOwnerConfigName(configName);
     try {
       return builder.build(ValueResolvingContext.builder(event)
-                             .withExpressionManager(expressionManager)
-                             .dynamic(resolverSet.isDynamic())
-                             .build());
+          .withExpressionManager(expressionManager)
+          .dynamic(resolverSet.isDynamic())
+          .build());
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }

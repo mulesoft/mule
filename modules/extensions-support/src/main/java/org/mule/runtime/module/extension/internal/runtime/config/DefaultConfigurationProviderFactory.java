@@ -92,7 +92,8 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
         }
       }
 
-      return new ConfigurationProviderToolingAdapter(name, extensionModel, configurationModel, configuration, reflectionCache, muleContext);
+      return new ConfigurationProviderToolingAdapter(name, extensionModel, configurationModel, configuration, reflectionCache,
+                                                     muleContext);
     });
   }
 

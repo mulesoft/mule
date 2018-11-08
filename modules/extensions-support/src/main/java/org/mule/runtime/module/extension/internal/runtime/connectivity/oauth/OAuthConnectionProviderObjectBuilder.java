@@ -149,9 +149,9 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   private AuthCodeConfig buildAuthCodeConfig(CoreEvent event) throws MuleException {
     ValueResolver<?> valueResolver = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
     ValueResolvingContext context = ValueResolvingContext.builder(event)
-      .dynamic(valueResolver.isDynamic())
-      .withExpressionManager(expressionManager)
-      .build();
+        .dynamic(valueResolver.isDynamic())
+        .withExpressionManager(expressionManager)
+        .build();
     Map<String, Object> map = (Map<String, Object>) valueResolver.resolve(context);
     return buildAuthCodeConfig(map);
   }
@@ -170,11 +170,11 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   private OAuthCallbackConfig buildOAuthCallbackConfig(CoreEvent event) throws MuleException {
     ValueResolver<?> valueResolver = resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME);
     ValueResolvingContext context = ValueResolvingContext.builder(event)
-      .dynamic(valueResolver.isDynamic())
-      .withExpressionManager(expressionManager)
-      .build();
+        .dynamic(valueResolver.isDynamic())
+        .withExpressionManager(expressionManager)
+        .build();
     Map<String, Object> map =
-      (Map<String, Object>) valueResolver.resolve(context);
+        (Map<String, Object>) valueResolver.resolve(context);
     return buildOAuthCallbackConfig(map);
   }
 
@@ -197,28 +197,28 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
     }
 
     ValueResolvingContext context = ValueResolvingContext.builder(event)
-      .dynamic(resolver.isDynamic())
-      .withExpressionManager(expressionManager)
-      .build();
+        .dynamic(resolver.isDynamic())
+        .withExpressionManager(expressionManager)
+        .build();
 
     Map<String, Object> map = (Map<String, Object>) resolver.resolve(context);
     return map != null
-      ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME)))
-      : empty();
+        ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME)))
+        : empty();
   }
 
   private Optional<OAuthObjectStoreConfig> buildOAuthObjectStoreConfig(ResolverSetResult result) throws MuleException {
     Map<String, Object> map = (Map<String, Object>) result.get(OAUTH_STORE_CONFIG_GROUP_NAME);
     return map != null
-      ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME)))
-      : empty();
+        ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME)))
+        : empty();
   }
 
 
   private Map<Field, String> getCallbackValues() {
     return providerModel.getModelProperty(OAuthCallbackValuesModelProperty.class)
-      .map(OAuthCallbackValuesModelProperty::getCallbackValues)
-      .orElseGet(Collections::emptyMap);
+        .map(OAuthCallbackValuesModelProperty::getCallbackValues)
+        .orElseGet(Collections::emptyMap);
   }
 
   private Map<String, String> getCustomParameters(ResolverSetResult result) {
@@ -231,7 +231,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
 
   private void withCustomParameters(BiConsumer<ParameterModel, OAuthParameterModelProperty> delegate) {
     providerModel.getAllParameterModels().forEach(parameter -> parameter.getModelProperty(OAuthParameterModelProperty.class)
-      .ifPresent(property -> delegate.accept(parameter, property)));
+        .ifPresent(property -> delegate.accept(parameter, property)));
   }
 
   private Map<String, String> getCustomParameters(CoreEvent event) {
@@ -257,16 +257,16 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
 
   private String resolveString(CoreEvent event, ValueResolver resolver) throws MuleException {
     Object value = resolver.resolve(ValueResolvingContext.builder(event)
-                                      .dynamic(resolver.isDynamic())
-                                      .withExpressionManager(expressionManager)
-                                      .build());
+        .dynamic(resolver.isDynamic())
+        .withExpressionManager(expressionManager)
+        .build());
     return value != null ? StringMessageUtils.toString(value) : null;
   }
 
   private AuthorizationCodeGrantType getGrantType() {
     return providerModel.getModelProperty(OAuthModelProperty.class)
-      .map(p -> (AuthorizationCodeGrantType) p.getGrantTypes().get(0))
-      .get();
+        .map(p -> (AuthorizationCodeGrantType) p.getGrantTypes().get(0))
+        .get();
   }
 
   private String sanitizePath(String path) {
@@ -280,18 +280,18 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
       ValueResolver<?> oauthAuthCodeGroup = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
       MapValueResolver mapResolver = staticOnly((MapValueResolver) oauthAuthCodeGroup);
       AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(ValueResolvingContext.builder(initialiserEvent)
-                                                                                .dynamic(mapResolver.isDynamic())
-                                                                                .withExpressionManager(expressionManager)
-                                                                                .build()));
+          .dynamic(mapResolver.isDynamic())
+          .withExpressionManager(expressionManager)
+          .build()));
       Optional<OAuthObjectStoreConfig> storeConfig = buildOAuthObjectStoreConfig(initialiserEvent);
 
       mapResolver = staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME));
       OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(ValueResolvingContext
-                                                                                          .builder(initialiserEvent)
-                                                                                          .dynamic(mapResolver.isDynamic())
-                                                                                          .withExpressionManager(
-                                                                                            expressionManager)
-                                                                                          .build()));
+          .builder(initialiserEvent)
+          .dynamic(mapResolver.isDynamic())
+          .withExpressionManager(
+                                 expressionManager)
+          .build()));
       return new OAuthConfig(ownerConfigName,
                              authCodeConfig,
                              callbackConfig,
@@ -324,7 +324,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
     }
 
     MapValueResolver result =
-      new MapValueResolver(HashMap.class, staticKeyResolvers, staticValueResolvers, getReflectionCache(), muleContext);
+        new MapValueResolver(HashMap.class, staticKeyResolvers, staticValueResolvers, getReflectionCache(), muleContext);
     initialiseIfNeeded(result, muleContext);
 
     return result;

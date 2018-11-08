@@ -145,7 +145,7 @@ public class ValueResolvingContext {
       }
       ExpressionManagerSession session = null;
       if (dynamic && manager != null) {
-         session = manager.openSession(event.asBindingContext());
+        session = manager.openSession(event.asBindingContext());
       }
       return new ValueResolvingContext(event, session, config.orElse(null), resolveCursors);
     }

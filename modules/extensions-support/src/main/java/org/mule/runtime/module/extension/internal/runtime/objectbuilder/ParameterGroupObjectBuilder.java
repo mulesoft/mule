@@ -60,9 +60,9 @@ public class ParameterGroupObjectBuilder<T> {
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
     ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
-      .withExpressionManager(expressionManager)
-      .withConfig(executionContext.getConfiguration())
-      .build();
+        .withExpressionManager(expressionManager)
+        .withConfig(executionContext.getConfiguration())
+        .build();
     return doBuild(executionContext::hasParameter, executionContext::getParameter, context);
   }
 

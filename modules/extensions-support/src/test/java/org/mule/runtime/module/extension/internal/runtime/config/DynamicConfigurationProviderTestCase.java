@@ -162,9 +162,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     }
 
     verify(providerResolverSet, times(count))
-      .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
     verify(resolverSet, times(count))
-      .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
   }
 
   @Test
@@ -176,15 +176,15 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(connectionProviderResolver.getResolverSet()).thenReturn(of(providerResolverSet));
     when(connectionProviderResolver.getObjectBuilder()).thenReturn(empty());
     when(providerResolverSet.resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build()))
-      .thenReturn(mock(ResolverSetResult.class));
+        .thenReturn(mock(ResolverSetResult.class));
     assertThat(provider.get(event).getValue(), is(not(sameInstance(config))));
 
     verify(resolverSet, times(2))
-      .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
     verify(providerResolverSet, times(1))
-      .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
     verify(connectionProviderResolver, times(2))
-      .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
   }
 
   @Test
@@ -220,7 +220,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(alternateResult.asMap()).thenReturn(new HashMap<>());
     mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
     when(resolverSet.resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build()))
-      .thenReturn(alternateResult);
+        .thenReturn(alternateResult);
 
     return (HeisenbergExtension) provider.get(event).getValue();
   }

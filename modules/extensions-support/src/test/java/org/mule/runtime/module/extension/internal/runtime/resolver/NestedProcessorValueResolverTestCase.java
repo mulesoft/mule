@@ -54,8 +54,8 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     final CoreEvent event = testEvent();
 
     Chain nestedProcessor = resolver.resolve(ValueResolvingContext.builder(event)
-                                               .withExpressionManager(expressionManager)
-                                               .build());
+        .withExpressionManager(expressionManager)
+        .build());
     nestedProcessor.process(result -> {
       assertThat(result.getOutput(), is(TEST_PAYLOAD));
 
@@ -86,8 +86,8 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
 
     Chain resolve = resolver.resolve(ValueResolvingContext.builder(testEvent())
-                                       .withExpressionManager(expressionManager)
-                                       .build());
+        .withExpressionManager(expressionManager)
+        .build());
 
     resolve.process(result -> {
     }, (t, r) -> {

@@ -78,8 +78,8 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
     checkArgument(!isBlank(propertyName), "property name cannot be blank");
 
     Field field = getField(prototypeClass, propertyName, reflectionCache)
-      .orElseThrow(() -> new IllegalArgumentException(format("Class '%s' does not contain property '%s'",
-                                                             prototypeClass.getName(), propertyName)));
+        .orElseThrow(() -> new IllegalArgumentException(format("Class '%s' does not contain property '%s'",
+                                                               prototypeClass.getName(), propertyName)));
 
     return addPropertyResolver(field, resolver);
   }
@@ -117,7 +117,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
     for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet()) {
       setField(entry.getKey(), object,
                context == null || context.resolveCursors() ? resolveCursor(resolveValue(entry.getValue(), context))
-                 : resolveValue(entry.getValue(), context));
+                   : resolveValue(entry.getValue(), context));
     }
 
     injectFields(object, name, encoding, reflectionCache);

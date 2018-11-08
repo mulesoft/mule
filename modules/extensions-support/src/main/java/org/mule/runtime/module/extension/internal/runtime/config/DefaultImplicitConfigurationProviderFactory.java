@@ -64,16 +64,19 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
     try {
       ImplicitConnectionProviderValueResolver implicitConnectionProviderValueResolver =
           new ImplicitConnectionProviderValueResolver(implicitConfigurationModel.getName(), extensionModel,
-                                                      implicitConfigurationModel, reflectionCache, expressionManager, muleContext);
+                                                      implicitConfigurationModel, reflectionCache, expressionManager,
+                                                      muleContext);
 
-      ConfigurationInstance configurationInstance = withContextClassLoader(pluginClassloader, () ->
-        new ConfigurationInstanceFactory(extensionModel,
-                                         implicitConfigurationModel,
-                                         resolverSet,
-                                         reflectionCache,
-                                         expressionManager,
-                                         muleContext)
-          .createConfiguration(providerName, event, implicitConnectionProviderValueResolver));
+      ConfigurationInstance configurationInstance =
+          withContextClassLoader(pluginClassloader, () -> new ConfigurationInstanceFactory(extensionModel,
+                                                                                           implicitConfigurationModel,
+                                                                                           resolverSet,
+                                                                                           reflectionCache,
+                                                                                           expressionManager,
+                                                                                           muleContext)
+                                                                                               .createConfiguration(providerName,
+                                                                                                                    event,
+                                                                                                                    implicitConnectionProviderValueResolver));
 
       if (resolverSet.isDynamic() || needsDynamicConnectionProvider(extensionModel, implicitConfigurationModel,
                                                                     implicitConnectionProviderValueResolver)) {

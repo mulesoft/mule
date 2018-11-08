@@ -130,7 +130,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
 
   static final String INVALID_TARGET_MESSAGE =
-    "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
+      "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   protected final ExtensionModel extensionModel;
   protected final ResolverSet resolverSet;
@@ -307,10 +307,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           try {
             initialiserEvent = getInitialiserEvent();
             return ValueResolvingContext.builder(initialiserEvent)
-              .withExpressionManager(expressionManager)
-              .withConfig(staticConfiguration.get())
-              .dynamic(resolverSet.isDynamic())
-              .build();
+                .withExpressionManager(expressionManager)
+                .withConfig(staticConfiguration.get())
+                .dynamic(resolverSet.isDynamic())
+                .build();
           } finally {
             if (initialiserEvent != null) {
               ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -460,9 +460,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     try {
       event = getInitialiserEvent(muleContext);
       ValueResolvingContext ctx = ValueResolvingContext.builder(event)
-        .withExpressionManager(expressionManager)
-        .dynamic(resolverSet.isDynamic())
-        .build();
+          .withExpressionManager(expressionManager)
+          .dynamic(resolverSet.isDynamic())
+          .build();
       LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
       return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);
     } finally {
@@ -491,8 +491,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       InterceptorsExecutionResult beforeExecutionResult = mediator.before(executionContext, interceptors);
       if (beforeExecutionResult.isOk()) {
         final Map<String, Supplier<Object>> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
-                                                                                          .createArgumentResolver(componentModel)
-                                                                                          .apply(executionContext);
+            .createArgumentResolver(componentModel)
+            .apply(executionContext);
         afterConfigurer.accept(resolvedArguments, executionContext);
         executionContext.changeEvent(eventBuilder.build());
       } else {
@@ -528,10 +528,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     return resolverSet.resolve(ValueResolvingContext.builder(event)
-                                 .withExpressionManager(expressionManager)
-                                 .dynamic(resolverSet.isDynamic())
-                                 .withConfig(configuration)
-                                 .build()).asMap();
+        .withExpressionManager(expressionManager)
+        .dynamic(resolverSet.isDynamic())
+        .withConfig(configuration)
+        .build()).asMap();
   }
 
   private boolean isInterceptedComponent(ComponentLocation location, InternalEvent event) {

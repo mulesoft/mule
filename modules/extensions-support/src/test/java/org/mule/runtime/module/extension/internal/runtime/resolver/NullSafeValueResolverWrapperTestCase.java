@@ -95,8 +95,8 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache,
                                                              muleContext, objectTypeParametersResolver);
     ValueResolvingContext ctx = ValueResolvingContext.builder(event)
-      .withExpressionManager(expressionManager)
-      .build();
+        .withExpressionManager(expressionManager)
+        .build();
     assertThat(resolver.isDynamic(), is(isDynamic));
     assertThat(resolver.resolve(ctx), is(expected));
   }

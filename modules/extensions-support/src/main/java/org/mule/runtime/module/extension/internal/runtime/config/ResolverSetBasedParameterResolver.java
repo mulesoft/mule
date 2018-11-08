@@ -37,7 +37,8 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
   private ReflectionCache reflectionCache;
   private ExpressionManager expressionManager;
   private LazyValue<ValueResolvingContext> resolvingCtx =
-    new LazyValue<>(() -> ValueResolvingContext.builder(getInitialiserEvent()).withExpressionManager(expressionManager).build());
+      new LazyValue<>(() -> ValueResolvingContext.builder(getInitialiserEvent()).withExpressionManager(expressionManager)
+          .build());
 
   public ResolverSetBasedParameterResolver(ResolverSet resolverSet,
                                            ParameterizedModel parameterizedModel,

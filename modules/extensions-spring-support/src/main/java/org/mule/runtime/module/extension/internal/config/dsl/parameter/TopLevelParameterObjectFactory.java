@@ -81,11 +81,11 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
         ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent)
-          .withExpressionManager(expressionManager)
-          .dynamic(resolver.isDynamic())
-          .build();
+            .withExpressionManager(expressionManager)
+            .dynamic(resolver.isDynamic())
+            .build();
         staticProduct = resolver.resolve(
-          ctx);
+                                         ctx);
         muleContext.getInjector().inject(staticProduct);
         return staticProduct;
       } finally {

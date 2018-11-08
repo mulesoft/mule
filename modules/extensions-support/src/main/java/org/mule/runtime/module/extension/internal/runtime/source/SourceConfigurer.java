@@ -82,32 +82,32 @@ public final class SourceConfigurer {
    */
   public Source configure(Source source, Optional<ConfigurationInstance> config) {
     ResolverSetBasedObjectBuilder<Source> builder =
-      new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet, muleContext) {
+        new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet, muleContext) {
 
-        @Override
-        protected Source instantiateObject() {
-          return source;
-        }
+          @Override
+          protected Source instantiateObject() {
+            return source;
+          }
 
-        @Override
-        public Source build(ValueResolvingContext context) throws MuleException {
-          Source source = build(resolverSet.resolve(context));
-          injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
-          injectComponentLocation(source, componentLocation);
-          config.ifPresent(c -> injectRefName(source, c.getName(), getReflectionCache()));
-          return source;
-        }
+          @Override
+          public Source build(ValueResolvingContext context) throws MuleException {
+            Source source = build(resolverSet.resolve(context));
+            injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
+            injectComponentLocation(source, componentLocation);
+            config.ifPresent(c -> injectRefName(source, c.getName(), getReflectionCache()));
+            return source;
+          }
 
-      };
+        };
 
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
       Source configuredSource = builder.build(ValueResolvingContext.builder(initialiserEvent)
-                                                .withExpressionManager(expressionManager)
-                                                .dynamic(builder.isDynamic())
-                                                .withConfig(config)
-                                                .build());
+          .withExpressionManager(expressionManager)
+          .dynamic(builder.isDynamic())
+          .withConfig(config)
+          .build());
 
       if (configuredSource instanceof PollingSource) {
         ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME);
@@ -117,9 +117,9 @@ public final class SourceConfigurer {
           }
         } else {
           Scheduler scheduler = (Scheduler) valueResolver.resolve(ValueResolvingContext.builder(initialiserEvent)
-                                                                    .withExpressionManager(expressionManager)
-                                                                    .dynamic(valueResolver.isDynamic())
-                                                                    .build());
+              .withExpressionManager(expressionManager)
+              .dynamic(valueResolver.isDynamic())
+              .build());
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }
@@ -127,7 +127,7 @@ public final class SourceConfigurer {
       return configuredSource;
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Exception was found trying to configure source of type "
-                                                           + source.getClass().getName()), e);
+          + source.getClass().getName()), e);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();

@@ -118,7 +118,7 @@ public class TypeSafeExpressionValueResolverMelTestCase extends AbstractMuleCont
     getResolver("#[mel:payload]", null);
   }
 
-  private ValueResolvingContext buildContext(CoreEvent event)  {
+  private ValueResolvingContext buildContext(CoreEvent event) {
     return ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
   }
 

@@ -66,6 +66,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -577,7 +578,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     TypedValue<String> stringJsonPayload = new TypedValue<>("\"string\"", JSON_STRING);
     CoreEvent eventWithJsonPayload = CoreEvent.builder(testEvent()).message(Message.of(stringJsonPayload)).build();
     BindingContext bindingContext = eventWithJsonPayload.asBindingContext();
-    ExpressionLanguageSession session = expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, null, bindingContext);
+    ExpressionLanguageSessionAdaptor session = expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, null, bindingContext);
     assertThat(session.evaluate("payload", STRING).getValue(), is("string"));
   }
 

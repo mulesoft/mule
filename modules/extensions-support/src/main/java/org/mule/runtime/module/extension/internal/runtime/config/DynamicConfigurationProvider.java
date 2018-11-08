@@ -72,7 +72,7 @@ import org.slf4j.Logger;
  * @since 4.0.0
  */
 public final class DynamicConfigurationProvider extends LifecycleAwareConfigurationProvider
-  implements ExpirableConfigurationProvider, ConfigurationParameterValueProvider {
+    implements ExpirableConfigurationProvider, ConfigurationParameterValueProvider {
 
   private static final Logger LOGGER = getLogger(DynamicConfigurationProvider.class);
 
@@ -131,8 +131,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public ConfigurationInstance get(Event event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
       ValueResolvingContext resolvingContext = ValueResolvingContext.builder(((CoreEvent) event))
-        .withExpressionManager(expressionManager)
-        .build();
+          .withExpressionManager(expressionManager)
+          .build();
       ResolverSetResult result = resolverSet.resolve(resolvingContext);
       ResolverSetResult providerResult = null;
       if (connectionProviderResolver.getResolverSet().isPresent()) {
@@ -143,7 +143,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   }
 
   private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event)
-    throws Exception {
+      throws Exception {
 
     ConfigurationInstance configuration;
     cacheReadLock.lock();
@@ -181,7 +181,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   }
 
   private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event)
-    throws MuleException {
+      throws MuleException {
 
     ConfigurationInstance configuration;
     ResolverSetResult connectionProviderValues = values.getSecond();
@@ -291,11 +291,11 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> new ValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
                                                                    () -> reflectionCache)
-                                   .getValues(parameterName,
-                                              new ResolverSetBasedParameterResolver(resolverSet,
-                                                                                    getConfigurationModel(),
-                                                                                    reflectionCache,
-                                                                                    expressionManager)),
+                                                                       .getValues(parameterName,
+                                                                                  new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                                                        getConfigurationModel(),
+                                                                                                                        reflectionCache,
+                                                                                                                        expressionManager)),
                                  getExtensionModel());
   }
 
@@ -306,29 +306,29 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
-        .orElseThrow(() -> new ValueResolvingException(
-          "Internal Error. Unable to resolve values because the service is unable to get the connection model",
-          UNKNOWN));
+          .orElseThrow(() -> new ValueResolvingException(
+                                                         "Internal Error. Unable to resolve values because the service is unable to get the connection model",
+                                                         UNKNOWN));
       ResolverSet resolverSet = ((Optional<ResolverSet>) connectionProviderResolver.getResolverSet())
-        .orElseThrow(() -> new ValueResolvingException(
-          "Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
-          UNKNOWN));
+          .orElseThrow(() -> new ValueResolvingException(
+                                                         "Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
+                                                         UNKNOWN));
 
       return new ValueProviderMediator<>(connectionProviderModel,
                                          () -> muleContext,
                                          () -> reflectionCache)
-        .getValues(parameterName,
-                   new ResolverSetBasedParameterResolver(resolverSet,
-                                                         connectionProviderModel,
-                                                         reflectionCache,
-                                                         expressionManager));
+                                             .getValues(parameterName,
+                                                        new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                              connectionProviderModel,
+                                                                                              reflectionCache,
+                                                                                              expressionManager));
     }, getExtensionModel());
   }
 
   private Optional<ConnectionProviderModel> getConnectionProviderModel() {
     return this.connectionProviderResolver.getObjectBuilder()
-      .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
-      .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
+        .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
+        .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
   }
 
 }

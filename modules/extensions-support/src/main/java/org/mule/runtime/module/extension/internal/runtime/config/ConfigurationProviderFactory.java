@@ -50,7 +50,7 @@ public interface ConfigurationProviderFactory {
                                                            ReflectionCache reflectionCache,
                                                            ExpressionManager expressionManager,
                                                            MuleContext muleContext)
-    throws Exception;
+      throws Exception;
 
 
   /**
@@ -73,5 +73,5 @@ public interface ConfigurationProviderFactory {
                                                           ReflectionCache reflectionCache,
                                                           ExpressionManager expressionManager,
                                                           MuleContext muleContext)
-    throws Exception;
+      throws Exception;
 }

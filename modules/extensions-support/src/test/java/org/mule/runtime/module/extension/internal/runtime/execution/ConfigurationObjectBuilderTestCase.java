@@ -85,8 +85,8 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void build() throws MuleException {
     TestConfig testConfig = configurationObjectBuilder.build(ValueResolvingContext.builder(event)
-                                                               .withExpressionManager(expressionManager)
-                                                               .build()).getFirst();
+        .withExpressionManager(expressionManager)
+        .build()).getFirst();
     assertThat(testConfig.getName(), is(NAME_VALUE));
     assertThat(testConfig.getDescription(), is(DESCRIPTION_VALUE));
   }

@@ -113,8 +113,8 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
       return evaluator.resolveTypedValue(context.getEvent());
     } else {
       return (TypedValue) context.getSession()
-        .map(session -> evaluator.resolveTypedValue(session))
-        .orElseGet(() -> evaluator.resolveTypedValue(context.getEvent()));
+          .map(session -> evaluator.resolveTypedValue(session))
+          .orElseGet(() -> evaluator.resolveTypedValue(context.getEvent()));
     }
   }
 

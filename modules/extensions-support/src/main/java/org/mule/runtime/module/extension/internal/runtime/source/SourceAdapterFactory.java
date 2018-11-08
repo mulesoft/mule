@@ -101,7 +101,9 @@ public class SourceAdapterFactory {
                                exceptionResolver,
                                backPressureAction);
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'", sourceModel.getName())), e);
+      throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",
+                                                                sourceModel.getName())),
+                                     e);
     }
   }
 

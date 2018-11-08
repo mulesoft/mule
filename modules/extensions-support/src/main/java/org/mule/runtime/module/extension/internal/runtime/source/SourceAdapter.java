@@ -339,11 +339,11 @@ public class SourceAdapter implements Lifecycle {
       try {
         ResolverSet resolverSet = SourceAdapter.this.successCallbackParameters;
         ValueResolvingContext context = ValueResolvingContext.builder(event)
-          .withExpressionManager(expressionManager)
-          .dynamic(resolverSet.isDynamic())
-          .withConfig(configurationInstance)
-          .resolveCursors(false)
-          .build();
+            .withExpressionManager(expressionManager)
+            .dynamic(resolverSet.isDynamic())
+            .withConfig(configurationInstance)
+            .resolveCursors(false)
+            .build();
         ResolverSetResult parameters = resolverSet.resolve(context);
         return parameters.asMap();
       } catch (Exception e) {
@@ -356,11 +356,11 @@ public class SourceAdapter implements Lifecycle {
       try {
         ResolverSet resolverSet = SourceAdapter.this.errorCallbackParameters;
         ValueResolvingContext ctx = ValueResolvingContext.builder(event)
-          .withExpressionManager(expressionManager)
-          .withConfig(configurationInstance)
-          .dynamic(resolverSet.isDynamic())
-          .resolveCursors(false)
-          .build();
+            .withExpressionManager(expressionManager)
+            .withConfig(configurationInstance)
+            .dynamic(resolverSet.isDynamic())
+            .resolveCursors(false)
+            .build();
         ResolverSetResult parameters = resolverSet.resolve(ctx);
         return parameters.asMap();
       } catch (Exception e) {
@@ -518,9 +518,9 @@ public class SourceAdapter implements Lifecycle {
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
       object = valueResolver.resolve(ValueResolvingContext.builder(initialiserEvent)
-                                       .withExpressionManager(expressionManager)
-                                       .dynamic(valueResolver.isDynamic())
-                                       .build());
+          .withExpressionManager(expressionManager)
+          .dynamic(valueResolver.isDynamic())
+          .build());
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage("Unable to get the " + type.getSimpleName()
           + " value for Message Source"), e);

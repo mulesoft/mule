@@ -125,7 +125,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       if (!requiresConnection) {
         return new StaticConnectionProviderResolver<>(null, null);
       }
-      return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, reflectionCache, expressionManager, muleContext);
+      return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, reflectionCache,
+                                                         expressionManager, muleContext);
     });
   }
 
