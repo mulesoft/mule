@@ -71,9 +71,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
   private boolean varsModified = false;
-  private Map<String, TypedValue<?>> flowVariables = new HashMap<>();
-  private CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
-  private Map<String, Object> internalParameters = new HashMap<>(4);
+  private final Map<String, TypedValue<?>> flowVariables = new HashMap<>();
+  private final CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
+  private final Map<String, Object> internalParameters = new HashMap<>(4);
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
   private String legacyCorrelationId;
@@ -295,11 +295,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     /** Immutable MuleEvent state **/
 
-    private BaseEventContext context;
+    private final BaseEventContext context;
     // TODO MULE-10013 make this final
     private Message message;
     private final MuleSession session;
-    private SecurityContext securityContext;
+    private final SecurityContext securityContext;
 
     private final ReplyToHandler replyToHandler;
 
@@ -314,7 +314,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final String legacyCorrelationId;
     private final Error error;
 
-    private ItemSequenceInfo itemSequenceInfo;
+    private final ItemSequenceInfo itemSequenceInfo;
 
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
@@ -330,32 +330,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.session = session;
       this.securityContext = securityContext;
       this.message = message;
-      this.variables = new CaseInsensitiveHashMap<>(variables);
-      this.internalParameters = internalParameters;
-
-      this.replyToHandler = replyToHandler;
-      this.replyToDestination = replyToDestination;
-
-      this.itemSequenceInfo = itemSequenceInfo.orElse(null);
-      this.error = error;
-      this.legacyCorrelationId = legacyCorrelationId;
-
-      this.notificationsEnabled = notificationsEnabled;
-    }
-
-    // Use this constructor from the builder
-    private InternalEventImplementation(BaseEventContext context, Message message,
-                                        CaseInsensitiveHashMap<String, TypedValue<?>> variables,
-                                        Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
-                                        Object replyToDestination, ReplyToHandler replyToHandler,
-                                        Optional<ItemSequenceInfo> itemSequenceInfo,
-                                        Error error,
-                                        String legacyCorrelationId, boolean notificationsEnabled) {
-      this.context = context;
-      this.session = session;
-      this.securityContext = securityContext;
-      this.message = message;
-      this.variables = variables;
+      this.variables = new CaseInsensitiveHashMap<String, TypedValue<?>>(variables).toImmutableCaseInsensitiveMap();
       this.internalParameters = internalParameters;
 
       this.replyToHandler = replyToHandler;
@@ -519,7 +494,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Map<String, TypedValue<?>> getVariables() {
-      return variables.toImmutableCaseInsensitiveMap();
+      return variables;
     }
 
     @Override
