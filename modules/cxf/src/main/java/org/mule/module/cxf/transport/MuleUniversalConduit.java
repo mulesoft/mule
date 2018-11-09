@@ -359,11 +359,9 @@ public class MuleUniversalConduit extends AbstractConduit
                 clearClientContextIfNeeded(getMessageObserver());
                 return;
             }
-            /*
-                If this branch is reached, it means that the message payload is empty. To avoid the flow
-                from finishing execution silently, an exception is thrown with the SOAP service response status code, handling differently the case of
-                an SC_ACCEPTED response status code, which according to the SOAP specification, is the only status code that MAY have an empty payload.
-            */
+            // If this branch is reached, it means that the message payload is empty. To avoid the flow
+            // from finishing execution silently, an exception is thrown with the SOAP service response status code, handling differently the case of
+            // an SC_ACCEPTED response status code, which according to the SOAP specification, is the only status code that MAY have an empty payload.
             else if (cxfMessageProcessorIsProxy(m) && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
             {
                 Integer soapServiceResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
@@ -371,7 +369,12 @@ public class MuleUniversalConduit extends AbstractConduit
 
                 resEvent.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, resolvedHttpStatusCode);
 
-                throw new CxfCannotProcessEmptyPayloadException(soapServiceResponseStatusCode);
+                // If processing strategy is non-blocking, force a reply to be sent back. Otherwise, if a blocking processing strategy is configured,
+                // avoid throwing an exception if the request status code is ACCEPTED since its supported by the spec.
+                if (resEvent.isAllowNonBlocking() || !resolvedHttpStatusCode.equals(SC_ACCEPTED))
+                {
+                    throw new CxfCannotProcessEmptyPayloadException(soapServiceResponseStatusCode);
+                }
             }
         }
 
