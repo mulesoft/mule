@@ -6,11 +6,14 @@
  */
 package org.mule.module.cxf.transport;
 
+import static org.apache.cxf.common.util.SOAPConstants.SOAP_ACTION;
 import static org.mule.module.cxf.CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR;
 import static org.mule.module.cxf.CxfConstants.MULE_EVENT;
 import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
 import static org.mule.module.cxf.support.CxfUtils.resolveEncoding;
 import static org.mule.transformer.types.DataTypeFactory.XML_STRING;
+import static org.mule.transformer.types.DataTypeFactory.createFromParameterType;
+import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.transport.http.HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static java.lang.Boolean.TRUE;
@@ -27,6 +30,7 @@ import static org.apache.cxf.message.Message.QUERY_STRING;
 import static org.apache.cxf.message.Message.RESPONSE_CODE;
 import static org.apache.cxf.phase.Phase.PRE_STREAM;
 import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
+import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -46,8 +50,8 @@ import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.cxf.CxfCannotProcessEmptyPayloadException;
 import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.transformer.types.DataTypeFactory;
@@ -70,6 +74,8 @@ import java.util.logging.Logger;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -93,8 +99,6 @@ public class MuleUniversalConduit extends AbstractConduit
 {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(MuleUniversalConduit.class);
-
-    public static final String HTTP_STATUS = "http.status";
 
     private EndpointInfo endpoint;
 
@@ -289,7 +293,7 @@ public class MuleUniversalConduit extends AbstractConduit
                             holder.value = event;
                             sendResultBackToCxf(m, event);
                         }
-                        catch (IOException | HttpResponseException e)
+                        catch (IOException | CxfCannotProcessEmptyPayloadException e)
                         {
                             processExceptionReplyTo(new MessagingException(event, e), replyTo);
                         }
@@ -316,17 +320,21 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             throw me;
         }
+        catch (CxfCannotProcessEmptyPayloadException e)
+        {
+            throw new DefaultMuleException(e);
+        }
         catch (Exception e)
         {
             throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
         }
     }
 
-    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException, HttpResponseException
+    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException, CxfCannotProcessEmptyPayloadException
     {
         if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
         {
-            m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
+            m.getExchange().put(MULE_EVENT, resEvent);
 
             // If we have a result, send it back to CXF
             MuleMessage result = resEvent.getMessage();
@@ -352,22 +360,35 @@ public class MuleUniversalConduit extends AbstractConduit
                 clearClientContextIfNeeded(getMessageObserver());
                 return;
             }
-            // If this branch is reached, it means that the message payload is empty.
-            // By asserting that the inboundProperty 'http.status' exists, I'm verifying that
-            // the last inbound endpoint used was HTTP, and that it set the property correctly.
-            else if (resEvent.getMessage().getInboundPropertyNames().contains("http.status"))
+            // If this branch is reached, it means that the message payload is empty. To avoid the flow
+            // from finishing execution silently, an exception is thrown with the SOAP service response status code, handling differently the case of
+            // an SC_ACCEPTED response status code, which according to the SOAP specification, is the only status code that MAY have an empty payload.
+            else if (cxfMessageProcessorIsProxy(m) && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
             {
-                int httpResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS).toString());
-                // Fail for any status code, but an Accepted (202) one.
-                if (httpResponseStatusCode != SC_ACCEPTED)
+                Integer soapServiceResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+                Integer resolvedHttpStatusCode = soapServiceResponseStatusCode.equals(SC_ACCEPTED) ? SC_ACCEPTED : SC_INTERNAL_SERVER_ERROR;
+
+                resEvent.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, resolvedHttpStatusCode);
+
+                // If processing strategy is non-blocking, force a reply to be sent back. Otherwise, if a blocking processing strategy is configured,
+                // avoid throwing an exception if the request status code is ACCEPTED since its supported by the spec.
+                if (resEvent.isAllowNonBlocking() || !resolvedHttpStatusCode.equals(SC_ACCEPTED))
                 {
-                    throw new HttpResponseException("HTTP Response payload empty can't be processed through CXF components", httpResponseStatusCode);
+                    throw new CxfCannotProcessEmptyPayloadException(soapServiceResponseStatusCode);
                 }
             }
         }
 
         // No body in the response, mark the exchange as finished.
         m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
+    }
+
+    private boolean cxfMessageProcessorIsProxy(Message aMessage)
+    {
+        // The SOAPAction check is done to verify if the 'message' does not correspond to a WS Consumer.
+        return aMessage.get(SOAP_ACTION) == null &&
+               aMessage.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR) != null &&
+               ((CxfOutboundMessageProcessor) aMessage.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR)).isProxy();
     }
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
