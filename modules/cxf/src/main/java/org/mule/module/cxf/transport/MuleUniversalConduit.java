@@ -333,7 +333,7 @@ public class MuleUniversalConduit extends AbstractConduit
     {
         if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
         {
-            m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
+            m.getExchange().put(MULE_EVENT, resEvent);
 
             // If we have a result, send it back to CXF
             MuleMessage result = resEvent.getMessage();
@@ -360,14 +360,12 @@ public class MuleUniversalConduit extends AbstractConduit
                 return;
             }
             /*
-                If this branch is reached, it means that the message payload is empty. By asserting that a ClientCallback is defined in the message exchange, I'm certain that
-                the message processing is being executed in a non-blocking fashion. So, the only way it is going to be replied, is through that callback. To avoid the flow
-                from finishing execution silently, an exception is thrown with the SOAP service response status code.
+                If this branch is reached, it means that the message payload is empty. To avoid the flow
+                from finishing execution silently, an exception is thrown with the SOAP service response status code, handling differently the case of
+                an SC_ACCEPTED response status code, which according to the SOAP specification, is the only status code that MAY have an empty payload.
             */
-            else if (resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
+            else if (cxfMessageProcessorIsProxy(m) && resEvent.getMessage().getInboundPropertyNames().contains(HTTP_STATUS_PROPERTY))
             {
-                // Handle differently the case in which the SOAP service responds an ACCEPTED status code. In any other case,
-                // return a 500, according to SOAP specification.
                 Integer soapServiceResponseStatusCode = Integer.valueOf(resEvent.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY).toString());
                 Integer resolvedHttpStatusCode = soapServiceResponseStatusCode.equals(SC_ACCEPTED) ? SC_ACCEPTED : SC_INTERNAL_SERVER_ERROR;
 
@@ -379,6 +377,12 @@ public class MuleUniversalConduit extends AbstractConduit
 
         // No body in the response, mark the exchange as finished.
         m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
+    }
+
+    private boolean cxfMessageProcessorIsProxy(Message m)
+    {
+        return m.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR) != null &&
+               ((CxfOutboundMessageProcessor) m.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR)).isProxy();
     }
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
