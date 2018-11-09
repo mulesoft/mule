@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.O
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
@@ -25,8 +26,11 @@ public class DefaultResolverSetBasedObjectBuilder<T> extends ResolverSetBasedObj
 
   private final Class<T> prototypeClass;
 
-  public DefaultResolverSetBasedObjectBuilder(Class<T> prototypeClass, ResolverSet resolverSet, MuleContext context) {
-    super(prototypeClass, resolverSet, context);
+  public DefaultResolverSetBasedObjectBuilder(Class<T> prototypeClass,
+                                              ResolverSet resolverSet,
+                                              ExpressionManager expressionManager,
+                                              MuleContext context) {
+    super(prototypeClass, resolverSet, expressionManager, context);
     this.prototypeClass = prototypeClass;
   }
 

@@ -15,6 +15,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -43,10 +44,11 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
                                              PoolingProfile poolingProfile,
                                              ReconnectionConfig reconnectionConfig,
                                              ExtensionModel extensionModel,
+                                             ExpressionManager expressionManager,
                                              MuleContext muleContext) {
     super(providerModel, getServiceProviderType(providerModel), resolverSet, poolingProfile,
-          reconnectionConfig, extensionModel, muleContext);
-    objectBuilder = new DefaultResolverSetBasedObjectBuilder<>(getServiceProviderType(providerModel), resolverSet, muleContext);
+          reconnectionConfig, extensionModel, expressionManager, muleContext);
+    objectBuilder = new DefaultResolverSetBasedObjectBuilder<>(getServiceProviderType(providerModel), resolverSet, expressionManager, muleContext);
   }
 
   /**

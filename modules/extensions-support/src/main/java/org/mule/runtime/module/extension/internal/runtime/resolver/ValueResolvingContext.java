@@ -24,7 +24,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ValueResolvingContext {
+public class ValueResolvingContext implements AutoCloseable {
 
   private CoreEvent event;
   private final ConfigurationInstance config;
@@ -99,6 +99,13 @@ public class ValueResolvingContext {
 
   public Optional<ExpressionManagerSession> getSession() {
     return ofNullable(session);
+  }
+
+  @Override
+  public void close() {
+    if (session != null) {
+      session.close();
+    }
   }
 
   public static class Builder {

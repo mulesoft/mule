@@ -59,23 +59,28 @@ public class ParameterGroupObjectBuilder<T> {
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
-    ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
+    try(ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
         .withExpressionManager(expressionManager)
         .withConfig(executionContext.getConfiguration())
-        .build();
-    return doBuild(executionContext::hasParameter, executionContext::getParameter, context);
+        .build()) {
+      return doBuild(executionContext::hasParameter, executionContext::getParameter, context);
+    }
   }
 
   public T build(ResolverSetResult result) throws MuleException {
     final Map<String, Object> resultMap = result.asMap();
-    CoreEvent initialiserEvent = null;
+    CoreEvent initializerEvent = null;
+    ValueResolvingContext context = null;
     try {
-      initialiserEvent = getInitialiserEvent();
-      ValueResolvingContext context = ValueResolvingContext.builder(initialiserEvent).dynamic(false).build();
+      initializerEvent = getInitialiserEvent();
+      context = ValueResolvingContext.builder(initializerEvent).dynamic(false).build();
       return doBuild(resultMap::containsKey, resultMap::get, context);
     } finally {
-      if (initialiserEvent != null) {
-        ((BaseEventContext) initialiserEvent.getContext()).success();
+      if (initializerEvent != null) {
+        ((BaseEventContext) initializerEvent.getContext()).success();
+      }
+      if (context != null) {
+        context.close();
       }
     }
   }
@@ -88,8 +93,8 @@ public class ParameterGroupObjectBuilder<T> {
       String name = field.getName();
       if (hasParameter.test(name)) {
         Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters.apply(name)), context);
-        setField(field.getField().get(), object,
-                 context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue);
+        Object value = context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue;
+        setField(field.getField().get(), object, value);
       }
     }
 

@@ -21,6 +21,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.HasDelegate;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
@@ -51,15 +52,18 @@ import net.sf.cglib.proxy.InvocationHandler;
 public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProviderObjectBuilder<C> {
 
   DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
-                                         ExtensionModel extensionModel, MuleContext muleContext) {
-    super(providerModel, resolverSet, extensionModel, muleContext);
+                                         ExtensionModel extensionModel, ExpressionManager expressionManager,
+                                         MuleContext muleContext) {
+    super(providerModel, resolverSet, extensionModel, expressionManager, muleContext);
   }
 
   public DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
                                                 PoolingProfile poolingProfile,
                                                 ReconnectionConfig reconnectionConfig,
-                                                ExtensionModel extensionModel, MuleContext muleContext) {
-    super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, muleContext);
+                                                ExtensionModel extensionModel,
+                                                ExpressionManager expressionManager,
+                                                MuleContext muleContext) {
+    super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager, muleContext);
   }
 
   @Override

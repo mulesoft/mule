@@ -70,16 +70,20 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
       builder = new SoapConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                         reconnectionConfig,
                                                         extensionModel,
+                                                        expressionManager,
                                                         muleContext);
     } else if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
       builder = new OAuthConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                          reconnectionConfig,
-                                                         oauthManager, extensionModel,
+                                                         oauthManager,
+                                                         extensionModel,
+                                                         expressionManager,
                                                          muleContext);
     } else {
       builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                            reconnectionConfig,
                                                            extensionModel,
+                                                           expressionManager,
                                                            muleContext);
     }
 

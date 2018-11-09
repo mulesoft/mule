@@ -11,6 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
@@ -33,8 +34,9 @@ public final class ConfigurationObjectBuilder<T> extends ResolverSetBasedObjectB
 
   public ConfigurationObjectBuilder(ConfigurationModel configurationModel,
                                     ResolverSet resolverSet,
-                                    MuleContext muleContext) {
-    super(getConfigurationFactory(configurationModel).getObjectType(), configurationModel, resolverSet, muleContext);
+                                    ExpressionManager expressionManager,
+                                    MuleContext ctx) {
+    super(getConfigurationFactory(configurationModel).getObjectType(), configurationModel, resolverSet, expressionManager, ctx);
     this.configurationModel = configurationModel;
   }
 

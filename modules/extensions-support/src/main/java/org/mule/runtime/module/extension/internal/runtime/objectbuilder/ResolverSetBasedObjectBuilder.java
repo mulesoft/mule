@@ -54,17 +54,21 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   protected ReflectionCache reflectionCache;
   protected ExpressionManager expressionManager;
 
-  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ResolverSet resolverSet, MuleContext context) {
-    this(prototypeClass, null, resolverSet, context);
+  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass,
+                                       ResolverSet resolverSet,
+                                       ExpressionManager expressionManager,
+                                       MuleContext context) {
+    this(prototypeClass, null, resolverSet, expressionManager, context);
   }
 
   public ResolverSetBasedObjectBuilder(Class<?> prototypeClass,
                                        ParameterizedModel model,
                                        ResolverSet resolverSet,
+                                       ExpressionManager expressionManager,
                                        MuleContext context) {
     this.resolverSet = resolverSet;
     this.muleContext = context;
-    this.expressionManager = context.getExpressionManager();
+    this.expressionManager = expressionManager;
     singleValueSetters = createSingleValueSetters(prototypeClass, resolverSet);
     groupValueSetters = model != null ? settersFor(model, () -> getReflectionCache(), () -> expressionManager) : emptyList();
   }

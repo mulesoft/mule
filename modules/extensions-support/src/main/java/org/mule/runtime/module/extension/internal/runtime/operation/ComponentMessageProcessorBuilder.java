@@ -100,11 +100,11 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   protected ResolverSet getArgumentsResolverSet() throws ConfigurationException {
     final ResolverSet parametersResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache)
+        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache, expressionManager)
             .getParametersAsResolverSet(operationModel, muleContext);
 
     final ResolverSet childsResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache)
+        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache, expressionManager)
             .getNestedComponentsAsResolverSet(operationModel);
 
     return parametersResolverSet.merge(childsResolverSet);

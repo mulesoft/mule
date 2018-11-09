@@ -28,6 +28,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -147,8 +148,8 @@ public class SourceAdapter implements Lifecycle {
     this.sourceModel = sourceModel;
     this.source = source;
     sourceInvokationTarget = source instanceof PollingSourceWrapper
-        ? () -> ((SourceWrapper<Object, Object>) source).getDelegate()
-        : () -> source;
+      ? () -> ((SourceWrapper<Object, Object>) source).getDelegate()
+      : () -> source;
     this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
@@ -169,8 +170,8 @@ public class SourceAdapter implements Lifecycle {
 
   private SourceCompletionHandlerFactory createCompletionHandlerFactory() {
     return sourceModel.getModelProperty(SourceCallbackModelProperty.class)
-        .map(this::doCreateCompletionHandler)
-        .orElse(context -> new NullSourceCompletionHandler());
+      .map(this::doCreateCompletionHandler)
+      .orElse(context -> new NullSourceCompletionHandler());
   }
 
   private SourceCompletionHandlerFactory doCreateCompletionHandler(SourceCallbackModelProperty modelProperty) {
@@ -205,15 +206,15 @@ public class SourceAdapter implements Lifecycle {
                                                    SourceCallbackModelProperty sourceCallbackModel,
                                                    SourceCallbackExecutor then) {
     SourceCallbackExecutor executor = method
-        .map(m -> (SourceCallbackExecutor) new ReflectiveSourceCallbackExecutor(extensionModel, configurationInstance,
-                                                                                sourceModel,
-                                                                                sourceInvokationTarget.get(),
-                                                                                m, cursorProviderFactory,
-                                                                                streamingManager,
-                                                                                component,
-                                                                                muleContext,
-                                                                                sourceCallbackModel))
-        .orElse(NullSourceCallbackExecutor.INSTANCE);
+      .map(m -> (SourceCallbackExecutor) new ReflectiveSourceCallbackExecutor(extensionModel, configurationInstance,
+                                                                              sourceModel,
+                                                                              sourceInvokationTarget.get(),
+                                                                              m, cursorProviderFactory,
+                                                                              streamingManager,
+                                                                              component,
+                                                                              muleContext,
+                                                                              sourceCallbackModel))
+      .orElse(NullSourceCallbackExecutor.INSTANCE);
 
     if (then != null) {
       executor = new ComposedSourceCallbackExecutor(executor, then);
@@ -229,7 +230,7 @@ public class SourceAdapter implements Lifecycle {
     }
 
     flowBackPressueErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)
-        .orElseThrow(() -> new IllegalStateException("FLOW_BACK_PRESSURE error type not found"));
+      .orElseThrow(() -> new IllegalStateException("FLOW_BACK_PRESSURE error type not found"));
 
     initialiseIfNeeded(nonCallbackParameters, true, muleContext);
     initialiseIfNeeded(errorCallbackParameters, true, muleContext);
@@ -288,8 +289,8 @@ public class SourceAdapter implements Lifecycle {
     public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
       final CoreEvent event = exception.getEvent();
       final boolean isBackPressureError = event.getError()
-          .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
-          .orElse(false);
+        .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
+        .orElse(false);
 
       SourceCallbackExecutor executor;
       if (isBackPressureError) {
@@ -308,8 +309,8 @@ public class SourceAdapter implements Lifecycle {
     public void onTerminate(Either<MessagingException, CoreEvent> result) throws Exception {
       CoreEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
       from(onTerminateExecutor.execute(event, emptyMap(), context))
-          .doAfterTerminate(() -> context.releaseConnection())
-          .subscribe();
+        .doAfterTerminate(() -> context.releaseConnection())
+        .subscribe();
     }
 
     private void commit() {
@@ -336,16 +337,14 @@ public class SourceAdapter implements Lifecycle {
 
     @Override
     public Map<String, Object> createResponseParameters(CoreEvent event) throws MessagingException {
-      try {
-        ResolverSet resolverSet = SourceAdapter.this.successCallbackParameters;
-        ValueResolvingContext context = ValueResolvingContext.builder(event)
-            .withExpressionManager(expressionManager)
-            .dynamic(resolverSet.isDynamic())
-            .withConfig(configurationInstance)
-            .resolveCursors(false)
-            .build();
-        ResolverSetResult parameters = resolverSet.resolve(context);
-        return parameters.asMap();
+      ResolverSet resolverSet = SourceAdapter.this.successCallbackParameters;
+      try (ValueResolvingContext context = ValueResolvingContext.builder(event)
+                                                                .withExpressionManager(expressionManager)
+                                                                .dynamic(resolverSet.isDynamic())
+                                                                .withConfig(configurationInstance)
+                                                                .resolveCursors(false)
+                                                                .build()) {
+        return resolverSet.resolve(context).asMap();
       } catch (Exception e) {
         throw createSourceException(event, e);
       }
@@ -353,14 +352,13 @@ public class SourceAdapter implements Lifecycle {
 
     @Override
     public Map<String, Object> createFailureResponseParameters(CoreEvent event) throws MessagingException {
-      try {
-        ResolverSet resolverSet = SourceAdapter.this.errorCallbackParameters;
-        ValueResolvingContext ctx = ValueResolvingContext.builder(event)
-            .withExpressionManager(expressionManager)
-            .withConfig(configurationInstance)
-            .dynamic(resolverSet.isDynamic())
-            .resolveCursors(false)
-            .build();
+      ResolverSet resolverSet = SourceAdapter.this.errorCallbackParameters;
+      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event)
+                                                            .withExpressionManager(expressionManager)
+                                                            .withConfig(configurationInstance)
+                                                            .dynamic(resolverSet.isDynamic())
+                                                            .resolveCursors(false)
+                                                            .build()) {
         ResolverSetResult parameters = resolverSet.resolve(ctx);
         return parameters.asMap();
       } catch (Exception e) {
@@ -417,18 +415,18 @@ public class SourceAdapter implements Lifecycle {
 
     FieldSetter<Object, ConnectionProvider> setter = connectionSetter.get();
     ConfigurationInstance config = configurationInstance.orElseThrow(() -> new DefaultMuleException(createStaticMessage(
-                                                                                                                        "Message Source on root component '%s' requires a connection but it doesn't point to any configuration. Please review your "
-                                                                                                                            + "application",
-                                                                                                                        component
-                                                                                                                            .getLocation()
-                                                                                                                            .getRootContainerName())));
+      "Message Source on root component '%s' requires a connection but it doesn't point to any configuration. Please review your "
+        + "application",
+      component
+        .getLocation()
+        .getRootContainerName())));
 
     if (!config.getConnectionProvider().isPresent()) {
       throw new DefaultMuleException(createStaticMessage(format(
-                                                                "Message Source on root component '%s' requires a connection, but points to config '%s' which doesn't specify any. "
-                                                                    + "Please review your application",
-                                                                component.getLocation().getRootContainerName(),
-                                                                config.getName())));
+        "Message Source on root component '%s' requires a connection, but points to config '%s' which doesn't specify any. "
+          + "Please review your application",
+        component.getLocation().getRootContainerName(),
+        config.getName())));
     }
 
     ConnectionProvider<Object> connectionProvider = new SourceConnectionProvider(connectionManager, config);
@@ -447,12 +445,12 @@ public class SourceAdapter implements Lifecycle {
     return fetchField(Connection.class).map(field -> {
       if (!ConnectionProvider.class.equals(field.getType())) {
         throw new IllegalModelDefinitionException(format(
-                                                         "Message Source defined on class '%s' has field '%s' of type '%s' annotated with @%s. That annotation can only be "
-                                                             + "used on fields of type '%s'",
-                                                         sourceInvokationTarget.get().getClass().getName(), field.getName(),
-                                                         field.getType().getName(),
-                                                         Connection.class.getName(),
-                                                         ConnectionProvider.class.getName()));
+          "Message Source defined on class '%s' has field '%s' of type '%s' annotated with @%s. That annotation can only be "
+            + "used on fields of type '%s'",
+          sourceInvokationTarget.get().getClass().getName(), field.getName(),
+          field.getType().getName(),
+          Connection.class.getName(),
+          ConnectionProvider.class.getName()));
       }
 
       return new FieldSetter<>(field);
@@ -468,10 +466,10 @@ public class SourceAdapter implements Lifecycle {
     if (fields.size() > 1) {
       // TODO: MULE-9220 Move this to a syntax validator
       throw new IllegalModelDefinitionException(
-                                                format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
-                                                    + "Only one field in the class can bare such annotation",
-                                                       sourceInvokationTarget.get().getClass().getName(),
-                                                       annotation.getSimpleName()));
+        format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
+                 + "Only one field in the class can bare such annotation",
+               sourceInvokationTarget.get().getClass().getName(),
+               annotation.getSimpleName()));
     }
 
     return of(fields.iterator().next());
@@ -488,8 +486,8 @@ public class SourceAdapter implements Lifecycle {
   Optional<Publisher<Void>> getReconnectionAction(ConnectionException e) {
     if (sourceInvokationTarget.get() instanceof Reconnectable) {
       return of(
-                create(sink -> ((Reconnectable) sourceInvokationTarget.get()).reconnect(e,
-                                                                                        new ReactiveReconnectionCallback(sink))));
+        create(sink -> ((Reconnectable) sourceInvokationTarget.get()).reconnect(e,
+                                                                                new ReactiveReconnectionCallback(sink))));
     }
 
     return empty();
@@ -497,12 +495,12 @@ public class SourceAdapter implements Lifecycle {
 
   public SourceTransactionalAction getTransactionalAction() {
     return getNonCallbackParameterValue(getTransactionalActionFieldName(), SourceTransactionalAction.class)
-        .orElse(NONE);
+      .orElse(NONE);
   }
 
   TransactionType getTransactionalType() {
     return getNonCallbackParameterValue(getTransactionTypeFieldName(), TransactionType.class)
-        .orElse(LOCAL);
+      .orElse(LOCAL);
   }
 
   private <T> Optional<T> getNonCallbackParameterValue(String fieldName, Class<T> type) {
@@ -515,15 +513,15 @@ public class SourceAdapter implements Lifecycle {
     T object;
 
     CoreEvent initialiserEvent = null;
-    try {
+    try (ValueResolvingContext context =ValueResolvingContext.builder(initialiserEvent)
+      .withExpressionManager(expressionManager)
+      .dynamic(valueResolver.isDynamic())
+      .build()) {
       initialiserEvent = getInitialiserEvent(muleContext);
-      object = valueResolver.resolve(ValueResolvingContext.builder(initialiserEvent)
-          .withExpressionManager(expressionManager)
-          .dynamic(valueResolver.isDynamic())
-          .build());
+      object = valueResolver.resolve(context);
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage("Unable to get the " + type.getSimpleName()
-          + " value for Message Source"), e);
+                                                           + " value for Message Source"), e);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -547,12 +545,12 @@ public class SourceAdapter implements Lifecycle {
 
   private String getFieldNameEnrichedWith(Class<? extends ModelProperty> type, String defaultName) {
     return sourceModel.getAllParameterModels()
-        .stream()
-        .filter(param -> param.getModelProperty(type).isPresent())
-        .filter(param -> param.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
-        .map(param -> param.getModelProperty(DeclaringMemberModelProperty.class).get())
-        .findAny()
-        .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(defaultName);
+      .stream()
+      .filter(param -> param.getModelProperty(type).isPresent())
+      .filter(param -> param.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
+      .map(param -> param.getModelProperty(DeclaringMemberModelProperty.class).get())
+      .findAny()
+      .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(defaultName);
   }
 
   private MessagingException createSourceException(CoreEvent event, Throwable cause) {

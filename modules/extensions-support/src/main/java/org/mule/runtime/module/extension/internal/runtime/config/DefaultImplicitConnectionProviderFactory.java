@@ -62,7 +62,7 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
                                                    "Configuration '%s' of extension '%s' does not define a connection provider and none can be created automatically. Please define one.",
                                                    configurationModel.getName(), extensionModel.getName()));
           }
-          resolverSet = buildImplicitResolverSet(connectionProviderModel, reflectionCache, muleContext);
+          resolverSet = buildImplicitResolverSet(connectionProviderModel, reflectionCache, expressionManager, muleContext);
           resolverSetProvider = () -> resolverSet;
         }
         return resolverSet;
@@ -79,6 +79,7 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
     ConnectionProviderObjectBuilder<T> builder = new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel,
                                                                                               resolverSet,
                                                                                               extensionModel,
+                                                                                              expressionManager,
                                                                                               muleContext);
     builder.setOwnerConfigName(configName);
     try {

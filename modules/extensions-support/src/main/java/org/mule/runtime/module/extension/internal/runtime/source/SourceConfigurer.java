@@ -82,7 +82,7 @@ public final class SourceConfigurer {
    */
   public Source configure(Source source, Optional<ConfigurationInstance> config) {
     ResolverSetBasedObjectBuilder<Source> builder =
-        new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet, muleContext) {
+        new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet, expressionManager, muleContext) {
 
           @Override
           protected Source instantiateObject() {
@@ -101,13 +101,15 @@ public final class SourceConfigurer {
         };
 
     CoreEvent initialiserEvent = null;
+    ValueResolvingContext context = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
-      Source configuredSource = builder.build(ValueResolvingContext.builder(initialiserEvent)
-          .withExpressionManager(expressionManager)
-          .dynamic(builder.isDynamic())
-          .withConfig(config)
-          .build());
+      context = ValueResolvingContext.builder(initialiserEvent)
+        .withExpressionManager(expressionManager)
+        .dynamic(builder.isDynamic())
+        .withConfig(config)
+        .build();
+      Source configuredSource = builder.build(context);
 
       if (configuredSource instanceof PollingSource) {
         ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME);
@@ -116,10 +118,11 @@ public final class SourceConfigurer {
             throw new IllegalStateException("The scheduling strategy has not been configured");
           }
         } else {
-          Scheduler scheduler = (Scheduler) valueResolver.resolve(ValueResolvingContext.builder(initialiserEvent)
-              .withExpressionManager(expressionManager)
-              .dynamic(valueResolver.isDynamic())
-              .build());
+          context = ValueResolvingContext.builder(initialiserEvent)
+            .withExpressionManager(expressionManager)
+            .dynamic(valueResolver.isDynamic())
+            .build();
+          Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }
@@ -131,6 +134,9 @@ public final class SourceConfigurer {
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
+      if (context != null) {
+        context.close();
       }
     }
   }

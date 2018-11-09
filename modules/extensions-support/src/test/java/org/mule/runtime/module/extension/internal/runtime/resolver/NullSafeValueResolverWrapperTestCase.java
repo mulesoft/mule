@@ -92,7 +92,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   private void assertExpected(ValueResolver valueResolver, MetadataType type, boolean isDynamic, Object expected)
       throws Exception {
-    ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache,
+    ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache, expressionManager,
                                                              muleContext, objectTypeParametersResolver);
     ValueResolvingContext ctx = ValueResolvingContext.builder(event)
         .withExpressionManager(expressionManager)

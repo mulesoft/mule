@@ -50,7 +50,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -330,6 +329,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 } catch (MuleException e) {
                   throw new MuleRuntimeException(e);
                 }
+                finally {
+                  resolvingContext.get().close();
+                }
               }
             });
       } else {
@@ -353,6 +355,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
+        }
+        finally {
+          resolvingContext.get().close();
         }
       }
     });
@@ -472,7 +477,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-
   @Override
   public abstract ProcessingType getProcessingType();
 
@@ -527,11 +531,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
-    return resolverSet.resolve(ValueResolvingContext.builder(event)
-        .withExpressionManager(expressionManager)
-        .dynamic(resolverSet.isDynamic())
-        .withConfig(configuration)
-        .build()).asMap();
+    try(ValueResolvingContext context = ValueResolvingContext.builder(event)
+      .withExpressionManager(expressionManager)
+      .dynamic(resolverSet.isDynamic())
+      .withConfig(configuration)
+      .build()) {
+      return resolverSet.resolve(context).asMap();
+    }
   }
 
   private boolean isInterceptedComponent(ComponentLocation location, InternalEvent event) {

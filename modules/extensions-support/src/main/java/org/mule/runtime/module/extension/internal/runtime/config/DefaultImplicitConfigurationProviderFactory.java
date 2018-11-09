@@ -58,7 +58,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
 
     final String providerName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
     Callable<ResolverSet> resolverSetCallable =
-        () -> buildImplicitResolverSet(implicitConfigurationModel, reflectionCache, muleContext);
+        () -> buildImplicitResolverSet(implicitConfigurationModel, reflectionCache, expressionManager, muleContext);
     ClassLoader pluginClassloader = getClassLoader(extensionModel);
     final ResolverSet resolverSet = withContextClassLoader(pluginClassloader, resolverSetCallable);
     try {

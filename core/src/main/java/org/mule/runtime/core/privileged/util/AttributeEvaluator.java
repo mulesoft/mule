@@ -11,6 +11,7 @@ import static java.util.regex.Pattern.compile;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -24,8 +25,9 @@ import org.mule.runtime.core.privileged.util.attribute.StaticAttributeEvaluatorD
 import java.util.regex.Pattern;
 
 /**
- * This class acts as a wrapper for configuration attributes that support simple text, expression or regular expressions. It can
- * be extended to support other cases too.
+ * This class acts as a wrapper for component attributes that support simple text, expression, parse expressions or templates.
+ * <p>
+ * It can be extended to support other cases too.
  */
 public final class AttributeEvaluator {
 
@@ -49,7 +51,7 @@ public final class AttributeEvaluator {
   /**
    * Creates a new Attribute Evaluator instance with a given attribute value and the expected {@link DataType}
    *
-   * @param attributeValue the value for an attribute, this value can be treated as expression, parse_expression or static.
+   * @param attributeValue   the value for an attribute, this value can be treated as expression, parse_expression or static.
    * @param expectedDataType specifies that the expression should be evaluated a coerced to the given expected {@link DataType}.
    */
   public AttributeEvaluator(String attributeValue, DataType expectedDataType) {
@@ -88,6 +90,14 @@ public final class AttributeEvaluator {
     }
     String remainingString = attributeValue.substring(beginExpression + DEFAULT_EXPRESSION_PREFIX.length());
     return remainingString.contains(DEFAULT_EXPRESSION_POSTFIX);
+  }
+
+  /**
+   * @deprecated use the {@link #resolveTypedValue(ExpressionManagerSession)}) with a proper created session}
+   */
+  @Deprecated
+  public <T> TypedValue<T> resolveTypedValueFromContext(BindingContext context) {
+    return evaluator.resolve(context, expressionManager);
   }
 
   public <T> TypedValue<T> resolveTypedValue(ExpressionManagerSession session) {

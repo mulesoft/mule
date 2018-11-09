@@ -34,6 +34,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -53,7 +54,8 @@ import java.util.Optional;
  * <p>
  * The values are generated according to the rules described in {@link NullSafe}.
  * <p>
- * Instances are to be obtained through the {@link #of(ValueResolver, MetadataType, MuleContext, ObjectTypeParametersResolver)} )}
+ * Instances are to be obtained through the
+ * {@link #of(ValueResolver, MetadataType, ReflectionCache, ExpressionManager, MuleContext, ObjectTypeParametersResolver)} )} )}
  * factory method
  *
  * @param <T> the generic type of the produced values.
@@ -81,6 +83,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate,
                                         MetadataType type,
                                         ReflectionCache reflectionCache,
+                                        ExpressionManager expressionManager,
                                         MuleContext muleContext,
                                         ObjectTypeParametersResolver parametersResolver) {
     checkArgument(delegate != null, "delegate cannot be null");
@@ -145,7 +148,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
               }
 
               fieldResolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType, reflectionCache,
-                                                              muleContext, parametersResolver);
+                                                              expressionManager, muleContext, parametersResolver);
             }
 
             if (field.getAnnotation(ConfigOverride.class) != null) {
@@ -159,7 +162,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           }
         }
 
-        ObjectBuilder<T> objectBuilder = new DefaultResolverSetBasedObjectBuilder<T>(clazz, resolverSet, muleContext);
+        ObjectBuilder<T> objectBuilder = new DefaultResolverSetBasedObjectBuilder<T>(clazz, resolverSet, expressionManager, muleContext);
 
         wrappedResolver.set(new NullSafeValueResolverWrapper(delegate,
                                                              new ObjectBuilderValueResolver(objectBuilder, muleContext),

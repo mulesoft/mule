@@ -79,7 +79,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
 
     resolverSet = createResolverSet();
 
-    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet, context);
+    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet, expressionManager, context);
   }
 
   @Test

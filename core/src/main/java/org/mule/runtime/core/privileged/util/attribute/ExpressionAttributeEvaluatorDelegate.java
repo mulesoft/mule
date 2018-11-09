@@ -25,7 +25,8 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
- * {@link AttributeEvaluatorDelegate} implementation that resolves EXPRESSION attribute values.
+ * {@link AttributeEvaluatorDelegate} implementation that resolves attributes with expression values that needs to be evaluated
+ * with a given session or event.
  *
  * @since 4.2.0
  */
@@ -53,6 +54,13 @@ public final class ExpressionAttributeEvaluatorDelegate<T> implements AttributeE
   @Override
   public TypedValue<T> resolve(ExpressionManagerSession session) {
     return resolveExpressionWithSession(session);
+  }
+
+  @Override
+  public TypedValue<T> resolve(BindingContext context, ExtendedExpressionManager expressionManager) {
+    try (ExpressionManagerSession session = expressionManager.openSession(context)) {
+      return resolveExpressionWithSession(session);
+    }
   }
 
   private TypedValue<T> resolveExpressionWithSession(ExpressionManagerSession session) {
