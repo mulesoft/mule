@@ -72,10 +72,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
       initialiserEvent = getInitialiserEvent(muleContext);
       if (connectivityTestingObject instanceof ConnectionProviderResolver) {
         ConnectionProviderResolver<?> resolver = (ConnectionProviderResolver<?>) connectivityTestingObject;
-        try(ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent)
-          .withExpressionManager(expressionManager)
-          .dynamic(resolver.isDynamic())
-          .build()) {
+        try (ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent, expressionManager).build()) {
           ConnectionProvider connectionProvider = resolver.resolve(ctx).getFirst();
           return connectionManager.testConnectivity(connectionProvider);
         }

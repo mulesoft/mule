@@ -305,10 +305,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           CoreEvent initialiserEvent = null;
           try {
             initialiserEvent = getInitialiserEvent();
-            return ValueResolvingContext.builder(initialiserEvent)
-                .withExpressionManager(expressionManager)
+            return ValueResolvingContext.builder(initialiserEvent, expressionManager)
                 .withConfig(staticConfiguration.get())
-                .dynamic(resolverSet.isDynamic())
                 .build();
           } finally {
             if (initialiserEvent != null) {
@@ -328,8 +326,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   params.put(getMemberName(p), resolveValue(resolver, resolvingContext.get()));
                 } catch (MuleException e) {
                   throw new MuleRuntimeException(e);
-                }
-                finally {
+                } finally {
                   resolvingContext.get().close();
                 }
               }
@@ -355,8 +352,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
-        }
-        finally {
+        } finally {
           resolvingContext.get().close();
         }
       }
@@ -461,13 +457,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
-    CoreEvent event = null;
-    try {
-      event = getInitialiserEvent(muleContext);
-      ValueResolvingContext ctx = ValueResolvingContext.builder(event)
-          .withExpressionManager(expressionManager)
-          .dynamic(resolverSet.isDynamic())
-          .build();
+    CoreEvent event = getInitialiserEvent(muleContext);
+    try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
       LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
       return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);
     } finally {
@@ -531,11 +522,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
-    try(ValueResolvingContext context = ValueResolvingContext.builder(event)
-      .withExpressionManager(expressionManager)
-      .dynamic(resolverSet.isDynamic())
-      .withConfig(configuration)
-      .build()) {
+    try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
+        .withConfig(configuration).build()) {
       return resolverSet.resolve(context).asMap();
     }
   }

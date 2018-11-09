@@ -50,6 +50,6 @@ public class StaticValueResolverTestCase extends AbstractMuleTestCase {
 
   private void assertExpected(Object expected) throws Exception {
     resolver = new StaticValueResolver(expected);
-    assertThat(resolver.resolve(ValueResolvingContext.builder(event).dynamic(resolver.isDynamic()).build()), is(expected));
+    assertThat(resolver.resolve(ValueResolvingContext.builder(event).build()), is(expected));
   }
 }

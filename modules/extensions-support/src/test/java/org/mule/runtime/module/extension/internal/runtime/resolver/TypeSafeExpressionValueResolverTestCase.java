@@ -85,7 +85,6 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
     when(expressionManager.openSession(anyObject(), anyObject(), anyObject())).thenReturn(session);
 
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())
-        .dynamic(resolver.isDynamic())
         .withExpressionManager(expressionManager)
         .build();
 

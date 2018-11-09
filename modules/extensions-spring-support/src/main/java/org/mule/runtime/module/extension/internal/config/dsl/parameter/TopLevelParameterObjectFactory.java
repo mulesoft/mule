@@ -77,12 +77,8 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
         return resolver;
       }
 
-      CoreEvent initialiserEvent = null;
-      try(ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent)
-                                                            .withExpressionManager(expressionManager)
-                                                            .dynamic(resolver.isDynamic())
-                                                            .build()) {
-        initialiserEvent = getInitialiserEvent(muleContext);
+      CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
+      try (ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent, expressionManager).build()) {
         staticProduct = resolver.resolve(ctx);
         muleContext.getInjector().inject(staticProduct);
         return staticProduct;

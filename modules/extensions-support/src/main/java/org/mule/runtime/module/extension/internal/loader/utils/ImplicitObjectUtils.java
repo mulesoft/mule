@@ -49,7 +49,8 @@ public final class ImplicitObjectUtils {
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel model, ReflectionCache reflectionCache,
                                                      ExpressionManager expressionManager, MuleContext muleContext) {
     ResolverSet resolverSet = new HashedResolverSet(muleContext);
-    ParametersResolver parametersResolver = ParametersResolver.fromDefaultValues(model, muleContext, reflectionCache, expressionManager);
+    ParametersResolver parametersResolver =
+        ParametersResolver.fromDefaultValues(model, muleContext, reflectionCache, expressionManager);
 
     for (ParameterGroupModel groupModel : model.getParameterGroupModels()) {
       Optional<ParameterGroupDescriptor> descriptor = groupModel.getModelProperty(ParameterGroupModelProperty.class)

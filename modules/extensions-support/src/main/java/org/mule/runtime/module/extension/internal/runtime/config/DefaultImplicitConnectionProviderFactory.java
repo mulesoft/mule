@@ -82,11 +82,8 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
                                                                                               expressionManager,
                                                                                               muleContext);
     builder.setOwnerConfigName(configName);
-    try {
-      return builder.build(ValueResolvingContext.builder(event)
-          .withExpressionManager(expressionManager)
-          .dynamic(resolverSet.isDynamic())
-          .build());
+    try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
+      return builder.build(ctx);
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }

@@ -53,6 +53,17 @@ public class ValueResolvingContext implements AutoCloseable {
   }
 
   /**
+   * A builder to create {@link ValueResolvingContext} instances.
+   *
+   * @param event The event used to create this context
+   *
+   * @return a builder that can create instance of {@link ValueResolvingContext}
+   */
+  public static Builder builder(CoreEvent event, ExpressionManager expressionManager) {
+    return new Builder().withEvent(event).withExpressionManager(expressionManager);
+  }
+
+  /**
    * @return the {@link CoreEvent} of the current resolution context
    */
   public CoreEvent getEvent() {
@@ -114,7 +125,6 @@ public class ValueResolvingContext implements AutoCloseable {
     private Optional<ConfigurationInstance> config = empty();
     private ExpressionManager manager;
     private boolean resolveCursors = true;
-    private boolean dynamic = true;
 
     public Builder withEvent(CoreEvent event) {
       this.event = event;
@@ -141,17 +151,12 @@ public class ValueResolvingContext implements AutoCloseable {
       return this;
     }
 
-    public Builder dynamic(boolean dynamic) {
-      this.dynamic = dynamic;
-      return this;
-    }
-
     public ValueResolvingContext build() {
       if (event == null) {
         return new ValueResolvingContext(null, null, null, true);
       }
       ExpressionManagerSession session = null;
-      if (dynamic && manager != null) {
+      if (manager != null) {
         session = manager.openSession(event.asBindingContext());
       }
       return new ValueResolvingContext(event, session, config.orElse(null), resolveCursors);

@@ -56,7 +56,8 @@ public abstract class ConnectionProviderObjectBuilder<C>
                                          ExtensionModel extensionModel,
                                          ExpressionManager expressionManager,
                                          MuleContext muleContext) {
-    super(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet, expressionManager, muleContext);
+    super(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet, expressionManager,
+          muleContext);
     this.providerModel = providerModel;
     this.poolingProfile = poolingProfile;
     this.extensionModel = extensionModel;

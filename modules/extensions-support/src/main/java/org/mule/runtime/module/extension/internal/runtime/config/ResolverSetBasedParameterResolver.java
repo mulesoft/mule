@@ -48,7 +48,7 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
 
   @Override
   public Object getParameterValue(String paramName) throws ValueResolvingException {
-    try(ValueResolvingContext ctx = buildResolvingContext()) {
+    try (ValueResolvingContext ctx = buildResolvingContext()) {
       ValueResolver<?> valueResolver = resolverSet.getResolvers().get(paramName);
       if (valueResolver != null) {
         return valueResolver.resolve(ctx);
@@ -89,7 +89,7 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
       throws MuleException, ValueResolvingException {
     try (ValueResolvingContext context = buildResolvingContext()) {
       return new ObjectBasedParameterValueResolver(paramGroup.resolve(context), parameterizedModel, reflectionCache)
-        .getParameterValue(parameterName);
+          .getParameterValue(parameterName);
     }
   }
 

@@ -52,7 +52,7 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-      delegate = objectBuilder.build(ValueResolvingContext.builder(initialiserEvent).dynamic(false).build());
+      delegate = objectBuilder.build(ValueResolvingContext.builder(initialiserEvent).build());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
           + implementationClass.getName()), e);

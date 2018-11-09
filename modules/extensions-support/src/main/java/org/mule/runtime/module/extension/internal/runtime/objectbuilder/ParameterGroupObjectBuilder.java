@@ -59,7 +59,7 @@ public class ParameterGroupObjectBuilder<T> {
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
-    try(ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
+    try (ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
         .withExpressionManager(expressionManager)
         .withConfig(executionContext.getConfiguration())
         .build()) {
@@ -73,7 +73,7 @@ public class ParameterGroupObjectBuilder<T> {
     ValueResolvingContext context = null;
     try {
       initializerEvent = getInitialiserEvent();
-      context = ValueResolvingContext.builder(initializerEvent).dynamic(false).build();
+      context = ValueResolvingContext.builder(initializerEvent).build();
       return doBuild(resultMap::containsKey, resultMap::get, context);
     } finally {
       if (initializerEvent != null) {

@@ -31,6 +31,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -401,13 +402,14 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public ExpressionManagerSession openSession(BindingContext context) {
-    return new DefaultExpressionManagerSession(expressionLanguage.openSession(null, null, context),
+    return new DefaultExpressionManagerSession(new LazyValue<>(() -> expressionLanguage.openSession(null, null, context)),
                                                currentThread().getContextClassLoader());
   }
 
   @Override
   public ExpressionManagerSession openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context) {
-    return new DefaultExpressionManagerSession(expressionLanguage.openSession(componentLocation, event, context),
+    return new DefaultExpressionManagerSession(new LazyValue<>(() -> expressionLanguage.openSession(componentLocation, event,
+                                                                                                    context)),
                                                currentThread().getContextClassLoader());
   }
 

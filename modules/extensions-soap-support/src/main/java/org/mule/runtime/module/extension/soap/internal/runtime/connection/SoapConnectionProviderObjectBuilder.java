@@ -48,7 +48,8 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
                                              MuleContext muleContext) {
     super(providerModel, getServiceProviderType(providerModel), resolverSet, poolingProfile,
           reconnectionConfig, extensionModel, expressionManager, muleContext);
-    objectBuilder = new DefaultResolverSetBasedObjectBuilder<>(getServiceProviderType(providerModel), resolverSet, expressionManager, muleContext);
+    objectBuilder = new DefaultResolverSetBasedObjectBuilder<>(getServiceProviderType(providerModel), resolverSet,
+                                                               expressionManager, muleContext);
   }
 
   /**

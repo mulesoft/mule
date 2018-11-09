@@ -104,11 +104,7 @@ public final class SourceConfigurer {
     ValueResolvingContext context = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
-      context = ValueResolvingContext.builder(initialiserEvent)
-        .withExpressionManager(expressionManager)
-        .dynamic(builder.isDynamic())
-        .withConfig(config)
-        .build();
+      context = ValueResolvingContext.builder(initialiserEvent, expressionManager).withConfig(config).build();
       Source configuredSource = builder.build(context);
 
       if (configuredSource instanceof PollingSource) {
@@ -118,10 +114,7 @@ public final class SourceConfigurer {
             throw new IllegalStateException("The scheduling strategy has not been configured");
           }
         } else {
-          context = ValueResolvingContext.builder(initialiserEvent)
-            .withExpressionManager(expressionManager)
-            .dynamic(valueResolver.isDynamic())
-            .build();
+          context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }

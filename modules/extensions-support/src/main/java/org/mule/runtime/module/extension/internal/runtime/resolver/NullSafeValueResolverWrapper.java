@@ -162,7 +162,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           }
         }
 
-        ObjectBuilder<T> objectBuilder = new DefaultResolverSetBasedObjectBuilder<T>(clazz, resolverSet, expressionManager, muleContext);
+        ObjectBuilder<T> objectBuilder =
+            new DefaultResolverSetBasedObjectBuilder<T>(clazz, resolverSet, expressionManager, muleContext);
 
         wrappedResolver.set(new NullSafeValueResolverWrapper(delegate,
                                                              new ObjectBuilderValueResolver(objectBuilder, muleContext),
