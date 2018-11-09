@@ -12,7 +12,7 @@ public class CxfCannotProcessEmptyPayloadException extends Exception
 
     public CxfCannotProcessEmptyPayloadException(Integer responseStatusCode)
     {
-        super("CXF cannot process and empty payload. Invoked service responded with status code: " + responseStatusCode.toString());
+        super("Invoked service responded with status code '" + responseStatusCode.toString() + "' and an empty body");
         responseCode = responseStatusCode;
     }
 }
