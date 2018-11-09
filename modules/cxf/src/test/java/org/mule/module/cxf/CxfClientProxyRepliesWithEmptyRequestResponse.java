@@ -42,7 +42,7 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
     public static final int SC_GATEWAY_TIMEOUT = 504;
     public static final int SC_ACCEPTED = 202;
     public static final int SC_INTERNAL_SERVER_ERROR = 500;
-    private HttpRequestOptions ignoreStatusCodeValidationOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().build();
+    public static final int CLIENT_TIMEOUT = 1000;
     private HttpServer server;
 
 
@@ -67,7 +67,7 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
     }
 
     @After
-    public void tearDown() throws Exception
+    public void tearDown()
     {
         server.shutdown();
     }
@@ -119,6 +119,7 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
 
         HttpClient client = new HttpClient();
         HttpClientParams clientParams = new HttpClientParams();
+        clientParams.setSoTimeout(CLIENT_TIMEOUT);
         client.setParams(clientParams);
 
         PostMethod soapRequestPostMethod = new PostMethod("http://localhost:" + listenerDynamicPort.getNumber() + "/");
