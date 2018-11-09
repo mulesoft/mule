@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.transport;
 
+import static org.apache.cxf.common.util.SOAPConstants.SOAP_ACTION;
 import static org.mule.module.cxf.CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR;
 import static org.mule.module.cxf.CxfConstants.MULE_EVENT;
 import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
@@ -51,7 +52,6 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfCannotProcessEmptyPayloadException;
 import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.transformer.types.DataTypeFactory;
@@ -74,6 +74,7 @@ import java.util.logging.Logger;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.interceptor.Fault;
@@ -382,10 +383,12 @@ public class MuleUniversalConduit extends AbstractConduit
         m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
     }
 
-    private boolean cxfMessageProcessorIsProxy(Message m)
+    private boolean cxfMessageProcessorIsProxy(Message aMessage)
     {
-        return m.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR) != null &&
-               ((CxfOutboundMessageProcessor) m.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR)).isProxy();
+        // The SOAPAction check is done to verify if the 'message' does not correspond to a WS Consumer.
+        return aMessage.get(SOAP_ACTION) == null &&
+               aMessage.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR) != null &&
+               ((CxfOutboundMessageProcessor) aMessage.getExchange().get(CXF_OUTBOUND_MESSAGE_PROCESSOR)).isProxy();
     }
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
