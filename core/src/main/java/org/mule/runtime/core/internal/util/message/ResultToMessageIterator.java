@@ -7,8 +7,9 @@
 package org.mule.runtime.core.internal.util.message;
 
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -25,7 +26,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-final class ResultToMessageIterator implements Iterator<Message> {
+final class ResultToMessageIterator implements Iterator<Message>, HasSize {
 
   private final Iterator<Object> delegate;
   private final CursorProviderFactory cursorProviderFactory;
@@ -44,7 +45,6 @@ final class ResultToMessageIterator implements Iterator<Message> {
     return delegate.hasNext();
   }
 
-
   @Override
   public Message next() {
     Object value = delegate.next();
@@ -58,6 +58,11 @@ final class ResultToMessageIterator implements Iterator<Message> {
   @Override
   public void remove() {
     delegate.remove();
+  }
+
+  @Override
+  public int getSize() {
+    return delegate instanceof HasSize ? ((HasSize) delegate).getSize() : -1;
   }
 
   @Override
