@@ -33,9 +33,6 @@ public class DefaultExpressionManagerFactoryBean implements FactoryBean<Extended
   public ExtendedExpressionManager getObject() throws Exception {
     DefaultExpressionManager delegate = new DefaultExpressionManager();
     muleContext.getInjector().inject(delegate);
-
-    //    TODO
-    //    delegate.initialise();
     return (ExtendedExpressionManager) createClassLoaderInjectorInvocationHandler(delegate,
                                                                                   muleContext.getExecutionClassLoader());
   }
