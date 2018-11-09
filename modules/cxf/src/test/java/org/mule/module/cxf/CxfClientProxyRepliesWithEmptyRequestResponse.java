@@ -81,7 +81,7 @@ public class CxfClientProxyRepliesWithEmptyRequestResponse extends AbstractServi
     }
 
     @Test
-    public void testCxfProxyBypasssesAcceptedStatusCode() throws IOException
+    public void testCxfProxyBypassesAcceptedStatusCode() throws IOException
     {
         startSoapServiceResponding(SC_ACCEPTED);
         int resultStatusCode = makeSoapRequest();
