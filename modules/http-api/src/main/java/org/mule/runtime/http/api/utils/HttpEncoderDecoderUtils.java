@@ -8,14 +8,19 @@ package org.mule.runtime.http.api.utils;
 
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
+import static java.util.regex.Pattern.compile;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.api.util.MultiMap.StringMultiMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -31,7 +36,7 @@ public final class HttpEncoderDecoderUtils {
     // Nothing to do
   }
 
-  private static final Pattern SPACES_MATCHER = Pattern.compile(" ");
+  private static final Pattern SPACES_MATCHER = compile(" ");
   private static final String SPACE_ENTITY = "%20";
 
   /**
@@ -98,8 +103,9 @@ public final class HttpEncoderDecoderUtils {
    * @return a map representation of the {@code queryString}
    */
   public static MultiMap<String, String> decodeUrlEncodedBody(String queryString, Charset encoding) {
-    MultiMap<String, String> queryParams = new MultiMap<>();
     if (queryString != null && queryString.trim().length() > 0) {
+      MultiMap<String, String> queryParams = new StringMultiMap();
+
       String[] pairs = queryString.split("&");
       for (String pair : pairs) {
         int idx = pair.indexOf("=");
@@ -111,8 +117,10 @@ public final class HttpEncoderDecoderUtils {
 
         }
       }
+      return queryParams;
+    } else {
+      return emptyMultiMap();
     }
-    return queryParams;
   }
 
   /**
@@ -123,8 +131,9 @@ public final class HttpEncoderDecoderUtils {
    * @return a map with the uri params present in the request path with the values decoded.
    */
   public static Map<String, String> decodeUriParams(String pathWithUriParams, String requestPath) {
-    MultiMap<String, String> uriParams = new MultiMap<>();
     if (pathWithUriParams.contains("{")) {
+      Map<String, String> uriParams = new HashMap<>();
+
       final String[] requestPathParts = requestPath.split("/");
       final String[] listenerPathParts = pathWithUriParams.split("/");
       int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
@@ -137,8 +146,10 @@ public final class HttpEncoderDecoderUtils {
           uriParams.put(parameterName, decode(parameterValue, UTF_8));
         }
       }
+      return uriParams;
+    } else {
+      return emptyMap();
     }
-    return uriParams;
   }
 
   private static void addParam(MultiMap<String, String> queryParams, String name, String value, Charset encoding) {
