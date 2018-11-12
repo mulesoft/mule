@@ -152,7 +152,12 @@ public final class JreExplorer {
 
   private static void exploreDirectory(final Set<String> packages, Set<String> resources, List<ExportedService> services,
                                        final File file) {
-    for (File entry : file.listFiles()) {
+    File[] content = file.listFiles();
+    if (content == null) {
+      return;
+    }
+
+    for (File entry : content) {
       if (entry.isDirectory()) {
         exploreDirectory(packages, resources, services, entry);
       } else if (entry.getName().endsWith(".jar")) {
