@@ -16,13 +16,6 @@ import static java.util.regex.Matcher.quoteReplacement;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -31,6 +24,14 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Provides Maven related utilities for testing purposes
@@ -68,8 +69,21 @@ public class MavenTestUtils {
    * @return the installed artifact on the Maven repository.
    */
   public static File installMavenArtifact(String baseDirectory, BundleDescriptor descriptor) {
-    runMavenGoal(INSTALL_GOALS, baseDirectory);
-    runMavenGoal(CLEAN_GOALS, baseDirectory);
+    return installMavenArtifact(baseDirectory, descriptor, new Properties());
+  }
+
+  /**
+   * Runs the Maven install goal using the project on the given directory for the artifact defined by the given descriptor. After
+   * the artifact has been installed, performs the Maven clean goal to delete the intermediate resources.
+   *
+   * @param baseDirectory directory on which the POM resides.
+   * @param descriptor the artifact descriptor for the project being built.
+   * @param props the system properties to pass the Maven jobs
+   * @return the installed artifact on the Maven repository.
+   */
+  public static File installMavenArtifact(String baseDirectory, BundleDescriptor descriptor, Properties props) {
+    runMavenGoal(INSTALL_GOALS, baseDirectory, props);
+    runMavenGoal(CLEAN_GOALS, baseDirectory, props);
     return findMavenArtifact(descriptor);
   }
 
@@ -110,7 +124,7 @@ public class MavenTestUtils {
     return mavenLocalRepositoryLocation;
   }
 
-  private static void runMavenGoal(List<String> goals, String baseDirectory) {
+  private static void runMavenGoal(List<String> goals, String baseDirectory, Properties props) {
     Invoker invoker = new DefaultInvoker();
     invoker.setLocalRepositoryDirectory(getMavenLocalRepository());
     invoker.setLogger(LOGGER);
@@ -118,6 +132,7 @@ public class MavenTestUtils {
     InvocationRequest request = new DefaultInvocationRequest();
     request.setGoals(goals);
     request.setBatchMode(true);
+    request.setProperties(props);
 
     File mavenArtifactsAndBaseDirectory;
     File baseDirFile = new File(baseDirectory);
