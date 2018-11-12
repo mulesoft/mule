@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -28,11 +29,11 @@ public class ValueResolvingContext implements AutoCloseable {
 
   private CoreEvent event;
   private final ConfigurationInstance config;
-  private final ExpressionManagerSession session;
+  private final LazyValue<ExpressionManagerSession> session;
   private final boolean resolveCursors;
 
   private ValueResolvingContext(CoreEvent event,
-                                ExpressionManagerSession session,
+                                LazyValue<ExpressionManagerSession> session,
                                 ConfigurationInstance config,
                                 boolean resolveCursors) {
     this.event = event;
@@ -109,13 +110,16 @@ public class ValueResolvingContext implements AutoCloseable {
   }
 
   public Optional<ExpressionManagerSession> getSession() {
-    return ofNullable(session);
+    if (session.isComputed()) {
+      return ofNullable(session.get());
+    }
+    return empty();
   }
 
   @Override
   public void close() {
-    if (session != null) {
-      session.close();
+    if (session.isComputed()) {
+      session.get().close();
     }
   }
 
@@ -155,9 +159,9 @@ public class ValueResolvingContext implements AutoCloseable {
       if (event == null) {
         return new ValueResolvingContext(null, null, null, true);
       }
-      ExpressionManagerSession session = null;
+      LazyValue<ExpressionManagerSession> session = null;
       if (manager != null) {
-        session = manager.openSession(event.asBindingContext());
+        session = new LazyValue<>(() -> manager.openSession(event.asBindingContext()));
       }
       return new ValueResolvingContext(event, session, config.orElse(null), resolveCursors);
     }
