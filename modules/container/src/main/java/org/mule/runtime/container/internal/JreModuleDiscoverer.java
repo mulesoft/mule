@@ -8,19 +8,20 @@
 package org.mule.runtime.container.internal;
 
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.container.internal.JreExplorer.exploreJdk;
+
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Discovers the module corresponding to the JRE by creating a new {@link MuleModule} with the Java packages, resources and
@@ -49,6 +50,6 @@ public class JreModuleDiscoverer implements ModuleDiscoverer {
 
     MuleModule jdkModule = new MuleModule(JRE_MODULE_NAME, packages, resources, emptySet(), emptySet(), services);
 
-    return Collections.singletonList(jdkModule);
+    return singletonList(jdkModule);
   }
 }

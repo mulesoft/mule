@@ -6,25 +6,24 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import org.mule.runtime.core.api.util.CompoundEnumeration;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+
+import org.mule.runtime.core.api.util.CompoundEnumeration;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
 /**
  * Classloader implementation that, given a set of classloaders, will first search for a resource/class in the first one. If it is
- * not found, it will try the nextx and so on until the resource/class is found or all classloaders have been tried.
+ * not found, it will try the next and so on until the resource/class is found or all classloaders have been tried.
  * <p>
- * For {@link #getResources(String)}, all the classloders will be queried to get the union of all found resources.
+ * For {@link #getResources(String)}, all the classloaders will be queried to get the union of all found resources.
  *
  * @since 1.0
  */
