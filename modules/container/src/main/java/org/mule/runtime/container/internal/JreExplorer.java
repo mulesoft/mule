@@ -9,10 +9,15 @@ package org.mule.runtime.container.internal;
 
 import static java.io.File.pathSeparatorChar;
 import static java.lang.String.format;
+import static java.lang.System.getProperties;
+import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
-import static org.apache.commons.lang3.SystemUtils.IS_JAVA_1_8;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +36,8 @@ import java.util.zip.ZipFile;
  */
 public final class JreExplorer {
 
+  private static final Logger LOGGER = getLogger(JreModuleDiscoverer.class);
+
   private static final String META_INF_SERVICES_PATH = "META-INF/services/";
   private static final Pattern SLASH_PATTERN = compile("/");
 
@@ -45,13 +52,28 @@ public final class JreExplorer {
    */
   public static void exploreJdk(final Set<String> packages, Set<String> resources, List<ExportedService> services) {
     List<String> jdkPaths = new ArrayList<>();
-    if (IS_JAVA_1_8) {
-      jdkPaths.add(System.getProperty("sun.boot.class.path"));
-      jdkPaths.add(System.getProperty("java.ext.dirs"));
-    } else {
-      jdkPaths.add(System.getProperty("java.class.path"));
+
+    // These are present in JDK 8
+    addJdkPath(jdkPaths, "sun.boot.class.path");
+    addJdkPath(jdkPaths, "java.ext.dirs");
+
+    // These are present in JDK 9, 10, 11
+    addJdkPath(jdkPaths, "sun.boot.library.path");
+    addJdkPath(jdkPaths, "java.library.path");
+
+    if (jdkPaths.isEmpty()) {
+      LOGGER.warn("No JDK path/dir system propety found. Defaulting to the whole classpath."
+          + " This may cause classloading issues in some plugins.");
+      jdkPaths.add(getProperty("java.class.path"));
     }
+
     explorePaths(jdkPaths, packages, resources, services);
+  }
+
+  private static void addJdkPath(List<String> jdkPaths, String key) {
+    if (getProperties().containsKey(key)) {
+      jdkPaths.add(getProperty(key));
+    }
   }
 
   /**
