@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.mediatype;
 
+import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.ListIterator;
@@ -13,14 +14,14 @@ import java.util.NoSuchElementException;
 
 /**
  * {@link ListIterator<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
- * 
+ *
  * This allows to avoid preemptive decoration of an entire collection of {@link Result}
- * 
+ *
  * @since 4.2
  */
-public class MediaTypeDecoratedResultListIterator implements ListIterator<Result> {
+public class MediaTypeDecoratedResultListIterator implements ListIterator<Result>, HasSize {
 
-  private MediaTypeDecoratedResultList delegate;
+  private final MediaTypeDecoratedResultList delegate;
   private final int size;
   private int index;
   private int lastIndex = 0;
@@ -69,6 +70,11 @@ public class MediaTypeDecoratedResultListIterator implements ListIterator<Result
   @Override
   public int previousIndex() {
     return index > 0 ? index - 1 : -1;
+  }
+
+  @Override
+  public int getSize() {
+    return delegate instanceof HasSize ? ((HasSize) delegate).getSize() : -1;
   }
 
   @Override
