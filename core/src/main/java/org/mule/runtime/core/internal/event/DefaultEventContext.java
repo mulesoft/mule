@@ -226,7 +226,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     private static final long serialVersionUID = 1054412872901205234L;
 
-    private final BaseEventContext root;
+    private transient BaseEventContext root;
     private final BaseEventContext parent;
     private final ComponentLocation componentLocation;
     private final String id;
@@ -285,6 +285,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public BaseEventContext getRootContext() {
+      if (root == null) {
+        root = this.parent.getRootContext();
+      }
       return root;
     }
 
