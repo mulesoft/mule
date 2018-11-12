@@ -36,7 +36,7 @@ import java.util.zip.ZipFile;
  */
 public final class JreExplorer {
 
-  private static final Logger LOGGER = getLogger(JreModuleDiscoverer.class);
+  private static final Logger LOGGER = getLogger(JreExplorer.class);
 
   private static final String META_INF_SERVICES_PATH = "META-INF/services/";
   private static final Pattern SLASH_PATTERN = compile("/");
