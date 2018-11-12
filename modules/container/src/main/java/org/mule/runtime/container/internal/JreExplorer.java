@@ -62,7 +62,7 @@ public final class JreExplorer {
     addJdkPath(jdkPaths, "java.library.path");
 
     if (jdkPaths.isEmpty()) {
-      LOGGER.warn("No JDK path/dir system propety found. Defaulting to the whole classpath."
+      LOGGER.warn("No JDK path/dir system property found. Defaulting to the whole classpath."
           + " This may cause classloading issues in some plugins.");
       jdkPaths.add(getProperty("java.class.path"));
     }
