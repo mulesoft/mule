@@ -159,7 +159,7 @@ public class ValueResolvingContext implements AutoCloseable {
       if (event == null) {
         return new ValueResolvingContext(null, null, null, true);
       }
-      LazyValue<ExpressionManagerSession> session = null;
+      LazyValue<ExpressionManagerSession> session = new LazyValue<>();
       if (manager != null) {
         session = new LazyValue<>(() -> manager.openSession(event.asBindingContext()));
       }
