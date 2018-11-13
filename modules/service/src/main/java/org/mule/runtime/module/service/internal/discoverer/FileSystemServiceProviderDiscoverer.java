@@ -119,11 +119,10 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   private List<ServiceDescriptor> getServiceDescriptors(ServiceDescriptorFactory serviceDescriptorFactory)
       throws ServiceResolutionError {
     List<ServiceDescriptor> foundServices = new LinkedList<>();
-    File servicesFolter = this.targetServicesFolder.get();
-    for (String serviceFile : servicesFolter.list(new SuffixFileFilter(".jar"))) {
+    for (String serviceFile : this.targetServicesFolder.get().list(new SuffixFileFilter(".jar"))) {
       final File tempFolder = new File(getServicesTempFolder(), getBaseName(serviceFile));
       try {
-        unzip(new File(servicesFolter, serviceFile), tempFolder);
+        unzip(new File(getServicesFolder(), serviceFile), tempFolder);
       } catch (IOException e) {
         throw new ServiceResolutionError("Error processing service JAR file", e);
       }
