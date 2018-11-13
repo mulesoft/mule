@@ -11,7 +11,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -42,12 +41,15 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   private MavenClient mavenClient;
   private Set<BundleDependency> nonProvidedDependencies;
+  private File temporaryFolder;
 
   public LightweightClassLoaderModelBuilder(File artifactFolder,
-                                            MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies) {
+                                            MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies,
+                                            File temporaryFolder) {
     super(artifactFolder);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;
+    this.temporaryFolder = temporaryFolder;
   }
 
   @Override
@@ -72,7 +74,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    File temporaryPomFolder = new File(getExecutionFolder(), "mavenTemp");
+    File temporaryPomFolder = new File(temporaryFolder, "temporary-poms");
     if (!temporaryPomFolder.exists() && !temporaryPomFolder.mkdirs()) {
       throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
           + temporaryPomFolder.getAbsolutePath()));
