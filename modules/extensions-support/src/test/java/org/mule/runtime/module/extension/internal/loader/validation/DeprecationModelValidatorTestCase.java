@@ -75,6 +75,20 @@ public class DeprecationModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void deprecatedExtensionWithInvalidVersion() {
+    when(extensionModel.isDeprecated()).thenReturn(true);
+    when(extensionModel.getDeprecationModel())
+        .thenReturn(of(new ImmutableDeprecationModel("This extension is deprecated.", "hola", null)));
+
+    ProblemsReporter problemsReporter = new ProblemsReporter(extensionModel);
+    validator.validate(extensionModel, problemsReporter);
+    assertTrue(problemsReporter.hasErrors());
+
+    assertThat(problemsReporter.getErrors().get(0).getMessage(),
+               is("The extension named extensionName was deprecated with an invalid 'since' version : 'hola' . This version must follow the semver convention"));
+  }
+
+  @Test
   public void optionalDeprecatedParameter() {
     when(parameterModel.isDeprecated()).thenReturn(true);
     ProblemsReporter problemsReporter = new ProblemsReporter(extensionModel);

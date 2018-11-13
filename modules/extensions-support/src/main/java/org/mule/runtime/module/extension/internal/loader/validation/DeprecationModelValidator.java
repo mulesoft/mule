@@ -140,7 +140,7 @@ public class DeprecationModelValidator implements ExtensionModelValidator {
 
   private String getModelTypeName(DeprecableModel deprecableModel) {
     return deprecableModel instanceof ParameterizedModel ? getComponentModelTypeName((ParameterizedModel) deprecableModel)
-        : "parameter";
+        : deprecableModel instanceof ExtensionModel ? "extension" : "parameter";
   }
 
 }
