@@ -41,6 +41,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.test.heisenberg.extension.model.HealthStatus;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -135,6 +136,21 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
 
     when(invalidParameterModel.getDefaultValue()).thenReturn("default");
     when(invalidParameterModel.isOverrideFromConfig()).thenReturn(true);
+    mockParameters(operationModel, invalidParameterModel);
+
+    validate(extensionModel, validator);
+  }
+
+
+  @Test
+  public void invalidEnumDefaultValue() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("Parameter 'url' in the operation 'dummyOperation' has a default value which is not listed as an available option");
+
+    when(invalidParameterModel.isRequired()).thenReturn(false);
+    when(invalidParameterModel.getDefaultValue()).thenReturn("default");
+    when(invalidParameterModel.getType()).thenReturn(toMetadataType(HealthStatus.class));
     mockParameters(operationModel, invalidParameterModel);
 
     validate(extensionModel, validator);
