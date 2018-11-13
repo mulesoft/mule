@@ -157,6 +157,16 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void validExpressionEnumDefaultValue() {
+    when(invalidParameterModel.isRequired()).thenReturn(false);
+    when(invalidParameterModel.getDefaultValue()).thenReturn("#[payload]");
+    when(invalidParameterModel.getType()).thenReturn(toMetadataType(HealthStatus.class));
+    mockParameters(operationModel, invalidParameterModel);
+
+    validate(extensionModel, validator);
+  }
+
+  @Test
   public void invalidOptionalComponentId() {
     expectedException.expect(IllegalModelDefinitionException.class);
     expectedException.expectMessage(COMPONENT_ID_ERROR_PREFIX + "is also marked as Optional.");
