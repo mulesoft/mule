@@ -112,7 +112,12 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   /**
    * Validates several versions of the same API definition artifact are considered in the model. Dependencies are as follows:
    *
-   * app |- dep |- api |- lib \- trait \- lib'
+   * app
+   * |- dep
+   * |- api
+   *    |- lib
+   *    \- trait
+  *         \- lib'
    */
   @Test
   public void applicationWithDuplicatedApiArtifactDependencies() throws Exception {
@@ -146,7 +151,12 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
    * Validates that API dependencies are fully analyzed, even when they contain loops among each other. Dependencies are as
    * follows:
    *
-   * app \- api |- lib | |- trait \- trait \- lib
+   * app
+   * \- api
+   *    |- lib
+   *    |  |- trait
+   *    \- trait
+   *       \- lib
    */
   @Test
   public void applicationWithLoopedApiArtifactDependencies() throws Exception {
