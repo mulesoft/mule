@@ -158,13 +158,15 @@ public final class JreExplorer {
     }
 
     for (File entry : content) {
-      if (entry.isDirectory()) {
-        exploreDirectory(packages, resources, services, entry);
-      } else if (entry.getName().endsWith(".jar")) {
-        try {
-          exploreJar(packages, resources, services, entry);
-        } catch (IOException e) {
-          throw new IllegalStateException(createJarExploringError(entry), e);
+      if (entry.exists()) {
+        if (entry.isDirectory()) {
+          exploreDirectory(packages, resources, services, entry);
+        } else if (entry.getName().endsWith(".jar")) {
+          try {
+            exploreJar(packages, resources, services, entry);
+          } catch (IOException e) {
+            throw new IllegalStateException(createJarExploringError(entry), e);
+          }
         }
       }
     }
