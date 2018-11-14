@@ -57,9 +57,8 @@ public final class JreExplorer {
     addJdkPath(jdkPaths, "sun.boot.class.path");
     addJdkPath(jdkPaths, "java.ext.dirs");
 
-    // These are present in JDK 9, 10, 11
+    // These is present in JDK 9, 10, 11
     addJdkPath(jdkPaths, "sun.boot.library.path");
-    addJdkPath(jdkPaths, "java.library.path");
 
     if (jdkPaths.isEmpty()) {
       LOGGER.warn("No JDK path/dir system property found. Defaulting to the whole classpath."
