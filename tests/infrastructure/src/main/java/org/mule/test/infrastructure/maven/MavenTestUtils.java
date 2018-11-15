@@ -16,14 +16,6 @@ import static java.util.regex.Matcher.quoteReplacement;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -32,6 +24,14 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Provides Maven related utilities for testing purposes
