@@ -110,10 +110,7 @@ public class ValueResolvingContext implements AutoCloseable {
   }
 
   public Optional<ExpressionManagerSession> getSession() {
-    if (session.isComputed()) {
-      return ofNullable(session.get());
-    }
-    return empty();
+    return ofNullable(session.get());
   }
 
   @Override
