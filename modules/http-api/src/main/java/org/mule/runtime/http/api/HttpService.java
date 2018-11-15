@@ -12,6 +12,7 @@ import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientFactory;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.ws.WebSocketBroadcaster;
 import org.mule.runtime.http.api.utils.RequestMatcherRegistry;
 import org.mule.runtime.http.api.utils.RequestMatcherRegistry.RequestMatcherRegistryBuilder;
 
@@ -39,4 +40,8 @@ public interface HttpService extends Service {
   @Experimental
   RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder();
 
+  @Experimental
+  default WebSocketBroadcaster newWebSocketBroadcaster() {
+    throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
 }
