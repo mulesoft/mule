@@ -58,7 +58,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
-  private static final String APP_TMP_DIR = "/temp";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
   private final ArtifactDeployer<T> deployer;
@@ -107,6 +106,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void undeployArtifact(String artifactId) {
+    this.undeployArtifact(artifactId, true);
+  }
+
+  private void undeployArtifact(String artifactId, boolean removeData) {
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactId);
     if ((zombieArtifact != null)) {
       if (zombieArtifact.exists()) {
@@ -118,7 +121,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     T artifact = (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
-    undeploy(artifact);
+    undeploy(artifact, removeData);
   }
 
   @Override
@@ -217,7 +220,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       if (isRedeploy) {
         deploymentListener.onRedeploymentStart(artifactName);
         deploymentTemplate.preRedeploy(artifact);
-        undeployArtifact(artifactName);
+        undeployArtifact(artifactName, false);
       }
 
       T deployedArtifact = deployPackagedArtifact(artifactUri, deploymentProperties);
@@ -318,15 +321,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     artifacts.remove(previousArtifact);
   }
 
-  private void undeployArtifactWithoutRemovingData(T artifact) {
-    undeployArtifact(artifact, false);
-  }
-
-  private void undeploy(T artifact) {
-    this.undeployArtifact(artifact, true);
-  }
-
-  private void undeployArtifact(T artifact, boolean removeData) {
+  private void undeploy(T artifact, boolean removeData) {
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
@@ -336,9 +331,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
         final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
-        final File tmpDir = new File(dataFolder, APP_TMP_DIR);
         try {
-          deleteDirectory(tmpDir);
+          deleteDirectory(dataFolder);
         } catch (IOException e) {
           logger.warn(
                       format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",

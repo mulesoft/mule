@@ -161,11 +161,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     super(parallelDeployment);
   }
 
-  @Override
-  public int getTestTimeoutSecs() {
-    return 1000;
-  }
-
   @Test
   public void deploysAppZipOnStartup() throws Exception {
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
@@ -1954,10 +1949,9 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
 
     File metaFolder = getAppMetaFolder(app);
-    File tmpFolder = getAppTempFolder(app);
 
     // As this app has a plugin, the tmp directory must exist
-    assertThat(tmpFolder, exists);
+    assertThat(metaFolder, exists);
 
     // Remove the anchor file so undeployment starts
     assertTrue("Unable to remove anchor file", removeAppAnchorFile(dummyAppDescriptorFileBuilder.getId()));
@@ -1966,8 +1960,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertStatus(app, DESTROYED);
 
     // Check the tmp directory was effectively removed
-    assertThat(metaFolder, exists);
-    assertThat(tmpFolder, not(exists));
+    assertThat(metaFolder, not(exists));
   }
 
   @Test
@@ -2002,35 +1995,26 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     Application app = findApp(emptyAppFileBuilder.getId(), 1);
 
-    final File preRedeploymentTmpFolder = getAppTempFolder(app);
     final File preRedeploymentMetaFolder = getAppMetaFolder(app);
 
     //Add test files to check if any of them was deleted
     final File preRedeploymentMetaTestFile = new File(preRedeploymentMetaFolder, TEST_FILE_NAME);
     preRedeploymentMetaTestFile.createNewFile();
-    final File preRedeploymentTempTestFile = new File(preRedeploymentTmpFolder, TEST_FILE_NAME);
-    preRedeploymentTempTestFile.createNewFile();
 
     assertThat(preRedeploymentMetaTestFile, exists);
-    assertThat(preRedeploymentTempTestFile, exists);
 
     reset(applicationDeploymentListener);
-    Thread.sleep(2000);
 
     redeployApp.run();
 
     assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
 
     app = findApp(emptyAppFileBuilder.getId(), 1);
-    final File postRedeploymentTmpFolder = getAppTempFolder(app);
     final File postRedeploymentMetaFolder = getAppMetaFolder(app);
-    final File postRedeploymentTmpTestFile = new File(postRedeploymentTmpFolder, TEST_FILE_NAME);
     final File postRedeploymentMetaTestFile = new File(postRedeploymentMetaFolder, TEST_FILE_NAME);
 
     assertThat(postRedeploymentMetaFolder, exists);
-    assertThat(postRedeploymentTmpFolder, exists);
     assertThat(postRedeploymentMetaTestFile, exists);
-    assertThat(postRedeploymentTmpTestFile, not(exists));
   }
 
   private File getAppMetaFolder(Application app) {
