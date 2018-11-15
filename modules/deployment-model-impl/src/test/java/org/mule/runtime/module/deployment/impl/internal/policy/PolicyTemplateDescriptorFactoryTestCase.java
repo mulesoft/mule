@@ -107,7 +107,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
         .thenReturn(new DeployableMavenClassLoaderModelLoader(mavenClientProvider.createMavenClient(newMavenConfigurationBuilder()
             .localMavenRepositoryLocation(mavenClientProvider
                 .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get())
-            .build())));
+            .build()), createTempFolder()));
 
     when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, POLICY, BundleDescriptorLoader.class))
         .thenReturn(new PropertiesBundleDescriptorLoader());

@@ -9,6 +9,10 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
+import java.io.File;
+import java.util.Map;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -17,9 +21,6 @@ import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClass
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
-
-import java.io.File;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public PluginMavenClassLoaderModelLoader(MavenClient mavenClient) {
-    super(mavenClient);
+  public PluginMavenClassLoaderModelLoader(MavenClient mavenClient, File temporaryFolder) {
+    super(mavenClient, temporaryFolder);
   }
 
   @Override
@@ -65,9 +66,10 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   @Override
   protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
-                                                                                     Map<String, Object> attributes) {
+                                                                                     Map<String, Object> attributes,
+                                                                                     File temporaryFolder) {
     final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
-        new LightweightClassLoaderModelBuilder(artifactFile, mavenClient);
+        new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, temporaryFolder);
     configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }

@@ -7,26 +7,29 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.util.stream.Collectors.toList;
-import org.mule.maven.client.api.MavenClient;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 
 import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
+import org.mule.maven.client.api.MavenClient;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+
 /**
- * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} responsible of resolving
- * dependencies when light weight packaging is used for an artifact.
+ * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} responsible of resolving dependencies
+ * when light weight packaging is used for an artifact.
  *
  * @since 4.1.5
  */
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
   private MavenClient mavenClient;
+  private File temporaryFolder;
 
   public LightweightClassLoaderModelBuilder(File artifactFolder,
-                                            MavenClient mavenClient) {
+                                            MavenClient mavenClient,
+                                            File temporaryFolder) {
     super(artifactFolder);
     this.mavenClient = mavenClient;
   }
@@ -37,7 +40,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri).collect(toList());
   }
 
-  //TODO: MULE-15768
+  // TODO: MULE-15768
   private List<org.mule.maven.client.api.model.BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
     return additionalDependencies.stream()
         .map(dependency -> dependency.getDescriptor())
@@ -50,4 +53,5 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .map(bundleDescriptor -> mavenClient.resolveBundleDescriptor(bundleDescriptor))
         .collect(toList());
   }
+
 }

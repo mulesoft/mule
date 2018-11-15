@@ -102,7 +102,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
           MavenClientProvider.discoverProvider(DefaultConnectivityTestingServiceBuilder.class.getClassLoader());
       applicationDescriptor
           .setClassLoaderModel(new DeployableMavenClassLoaderModelLoader(mavenClientProvider
-              .createMavenClient(GlobalConfigLoader.getMavenConfig()))
+              .createMavenClient(GlobalConfigLoader.getMavenConfig()), applicationFolder)
                   .load(applicationFolder, emptyMap(), ArtifactType.APP));
       return defaultApplicationFactory.createArtifact(applicationDescriptor);
     });

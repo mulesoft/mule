@@ -12,6 +12,10 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer.deserialize;
+
+import java.io.File;
+import java.util.Map;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -20,9 +24,6 @@ import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClass
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
-
-import java.io.File;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +38,8 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient) {
-    super(mavenClient);
+  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient, File temporaryFolder) {
+    super(mavenClient, temporaryFolder);
   }
 
   @Override
@@ -48,8 +49,9 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   @Override
   protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
-                                                                                     Map<String, Object> attributes) {
-    return new LightweightClassLoaderModelBuilder(artifactFile, mavenClient);
+                                                                                     Map<String, Object> attributes,
+                                                                                     File temporaryFolder) {
+    return new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, temporaryFolder);
   }
 
   @Override
