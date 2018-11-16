@@ -84,8 +84,11 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.GlobalElementDeclaration;
+import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
+import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.RouteElementDeclaration;
+import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ArtifactDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ComponentElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ConfigurationElementDeclarer;
@@ -119,6 +122,8 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -312,10 +317,37 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           model.getErrorCallback()
               .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
                                                              line.getConfigAttributes(), line.getChildren()));
-
+          cleanSourceDeclarationParameters((SourceElementDeclaration) declarer.getDeclaration());
           declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
           stop();
         });
+      }
+
+      private void cleanSourceDeclarationParameters(SourceElementDeclaration declaration) {
+        Set<String> alreadyDeclaredParametersNames = new HashSet<>();
+        removeDuplicatesFromParameterGroups(declaration, alreadyDeclaredParametersNames);
+        removeDuplicatesFromParameterList(declaration.getCustomConfigurationParameters(), alreadyDeclaredParametersNames);
+      }
+
+      private void removeDuplicatesFromParameterGroups(SourceElementDeclaration declaration,
+                                                       Set<String> alreadyDeclaredParametersNames) {
+        List<ParameterGroupElementDeclaration> parameterGroups = declaration.getParameterGroups();
+        for (ParameterGroupElementDeclaration parameterGroup : parameterGroups) {
+          removeDuplicatesFromParameterList(parameterGroup.getParameters(), alreadyDeclaredParametersNames);
+        }
+      }
+
+      private void removeDuplicatesFromParameterList(List<ParameterElementDeclaration> parameters,
+                                                     Set<String> alreadyDeclaredParametersNames) {
+        Iterator<ParameterElementDeclaration> parameterIterator = parameters.iterator();
+        while (parameterIterator.hasNext()) {
+          ParameterElementDeclaration nextParameter = parameterIterator.next();
+          if (alreadyDeclaredParametersNames.contains(nextParameter.getName())) {
+            parameterIterator.remove();
+          } else {
+            alreadyDeclaredParametersNames.add(nextParameter.getName());
+          }
+        }
       }
 
       @Override
