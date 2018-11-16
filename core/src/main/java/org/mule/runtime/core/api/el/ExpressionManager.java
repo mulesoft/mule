@@ -254,6 +254,8 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * Returns an object that caches computation results. Provides better performance when evaluation multiple expressions on the
    * same bindings.
    * <p>
+   * This method will also add the `flow.name` binding to the opened session.
+   * <p>
    * Sessions obtained through this method have to be explicitly {@link ExpressionLanguageSession#close() closed}.
    *
    * @since 4.2

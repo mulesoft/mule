@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -37,14 +37,18 @@ public final class ImplicitConnectionProviderValueResolver<C> implements Connect
                                                  ExtensionModel extensionModel,
                                                  ConfigurationModel configurationModel,
                                                  ReflectionCache reflectionCache,
+                                                 ExpressionManager expressionManager,
                                                  MuleContext muleContext) {
     configName = name;
-    implicitConnectionProviderFactory =
-        new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, reflectionCache, muleContext);
+    implicitConnectionProviderFactory = new DefaultImplicitConnectionProviderFactory(extensionModel,
+                                                                                     configurationModel,
+                                                                                     reflectionCache,
+                                                                                     expressionManager,
+                                                                                     muleContext);
   }
 
   @Override
-  public Pair<ConnectionProvider<C>, ResolverSetResult> resolve(ValueResolvingContext context) throws MuleException {
+  public Pair<ConnectionProvider<C>, ResolverSetResult> resolve(ValueResolvingContext context) {
     return implicitConnectionProviderFactory.createImplicitConnectionProvider(configName, context.getEvent());
   }
 

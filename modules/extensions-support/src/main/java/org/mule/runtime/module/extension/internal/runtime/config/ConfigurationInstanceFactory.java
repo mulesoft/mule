@@ -9,15 +9,16 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -27,6 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Collections;
@@ -50,6 +52,7 @@ public final class ConfigurationInstanceFactory<T> {
   private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
   private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory;
   private final boolean requiresConnection;
+  private final ExpressionManager expressionManager;
   private final MuleContext muleContext;
 
   /**
@@ -58,16 +61,26 @@ public final class ConfigurationInstanceFactory<T> {
    * @param extensionModel     the {@link ExtensionModel} that owns the {@code configurationModel}
    * @param configurationModel the {@link ConfigurationModel} that describes the configurations to be created
    * @param resolverSet        the {@link ResolverSet} which provides the values for the configuration's parameters
-   * @param muleContext        the current {@link MuleContext}
+   * @param reflectionCache    the {@link ReflectionCache} used to improve reflection lookups performance
+   * @param expressionManager  the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param context            the current {@link MuleContext}
    */
-  public ConfigurationInstanceFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
-                                      ResolverSet resolverSet, ReflectionCache reflectionCache, MuleContext muleContext) {
+  public ConfigurationInstanceFactory(ExtensionModel extensionModel,
+                                      ConfigurationModel configurationModel,
+                                      ResolverSet resolverSet,
+                                      ReflectionCache reflectionCache,
+                                      ExpressionManager expressionManager,
+                                      MuleContext context) {
     this.configurationModel = configurationModel;
-    this.muleContext = muleContext;
-    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
+    this.expressionManager = expressionManager;
+    this.muleContext = context;
+    configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet, expressionManager, context);
     requiresConnection = supportsConnectivity(extensionModel, configurationModel);
-    implicitConnectionProviderFactory =
-        new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, reflectionCache, muleContext);
+    implicitConnectionProviderFactory = new DefaultImplicitConnectionProviderFactory(extensionModel,
+                                                                                     configurationModel,
+                                                                                     reflectionCache,
+                                                                                     expressionManager,
+                                                                                     context);
   }
 
   /**
@@ -76,22 +89,22 @@ public final class ConfigurationInstanceFactory<T> {
    * This method overload allows specifying a {@link ValueResolver} to provide the {@link ConnectionProvider} that the
    * configuration will use to obtain connections. If the connection does not need such a concept you can provide a {@code null}
    *
-   * @param name                       the name of the configuration to return
-   * @param event                      the current {@link CoreEvent}
-   * @param connectionProviderResolver a {@link ValueResolver} to provide the {@link ConnectionProvider} or {@code null}
+   * @param name     the name of the configuration to return
+   * @param event    the current {@link CoreEvent}
+   * @param resolver a {@link ValueResolver} to provide the {@link ConnectionProvider} or {@code null}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public <C> ConfigurationInstance createConfiguration(String name,
-                                                       CoreEvent event,
-                                                       ConnectionProviderValueResolver<C> connectionProviderResolver)
+  public <C> ConfigurationInstance createConfiguration(String name, CoreEvent event, ConnectionProviderValueResolver<C> resolver)
       throws MuleException {
 
     Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider;
 
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, event);
     if (requiresConnection) {
-      connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(from(event)));
+      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
+        connectionProvider = ofNullable(resolver.resolve(ctx));
+      }
     } else {
       connectionProvider = empty();
     }
@@ -125,7 +138,10 @@ public final class ConfigurationInstanceFactory<T> {
     Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider;
 
     if (requiresConnection && connectionProviderResolver.isPresent()) {
-      connectionProvider = ofNullable(connectionProviderResolver.get().resolve(from(event)));
+      ConnectionProviderValueResolver<C> resolver = connectionProviderResolver.get();
+      try (ValueResolvingContext cxt = ValueResolvingContext.builder(event, expressionManager).build()) {
+        connectionProvider = ofNullable(resolver.resolve(cxt));
+      }
     } else {
       connectionProvider = empty();
     }
@@ -142,31 +158,33 @@ public final class ConfigurationInstanceFactory<T> {
    * Creates a new instance using the given {@code configValues} and {@code connectionProviderValues} to obtain the
    * configuration's parameter values
    *
-   * @param name                       the name of the configuration to return
-   * @param configValues               the {@link ResolverSetResult} with the evaluated config parameters values
-   * @param event                      the current {@link CoreEvent}
-   * @param connectionProviderResolver a resolver to obtain a {@link ConnectionProvider}
-   * @param connectionProviderValues   e {@link ResolverSetResult} with the evaluated connection parameters values
+   * @param name                     the name of the configuration to return
+   * @param configValues             the {@link ResolverSetResult} with the evaluated config parameters values
+   * @param event                    the current {@link CoreEvent}
+   * @param resolver                 a resolver to obtain a {@link ConnectionProvider}
+   * @param connectionProviderValues e {@link ResolverSetResult} with the evaluated connection parameters values
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
   public <C> ConfigurationInstance createConfiguration(String name,
                                                        ResolverSetResult configValues,
                                                        CoreEvent event,
-                                                       ConnectionProviderValueResolver<C> connectionProviderResolver,
+                                                       ConnectionProviderValueResolver<C> resolver,
                                                        ResolverSetResult connectionProviderValues)
       throws MuleException {
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, configValues);
 
     Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider = empty();
 
-    if (requiresConnection && connectionProviderResolver != null) {
-      if (connectionProviderResolver.getObjectBuilder().isPresent()) {
-        connectionProvider = ofNullable(connectionProviderResolver.getObjectBuilder().get().build(connectionProviderValues));
+    if (requiresConnection && resolver != null) {
+      if (resolver.getObjectBuilder().isPresent()) {
+        connectionProvider = ofNullable(resolver.getObjectBuilder().get().build(connectionProviderValues));
       }
 
       if (!connectionProvider.isPresent()) {
-        connectionProvider = ofNullable(connectionProviderResolver.resolve(from(event)));
+        try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager).build()) {
+          connectionProvider = ofNullable(resolver.resolve(context));
+        }
       }
     }
 
@@ -187,10 +205,11 @@ public final class ConfigurationInstanceFactory<T> {
   }
 
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, CoreEvent event) throws MuleException {
-    Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(from(event));
-    injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding());
-
-    return config;
+    try (ValueResolvingContext context = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build()) {
+      Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(context);
+      injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding());
+      return config;
+    }
   }
 
   private <C> ConfigurationState createState(ResolverSetResult configValues,

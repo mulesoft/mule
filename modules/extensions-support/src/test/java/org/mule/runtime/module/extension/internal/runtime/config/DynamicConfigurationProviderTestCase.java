@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
@@ -39,12 +38,14 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -88,6 +89,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   @Mock
   private ConnectionProvider connectionProvider;
 
+  @Mock
+  private ExpressionManager expressionManager;
+
   private ExpirationPolicy expirationPolicy;
 
   @Override
@@ -106,7 +110,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
 
-    when(resolverSet.resolve(from(event))).thenReturn(resolverSetResult);
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    when(resolverSet.resolve(ctx)).thenReturn(resolverSetResult);
     when(resolverSetResult.asMap()).thenReturn(new HashMap<>());
     visitableMock(operationModel);
 
@@ -116,7 +121,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
-                                                connectionProviderResolver, expirationPolicy, new ReflectionCache(), muleContext);
+                                                connectionProviderResolver, expirationPolicy, new ReflectionCache(),
+                                                expressionManager, muleContext);
 
     super.before();
     provider.initialise();
@@ -137,7 +143,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
       assertThat(provider.get(event).getValue(), is(sameInstance(config)));
     }
 
-    verify(resolverSet, times(count)).resolve(from(event));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    verify(resolverSet, times(count)).resolve(ctx);
   }
 
   @Test
@@ -145,7 +152,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     ResolverSet providerResolverSet = mock(ResolverSet.class);
     when(connectionProviderResolver.getResolverSet()).thenReturn(of(providerResolverSet));
     when(connectionProviderResolver.getObjectBuilder()).thenReturn(empty());
-    when(providerResolverSet.resolve(from(event))).thenReturn(resolverSetResult);
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    when(providerResolverSet.resolve(ctx)).thenReturn(resolverSetResult);
 
     final int count = 10;
     HeisenbergExtension config = (HeisenbergExtension) provider.get(event).getValue();
@@ -153,8 +161,10 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
       assertThat(provider.get(event).getValue(), is(sameInstance(config)));
     }
 
-    verify(providerResolverSet, times(count)).resolve(from(event));
-    verify(resolverSet, times(count)).resolve(from(event));
+    verify(providerResolverSet, times(count))
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+    verify(resolverSet, times(count))
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
   }
 
   @Test
@@ -165,12 +175,16 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     ResolverSet providerResolverSet = mock(ResolverSet.class);
     when(connectionProviderResolver.getResolverSet()).thenReturn(of(providerResolverSet));
     when(connectionProviderResolver.getObjectBuilder()).thenReturn(empty());
-    when(providerResolverSet.resolve(from(event))).thenReturn(mock(ResolverSetResult.class));
+    when(providerResolverSet.resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build()))
+        .thenReturn(mock(ResolverSetResult.class));
     assertThat(provider.get(event).getValue(), is(not(sameInstance(config))));
 
-    verify(resolverSet, times(2)).resolve(from(event));
-    verify(providerResolverSet, times(1)).resolve(from(event));
-    verify(connectionProviderResolver, times(2)).resolve(from(event));
+    verify(resolverSet, times(2))
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+    verify(providerResolverSet, times(1))
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
+    verify(connectionProviderResolver, times(2))
+        .resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build());
   }
 
   @Test
@@ -205,7 +219,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
     when(alternateResult.asMap()).thenReturn(new HashMap<>());
     mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
-    when(resolverSet.resolve(from(event))).thenReturn(alternateResult);
+    when(resolverSet.resolve(ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build()))
+        .thenReturn(alternateResult);
 
     return (HeisenbergExtension) provider.get(event).getValue();
   }
@@ -219,7 +234,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   public void resolveDynamicConfigWithDifferentEvent() throws Exception {
     Object config1 = provider.get(event);
 
-    when(resolverSet.resolve(from(event))).thenReturn(mock(ResolverSetResult.class));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    when(resolverSet.resolve(ctx)).thenReturn(mock(ResolverSetResult.class));
     Object config2 = provider.get(event);
 
     assertThat(config1, is(not(sameInstance(config2))));

@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -22,6 +22,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class StaticValueResolverTestCase extends AbstractMuleTestCase {
+
+
+  @Mock
+  private ExpressionManager expressionManager;
 
   @Mock
   private CoreEvent event;
@@ -46,6 +50,6 @@ public class StaticValueResolverTestCase extends AbstractMuleTestCase {
 
   private void assertExpected(Object expected) throws Exception {
     resolver = new StaticValueResolver(expected);
-    assertThat(resolver.resolve(ValueResolvingContext.from(event)), is(expected));
+    assertThat(resolver.resolve(ValueResolvingContext.builder(event).build()), is(expected));
   }
 }

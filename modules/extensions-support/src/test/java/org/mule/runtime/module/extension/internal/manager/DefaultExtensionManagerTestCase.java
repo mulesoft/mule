@@ -42,6 +42,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -151,7 +152,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private final Object configInstance = new Object();
 
   @Before
-  public void before() throws InitialisationException, RegistrationException {
+  public void before() throws MuleException {
     muleContext = mockContextWithServices();
 
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
@@ -221,6 +222,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
     registerIntoMockContext(muleContext, OBJECT_CONNECTION_MANAGER, mock(ConnectionManagerAdapter.class));
     registerIntoMockContext(muleContext, MuleMetadataService.class, mock(MuleMetadataService.class));
+
+    muleContext.getInjector().inject(extensionsManager);
   }
 
   private void registerExtensions(ExtensionModel... extensionModels) {
@@ -293,12 +296,11 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
                               extension1ConfigurationProvider);
       new Thread(() -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event)).start();
       joinerLatch.countDown();
-
       return null;
     }).when(registry).registerObject(anyString(), anyObject());
-    Optional<ConfigurationInstance> configurationInstance =
-        extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
-
+    Optional<ConfigurationInstance> configurationInstance = extensionsManager.getConfiguration(extensionModel1,
+                                                                                               extension1OperationModel,
+                                                                                               event);
     joinerLatch.countDown();
     assertThat(configurationInstance.isPresent(), is(true));
     assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));

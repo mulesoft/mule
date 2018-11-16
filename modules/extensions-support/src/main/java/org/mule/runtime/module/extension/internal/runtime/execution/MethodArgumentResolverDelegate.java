@@ -25,6 +25,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -76,15 +77,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackA
 import org.mule.runtime.module.extension.internal.runtime.streaming.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.io.InputStream;
+import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import javax.inject.Inject;
 
 
 /**
@@ -103,6 +102,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
   @Inject
   private ReflectionCache reflectionCache;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
@@ -298,7 +300,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
             .map(ParameterGroupModelProperty::getDescriptor).orElse(null))
         .filter(group -> group != null && group.getContainer() instanceof Parameter)
         .collect(toImmutableMap(group -> (Parameter) group.getContainer(),
-                                group -> new ParameterGroupArgumentResolver(group, reflectionCache)));
+                                group -> new ParameterGroupArgumentResolver(group, reflectionCache, expressionManager)));
   }
 
   @Override

@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
+
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -43,6 +45,9 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
   private ValueSetter valueSetter;
 
   @Mock
+  private ExpressionManager expressionManager;
+
+  @Mock
   private ResolverSetResult result;
 
   private ReflectionCache reflectionCache = new ReflectionCache();
@@ -63,7 +68,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
 
     when(result.asMap()).thenReturn(resultMap);
 
-    valueSetter = new GroupValueSetter(group, () -> reflectionCache);
+    valueSetter = new GroupValueSetter(group, () -> reflectionCache, () -> expressionManager);
   }
 
   @Test

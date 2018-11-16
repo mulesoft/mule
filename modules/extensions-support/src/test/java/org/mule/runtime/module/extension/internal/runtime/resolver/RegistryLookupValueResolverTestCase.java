@@ -19,6 +19,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -45,6 +46,9 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Registry registry;
 
+  @Mock
+  private ExpressionManager expressionManager;
+
   private ValueResolver resolver;
 
   @Before
@@ -57,7 +61,8 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void cache() throws Exception {
-    Object value = resolver.resolve(ValueResolvingContext.from(event));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    Object value = resolver.resolve(ctx);
     assertThat(value, is(HELLO_WORLD));
     verify(registry).lookupByName(KEY);
   }
@@ -69,18 +74,21 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void nullKey() throws MuleException {
-    new RegistryLookupValueResolver(null).resolve(ValueResolvingContext.from(testEvent()));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    new RegistryLookupValueResolver(null).resolve(ctx);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void blankKey() throws MuleException {
-    new RegistryLookupValueResolver("").resolve(ValueResolvingContext.from(testEvent()));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    new RegistryLookupValueResolver("").resolve(ctx);
   }
 
   @Test(expected = ConfigurationException.class)
   public void nonExistingKey() throws Exception {
     RegistryLookupValueResolver<Object> valueResolver = new RegistryLookupValueResolver<>(FAKE_KEY);
     valueResolver.setRegistry(registry);
-    valueResolver.resolve(ValueResolvingContext.from(event));
+    ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
+    valueResolver.resolve(ctx);
   }
 }

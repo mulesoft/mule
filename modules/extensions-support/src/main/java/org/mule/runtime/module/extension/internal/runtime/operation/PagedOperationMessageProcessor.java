@@ -23,8 +23,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.Optional;
-
 /**
  * A specialization of {@link OperationMessageProcessor} which supports auto paging by the means of a
  * {@link ConsumerStreamingIterator}
@@ -57,11 +55,8 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
       if (value == null) {
         throw new IllegalStateException("Obtained paging delegate cannot be null");
       }
-      Optional<ConfigurationInstance> config = operationContext.getConfiguration();
-      Producer<?> producer =
-          new PagingProviderProducer((PagingProvider) value, config.get(),
-                                     operationContext, connectionSupplier);
-
+      ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
+      Producer<?> producer = new PagingProviderProducer((PagingProvider) value, config, operationContext, connectionSupplier);
       ListConsumer<?> consumer = new ListConsumer(producer);
       consumer.loadNextPage();
       return new ConsumerStreamingIterator<>(consumer);

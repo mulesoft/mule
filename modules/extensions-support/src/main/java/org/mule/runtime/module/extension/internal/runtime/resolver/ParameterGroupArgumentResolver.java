@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -23,9 +24,11 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
 
   private final ParameterGroupObjectBuilder<T> parameterGroupObjectBuilder;
 
-  public ParameterGroupArgumentResolver(ParameterGroupDescriptor group, ReflectionCache reflectionCache) {
+  public ParameterGroupArgumentResolver(ParameterGroupDescriptor group,
+                                        ReflectionCache reflectionCache,
+                                        ExpressionManager expressionManager) {
     checkState(group.getType().isInstantiable(), "Class %s cannot be instantiated.");
-    this.parameterGroupObjectBuilder = new ParameterGroupObjectBuilder<>(group, reflectionCache);
+    this.parameterGroupObjectBuilder = new ParameterGroupObjectBuilder<>(group, reflectionCache, expressionManager);
   }
 
   /**

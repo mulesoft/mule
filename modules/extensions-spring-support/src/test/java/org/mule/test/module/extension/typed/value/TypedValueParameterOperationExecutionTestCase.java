@@ -13,6 +13,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.test.typed.value.extension.extension.TypedValueParameterOperations.THIS_IS_A_DEFAULT_STRING;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -201,8 +202,8 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
 
   @Test
   public void wrappedAndUnwrappedTypes() throws Exception {
-    List<Object> wrappedAndUnwrappedTypes = (List<Object>) flowRunner("wrappedAndUnwrappedTypes").run()
-        .getMessage().getPayload().getValue();
+    Message message = flowRunner("wrappedAndUnwrappedTypes").run().getMessage();
+    List<Object> wrappedAndUnwrappedTypes = (List<Object>) message.getPayload().getValue();
     assertThat(wrappedAndUnwrappedTypes.get(0), is("stringNotWrapped"));
     assertThat(((TypedValue) wrappedAndUnwrappedTypes.get(1)).getValue(), is("wrappedString"));
     assertThat(((SimplePojo) ((TypedValue) wrappedAndUnwrappedTypes.get(2)).getValue()).getUser(), is("user"));

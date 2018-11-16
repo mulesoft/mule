@@ -26,7 +26,6 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.RESOURCE_OWNER_ID_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.SCOPES_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -38,6 +37,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -52,6 +52,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -83,8 +85,9 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                                               ReconnectionConfig reconnectionConfig,
                                               ExtensionsOAuthManager oauthManager,
                                               ExtensionModel extensionModel,
+                                              ExpressionManager expressionManager,
                                               MuleContext muleContext) {
-    super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, muleContext);
+    super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager, muleContext);
     this.oauthManager = oauthManager;
     grantType = getGrantType();
     callbackValues = getCallbackValues();
@@ -142,9 +145,11 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   private AuthCodeConfig buildAuthCodeConfig(CoreEvent event) throws MuleException {
-    Map<String, Object> map =
-        (Map<String, Object>) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME).resolve(from(event));
-    return buildAuthCodeConfig(map);
+    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
+    try (ValueResolvingContext context = getResolvingContextFor(event)) {
+      Map<String, Object> map = (Map<String, Object>) valueResolver.resolve(context);
+      return buildAuthCodeConfig(map);
+    }
   }
 
   private AuthCodeConfig buildAuthCodeConfig(Map<String, Object> map) {
@@ -159,9 +164,11 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   private OAuthCallbackConfig buildOAuthCallbackConfig(CoreEvent event) throws MuleException {
-    Map<String, Object> map =
-        (Map<String, Object>) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME).resolve(from(event));
-    return buildOAuthCallbackConfig(map);
+    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME);
+    try (ValueResolvingContext context = getResolvingContextFor(event)) {
+      Map<String, Object> map = (Map<String, Object>) valueResolver.resolve(context);
+      return buildOAuthCallbackConfig(map);
+    }
   }
 
   private OAuthCallbackConfig buildOAuthCallbackConfig(ResolverSetResult result) throws MuleException {
@@ -182,17 +189,15 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
       return empty();
     }
 
-    Map<String, Object> map = (Map<String, Object>) resolver.resolve(from(event));
-    return map != null
-        ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME)))
-        : empty();
+    try (ValueResolvingContext context = getResolvingContextFor(event)) {
+      Map<String, Object> map = (Map<String, Object>) resolver.resolve(context);
+      return map != null ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME))) : empty();
+    }
   }
 
   private Optional<OAuthObjectStoreConfig> buildOAuthObjectStoreConfig(ResolverSetResult result) throws MuleException {
     Map<String, Object> map = (Map<String, Object>) result.get(OAUTH_STORE_CONFIG_GROUP_NAME);
-    return map != null
-        ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME)))
-        : empty();
+    return map != null ? of(new OAuthObjectStoreConfig((String) map.get(OBJECT_STORE_PARAMETER_NAME))) : empty();
   }
 
 
@@ -206,7 +211,6 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
     Map<String, String> oauthParams = new HashMap<>();
     withCustomParameters((parameter, property) -> oauthParams.put(property.getRequestAlias(),
                                                                   result.get(parameter.getName()).toString()));
-
     return oauthParams;
   }
 
@@ -237,14 +241,15 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   private String resolveString(CoreEvent event, ValueResolver resolver) throws MuleException {
-    Object value = resolver.resolve(from(event));
-    return value != null ? StringMessageUtils.toString(value) : null;
+    try (ValueResolvingContext context = getResolvingContextFor(event)) {
+      Object value = resolver.resolve(context);
+      return value != null ? StringMessageUtils.toString(value) : null;
+    }
   }
 
   private AuthorizationCodeGrantType getGrantType() {
     return providerModel.getModelProperty(OAuthModelProperty.class)
-        .map(p -> (AuthorizationCodeGrantType) p.getGrantTypes().get(0))
-        .get();
+        .map(p -> (AuthorizationCodeGrantType) p.getGrantTypes().get(0)).get();
   }
 
   private String sanitizePath(String path) {
@@ -253,15 +258,19 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
 
   private OAuthConfig getInitialOAuthConfig() throws MuleException {
     CoreEvent initialiserEvent = null;
+    ValueResolvingContext ctxForConfig = null;
+    ValueResolvingContext ctxForCallback = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);
-      MapValueResolver mapResolver =
-          staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME));
-      AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(from(initialiserEvent)));
+      ValueResolver<?> oauthAuthCodeGroup = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
+      MapValueResolver mapResolver = staticOnly((MapValueResolver) oauthAuthCodeGroup);
+      ctxForConfig = getResolvingContextFor(initialiserEvent);
+      AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(ctxForConfig));
       Optional<OAuthObjectStoreConfig> storeConfig = buildOAuthObjectStoreConfig(initialiserEvent);
 
       mapResolver = staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME));
-      OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(from(initialiserEvent)));
+      ctxForCallback = getResolvingContextFor(initialiserEvent);
+      OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(ctxForCallback));
 
       return new OAuthConfig(ownerConfigName,
                              authCodeConfig,
@@ -274,7 +283,17 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();
       }
+      if (ctxForCallback != null) {
+        ctxForCallback.close();
+      }
+      if (ctxForConfig != null) {
+        ctxForConfig.close();
+      }
     }
+  }
+
+  private ValueResolvingContext getResolvingContextFor(CoreEvent event) {
+    return ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
   }
 
   private MapValueResolver staticOnly(MapValueResolver resolver) throws MuleException {

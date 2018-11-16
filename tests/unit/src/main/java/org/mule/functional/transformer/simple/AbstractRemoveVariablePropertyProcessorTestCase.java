@@ -24,6 +24,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -54,8 +55,9 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   private CoreEvent event;
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
-  private TypedValue<String> typedValue;
+  private TypedValue typedValue;
   private AbstractRemoveVariablePropertyProcessor removeVariableProcessor;
+  private ExpressionManagerSession mockSession;
 
   public AbstractRemoveVariablePropertyProcessorTestCase(AbstractRemoveVariablePropertyProcessor abstractAddVariableProcessor) {
     removeVariableProcessor = abstractAddVariableProcessor;
@@ -69,7 +71,9 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     typedValue = new TypedValue<>(EXPRESSION_VALUE, STRING);
-    when(mockExpressionManager.evaluate(eq(EXPRESSION), eq(STRING), any(), eq(event))).thenReturn(typedValue);
+    mockSession = mock(ExpressionManagerSession.class);
+    when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(mockSession);
+    when(mockSession.evaluate(eq(EXPRESSION), eq(STRING))).thenReturn(typedValue);
     removeVariableProcessor.setMuleContext(mockMuleContext);
   }
 
@@ -101,7 +105,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   @Test // Don't fail.
   public void testRemoveVariableExpressionKeyNullValue() throws MuleException {
     TypedValue typedValue = new TypedValue(null, OBJECT);
-    when(mockExpressionManager.evaluate(eq(NULL_EXPRESSION), eq(DataType.STRING), any(), eq(event))).thenReturn(typedValue);
+    when(mockSession.evaluate(eq(NULL_EXPRESSION), eq(DataType.STRING))).thenReturn(typedValue);
     removeVariableProcessor.setIdentifier(NULL_EXPRESSION);
     removeVariableProcessor.initialise();
     event = removeVariableProcessor.process(event);

@@ -10,11 +10,11 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.springframework.util.ReflectionUtils.setField;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -39,6 +39,7 @@ import java.util.function.Predicate;
 public class ParameterGroupObjectBuilder<T> {
 
   private final Class<T> prototypeClass;
+  private ExpressionManager expressionManager;
   private final List<FieldElement> groupDescriptorFields;
 
   /**
@@ -47,27 +48,39 @@ public class ParameterGroupObjectBuilder<T> {
    * @param groupDescriptor the descriptor for the group being built
    * @param reflectionCache the cache for expensive reflection lookups
    */
-  public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor, ReflectionCache reflectionCache) {
+  public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor,
+                                     ReflectionCache reflectionCache,
+                                     ExpressionManager expressionManager) {
     this.prototypeClass = (Class<T>) groupDescriptor.getType().getDeclaringClass().get();
     checkInstantiable(prototypeClass, reflectionCache);
+    this.expressionManager = expressionManager;
     this.groupDescriptorFields = reflectionCache.fieldElementsFor(groupDescriptor);
     this.groupDescriptorFields.forEach(f -> f.getField().ifPresent(field -> field.setAccessible(true)));
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
-    return doBuild(executionContext::hasParameter, executionContext::getParameter,
-                   from(executionContext.getEvent(), executionContext.getConfiguration()));
+    try (ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
+        .withExpressionManager(expressionManager)
+        .withConfig(executionContext.getConfiguration())
+        .build()) {
+      return doBuild(executionContext::hasParameter, executionContext::getParameter, context);
+    }
   }
 
   public T build(ResolverSetResult result) throws MuleException {
     final Map<String, Object> resultMap = result.asMap();
-    CoreEvent initialiserEvent = null;
+    CoreEvent initializerEvent = null;
+    ValueResolvingContext context = null;
     try {
-      initialiserEvent = getInitialiserEvent();
-      return doBuild(resultMap::containsKey, resultMap::get, from(initialiserEvent));
+      initializerEvent = getInitialiserEvent();
+      context = ValueResolvingContext.builder(initializerEvent).build();
+      return doBuild(resultMap::containsKey, resultMap::get, context);
     } finally {
-      if (initialiserEvent != null) {
-        ((BaseEventContext) initialiserEvent.getContext()).success();
+      if (initializerEvent != null) {
+        ((BaseEventContext) initializerEvent.getContext()).success();
+      }
+      if (context != null) {
+        context.close();
       }
     }
   }
@@ -80,8 +93,8 @@ public class ParameterGroupObjectBuilder<T> {
       String name = field.getName();
       if (hasParameter.test(name)) {
         Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters.apply(name)), context);
-        setField(field.getField().get(), object,
-                 context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue);
+        Object value = context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue;
+        setField(field.getField().get(), object, value);
       }
     }
 

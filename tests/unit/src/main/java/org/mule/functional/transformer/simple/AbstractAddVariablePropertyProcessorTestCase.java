@@ -29,6 +29,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -60,6 +61,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
   private TypedValue typedValue;
   private AbstractAddVariablePropertyProcessor addVariableProcessor;
+  private ExpressionManagerSession mockSession;
 
   public AbstractAddVariablePropertyProcessorTestCase(AbstractAddVariablePropertyProcessor abstractAddVariableProcessor) {
     addVariableProcessor = abstractAddVariableProcessor;
@@ -70,8 +72,12 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     typedValue = new TypedValue(EXPRESSION_VALUE, STRING);
-    when(mockExpressionManager.evaluate(eq(EXPRESSION), eq(STRING), any(), any(CoreEvent.class))).thenReturn(typedValue);
-    when(mockExpressionManager.evaluate(eq(EXPRESSION), any(CoreEvent.class))).thenReturn(typedValue);
+
+    mockSession = mock(ExpressionManagerSession.class);
+    when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(mockSession);
+    when(mockSession.evaluate(eq(EXPRESSION), eq(STRING))).thenReturn(typedValue);
+    when(mockSession.evaluate(eq(EXPRESSION))).thenReturn(typedValue);
+
     addVariableProcessor.setMuleContext(mockMuleContext);
 
     message = of("");
@@ -160,7 +166,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   @Test
   public void testAddVariableWithNullExpressionKeyResult() throws MuleException {
     TypedValue typedValue = new TypedValue(null, OBJECT);
-    when(mockExpressionManager.evaluate(eq(NULL_EXPRESSION), eq(DataType.STRING), any(), eq(event))).thenReturn(typedValue);
+    when(mockSession.evaluate(eq(NULL_EXPRESSION), eq(DataType.STRING))).thenReturn(typedValue);
     addVariableProcessor.setIdentifier(NULL_EXPRESSION);
     addVariableProcessor.setValue(PLAIN_STRING_VALUE);
     addVariableProcessor.initialise();
@@ -172,7 +178,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   public void testAddVariableWithNullExpressionValueResult() throws MuleException {
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
     TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
-    when(mockExpressionManager.evaluate(NULL_EXPRESSION, event)).thenReturn(typedValue);
+    when(mockSession.evaluate(NULL_EXPRESSION)).thenReturn(typedValue);
     addVariableProcessor.setValue(NULL_EXPRESSION);
     addVariableProcessor.initialise();
     event = addVariableProcessor.process(event);
@@ -184,7 +190,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
     addVariableProcessor.setValue(EXPRESSION);
     TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
-    when(mockExpressionManager.evaluate(EXPRESSION, event)).thenReturn(typedValue);
+    when(mockSession.evaluate(EXPRESSION)).thenReturn(typedValue);
     addVariableProcessor.initialise();
 
     event = addVariableProcessor.process(event);

@@ -44,6 +44,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.ConfigOverrideTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExclusiveOptionalsTypeAnnotation;
@@ -83,28 +84,30 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private final MuleContext muleContext;
   private final Map<String, ?> parameters;
   private final ReflectionCache reflectionCache;
+  private final ExpressionManager expressionManager;
 
   private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters, boolean lazyInitEnabled,
-                             ReflectionCache reflectionCache) {
+                             ReflectionCache reflectionCache, ExpressionManager expressionManager) {
     this.muleContext = muleContext;
     this.parameters = parameters;
     this.lazyInitEnabled = lazyInitEnabled;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
   }
 
   public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean lazyInitEnabled,
-                                              ReflectionCache reflectionCache) {
-    return new ParametersResolver(muleContext, parameters, lazyInitEnabled, reflectionCache);
+                                              ReflectionCache reflectionCache, ExpressionManager expressionManager) {
+    return new ParametersResolver(muleContext, parameters, lazyInitEnabled, reflectionCache, expressionManager);
   }
 
   public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext,
-                                                     ReflectionCache reflectionCache) {
+                                                     ReflectionCache reflectionCache, ExpressionManager expressionManager) {
     Map<String, Object> parameterValues = new HashMap<>();
     for (ParameterModel model : parameterizedModel.getAllParameterModels()) {
       parameterValues.put(model.getName(), model.getDefaultValue());
     }
 
-    return new ParametersResolver(muleContext, parameterValues, false, reflectionCache);
+    return new ParametersResolver(muleContext, parameterValues, false, reflectionCache, expressionManager);
   }
 
   /**
@@ -177,7 +180,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     } else if (descriptor.isPresent()) {
       resolverSet.add(groupKey,
                       NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
-                                                      reflectionCache, muleContext, this));
+                                                      reflectionCache, expressionManager, muleContext, this));
     } else {
       List<ValueResolver<Object>> keyResolvers = new LinkedList<>();
       List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
@@ -253,7 +256,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     if (isNullSafe(parameterModel)) {
       ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
       MetadataType type = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-      resolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, this.muleContext, this);
+      resolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, expressionManager, this.muleContext, this);
     }
 
     if (parameterModel.isOverrideFromConfig()) {
@@ -333,7 +336,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
         MetadataType type =
             getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
-        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, muleContext, this);
+        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, expressionManager, muleContext, this);
       }
 
       if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {

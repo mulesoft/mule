@@ -18,12 +18,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -38,6 +38,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -71,6 +72,8 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHan
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -104,6 +107,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ReflectionCache reflectionCache;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -562,8 +568,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-
-      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), from(initialiserEvent, this.getConfigurationInstance())));
+      ResolverSet sourceParameters = sourceAdapterFactory.getSourceParameters();
+      try (ValueResolvingContext context = ValueResolvingContext.builder(initialiserEvent)
+          .withExpressionManager(expressionManager)
+          .withConfig(getConfigurationInstance())
+          .build()) {
+        return copyOf(toMap(sourceParameters, context));
+      }
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not resolve parameters message source at location '%s'",
                                                                 getLocation().toString()),
@@ -580,12 +591,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return backPressureStrategy;
   }
 
-  private boolean shouldRunOnThisNode() {
-    return primaryNodeOnly ? muleContext.isPrimaryPollingInstance() : true;
-  }
-
   @Override
   public LifecycleState getLifecycleState() {
     return lifecycleManager.getState();
+  }
+
+  private boolean shouldRunOnThisNode() {
+    return primaryNodeOnly ? muleContext.isPrimaryPollingInstance() : true;
   }
 }

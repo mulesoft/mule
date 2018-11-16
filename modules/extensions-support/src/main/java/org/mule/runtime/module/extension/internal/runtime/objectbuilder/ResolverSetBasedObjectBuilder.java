@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.internal.util.GroupValueSetter.settersFor;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getDefaultEncodingFieldSetter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
@@ -17,17 +19,15 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
-import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.util.SingleValueSetter;
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,20 +50,27 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   private final List<ValueSetter> groupValueSetters;
   private final ConcurrentMap<Class<?>, Optional<FieldSetter>> encodingFieldSetter = new ConcurrentHashMap<>();
 
-  @Inject
   private MuleContext muleContext;
-
-  @Inject
   protected ReflectionCache reflectionCache;
+  protected ExpressionManager expressionManager;
 
-  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ResolverSet resolverSet) {
-    this(prototypeClass, null, resolverSet);
+  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass,
+                                       ResolverSet resolverSet,
+                                       ExpressionManager expressionManager,
+                                       MuleContext context) {
+    this(prototypeClass, null, resolverSet, expressionManager, context);
   }
 
-  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ParameterizedModel model, ResolverSet resolverSet) {
+  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass,
+                                       ParameterizedModel model,
+                                       ResolverSet resolverSet,
+                                       ExpressionManager expressionManager,
+                                       MuleContext context) {
     this.resolverSet = resolverSet;
+    this.muleContext = context;
+    this.expressionManager = expressionManager;
     singleValueSetters = createSingleValueSetters(prototypeClass, resolverSet);
-    groupValueSetters = model != null ? GroupValueSetter.settersFor(model, () -> getReflectionCache()) : ImmutableList.of();
+    groupValueSetters = model != null ? settersFor(model, () -> getReflectionCache(), () -> expressionManager) : emptyList();
   }
 
   /**

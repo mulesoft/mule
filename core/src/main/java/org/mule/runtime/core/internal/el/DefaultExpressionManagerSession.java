@@ -10,9 +10,9 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.resolveBoolean;
 
 import org.mule.runtime.api.el.ExpressionExecutionException;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
@@ -21,10 +21,10 @@ import java.util.Iterator;
 
 class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
-  private ExpressionLanguageSessionAdaptor session;
+  private LazyValue<ExpressionLanguageSessionAdaptor> session;
   private ClassLoader evaluationClassLoader;
 
-  public DefaultExpressionManagerSession(ExpressionLanguageSessionAdaptor session, ClassLoader evaluationClassLoader) {
+  public DefaultExpressionManagerSession(LazyValue<ExpressionLanguageSessionAdaptor> session, ClassLoader evaluationClassLoader) {
     this.session = session;
     this.evaluationClassLoader = evaluationClassLoader;
   }
@@ -35,7 +35,7 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
     try {
       currentThread().setContextClassLoader(evaluationClassLoader);
-      return session.evaluate(expression);
+      return session.get().evaluate(expression);
     } finally {
       currentThread().setContextClassLoader(originalLoader);
     }
@@ -47,7 +47,7 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
     try {
       currentThread().setContextClassLoader(evaluationClassLoader);
-      return session.evaluate(expression, expectedOutputType);
+      return session.get().evaluate(expression, expectedOutputType);
     } finally {
       currentThread().setContextClassLoader(originalLoader);
     }
@@ -59,7 +59,7 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
     try {
       currentThread().setContextClassLoader(evaluationClassLoader);
-      return session.evaluate(expression, timeout);
+      return session.get().evaluate(expression, timeout);
     } finally {
       currentThread().setContextClassLoader(originalLoader);
     }
@@ -77,7 +77,7 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
     try {
       currentThread().setContextClassLoader(evaluationClassLoader);
-      return session.evaluateLogExpression(expression);
+      return session.get().evaluateLogExpression(expression);
     } finally {
       currentThread().setContextClassLoader(originalLoader);
     }
@@ -89,7 +89,7 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
     try {
       currentThread().setContextClassLoader(evaluationClassLoader);
-      return session.split(expression);
+      return session.get().split(expression);
     } finally {
       currentThread().setContextClassLoader(originalLoader);
     }
@@ -97,6 +97,8 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
   @Override
   public void close() {
-    session.close();
+    if (session.isComputed()) {
+      session.get().close();
+    }
   }
 }

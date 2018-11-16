@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -33,6 +32,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -45,6 +45,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
@@ -85,29 +86,35 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private final Lock cacheReadLock = cacheLock.readLock();
   private final Lock cacheWriteLock = cacheLock.writeLock();
   private final ReflectionCache reflectionCache;
+  private final ExpressionManager expressionManager;
 
   /**
    * Creates a new instance
    *
    * @param name                       this provider's name
-   * @param extensionModel             the model that owns the {@code configurationModel}
-   * @param configurationModel         the model for the returned configurations
+   * @param extension                  the model that owns the {@code configurationModel}
+   * @param config                     the model for the returned configurations
    * @param resolverSet                the {@link ResolverSet} that provides the configuration's parameter values
    * @param connectionProviderResolver a {@link ValueResolver} used to obtain a {@link ConnectionProvider}
    * @param expirationPolicy           the {@link ExpirationPolicy} for the unused instances
+   * @param reflectionCache            the {@link ReflectionCache} used to improve reflection lookups performance
+   * @param expressionManager          the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param muleContext                the {@link MuleContext} that will own the configuration instances
    */
   public DynamicConfigurationProvider(String name,
-                                      ExtensionModel extensionModel,
-                                      ConfigurationModel configurationModel,
+                                      ExtensionModel extension,
+                                      ConfigurationModel config,
                                       ResolverSet resolverSet,
                                       ConnectionProviderValueResolver connectionProviderResolver,
                                       ExpirationPolicy expirationPolicy,
                                       ReflectionCache reflectionCache,
+                                      ExpressionManager expressionManager,
                                       MuleContext muleContext) {
-    super(name, extensionModel, configurationModel, muleContext);
-    configurationInstanceFactory =
-        new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, reflectionCache, muleContext);
+    super(name, extension, config, muleContext);
+    this.configurationInstanceFactory = new ConfigurationInstanceFactory<>(extension, config, resolverSet, reflectionCache,
+                                                                           expressionManager, muleContext);
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
     this.resolverSet = resolverSet;
     this.connectionProviderResolver = connectionProviderResolver;
     this.expirationPolicy = expirationPolicy;
@@ -123,18 +130,21 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   @Override
   public ConfigurationInstance get(Event event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ResolverSetResult result = resolverSet.resolve(from((CoreEvent) event));
-      ResolverSetResult providerResult = null;
-      if (connectionProviderResolver.getResolverSet().isPresent()) {
-        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(from((CoreEvent) event));
+      try (ValueResolvingContext resolvingContext = ValueResolvingContext.builder(((CoreEvent) event))
+          .withExpressionManager(expressionManager).build()) {
+        ResolverSetResult result = resolverSet.resolve(resolvingContext);
+        ResolverSetResult providerResult = null;
+        if (connectionProviderResolver.getResolverSet().isPresent()) {
+          providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(resolvingContext);
+        }
+        return getConfiguration(new Pair<>(result, providerResult), (CoreEvent) event);
       }
-      return getConfiguration(new Pair<>(result, providerResult), (CoreEvent) event);
     });
   }
 
-  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult,
-                                                 CoreEvent event)
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event)
       throws Exception {
+
     ConfigurationInstance configuration;
     cacheReadLock.lock();
     try {
@@ -176,15 +186,16 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     ConfigurationInstance configuration;
     ResolverSetResult connectionProviderValues = values.getSecond();
     if (connectionProviderValues != null) {
-      configuration =
-          configurationInstanceFactory.createConfiguration(getName(),
-                                                           values.getFirst(),
-                                                           event,
-                                                           connectionProviderResolver,
-                                                           connectionProviderValues);
+      configuration = configurationInstanceFactory.createConfiguration(getName(),
+                                                                       values.getFirst(),
+                                                                       event,
+                                                                       connectionProviderResolver,
+                                                                       connectionProviderValues);
     } else {
-      configuration = configurationInstanceFactory
-          .createConfiguration(getName(), values.getFirst(), event, ofNullable(connectionProviderResolver));
+      configuration = configurationInstanceFactory.createConfiguration(getName(),
+                                                                       values.getFirst(),
+                                                                       event,
+                                                                       ofNullable(connectionProviderResolver));
     }
 
     registerConfiguration(configuration);
@@ -283,7 +294,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                                                        .getValues(parameterName,
                                                                                   new ResolverSetBasedParameterResolver(resolverSet,
                                                                                                                         getConfigurationModel(),
-                                                                                                                        reflectionCache)),
+                                                                                                                        reflectionCache,
+                                                                                                                        expressionManager)),
                                  getExtensionModel());
   }
 
@@ -294,10 +306,12 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
-          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because the service is unable to get the connection model",
+          .orElseThrow(() -> new ValueResolvingException(
+                                                         "Internal Error. Unable to resolve values because the service is unable to get the connection model",
                                                          UNKNOWN));
       ResolverSet resolverSet = ((Optional<ResolverSet>) connectionProviderResolver.getResolverSet())
-          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
+          .orElseThrow(() -> new ValueResolvingException(
+                                                         "Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
                                                          UNKNOWN));
 
       return new ValueProviderMediator<>(connectionProviderModel,
@@ -306,7 +320,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                              .getValues(parameterName,
                                                         new ResolverSetBasedParameterResolver(resolverSet,
                                                                                               connectionProviderModel,
-                                                                                              reflectionCache));
+                                                                                              reflectionCache,
+                                                                                              expressionManager));
     }, getExtensionModel());
   }
 
