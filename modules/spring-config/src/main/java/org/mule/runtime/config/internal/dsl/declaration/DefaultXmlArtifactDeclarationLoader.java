@@ -317,13 +317,13 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           model.getErrorCallback()
               .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
                                                              line.getConfigAttributes(), line.getChildren()));
-          cleanSourceDeclarationParameters((SourceElementDeclaration) declarer.getDeclaration());
+          removeDuplicatedParametersFromSourceDeclaration((SourceElementDeclaration) declarer.getDeclaration());
           declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
           stop();
         });
       }
 
-      private void cleanSourceDeclarationParameters(SourceElementDeclaration declaration) {
+      private void removeDuplicatedParametersFromSourceDeclaration(SourceElementDeclaration declaration) {
         Set<String> alreadyDeclaredParametersNames = new HashSet<>();
         removeDuplicatesFromParameterGroups(declaration, alreadyDeclaredParametersNames);
         removeDuplicatesFromParameterList(declaration.getCustomConfigurationParameters(), alreadyDeclaredParametersNames);
