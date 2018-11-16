@@ -42,6 +42,7 @@ import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +103,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void undeployArtifact(String artifactId) {
+    this.undeployArtifact(artifactId, true);
+  }
+
+  private void undeployArtifact(String artifactId, boolean removeData) {
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactId);
     if ((zombieArtifact != null)) {
       if (zombieArtifact.exists()) {
@@ -113,7 +118,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     T artifact = (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
-    undeploy(artifact);
+    undeploy(artifact, removeData);
   }
 
   @Override
@@ -211,7 +216,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       if (isRedeploy) {
         deploymentListener.onRedeploymentStart(artifactName);
         deploymentTemplate.preRedeploy(artifact);
-        undeployArtifact(artifactName);
+        undeployArtifact(artifactName, false);
       }
 
       T deployedArtifact = deployPackagedArtifact(artifactUri, deploymentProperties);
@@ -311,15 +316,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     artifacts.remove(previousArtifact);
   }
 
-  private void undeployArtifactWithoutRemovingData(T artifact) {
-    undeployArtifact(artifact, false);
-  }
-
-  private void undeploy(T artifact) {
-    this.undeployArtifact(artifact, true);
-  }
-
-  private void undeployArtifact(T artifact, boolean removeData) {
+  private void undeploy(T artifact, boolean removeData) {
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());

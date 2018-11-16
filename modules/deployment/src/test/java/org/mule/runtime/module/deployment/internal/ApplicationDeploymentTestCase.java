@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -19,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -62,6 +64,7 @@ import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
@@ -89,6 +92,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import org.apache.commons.io.IOUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -101,6 +106,19 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   private static final String PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID = "org.mule.test:" + PRIVILEGED_EXTENSION_ARTIFACT_ID;
   private static final String APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG = "app-with-privileged-extension-plugin-config.xml";
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
+
+  private static final Matcher<File> exists = new BaseMatcher<File>() {
+
+    @Override
+    public boolean matches(Object o) {
+      return ((File) o).exists();
+    }
+
+    @Override
+    public void describeTo(org.hamcrest.Description description) {
+      description.appendText("File does not exist");
+    }
+  };
 
   // Classes and JAR resources
   private static File pluginEcho3TestClassFile;
@@ -119,7 +137,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                                                                                                            "dummy-app-with-props")
                                                                                                                .definedBy("dummy-app-with-props-config.xml")
                                                                                                                .containingClass(echoTestClassFile,
-                                                                                                                                "org/foo/EchoTest.class");;
+                                                                                                                                "org/foo/EchoTest.class");
 
   // Application plugin artifact builders
   private final ArtifactPluginFileBuilder echoPluginWithLib1 =
@@ -889,7 +907,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     // Sets a modification time in the future
     File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.getId());
     File configFile = new File(appFolder, MULE_CONFIG_XML_FILE);
-    configFile.setLastModified(System.currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
+    configFile.setLastModified(currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -1931,11 +1949,10 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
 
-    File appTemporaryFolder = new File(app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION)
-        .get().getWorkingDirectory());
+    File metaFolder = getAppMetaFolder(app);
 
     // As this app has a plugin, the tmp directory must exist
-    assertThat(appTemporaryFolder.exists(), is(true));
+    assertThat(metaFolder, exists);
 
     // Remove the anchor file so undeployment starts
     assertTrue("Unable to remove anchor file", removeAppAnchorFile(dummyAppDescriptorFileBuilder.getId()));
@@ -1944,7 +1961,71 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertStatus(app, DESTROYED);
 
     // Check the tmp directory was effectively removed
-    assertThat(appTemporaryFolder.exists(), is(false));
+    assertThat(metaFolder, not(exists));
+  }
+
+  @Test
+  public void explodedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
+    testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
+                               () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
+  }
+
+  @Test
+  public void packedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
+    testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
+                               () -> addPackedAppFromBuilder(emptyAppFileBuilder));
+  }
+
+  @Test
+  public void packedAppRedeploymentWithExplodedDoesNotDeleteTempFile() throws Exception {
+    testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
+                               () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
+  }
+
+  @Test
+  public void explodedAppRedeploymentWithPackedDoesNotDeleteTempFile() throws Exception {
+    testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
+                               () -> addPackedAppFromBuilder(emptyAppFileBuilder));
+  }
+
+  private void testTempFileOnRedeployment(CheckedRunnable deployApp, CheckedRunnable redeployApp) throws Exception {
+    final String TEST_FILE_NAME = "testFile";
+    startDeployment();
+    deployApp.run();
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+    Application app = findApp(emptyAppFileBuilder.getId(), 1);
+
+    final File preRedeploymentMetaFolder = getAppMetaFolder(app);
+
+    //Add test files to check if any of them was deleted
+    final File preRedeploymentMetaTestFile = new File(preRedeploymentMetaFolder, TEST_FILE_NAME);
+    preRedeploymentMetaTestFile.createNewFile();
+
+    assertThat(preRedeploymentMetaTestFile, exists);
+
+    reset(applicationDeploymentListener);
+
+    //file.lastModified() has seconds precision(it truncates the milliseconds timestamp, adding 3 zeroes at the end).
+    //This forces the first none-zero digit (from the right) to be different and trigger redeployment.
+    Thread.sleep(1000);
+
+
+    redeployApp.run();
+
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
+
+    app = findApp(emptyAppFileBuilder.getId(), 1);
+    final File postRedeploymentMetaFolder = getAppMetaFolder(app);
+    final File postRedeploymentMetaTestFile = new File(postRedeploymentMetaFolder, TEST_FILE_NAME);
+
+    assertThat(postRedeploymentMetaFolder, exists);
+    assertThat(postRedeploymentMetaTestFile, exists);
+  }
+
+  private File getAppMetaFolder(Application app) {
+    return new File((app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION).get()
+        .getWorkingDirectory()));
   }
 
   private ArtifactPluginFileBuilder createPrivilegedExtensionPlugin() {
