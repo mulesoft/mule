@@ -207,7 +207,18 @@ public class DefaultToolingService implements ToolingService {
   public Domain createDomain(File domainLocation) throws IOException {
     File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainLocation);
     try {
-      return doCreateDomain(toolingDomainContent);
+      return doCreateDomain(toolingDomainContent, empty());
+    } catch (Throwable t) {
+      deleteQuietly(toolingDomainContent);
+      throw t;
+    }
+  }
+
+  @Override
+  public Domain createDomain(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
+    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainLocation);
+    try {
+      return doCreateDomain(toolingDomainContent, deploymentProperties);
     } catch (Throwable t) {
       deleteQuietly(toolingDomainContent);
       throw t;
@@ -221,24 +232,31 @@ public class DefaultToolingService implements ToolingService {
   public Domain createDomain(byte[] domainContent) throws IOException {
     File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainContent);
     try {
-      return doCreateDomain(toolingDomainContent);
+      return doCreateDomain(toolingDomainContent, empty());
     } catch (Throwable t) {
       deleteQuietly(toolingDomainContent);
       throw t;
     }
   }
 
-  private Domain doCreateDomain(File toolingDomainContent) throws IOException {
-    Domain domain = domainFactory.createArtifact(toolingDomainContent, of(createDeploymentProperties()));
+  @Override
+  public Domain createDomain(byte[] domainContent, Optional<Properties> deploymentProperties) throws IOException {
+    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainContent);
+    try {
+      return doCreateDomain(toolingDomainContent, deploymentProperties);
+    } catch (Throwable t) {
+      deleteQuietly(toolingDomainContent);
+      throw t;
+    }
+  }
+
+  private Domain doCreateDomain(File toolingDomainContent, Optional<Properties> deploymentProperties) throws IOException {
+    Optional<Properties> mergedDeploymentProperties = of(createDeploymentProperties(deploymentProperties));
+    Domain domain = domainFactory.createArtifact(toolingDomainContent, mergedDeploymentProperties);
     domain.install();
     domain.lazyInit();
     domain.start();
     return new ToolingDomainWrapper(domain);
-  }
-
-  private Properties createDeploymentProperties() {
-    final Properties properties = new Properties();
-    return createDeploymentProperties(of(properties));
   }
 
   private Properties createDeploymentProperties(Optional<Properties> deploymentProperties) {
