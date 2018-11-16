@@ -16,9 +16,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
@@ -81,8 +83,14 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     setPayloadTransformer.setValue(EXPRESSION);
     when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadTransformer.initialise();
+
+    EventContext eventContext = mock(EventContext.class);
+    when(mockMuleEvent.getContext()).thenReturn(eventContext);
+
     TypedValue typedValue = new TypedValue<>(PLAIN_TEXT, STRING);
-    when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent)).thenReturn(typedValue);
+    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
+    when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(session);
+    when(session.evaluate(EXPRESSION)).thenReturn(typedValue);
 
     Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
     assertThat(response, is(PLAIN_TEXT));

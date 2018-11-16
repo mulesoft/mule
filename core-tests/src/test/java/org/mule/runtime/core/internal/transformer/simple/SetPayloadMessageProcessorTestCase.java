@@ -25,6 +25,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
@@ -85,13 +86,15 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(EXPRESSION);
     when(expressionManager.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadMessageProcessor.initialise();
+
+    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
+    when(expressionManager.openSession(any(), any(), any())).thenReturn(session);
+
     TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
-    when(expressionManager.evaluate(EXPRESSION, testEvent())).thenReturn(typedValue);
-    when(expressionManager.evaluate(eq(EXPRESSION), eq(testEvent()), any(CoreEvent.Builder.class), eq(null)))
-        .thenReturn(typedValue);
+    when(session.evaluate(EXPRESSION)).thenReturn(typedValue);
+    when(session.evaluate(eq(EXPRESSION))).thenReturn(typedValue);
 
     CoreEvent response = setPayloadMessageProcessor.process(testEvent());
-
     assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }
 
