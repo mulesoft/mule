@@ -10,9 +10,10 @@ import org.mule.runtime.api.metadata.TypedValue;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 public interface WebSocketBroadcaster {
 
-  void broadcast(Collection<WebSocket> sockets, TypedValue<InputStream> content, BiConsumer<WebSocket, Throwable> errorCallback);
+  CompletableFuture<Void> broadcast(Collection<WebSocket> sockets, TypedValue<InputStream> content, BiConsumer<WebSocket, Throwable> errorCallback);
 }
