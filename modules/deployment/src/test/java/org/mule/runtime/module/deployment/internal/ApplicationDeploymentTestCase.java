@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -906,7 +907,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     // Sets a modification time in the future
     File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.getId());
     File configFile = new File(appFolder, MULE_CONFIG_XML_FILE);
-    configFile.setLastModified(System.currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
+    configFile.setLastModified(currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -1964,25 +1965,25 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void explodedAppRedeploymentDeletesTempFile() throws Exception {
+  public void explodedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
                                () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
-  public void packedAppRedeploymentDeletesTempFile() throws Exception {
+  public void packedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
                                () -> addPackedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
-  public void packedAppRedeploymentWithExplodedDeletesTempFile() throws Exception {
+  public void packedAppRedeploymentWithExplodedDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
                                () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
-  public void explodedAppRedeploymentWithPackedDeletesTempFile() throws Exception {
+  public void explodedAppRedeploymentWithPackedDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
                                () -> addPackedAppFromBuilder(emptyAppFileBuilder));
   }
@@ -2005,6 +2006,11 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     reset(applicationDeploymentListener);
 
+    //file.lastModified() has seconds precision(it truncates the milliseconds timestamp, adding 3 zeroes at the end).
+    //This forces the first none-zero digit (from the right) to be different and trigger redeployment.
+    Thread.sleep(1000);
+
+
     redeployApp.run();
 
     assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
@@ -2020,10 +2026,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   private File getAppMetaFolder(Application app) {
     return new File((app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION).get()
         .getWorkingDirectory()));
-  }
-
-  private File getAppTempFolder(Application app) {
-    return new File(getAppMetaFolder(app), "/temp");
   }
 
   private ArtifactPluginFileBuilder createPrivilegedExtensionPlugin() {

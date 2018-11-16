@@ -540,7 +540,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
 
     public boolean resourcesHaveSameTimestamp() {
-      return !timestampsPerResource.entrySet().stream().filter(entry -> {
+      return timestampsPerResource.entrySet().stream().noneMatch(entry -> {
         File trackedFile = new File(entry.getKey());
         long originalTimestamp = entry.getValue();
         long currentTimestamp = trackedFile.lastModified();
@@ -549,7 +549,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
           return true;
         }
         return false;
-      }).findAny().isPresent();
+      });
     }
   }
 }
