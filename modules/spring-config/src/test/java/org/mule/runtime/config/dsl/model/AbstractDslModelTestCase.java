@@ -43,12 +43,14 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.mockito.Mock;
+import org.mule.runtime.extension.api.property.MetadataImpactModelProperty;
 
 public abstract class AbstractDslModelTestCase {
 
@@ -158,6 +160,10 @@ public abstract class AbstractDslModelTestCase {
           return Optional.empty();
         });
 
+    List<String> parameters = new ArrayList<>();
+    parameters.add(BEHAVIOUR_NAME);
+    MetadataImpactModelProperty metadataImpactModelProperty = new MetadataImpactModelProperty(parameters);
+
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
 
@@ -166,6 +172,10 @@ public abstract class AbstractDslModelTestCase {
     when(configuration.getOperationModels()).thenReturn(asList(operation));
     when(configuration.getSourceModels()).thenReturn(asList(source));
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
+
+    when(configuration.getModelProperty(MetadataImpactModelProperty.class)).thenReturn(Optional.of(metadataImpactModelProperty));
+    when(connectionProvider.getModelProperty(MetadataImpactModelProperty.class))
+        .thenReturn(Optional.of(metadataImpactModelProperty));
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
