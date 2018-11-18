@@ -11,7 +11,6 @@ import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.O
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-import static org.springframework.util.ReflectionUtils.setField;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -39,7 +38,7 @@ import java.util.function.Predicate;
 public class ParameterGroupObjectBuilder<T> {
 
   private final Class<T> prototypeClass;
-  private ExpressionManager expressionManager;
+  private final ExpressionManager expressionManager;
   private final List<FieldElement> groupDescriptorFields;
 
   /**
@@ -55,7 +54,7 @@ public class ParameterGroupObjectBuilder<T> {
     checkInstantiable(prototypeClass, reflectionCache);
     this.expressionManager = expressionManager;
     this.groupDescriptorFields = reflectionCache.fieldElementsFor(groupDescriptor);
-    this.groupDescriptorFields.forEach(f -> f.getField().ifPresent(field -> field.setAccessible(true)));
+    // this.groupDescriptorFields.forEach(f -> f.getField().ifPresent(field -> field.setAccessible(true)));
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
@@ -94,7 +93,7 @@ public class ParameterGroupObjectBuilder<T> {
       if (hasParameter.test(name)) {
         Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters.apply(name)), context);
         Object value = context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue;
-        setField(field.getField().get(), object, value);
+        field.set(object, value);
       }
     }
 

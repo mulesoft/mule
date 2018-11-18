@@ -16,13 +16,14 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.InfrastructureType;
-
-import javax.lang.model.element.VariableElement;
+import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.lang.model.element.VariableElement;
 
 /**
  * Wrapper for {@link Field} that provide utility methods to facilitate the introspection of a {@link Field}
@@ -32,10 +33,12 @@ import java.util.Optional;
 public class FieldWrapper implements FieldElement {
 
   private final Field field;
-  private ClassTypeLoader typeLoader;
+  private final FieldSetter fieldSetter;
+  private final ClassTypeLoader typeLoader;
 
   public FieldWrapper(Field field, ClassTypeLoader typeLoader) {
     this.field = field;
+    this.fieldSetter = new FieldSetter<>(field);
     this.typeLoader = typeLoader;
   }
 
@@ -45,6 +48,11 @@ public class FieldWrapper implements FieldElement {
   @Override
   public Optional<Field> getField() {
     return ofNullable(field);
+  }
+
+  @Override
+  public void set(Object object, Object value) {
+    fieldSetter.set(object, value);
   }
 
   /**

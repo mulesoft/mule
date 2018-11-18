@@ -26,6 +26,16 @@ public interface FieldElement extends ExtensionParameter {
   Optional<Field> getField();
 
   /**
+   * Sets the {@code value} into the {@code target} instance
+   *
+   * @param target the object on which the field value is to be set
+   * @param value the value to set
+   */
+  default void set(Object object, Object value) {
+    // Nothing to do by default
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

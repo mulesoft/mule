@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link ExecutionContextAdapter} which adds additional information which is relevant to this
@@ -52,6 +53,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
 
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
 
+  private static final Supplier<Optional<TransactionConfig>> EMPTY_TX_CONFIG = () -> empty();
+
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configuration;
   private final Map<String, Object> parameters;
@@ -62,7 +65,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private SecurityContext securityContext;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
-  private final LazyValue<Optional<TransactionConfig>> transactionConfig;
+  private final Supplier<Optional<TransactionConfig>> transactionConfig;
   private final Component component;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler currentScheduler;
@@ -106,7 +109,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.currentScheduler = currentScheduler;
 
     final boolean isTransactional = isTransactional(componentModel);
-    this.transactionConfig = new LazyValue<>(() -> isTransactional ? of(buildTransactionConfig()) : empty());
+    this.transactionConfig = isTransactional ? new LazyValue<>(() -> of(buildTransactionConfig())) : EMPTY_TX_CONFIG;
   }
 
   /**

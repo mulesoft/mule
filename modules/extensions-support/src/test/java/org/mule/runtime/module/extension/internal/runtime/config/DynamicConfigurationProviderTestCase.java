@@ -39,6 +39,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -109,6 +110,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(operationModel.requiresConnection()).thenReturn(true);
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
+
+    when(expressionManager.openSession(any())).thenReturn(mock(ExpressionManagerSession.class));
 
     ValueResolvingContext ctx = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build();
     when(resolverSet.resolve(ctx)).thenReturn(resolverSetResult);

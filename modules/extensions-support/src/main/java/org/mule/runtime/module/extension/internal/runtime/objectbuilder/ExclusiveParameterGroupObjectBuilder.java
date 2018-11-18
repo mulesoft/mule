@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getAlias;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExclusiveOptionalsTypeAnnotation;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParameterValueResolverWrapper;
@@ -22,11 +24,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import com.google.common.base.Joiner;
-
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * {@link DefaultObjectBuilder} extension that validates that the built object complies with
@@ -86,19 +85,19 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
     if (!lazyInitEnabled) {
       Collection<String> definedExclusiveParameters =
           intersection(exclusiveOptionalsTypeAnnotation.getExclusiveParameterNames(),
-                       resolvers.keySet().stream().map(TypeUtils::getAlias).collect(Collectors.toSet()));
+                       resolvers.keySet().stream().map(fs -> getAlias(fs.getField())).collect(toSet()));
       if (definedExclusiveParameters.isEmpty() && exclusiveOptionalsTypeAnnotation.isOneRequired()) {
         throw new ConfigurationException((createStaticMessage(format(
                                                                      "Parameter group of type '%s' requires that one of its optional parameters should be set but all of them are missing. "
                                                                          + "One of the following should be set: [%s]",
                                                                      prototypeClass.getName(),
-                                                                     Joiner.on(", ").join(exclusiveOptionalsTypeAnnotation
+                                                                     on(", ").join(exclusiveOptionalsTypeAnnotation
                                                                          .getExclusiveParameterNames())))));
       } else if (definedExclusiveParameters.size() > 1) {
         throw new ConfigurationException(
                                          createStaticMessage(format("In Parameter group of type '%s', the following parameters cannot be set at the same time: [%s]",
                                                                     prototypeClass.getName(),
-                                                                    Joiner.on(", ").join(definedExclusiveParameters))));
+                                                                    on(", ").join(definedExclusiveParameters))));
       }
     }
     return super.build(context);

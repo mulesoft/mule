@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasDwExpression;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelExpression;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -26,9 +27,9 @@ import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.StringUtils;
+
+import javax.inject.Inject;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -106,15 +107,14 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   }
 
   protected <V> TypedValue<V> resolveTypedValue(ValueResolvingContext context) {
-    if (isMelAvailable()
-        && (!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault)
-        || hasMelExpression(expression)) {
-      // MEL requires an actual event, so in this case we may not optimize by using a precalculated binding context
+    if (context.getSession() == null
+        || (isMelAvailable()
+            && (!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault)
+            || hasMelExpression(expression))) {
+      // MEL requires an actual event, so in this case we may not optimize by using a session
       return evaluator.resolveTypedValue(context.getEvent());
     } else {
-      return (TypedValue) context.getSession()
-          .map(session -> evaluator.resolveTypedValue(session))
-          .orElseGet(() -> evaluator.resolveTypedValue(context.getEvent()));
+      return evaluator.resolveTypedValue(context.getSession());
     }
   }
 
