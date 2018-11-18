@@ -48,7 +48,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
-import org.mockito.Mock;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -92,6 +91,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.ImmutableMap;
@@ -117,7 +117,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Rule
   public ExpectedException expectedException = none();
 
-  private ReflectionCache reflectionCache = new ReflectionCache();
+  private final ReflectionCache reflectionCache = new ReflectionCache();
 
   @Mock
   private ExpressionManager expressionManager;
@@ -408,7 +408,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor), same(event), any(Map.class),
                                                     any(OperationExecutionFunction.class));
-    verify(mockOperationPolicy).process(same(event));
+    verify(mockOperationPolicy).process(same(event), any());
   }
 
   @Test

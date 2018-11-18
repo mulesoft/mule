@@ -12,19 +12,19 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 
+import org.reactivestreams.Publisher;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -61,6 +61,7 @@ public class CompositeOperationPolicy extends
                                   OperationParametersProcessor operationParametersProcessor,
                                   OperationExecutionFunction operationExecutionFunction) {
     super(parameterizedPolicies, operationPolicyParametersTransformer, operationParametersProcessor);
+
     this.nextOperation = new Processor() {
 
       @Override
@@ -85,7 +86,21 @@ public class CompositeOperationPolicy extends
         });
       }
     };
+
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
+  }
+
+  @FunctionalInterface
+  private interface OperationPolicyNextProcessor extends Processor {
+
+    @Override
+    default CoreEvent process(CoreEvent event) throws MuleException {
+      return processToApply(event, this);
+    }
+
+    @Override
+    Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher);
+
   }
 
   /**
@@ -95,7 +110,7 @@ public class CompositeOperationPolicy extends
    * @param event the event to execute the operation.
    */
   @Override
-  protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
+  protected Publisher<CoreEvent> processNextOperation(CoreEvent event, OperationParametersProcessor parametersProcessor) {
     return just(event).transform(nextOperation).doOnNext(response -> this.nextOperationResponse = response);
   }
 
@@ -128,13 +143,15 @@ public class CompositeOperationPolicy extends
   }
 
   @Override
-  public Publisher<CoreEvent> process(CoreEvent operationEvent) {
+  public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationParametersProcessor parametersProcessor) {
     try {
-      Message message = getParametersTransformer().isPresent()
-          ? getParametersTransformer().get().fromParametersToMessage(getParametersProcessor().getOperationParameters())
-          : operationEvent.getMessage();
-      return processWithChildContext(CoreEvent.builder(operationEvent).message(message).build(), getPolicyProcessor(),
-                                     empty());
+      if (getParametersTransformer().isPresent()) {
+        return processWithChildContext(CoreEvent.builder(operationEvent)
+            .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
+            .build(), getPolicyProcessor(), empty());
+      } else {
+        return processWithChildContext(operationEvent, getPolicyProcessor(), empty());
+      }
     } catch (Exception e) {
       return error(e);
     }

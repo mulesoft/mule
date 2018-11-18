@@ -20,6 +20,6 @@ public interface OperationPolicy {
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  Publisher<CoreEvent> process(CoreEvent operationEvent);
+  Publisher<CoreEvent> process(CoreEvent operationEvent, OperationParametersProcessor parametersProcessor);
 
 }
