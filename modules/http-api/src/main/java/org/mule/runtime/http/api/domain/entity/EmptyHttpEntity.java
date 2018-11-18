@@ -24,7 +24,7 @@ import java.util.OptionalLong;
  */
 public final class EmptyHttpEntity implements HttpEntity {
 
-  private byte[] noBytes = new byte[0];
+  private static final byte[] NO_BYTES = new byte[0];
 
   @Override
   public boolean isStreaming() {
@@ -38,12 +38,12 @@ public final class EmptyHttpEntity implements HttpEntity {
 
   @Override
   public InputStream getContent() {
-    return new ByteArrayInputStream(noBytes);
+    return new ByteArrayInputStream(NO_BYTES);
   }
 
   @Override
   public byte[] getBytes() {
-    return noBytes;
+    return NO_BYTES;
   }
 
   @Override
