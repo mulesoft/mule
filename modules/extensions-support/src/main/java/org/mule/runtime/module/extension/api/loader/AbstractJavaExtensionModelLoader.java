@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParamet
 import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupportEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.DeprecationModelDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
@@ -54,6 +55,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Exten
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.DeprecationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
@@ -83,6 +85,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
                                                                                          new ConfigurationModelValidator(),
                                                                                          new ConnectionProviderModelValidator(),
+                                                                                         new DeprecationModelValidator(),
                                                                                          new InputParametersTypeModelValidator(),
                                                                                          new JavaSubtypesModelValidator(),
                                                                                          new MediaTypeModelValidator(),
@@ -106,13 +109,15 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new BooleanParameterDeclarationEnricher(),
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new DefaultEncodingDeclarationEnricher(),
+                                                                                               new DeprecationModelDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new NotificationsDeclarationEnricher(),
                                                                                                new JavaExportedTypesDeclarationEnricher(),
                                                                                                new StereotypesDeclarationEnricher(),
                                                                                                new ExtensionsErrorsDeclarationEnricher(),
-                                                                                               //TODO: MOVE TO EXT_API when https://www.mulesoft.org/jira/browse/MULE-13070
+                                                                                               // TODO: MOVE TO EXT_API when
+                                                                                               // https://www.mulesoft.org/jira/browse/MULE-13070
                                                                                                new MimeTypeParametersDeclarationEnricher(),
                                                                                                new DisplayDeclarationEnricher(),
                                                                                                new DynamicMetadataDeclarationEnricher(),

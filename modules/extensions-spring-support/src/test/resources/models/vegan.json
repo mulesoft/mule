@@ -2853,6 +2853,10 @@
           "kind": "source"
         }
       ],
+      "deprecationModel": {
+        "message": "This configuration overlaps with the BananaConfig, use that one instead.",
+        "deprecatedSince": "1.2.0"
+      },
       "name": "apple-config",
       "description": "",
       "modelProperties": {}
