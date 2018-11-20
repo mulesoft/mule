@@ -71,6 +71,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -169,10 +170,7 @@ public final class IntrospectionUtils {
   public static MetadataType getMetadataType(Type type) {
     MetadataType metadataType = type.asMetadataType();
 
-    if (type.isSameType(Object.class) ||
-        type.isAssignableTo(InputStream.class) ||
-        type.isAssignableTo(Byte[].class) ||
-        type.isAssignableTo(byte[].class)) {
+    if (isAnyType(type)) {
 
       MetadataTypeEnricher enricher = new MetadataTypeEnricher();
 
@@ -309,12 +307,7 @@ public final class IntrospectionUtils {
       }
     }
 
-    if ((returnType.isSameType(Object.class) ||
-        returnType.isSameType(Serializable.class) ||
-        returnType.isAssignableTo(InputStream.class) ||
-        returnType.isAssignableTo(Byte[].class) ||
-        returnType.isAssignableTo(byte[].class)) && type != null) {
-
+    if (isAnyType(returnType) && type != null) {
       MetadataType metadataType = typeBuilder().anyType().build();
       MetadataTypeEnricher enricher = new MetadataTypeEnricher();
 
@@ -1583,5 +1576,17 @@ public final class IntrospectionUtils {
                                                getGroupModelContainerName(groupModel))));
 
     return showInDslMap;
+  }
+
+  /**
+   * @return a boolean indicating if the given type should be considered as a {@link AnyType Any type}
+   */
+  private static boolean isAnyType(Type type) {
+    return type.isSameType(Object.class) ||
+        type.isSameType(Serializable.class) ||
+        type.isAssignableTo(InputStream.class) ||
+        type.isAssignableTo(Byte[].class) ||
+        type.isAssignableTo(byte[].class) ||
+        type.isAssignableTo(CursorProvider.class);
   }
 }
