@@ -83,7 +83,7 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @param applicationLocation location of the application content. The application content
    *                            may be a folder holding an exploded structure for an application
    *                            or may be a zip file containing the resources of the application.
-   * @param deploymentProperties defines the deployment properties to be used when deploying these application.
+   * @param deploymentProperties defines the deployment properties to be used when deploying the application.
    * @return                     the created application.
    * @throws IOException
    */
@@ -106,11 +106,37 @@ public interface ToolingService extends Initialisable, Stoppable {
    * Creates an application but from the content byte[], see {@link #createApplication(File, Optional)} for more details.
    *
    * @param appContent the content of the application.
-   * @param deploymentProperties defines the deployment properties to be used when deploying these application.
+   * @param deploymentProperties defines the deployment properties to be used when deploying the application.
    * @return the created application.
    * @throws IOException
    */
   default Application createApplication(byte[] appContent, Optional<Properties> deploymentProperties) throws IOException {
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+  }
+
+  /**
+   * Creates a {@link org.mule.runtime.deployment.model.api.domain.Domain} from a set of resources.
+   * <p/>
+   * The created domain will be created lazily meaning that the domain resources
+   * will be created based on the different request made to the domain.
+   * <p/>
+   * Only requested components will be executed. All sources for flows will be stop unless
+   * they are requested to be started by the client.
+   * <p/>
+   * Be aware that resources (ports, file system, etc) are shared so in those cases where resources are needed by the domain a deployment
+   * exception could happen.
+   * <p/>
+   * The domain will be deployed using {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY}
+   * so the domain logs are muted.
+   *
+   * @param domainLocation location of the domain content. The domain content
+   *                          may be a folder holding an exploded structure for an domain
+   *                          or may be a jar file containing the resources of the domain.
+   * @param deploymentProperties defines the deployment properties to be used when deploying the domain.
+   * @return the created domain.
+   * @throws IOException
+   */
+  default Domain createDomain(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
     throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
   }
 
@@ -147,6 +173,18 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @throws IOException
    */
   default Domain createDomain(byte[] domainContent) throws IOException {
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+  }
+
+  /**
+   * Creates a domain but from the content byte[], see {@link #createDomain(File)} for more details.
+   *
+   * @param domainContent the content of the domain.
+   * @param deploymentProperties defines the deployment properties to be used when deploying the application.
+   * @return the created domain.
+   * @throws IOException
+   */
+  default Domain createDomain(byte[] domainContent, Optional<Properties> deploymentProperties) throws IOException {
     throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
   }
 
