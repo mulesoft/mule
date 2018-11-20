@@ -147,7 +147,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalModelDefinitionException.class);
     expectedException
         .expectMessage("Parameter 'url' in the operation 'dummyOperation' has 'default' as default value"
-                + " which is not listed as an available option (i.e.: HEALTHY, CANCER, DEAD)");
+            + " which is not listed as an available option (i.e.: HEALTHY, CANCER, DEAD)");
 
     when(invalidParameterModel.isRequired()).thenReturn(false);
     when(invalidParameterModel.getDefaultValue()).thenReturn("default");
