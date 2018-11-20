@@ -15,5 +15,6 @@ import java.util.function.BiConsumer;
 
 public interface WebSocketBroadcaster {
 
-  CompletableFuture<Void> broadcast(Collection<WebSocket> sockets, TypedValue<InputStream> content, BiConsumer<WebSocket, Throwable> errorCallback);
+  CompletableFuture<Void> broadcast(Collection<WebSocket> sockets, TypedValue<InputStream> content,
+                                    BiConsumer<WebSocket, Throwable> errorCallback);
 }
