@@ -71,6 +71,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Pair;
@@ -1593,6 +1594,7 @@ public final class IntrospectionUtils {
         type.isAssignableTo(InputStream.class) ||
         type.isAssignableTo(Byte[].class) ||
         type.isAssignableTo(byte[].class) ||
+        type.isSameType(CursorProvider.class) ||
         type.isAssignableTo(CursorStreamProvider.class);
   }
 
