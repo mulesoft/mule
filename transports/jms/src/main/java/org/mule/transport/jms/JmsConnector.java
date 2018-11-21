@@ -65,6 +65,8 @@ import javax.jms.TemporaryTopic;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
 
+import org.springframework.jms.connection.CachingConnectionFactory;
+
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be used
  * by a Mule endpoint. The connector supports all JMS functionality including topics
@@ -231,6 +233,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
     }
 
+    private boolean connectionFactoryIsSpringConfigured = false;
+
     public JmsConnector(MuleContext context)
     {
         super(context);
@@ -312,6 +316,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         return result;
     }
 
+    public boolean isConnectionFactorySpringConfigured()
+    {
+        return connectionFactoryIsSpringConfigured;
+    }
+
     protected ConnectionFactory createConnectionFactory() throws NamingException, MuleException
     {
         // if an initial factory class was configured that takes precedence over the 
@@ -325,6 +334,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             jndiNameResolver.initialise();
 
             Object temp = jndiNameResolver.lookup(connectionFactoryJndiName);
+
             if (temp instanceof ConnectionFactory)
             {
                 return (ConnectionFactory) temp;
@@ -344,6 +354,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             // don't use JNDI. Use the spring-configured connection factory if that's provided
             if (connectionFactory != null)
             {
+                connectionFactoryIsSpringConfigured = true;
                 return connectionFactory;
             }
 
@@ -470,6 +481,16 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 throw new DefaultMuleException(JmsMessages.errorCreatingConnectionFactory(), ne);
             }
         }
+        // If the connection factory was instanced directly as a Spring's CachingConnectionFactory,
+        // disable the reconnectOnException property to avoid spring from handling exception without
+        // passing through mule
+        else if (isConnectionFactorySpringConfigured() && connectionFactory instanceof CachingConnectionFactory)
+        {
+            logger.info("Disabling 'reconnectOnException' option for bean-defined Spring's CachingConnectionFactory");
+            CachingConnectionFactory cachingConnectionFactory = (CachingConnectionFactory) connectionFactory;
+            cachingConnectionFactory.setReconnectOnException(false);
+        }
+
         if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())
         {
             // apply connection factory properties
