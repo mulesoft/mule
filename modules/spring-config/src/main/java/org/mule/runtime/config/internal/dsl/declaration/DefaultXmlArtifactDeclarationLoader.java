@@ -7,8 +7,10 @@
 package org.mule.runtime.config.internal.dsl.declaration;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -78,6 +80,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
@@ -125,6 +128,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.w3c.dom.Document;
@@ -304,13 +308,14 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
 
-        Map<String, SimpleConfigAttribute> successCallbackAttributes = new HashMap<>();
-        Map<String, SimpleConfigAttribute> errorCallbackAttributes = new HashMap<>();
-        Map<String, SimpleConfigAttribute> sourceAttributes = new HashMap<>();
-
-        populateAttributeMaps(line.getConfigAttributes(), model, sourceAttributes, successCallbackAttributes,
-                              errorCallbackAttributes);
-
+        Map<String, SimpleConfigAttribute> successCallbackAttributes =
+            filterSourceCallbackAttributes(line.getConfigAttributes(), model.getSuccessCallback(), entry -> true);
+        Map<String, SimpleConfigAttribute> errorCallbackAttributes =
+            filterSourceCallbackAttributes(line.getConfigAttributes(), model.getErrorCallback(),
+                                           entry -> !successCallbackAttributes.containsKey(entry.getKey()));
+        Map<String, SimpleConfigAttribute> sourceAttributes =
+            filterAttributes(line.getConfigAttributes(), entry -> !successCallbackAttributes.containsKey(entry.getKey())
+                && !errorCallbackAttributes.containsKey(entry.getKey()));
 
         declareComponentModel(line.getNamespace(), line.getIdentifier(), sourceAttributes, line.getChildren(), model,
                               extensionElementsDeclarer::newSource).ifPresent(declarer -> {
@@ -329,30 +334,26 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                               });
       }
 
-      private void populateAttributeMaps(Map<String, SimpleConfigAttribute> configAttributes, SourceModel model,
-                                         Map<String, SimpleConfigAttribute> sourceAttributes,
-                                         Map<String, SimpleConfigAttribute> successCallbackAttributes,
-                                         Map<String, SimpleConfigAttribute> errorCallbackAttributes) {
-        sourceAttributes.putAll(configAttributes);
+      private Map<String, SimpleConfigAttribute> filterSourceCallbackAttributes(Map<String, SimpleConfigAttribute> configAttributes,
+                                                                                Optional<SourceCallbackModel> sourceCallbackModel,
+                                                                                Predicate<Map.Entry<String, SimpleConfigAttribute>> filterCondition) {
+        if (sourceCallbackModel.isPresent()) {
+          final Set<String> parameterNames = sourceCallbackModel.map(callbackModel -> callbackModel.getAllParameterModels()
+              .stream().map(parameterModel -> parameterModel.getName()).collect(toSet())).orElse(null);
+          return sourceCallbackModel
+              .map(callbackModel -> filterAttributes(configAttributes,
+                                                     entry -> parameterNames.contains(entry.getKey())
+                                                         && filterCondition.test(entry)))
+              .orElse(emptyMap());
+        } else {
+          return emptyMap();
+        }
+      }
 
-        model.getSuccessCallback().ifPresent(successCallback -> {
-          successCallback.getAllParameterModels().stream().forEach(parameterModel -> {
-            String parameterName = parameterModel.getName();
-            if (sourceAttributes.containsKey(parameterName)) {
-              successCallbackAttributes.put(parameterName, sourceAttributes.remove(parameterName));
-            }
-          });
-        });
-
-        model.getErrorCallback().ifPresent(successCallback -> {
-          successCallback.getAllParameterModels().stream().forEach(parameterModel -> {
-            String parameterName = parameterModel.getName();
-            if (sourceAttributes.containsKey(parameterName) && !successCallbackAttributes.containsKey(parameterName)) {
-              errorCallbackAttributes.put(parameterName, sourceAttributes.remove(parameterName));
-            }
-          });
-        });
-
+      private Map<String, SimpleConfigAttribute> filterAttributes(Map<String, SimpleConfigAttribute> configAttributes,
+                                                                  Predicate<Map.Entry<String, SimpleConfigAttribute>> filterCondition) {
+        return configAttributes.entrySet().stream().filter(filterCondition)
+            .collect(toMap(entry -> entry.getKey(), entry -> entry.getValue()));
       }
 
       @Override
