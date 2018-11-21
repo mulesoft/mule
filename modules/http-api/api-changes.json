@@ -4,6 +4,23 @@
       "ignore": [
         {
           "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.ws.WebSocketBroadcaster org.mule.runtime.http.api.HttpService::newWebSocketBroadcaster()",
+          "package": "org.mule.runtime.http.api",
+          "classSimpleName": "HttpService",
+          "methodName": "newWebSocketBroadcaster",
+          "elementKind": "method",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.ws.WebSocketBroadcaster",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketBroadcaster",
+          "elementKind": "interface",
+          "justification": "@Experimental feature. Feature flagged by default"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
           "new": "method java.lang.ClassLoader org.mule.runtime.http.api.server.RequestHandler::getContextClassLoader()",
           "package": "org.mule.runtime.http.api.server",
           "classSimpleName": "RequestHandler",
@@ -391,7 +408,7 @@
           "methodName": "getAddress",
           "elementKind": "method",
           "justification": "This enables a performance optimization. It doesn't break the API"
-        }        
+        }
       ]
     }
   },

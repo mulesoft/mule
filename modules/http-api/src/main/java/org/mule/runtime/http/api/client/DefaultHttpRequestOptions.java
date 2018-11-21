@@ -16,7 +16,7 @@ import java.util.Optional;
 /**
  * Basic implementation of {@link HttpRequestOptions}. Instances can only be obtained through {@link HttpRequestOptionsBuilder}.
  *
- * @since 4.1.5 as experimental. GA in 4.2
+ * @since 4.1.5
  */
 @Experimental
 class DefaultHttpRequestOptions implements HttpRequestOptions {

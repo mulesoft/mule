@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * The codes of the close frame that will be sent (or has been received) when closing a {@link WebSocket}
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public enum WebSocketCloseCode {

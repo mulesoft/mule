@@ -11,7 +11,7 @@ import org.mule.api.annotation.Experimental;
 /**
  * Handler for an inbound WebSocket requests
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public interface WebSocketHandler {

@@ -18,7 +18,7 @@ import java.io.InputStream;
  * <p>
  * Implementations <b>MUST</b> be thread safe
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public interface WebSocketCallback {

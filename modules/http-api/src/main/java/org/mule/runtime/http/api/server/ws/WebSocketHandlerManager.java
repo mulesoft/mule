@@ -12,7 +12,7 @@ import org.mule.api.annotation.NoImplement;
 /**
  * Object to manage a {@link WebSocketHandler} for a server.
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @NoImplement
 @Experimental

@@ -14,7 +14,7 @@ import java.util.Collection;
 /**
  * Base class for implementations of {@link MessageWithHeaders}
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public abstract class BaseMessageWithHeaders implements MessageWithHeaders {

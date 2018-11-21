@@ -13,7 +13,7 @@ import org.mule.runtime.http.api.ws.WebSocketCloseCode;
 /**
  * Handles connection aspects of an inbound {@link WebSocket}
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public interface WebSocketConnectionHandler {

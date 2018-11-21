@@ -7,7 +7,6 @@
 package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.Experimental;
-import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
@@ -16,7 +15,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
  * By default, a 30 seconds timeout is set with follows redirect and no authentication, streaming or proxy settings. The last
  * two can be configured at the {@link HttpClient} level as well, so if not set, the client's configuration will be used.
  *
- * @since 4.1.5 as experimental. GA in 4.2
+ * @since 4.1.5
  */
 @Experimental
 public final class HttpRequestOptionsBuilder {

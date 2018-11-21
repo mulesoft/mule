@@ -93,7 +93,7 @@ public interface HttpServer {
    *
    * @param handler the handler
    * @return a {@link WebSocketHandlerManager}
-   * @since 4.1.5 as experimental
+   * @since 4.1.5
    */
   @Experimental
   default WebSocketHandlerManager addWebSocketHandler(WebSocketHandler handler) {
