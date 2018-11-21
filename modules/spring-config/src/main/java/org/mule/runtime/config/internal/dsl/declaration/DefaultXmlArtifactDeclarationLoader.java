@@ -7,8 +7,10 @@
 package org.mule.runtime.config.internal.dsl.declaration;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -78,6 +80,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
@@ -125,6 +128,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.w3c.dom.Document;
@@ -303,19 +307,53 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
-        declareComponentModel(line, model, extensionElementsDeclarer::newSource).ifPresent(declarer -> {
-          final DslElementSyntax elementDsl = dsl.resolve(model);
-          model.getSuccessCallback()
-              .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
-                                                             line.getConfigAttributes(), line.getChildren()));
 
-          model.getErrorCallback()
-              .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
-                                                             line.getConfigAttributes(), line.getChildren()));
+        Map<String, SimpleConfigAttribute> successCallbackAttributes =
+            filterSourceCallbackAttributes(line.getConfigAttributes(), model.getSuccessCallback(), entry -> true);
+        Map<String, SimpleConfigAttribute> errorCallbackAttributes =
+            filterSourceCallbackAttributes(line.getConfigAttributes(), model.getErrorCallback(),
+                                           entry -> !successCallbackAttributes.containsKey(entry.getKey()));
+        Map<String, SimpleConfigAttribute> sourceAttributes =
+            filterAttributes(line.getConfigAttributes(), entry -> !successCallbackAttributes.containsKey(entry.getKey())
+                && !errorCallbackAttributes.containsKey(entry.getKey()));
 
-          declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
-          stop();
-        });
+        declareComponentModel(line.getNamespace(), line.getIdentifier(), sourceAttributes, line.getChildren(), model,
+                              extensionElementsDeclarer::newSource).ifPresent(declarer -> {
+                                final DslElementSyntax elementDsl = dsl.resolve(model);
+                                model.getSuccessCallback()
+                                    .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
+                                                                                   successCallbackAttributes,
+                                                                                   line.getChildren()));
+
+                                model.getErrorCallback()
+                                    .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
+                                                                                   errorCallbackAttributes,
+                                                                                   line.getChildren()));
+                                declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
+                                stop();
+                              });
+      }
+
+      private Map<String, SimpleConfigAttribute> filterSourceCallbackAttributes(Map<String, SimpleConfigAttribute> configAttributes,
+                                                                                Optional<SourceCallbackModel> sourceCallbackModel,
+                                                                                Predicate<Map.Entry<String, SimpleConfigAttribute>> filterCondition) {
+        if (sourceCallbackModel.isPresent()) {
+          final Set<String> parameterNames = sourceCallbackModel.map(callbackModel -> callbackModel.getAllParameterModels()
+              .stream().map(parameterModel -> parameterModel.getName()).collect(toSet())).orElse(null);
+          return sourceCallbackModel
+              .map(callbackModel -> filterAttributes(configAttributes,
+                                                     entry -> parameterNames.contains(entry.getKey())
+                                                         && filterCondition.test(entry)))
+              .orElse(emptyMap());
+        } else {
+          return emptyMap();
+        }
+      }
+
+      private Map<String, SimpleConfigAttribute> filterAttributes(Map<String, SimpleConfigAttribute> configAttributes,
+                                                                  Predicate<Map.Entry<String, SimpleConfigAttribute>> filterCondition) {
+        return configAttributes.entrySet().stream().filter(filterCondition)
+            .collect(toMap(entry -> entry.getKey(), entry -> entry.getValue()));
       }
 
       @Override
@@ -457,16 +495,24 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private Optional<ComponentElementDeclarer> declareComponentModel(final ConfigLine line,
                                                                    ComponentModel model,
                                                                    Function<String, ComponentElementDeclarer> declarerBuilder) {
-    final DslElementSyntax elementDsl = resolvers.get(getNamespace(line)).resolve(model);
-    if (elementDsl.getElementName().equals(line.getIdentifier())) {
+    return declareComponentModel(line.getNamespace(), line.getIdentifier(), line.getConfigAttributes(), line.getChildren(), model,
+                                 declarerBuilder);
+  }
+
+  private Optional<ComponentElementDeclarer> declareComponentModel(String namespace, String identifier,
+                                                                   Map<String, SimpleConfigAttribute> configAttributes,
+                                                                   List<ConfigLine> children, ComponentModel model,
+                                                                   Function<String, ComponentElementDeclarer> declarerBuilder) {
+    final DslElementSyntax elementDsl = resolvers.get(getNamespace(namespace)).resolve(model);
+    if (elementDsl.getElementName().equals(identifier)) {
       ComponentElementDeclarer declarer = declarerBuilder.apply(model.getName());
 
-      if (line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME) != null) {
-        declarer.withConfig(line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME).getValue());
+      if (configAttributes.get(CONFIG_ATTRIBUTE_NAME) != null) {
+        declarer.withConfig(configAttributes.get(CONFIG_ATTRIBUTE_NAME).getValue());
       }
 
-      declareParameterizedComponent(model, elementDsl, declarer, line.getConfigAttributes(), line.getChildren());
-      declareComposableModel(model, elementDsl, line, declarer);
+      declareParameterizedComponent(model, elementDsl, declarer, configAttributes, children);
+      declareComposableModel(model, elementDsl, children, declarer);
       return Optional.of(declarer);
     }
     return Optional.empty();
@@ -500,22 +546,26 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private void declareComposableModel(ComposableModel model,
                                       DslElementSyntax elementDsl,
                                       ConfigLine containerConfig, HasNestedComponentDeclarer declarer) {
-    containerConfig.getChildren()
-        .forEach((ConfigLine child) -> {
-          ExtensionModel extensionModel = getExtensionModel(child);
-          ElementDeclarer extensionElementsDeclarer = forExtension(extensionModel.getName());
-          Reference<Boolean> componentFound = new Reference<>(false);
-          getComponentDeclaringWalker(declaration -> {
-            declarer.withComponent(declaration);
-            componentFound.set(true);
-          }, child, extensionElementsDeclarer)
-              .walk(extensionModel);
+    declareComposableModel(model, elementDsl, containerConfig.getChildren(), declarer);
+  }
 
-          if (!componentFound.get()) {
-            declareRoute(model, elementDsl, child, extensionElementsDeclarer)
-                .ifPresent(declarer::withComponent);
-          }
-        });
+  private void declareComposableModel(ComposableModel model, DslElementSyntax elementDsl,
+                                      List<ConfigLine> children, HasNestedComponentDeclarer declarer) {
+    children.forEach((ConfigLine child) -> {
+      ExtensionModel extensionModel = getExtensionModel(child);
+      ElementDeclarer extensionElementsDeclarer = forExtension(extensionModel.getName());
+      Reference<Boolean> componentFound = new Reference<>(false);
+      getComponentDeclaringWalker(declaration -> {
+        declarer.withComponent(declaration);
+        componentFound.set(true);
+      }, child, extensionElementsDeclarer)
+          .walk(extensionModel);
+
+      if (!componentFound.get()) {
+        declareRoute(model, elementDsl, child, extensionElementsDeclarer)
+            .ifPresent(declarer::withComponent);
+      }
+    });
   }
 
   private Optional<RouteElementDeclaration> declareRoute(ComposableModel model, DslElementSyntax elementDsl,
@@ -927,7 +977,11 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   }
 
   private String getNamespace(ConfigLine configLine) {
-    return configLine.getNamespace() == null ? CORE_PREFIX : configLine.getNamespace();
+    return getNamespace(configLine.getNamespace());
+  }
+
+  private String getNamespace(String namespace) {
+    return namespace == null ? CORE_PREFIX : namespace;
   }
 
   private void copyExplicitAttributes(Map<String, SimpleConfigAttribute> attributes,
