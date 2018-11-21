@@ -6,15 +6,19 @@
  */
 package org.mule.session;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+
+import java.io.IOException;
+import java.io.InvalidClassException;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.model.SessionException;
+import org.mule.api.serialization.SerializationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.Base64;
-
-import java.io.IOException;
 
 /**
  * A session handler used to store and retrieve session information on an
@@ -36,7 +40,25 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
             byte[] serializedSession = Base64.decodeWithoutUnzipping(serializedEncodedSession);
             if (serializedSession != null)
             {
-                session = deserialize(message, serializedSession);
+                try
+                {
+                    session = deserialize(message, serializedSession);
+                }
+                catch (SerializationException e)
+                {
+                    Throwable rootCause = getRootCause(e);
+                    
+                    if (rootCause != null && rootCause instanceof InvalidClassException)
+                    {
+                        logger.warn("Session could not be deserialized due to class incompatibility: " + e.getCause().getMessage());
+                        session = null;
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
+
             }
         }
         return session;
