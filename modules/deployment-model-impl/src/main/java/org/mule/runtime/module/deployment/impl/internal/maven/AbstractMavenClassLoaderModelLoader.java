@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mule.maven.client.api.MavenClient;
@@ -253,8 +254,11 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                   includeProvidedDependencies, mavenRepository,
                                                   mavenReactorResolver,
                                                   temporaryDirectory);
+      Set<BundleDependency> nonProvidedDependencies = dependencies.stream()
+          .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
+          .map(this::convertBundleDependency).collect(Collectors.toSet());
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-          newLightweightClassLoaderModelBuilder(artifactFile, mavenClient, attributes, temporaryFolder);
+          newLightweightClassLoaderModelBuilder(artifactFile, mavenClient, attributes, nonProvidedDependencies, temporaryFolder);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -264,10 +268,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       Set<BundleDependency> missingApiDependencyBundles = findMissingApiDependencies(dependencies, attributes,
                                                                                      includeProvidedDependencies, mavenRepository,
                                                                                      mavenReactorResolver, temporaryDirectory);
-      Stream<BundleDependency> bundleDependencies = dependencies.stream()
-          .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
-          .map(this::convertBundleDependency);
-      loadUrls(artifactFile, classLoaderModelBuilder, concat(bundleDependencies,
+      loadUrls(artifactFile, classLoaderModelBuilder, concat(nonProvidedDependencies.stream(),
                                                              missingApiDependencyBundles.stream()).collect(toSet()));
       Stream<BundleDependency> allBundleDependencies = dependencies.stream().map(this::convertBundleDependency);
       classLoaderModelBuilder.dependingOn(concat(allBundleDependencies,
@@ -281,6 +282,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   protected abstract LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
                                                                                               MavenClient mavenClient,
                                                                                               Map<String, Object> attributes,
+                                                                                              Set<BundleDependency> nonProvidedDependencies,
                                                                                               File temporaryFolder);
 
   protected abstract HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,

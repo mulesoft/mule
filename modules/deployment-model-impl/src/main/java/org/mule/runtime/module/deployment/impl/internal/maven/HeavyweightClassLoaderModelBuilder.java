@@ -7,9 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
@@ -21,6 +20,7 @@ import com.vdurmont.semver4j.Semver;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,8 +29,7 @@ import org.apache.maven.model.Plugin;
 
 /**
  * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} with information from a
- * {@link org.mule.tools.api.classloader.model.ClassLoaderModel} included when packaging the artifact in a heavyweight
- * manner.
+ * {@link org.mule.tools.api.classloader.model.ClassLoaderModel} included when packaging the artifact in a heavyweight manner.
  *
  * @since 4.1.5
  */
@@ -59,12 +58,13 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   @Override
-  protected void doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
+  protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()
           .ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
     }
+    return emptyMap();
   }
 
   @Override
@@ -115,7 +115,8 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   /**
-   * Exports shared libraries resources and packages getting the information from the packager {@link org.mule.tools.api.classloader.model.ClassLoaderModel}.
+   * Exports shared libraries resources and packages getting the information from the packager
+   * {@link org.mule.tools.api.classloader.model.ClassLoaderModel}.
    */
   private void exportSharedLibrariesResourcesAndPackages() {
     packagerClassLoaderModel.getDependencies().stream()

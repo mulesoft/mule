@@ -45,6 +45,14 @@
           "methodName": "getAdditionalDependencies",
           "elementKind": "method",
           "justification": "Getter for new attributes"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "MuleExtensionsMavenPlugin",
+          "elementKind": "interface",
+          "justification": "New constants class"
         }
       ]
     }

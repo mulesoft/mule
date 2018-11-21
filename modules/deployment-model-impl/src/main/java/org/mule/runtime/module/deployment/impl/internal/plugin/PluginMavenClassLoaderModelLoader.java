@@ -12,9 +12,11 @@ import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.dese
 
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
@@ -67,9 +69,10 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   @Override
   protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
                                                                                      Map<String, Object> attributes,
+                                                                                     Set<BundleDependency> nonProvidedDependencies,
                                                                                      File temporaryFolder) {
     final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
-        new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, temporaryFolder);
+        new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, nonProvidedDependencies, temporaryFolder);
     configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }
