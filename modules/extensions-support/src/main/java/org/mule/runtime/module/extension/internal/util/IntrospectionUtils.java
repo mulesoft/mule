@@ -71,6 +71,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -153,6 +156,10 @@ import org.springframework.core.ResolvableType;
  */
 public final class IntrospectionUtils {
 
+  private static final AnyType ANY_TYPE = typeBuilder().anyType().build();
+  private static final ArrayType ANY_ARRAY_TYPE = typeBuilder().arrayType().of(ANY_TYPE).build();
+  private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
+
   private IntrospectionUtils() {}
 
   /**
@@ -169,14 +176,12 @@ public final class IntrospectionUtils {
   public static MetadataType getMetadataType(Type type) {
     MetadataType metadataType = type.asMetadataType();
 
-    if (type.isSameType(Object.class) ||
-        type.isAssignableTo(InputStream.class) ||
-        type.isAssignableTo(Byte[].class) ||
-        type.isAssignableTo(byte[].class)) {
+    if (isAnyType(type)) {
+      return enricher.enrich(ANY_TYPE, metadataType.getAnnotations());
+    }
 
-      MetadataTypeEnricher enricher = new MetadataTypeEnricher();
-
-      return enricher.enrich(typeBuilder().anyType().build(), metadataType.getAnnotations());
+    if (isArrayOfAny(type)) {
+      return enricher.enrich(typeBuilder().arrayType().of(typeBuilder().anyType()).build(), metadataType.getAnnotations());
     }
 
     return metadataType;
@@ -273,7 +278,7 @@ public final class IntrospectionUtils {
     if (returnType.isAssignableTo(Result.class)) {
       List<TypeGeneric> generics = returnType.getGenerics();
       if (generics.isEmpty()) {
-        return typeBuilder().anyType().build();
+        return ANY_TYPE;
       }
       Type payloadType = generics.get(0).getConcreteType();
       if (!payloadType.isAnyType()) {
@@ -309,26 +314,21 @@ public final class IntrospectionUtils {
       }
     }
 
-    if ((returnType.isSameType(Object.class) ||
-        returnType.isSameType(Serializable.class) ||
-        returnType.isAssignableTo(InputStream.class) ||
-        returnType.isAssignableTo(Byte[].class) ||
-        returnType.isAssignableTo(byte[].class)) && type != null) {
-
-      MetadataType metadataType = typeBuilder().anyType().build();
-      MetadataTypeEnricher enricher = new MetadataTypeEnricher();
-
-      return enricher.enrich(metadataType, type.asMetadataType().getAnnotations());
+    if (isAnyType(returnType) && type != null) {
+      return enricher.enrich(ANY_TYPE, type.asMetadataType().getAnnotations());
     }
 
-    return type != null ? type.asMetadataType() : typeBuilder().anyType().build();
+    if (isArrayOfAny(returnType) && type != null) {
+      return enricher.enrich(ANY_ARRAY_TYPE, type.asMetadataType().getAnnotations());
+    }
+
+    return type != null ? type.asMetadataType() : ANY_TYPE;
   }
 
   private static MetadataType returnListOfMessagesType(Type returnType,
                                                        Type resultType) {
     if (resultType.getGenerics().isEmpty()) {
-      AnyType anyType = typeBuilder().anyType().build();
-      return getListOfMessageType(returnType, anyType, anyType);
+      return getListOfMessageType(returnType, ANY_TYPE, ANY_TYPE);
     } else {
       TypeGeneric genericType = resultType.getGenerics().get(0);
       Type payloadType = genericType.getConcreteType();
@@ -336,7 +336,7 @@ public final class IntrospectionUtils {
       MetadataType outputType;
 
       if (payloadType.isAnyType()) {
-        outputType = typeBuilder().anyType().build();
+        outputType = ANY_TYPE;
       } else {
         if (payloadType.isAssignableTo(TypedValue.class)) {
           payloadType = payloadType.getGenerics().get(0).getConcreteType();
@@ -348,7 +348,7 @@ public final class IntrospectionUtils {
           resultType.getGenerics().get(1).getConcreteType();
 
       MetadataType attributesOutputType = attributesType.isAnyType()
-          ? typeBuilder().anyType().build()
+          ? ANY_TYPE
           : attributesType.asMetadataType();
 
       return getListOfMessageType(returnType, outputType, attributesOutputType);
@@ -393,15 +393,15 @@ public final class IntrospectionUtils {
         Type genericType = generics.get(1).getConcreteType();
         if (genericType != null) {
           if (genericType.isAnyType()) {
-            return typeBuilder().anyType().build();
+            return ANY_TYPE;
           } else {
             attributesType = genericType;
           }
         } else {
-          return typeBuilder().anyType().build();
+          return ANY_TYPE;
         }
       } else {
-        return typeBuilder().anyType().build();
+        return ANY_TYPE;
       }
     }
 
@@ -1583,5 +1583,25 @@ public final class IntrospectionUtils {
                                                getGroupModelContainerName(groupModel))));
 
     return showInDslMap;
+  }
+
+  /**
+   * @return a boolean indicating if the given type should be considered as a {@link AnyType Any type}
+   */
+  private static boolean isAnyType(Type type) {
+    return type.isSameType(Object.class) ||
+        type.isSameType(Serializable.class) ||
+        type.isAssignableTo(InputStream.class) ||
+        type.isAssignableTo(Byte[].class) ||
+        type.isAssignableTo(byte[].class) ||
+        type.isSameType(CursorProvider.class) ||
+        type.isAssignableTo(CursorStreamProvider.class);
+  }
+
+  /**
+   * @return a boolean indicating if the given type should be considered as a {@link ArrayType array} of {@link AnyType Any type}
+   */
+  private static boolean isArrayOfAny(Type type) {
+    return type.isAssignableTo(CursorIteratorProvider.class);
   }
 }
