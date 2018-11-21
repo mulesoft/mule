@@ -12,7 +12,7 @@ import org.mule.runtime.http.api.ws.WebSocket;
 /**
  * Handles the arrival of a message into an inbound {@link WebSocket}
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public interface WebSocketMessageHandler {

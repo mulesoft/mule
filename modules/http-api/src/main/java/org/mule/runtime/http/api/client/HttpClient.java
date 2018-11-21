@@ -79,6 +79,7 @@ public interface HttpClient {
    * @param socketId       the id of the obtained socket
    * @param callback       the callback that will receive the associated  socket events
    * @return a future {@link WebSocket}
+   * @since 4.1.5
    */
   @Experimental
   default CompletableFuture<WebSocket> openWebSocket(HttpRequest request,

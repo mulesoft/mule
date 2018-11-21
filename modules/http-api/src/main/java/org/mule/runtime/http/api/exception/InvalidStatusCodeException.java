@@ -11,7 +11,7 @@ import org.mule.api.annotation.Experimental;
 /**
  * Exceptions to be thrown when a received status code was not between the expected range
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public class InvalidStatusCodeException extends Exception {

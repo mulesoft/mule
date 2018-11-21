@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 /**
  * Exception thrown when a WebSocket connection is rejected.
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public class WebSocketConnectionRejectedException extends MuleException {

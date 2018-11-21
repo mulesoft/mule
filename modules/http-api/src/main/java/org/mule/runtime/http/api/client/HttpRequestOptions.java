@@ -17,7 +17,7 @@ import java.util.Optional;
 /**
  * Options for setting up an {@link HttpRequest}. Instances can only be obtained through a {@link HttpRequestOptionsBuilder}.
  *
- * @since 4.1.5 as experimental. GA in 4.2
+ * @since 4.1.5
  */
 @NoImplement
 @Experimental

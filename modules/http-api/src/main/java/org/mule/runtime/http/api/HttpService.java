@@ -40,6 +40,13 @@ public interface HttpService extends Service {
   @Experimental
   RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder();
 
+  /**
+   * Returns a new {@link WebSocketBroadcaster}. Instances are not be assumed reusable. Unless specific implementation
+   * says otherwise, create a new broadcaster per each message to be broadcasted.
+   *
+   * @return A new {@link WebSocketBroadcaster}
+   * @since 4.1.5
+   */
   @Experimental
   default WebSocketBroadcaster newWebSocketBroadcaster() {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");

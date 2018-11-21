@@ -14,7 +14,7 @@ import java.util.Collection;
 /**
  * Generic contract for a message which contains headers
  *
- * @since 4.1.5 as experimental
+ * @since 4.1.5
  */
 @Experimental
 public interface MessageWithHeaders {
