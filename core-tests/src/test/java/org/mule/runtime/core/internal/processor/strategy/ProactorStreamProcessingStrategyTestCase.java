@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -31,6 +32,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
@@ -40,22 +42,29 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
+import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.apache.commons.io.input.NullInputStream;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalLong;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
@@ -473,6 +482,89 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
         .message(Message.builder().payload(new TypedValue(new NullInputStream(length.orElse(-1l)), INPUT_STREAM, length))
             .build())
         .build();
+  }
+
+  @Test
+  public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
+    if (mode.equals(SOURCE)) {
+      MultipleInvocationLatchedProcessor latchedProcessor =
+          new MultipleInvocationLatchedProcessor(ProcessingType.CPU_INTENSIVE, 4);
+
+      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+
+      flow = flowBuilder.get()
+          .source(triggerableMessageSource)
+          .processors(cpuLightProcessor, latchedProcessor).build();
+      flow.initialise();
+      flow.start();
+
+      List<Future> futures = new ArrayList<>();
+
+      try {
+        // Fill the threads, the queue and an extra one to keep retrying
+        for (int i = 0; i < (2 * 2) + 1; ++i) {
+          futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
+        }
+
+        // Give time for the extra dispatch to get to the point where it starts retrying
+        Thread.sleep(500);
+
+        expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+        processFlow(newEvent());
+      } finally {
+        latchedProcessor.release();
+        latchedProcessor.getAllLatchedLatch().await();
+
+        futures.forEach(f -> {
+          try {
+            f.get(RECEIVE_TIMEOUT, MILLISECONDS);
+          } catch (Exception e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
+      }
+    }
+  }
+
+  @Test
+  public void backpressureOnInnerCpuIntensiveSchedulerBusyRecovery() throws Exception {
+    if (mode.equals(SOURCE)) {
+      MultipleInvocationLatchedProcessor latchedProcessor =
+          new MultipleInvocationLatchedProcessor(ProcessingType.CPU_INTENSIVE, 5);
+
+      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+
+      flow = flowBuilder.get()
+          .source(triggerableMessageSource)
+          .processors(cpuLightProcessor, latchedProcessor).build();
+      flow.initialise();
+      flow.start();
+
+      List<Future> futures = new ArrayList<>();
+
+      try {
+        // Fill the threads, the queue and an extra one to keep retrying
+        for (int i = 0; i < (2 * 2) + 1; ++i) {
+          futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
+        }
+
+        // Give time for the extra dispatch to get to the point where it starts retrying
+        Thread.sleep(500);
+
+        latchedProcessor.release();
+
+        Thread.sleep(500);
+        processFlow(newEvent());
+      } finally {
+        futures.forEach(f -> {
+          try {
+            f.get(RECEIVE_TIMEOUT, MILLISECONDS);
+          } catch (Exception e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
+      }
+    }
   }
 
 }

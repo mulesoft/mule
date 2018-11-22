@@ -7,27 +7,23 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
@@ -63,7 +59,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
 
   /**
    * Checks whether an error indicates that a thread pool is full.
-   * 
+   *
    * @param t the thrown error to analyze
    * @return {@code true} if {@code t} indicates that a thread pool needed for the processing strategy owner rejected a task.
    */
@@ -85,17 +81,26 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
   }
 
   /**
+   * Extension of {@link Sink} using Reactor's {@link FluxSink} to accept events.
+   */
+  static interface ReactorSink<E> extends Sink, Disposable {
+
+    E intoSink(CoreEvent event);
+
+  }
+
+  /**
    * Implementation of {@link Sink} using Reactor's {@link FluxSink} to accept events.
    */
-  static class ReactorSink<E> implements Sink, Disposable {
+  static class DefaultReactorSink<E> implements ReactorSink<E> {
 
     private final FluxSink<E> fluxSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
     private final int bufferSize;
 
-    ReactorSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
-                Consumer<CoreEvent> onEventConsumer, int bufferSize) {
+    DefaultReactorSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
+                       Consumer<CoreEvent> onEventConsumer, int bufferSize) {
       this.fluxSink = fluxSink;
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
@@ -134,7 +139,8 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
       }
     }
 
-    protected E intoSink(CoreEvent event) {
+    @Override
+    public E intoSink(CoreEvent event) {
       return (E) event;
     }
 
