@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
@@ -29,6 +30,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
+import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.hamcrest.Matcher;
@@ -211,13 +213,19 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Test
   @Description("If CPU LITE pool is busy OVERLOAD error is thrown")
   public void cpuLightRejectedExecution() throws Exception {
-    flow = flowBuilder.get().processors(blockingProcessor)
-        .processingStrategyFactory((context, prefix) -> new ReactorProcessingStrategy(() -> new RejectingScheduler(cpuLight)))
-        .build();
-    flow.initialise();
-    flow.start();
-    expectRejected();
-    processFlow(testEvent());
+    if (mode.equals(SOURCE)) {
+      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+
+      flow = flowBuilder.get()
+          .source(triggerableMessageSource)
+          .processors(blockingProcessor)
+          .processingStrategyFactory((context, prefix) -> new ReactorProcessingStrategy(() -> new RejectingScheduler(cpuLight)))
+          .build();
+      flow.initialise();
+      flow.start();
+      expectRejected();
+      processFlow(testEvent());
+    }
   }
 
   @Test
