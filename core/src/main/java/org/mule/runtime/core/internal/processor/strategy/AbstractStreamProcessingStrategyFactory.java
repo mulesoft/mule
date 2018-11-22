@@ -42,8 +42,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.WorkQueueProcessor;
 
 /**
@@ -175,7 +177,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
             .transform(function)
             .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
       }
-      return new ReactorSink(processor.sink(), () -> {
+      return buildSink(processor.sink(), () -> {
         long start = currentTimeMillis();
         if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
           LOGGER.warn("WorkQueueProcessor of ProcessingStrategy for flow '{}' not shutDown in {} ms. Forcing shutdown...",
@@ -192,10 +194,16 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
           throw new MuleRuntimeException(e);
         }
 
-      }, createOnEventConsumer(), bufferSize) {
+      }, createOnEventConsumer(), bufferSize);
+    }
+
+
+    protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
+                                           Consumer<CoreEvent> onEventConsumer, int bufferSize) {
+      return new DefaultReactorSink(fluxSink, disposable, onEventConsumer, bufferSize) {
 
         @Override
-        protected EventWrapper intoSink(CoreEvent event) {
+        public EventWrapper intoSink(CoreEvent event) {
           return new EventWrapper(event);
         }
       };

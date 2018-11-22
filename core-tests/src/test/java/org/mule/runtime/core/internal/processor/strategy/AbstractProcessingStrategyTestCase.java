@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.Executors.newFixedThreadPool;
@@ -126,7 +125,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected Flow flow;
   protected Set<String> threads = synchronizedSet(new HashSet<>());
   protected Set<String> schedulers = synchronizedSet(new HashSet<>());
-  private TriggerableMessageSource triggerableMessageSource = getTriggerableMessageSource();
+  protected TriggerableMessageSource triggerableMessageSource = getTriggerableMessageSource();
   protected Processor cpuLightProcessor = new ThreadTrackingProcessor() {
 
     @Override
@@ -167,7 +166,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   protected Processor errorSuccessProcessor = new ThreadTrackingProcessor() {
 
-    private AtomicInteger count = new AtomicInteger();
+    private final AtomicInteger count = new AtomicInteger();
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
@@ -480,7 +479,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
         return flow.process(event);
       case SOURCE:
         Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
-        just(event).transform(triggerableMessageSource.getListener()).subscribe(requestUnbounded());
+        just(event)
+            .transform(triggerableMessageSource.getListener())
+            .subscribe(requestUnbounded());
         try {
           return Mono.from(responsePublisher).block();
         } catch (Throwable throwable) {
@@ -588,11 +589,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   class MultipleInvocationLatchedProcessor extends AbstractComponent implements Processor {
 
-    private ProcessingType type;
+    private final ProcessingType type;
     private volatile Latch latch = new Latch();
     private volatile CountDownLatch allLatchedLatch;
     private volatile Latch unlatchedInvocationLatch;
-    private AtomicInteger invocations;
+    private final AtomicInteger invocations;
 
     public MultipleInvocationLatchedProcessor(ProcessingType type, int latchedInvocations) {
       this.type = type;
@@ -638,8 +639,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   static class TestScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
-    private String threadNamePrefix;
-    private ExecutorService executor;
+    private final String threadNamePrefix;
+    private final ExecutorService executor;
 
     public TestScheduler(int threads, String threadNamePrefix, boolean reject) {
       super(1, new NamedThreadFactory(threadNamePrefix + ".tasks"));
@@ -691,7 +692,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     static int REJECTION_COUNT = 10;
     private int rejections;
-    private Scheduler delegate;
+    private final Scheduler delegate;
 
     public RejectingScheduler(Scheduler delegate) {
       super(1, "prefix", true);
