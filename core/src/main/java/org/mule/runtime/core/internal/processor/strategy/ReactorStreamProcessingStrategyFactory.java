@@ -67,9 +67,9 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
 
   static class ReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable {
 
-    private Supplier<Scheduler> cpuLightSchedulerSupplier;
+    private final Supplier<Scheduler> cpuLightSchedulerSupplier;
     private Scheduler cpuLightScheduler;
-    private int parallelism;
+    private final int parallelism;
 
     ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
                                     String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier, int parallelism,
@@ -86,7 +86,7 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
         return publisher -> {
           return from(publisher).parallel(parallelism)
               .runOn(scheduler)
-              .composeGroup(pipeline);
+              .composeGroup(super.onPipeline(pipeline));
         };
       } else {
         return super.onPipeline(pipeline);

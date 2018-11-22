@@ -35,12 +35,15 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.WorkQueueProcessor;
 
 /**
@@ -169,7 +172,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader)).transform(function)
             .doFinally(s -> completionLatch.countDown()).subscribe();
       }
-      return new ReactorSink(processor.sink(), () -> {
+      return buildSink(processor.sink(), () -> {
         long start = currentTimeMillis();
         if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
           LOGGER.warn("WorkQueueProcessor of ProcessingStrategy for flow '{}' not shutDown in {} ms. Forcing shutdown...",
@@ -187,6 +190,18 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
         }
 
       }, createOnEventConsumer(), bufferSize);
+    }
+
+
+    protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
+                                           Consumer<CoreEvent> onEventConsumer, int bufferSize) {
+      return new DefaultReactorSink(fluxSink, disposable, onEventConsumer, bufferSize) {
+
+        @Override
+        public EventWrapper intoSink(CoreEvent event) {
+          return new EventWrapper(event);
+        }
+      };
     }
 
     protected enum WaitStrategy {
@@ -215,5 +230,18 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
       }
     }
 
+    private static final class EventWrapper {
+
+      CoreEvent wrappedEvent;
+
+      public EventWrapper(CoreEvent event) {
+        this.wrappedEvent = event;
+        ((BaseEventContext) this.wrappedEvent.getContext()).getRootContext().onTerminated((e, t) -> this.wrappedEvent = null);
+      }
+
+      public CoreEvent getWrappedEvent() {
+        return this.wrappedEvent;
+      }
+    }
   }
 }

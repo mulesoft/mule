@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory.WorkQueueProcessingStrategy;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.hamcrest.Matcher;
@@ -216,13 +217,19 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Test
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void rejectedExecution() throws Exception {
-    flow = flowBuilder.get().processors(blockingProcessor)
-        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new RejectingScheduler(blocking)))
-        .build();
-    flow.initialise();
-    flow.start();
-    expectRejected();
-    processFlow(testEvent());
+    if (mode.equals(SOURCE)) {
+      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+
+      flow = flowBuilder.get()
+          .source(triggerableMessageSource)
+          .processors(blockingProcessor)
+          .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new RejectingScheduler(blocking)))
+          .build();
+      flow.initialise();
+      flow.start();
+      expectRejected();
+      processFlow(testEvent());
+    }
   }
 
   @Test
@@ -290,16 +297,22 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Test
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void blockingRejectedExecution() throws Exception {
-    Scheduler blockingSchedulerSpy = spy(blocking);
-    Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
+    if (mode.equals(SOURCE)) {
+      Scheduler blockingSchedulerSpy = spy(blocking);
+      Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
 
-    flow = flowBuilder.get().processors(blockingProcessor)
-        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> rejectingSchedulerSpy))
-        .build();
-    flow.initialise();
-    flow.start();
-    expectRejected();
-    processFlow(testEvent());
+      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+
+      flow = flowBuilder.get()
+          .source(triggerableMessageSource)
+          .processors(blockingProcessor)
+          .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> rejectingSchedulerSpy))
+          .build();
+      flow.initialise();
+      flow.start();
+      expectRejected();
+      processFlow(testEvent());
+    }
   }
 
   @Test

@@ -11,6 +11,7 @@ import static java.lang.Long.getLong;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.time.Duration.ofMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -33,8 +34,13 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import reactor.core.Disposable;
+import reactor.core.publisher.FluxSink;
 import reactor.retry.BackoffDelay;
 
 /**
@@ -99,13 +105,50 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
   static class ProactorStreamProcessingStrategy extends ReactorStreamProcessingStrategy {
 
+    private final class ProactorSinkWrapper<E> implements ReactorSink<E> {
+
+      private final ReactorSink<E> innerSink;
+
+      private ProactorSinkWrapper(ReactorSink<E> innerSink) {
+        this.innerSink = innerSink;
+      }
+
+      @Override
+      public final void accept(CoreEvent event) {
+        if (retryingCounter.get() > 0) {
+          throw new RejectedExecutionException();
+        }
+        innerSink.accept(event);
+      }
+
+      @Override
+      public final boolean emit(CoreEvent event) {
+        if (retryingCounter.get() > 0) {
+          return false;
+        }
+        return innerSink.emit(event);
+      }
+
+      @Override
+      public E intoSink(CoreEvent event) {
+        return innerSink.intoSink(event);
+      }
+
+      @Override
+      public final void dispose() {
+        innerSink.dispose();
+      }
+    }
+
     private static Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
     private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
-    private Supplier<Scheduler> blockingSchedulerSupplier;
-    private Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
+    private final Supplier<Scheduler> blockingSchedulerSupplier;
+    private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
+
+    private final AtomicInteger retryingCounter = new AtomicInteger();
 
     public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                             int bufferSize,
@@ -186,13 +229,29 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
             if (schedulerBusy) {
               LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
                            processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+
+              retryingCounter.incrementAndGet();
             }
             return schedulerBusy;
           })
+              .doOnRetry(ctx -> {
+                getCpuLightScheduler().schedule(() -> {
+                  // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
+                  // again by the retry mechanism.
+                  retryingCounter.decrementAndGet();
+                }, SCHEDULER_BUSY_RETRY_INTERVAL_MS * 2, MILLISECONDS);
+              })
               .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }
 
+    @Override
+    protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, Disposable disposable, Consumer<CoreEvent> onEventConsumer,
+                                           int bufferSize) {
+      ReactorSink<E> innerSink = super.buildSink(fluxSink, disposable, onEventConsumer, bufferSize);
+
+      return new ProactorSinkWrapper<E>(innerSink);
+    }
   }
 
 }
