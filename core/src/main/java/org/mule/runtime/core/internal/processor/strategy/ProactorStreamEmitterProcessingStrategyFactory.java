@@ -152,8 +152,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
       EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
 
-      int subscriberCount = maxConcurrency < subscribers ? maxConcurrency : subscribers;
-      CountDownLatch completionLatch = new CountDownLatch(subscriberCount);
+      CountDownLatch completionLatch = new CountDownLatch(1);
 
       processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader)).transform(function)
           .doFinally(s -> completionLatch.countDown()).subscribe();
@@ -203,8 +202,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-      reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-
       return publisher -> from(publisher).flatMap(event -> {
         if (processor.getProcessingType() == IO_RW && !scheduleIoRwEvent(event)) {
           // If payload is not a stream o length is < STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD (default 16KB) perform processing on
@@ -213,6 +210,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
               .transform(processor)
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
         } else {
+          reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
           return scheduleProcessor(processor, publishOnScheduler, scheduler, event);
         }
       }, max(maxConcurrency / (getParallelism() * subscribers), 1));

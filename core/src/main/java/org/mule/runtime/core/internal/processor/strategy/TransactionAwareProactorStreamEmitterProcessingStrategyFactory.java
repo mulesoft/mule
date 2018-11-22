@@ -55,8 +55,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                                                .getSchedulerBaseConfig()
                                                                                .withName(schedulersNamePrefix + "."
                                                                                    + CPU_INTENSIVE.name())),
-                                                                       getMaxConcurrency(),
                                                                        resolveParallelism(),
+                                                                       getMaxConcurrency(),
                                                                        muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
