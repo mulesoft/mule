@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 
 import java.util.Collection;
 import java.util.Set;
@@ -125,16 +126,16 @@ public class CursorManager {
 
   private class EventStreamingState {
 
-    private AtomicBoolean disposed = new AtomicBoolean(false);
-    private AtomicInteger cursorCount = new AtomicInteger(0);
+    private final AtomicBoolean disposed = new AtomicBoolean(false);
+    private final AtomicInteger cursorCount = new AtomicInteger(0);
 
-    private final LoadingCache<CursorProvider, Set<Cursor>> cursors = Caffeine.newBuilder()
-        .removalListener((key, value, cause) -> {
+    private final LoadingCache<CursorProvider<CursorStream>, Set<Cursor>> cursors = Caffeine.newBuilder()
+        .removalListener((CursorProvider<CursorStream> key, Set<Cursor> value, RemovalCause cause) -> {
           try {
-            closeProvider((CursorProvider) key);
-            releaseAll((Collection<Cursor>) value);
+            closeProvider(key);
+            releaseAll(value);
           } finally {
-            ((CursorProvider<CursorStream>) key).releaseResources();
+            key.releaseResources();
           }
         })
         .build(key -> {
