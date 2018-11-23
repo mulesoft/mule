@@ -54,7 +54,6 @@ public class ParameterGroupObjectBuilder<T> {
     checkInstantiable(prototypeClass, reflectionCache);
     this.expressionManager = expressionManager;
     this.groupDescriptorFields = reflectionCache.fieldElementsFor(groupDescriptor);
-    // this.groupDescriptorFields.forEach(f -> f.getField().ifPresent(field -> field.setAccessible(true)));
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
