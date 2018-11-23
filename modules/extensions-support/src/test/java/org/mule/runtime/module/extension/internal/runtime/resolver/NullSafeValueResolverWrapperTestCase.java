@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,8 +21,11 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -53,7 +58,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Mock
   private ExpressionManager expressionManager;
 
-  private ReflectionCache reflectionCache = new ReflectionCache();
+  private final ReflectionCache reflectionCache = new ReflectionCache();
 
   @Before
   public void setUp() {
@@ -73,6 +78,11 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   @Test
   public void testPojoType() throws Exception {
+    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
+    when(session.evaluate(eq("#[5]"), any(DataType.class)))
+        .thenAnswer(inv -> new TypedValue<>(5, inv.getArgumentAt(1, DataType.class)));
+    when(expressionManager.openSession(any())).thenReturn(session);
+
     assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojo.class), true, new DynamicPojo(5));
 
     verify(event, times(1)).asBindingContext();

@@ -10,7 +10,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -20,8 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Context used to provide all the parameters required for a {@link ValueResolver} to produce
- * a result.
+ * Context used to provide all the parameters required for a {@link ValueResolver} to produce a result.
  *
  * @since 4.0
  */
@@ -29,11 +27,11 @@ public class ValueResolvingContext implements AutoCloseable {
 
   private CoreEvent event;
   private final ConfigurationInstance config;
-  private final LazyValue<ExpressionManagerSession> session;
+  private final ExpressionManagerSession session;
   private final boolean resolveCursors;
 
   private ValueResolvingContext(CoreEvent event,
-                                LazyValue<ExpressionManagerSession> session,
+                                ExpressionManagerSession session,
                                 ConfigurationInstance config,
                                 boolean resolveCursors) {
     this.event = event;
@@ -80,8 +78,8 @@ public class ValueResolvingContext implements AutoCloseable {
   }
 
   /**
-   * @return the {@link ConfigurationInstance} of the current resolution context
-   * if one is bound to the element to be resolved, or {@link Optional#empty()} if none is found.
+   * @return the {@link ConfigurationInstance} of the current resolution context if one is bound to the element to be resolved, or
+   *         {@link Optional#empty()} if none is found.
    */
   public Optional<ConfigurationInstance> getConfig() {
     return ofNullable(config);
@@ -109,14 +107,14 @@ public class ValueResolvingContext implements AutoCloseable {
     return resolveCursors;
   }
 
-  public Optional<ExpressionManagerSession> getSession() {
-    return ofNullable(session.get());
+  public ExpressionManagerSession getSession() {
+    return session;
   }
 
   @Override
   public void close() {
-    if (session.isComputed()) {
-      session.get().close();
+    if (session != null) {
+      session.close();
     }
   }
 
@@ -155,12 +153,12 @@ public class ValueResolvingContext implements AutoCloseable {
     public ValueResolvingContext build() {
       if (event == null) {
         return new ValueResolvingContext(null, null, null, true);
+      } else if (manager == null) {
+        return new ValueResolvingContext(event, null, config.orElse(null), resolveCursors);
+      } else {
+        return new ValueResolvingContext(event, manager.openSession(event.asBindingContext()), config.orElse(null),
+                                         resolveCursors);
       }
-      LazyValue<ExpressionManagerSession> session = new LazyValue<>();
-      if (manager != null) {
-        session = new LazyValue<>(() -> manager.openSession(event.asBindingContext()));
-      }
-      return new ValueResolvingContext(event, session, config.orElse(null), resolveCursors);
     }
   }
 }
