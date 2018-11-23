@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 
 import com.google.common.base.Objects;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -74,7 +74,7 @@ public class ResolverSetResult {
   private final Map<String, Object> evaluationResult;
 
   ResolverSetResult(Map<String, Object> evaluationResult) {
-    this.evaluationResult = new HashMap<>(evaluationResult);
+    this.evaluationResult = evaluationResult;
   }
 
   /**

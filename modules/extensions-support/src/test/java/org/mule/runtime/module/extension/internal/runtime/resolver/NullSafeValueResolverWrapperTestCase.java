@@ -49,7 +49,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Mock
   private ObjectTypeParametersResolver objectTypeParametersResolver;
 
-  private ReflectionCache reflectionCache = new ReflectionCache();
+  private final ReflectionCache reflectionCache = new ReflectionCache();
 
   @Before
   public void setUp() {

@@ -18,7 +18,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
-import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -28,6 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
@@ -46,7 +47,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   private static final ValueResolvingContext RESOLVING_CONTEXT =
       ValueResolvingContext.from(MuleExtensionUtils.getInitialiserEvent());
   protected final Class<T> prototypeClass;
-  protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
+  protected final Map<FieldSetter, ValueResolver<Object>> resolvers = new HashMap<>();
   protected final Map<String, ValueResolver<? extends Object>> resolverByFieldName = new HashMap<>();
   protected ReflectionCache reflectionCache;
   private String name = null;
@@ -98,8 +99,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
 
     resolverByFieldName.put(field.getName(), resolver);
 
-    field.setAccessible(true);
-    resolvers.put(field, (ValueResolver<Object>) resolver);
+    resolvers.put(new FieldSetter<>(field), (ValueResolver<Object>) resolver);
     return this;
   }
 
@@ -115,10 +115,10 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   public T build(ValueResolvingContext context) throws MuleException {
     T object = createInstance(prototypeClass);
 
-    for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet()) {
-      setField(entry.getKey(), object,
-               context == null || context.resolveCursors() ? resolveCursor(resolveValue(entry.getValue(), context))
-                   : resolveValue(entry.getValue(), context));
+    for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
+      entry.getKey().set(object,
+                         context == null || context.resolveCursors() ? resolveCursor(resolveValue(entry.getValue(), context))
+                             : resolveValue(entry.getValue(), context));
     }
 
     injectFields(object, name, encoding, reflectionCache);

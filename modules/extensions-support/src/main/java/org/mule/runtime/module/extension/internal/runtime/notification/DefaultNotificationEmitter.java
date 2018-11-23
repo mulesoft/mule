@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.notification.HasNotifications;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -44,10 +45,15 @@ public class DefaultNotificationEmitter implements NotificationEmitter {
 
   private void validateAction(Enum action) {
     String actionName = action.name();
-    if (componentModel.getNotificationModels().stream().noneMatch(nm -> actionName.equals(nm.getIdentifier()))) {
-      throw new IllegalArgumentException(format("Cannot fire '%s' notification since it's not declared by the component.",
-                                                actionName));
+
+    for (NotificationModel nm : componentModel.getNotificationModels()) {
+      if (actionName.equals(nm.getIdentifier())) {
+        return;
+      }
     }
+
+    throw new IllegalArgumentException(format("Cannot fire '%s' notification since it's not declared by the component.",
+                                              actionName));
   }
 
 }
