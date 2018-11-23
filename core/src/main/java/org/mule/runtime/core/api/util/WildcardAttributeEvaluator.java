@@ -10,8 +10,8 @@ import java.util.Collection;
 
 public final class WildcardAttributeEvaluator {
 
-  private String escapedValue;
-  private Boolean hasWildcards;
+  private final String escapedValue;
+  private final Boolean hasWildcards;
 
   public WildcardAttributeEvaluator(String attributeValue) {
     if (attributeValue == null) {
@@ -30,8 +30,7 @@ public final class WildcardAttributeEvaluator {
     if (!hasWildcards()) {
       throw new IllegalStateException("Can't call processValues with non wildcard attribute");
     }
-    String[] valuesArray = values.toArray(new String[values.size()]);
-    for (String value : valuesArray) {
+    for (String value : values) {
       if (matches(value)) {
         matchCallback.processMatch(value);
       }

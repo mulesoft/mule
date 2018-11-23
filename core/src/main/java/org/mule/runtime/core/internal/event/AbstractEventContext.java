@@ -66,7 +66,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
   private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
-  private ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
+  private final ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
 
   private final int depthLevel;
 
@@ -196,9 +196,13 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private synchronized void responseDone(Either<Throwable, CoreEvent> result) {
     this.result = result;
-    responsePublishers.forEach(rp -> rp.result = result);
+    for (ResponsePublisher rp : responsePublishers) {
+      rp.result = result;
+    }
     state = STATE_RESPONSE;
-    onResponseConsumerList.stream().forEach(consumer -> signalConsumerSilently(consumer));
+    for (BiConsumer<CoreEvent, Throwable> onResponseConsumer : onResponseConsumerList) {
+      signalConsumerSilently(onResponseConsumer);
+    }
     onResponseConsumerList.clear();
     tryComplete();
   }
@@ -208,7 +212,7 @@ abstract class AbstractEventContext implements BaseEventContext {
 
     childContextsReadWriteLock.readLock().lock();
     try {
-      allChildrenComplete = childContexts.stream().allMatch(context -> context.isComplete());
+      allChildrenComplete = childContexts.stream().allMatch(BaseEventContext::isComplete);
     } finally {
       childContextsReadWriteLock.readLock().unlock();
     }
@@ -219,7 +223,10 @@ abstract class AbstractEventContext implements BaseEventContext {
           LOGGER.debug(this + " completed.");
         }
         this.state = STATE_COMPLETE;
-        onCompletionConsumerList.forEach(consumer -> signalConsumerSilently(consumer));
+
+        for (BiConsumer<CoreEvent, Throwable> consumer : onCompletionConsumerList) {
+          signalConsumerSilently(consumer);
+        }
         onCompletionConsumerList.clear();
         getParentContext().ifPresent(context -> {
           if (context instanceof AbstractEventContext) {
@@ -238,7 +245,9 @@ abstract class AbstractEventContext implements BaseEventContext {
       }
       this.state = STATE_TERMINATED;
 
-      onTerminatedConsumerList.forEach(consumer -> signalConsumerSilently(consumer));
+      for (BiConsumer<CoreEvent, Throwable> consumer : onTerminatedConsumerList) {
+        signalConsumerSilently(consumer);
+      }
       onTerminatedConsumerList.clear();
 
       childContextsReadWriteLock.writeLock().lock();

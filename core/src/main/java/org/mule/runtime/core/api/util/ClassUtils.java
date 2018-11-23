@@ -741,7 +741,7 @@ public class ClassUtils {
     }
 
     Class<?> valueType = value.getClass();
-    return isWrapperAndPrimitivePair(type, valueType) || isWrapperAndPrimitivePair(valueType, type);
+    return isWrapperAndPrimitivePair(type, valueType);
   }
 
   /**
