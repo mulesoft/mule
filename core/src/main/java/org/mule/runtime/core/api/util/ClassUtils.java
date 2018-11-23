@@ -14,6 +14,7 @@ import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -806,7 +807,7 @@ public class ClassUtils {
     }
 
     Class<?> valueType = value.getClass();
-    return isWrapperAndPrimitivePair(type, valueType) || isWrapperAndPrimitivePair(valueType, type);
+    return isWrapperAndPrimitivePair(type, valueType);
   }
 
   /**
