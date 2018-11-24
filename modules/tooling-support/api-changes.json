@@ -1,4 +1,28 @@
 {
+  "4.1.5":{
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.deployment.model.api.domain.Domain org.mule.runtime.module.tooling.api.ToolingService::createDomain(byte[], java.util.Optional<java.util.Properties>) throws java.io.IOException",
+          "package": "org.mule.runtime.module.tooling.api",
+          "classSimpleName": "ToolingService",
+          "methodName": "createDomain",
+          "elementKind": "method",
+          "justification": "Support deployment properties on Domains"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.deployment.model.api.domain.Domain org.mule.runtime.module.tooling.api.ToolingService::createDomain(java.io.File, java.util.Optional<java.util.Properties>) throws java.io.IOException",
+          "package": "org.mule.runtime.module.tooling.api",
+          "classSimpleName": "ToolingService",
+          "methodName": "createDomain",
+          "elementKind": "method",
+          "justification": "Support deployment properties on Domains"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
