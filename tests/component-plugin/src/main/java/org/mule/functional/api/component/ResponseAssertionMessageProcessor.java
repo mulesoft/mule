@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 import static reactor.core.Exceptions.propagate;
@@ -29,8 +30,6 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.reactivestreams.Publisher;
-
-import com.eaio.uuid.UUID;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -120,7 +119,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   protected String generateTaskToken() {
-    return currentThread().getName() + " - " + new UUID().toString();
+    return currentThread().getName() + " - " + getUUID();
   }
 
   private CoreEvent processNext(CoreEvent event) throws MuleException {
