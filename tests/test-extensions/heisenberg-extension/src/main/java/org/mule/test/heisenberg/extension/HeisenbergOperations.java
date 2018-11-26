@@ -115,12 +115,6 @@ public class HeisenbergOperations implements Disposable {
   @Inject
   private ExtensionManager extensionManager;
 
-  @MediaType(ANY)
-  public void scopeWithMuleStereotype(@AllowedStereotypes(ValidatorStereotype.class) Chain validators,
-                                      CompletionCallback<String, String> completionCallback) {
-    completionCallback.success((Result.<String, String>builder().output("Ok").attributes("Attributes").build()));
-  }
-
   public List<Result<String, Object>> getSimpleBlacklist(@Config HeisenbergExtension config) {
     List<Result<String, Object>> blacklist = new LinkedList<>();
     blacklist.add(Result.<String, Object>builder().output("Fring").build());
