@@ -7,6 +7,8 @@
 
 package org.mule.runtime.deployment.model.internal.nativelib;
 
+import static java.net.URLDecoder.decode;
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.stream;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
@@ -93,7 +95,7 @@ public class ArtifactCopyNativeLibraryFinder implements NativeLibraryFinder {
     final File tempLibrary = new File(artifactTempFolder, nativeLibName + System.currentTimeMillis());
 
     try {
-      final File library = new File(libraryPath);
+      final File library = new File(decode(libraryPath, defaultCharset().name()));
       copyFile(library, tempLibrary);
 
       return tempLibrary;
