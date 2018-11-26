@@ -67,11 +67,6 @@
             <artifactId>reactor-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.stephenc.eaio-uuid</groupId>
-            <artifactId>uuid</artifactId>
-            <version>3.4.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-core-deprecated-schema-plugin</artifactId>
             <version>${project.version}</version>
