@@ -82,6 +82,21 @@ public class ArtifactCopyNativeLibraryFinderTestCase extends AbstractMuleTestCas
   }
 
   @Test
+  public void findsLocalLibraryIfPathEncoded() throws Exception {
+    File encodedPathFile = new File(tempFolder.getRoot(), "path with space");
+    encodedPathFile.mkdir();
+    File nativeLibrary = createDefaultNativeLibraryFile(encodedPathFile, TEST_LIB_NAME);
+
+    NativeLibraryFinder nativeLibraryFinder =
+        new ArtifactCopyNativeLibraryFinder(tempFolder.getRoot(), new URL[] {nativeLibrary.toURI().toURL()});
+
+    String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
+
+    assertThat(testLibPath, startsWith(tempFolder.getRoot().getAbsolutePath()));
+    assertThat(testLibPath, containsString(TEST_LIB_NAME));
+  }
+
+  @Test
   public void findsJnilibInMac() throws Exception {
     assumeThat(this, new MacOsMatcher());
 
@@ -97,8 +112,12 @@ public class ArtifactCopyNativeLibraryFinderTestCase extends AbstractMuleTestCas
     assertThat(testLibPath, containsString(TEST_LIB_NAME));
   }
 
+  private File createDefaultNativeLibraryFile(File folder, String libName) throws IOException {
+    return createNativeLibraryFile(folder, System.mapLibraryName(libName));
+  }
+
   private File createDefaultNativeLibraryFile(String libName) throws IOException {
-    return createNativeLibraryFile(libFolder.getRoot(), System.mapLibraryName(libName));
+    return createDefaultNativeLibraryFile(libFolder.getRoot(), libName);
   }
 
   private File createNativeLibraryFile(File folder, String libFileName) throws IOException {
