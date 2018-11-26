@@ -85,10 +85,10 @@ public class ArtifactCopyNativeLibraryFinderTestCase extends AbstractMuleTestCas
   public void findsLocalLibraryIfPathEncoded() throws Exception {
     File encodedPathFile = new File(tempFolder.getRoot(), "path with space");
     encodedPathFile.mkdir();
-    File nativeLibrary = createDefaultNativeLibraryFile(encodedPathFile,TEST_LIB_NAME);
+    File nativeLibrary = createDefaultNativeLibraryFile(encodedPathFile, TEST_LIB_NAME);
 
     NativeLibraryFinder nativeLibraryFinder =
-            new ArtifactCopyNativeLibraryFinder(tempFolder.getRoot(), new URL[] {nativeLibrary.toURI().toURL()});
+        new ArtifactCopyNativeLibraryFinder(tempFolder.getRoot(), new URL[] {nativeLibrary.toURI().toURL()});
 
     String testLibPath = nativeLibraryFinder.findLibrary(TEST_LIB_NAME, null);
 
