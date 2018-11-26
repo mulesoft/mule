@@ -50,8 +50,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   public static final String MULE = "mule";
   public static final String APP = "app";
 
-  private ExpressionLanguage expressionExecutor;
-  private MuleContext muleContext;
+  private final ExpressionLanguage expressionExecutor;
+  private final MuleContext muleContext;
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
@@ -248,7 +248,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
         try {
           return session.evaluate(sanitized);
         } catch (ExpressionExecutionException e) {
-          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), sanitized), e);
         }
       }
 
@@ -261,25 +261,27 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
         try {
           return session.evaluate(sanitized, timeout);
         } catch (ExpressionExecutionException e) {
-          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), sanitized), e);
         }
       }
 
       @Override
       public TypedValue<?> evaluate(String expression, DataType expectedOutputType) throws ExpressionRuntimeException {
+        String sanitized = sanitize(expression);
         try {
-          return session.evaluate(sanitize(expression), expectedOutputType);
+          return session.evaluate(sanitized, expectedOutputType);
         } catch (ExpressionExecutionException e) {
-          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), sanitized), e);
         }
       }
 
       @Override
       public TypedValue<?> evaluateLogExpression(String expression) throws ExpressionRuntimeException {
+        String sanitized = sanitize(expression);
         try {
-          return session.evaluateLogExpression(sanitize(expression));
+          return session.evaluateLogExpression(sanitized);
         } catch (ExpressionExecutionException e) {
-          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
+          throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), sanitized), e);
         }
       }
 
