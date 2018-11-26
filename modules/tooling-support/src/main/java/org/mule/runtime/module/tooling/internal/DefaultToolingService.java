@@ -14,6 +14,8 @@ import static java.util.Optional.of;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
@@ -25,6 +27,7 @@ import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -352,6 +355,7 @@ public class DefaultToolingService implements ToolingService {
         logger.warn(format("Error while disposing application: {} ", this.getArtifactName()), t);
       }
       deleteQuietly(appLocation);
+      deleteQuietly(getAppDataFolder(getArtifactName()));
     }
 
   }
@@ -376,6 +380,7 @@ public class DefaultToolingService implements ToolingService {
         logger.warn(format("Error while disposing domain: {} ", super.getArtifactName()), t);
       }
       deleteQuietly(domainLocation);
+      deleteQuietly(getAppDataFolder(getArtifactName()));
     }
 
   }
