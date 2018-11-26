@@ -9,4 +9,3 @@ Map pipelineParams = ["upstreamProjects"   : UPSTREAM_PROJECTS_LIST.join(','),
 
 runtimeProjectsBuild(pipelineParams)
 
-
