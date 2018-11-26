@@ -58,9 +58,6 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
   }
 
   private Object doResolve(InputStream inputStream) {
-    InMemoryCursorStreamProvider inMemoryCursorStreamProvider =
-        new InMemoryCursorStreamProvider(inputStream, config, getBufferManager());
-    inMemoryCursorStreamProvider.setAnnotations(getAnnotations());
-    return inMemoryCursorStreamProvider;
+    return new InMemoryCursorStreamProvider(inputStream, config, getBufferManager());
   }
 }
