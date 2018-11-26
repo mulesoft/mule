@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
-
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
     <configuration-properties file="heisenberg.properties"/>
 
     <heisenberg:config name="heisenberg"
@@ -109,7 +110,13 @@
 
     <flow name="executeNonBlocking">
         <heisenberg:execute-anything>
-            <heisenberg:blocking-non-blocking />
+            <heisenberg:blocking-non-blocking/>
         </heisenberg:execute-anything>
+    </flow>
+
+    <flow name="scopeWithMuleAllowedStereotype">
+        <petstore:scope-with-mule-stereotype>
+            <heisenberg:validate-money/>
+        </petstore:scope-with-mule-stereotype>
     </flow>
 </mule>

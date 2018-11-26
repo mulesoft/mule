@@ -191,4 +191,10 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
     cpuLightScheduler.submit(() -> {
     }).get(5, SECONDS);
   }
+
+  @Test
+  public void scopeUsingMuleAllowedStereotypes() throws Exception {
+    String result = (String) flowRunner("scopeWithMuleAllowedStereotype").run().getMessage().getPayload().getValue();
+    assertThat(result, is("Ok"));
+  }
 }
