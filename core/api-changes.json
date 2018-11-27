@@ -1,4 +1,23 @@
 {
+  "4.1.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(===org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap===)",
+          "new": "parameter java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(===java.util.AbstractMap===)",
+          "oldType": "org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap",
+          "newType": "java.util.AbstractMap",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "CaseInsensitiveHashMap",
+          "methodName": "wrap",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "This is not exposed"
+        }
+      ]
+    }
+  },
   "4.1.5": {
     "revapi": {
       "ignore": [
