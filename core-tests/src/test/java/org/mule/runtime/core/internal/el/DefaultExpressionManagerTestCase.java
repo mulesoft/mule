@@ -43,7 +43,6 @@ import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnor
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -67,14 +66,6 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +75,13 @@ import java.util.Optional;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -397,6 +395,6 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
 
     ExpressionManagerSession session = expressionManager.openSession(context);
 
-    assertThat(session.evaluate("#[myVar]").getValue(), equalTo(object));
+    assertThat(session.evaluate("#[myVar]").getValue(), equalTo(session));
   }
 }
