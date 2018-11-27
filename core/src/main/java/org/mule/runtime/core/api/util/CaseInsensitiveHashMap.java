@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -86,7 +87,7 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
     delegate = wrap(new InternalCaseInsensitiveHashMap(map));
   }
 
-  protected Map wrap(InternalCaseInsensitiveHashMap map) {
+  protected Map wrap(AbstractMap map) {
     return map;
   }
 
@@ -263,7 +264,7 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
     }
 
     @Override
-    protected Map<K, V> wrap(InternalCaseInsensitiveHashMap map) {
+    protected Map<K, V> wrap(AbstractMap map) {
       return unmodifiableMap(map);
     }
 

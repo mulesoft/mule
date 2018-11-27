@@ -189,7 +189,7 @@
         },
         {
           "code": "java.method.added",
-          "new": "method java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap)",
+          "new": "method java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(java.util.AbstractMap)",
           "package": "org.mule.runtime.core.api.util",
           "classSimpleName": "CaseInsensitiveHashMap",
           "methodName": "wrap",
