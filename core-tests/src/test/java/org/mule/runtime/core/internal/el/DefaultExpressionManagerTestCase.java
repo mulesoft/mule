@@ -397,6 +397,6 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
 
     ExpressionManagerSession session = expressionManager.openSession(context);
 
-    assertThat(session.evaluate("#[myVar]").getValue(), equalTo(object));
+    assertThat(session.evaluate("#[myVar]").getValue(), equalTo(object))
   }
 }
