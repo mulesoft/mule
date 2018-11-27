@@ -8,12 +8,9 @@ package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static javax.lang.model.element.ElementKind.PACKAGE;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 
 import java.util.ArrayList;
@@ -22,8 +19,9 @@ import java.util.Optional;
 
 /**
  * Default {@link ClassPackageFinder} implementation.
- * By default it uses the current {@link ClassLoader} to look for the {@link Class} package.
- * If a {@link ProcessingEnvironment} is provided it will be also used.
+ * <p>
+ * By default it uses the current {@link ClassLoader} to look for the {@link Class} package. If a
+ * {@link ProcessingEnvironment} is provided it will be also used.
  *
  * @since 4.1
  */
@@ -58,10 +56,7 @@ public class DefaultClassPackageFinder implements ClassPackageFinder {
     if (processingEnvironment != null) {
       TypeElement typeElement = processingEnvironment.getElementUtils().getTypeElement(className);
       if (typeElement != null) {
-        Element enclosingElement = typeElement.getEnclosingElement();
-        if (enclosingElement.getKind().equals(PACKAGE)) {
-          return Optional.of(((PackageElement) enclosingElement).getQualifiedName().toString());
-        }
+        return Optional.of(processingEnvironment.getElementUtils().getPackageOf(typeElement).getQualifiedName().toString());
       }
     }
     return empty();
