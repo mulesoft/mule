@@ -221,11 +221,27 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
           && event.getMessage().getPayload().getByteLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
     }
 
+    @Override
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+      if (maxConcurrency > subscribers) {
+        return publisher -> from(publisher)
+            .parallel()
+            .runOn(scheduler)
+            .composeGroup(pipeline);
+      } else {
+        return pipeline;
+      }
+    }
+
     private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
                                                    reactor.core.scheduler.Scheduler eventLoopScheduler,
                                                    Scheduler processorScheduler, CoreEvent event) {
-      return scheduleWithLogging(processor, processorScheduler, event)
-          .publishOn(eventLoopScheduler)
+
+      return just(event)
+          .transform(processor)
+          .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)))
+          //.publishOn(eventLoopScheduler)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .doOnError(RejectedExecutionException.class,
                      throwable -> LOGGER.trace("Shared scheduler " + processorScheduler.getName()
