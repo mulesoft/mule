@@ -469,6 +469,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             try
             {
+                // If the connector is handling an exception, avoid consuming message and throw an exception
+                // to execute rollback or unack.
+                if (((JmsConnector) MultiConsumerJmsMessageReceiver.this.connector).isHandlingException())
+                {
+                    throw new CannotReceiveMessageWhenHandlingExceptionException();
+                }
                 isProcessingMessage = true;
                 // Note: Despite the name "Worker", there is no new thread created here in order to maintain synchronicity for exception handling.
                 JmsWorker worker = new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this);
