@@ -482,7 +482,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         // passing through mule
         else if (connectionFactory instanceof CachingConnectionFactory)
         {
-            logger.info("Disabling 'reconnectOnException' option for bean-defined Spring's CachingConnectionFactory");
 
             // Since connector initiate in an async manner, synchronization is needed.
             synchronized (factoryInterceptionLock)
@@ -554,6 +553,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         // Verify that an CachingConnectionFactoryInterceptor has not been setup
         if (!(cachingConnectionFactory.getTargetConnectionFactory() instanceof CachingConnectionFactoryExceptionInterceptor))
         {
+            logger.info("Intercepting CachingConnectionFactory for mule exception handling");
             CachingConnectionFactoryExceptionInterceptor interceptorConnectionFactory = new
                     CachingConnectionFactoryExceptionInterceptor(cachingConnectionFactory);
 
@@ -564,6 +564,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             // Route connection factories.
             interceptorConnectionFactory.setTargetConnectionFactory(cachingConnectionFactory.getTargetConnectionFactory());
             cachingConnectionFactory.setTargetConnectionFactory(interceptorConnectionFactory);
+        }
+        else
+        {
+            logger.info("CachingConnectionFactory already intercepted");
         }
     }
 
