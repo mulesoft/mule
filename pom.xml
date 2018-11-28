@@ -180,7 +180,7 @@
         <commonsMath3Version>3.6.1</commonsMath3Version>
         <derbyVersion>10.13.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
-        <eaioUuidVersion>3.4.2-MULE-001-SNAPSHOT</eaioUuidVersion>
+        <eaioUuidVersion>3.4.2-MULE-001</eaioUuidVersion>
         <fastUtilVersion>8.1.1</fastUtilVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
