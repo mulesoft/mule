@@ -42,6 +42,7 @@ import org.mule.runtime.config.internal.dsl.model.MinimalApplicationModelGenerat
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.core.api.config.MuleDeploymentProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -55,6 +56,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.dsl.api.component.TypeDefinition;
+import org.mule.runtime.dsl.api.component.TypeDefinitionVisitor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,6 +65,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
@@ -118,7 +122,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.componentLocator = new SpringConfigurationComponentLocator();
     // By default when a lazy context is created none of its components are enabled...
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
-    enableMuleObjectConfiguration();
+    enableMuleObjects();
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
@@ -152,14 +156,38 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   /**
-   * Custom logic to only enable the configuration element as this is immutable and once the MuleContext is started we cannot change
-   * values.
+   * Custom logic to only enable those components that should be created when MuleContext is created.
+   * MuleConfiguration for instance is immutable and once the MuleContext is started we cannot change its values.
+   * TransactionManagerFactory should be created before a TransactionManager is defined in the configuration.
    */
-  public void enableMuleObjectConfiguration() {
+  private void enableMuleObjects() {
     ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
                                                                                              componentBuildingDefinitionRegistry);
     new MinimalApplicationModelGenerator(dependencyResolver, true)
-        .getMinimalModel(componentModel -> componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER));
+        .getMinimalModel(componentModel -> {
+          if (componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
+            return true;
+          }
+          AtomicBoolean transactionFactoryType = new AtomicBoolean(false);
+          TypeDefinitionVisitor visitor = new TypeDefinitionVisitor() {
+
+            @Override
+            public void onType(Class<?> type) {
+              transactionFactoryType.set(TransactionManagerFactory.class.isAssignableFrom(type));
+            }
+
+            @Override
+            public void onConfigurationAttribute(String attributeName, Class<?> enforcedClass) {}
+
+            @Override
+            public void onMapType(TypeDefinition.MapEntryType mapEntryType) {}
+          };
+          return componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
+              .map(componentBuildingDefinition -> {
+                componentBuildingDefinition.getTypeDefinition().visit(visitor);
+                return transactionFactoryType.get();
+              }).orElse(false);
+        });
   }
 
   private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
