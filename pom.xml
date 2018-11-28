@@ -181,7 +181,7 @@
         <corbaVersion>4.1.0</corbaVersion>
         <derbyVersion>10.13.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
-        <eaioUuidVersion>3.4.2</eaioUuidVersion>
+        <eaioUuidVersion>3.4.2-MULE-001-SNAPSHOT</eaioUuidVersion>
         <fastUtilVersion>8.1.1</fastUtilVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
