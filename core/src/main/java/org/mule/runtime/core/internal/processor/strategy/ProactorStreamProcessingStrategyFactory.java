@@ -238,21 +238,17 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
       reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
 
-      if (processor.getProcessingType() == IO_RW) {
-        return publisher -> from(publisher).flatMap(event -> {
-          if (!scheduleIoRwEvent(event)) {
-            // If payload is not a stream o length is < STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD (default 16KB) perform processing on
-            // current thread in stead of scheduling using IO pool.
-            return just(event)
-                .transform(processor)
-                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-          } else {
-            return scheduleProcessor(processor, publishOnScheduler, scheduler, event);
-          }
-        }, max(maxConcurrency / (getParallelism() * subscribers), 1));
-      } else {
-        return publisher -> from(publisher).transform(ep -> scheduleProcessor(processor, publishOnScheduler, scheduler, ep));
-      }
+      return publisher -> from(publisher).flatMap(event -> {
+        if (processor.getProcessingType() == IO_RW && !scheduleIoRwEvent(event)) {
+          // If payload is not a stream o length is < STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD (default 16KB) perform processing on
+          // current thread in stead of scheduling using IO pool.
+          return just(event)
+              .transform(processor)
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
+        } else {
+          return scheduleProcessor(processor, publishOnScheduler, scheduler, event);
+        }
+      }, max(maxConcurrency / (getParallelism() * subscribers), 1));
     }
 
     private boolean scheduleIoRwEvent(CoreEvent event) {
@@ -263,12 +259,6 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
                                                    reactor.core.scheduler.Scheduler eventLoopScheduler,
                                                    Scheduler processorScheduler, CoreEvent event) {
-      return scheduleProcessor(processor, eventLoopScheduler, processorScheduler, just(event));
-    }
-
-    private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
-                                                   reactor.core.scheduler.Scheduler eventLoopScheduler,
-                                                   Scheduler processorScheduler, Flux<CoreEvent> event) {
       return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .retryWhen(onlyIf(ctx -> {
@@ -293,17 +283,17 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     }
 
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, reactor.core.scheduler.Scheduler eventLoopScheduler,
-                                                Scheduler processorScheduler, Flux<CoreEvent> event) {
+                                                Scheduler processorScheduler, CoreEvent event) {
       if (isThreadLoggingEnabled) {
         final Context ctx = subscriberContext().block();
-        return from(event)
+        return just(event)
             .flatMap(e -> Mono.just(e).transform(processor)
                 .publishOn(eventLoopScheduler)
                 .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
                     .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
                                                                                            e.getContext().getId()))));
       } else {
-        return from(event)
+        return just(event)
             .transform(processor)
             .publishOn(eventLoopScheduler)
             .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)));
