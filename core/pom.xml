@@ -115,14 +115,9 @@
         </dependency>
         <!-- UUID generator, only called directly by mule-core -->
         <dependency>
-            <groupId>com.github.stephenc.eaio-uuid</groupId>
+            <groupId>org.mule.com.github.stephenc.eaio-uuid</groupId>
             <artifactId>uuid</artifactId>
             <version>${eaioUuidVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.corba</groupId>
-            <artifactId>glassfish-corba-omgapi</artifactId>
-            <version>${corbaVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
