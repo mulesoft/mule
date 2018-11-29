@@ -88,6 +88,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                 () -> cpuLight,
                                                 () -> blocking,
                                                 () -> cpuIntensive,
+                                                () -> custom,
                                                 CORES,
                                                 MAX_VALUE);
   }
@@ -246,6 +247,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> rejectingSchedulerSpy,
                                                                                              () -> cpuIntensive,
+                                                                                             () -> custom,
                                                                                              1,
                                                                                              2))
         .build();
@@ -275,6 +277,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> rejectingSchedulerSpy,
+                                                                                             () -> custom,
                                                                                              1,
                                                                                              2))
         .build();
@@ -302,6 +305,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             () -> custom,
                                                                                              CORES,
                                                                                              1)),
                        true, CPU_LITE, 1);
@@ -324,6 +328,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             () -> custom,
                                                                                              CORES,
                                                                                              2)),
                        true, CPU_LITE, 2);
@@ -347,6 +352,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             () -> custom,
                                                                                              CORES,
                                                                                              1)),
                        true, BLOCKING, 1);
@@ -369,6 +375,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             () -> custom,
                                                                                              1,
                                                                                              2)),
                        true, BLOCKING, 2);
@@ -418,6 +425,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             () -> custom,
                                                                                              4,
                                                                                              2))
         .processors(blockingProcessor)

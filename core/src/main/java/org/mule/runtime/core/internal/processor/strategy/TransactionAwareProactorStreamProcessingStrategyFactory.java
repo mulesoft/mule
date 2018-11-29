@@ -12,10 +12,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
-import java.util.concurrent.ExecutorService;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -25,6 +21,10 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+
+import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Creates default processing strategy with same behavior as {@link ProactorStreamProcessingStrategyFactory} apart from the fact
@@ -52,6 +52,10 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                         .withName(schedulersNamePrefix + "."
                                                                             + CPU_INTENSIVE.name())),
+                                                                () -> muleContext.getSchedulerService()
+                                                                    .customScheduler(muleContext.getSchedulerBaseConfig()
+                                                                        .withName(schedulersNamePrefix + ".retrySupport")
+                                                                        .withMaxConcurrentTasks(CORES)),
                                                                 getMaxConcurrency());
   }
 
@@ -69,11 +73,12 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                      Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                      Supplier<Scheduler> blockingSchedulerSupplier,
                                                      Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                     Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                      int maxConcurrency)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, CORES, maxConcurrency);
     }
 
     @Override
