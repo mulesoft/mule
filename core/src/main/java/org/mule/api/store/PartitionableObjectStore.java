@@ -18,7 +18,6 @@ import java.util.List;
  * to use.
  *
  * @param <T> the generic type of the store's items.
- * @since 1.0
  */
 public interface PartitionableObjectStore<T extends Serializable> extends ListableObjectStore<T>
 {
