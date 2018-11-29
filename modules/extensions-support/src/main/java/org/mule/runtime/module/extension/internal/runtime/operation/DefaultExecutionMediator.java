@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
@@ -125,43 +126,37 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     }
   }
 
-  private Mono<Object> executeWithInterceptors(ComponentExecutor<T> executor,
-                                               ExecutionContextAdapter<T> context,
-                                               final List<Interceptor> interceptors,
-                                               Optional<MutableConfigurationStats> stats) {
-
-    List<Interceptor> executedInterceptors = new ArrayList<>(interceptors.size());
-    // If the operation is retried, then the interceptors need to be executed again,
-    // so we wrap the mono which executes the operation into another which sets up
-    // the context and is the one configured with the retry logic
-    return Mono.create(sink -> {
-      Mono<Object> result;
-
+  private Publisher<Object> executeWithInterceptors(ComponentExecutor<T> executor,
+                                                    ExecutionContextAdapter<T> context,
+                                                    final List<Interceptor> interceptors,
+                                                    Optional<MutableConfigurationStats> stats) {
+    return defer(() -> {
+      // If the operation is retried, then the interceptors need to be executed again,
+      // so we wrap the mono which executes the operation into another which sets up
+      // the context and is the one configured with the retry logic
       InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
+
+      Mono<Object> result;
       if (beforeExecutionResult.isOk()) {
-        result = from(withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context)));
-        executedInterceptors.addAll(interceptors);
+        result = from(withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context)))
+            .map(value -> transform(context, value))
+            .doOnSuccess(value -> {
+              onSuccess(context, value, interceptors);
+              stats.ifPresent(s -> s.discountInflightOperation());
+            })
+            .onErrorMap(t -> mapError(context, interceptors, t));
       } else {
         result = error(beforeExecutionResult.getThrowable());
-        executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
       }
-
-      result.map(value -> transform(context, value))
-          .doOnSuccess(value -> {
-            onSuccess(context, value, interceptors);
-            stats.ifPresent(s -> s.discountInflightOperation());
-            sink.success(value);
-          }).onErrorMap(t -> mapError(context, interceptors, t))
-          .subscribe(v -> {
-          }, sink::error);
+      return result
+          .doOnSuccessOrError((value, e) -> {
+            try {
+              after(context, value, beforeExecutionResult.getExecutedInterceptors());
+            } finally {
+              beforeExecutionResult.getExecutedInterceptors().clear();
+            }
+          });
     })
-        .doOnSuccessOrError((value, e) -> {
-          try {
-            after(context, value, executedInterceptors);
-          } finally {
-            executedInterceptors.clear();
-          }
-        })
         .transform(pub -> from(getRetryPolicyTemplate(context)
             .applyPolicy(pub,
                          e -> extractConnectionException(e).isPresent(),
