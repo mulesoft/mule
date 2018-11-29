@@ -73,6 +73,10 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                 () -> muleContext.getSchedulerService()
                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                         .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
+                                                () -> muleContext.getSchedulerService()
+                                                    .customScheduler(muleContext.getSchedulerBaseConfig()
+                                                        .withName(schedulersNamePrefix + ".retrySupport")
+                                                        .withMaxConcurrentTasks(CORES)),
                                                 resolveParallelism(),
                                                 getMaxConcurrency());
   }
@@ -145,8 +149,10 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
     private final Supplier<Scheduler> blockingSchedulerSupplier;
     private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
+    private final Supplier<Scheduler> retrySupportSchedulerSupplier;
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
+    private Scheduler retrySupportScheduler;
 
     private final AtomicInteger retryingCounter = new AtomicInteger();
 
@@ -157,14 +163,16 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                            int parrelism,
+                                            Supplier<Scheduler> retrySupportSchedulerSupplier,
+                                            int parallelism,
                                             int maxConcurrency)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parrelism,
+      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism,
             maxConcurrency);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
+      this.retrySupportSchedulerSupplier = retrySupportSchedulerSupplier;
     }
 
     @Override
@@ -172,6 +180,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
       super.start();
       this.blockingScheduler = blockingSchedulerSupplier.get();
       this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
+      this.retrySupportScheduler = retrySupportSchedulerSupplier.get();
     }
 
     @Override
@@ -181,6 +190,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
       }
       if (cpuIntensiveScheduler != null) {
         cpuIntensiveScheduler.stop();
+      }
+      if (retrySupportScheduler != null) {
+        retrySupportScheduler.stop();
       }
       super.stop();
     }
@@ -235,7 +247,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
             return schedulerBusy;
           })
               .doOnRetry(ctx -> {
-                getCpuLightScheduler().schedule(() -> {
+                retrySupportScheduler.schedule(() -> {
                   // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
                   // again by the retry mechanism.
                   retryingCounter.decrementAndGet();
@@ -248,9 +260,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     @Override
     protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, Disposable disposable, Consumer<CoreEvent> onEventConsumer,
                                            int bufferSize) {
-      ReactorSink<E> innerSink = super.buildSink(fluxSink, disposable, onEventConsumer, bufferSize);
-
-      return new ProactorSinkWrapper<E>(innerSink);
+      return new ProactorSinkWrapper<E>(super.buildSink(fluxSink, disposable, onEventConsumer, bufferSize));
     }
   }
 
