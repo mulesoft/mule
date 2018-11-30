@@ -27,6 +27,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
 
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
@@ -154,7 +155,9 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
       CountDownLatch completionLatch = new CountDownLatch(1);
 
-      processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader)).transform(function)
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+      processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
+          .transform(function)
           .doFinally(s -> completionLatch.countDown()).subscribe();
 
       return new ReactorSink(processor.sink(), () -> {
@@ -210,8 +213,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
               .transform(processor)
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
         } else {
-          reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-          return scheduleProcessor(processor, publishOnScheduler, scheduler, event);
+          return scheduleProcessor(processor, scheduler, event);
         }
       }, max(maxConcurrency / (getParallelism() * subscribers), 1));
     }
@@ -223,25 +225,21 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-      if (maxConcurrency > subscribers) {
-        return publisher -> from(publisher)
-            .parallel()
-            .runOn(scheduler)
-            .composeGroup(pipeline);
-      } else {
+      if (maxConcurrency <= subscribers) {
         return pipeline;
       }
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+      return publisher -> from(publisher)
+          .parallel()
+          .runOn(scheduler)
+          .composeGroup(pipeline);
     }
 
-    private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
-                                                   reactor.core.scheduler.Scheduler eventLoopScheduler,
-                                                   Scheduler processorScheduler, CoreEvent event) {
+    private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
 
       return just(event)
           .transform(processor)
           .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)))
-          //.publishOn(eventLoopScheduler)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .doOnError(RejectedExecutionException.class,
                      throwable -> LOGGER.trace("Shared scheduler " + processorScheduler.getName()
