@@ -6,65 +6,119 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.property.MetadataImpactModelProperty;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.extension.api.annotation.metadata.RequiredForMetadata;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.test.metadata.extension.MetadataExtension;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RequiredForMetadataDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
-  private ExtensionDeclaration declaration;
+  private static final String REQUIRED_PARAM = "RequiredParam";
+  private static final RequiredForMetadataDeclarationEnricher ENRICHER = new RequiredForMetadataDeclarationEnricher();
+
+  @Mock
+  ExtensionDeclaration declaration;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  ExtensionLoadingContext loadingContext;
+
+  @Mock
+  ConnectionProviderDeclaration connectionProviderDeclaration;
+
+  @Mock
+  ConfigurationDeclaration configurationDeclaration;
+
+  @Mock
+  ParameterDeclaration parameterDeclaration;
+
+  @Mock
+  ExtensionParameter extensionParameter;
+
+  private ArgumentCaptor<RequiredForMetadataModelProperty> argumentCaptor = forClass(RequiredForMetadataModelProperty.class);
+
 
   @Before
   public void setUp() {
-    DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(MetadataExtension.class, getProductVersion());
-    ExtensionDeclarer declarer =
-        loader.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
-    new RequiredForMetadataDeclarationEnricher()
-        .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));
-    declaration = declarer.getDeclaration();
+    when(loadingContext.getExtensionDeclarer().getDeclaration()).thenReturn(declaration);
+    when(declaration.getConnectionProviders()).thenReturn(singletonList(connectionProviderDeclaration));
+    when(declaration.getConfigurations()).thenReturn(singletonList(configurationDeclaration));
+    ExtensionParameterDescriptorModelProperty descriptorModelProperty = mock(ExtensionParameterDescriptorModelProperty.class);
+    when(parameterDeclaration.getModelProperty(ExtensionParameterDescriptorModelProperty.class))
+        .thenReturn(Optional.of(descriptorModelProperty));
+    when(parameterDeclaration.getName()).thenReturn(REQUIRED_PARAM);
+    when(descriptorModelProperty.getExtensionParameter()).thenReturn(extensionParameter);
   }
 
   @Test
   public void connectionProviderWithRequiredForMetadataParameterGetsEnriched() {
-    List<ConnectionProviderDeclaration> connectionProviders = declaration.getConnectionProviders();
-    ConnectionProviderDeclaration connectionProviderDeclaration = connectionProviders.get(0);
+    enrichDeclaration(connectionProviderDeclaration, true);
 
-    Optional<MetadataImpactModelProperty> optionalMetadataImpact =
-        connectionProviderDeclaration.getModelProperty(MetadataImpactModelProperty.class);
-    assertThat(optionalMetadataImpact, is(not(empty())));
+    verify(connectionProviderDeclaration).addModelProperty(argumentCaptor.capture());
 
-    MetadataImpactModelProperty metadataImpact = optionalMetadataImpact.get();
-    assertThat(metadataImpact.getRequiredParameters(), is(hasItems("user")));
+    RequiredForMetadataModelProperty value = argumentCaptor.getValue();
+    assertThat(value.getRequiredParameters(), is(hasItem(REQUIRED_PARAM)));
+  }
+
+  @Test
+  public void connectionWithOutRequiredForMetadataParameterDontGetsEnriched() {
+    enrichDeclaration(connectionProviderDeclaration, false);
+
+    verify(connectionProviderDeclaration, never()).addModelProperty(any(RequiredForMetadataModelProperty.class));
+  }
+
+  @Test
+  public void configWithRequiredForMetadataParameterGetsEnriched() {
+    enrichDeclaration(configurationDeclaration, true);
+
+    verify(configurationDeclaration).addModelProperty(argumentCaptor.capture());
+
+    RequiredForMetadataModelProperty value = argumentCaptor.getValue();
+    assertThat(value.getRequiredParameters(), is(hasItem(REQUIRED_PARAM)));
   }
 
   @Test
   public void configWithOutRequiredForMetadataParameterDontGetsEnriched() {
-    List<ConfigurationDeclaration> configs = declaration.getConfigurations();
-    ConfigurationDeclaration configDeclaration = configs.get(0);
+    enrichDeclaration(configurationDeclaration, false);
 
-    Optional<MetadataImpactModelProperty> optionalMetadataImpact =
-        configDeclaration.getModelProperty(MetadataImpactModelProperty.class);
-    assertThat(optionalMetadataImpact, is(empty()));
+    verify(configurationDeclaration, never()).addModelProperty(any(RequiredForMetadataModelProperty.class));
+  }
+
+  private void enrichDeclaration(ParameterizedDeclaration declaration, boolean requiredParameter) {
+    when(extensionParameter.isAnnotatedWith(RequiredForMetadata.class)).thenReturn(requiredParameter);
+    ArrayList<ParameterDeclaration> params = new ArrayList<>();
+    params.add(parameterDeclaration);
+    when(declaration.getAllParameters()).thenReturn(params);
+
+    ENRICHER.enrich(loadingContext);
   }
 }

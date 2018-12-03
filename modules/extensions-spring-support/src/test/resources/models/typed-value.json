@@ -1039,8 +1039,8 @@
           "category": "typed-value",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -1646,8 +1646,8 @@
           "category": "typed-value",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },

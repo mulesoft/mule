@@ -12221,8 +12221,8 @@
           "category": "correlationInfo",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -18935,8 +18935,8 @@
           "category": "PetStore",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -19308,8 +19308,8 @@
           "category": "PetStore",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -19681,8 +19681,8 @@
           "category": "PetStore",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -19949,8 +19949,8 @@
           "category": "PetstoreResolver",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },

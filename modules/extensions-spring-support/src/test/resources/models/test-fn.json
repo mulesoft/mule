@@ -305,8 +305,8 @@
           "category": "AnyTypeResolver",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },

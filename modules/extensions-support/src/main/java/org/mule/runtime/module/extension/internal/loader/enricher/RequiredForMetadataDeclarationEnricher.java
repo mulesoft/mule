@@ -14,7 +14,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithParametersDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.api.util.Pair;
@@ -22,15 +21,14 @@ import org.mule.runtime.extension.api.annotation.metadata.RequiredForMetadata;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.property.MetadataImpactModelProperty;
+import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * {@link DeclarationEnricher} implementation which introspect Configurations and Connection Provides and looks
- * for parameters declared as {@link RequiredForMetadata}. If at least one is detected a {@link MetadataImpactModelProperty}
+ * for parameters declared as {@link RequiredForMetadata}. If at least one is detected a {@link RequiredForMetadataModelProperty}
  * will be added in the config or connection provider indicating which are the required parameters for metadata resolution.
  *
  * @since 4.2.0
@@ -59,23 +57,22 @@ public class RequiredForMetadataDeclarationEnricher implements DeclarationEnrich
   }
 
   private <T extends BaseDeclaration & WithParametersDeclaration> void registerRequiredParametersForMetadata(T declaration) {
-    List<String> parametersRequiredForMetadata = getParametersRequiredForMetadata(declaration)
-        .map(NamedObject::getName)
-        .collect(toList());
+    List<String> parametersRequiredForMetadata = getParametersNameRequiredForMetadata(declaration);
     if (!parametersRequiredForMetadata.isEmpty()) {
-      declaration.addModelProperty(new MetadataImpactModelProperty(parametersRequiredForMetadata));
+      declaration.addModelProperty(new RequiredForMetadataModelProperty(getParametersNameRequiredForMetadata(declaration)));
     }
   }
 
   /**
    * Filters the parameters of the given declaration and retrieves the ones that are required for Metadata Resolution.
    */
-  private Stream<ParameterDeclaration> getParametersRequiredForMetadata(WithParametersDeclaration declaration) {
+  private List<String> getParametersNameRequiredForMetadata(WithParametersDeclaration declaration) {
     return declaration.getAllParameters()
         .stream()
-        .map(p -> new Pair<>(p, p.getModelProperty(ExtensionParameterDescriptorModelProperty.class)))
-        .filter(p -> p.getSecond().isPresent()
-            && p.getSecond().get().getExtensionParameter().isAnnotatedWith(RequiredForMetadata.class))
-        .map(Pair::getFirst);
+        .filter(p -> p.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+            .map(mp -> mp.getExtensionParameter().isAnnotatedWith(RequiredForMetadata.class))
+            .orElse(false))
+        .map(NamedObject::getName)
+        .collect(toList());
   }
 }

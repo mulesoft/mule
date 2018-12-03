@@ -50,7 +50,7 @@ import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.mockito.Mock;
-import org.mule.runtime.extension.api.property.MetadataImpactModelProperty;
+import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
 public abstract class AbstractDslModelTestCase {
 
@@ -162,7 +162,7 @@ public abstract class AbstractDslModelTestCase {
 
     List<String> parameters = new ArrayList<>();
     parameters.add(BEHAVIOUR_NAME);
-    MetadataImpactModelProperty metadataImpactModelProperty = new MetadataImpactModelProperty(parameters);
+    RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(parameters);
 
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
@@ -173,9 +173,10 @@ public abstract class AbstractDslModelTestCase {
     when(configuration.getSourceModels()).thenReturn(asList(source));
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
 
-    when(configuration.getModelProperty(MetadataImpactModelProperty.class)).thenReturn(Optional.of(metadataImpactModelProperty));
-    when(connectionProvider.getModelProperty(MetadataImpactModelProperty.class))
-        .thenReturn(Optional.of(metadataImpactModelProperty));
+    when(configuration.getModelProperty(RequiredForMetadataModelProperty.class))
+        .thenReturn(Optional.of(requiredForMetadataModelProperty));
+    when(connectionProvider.getModelProperty(RequiredForMetadataModelProperty.class))
+        .thenReturn(Optional.of(requiredForMetadataModelProperty));
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));

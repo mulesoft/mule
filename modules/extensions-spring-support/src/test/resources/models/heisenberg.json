@@ -16118,8 +16118,8 @@
           "category": "Heisenberg",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -18881,8 +18881,8 @@
           "category": "Heisenberg",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -23292,8 +23292,8 @@
           "category": "Heisenberg",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -23505,8 +23505,8 @@
           "category": "Heisenberg",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -23719,8 +23719,8 @@
           "category": "Heisenberg",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -23891,8 +23891,8 @@
           "category": "Heisenberg",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },

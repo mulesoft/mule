@@ -2282,8 +2282,8 @@
               "category": "FruitResolver",
               "outputResolver": {
                 "resolverName": "OUTPUT_PAYLOAD",
-                "requiresConnection": true,
-                "requiresConfiguration": true
+                "requiresConnection": false,
+                "requiresConfiguration": false
               }
             }
           },
@@ -2848,13 +2848,13 @@
               "category": "HarvestedKeys",
               "outputResolver": {
                 "resolverName": "HarvestAppleKeyResolver",
-                "requiresConnection": true,
-                "requiresConfiguration": true
+                "requiresConnection": false,
+                "requiresConfiguration": false
               },
               "keysResolver": {
                 "resolverName": "HarvestAppleKeyResolver",
-                "requiresConnection": true,
-                "requiresConfiguration": true
+                "requiresConnection": false,
+                "requiresConfiguration": false
               }
             },
             "metadataKeyId": {
@@ -4058,8 +4058,8 @@
               "category": "FruitResolver",
               "outputResolver": {
                 "resolverName": "OUTPUT_PAYLOAD",
-                "requiresConnection": true,
-                "requiresConfiguration": true
+                "requiresConnection": false,
+                "requiresConfiguration": false
               }
             }
           },
@@ -5403,8 +5403,8 @@
               "category": "FruitResolver",
               "outputResolver": {
                 "resolverName": "OUTPUT_PAYLOAD",
-                "requiresConnection": true,
-                "requiresConfiguration": true
+                "requiresConnection": false,
+                "requiresConfiguration": false
               }
             }
           },
@@ -8038,8 +8038,8 @@
           "category": "FruitResolver",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -8873,8 +8873,8 @@
           "category": "FruitResolver",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
@@ -9100,8 +9100,8 @@
           "category": "FruitResolver",
           "outputResolver": {
             "resolverName": "OUTPUT_PAYLOAD",
-            "requiresConnection": true,
-            "requiresConfiguration": true
+            "requiresConnection": false,
+            "requiresConfiguration": false
           }
         }
       },
