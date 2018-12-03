@@ -43,6 +43,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
@@ -254,19 +255,19 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   }
 
   private void assertParamResolverInfo(ComponentDeclaration declaration, String param, Optional<String> expectedName) {
-    assertResolverInfo(declaration, info -> info.getParameterResolverName(param), "ParameterResolver", expectedName);
+    assertResolverInfo(declaration, info -> info.getParameterResolver(param), "ParameterResolver", expectedName);
   }
 
   private void assertOutputResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
-    assertResolverInfo(declaration, info -> info.getOutputResolverName(), "OutputResolver", expectedName);
+    assertResolverInfo(declaration, info -> info.getOutputResolver(), "OutputResolver", expectedName);
   }
 
   private void assertAttributesResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
-    assertResolverInfo(declaration, info -> info.getAttributesResolverName(), "AttributesResolver", expectedName);
+    assertResolverInfo(declaration, info -> info.getAttributesResolver(), "AttributesResolver", expectedName);
   }
 
   private void assertKeysResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
-    assertResolverInfo(declaration, info -> info.getKeysResolverName(), "KeysResolver", expectedName);
+    assertResolverInfo(declaration, info -> info.getKeysResolver(), "KeysResolver", expectedName);
   }
 
   private void assertCategoryInfo(ComponentDeclaration declaration, String expectedName) {
@@ -287,10 +288,10 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   }
 
   private void assertResolverInfo(ComponentDeclaration declaration,
-                                  Function<TypeResolversInformationModelProperty, Optional<String>> resolverSupplier,
+                                  Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> resolverSupplier,
                                   String kind, Optional<String> expectedName) {
     TypeResolversInformationModelProperty info = getResolversInfo(declaration);
-    Optional<String> resolverName = resolverSupplier.apply(info);
+    Optional<ResolverInformation> resolverName = resolverSupplier.apply(info);
     if (expectedName.isPresent() && !resolverName.isPresent()) {
       fail(format("Expected %s name to be '%s' but it was not declared in the model. "
           + "Information was: %s", kind, expectedName, info.toString()));
@@ -300,6 +301,6 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
           + "Information was: %s", kind, info.toString()));
     }
     assertThat("Name miss match for the " + kind,
-               resolverName, is(equalTo(expectedName)));
+               resolverName.map(ResolverInformation::getResolverName), is(equalTo(expectedName)));
   }
 }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
@@ -120,7 +121,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
           });
     }
 
-    private void enrichResolversInformation(ComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
+    private void enrichResolversInformation(ExecutableComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
       final String categoryName = getCategoryName(metadataScope);
       declareResolversInformation(declaration, metadataScope, categoryName);
       declareMetadataResolverFactory(declaration, metadataScope, categoryName);
@@ -136,7 +137,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                       typeKeysResolver)));
     }
 
-    private void declareResolversInformation(ComponentDeclaration<? extends ComponentDeclaration> declaration,
+    private void declareResolversInformation(ExecutableComponentDeclaration<? extends ComponentDeclaration> declaration,
                                              MetadataScopeAdapter metadataScope, String categoryName) {
       if (metadataScope.isCustomScope()) {
         Map<String, String> inputResolversByParam = metadataScope.getInputResolvers()
@@ -146,11 +147,15 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
         String outputResolver = metadataScope.getOutputResolver().get().getResolverName();
         String attributesResolver = metadataScope.getAttributesResolver().get().getResolverName();
         String keysResolver = metadataScope.getKeysResolver().get().getResolverName();
+
+        //TODO MULE-15638 - Once Metadata API 2.0 is implemented we will know better if the resolver requires or not a connection of config.
         declaration.addModelProperty(new TypeResolversInformationModelProperty(categoryName,
                                                                                inputResolversByParam,
                                                                                outputResolver,
                                                                                attributesResolver,
-                                                                               keysResolver));
+                                                                               keysResolver,
+                                                                               declaration.isRequiresConnection(),
+                                                                               declaration.isRequiresConnection()));
       }
     }
 
