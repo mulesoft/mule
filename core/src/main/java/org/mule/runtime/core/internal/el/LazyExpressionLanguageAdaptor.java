@@ -50,10 +50,10 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
       delegate.addGlobalBindings(bindingContext);
     } else {
       synchronized (this) {
-        if (globalBindings != null) {
-          globalBindings.add(bindingContext);
-        } else {
+        if (initialised) {
           delegate.addGlobalBindings(bindingContext);
+        } else {
+          globalBindings.add(bindingContext);
         }
       }
     }
@@ -62,7 +62,7 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
   private ExtendedExpressionLanguageAdaptor delegate() {
     if (!initialised) {
       synchronized (this) {
-        if (delegate == null) {
+        if (!initialised) {
           delegate = delegateSupplier.get();
           globalBindings.forEach(delegate::addGlobalBindings);
           globalBindings = null;
