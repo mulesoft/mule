@@ -26,7 +26,12 @@ public class DefaultClassPackageFinder implements ClassPackageFinder {
     this.classFinders.add(new ClassloaderClassPackageFinder());
   }
 
-  public void add(ClassPackageFinder classPackageFinder) {
+  /**
+   * Add an additional {@link ClassPackageFinder} to this composite {@link ClassPackageFinder}.
+   *
+   * @param classPackageFinder The {@link ClassPackageFinder} to be added.
+   */
+  public void addAdditionalPackageFinder(ClassPackageFinder classPackageFinder) {
     this.classFinders.add(classPackageFinder);
   }
 

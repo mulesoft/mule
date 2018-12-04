@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +40,7 @@ public class ProcessingEnvironmentClassPackageFinderTestCase {
   public void packageForUsingProcessingEnvironment() {
     Optional<String> optionalPackage = processingEnvironmentClassPackageFinder
         .packageFor("org.mule.test.heisenberg.extension.model.hidingPlaces.Places.HidingPlaces");
-    assertEquals("org.mule.test.heisenberg.extension.model.hidingPlaces", optionalPackage.get());
+    assertThat(optionalPackage.get(), is("org.mule.test.heisenberg.extension.model.hidingPlaces"));
   }
 
 }

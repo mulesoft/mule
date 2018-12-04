@@ -107,7 +107,7 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
   private ExportedArtifactsCollector getExportedArtifactsCollector(ExtensionModel extensionModel) {
     if (processingEnv != null) {
       DefaultClassPackageFinder defaultClassPackageFinder = new DefaultClassPackageFinder();
-      defaultClassPackageFinder.add(new ProcessingEnvironmentClassPackageFinder(processingEnv));
+      defaultClassPackageFinder.addAdditionalPackageFinder(new ProcessingEnvironmentClassPackageFinder(processingEnv));
       return new ExportedArtifactsCollector(extensionModel, defaultClassPackageFinder);
     } else {
       return new ExportedArtifactsCollector(extensionModel);
