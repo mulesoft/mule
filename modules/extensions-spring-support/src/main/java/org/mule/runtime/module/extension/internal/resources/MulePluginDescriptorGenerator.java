@@ -65,7 +65,9 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, 
     }
 
     DefaultClassPackageFinder defaultClassPackageFinder = new DefaultClassPackageFinder();
-    defaultClassPackageFinder.addAdditionalPackageFinder(new ProcessingEnvironmentClassPackageFinder(processingEnvironment));
+    if (processingEnvironment != null) {
+      defaultClassPackageFinder.addAdditionalPackageFinder(new ProcessingEnvironmentClassPackageFinder(processingEnvironment));
+    }
 
     final ExportedArtifactsCollector exportCollector =
         new ExportedArtifactsCollector(extensionModel, defaultClassPackageFinder);
