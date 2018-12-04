@@ -10,8 +10,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.internal.resources.manifest.ClassloaderClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
+import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -103,8 +105,12 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
   }
 
   private ExportedArtifactsCollector getExportedArtifactsCollector(ExtensionModel extensionModel) {
-    return processingEnv != null
-        ? new ExportedArtifactsCollector(extensionModel, new DefaultClassPackageFinder(processingEnv))
-        : new ExportedArtifactsCollector(extensionModel);
+    if (processingEnv != null) {
+      DefaultClassPackageFinder defaultClassPackageFinder = new DefaultClassPackageFinder();
+      defaultClassPackageFinder.addAdditionalPackageFinder(new ProcessingEnvironmentClassPackageFinder(processingEnv));
+      return new ExportedArtifactsCollector(extensionModel, defaultClassPackageFinder);
+    } else {
+      return new ExportedArtifactsCollector(extensionModel);
+    }
   }
 }

@@ -7,23 +7,14 @@
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static javax.lang.model.element.ElementKind.PACKAGE;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Default {@link ClassPackageFinder} implementation.
- * By default it uses the current {@link ClassLoader} to look for the {@link Class} package.
- * If a {@link ProcessingEnvironment} is provided it will be also used.
+ * {@link ClassPackageFinder} composite implementation that finds the package of a given class using all the contained
+ * {@link ClassPackageFinder}.
  *
  * @since 4.1
  */
@@ -32,14 +23,16 @@ public class DefaultClassPackageFinder implements ClassPackageFinder {
   private List<ClassPackageFinder> classFinders = new ArrayList<>();
 
   public DefaultClassPackageFinder() {
-    classFinders.add(this::usingClassloader);
+    this.classFinders.add(new ClassloaderClassPackageFinder());
   }
 
-  public DefaultClassPackageFinder(ProcessingEnvironment processingEnvironment) {
-    this();
-    if (processingEnvironment != null) {
-      classFinders.add(className -> usingProcessingEnvironment(className, processingEnvironment));
-    }
+  /**
+   * Add an additional {@link ClassPackageFinder} to this composite {@link ClassPackageFinder}.
+   *
+   * @param classPackageFinder The {@link ClassPackageFinder} to be added.
+   */
+  public void addAdditionalPackageFinder(ClassPackageFinder classPackageFinder) {
+    this.classFinders.add(classPackageFinder);
   }
 
   /**
@@ -54,25 +47,4 @@ public class DefaultClassPackageFinder implements ClassPackageFinder {
         .orElse(empty());
   }
 
-  private Optional<String> usingProcessingEnvironment(String className, ProcessingEnvironment processingEnvironment) {
-    if (processingEnvironment != null) {
-      TypeElement typeElement = processingEnvironment.getElementUtils().getTypeElement(className);
-      if (typeElement != null) {
-        Element enclosingElement = typeElement.getEnclosingElement();
-        if (enclosingElement.getKind().equals(PACKAGE)) {
-          return Optional.of(((PackageElement) enclosingElement).getQualifiedName().toString());
-        }
-      }
-    }
-    return empty();
-  }
-
-  private Optional<String> usingClassloader(String className) {
-    try {
-      Class aClass = loadClass(className, Thread.currentThread().getContextClassLoader());
-      return ofNullable(aClass.getPackage().getName());
-    } catch (ClassNotFoundException e) {
-      return empty();
-    }
-  }
 }

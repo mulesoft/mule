@@ -32,8 +32,10 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.resources.manifest.ClassloaderClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
+import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -62,8 +64,11 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, 
       return empty();
     }
 
+    DefaultClassPackageFinder defaultClassPackageFinder = new DefaultClassPackageFinder();
+    defaultClassPackageFinder.addAdditionalPackageFinder(new ProcessingEnvironmentClassPackageFinder(processingEnvironment));
+
     final ExportedArtifactsCollector exportCollector =
-        new ExportedArtifactsCollector(extensionModel, new DefaultClassPackageFinder(processingEnvironment));
+        new ExportedArtifactsCollector(extensionModel, defaultClassPackageFinder);
     final MulePluginModelBuilder builder = new MulePluginModelBuilder();
     // Set only for testing purposes, the value will be reset by the plugin packager.
     builder.setName(extensionModel.getName());
