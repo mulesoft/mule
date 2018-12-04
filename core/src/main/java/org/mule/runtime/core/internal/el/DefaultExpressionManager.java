@@ -78,44 +78,44 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public void initialise() throws InitialisationException {
-    if (!initialized.getAndSet(true)) {
+    if (!initialized.compareAndSet(false, true)) {
+      return;
+    }
 
-      final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage =
-          registry.lookupByType(DefaultExpressionLanguageFactoryService.class)
-              .map(s -> new DataWeaveExpressionLanguageAdaptor(muleContext, registry, s))
-              .orElse(null);
+    final ExtendedExpressionLanguageAdaptor dwExpressionLanguage =
+        registry.lookupByType(DefaultExpressionLanguageFactoryService.class)
+            .map(s -> new LazyExpressionLanguageAdaptor(() -> new DataWeaveExpressionLanguageAdaptor(muleContext, registry, s)))
+            .orElse(null);
 
+    if (isMelDefault() || registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
+      MVELExpressionLanguage mvelExpressionLanguage =
+          registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
 
-      if (isMelDefault() || registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
-        MVELExpressionLanguage mvelExpressionLanguage =
-            registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
+      ExtendedExpressionLanguageAdaptor exprLangAdaptorHandler = dwExpressionLanguage != null
+          ? new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage)
+          : mvelExpressionLanguage;
 
-        ExtendedExpressionLanguageAdaptor exprLangAdaptorHandler = dwExpressionLanguage != null
-            ? new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage)
-            : mvelExpressionLanguage;
-
-        this.melDefault = dwExpressionLanguage == null || isMelDefault();
-        this.expressionLanguage = exprLangAdaptorHandler;
-      } else {
-        if (dwExpressionLanguage == null) {
-          throw new IllegalStateException("No expression language installed");
-        }
-        this.expressionLanguage = dwExpressionLanguage;
+      this.melDefault = dwExpressionLanguage == null || isMelDefault();
+      this.expressionLanguage = exprLangAdaptorHandler;
+    } else {
+      if (dwExpressionLanguage == null) {
+        throw new IllegalStateException("No expression language installed");
       }
+      this.expressionLanguage = dwExpressionLanguage;
+    }
 
-      BindingContext.Builder contextBuilder = BindingContext.builder();
+    BindingContext.Builder contextBuilder = BindingContext.builder();
 
-      registry.lookupAllByType(GlobalBindingContextProvider.class).stream()
-          .map(GlobalBindingContextProvider::getBindingContext)
-          .forEach(contextBuilder::addAll);
+    registry.lookupAllByType(GlobalBindingContextProvider.class).stream()
+        .map(GlobalBindingContextProvider::getBindingContext)
+        .forEach(contextBuilder::addAll);
 
-      expressionLanguage.addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
-          ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()
-          : contextBuilder.build());
+    expressionLanguage.addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
+        ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()
+        : contextBuilder.build());
 
-      if (melDefault) {
-        LOGGER.warn("Using MEL as the default expression language.");
-      }
+    if (melDefault) {
+      LOGGER.warn("Using MEL as the default expression language.");
     }
   }
 
