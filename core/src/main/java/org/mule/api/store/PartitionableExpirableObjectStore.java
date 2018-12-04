@@ -10,6 +10,8 @@ import java.io.Serializable;
 
 /**
  * A {@link PartitionableObjectStore} which is also an {@link ExpirableObjectStore}
+ * <p/>
+ * {@inheritDoc}
  *
  * @param <T> the generic type of the objects to be stored
  */

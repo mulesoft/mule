@@ -13,7 +13,11 @@ import java.util.List;
  * An {@link ObjectStore} which has native support for partitioning. All the methods inherited from the
  * {@link ObjectStore} interface should be executed against the default partition. Plus, this interface
  * adds methods to obtain the same behaviour against specific partitions.
- * <p>
+ * <p/>
+ * Same as {@link ListableObjectStore#open()} should be called to open the default partition in order for it to work properly,
+ * before executing any operation in a specific partition, the partition must be also opened by calling {@link PartitionableObjectStore#open(String)}, otherwise,
+ * an exception may be raised because the partition does not yet exist.
+ * <p/>
  * The Mule Runtime will automatically decide when to invoke each version of each method and the partition name
  * to use.
  *
@@ -21,6 +25,7 @@ import java.util.List;
  */
 public interface PartitionableObjectStore<T extends Serializable> extends ListableObjectStore<T>
 {
+
   /**
    * Check whether the given {@code partitionName} already contains a value for the given {@code key}
    *
@@ -92,6 +97,7 @@ public interface PartitionableObjectStore<T extends Serializable> extends Listab
 
   /**
    * Closes the partition of the give {@code partitionName}
+   *
    * @param partitionName the name of the partition to close
    * @throws ObjectStoreException if an exception occurred while closing the partition
    */
@@ -108,8 +114,9 @@ public interface PartitionableObjectStore<T extends Serializable> extends Listab
 
   /**
    * Clears the contents of the partition, but the partition itself remains functional
+   *
    * @param partitionName the name of the partition
    * @throws ObjectStoreException if an exception occurred while clearing the partition
    */
-  void clear(String partitionName) throws ObjectStoreException;
+    void clear(String partitionName) throws ObjectStoreException;
 }
