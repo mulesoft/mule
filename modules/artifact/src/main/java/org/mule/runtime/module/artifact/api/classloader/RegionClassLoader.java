@@ -144,12 +144,12 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       // *.class files may be requested as resources.
       for (String exportedClassPackage : filter.getExportedClassPackages()) {
         String packageAsDirectory =
-            normalize(DOT_REPLACEMENT_PATTERN.matcher(exportedClassPackage).replaceAll(PATH_SEPARATOR), true);
+            DOT_REPLACEMENT_PATTERN.matcher(exportedClassPackage).replaceAll(PATH_SEPARATOR);
         List<ArtifactClassLoader> classLoaders =
             resourceMapping.computeIfAbsent(packageAsDirectory, k -> new ArrayList<>());
         classLoaders.add(artifactClassLoader);
         classLoaders =
-            resourceMapping.computeIfAbsent(normalize(packageAsDirectory + PATH_SEPARATOR), k -> new ArrayList<>());
+            resourceMapping.computeIfAbsent(packageAsDirectory + PATH_SEPARATOR, k -> new ArrayList<>());
         classLoaders.add(artifactClassLoader);
       }
     } finally {
