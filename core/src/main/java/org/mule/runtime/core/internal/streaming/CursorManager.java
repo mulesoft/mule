@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.streaming;
 
 import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -19,9 +18,6 @@ import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvide
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -31,6 +27,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps track of active {@link Cursor cursors} and their {@link CursorProvider providers}
@@ -52,7 +51,6 @@ public class CursorManager {
    * Creates a new instance
    *
    * @param statistics statistics which values should be kept updated
-   * @param disposalScheduler where to run the disposal
    */
   public CursorManager(MutableStreamingStatistics statistics) {
     this.statistics = statistics;
@@ -64,7 +62,7 @@ public class CursorManager {
    *
    * @param provider the provider to be tracked
    * @param ownerContext the root context of the event that created the provider
-   * @return a {@link CursorContext}
+   * @return a {@link CursorProvider}
    */
   public CursorProvider manage(CursorProvider provider, BaseEventContext ownerContext) {
     registerEventContext(ownerContext);
