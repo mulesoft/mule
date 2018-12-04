@@ -85,7 +85,7 @@ public class DefaultFlowListener implements FlowListener {
         successConsumer.accept(event.getMessage());
       } catch (Exception e) {
         LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
-                        + " threw exception while executing the onSuccess FlowListener", e);
+            + " threw exception while executing the onSuccess FlowListener", e);
       }
     } else if (error != null && errorConsumer != null) {
       Exception exception = error instanceof Exception ? (Exception) error : new MessagingException(event, error);
@@ -93,7 +93,7 @@ public class DefaultFlowListener implements FlowListener {
         errorConsumer.accept(exception);
       } catch (Exception e) {
         LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
-                        + " threw exception while executing the onError FlowListener", e);
+            + " threw exception while executing the onError FlowListener", e);
       }
     }
   }
@@ -104,7 +104,7 @@ public class DefaultFlowListener implements FlowListener {
         onComplete.run();
       } catch (Exception e) {
         LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
-                        + " threw exception while executing the onComplete FlowListener", e);
+            + " threw exception while executing the onComplete FlowListener", e);
       }
     }
   }
