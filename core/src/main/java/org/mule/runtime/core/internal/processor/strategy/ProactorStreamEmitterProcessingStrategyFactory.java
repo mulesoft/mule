@@ -9,12 +9,9 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Integer.getInteger;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.max;
-import static java.lang.Math.sin;
-import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -30,15 +27,11 @@ import static reactor.retry.Retry.onlyIf;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -56,7 +49,6 @@ import org.slf4j.Logger;
 
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import reactor.retry.BackoffDelay;
 
@@ -157,18 +149,19 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
-      List<FluxSink<CoreEvent>> sinks = new ArrayList<>();
+      List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
       int subscriberCount = maxConcurrency < subscribers ? maxConcurrency : subscribers;
       for (int i = 0; i < subscriberCount; i++) {
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
             .transform(function).subscribe();
-        sinks.add(processor.sink());
+        ReactorSink<CoreEvent> sink = new DefaultReactorSink<>(processor.sink(), () -> {
+        }, createOnEventConsumer(), bufferSize);
+        sinks.add(sink);
       }
 
-      return new RoundRobinReactorSink<>(sinks, () -> {
-      }, createOnEventConsumer(), bufferSize);
+      return new RoundRobinReactorSink<>(sinks);
     }
 
     @Override
@@ -260,67 +253,37 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
   }
 
-  static class RoundRobinReactorSink<E> implements Sink, Disposable {
+  static class RoundRobinReactorSink<E> implements AbstractProcessingStrategy.ReactorSink<E> {
 
-    private final List<FluxSink<E>> fluxSinks;
-    private final reactor.core.Disposable disposable;
-    private final Consumer onEventConsumer;
-    private final int bufferSize;
+    private final List<AbstractProcessingStrategy.ReactorSink<E>> fluxSinks;
     private final AtomicInteger index = new AtomicInteger(0);
 
-    public RoundRobinReactorSink(List<FluxSink<E>> sinks, reactor.core.Disposable disposable,
-                                 Consumer<CoreEvent> onEventConsumer, int bufferSize) {
+    public RoundRobinReactorSink(List<AbstractProcessingStrategy.ReactorSink<E>> sinks) {
       this.fluxSinks = sinks;
-      this.disposable = disposable;
-      this.onEventConsumer = onEventConsumer;
-      this.bufferSize = bufferSize;
     }
 
     @Override
     public void dispose() {
-      fluxSinks.stream().forEach(sink -> sink.complete());
-      disposable.dispose();
+      fluxSinks.stream().forEach(sink -> sink.dispose());
     }
 
     @Override
     public void accept(CoreEvent event) {
-      onEventConsumer.accept(event);
-      fluxSinks.get(nextIndex()).next(intoSink(event));
+      fluxSinks.get(nextIndex()).accept(event);
     }
 
     private int nextIndex() {
       return index.getAndUpdate(v -> (v + 1) % fluxSinks.size());
     }
 
-    protected E intoSink(CoreEvent event) {
-      return (E) event;
+    @Override
+    public boolean emit(CoreEvent event) {
+      return fluxSinks.get(nextIndex()).emit(event);
     }
 
     @Override
-    public boolean emit(CoreEvent event) {
-      onEventConsumer.accept(event);
-      // Optimization to avoid using synchronized block for all emissions.
-      // See: https://github.com/reactor/reactor-core/issues/1037
-      FluxSink<E> sink = fluxSinks.get(nextIndex());
-      long remainingCapacity = sink.requestedFromDownstream();
-      if (remainingCapacity == 0) {
-        return false;
-      } else if (remainingCapacity > (bufferSize > CORES * 4 ? CORES : 0)) {
-        // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
-        // emit without synchronized block.
-        sink.next(intoSink(event));
-        return true;
-      } else {
-        // If there is very little room in buffer also emit but synchronized.
-        synchronized (sink) {
-          if (remainingCapacity > 0) {
-            sink.next(intoSink(event));
-            return true;
-          } else {
-            return false;
-          }
-        }
-      }
+    public E intoSink(CoreEvent event) {
+      return (E) event;
     }
   }
 
