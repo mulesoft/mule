@@ -6,25 +6,19 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Long.MAX_VALUE;
-import static java.lang.Long.getLong;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
@@ -63,14 +57,11 @@ import reactor.util.context.Context;
  *
  * @since 4.0
  */
-public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
-
-  protected static final long STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
-      getLong(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
+public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ProactorStreamProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
+    return new ProactorStreamWorkQueueProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
                                                 getBufferSize(),
                                                 getSubscriberCount(),
                                                 getWaitStrategy(),
@@ -111,10 +102,10 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
   @Override
   public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
-    return ProactorStreamProcessingStrategy.class;
+    return ProactorStreamWorkQueueProcessingStrategy.class;
   }
 
-  static class ProactorStreamProcessingStrategy extends ReactorStreamProcessingStrategy {
+  static class ProactorStreamWorkQueueProcessingStrategy extends ProactorStreamProcessingStrategy {
 
     private final AtomicInteger inFlightEvents = new AtomicInteger();
     private final BiConsumer<CoreEvent, Throwable> IN_FLIGHT_DECREMENT_CALLBACK = (e, t) -> inFlightEvents.decrementAndGet();
@@ -170,21 +161,12 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
       }
     }
 
-    private static Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
+    private static Logger LOGGER = getLogger(ProactorStreamWorkQueueProcessingStrategy.class);
     private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
-
-    private final Supplier<Scheduler> blockingSchedulerSupplier;
-    private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
-    private final Supplier<Scheduler> retrySupportSchedulerSupplier;
-    private Scheduler blockingScheduler;
-    private Scheduler cpuIntensiveScheduler;
-    private Scheduler retrySupportScheduler;
-
-    private final AtomicInteger retryingCounter = new AtomicInteger();
 
     private final boolean isThreadLoggingEnabled;
 
-    public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+    public ProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                             int bufferSize,
                                             int subscriberCount,
                                             String waitStrategy,
@@ -196,15 +178,11 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             int maxConcurrency, boolean maxConcurrencyEagerCheck, boolean isThreadLoggingEnabled)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism,
-            maxConcurrency, maxConcurrencyEagerCheck);
-      this.blockingSchedulerSupplier = blockingSchedulerSupplier;
-      this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
-      this.retrySupportSchedulerSupplier = retrySupportSchedulerSupplier;
+      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
 
-    public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+    public ProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                             int bufferSize,
                                             int subscriberCount,
                                             String waitStrategy,
@@ -216,68 +194,14 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
-      this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
-           maxConcurrencyEagerCheck, false);
+        this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+                blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+                maxConcurrencyEagerCheck, false);
     }
 
     @Override
-    public void start() throws MuleException {
-      super.start();
-      this.blockingScheduler = blockingSchedulerSupplier.get();
-      this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
-      this.retrySupportScheduler = retrySupportSchedulerSupplier.get();
-    }
-
-    @Override
-    public void stop() throws MuleException {
-      if (blockingScheduler != null) {
-        blockingScheduler.stop();
-      }
-      if (cpuIntensiveScheduler != null) {
-        cpuIntensiveScheduler.stop();
-      }
-      if (retrySupportScheduler != null) {
-        retrySupportScheduler.stop();
-      }
-      super.stop();
-    }
-
-    @Override
-    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == BLOCKING || processor.getProcessingType() == IO_RW) {
-        return proactor(processor, blockingScheduler);
-      } else if (processor.getProcessingType() == CPU_INTENSIVE) {
-        return proactor(processor, cpuIntensiveScheduler);
-      } else {
-        return super.onProcessor(processor);
-      }
-    }
-
-    private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-      reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-
-      return publisher -> from(publisher).flatMap(event -> {
-        if (processor.getProcessingType() == IO_RW && !scheduleIoRwEvent(event)) {
-          // If payload is not a stream o length is < STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD (default 16KB) perform processing on
-          // current thread in stead of scheduling using IO pool.
-          return just(event)
-              .transform(processor)
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-        } else {
-          return scheduleProcessor(processor, publishOnScheduler, scheduler, event);
-        }
-      }, max(maxConcurrency / (getParallelism() * subscribers), 1));
-    }
-
-    private boolean scheduleIoRwEvent(CoreEvent event) {
-      return event.getMessage().getPayload().getDataType().isStreamType()
-          && event.getMessage().getPayload().getByteLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
-    }
-
-    private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
-                                                   reactor.core.scheduler.Scheduler eventLoopScheduler,
-                                                   Scheduler processorScheduler, CoreEvent event) {
+    protected Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+      reactor.core.scheduler.Scheduler eventLoopScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
           .retryWhen(onlyIf(ctx -> {
@@ -291,7 +215,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
             return schedulerBusy;
           })
               .doOnRetry(ctx -> {
-                retrySupportScheduler.schedule(() -> {
+                getRetrySupportScheduler().schedule(() -> {
                   // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
                   // again by the retry mechanism.
                   retryingCounter.decrementAndGet();

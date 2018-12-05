@@ -53,7 +53,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -73,9 +73,9 @@ import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
-public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
+public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public ProactorStreamProcessingStrategyTestCase(Mode mode) {
+  public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
 
@@ -86,7 +86,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
 
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix,
                                                         int maxConcurrency) {
-    return new ProactorStreamProcessingStrategy(() -> ringBuffer,
+    return new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                 XS_BUFFER_SIZE,
                                                 1,
                                                 DEFAULT_WAIT_STRATEGY,
@@ -245,7 +245,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
 
     flow = flowBuilder.get().processors(blockingProcessor)
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              1,
                                                                                              DEFAULT_WAIT_STRATEGY,
@@ -275,7 +275,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(cpuIntensiveSchedulerSpy));
 
     flow = flowBuilder.get().processors(cpuIntensiveProcessor)
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              1,
                                                                                              DEFAULT_WAIT_STRATEGY,
@@ -303,7 +303,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              1,
                                                                                              DEFAULT_WAIT_STRATEGY,
@@ -326,7 +326,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("If max concurrency is 2, only 2 threads are used for CPU_LITE processors and further requests blocks.")
   public void singleCpuLightConcurrentMaxConcurrency2() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              1,
                                                                                              DEFAULT_WAIT_STRATEGY,
@@ -350,7 +350,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              1,
                                                                                              DEFAULT_WAIT_STRATEGY,
@@ -373,7 +373,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("If max concurrency is 2, only 2 threads are used for BLOCKING processors and further requests blocks.")
   public void singleBlockingConcurrentMaxConcurrency2() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              1,
                                                                                              DEFAULT_WAIT_STRATEGY,
@@ -423,7 +423,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("When concurrency < parallelism IO threads are still used for blocking processors to avoid cpuLight thread starvation.")
   public void concurrencyLessThanParallelism() throws Exception {
     flow = flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                              XS_BUFFER_SIZE,
                                                                                              1,
                                                                                              DEFAULT_WAIT_STRATEGY,

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
@@ -27,17 +27,17 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * Creates default processing strategy with same behavior as {@link ProactorStreamProcessingStrategyFactory} apart from the fact
+ * Creates default processing strategy with same behavior as {@link ProactorStreamWorkQueueProcessingStrategyFactory} apart from the fact
  * it will process synchronously without error when a transaction is active.
  *
  * @since 4.0
  */
-public class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
+public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
     implements TransactionAwareProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareProactorStreamProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
+    return new TransactionAwareProactorStreamWorkQueueProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
                                                                 getBufferSize(),
                                                                 getSubscriberCount(),
                                                                 getWaitStrategy(), () -> muleContext.getSchedulerService()
@@ -60,12 +60,12 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
 
   @Override
   public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
-    return TransactionAwareProactorStreamProcessingStrategy.class;
+    return TransactionAwareProactorStreamWorkQueueProcessingStrategy.class;
   }
 
-  static class TransactionAwareProactorStreamProcessingStrategy extends ProactorStreamProcessingStrategy {
+  static class TransactionAwareProactorStreamWorkQueueProcessingStrategy extends ProactorStreamWorkQueueProcessingStrategy {
 
-    TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+      TransactionAwareProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                                      int bufferSize,
                                                      int subscriberCount,
                                                      String waitStrategy,
@@ -82,7 +82,7 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
             maxConcurrencyEagerCheck, isThreadLoggingEnabled);
     }
 
-    TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+      TransactionAwareProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                                      int bufferSize,
                                                      int subscriberCount,
                                                      String waitStrategy,

@@ -55,6 +55,10 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                                                .getSchedulerBaseConfig()
                                                                                .withName(schedulersNamePrefix + "."
                                                                                    + CPU_INTENSIVE.name())),
+                                                                       () -> muleContext.getSchedulerService()
+                                                                           .customScheduler(muleContext.getSchedulerBaseConfig()
+                                                                               .withName(schedulersNamePrefix + ".retrySupport")
+                                                                               .withMaxConcurrentTasks(CORES)),
                                                                        resolveParallelism(),
                                                                        getMaxConcurrency(),
                                                                        muleContext.getConfiguration().isThreadLoggingEnabled());
@@ -74,12 +78,14 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                            Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                             int parallelism,
                                                             int maxConcurrency, boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency, isThreadLoggingEnabled);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+            isThreadLoggingEnabled);
     }
 
     TransactionAwareProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
@@ -89,11 +95,13 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                            Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                             int maxConcurrency)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency, false);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, CORES, maxConcurrency,
+            false);
     }
 
     @Override
