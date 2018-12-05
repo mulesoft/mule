@@ -10,6 +10,7 @@ import static java.lang.Integer.getInteger;
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -81,6 +82,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                                .withMaxConcurrentTasks(CORES)),
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
+                                                       isMaxConcurrencyEagerCheck(),
                                                        muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
@@ -110,12 +112,12 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                    Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                    int parallelism,
-                                                   int maxConcurrency,
+                                                   int maxConcurrency, boolean maxConcurrencyEagerCheck,
                                                    boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
 
@@ -128,12 +130,12 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                    Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                    int parallelism,
-                                                   int maxConcurrency)
+                                                   int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
-           false);
+           maxConcurrencyEagerCheck ,false);
     }
 
     @Override
@@ -147,7 +149,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
             .transform(function).subscribe();
         ReactorSink<CoreEvent> sink = new DefaultReactorSink<>(processor.sink(), () -> {
         }, createOnEventConsumer(), bufferSize);
-        sinks.add(sink);
+        sinks.add(new ProactorSinkWrapper<>(sink));
       }
 
       return new RoundRobinReactorSink<>(sinks);
@@ -166,12 +168,25 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     protected Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
       return scheduleWithLogging(processor, processorScheduler, event)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
-          .doOnError(RejectedExecutionException.class,
-                     throwable -> LOGGER.trace("Shared scheduler " + processorScheduler.getName()
-                         + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS
-                         + "ms."))
-          .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
-              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), ZERO, ZERO))
+
+          .retryWhen(onlyIf(ctx -> {
+            final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
+            if (schedulerBusy) {
+              LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                           processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+
+              retryingCounter.incrementAndGet();
+            }
+            return schedulerBusy;
+          })
+              .doOnRetry(ctx -> {
+                getRetrySupportScheduler().schedule(() -> {
+                  // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
+                  // again by the retry mechanism.
+                  retryingCounter.decrementAndGet();
+                }, SCHEDULER_BUSY_RETRY_INTERVAL_MS * 2, MILLISECONDS);
+              })
+              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }
 

@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -133,4 +134,38 @@ public abstract class ProactorStreamProcessingStrategy
     return this.retrySupportScheduler;
   }
 
+  protected final class ProactorSinkWrapper<E> implements ReactorSink<E> {
+
+    private final ReactorSink<E> innerSink;
+
+    protected ProactorSinkWrapper(ReactorSink<E> innerSink) {
+      this.innerSink = innerSink;
+    }
+
+    @Override
+    public final void accept(CoreEvent event) {
+      if (retryingCounter.get() > 0) {
+        throw new RejectedExecutionException();
+      }
+      innerSink.accept(event);
+    }
+
+    @Override
+    public final boolean emit(CoreEvent event) {
+      if (retryingCounter.get() > 0) {
+        return false;
+      }
+      return innerSink.emit(event);
+    }
+
+    @Override
+    public E intoSink(CoreEvent event) {
+      return innerSink.intoSink(event);
+    }
+
+    @Override
+    public final void dispose() {
+      innerSink.dispose();
+    }
+  }
 }
