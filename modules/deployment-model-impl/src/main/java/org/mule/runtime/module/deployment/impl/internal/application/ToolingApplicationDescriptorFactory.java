@@ -61,8 +61,10 @@ public class ToolingApplicationDescriptorFactory extends ApplicationDescriptorFa
     builder.setConfigs(muleApplicationModel.getConfigs());
     builder.setMinMuleVersion(muleApplicationModel.getMinMuleVersion());
     builder.setRequiredProduct(muleApplicationModel.getRequiredProduct());
+    builder.setSecureProperties(muleApplicationModel.getSecureProperties());
+    builder.setLogConfigFile(muleApplicationModel.getLogConfigFile());
     builder.withBundleDescriptorLoader(muleApplicationModel.getBundleDescriptorLoader());
-    builder.withClassLoaderModelDescriptorLoader(muleApplicationModel.getBundleDescriptorLoader());
+    builder.withClassLoaderModelDescriptorLoader(muleApplicationModel.getClassLoaderModelLoaderDescriptor());
 
     return builder;
   }
