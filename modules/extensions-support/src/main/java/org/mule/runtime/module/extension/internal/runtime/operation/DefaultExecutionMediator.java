@@ -143,12 +143,12 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
             .doOnSuccess(value -> {
               onSuccess(context, value, interceptors);
               stats.ifPresent(s -> s.discountInflightOperation());
-            })
-            .onErrorMap(t -> mapError(context, interceptors, t));
+            });
       } else {
         result = error(beforeExecutionResult.getThrowable());
       }
       return result
+          .onErrorMap(t -> mapError(context, interceptors, t))
           .doOnSuccessOrError((value, e) -> {
             try {
               after(context, value, beforeExecutionResult.getExecutedInterceptors());
