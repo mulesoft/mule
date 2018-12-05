@@ -11,6 +11,7 @@ import static java.lang.Integer.compare;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
@@ -38,8 +39,6 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   private final PolicyInstanceProviderFactory policyInstanceProviderFactory;
   private final List<RegisteredPolicyTemplate> registeredPolicyTemplates = new LinkedList<>();
   private final List<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProviders = new LinkedList<>();
-  private Runnable policiesDeploymentChangeCallback = () -> {
-  };
   private Application application;
 
   /**
@@ -86,8 +85,6 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
           .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance, parametrization.getId()));
       registeredPolicyInstanceProviders.sort(null);
       registeredPolicyTemplate.get().count++;
-
-      policiesDeploymentChangeCallback.run();
     } catch (Exception e) {
       throw new PolicyRegistrationException(createPolicyRegistrationError(parametrization.getId()), e);
     }
@@ -116,16 +113,9 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
         registeredPolicyTemplate.get().policyTemplate.dispose();
         registeredPolicyTemplates.remove(registeredPolicyTemplate.get());
       }
-
-      policiesDeploymentChangeCallback.run();
     });
 
     return registeredPolicyInstanceProvider.isPresent();
-  }
-
-  @Override
-  public void onPoliciesDeploymentChange(Runnable callback) {
-    policiesDeploymentChangeCallback = callback;
   }
 
   @Override
