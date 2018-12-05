@@ -90,11 +90,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
   }
 
   @Override
-  protected final int getSubscriberCount() {
-    return 1;
-  }
-
-  @Override
   public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return ProactorStreamEmitterProcessingStrategy.class;
   }
@@ -145,8 +140,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
-      int subscriberCount = maxConcurrency < subscribers ? maxConcurrency : subscribers;
-      for (int i = 0; i < subscriberCount; i++) {
+      int concurrency = maxConcurrency < getParallelism() ? maxConcurrency : getParallelism();
+      for (int i = 0; i < concurrency; i++) {
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
             .transform(function).subscribe();
