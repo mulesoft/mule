@@ -8,9 +8,7 @@ package org.mule.runtime.core.api.el;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -47,7 +45,7 @@ public interface ExtendedExpressionManager extends ExpressionManager {
 
   /**
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
-   * evaluate a single expression they can use {@link #evaluate(String, CoreEvent, FlowConstruct, BindingContext)}.
+   * evaluate a single expression they can use {@link #evaluate(String, CoreEvent, ComponentLocation)}.
    * <p>
    * This version of {@code evaluate} performs expression evaluation on an immutable event. Any {@link CoreEvent} or
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
