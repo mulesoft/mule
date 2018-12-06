@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>api-annotations</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>${apiAnnotations}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
