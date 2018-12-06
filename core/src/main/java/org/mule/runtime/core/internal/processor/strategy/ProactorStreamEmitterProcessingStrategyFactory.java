@@ -142,7 +142,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
-      int concurrency = maxConcurrency < getParallelism() ? maxConcurrency : getParallelism();
+      int concurrency = maxConcurrency < subscribers ? maxConcurrency : subscribers;
       for (int i = 0; i < concurrency; i++) {
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
