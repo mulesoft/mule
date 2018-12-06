@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -86,12 +84,13 @@ public class CompositeSourcePolicy extends
    * {@link MessagingException} to signal that the failure was through the the flow exception and not the policy logic.
    */
   @Override
-  protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
+  protected Publisher<CoreEvent> processNextOperation(CoreEvent event,
+                                                      MessageSourceResponseParametersProcessor parametersProcessor) {
     return just(event)
-        .flatMap(request -> from(processWithChildContext(request, flowExecutionProcessor, empty())))
+        .transform(flowExecutionProcessor)
         .map(flowExecutionResponse -> {
           originalResponseParameters =
-              getParametersProcessor().getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);
+              parametersProcessor.getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);
           Message message = getParametersTransformer()
               .map(parametersTransformer -> parametersTransformer
                   .fromSuccessResponseParametersToMessage(originalResponseParameters))
@@ -101,7 +100,7 @@ public class CompositeSourcePolicy extends
         })
         .onErrorMap(MessagingException.class, messagingException -> {
           originalFailureResponseParameters =
-              getParametersProcessor().getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
+              parametersProcessor.getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
           Message message = getParametersTransformer()
               .map(parametersTransformer -> parametersTransformer
                   .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
@@ -147,14 +146,16 @@ public class CompositeSourcePolicy extends
    * @throws Exception if there was an unexpected failure thrown by executing the chain.
    */
   @Override
-  public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent) {
+  public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
+                                                                                         MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     return from(MessageProcessors.process(sourceEvent, getPolicyProcessor()))
         .<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>map(policiesResultEvent -> {
           Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer
                   .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage())))
               .orElse(originalResponseParameters);
-          return right(new SourcePolicySuccessResult(policiesResultEvent, responseParameters, getParametersProcessor()));
+          return right(new SourcePolicySuccessResult(policiesResultEvent, responseParameters,
+                                                     messageSourceResponseParametersProcessor));
         }).doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
 
         .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
