@@ -220,7 +220,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               return Mono.from(policyManager
                   .createOperationPolicy(this, event, resolutionResult,
                                          operationExecutionFunction)
-                  .process(event));
+                  .process(event, () -> resolutionResult));
             } else {
               // If this operation has no component location then it is internal. Don't apply policies on internal operations.
               return Mono.from(operationExecutionFunction.execute(resolutionResult, event));

@@ -23,6 +23,6 @@ public interface OperationParametersProcessor {
    *
    * @return the operation parameters as map
    */
-  Map<String, Object> getOperationParameters() throws Exception;
+  Map<String, Object> getOperationParameters();
 
 }

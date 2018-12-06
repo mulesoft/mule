@@ -38,6 +38,7 @@ import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -64,15 +65,16 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
 
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -95,10 +97,10 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private RuntimeException mockException;
 
   private ModuleFlowProcessingPhase moduleFlowProcessingPhase;
-  private Supplier<Map<String, Object>> failingParameterSupplier = () -> {
+  private final Supplier<Map<String, Object>> failingParameterSupplier = () -> {
     throw mockException;
   };
-  private Function<CoreEvent, Map<String, Object>> failingParameterFunction = event -> {
+  private final Function<CoreEvent, Map<String, Object>> failingParameterFunction = event -> {
     throw mockException;
   };
   private PolicyManager policyManager;
@@ -131,7 +133,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     failureResult = mock(SourcePolicyFailureResult.class);
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
-    when(sourcePolicy.process(any())).thenAnswer(invocation -> {
+    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
       event = invocation.getArgumentAt(0, CoreEvent.class);
       return just(right(successResult));
     });
@@ -398,7 +400,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   }
 
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
-    when(sourcePolicy.process(any())).thenAnswer(invocation -> {
+    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
       messagingException = buildFailingFlowException(invocation.getArgumentAt(0, CoreEvent.class), failure);
       return just(left(failureResult));
     });

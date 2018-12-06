@@ -11,18 +11,18 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Abstract implementation that performs the chaining of a set of policies and the {@link Processor} being intercepted.
@@ -83,16 +83,16 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
 
   /**
    * Template method for executing the final processor of the chain.
-   * 
+   *
    * @param event the event to use for executing the next operation.
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Publisher<CoreEvent> processNextOperation(CoreEvent event);
+  protected abstract Publisher<CoreEvent> processNextOperation(CoreEvent event, ParametersProcessor parametersProcessor);
 
   /**
    * Template method for executing a policy.
-   * 
+   *
    * @param policy the policy to execute
    * @param nextProcessor the next processor to use as the {@link PolicyNextActionMessageProcessor}. It will invoke the next
    *        policy in the chain.
@@ -120,7 +120,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
           .flatMap(event -> {
             checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");
             if (index == parameterizedPolicies.size()) {
-              return from(processNextOperation(event));
+              return from(processNextOperation(event, getParametersProcessor()));
             }
             return from(processPolicy(parameterizedPolicies.get(index++), this, event));
           })

@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -21,12 +20,10 @@ import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import java.util.Optional;
-
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 
 /**
@@ -112,13 +109,11 @@ public class SourcePolicyProcessor implements Processor {
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return Flux.from(publisher)
-            .cast(PrivilegedEvent.class)
-            .doOnNext(event -> saveState(event))
+            .doOnNext(event -> saveState((PrivilegedEvent) event))
             .map(event -> (CoreEvent) policyEventConverter
-                .createEvent(event, sourceEvent, policy.getPolicyChain().isPropagateMessageTransformations()))
-            .flatMap(e -> from(processWithChildContext(e, nextProcessor, Optional.empty()))
-                .cast(PrivilegedEvent.class)
-                .map(result -> policyEventConverter.createEvent(result, loadState()))
+                .createEvent((PrivilegedEvent) event, sourceEvent, policy.getPolicyChain().isPropagateMessageTransformations()))
+            .flatMap(e -> just(e).transform(nextProcessor)
+                .map(result -> (CoreEvent) policyEventConverter.createEvent((PrivilegedEvent) result, loadState()))
                 .onErrorMap(MessagingException.class,
                             me -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
                                                                                           loadState()),

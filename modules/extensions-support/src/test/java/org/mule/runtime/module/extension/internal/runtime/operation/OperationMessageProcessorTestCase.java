@@ -47,6 +47,7 @@ import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
@@ -114,7 +115,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Rule
   public ExpectedException expectedException = none();
 
-  private ReflectionCache reflectionCache = new ReflectionCache();
+  private final ReflectionCache reflectionCache = new ReflectionCache();
 
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
@@ -400,7 +401,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor), same(event), any(Map.class),
                                                     any(OperationExecutionFunction.class));
-    verify(mockOperationPolicy).process(same(event));
+    verify(mockOperationPolicy).process(same(event), any());
   }
 
   @Test
