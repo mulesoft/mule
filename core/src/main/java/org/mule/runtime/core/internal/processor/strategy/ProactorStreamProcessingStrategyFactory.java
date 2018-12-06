@@ -16,6 +16,7 @@ import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -28,18 +29,24 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import reactor.core.Disposable;
@@ -66,6 +73,21 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
   protected static final long STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
       getLong(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
 
+  private static final Function<MuleContext, Scheduler> RETRY_SUPPORT_SCHEDULER_PROVIDER = memoize(mCtx -> {
+    Scheduler retrySupportScheduler = mCtx.getSchedulerService()
+        .customScheduler(mCtx.getSchedulerBaseConfig()
+            .withName("retrySupport")
+            .withMaxConcurrentTasks(1));
+
+    mCtx.getNotificationManager().addListener((MuleContextNotificationListener) notification -> {
+      if (MuleContextNotification.CONTEXT_STOPPED == ((MuleContextNotification) notification).getAction().getActionId()) {
+        retrySupportScheduler.stop();
+      }
+    });
+
+    return retrySupportScheduler;
+  }, new ConcurrentHashMap<MuleContext, Scheduler>());
+
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new ProactorStreamProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
@@ -79,10 +101,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                 () -> muleContext.getSchedulerService()
                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                         .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                () -> muleContext.getSchedulerService()
-                                                    .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                        .withName(schedulersNamePrefix + ".retrySupport")
-                                                        .withMaxConcurrentTasks(CORES)),
+                                                () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.apply(muleContext),
                                                 resolveParallelism(),
                                                 getMaxConcurrency(),
                                                 muleContext.getConfiguration().isThreadLoggingEnabled());
@@ -116,6 +135,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
   static class ProactorStreamProcessingStrategy extends ReactorStreamProcessingStrategy {
 
+    private final AtomicInteger inFlightEvents = new AtomicInteger();
+    private final BiConsumer<CoreEvent, Throwable> IN_FLIGHT_DECREMENT_CALLBACK = (e, t) -> inFlightEvents.decrementAndGet();
+
     private final class ProactorSinkWrapper<E> implements ReactorSink<E> {
 
       private final ReactorSink<E> innerSink;
@@ -126,18 +148,29 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
       @Override
       public final void accept(CoreEvent event) {
-        if (retryingCounter.get() > 0) {
+        if (!checkCapacity(event)) {
           throw new RejectedExecutionException();
         }
+
         innerSink.accept(event);
       }
 
       @Override
       public final boolean emit(CoreEvent event) {
+        return checkCapacity(event) && innerSink.emit(event);
+      }
+
+      private boolean checkCapacity(CoreEvent event) {
         if (retryingCounter.get() > 0) {
           return false;
         }
-        return innerSink.emit(event);
+        if (inFlightEvents.incrementAndGet() > maxConcurrency) {
+          inFlightEvents.decrementAndGet();
+          return false;
+        }
+
+        ((BaseEventContext) event.getContext()).getRootContext().onTerminated(IN_FLIGHT_DECREMENT_CALLBACK);
+        return true;
       }
 
       @Override
