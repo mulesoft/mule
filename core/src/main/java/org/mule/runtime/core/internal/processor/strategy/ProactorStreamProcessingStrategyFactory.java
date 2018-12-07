@@ -104,6 +104,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                 () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.apply(muleContext),
                                                 resolveParallelism(),
                                                 getMaxConcurrency(),
+                                                isMaxConcurrencyEagerCheck(),
                                                 muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
@@ -164,12 +165,17 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
         if (retryingCounter.get() > 0) {
           return false;
         }
-        if (inFlightEvents.incrementAndGet() > maxConcurrency) {
-          inFlightEvents.decrementAndGet();
-          return false;
+        if (maxConcurrencyEagerCheck) {
+          if (inFlightEvents.incrementAndGet() > maxConcurrency) {
+            inFlightEvents.decrementAndGet();
+            return false;
+          }
+
+          // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
+          // an async, for instance)
+          ((BaseEventContext) event.getContext()).onResponse(IN_FLIGHT_DECREMENT_CALLBACK);
         }
 
-        ((BaseEventContext) event.getContext()).getRootContext().onTerminated(IN_FLIGHT_DECREMENT_CALLBACK);
         return true;
       }
 
@@ -207,11 +213,11 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                             Supplier<Scheduler> retrySupportSchedulerSupplier,
                                             int parallelism,
-                                            int maxConcurrency, boolean isThreadLoggingEnabled)
+                                            int maxConcurrency, boolean maxConcurrencyEagerCheck, boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism,
-            maxConcurrency);
+            maxConcurrency, maxConcurrencyEagerCheck);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
       this.retrySupportSchedulerSupplier = retrySupportSchedulerSupplier;
@@ -227,12 +233,12 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                             Supplier<Scheduler> retrySupportSchedulerSupplier,
                                             int parallelism,
-                                            int maxConcurrency)
+                                            int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
-           false);
+           maxConcurrencyEagerCheck, false);
     }
 
     @Override

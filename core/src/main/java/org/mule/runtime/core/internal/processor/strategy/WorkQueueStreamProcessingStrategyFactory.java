@@ -14,6 +14,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -54,7 +55,8 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
                                                  () -> muleContext.getSchedulerService()
                                                      .ioScheduler(muleContext.getSchedulerBaseConfig()
                                                          .withName(schedulersNamePrefix + "." + BLOCKING.name())),
-                                                 getMaxConcurrency(), muleContext.getConfiguration().isThreadLoggingEnabled());
+                                                 getMaxConcurrency(), isMaxConcurrencyEagerCheck(),
+                                                 muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override
@@ -66,14 +68,15 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
 
     private final Supplier<Scheduler> blockingSchedulerSupplier;
     private Scheduler blockingScheduler;
-    private List<Sink> sinkList = new ArrayList<>();
-    private boolean isThreadLoggingEnabled;
+    private final List<Sink> sinkList = new ArrayList<>();
+    private final boolean isThreadLoggingEnabled;
 
     protected WorkQueueStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize,
                                                 int subscribers,
                                                 String waitStrategy, Supplier<Scheduler> blockingSchedulerSupplier,
-                                                int maxConcurrency, boolean isThreadLoggingEnabled) {
-      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency);
+                                                int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                                boolean isThreadLoggingEnabled) {
+      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency, maxConcurrencyEagerCheck);
       this.blockingSchedulerSupplier = requireNonNull(blockingSchedulerSupplier);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
@@ -81,8 +84,9 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     protected WorkQueueStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize,
                                                 int subscribers,
                                                 String waitStrategy, Supplier<Scheduler> blockingSchedulerSupplier,
-                                                int maxConcurrency) {
-      this(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, blockingSchedulerSupplier, maxConcurrency, false);
+                                                int maxConcurrency, boolean maxConcurrencyEagerCheck) {
+      this(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, blockingSchedulerSupplier, maxConcurrency,
+           maxConcurrencyEagerCheck, false);
     }
 
     @Override

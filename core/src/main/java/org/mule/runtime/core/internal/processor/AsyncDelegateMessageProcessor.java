@@ -90,7 +90,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Sink sink;
 
-  private MessageProcessorChainBuilder delegateBuilder;
+  private final MessageProcessorChainBuilder delegateBuilder;
   protected MessageProcessorChain delegate;
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
@@ -120,6 +120,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
         if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
           ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrency(maxConcurrency);
+          // TODO MULE-XXXXX Review how backpressure should be handled for async
+          ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
         } else {
           logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());
         }

@@ -95,7 +95,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                 () -> cpuIntensive,
                                                 () -> custom,
                                                 CORES,
-                                                maxConcurrency);
+                                                maxConcurrency, true);
   }
 
   @Override
@@ -254,7 +254,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuIntensive,
                                                                                              () -> custom,
                                                                                              1,
-                                                                                             2))
+                                                                                             2, true))
         .build();
     flow.initialise();
     flow.start();
@@ -284,7 +284,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> rejectingSchedulerSpy,
                                                                                              () -> custom,
                                                                                              1,
-                                                                                             2))
+                                                                                             2, true))
         .build();
     flow.initialise();
     flow.start();
@@ -312,7 +312,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuIntensive,
                                                                                              () -> custom,
                                                                                              CORES,
-                                                                                             1)),
+                                                                                             1, true)),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
@@ -335,7 +335,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuIntensive,
                                                                                              () -> custom,
                                                                                              CORES,
-                                                                                             2)),
+                                                                                             2, true)),
                        true, CPU_LITE, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads, not(hasItem(startsWith(RING_BUFFER))));
@@ -359,7 +359,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuIntensive,
                                                                                              () -> custom,
                                                                                              CORES,
-                                                                                             1)),
+                                                                                             1, true)),
                        true, BLOCKING, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
@@ -382,7 +382,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuIntensive,
                                                                                              () -> custom,
                                                                                              1,
-                                                                                             2)),
+                                                                                             2, true)),
                        true, BLOCKING, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(2l));
@@ -432,7 +432,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuIntensive,
                                                                                              () -> custom,
                                                                                              4,
-                                                                                             2))
+                                                                                             2, true))
         .processors(blockingProcessor)
         .build();
     flow.initialise();
@@ -609,6 +609,49 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
         processFlow(newEvent());
       } finally {
         latchedProcessor.release();
+        latchedProcessor.getAllLatchedLatch().await();
+
+        futures.forEach(f -> {
+          try {
+            f.get(RECEIVE_TIMEOUT, MILLISECONDS);
+          } catch (Exception e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
+      }
+    }
+  }
+
+  @Test
+  public void eagerBackpressureOnMaxConcurrencyHitRecovery() throws Exception {
+    if (mode.equals(SOURCE)) {
+      MultipleInvocationLatchedProcessor latchedProcessor =
+          new MultipleInvocationLatchedProcessor(CPU_LITE, 1);
+
+      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+
+      flow = flowBuilder.get()
+          .source(triggerableMessageSource)
+          .processors(latchedProcessor)
+          .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
+          .build();
+
+      flow.initialise();
+      flow.start();
+
+      List<Future> futures = new ArrayList<>();
+
+      try {
+        futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
+
+        // Give time for the dispatch to get to the capacity check
+        Thread.sleep(500);
+        latchedProcessor.release();
+        Thread.sleep(500);
+
+        // expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+        processFlow(newEvent());
+      } finally {
         latchedProcessor.getAllLatchedLatch().await();
 
         futures.forEach(f -> {
