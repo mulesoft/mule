@@ -30,7 +30,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
@@ -47,7 +46,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +68,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private ConfigurationProperties configurationProperties;
 
   private MessageProcessorChain configuredMessageProcessors;
-  private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
 
   protected String when;
   private boolean handleException;
@@ -96,7 +93,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return just(event)
         .map(beforeRouting(exception))
         .flatMapMany(route(exception)).last()
-        .map(afterRouting(exception))
+        .map(afterRouting())
         .doOnError(MessagingException.class, onRoutingError())
         .<CoreEvent>handle((result, sink) -> {
           if (exception instanceof MessagingException) {
@@ -168,15 +165,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected void markExceptionAsHandled(Exception exception) {
     if (exception instanceof MessagingException) {
       ((MessagingException) exception).setHandled(true);
-    }
-  }
-
-  protected CoreEvent processReplyTo(CoreEvent event, Exception e) {
-    try {
-      return replyToMessageProcessor.process(event);
-    } catch (MuleException ex) {
-      logFatal(event, ex);
-      return event;
     }
   }
 
@@ -279,10 +267,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return errorTypeMatcher != null && errorTypeMatcher.match(event.getError().get().getErrorType());
   }
 
-  protected Function<CoreEvent, CoreEvent> afterRouting(Exception exception) {
+  protected Function<CoreEvent, CoreEvent> afterRouting() {
     return event -> {
       if (event != null) {
-        event = processReplyTo(event, exception);
         return nullifyExceptionPayloadIfRequired(event);
       }
       return event;

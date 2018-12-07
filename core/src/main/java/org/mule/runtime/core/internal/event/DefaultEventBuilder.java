@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseIns
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -45,15 +44,11 @@ import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -63,6 +58,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
@@ -77,8 +75,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
   private String legacyCorrelationId;
-  private ReplyToHandler replyToHandler;
-  private Object replyToDestination;
   private MuleSession session;
   private SecurityContext securityContext;
   private InternalEvent originalEvent;
@@ -97,8 +93,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.messageFactory = e -> event.getMessage();
     this.itemSequenceInfo = event.getItemSequenceInfo();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
-    this.replyToHandler = event.getReplyToHandler();
-    this.replyToDestination = event.getReplyToDestination();
     this.securityContext = event.getSecurityContext();
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
@@ -219,15 +213,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder replyToHandler(ReplyToHandler replyToHandler) {
-    this.replyToHandler = replyToHandler;
-    this.modified = true;
     return this;
   }
 
   @Override
   public DefaultEventBuilder replyToDestination(Object replyToDestination) {
-    this.replyToDestination = replyToDestination;
-    this.modified = true;
     return this;
   }
 
@@ -261,8 +251,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       initVariables();
       return new InternalEventImplementation(context, requireNonNull(messageFactory.apply(context)),
                                              varsModified ? flowVariables : originalVars,
-                                             internalParameters, session, securityContext, replyToDestination,
-                                             replyToHandler, itemSequenceInfo, error,
+                                             internalParameters, session, securityContext, itemSequenceInfo, error,
                                              legacyCorrelationId,
                                              notificationsEnabled);
     }
@@ -301,11 +290,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final MuleSession session;
     private final SecurityContext securityContext;
 
-    private final ReplyToHandler replyToHandler;
-
-    /** Mutable MuleEvent state **/
-    private final Object replyToDestination;
-
     private final boolean notificationsEnabled;
 
     private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
@@ -322,7 +306,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
-                                        Object replyToDestination, ReplyToHandler replyToHandler,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
                                         Error error,
                                         String legacyCorrelationId, boolean notificationsEnabled) {
@@ -332,9 +315,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.message = message;
       this.variables = new CaseInsensitiveHashMap<String, TypedValue<?>>(variables).toImmutableCaseInsensitiveMap();
       this.internalParameters = internalParameters;
-
-      this.replyToHandler = replyToHandler;
-      this.replyToDestination = replyToDestination;
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
       this.error = error;
@@ -447,28 +427,18 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       if (message instanceof InternalMessage) {
         setMessage(message);
       }
-      if (replyToHandler instanceof DefaultReplyToHandler) {
-        ((DefaultReplyToHandler) replyToHandler).initAfterDeserialisation(muleContext);
-      }
-      if (replyToDestination instanceof DeserializationPostInitialisable) {
-        try {
-          DeserializationPostInitialisable.Implementation.init(replyToDestination, muleContext);
-        } catch (Exception e) {
-          throw new DefaultMuleException(e);
-        }
-      }
 
       bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
     }
 
     @Override
     public ReplyToHandler getReplyToHandler() {
-      return replyToHandler;
+      return null;
     }
 
     @Override
     public Object getReplyToDestination() {
-      return replyToDestination;
+      return null;
     }
 
     // //////////////////////////

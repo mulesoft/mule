@@ -162,6 +162,38 @@
           "fieldName": "serialVersionUID",
           "elementKind": "field",
           "justification": "Just generalizing a type definition"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.connector.DefaultReplyToHandler",
+          "package": "org.mule.runtime.core.privileged.connector",
+          "classSimpleName": "DefaultReplyToHandler",
+          "elementKind": "class",
+          "justification": "deprecated and not used anymore"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.requestreply.AbstractReplyToPropertyRequestReplyReplier",
+          "package": "org.mule.runtime.core.privileged.routing.requestreply",
+          "classSimpleName": "AbstractReplyToPropertyRequestReplyReplier",
+          "elementKind": "class",
+          "justification": "deprecated and not used anymore"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier",
+          "package": "org.mule.runtime.core.privileged.routing.requestreply",
+          "classSimpleName": "ReplyToPropertyRequestReplyReplier",
+          "elementKind": "class",
+          "justification": "deprecated and not used anymore"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.routing.requestreply.RequestReplyReplierMessageProcessor",
+          "package": "org.mule.runtime.core.privileged.routing.requestreply",
+          "classSimpleName": "RequestReplyReplierMessageProcessor",
+          "elementKind": "interface",
+          "justification": "deprecated and not used anymore"
         }
       ]
     }

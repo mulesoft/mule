@@ -7,17 +7,16 @@
 package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -62,15 +61,6 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
       return super.route(exception);
     }
     return event -> just(event);
-  }
-
-  @Override
-  protected CoreEvent processReplyTo(CoreEvent event, Exception e) {
-    if (isRedeliveryExhausted(e)) {
-      return super.processReplyTo(event, e);
-    } else {
-      return event;
-    }
   }
 
 }
