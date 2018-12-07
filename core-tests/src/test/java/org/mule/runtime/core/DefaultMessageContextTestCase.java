@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,13 +22,13 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Optional;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
@@ -39,7 +38,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   private static final String SERVER_ID = "serverId";
 
   private MuleContext muleContext = mockContextWithServices();
-  @Mock
+
+  @Mock(lenient = true)
   private FlowConstruct flow;
 
   private EventContext executionContext;

@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -24,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -44,7 +43,6 @@ public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTest
   public void before() throws Exception {
     when(connectionProvider.connect()).thenReturn(connection);
     connectionStrategy = new CachedConnectionManagementStrategy<>(connectionProvider, muleContext);
-    when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
   }
 
   @Test

@@ -11,10 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
@@ -30,7 +27,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
@@ -44,8 +40,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -60,12 +55,8 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private CoreEvent mockMuleEvent = mock(CoreEvent.class);
   private DefaultExpressionManager expressionManager;
 
-  @Mock
-  private StreamingManager streamingManager;
-
   @Before
   public void setUp() throws MuleException {
-    when(streamingManager.manage(any(CursorProvider.class), any(CoreEvent.class))).then(returnsFirstArg());
     expressionManager = new DefaultExpressionManager();
     initialiseIfNeeded(expressionManager, muleContext);
   }

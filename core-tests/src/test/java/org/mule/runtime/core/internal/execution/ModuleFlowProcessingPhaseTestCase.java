@@ -12,14 +12,14 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
@@ -38,7 +38,6 @@ import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -65,16 +64,15 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
 
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -134,7 +132,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
     when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
-      event = invocation.getArgumentAt(0, CoreEvent.class);
+      event = invocation.getArgument(0);
       return just(right(successResult));
     });
 
@@ -146,7 +144,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     final FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
-        .thenAnswer(invocationOnMock -> error(invocationOnMock.getArgumentAt(0, MessagingException.class)));
+        .thenAnswer(invocationOnMock -> error((MessagingException) invocationOnMock.getArgument(0)));
     when(flow.getMuleContext()).thenReturn(muleContext);
 
     context = mock(MessageProcessContext.class);
@@ -407,7 +405,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
     when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
-      messagingException = buildFailingFlowException(invocation.getArgumentAt(0, CoreEvent.class), failure);
+      messagingException = buildFailingFlowException(invocation.getArgument(0), failure);
       messagingException.setInErrorHandler(inErrorHandler);
       return just(left(failureResult));
     });

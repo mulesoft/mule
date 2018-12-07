@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -51,7 +51,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -141,7 +141,6 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void sendFailureResponseWhenFlowExecutionFailsAndExceptionIsNotHandled() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
     when(mockRequestResponseTemplate.afterRouteEvent(any(CoreEvent.class))).thenThrow(mockMessagingException);
-    when(mockMessagingException.handled()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
     verify(mockRequestResponseTemplate).afterFailureProcessingFlow(mockMessagingException);
   }
@@ -150,7 +149,6 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void doNotSendResponseWhenFlowExecutionFailsSendingResponseAndExceptionIsHandled() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
     doThrow(mockResponseDispatchException).when(mockRequestResponseTemplate).sendResponseToClient(any(CoreEvent.class));
-    when(mockMessagingException.handled()).thenReturn(true);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
     verify(mockRequestResponseTemplate).sendResponseToClient(any(CoreEvent.class));
     verify(mockRequestResponseTemplate, never()).afterFailureProcessingFlow(mockMessagingException);
@@ -160,7 +158,6 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void doNotSendFailureResponseWhenFlowExecutionFailsSendingResponseAndExceptionIsNotHandled() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
     doThrow(mockMessagingException).when(mockRequestResponseTemplate).sendResponseToClient(any(CoreEvent.class));
-    when(mockMessagingException.handled()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
     verify(mockRequestResponseTemplate).sendResponseToClient(any(CoreEvent.class));
     verify(mockRequestResponseTemplate).afterFailureProcessingFlow(mockMessagingException);
@@ -170,7 +167,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void responseNotificationFired() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
     when(mockRequestResponseTemplate.afterRouteEvent(any(CoreEvent.class)))
-        .thenAnswer(invocation -> invocation.getArgumentAt(0, CoreEvent.class));
+        .thenAnswer(invocation -> invocation.getArgument(0));
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
 
     ArgumentCaptor<ConnectorMessageNotification> notificationCaptor = ArgumentCaptor.forClass(ConnectorMessageNotification.class);
@@ -184,7 +181,6 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void errorResponseNotificationFired() throws Exception {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
     when(mockRequestResponseTemplate.afterRouteEvent(any(CoreEvent.class))).thenThrow(mockMessagingException);
-    when(mockMessagingException.handled()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
 
     ArgumentCaptor<ConnectorMessageNotification> notificationCaptor = ArgumentCaptor.forClass(ConnectorMessageNotification.class);

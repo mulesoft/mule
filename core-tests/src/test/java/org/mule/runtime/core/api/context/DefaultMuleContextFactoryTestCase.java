@@ -16,12 +16,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP;
@@ -29,7 +28,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -204,7 +202,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     context = mockMuleContext();
     context = mockMuleContext();
     doAnswer(invocation -> {
-      listener.onInitialization(context, null);
+      listener.onInitialization(context, mock(Registry.class));
       return null;
     }).when(context).initialise();
     MuleContextBuilder contextBuilder = mock(MuleContextBuilder.class);
@@ -215,8 +213,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     muleContextFactory.createMuleContext(configurationBuilder, contextBuilder);
 
     InOrder inOrder = inOrder(listener);
-    inOrder.verify(listener, times(1)).onCreation(context);
-    inOrder.verify(listener, times(1)).onInitialization(eq(context), any(Registry.class));
+    inOrder.verify(listener).onCreation(context);
+    inOrder.verify(listener).onInitialization(eq(context), any(Registry.class));
   }
 
   private void assertDefaults(MuleContext context) {

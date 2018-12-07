@@ -22,27 +22,32 @@ import org.mule.runtime.core.privileged.transaction.XaTransaction;
 import org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.transaction.TransactionManager;
-import javax.transaction.xa.XAResource;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   private MuleContext mockMuleContext = mockContextWithServices();
+
   @Mock
   private TransactionManager mockTransactionManager;
+
   @Mock
   private XaResourceFactoryHolder mockXaResourceFactoryHolder1;
+
   @Mock
   private XaResourceFactoryHolder mockXaResourceFactoryHolder2;
+
   @Mock
   private XAResource mockXaResource;
 

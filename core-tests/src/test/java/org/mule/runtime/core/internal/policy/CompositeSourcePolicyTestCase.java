@@ -14,8 +14,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -26,7 +26,6 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -37,15 +36,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.reactivestreams.Publisher;
-
-import java.util.Optional;
-
 import reactor.core.publisher.Mono;
 
 //TODO MULE-10927 - create a common class between CompositeOperationPolicyTestCase and CompositeSourcePolicyTestCase
@@ -84,7 +82,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
 
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      Mono<CoreEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
+      Mono<CoreEvent> mono = from(invocation.getArgument(0));
       return mono.doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
     });
     when(firstPolicy.getPolicyChain().apply(any())).thenReturn(just(firstPolicyResultEvent));
@@ -178,7 +176,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     RuntimeException policyException = new RuntimeException("policy failure");
     reset(flowExecutionProcessor);
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      Mono<CoreEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
+      Mono<CoreEvent> mono = from(invocation.getArgument(0));
       return mono.map(event -> {
         throw policyException;
       });

@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -159,15 +159,16 @@ public class MuleContextUtils {
   public static MuleContextWithRegistry mockMuleContext() {
     final MuleContextWithRegistry muleContext =
         mock(DefaultMuleContext.class,
-             withSettings().defaultAnswer(RETURNS_DEEP_STUBS).extraInterfaces(PrivilegedMuleContext.class));
+             withSettings().defaultAnswer(RETURNS_DEEP_STUBS).extraInterfaces(PrivilegedMuleContext.class).lenient());
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new OnErrorPropagateHandler());
 
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      MuleRegistry registry = mock(MuleRegistry.class);
+      MuleRegistry registry = mock(MuleRegistry.class, withSettings().lenient());
       when(muleContext.getRegistry()).thenReturn(registry);
-      ComponentInitialStateManager componentInitialStateManager = mock(ComponentInitialStateManager.class);
+      ComponentInitialStateManager componentInitialStateManager =
+          mock(ComponentInitialStateManager.class, withSettings().lenient());
       when(componentInitialStateManager.mustStartMessageSource(any())).thenReturn(true);
       when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(componentInitialStateManager);
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
@@ -192,16 +193,17 @@ public class MuleContextUtils {
 
     when(muleContext.getSchedulerService()).thenReturn(schedulerService);
 
-    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
+    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class, withSettings().lenient());
     when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
     when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(of(mock(ErrorType.class)));
     final MuleRegistry registry = muleContext.getRegistry();
 
     NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);
-    ConfigurationProperties configProps = mock(ConfigurationProperties.class);
+    ConfigurationProperties configProps = mock(ConfigurationProperties.class, withSettings().lenient());
     when(configProps.resolveBooleanProperty(any())).thenReturn(empty());
 
-    ConfigurationComponentLocator configurationComponentLocator = mock(ConfigurationComponentLocator.class);
+    ConfigurationComponentLocator configurationComponentLocator =
+        mock(ConfigurationComponentLocator.class, withSettings().lenient());
     when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
     when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
 

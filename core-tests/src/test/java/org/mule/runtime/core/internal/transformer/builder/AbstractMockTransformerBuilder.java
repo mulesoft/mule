@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.core.internal.transformer.builder;
 
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -63,7 +62,7 @@ public abstract class AbstractMockTransformerBuilder<T extends AbstractMockTrans
     if (sourceDataTypes != null) {
       doReturn(Arrays.asList(sourceDataTypes)).when(transformer).getSourceDataTypes();
 
-      when(transformer.isSourceDataTypeSupported((DataType) argThat(new SupportsSourceDataType()))).thenReturn(true);
+      when(transformer.isSourceDataTypeSupported(argThat(new SupportsSourceDataType()))).thenReturn(true);
     }
     try {
       doReturn(value).when(transformer).transform(Mockito.any(Object.class));
@@ -83,11 +82,10 @@ public abstract class AbstractMockTransformerBuilder<T extends AbstractMockTrans
     return (T) this;
   }
 
-  class SupportsSourceDataType extends ArgumentMatcher {
+  class SupportsSourceDataType implements ArgumentMatcher<DataType> {
 
     @Override
-    public boolean matches(Object value) {
-      DataType dataType = (DataType) value;
+    public boolean matches(DataType dataType) {
 
       for (DataType sourceDataType : sourceDataTypes) {
         if (sourceDataType.isCompatibleWith(dataType)) {

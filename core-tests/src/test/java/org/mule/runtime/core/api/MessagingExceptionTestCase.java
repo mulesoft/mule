@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -27,7 +27,6 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.core.internal.exception.MessagingException.PAYLOAD_INFO_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -45,6 +44,14 @@ import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketException;
+import java.util.Optional;
+
+import javax.xml.namespace.QName;
+
 import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
@@ -53,16 +60,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.SocketException;
-import java.util.Optional;
-
-import javax.xml.namespace.QName;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -98,7 +97,6 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     DefaultMuleConfiguration mockConfiguration = mock(DefaultMuleConfiguration.class);
     when(mockConfiguration.getId()).thenReturn("MessagingExceptionTestCase");
     when(mockContext.getConfiguration()).thenReturn(mockConfiguration);
-    when(mockContext.getTransformationService()).thenReturn(transformationService);
 
     testEvent = eventBuilder(muleContext).message(of(TEST_PAYLOAD)).build();
   }

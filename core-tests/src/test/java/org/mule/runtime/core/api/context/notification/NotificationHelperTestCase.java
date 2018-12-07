@@ -15,13 +15,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
@@ -32,14 +29,14 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Collections;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -66,7 +63,6 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   public void before() {
     when(muleContext.getNotificationManager()).thenReturn(eventNotificationHandler);
     when(event.getMessage()).thenReturn(message);
-    when(message.getPayload()).thenReturn(new TypedValue("", DataType.STRING));
     initMocks(eventNotificationHandler);
 
     helper = new NotificationHelper(eventNotificationHandler, TestServerNotification.class, false);
