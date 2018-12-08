@@ -85,7 +85,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private boolean ownProcessingStrategy = false;
   private ProcessingStrategy processingStrategy;
 
   private Sink sink;
@@ -113,7 +112,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                                                  this.getLocation().getRootContainerName())) {
       // This is for the case of the async inside a sub-flow
       processingStrategy = defaultProcessingStrategy().create(muleContext, getLocation().getLocation());
-      ownProcessingStrategy = true;
     } else if (rootContainer instanceof FlowConstruct) {
       if (maxConcurrency != null && rootContainer instanceof Pipeline) {
         ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
@@ -126,7 +124,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
           logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());
         }
         processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
-        ownProcessingStrategy = true;
       } else {
         ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
         if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
@@ -134,11 +131,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
           ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
         }
         processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
-        ownProcessingStrategy = true;
       }
     } else {
       processingStrategy = createDefaultProcessingStrategyFactory().create(getMuleContext(), getLocation().getLocation());
-      ownProcessingStrategy = true;
     }
     if (delegateBuilder == null) {
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
@@ -174,9 +169,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    if (ownProcessingStrategy) {
-      startIfNeeded(processingStrategy);
-    }
+    startIfNeeded(processingStrategy);
 
     sink = processingStrategy
         .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
@@ -208,9 +201,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     disposeIfNeeded(sink, logger);
     sink = null;
 
-    if (ownProcessingStrategy) {
-      stopIfNeeded(processingStrategy);
-    }
+    stopIfNeeded(processingStrategy);
   }
 
   @Override
