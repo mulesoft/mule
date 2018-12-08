@@ -120,7 +120,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
         if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
           ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrency(maxConcurrency);
-          // TODO MULE-XXXXX Review how backpressure should be handled for async
+          // TODO MULE-16194 Review how backpressure should be handled for async
           ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
         } else {
           logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());

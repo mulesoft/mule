@@ -52,11 +52,9 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                         .withName(schedulersNamePrefix + "."
                                                                             + CPU_INTENSIVE.name())),
-                                                                () -> muleContext.getSchedulerService()
-                                                                    .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                                        .withName(schedulersNamePrefix + ".retrySupport")
-                                                                        .withMaxConcurrentTasks(CORES)),
+                                                                () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                                 getMaxConcurrency(),
+                                                                isMaxConcurrencyEagerCheck(),
                                                                 muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
