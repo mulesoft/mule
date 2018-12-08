@@ -128,7 +128,13 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
         ownProcessingStrategy = true;
       } else {
-        processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+        ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
+        if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
+          // TODO MULE-16194 Review how backpressure should be handled for async
+          ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
+        }
+        processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
+        ownProcessingStrategy = true;
       }
     } else {
       processingStrategy = createDefaultProcessingStrategyFactory().create(getMuleContext(), getLocation().getLocation());
