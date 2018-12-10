@@ -63,7 +63,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public void initialise() throws InitialisationException {
-    System.out.println("Initializing UntilSuccessful " + this);
     if (processors == null) {
       throw new InitialisationException(createStaticMessage("One message processor must be configured within 'until-successful'."),
                                         this);
@@ -78,7 +77,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public void dispose() {
-    System.out.println("Disposing UntilSuccessful " + this);
     super.dispose();
     timer.stop();
   }

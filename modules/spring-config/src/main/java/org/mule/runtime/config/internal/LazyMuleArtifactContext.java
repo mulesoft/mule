@@ -210,17 +210,19 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
             applyLifecycleMessageProcessorChainBuilder(object,
                                                        messageProcessorChain -> initialiseIfNeeded(messageProcessorChain,
                                                                                                    muleContext))
-                    .ifPresent(messageProcessorChain -> {
-                      try {
-                        muleContext.getRegistry().registerObject(createdComponentModelName + "_instances", messageProcessorChain.getMessageProcessors());
-                      }
-                      catch (RegistrationException e) {
-                        throw new RuntimeException(e);
-                      }
-                    });
+                                                                                                       .ifPresent(messageProcessorChain -> {
+                                                                                                         try {
+                                                                                                           muleContext
+                                                                                                               .getRegistry()
+                                                                                                               .registerObject(messageProcessorChainInstancesKey(createdComponentModelName),
+                                                                                                                               messageProcessorChain
+                                                                                                                                   .getMessageProcessors());
+                                                                                                         } catch (RegistrationException e) {
+                                                                                                           throw new RuntimeException(e);
+                                                                                                         }
+                                                                                                       });
             muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
-          }
-          catch (MuleException e) {
+          } catch (MuleException e) {
             throw new RuntimeException(e);
           }
         }
@@ -230,7 +232,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
             if (object instanceof MessageProcessorChainBuilder) {
-              startIfNeeded(muleContext.getRegistry().get(createdComponentModelName + "_instances"));
+              startIfNeeded(muleContext.getRegistry().get(messageProcessorChainInstancesKey(createdComponentModelName)));
             }
             muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
           } catch (MuleException e) {
@@ -289,7 +291,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   public Optional<ComponentModelInitializerAdapter> getParentComponentModelInitializerAdapter(
                                                                                               boolean applyStartPhase) {
     return parentComponentModelInitializer
-            .map(componentModelInitializer -> componentModelPredicate1 -> componentModelInitializer
+        .map(componentModelInitializer -> componentModelPredicate1 -> componentModelInitializer
             .initializeComponents(componentModelPredicate1, applyStartPhase));
   }
 
@@ -384,17 +386,16 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       beanNames.forEach(beanName -> {
         try {
           getRegistry().lookupByName(beanName)
-                  .ifPresent(object -> {
-                    if (object instanceof MessageProcessorChainBuilder) {
-                      disposeIfNeeded(muleContext.getRegistry().get(beanName + "_instances"), LOGGER);
-                      try {
-                        unregisterObject(muleContext, beanName + "_instances");
-                      }
-                      catch (RegistrationException e) {
-                        throw new RuntimeException(e);
-                      }
-                    }
-                  });
+              .ifPresent(object -> {
+                if (object instanceof MessageProcessorChainBuilder) {
+                  disposeIfNeeded(muleContext.getRegistry().get(messageProcessorChainInstancesKey(beanName)), LOGGER);
+                  try {
+                    unregisterObject(muleContext, messageProcessorChainInstancesKey(beanName));
+                  } catch (RegistrationException e) {
+                    throw new RuntimeException(e);
+                  }
+                }
+              });
           unregisterObject(muleContext, beanName);
         } catch (Exception e) {
           logger
@@ -407,6 +408,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       });
     }
     removeFromComponentLocator(beanNames);
+  }
+
+  private String messageProcessorChainInstancesKey(String componentName) {
+    return componentName + "_" + componentName.hashCode();
   }
 
   private void removeFromComponentLocator(List<String> locations) {
