@@ -12,21 +12,17 @@ import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
-
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-
-import org.mockito.Mockito;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -37,6 +33,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import javax.activation.DataHandler;
+
+import org.mockito.Mockito;
 
 /**
  * Provides a fluent API for building events for testing.
@@ -56,8 +54,6 @@ public class TestEventBuilder {
   private ItemSequenceInfo itemSequenceInfo;
 
   private Map<String, TypedValue> variables = new HashMap<>();
-
-  private ReplyToHandler replyToHandler;
 
   private Function<Message, Message> spyMessage = input -> input;
   private Function<CoreEvent, CoreEvent> spyEvent = input -> input;
@@ -235,19 +231,6 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@link ReplyToHandler}.
-   *
-   * @return this {@link TestEventBuilder}
-   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-   */
-  @Deprecated
-  public TestEventBuilder withReplyToHandler(ReplyToHandler replyToHandler) {
-    this.replyToHandler = replyToHandler;
-
-    return this;
-  }
-
-  /**
    * Will spy the built {@link Message} and {@link CoreEvent}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link TestEventBuilder}
@@ -291,7 +274,7 @@ public class TestEventBuilder {
     }
 
     CoreEvent.Builder builder = InternalEvent.builder(eventContext)
-        .message(spyMessage.apply(muleMessage)).replyToHandler(replyToHandler).itemSequenceInfo(ofNullable(itemSequenceInfo));
+        .message(spyMessage.apply(muleMessage)).itemSequenceInfo(ofNullable(itemSequenceInfo));
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }
