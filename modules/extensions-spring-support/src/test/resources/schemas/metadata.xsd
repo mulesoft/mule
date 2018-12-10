@@ -151,6 +151,8 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="optional" name="user"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="password"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
