@@ -148,15 +148,17 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
     final protected int subscribers;
     final protected WaitStrategy waitStrategy;
     final protected int maxConcurrency;
+    final protected boolean maxConcurrencyEagerCheck;
     final private ClassLoader executionClassloader;
 
     protected AbstractStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
-                                               String waitStrategy, int maxConcurrency) {
+                                               String waitStrategy, int maxConcurrency, boolean maxConcurrencyEagerCheck) {
       this.subscribers = requireNonNull(subscribers);
       this.waitStrategy = valueOf(waitStrategy);
       this.bufferSize = requireNonNull(bufferSize);
       this.ringBufferSchedulerSupplier = requireNonNull(ringBufferSchedulerSupplier);
       this.maxConcurrency = requireNonNull(maxConcurrency);
+      this.maxConcurrencyEagerCheck = maxConcurrencyEagerCheck;
       this.executionClassloader = currentThread().getContextClassLoader();
     }
 
