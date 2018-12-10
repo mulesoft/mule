@@ -49,7 +49,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
                                                  () -> muleContext.getSchedulerService()
                                                      .ioScheduler(muleContext.getSchedulerBaseConfig()
                                                          .withName(schedulersNamePrefix + "." + BLOCKING.name())),
-                                                 getMaxConcurrency());
+                                                 getMaxConcurrency(), isMaxConcurrencyEagerCheck());
   }
 
   @Override
@@ -61,13 +61,13 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
 
     private final Supplier<Scheduler> blockingSchedulerSupplier;
     private Scheduler blockingScheduler;
-    private List<Sink> sinkList = new ArrayList<>();
+    private final List<Sink> sinkList = new ArrayList<>();
 
     protected WorkQueueStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize,
                                                 int subscribers,
                                                 String waitStrategy, Supplier<Scheduler> blockingSchedulerSupplier,
-                                                int maxConcurrency) {
-      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency);
+                                                int maxConcurrency, boolean maxConcurrencyEagerCheck) {
+      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency, maxConcurrencyEagerCheck);
       this.blockingSchedulerSupplier = requireNonNull(blockingSchedulerSupplier);
     }
 

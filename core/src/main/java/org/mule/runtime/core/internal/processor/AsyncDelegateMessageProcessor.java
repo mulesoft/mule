@@ -38,11 +38,13 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -82,12 +84,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private boolean ownProcessingStrategy = false;
   private ProcessingStrategy processingStrategy;
 
   private Sink sink;
 
-  private MessageProcessorChainBuilder delegateBuilder;
+  private final MessageProcessorChainBuilder delegateBuilder;
   protected MessageProcessorChain delegate;
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
@@ -109,12 +110,15 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                                                  this.getLocation().getRootContainerName())) {
       // This is for the case of the async inside a sub-flow
       processingStrategy = defaultProcessingStrategy().create(muleContext, getLocation().getLocation());
-      ownProcessingStrategy = true;
     } else if (rootContainer instanceof FlowConstruct) {
-      processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+      ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
+      if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
+        // TODO MULE-16194 Review how backpressure should be handled for async
+        ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
+      }
+      processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
     } else {
       processingStrategy = createDefaultProcessingStrategyFactory().create(getMuleContext(), getLocation().getLocation());
-      ownProcessingStrategy = true;
     }
     if (delegateBuilder == null) {
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
@@ -150,9 +154,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    if (ownProcessingStrategy) {
-      startIfNeeded(processingStrategy);
-    }
+    startIfNeeded(processingStrategy);
 
     sink = processingStrategy
         .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
@@ -184,9 +186,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     disposeIfNeeded(sink, logger);
     sink = null;
 
-    if (ownProcessingStrategy) {
-      stopIfNeeded(processingStrategy);
-    }
+    stopIfNeeded(processingStrategy);
   }
 
   @Override

@@ -30,12 +30,14 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -73,12 +75,10 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                 () -> muleContext.getSchedulerService()
                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                         .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                () -> muleContext.getSchedulerService()
-                                                    .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                        .withName(schedulersNamePrefix + ".retrySupport")
-                                                        .withMaxConcurrentTasks(CORES)),
+                                                () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                 resolveParallelism(),
-                                                getMaxConcurrency());
+                                                getMaxConcurrency(),
+                                                isMaxConcurrencyEagerCheck());
   }
 
   @Override
@@ -109,6 +109,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
   static class ProactorStreamProcessingStrategy extends ReactorStreamProcessingStrategy {
 
+    private final AtomicInteger inFlightEvents = new AtomicInteger();
+    private final BiConsumer<CoreEvent, Throwable> IN_FLIGHT_DECREMENT_CALLBACK = (e, t) -> inFlightEvents.decrementAndGet();
+
     private final class ProactorSinkWrapper<E> implements ReactorSink<E> {
 
       private final ReactorSink<E> innerSink;
@@ -119,7 +122,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
       @Override
       public final void accept(CoreEvent event) {
-        if (retryingCounter.get() > 0) {
+        if (!checkCapacity(event)) {
           throw new RejectedExecutionException();
         }
         innerSink.accept(event);
@@ -127,10 +130,25 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
       @Override
       public final boolean emit(CoreEvent event) {
+        return checkCapacity(event) && innerSink.emit(event);
+      }
+
+      private boolean checkCapacity(CoreEvent event) {
         if (retryingCounter.get() > 0) {
           return false;
         }
-        return innerSink.emit(event);
+        if (maxConcurrencyEagerCheck) {
+          if (inFlightEvents.incrementAndGet() > maxConcurrency) {
+            inFlightEvents.decrementAndGet();
+            return false;
+          }
+
+          // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
+          // an async, for instance)
+          ((BaseEventContext) event.getContext()).onResponse(IN_FLIGHT_DECREMENT_CALLBACK);
+        }
+
+        return true;
       }
 
       @Override
@@ -165,11 +183,11 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                             Supplier<Scheduler> retrySupportSchedulerSupplier,
                                             int parallelism,
-                                            int maxConcurrency)
+                                            int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism,
-            maxConcurrency);
+            maxConcurrency, maxConcurrencyEagerCheck);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
       this.retrySupportSchedulerSupplier = retrySupportSchedulerSupplier;

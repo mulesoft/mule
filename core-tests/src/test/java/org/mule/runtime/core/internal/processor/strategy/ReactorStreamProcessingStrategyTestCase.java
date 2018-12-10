@@ -51,7 +51,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
                                                DEFAULT_WAIT_STRATEGY,
                                                () -> cpuLight,
                                                CORES,
-                                               MAX_VALUE);
+                                               MAX_VALUE, true);
   }
 
   @Test
@@ -66,7 +66,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
                                                                                             DEFAULT_WAIT_STRATEGY,
                                                                                             () -> cpuLight,
                                                                                             CORES,
-                                                                                            1)),
+                                                                                            1, true)),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
@@ -86,7 +86,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
                                                                                             DEFAULT_WAIT_STRATEGY,
                                                                                             () -> cpuLight,
                                                                                             CORES,
-                                                                                            2)),
+                                                                                            2, true)),
                        true, CPU_LITE, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));

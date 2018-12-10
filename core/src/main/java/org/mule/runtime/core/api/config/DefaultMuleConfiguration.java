@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -29,6 +30,10 @@ import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -38,10 +43,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext. TODO
@@ -146,7 +147,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * List of extensions defined in the configuration element at the application.
    */
-  private List<ConfigurationExtension> extensions = new ArrayList<>();
+  private final List<ConfigurationExtension> extensions = new ArrayList<>();
 
   /**
    * The instance of {@link ObjectSerializer} to use by default
@@ -290,7 +291,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       disableTimeouts = Boolean.valueOf(p);
     }
     try {
-      String name = ProcessingStrategyFactory.class.getName();
       p = getProperty(ProcessingStrategyFactory.class.getName());
       if (p != null) {
         defaultProcessingStrategyFactory = (ProcessingStrategyFactory) instantiateClass(p);

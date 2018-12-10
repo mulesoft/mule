@@ -8,10 +8,10 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
 
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
 
 /**
  * Abstract {@link AsyncProcessingStrategyFactory} implementation that supports the configuration of maximum concurrency.
@@ -21,6 +21,7 @@ import org.mule.runtime.api.scheduler.SchedulerConfig;
 public abstract class AbstractProcessingStrategyFactory implements AsyncProcessingStrategyFactory {
 
   private int maxConcurrency = DEFAULT_MAX_CONCURRENCY;
+  private boolean maxConcurrencyEagerCheck = true;
 
   /**
    * Configures the maximum concurrency permitted. This will typically be used to limit the number of concurrent blocking tasks
@@ -39,11 +40,20 @@ public abstract class AbstractProcessingStrategyFactory implements AsyncProcessi
   /**
    * The maximum concurrency permitted. This will typically be used to limit the number of concurrent blocking tasks using the IO
    * pool, but will also limit the number of CPU_LIGHT threads in used concurrently.
-   * 
+   *
    * @return the maximum concurrency
    */
   protected int getMaxConcurrency() {
     return maxConcurrency;
+  }
+
+  @Override
+  public void setMaxConcurrencyEagerCheck(boolean maxConcurrencyEagerCheck) {
+    this.maxConcurrencyEagerCheck = maxConcurrencyEagerCheck;
+  }
+
+  public boolean isMaxConcurrencyEagerCheck() {
+    return maxConcurrencyEagerCheck;
   }
 
   protected SchedulerConfig createSchedulerConfig(MuleContext muleContext, String schedulersNamePrefix,
