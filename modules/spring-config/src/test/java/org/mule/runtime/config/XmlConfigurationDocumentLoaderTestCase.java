@@ -10,11 +10,11 @@ package org.mule.runtime.config;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
@@ -53,7 +53,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
   @Test
   public void testWellformedXml() {
     final Document document = getDocument("mule-config.xml");
-    assertThat(document, not(isNull()));
+    assertThat(document, not(nullValue()));
     assertThat(document.getDocumentElement().getNodeName(), is("mule"));
     assertThat(document.getDocumentElement().getChildNodes().getLength(), is(3));
 
@@ -107,7 +107,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
 
     // Validates that the DOM was properly parsed even when it was non-XSD valid
     final Document document = getDocument("mule-config-malformed.xml", xmlConfigurationDocumentLoader);
-    assertThat(document, not(isNull()));
+    assertThat(document, not(nullValue()));
     assertThat(document.getDocumentElement().getNodeName(), is("mule"));
     assertThat(document.getDocumentElement().getChildNodes().getLength(), is(3));
 

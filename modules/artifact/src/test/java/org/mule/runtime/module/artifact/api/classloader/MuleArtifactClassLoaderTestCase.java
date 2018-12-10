@@ -14,7 +14,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
-import static org.powermock.api.mockito.PowerMockito.spy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -35,7 +34,7 @@ public class MuleArtifactClassLoaderTestCase extends AbstractMuleTestCase {
   private final URL testsJarLocation;
 
   public MuleArtifactClassLoaderTestCase() {
-    apiLocation = spy(getResource("com/organization/test-artifact/1.0.0/test-artifact-1.0.0-raml.zip", this.getClass()));
+    apiLocation = getResource("com/organization/test-artifact/1.0.0/test-artifact-1.0.0-raml.zip", this.getClass());
     apiLibraryLocation =
         getResource("com/organization/test-artifact/1.0.0/test-artifact-1.0.0-raml-fragment.zip", this.getClass());
     jarLocation = getResource("com/organization/test-artifact/1.0.0/test-artifact-1.0.0.jar", this.getClass());

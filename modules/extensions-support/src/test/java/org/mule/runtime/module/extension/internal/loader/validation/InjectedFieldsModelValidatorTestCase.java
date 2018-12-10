@@ -54,7 +54,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
   @Mock

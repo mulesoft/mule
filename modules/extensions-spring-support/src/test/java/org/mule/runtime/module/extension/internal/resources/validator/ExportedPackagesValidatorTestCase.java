@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
@@ -56,7 +57,7 @@ public class ExportedPackagesValidatorTestCase {
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
   @Before
@@ -133,7 +134,7 @@ public class ExportedPackagesValidatorTestCase {
   }
 
   private OutputModel mockOutputModel(Type type) {
-    OutputModel om = mock(OutputModel.class);
+    OutputModel om = mock(OutputModel.class, withSettings().lenient());
     when(om.getType()).thenReturn(loader.load(type));
     return om;
   }
@@ -145,7 +146,7 @@ public class ExportedPackagesValidatorTestCase {
   }
 
   private OperationModel mockOperationModel(OutputModel output, OutputModel attributes, ParameterModel... params) {
-    OperationModel op = mock(OperationModel.class);
+    OperationModel op = mock(OperationModel.class, withSettings().lenient());
     when(op.getOutput()).thenReturn(output);
     when(op.getOutputAttributes()).thenReturn(attributes);
     if (params != null) {

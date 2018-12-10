@@ -52,7 +52,7 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
 
   public static final String PROVIDER_NAME = "providerName";
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionManager parentExtensionManager;
 
   @Mock(extraInterfaces = Lifecycle.class)

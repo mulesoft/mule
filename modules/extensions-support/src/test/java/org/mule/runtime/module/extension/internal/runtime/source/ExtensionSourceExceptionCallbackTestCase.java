@@ -78,8 +78,9 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
   public void onException() {
     callback.onException(exception);
     verify(responseCallback).responseSentWithFailure(
-        argThat(e -> e.getRootCause().equals(exception)),
-        argThat(event -> event.getError().isPresent() && event.getError().get().getErrorType().equals(errorType)));
+                                                     argThat(e -> e.getRootCause().equals(exception)),
+                                                     argThat(event -> event.getError().isPresent()
+                                                         && event.getError().get().getErrorType().equals(errorType)));
   }
 
   @Test

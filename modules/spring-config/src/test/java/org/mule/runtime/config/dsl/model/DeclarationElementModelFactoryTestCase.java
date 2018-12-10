@@ -13,6 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
@@ -168,14 +169,14 @@ public class DeclarationElementModelFactoryTestCase extends AbstractDslModelTest
   @Test
   public void testConfigNoConnectionNoParams() {
 
-    ConfigurationModel emptyConfig = mock(ConfigurationModel.class);
+    ConfigurationModel emptyConfig = mock(ConfigurationModel.class, withSettings().lenient());
     when(emptyConfig.getName()).thenReturn(CONFIGURATION_NAME);
     when(emptyConfig.getParameterGroupModels()).thenReturn(emptyList());
     when(emptyConfig.getOperationModels()).thenReturn(emptyList());
     when(emptyConfig.getSourceModels()).thenReturn(emptyList());
     when(emptyConfig.getConnectionProviders()).thenReturn(emptyList());
 
-    ExtensionModel extensionModel = mock(ExtensionModel.class);
+    ExtensionModel extensionModel = mock(ExtensionModel.class, withSettings().lenient());
     initializeExtensionMock(extensionModel);
     when(extensionModel.getConfigurationModels()).thenReturn(asList(emptyConfig));
 

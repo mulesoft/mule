@@ -71,37 +71,37 @@ public abstract class AbstractDslModelTestCase {
   protected static final String ITEM_VALUE = "itemValue";
   protected static final String ITEM_NAME = "list-name-item";
 
-  @Mock
+  @Mock(lenient = true)
   protected ExtensionModel mockExtension;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConfigurationModel configuration;
 
-  @Mock
+  @Mock(lenient = true)
   protected OperationModel operation;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConnectionProviderModel connectionProvider;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel contentParameter;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel behaviourParameter;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel listParameter;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterGroupModel parameterGroupModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected SourceModel source;
 
-  @Mock
+  @Mock(lenient = true)
   protected DslResolvingContext dslContext;
 
-  @Mock
+  @Mock(lenient = true)
   protected TypeCatalog typeCatalog;
 
   protected ObjectType complexType;

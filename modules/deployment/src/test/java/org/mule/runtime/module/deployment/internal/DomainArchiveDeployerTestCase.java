@@ -48,19 +48,26 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  @Mock
+
+  @Mock(lenient = true)
   private ArchiveDeployer<Domain> mockDomainDeployer;
-  @Mock
+
+  @Mock(lenient = true)
   private Domain mockDomain;
-  @Mock
+
+  @Mock(lenient = true)
   private ArchiveDeployer<Application> mockApplicationDeployer;
-  @Mock
+
+  @Mock(lenient = true)
   private DeploymentService mockDeploymentService;
-  @Mock
+
+  @Mock(lenient = true)
   private Application mockApplication1;
-  @Mock
+
+  @Mock(lenient = true)
   private Application mockApplication2;
-  @Mock
+
+  @Mock(lenient = true)
   private ArtifactDeployer<Application> mockApplicationArtifactDeployer;
 
   private File domainsFolder;
@@ -143,6 +150,6 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
     assertThat(FileUtils.createFile(new File(domainsFolder,
                                              DOMAIN_NAME + File.separator + DomainArchiveDeployer.DOMAIN_BUNDLE_APPS_FOLDER
                                                  + File.separator + appName + JAR_FILE_EXTENSION).getAbsolutePath())
-        .exists(), is(true));
+                   .exists(), is(true));
   }
 }
