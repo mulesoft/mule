@@ -150,6 +150,6 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
     assertThat(FileUtils.createFile(new File(domainsFolder,
                                              DOMAIN_NAME + File.separator + DomainArchiveDeployer.DOMAIN_BUNDLE_APPS_FOLDER
                                                  + File.separator + appName + JAR_FILE_EXTENSION).getAbsolutePath())
-                   .exists(), is(true));
+        .exists(), is(true));
   }
 }
