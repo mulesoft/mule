@@ -85,12 +85,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private boolean ownProcessingStrategy = false;
   private ProcessingStrategy processingStrategy;
 
   private Sink sink;
 
-  private MessageProcessorChainBuilder delegateBuilder;
+  private final MessageProcessorChainBuilder delegateBuilder;
   protected MessageProcessorChain delegate;
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
@@ -113,24 +112,28 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                                                  this.getLocation().getRootContainerName())) {
       // This is for the case of the async inside a sub-flow
       processingStrategy = defaultProcessingStrategy().create(muleContext, getLocation().getLocation());
-      ownProcessingStrategy = true;
     } else if (rootContainer instanceof FlowConstruct) {
       if (maxConcurrency != null && rootContainer instanceof Pipeline) {
         ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
 
         if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
           ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrency(maxConcurrency);
+          // TODO MULE-16194 Review how backpressure should be handled for async
+          ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
         } else {
           logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());
         }
         processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
-        ownProcessingStrategy = true;
       } else {
-        processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+        ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
+        if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
+          // TODO MULE-16194 Review how backpressure should be handled for async
+          ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
+        }
+        processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
       }
     } else {
       processingStrategy = createDefaultProcessingStrategyFactory().create(getMuleContext(), getLocation().getLocation());
-      ownProcessingStrategy = true;
     }
     if (delegateBuilder == null) {
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
@@ -166,9 +169,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    if (ownProcessingStrategy) {
-      startIfNeeded(processingStrategy);
-    }
+    startIfNeeded(processingStrategy);
 
     sink = processingStrategy
         .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
@@ -200,9 +201,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     disposeIfNeeded(sink, logger);
     sink = null;
 
-    if (ownProcessingStrategy) {
-      stopIfNeeded(processingStrategy);
-    }
+    stopIfNeeded(processingStrategy);
   }
 
   @Override

@@ -52,11 +52,9 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                         .withName(schedulersNamePrefix + "."
                                                                             + CPU_INTENSIVE.name())),
-                                                                () -> muleContext.getSchedulerService()
-                                                                    .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                                        .withName(schedulersNamePrefix + ".retrySupport")
-                                                                        .withMaxConcurrentTasks(CORES)),
+                                                                () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                                 getMaxConcurrency(),
+                                                                isMaxConcurrencyEagerCheck(),
                                                                 muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
@@ -75,12 +73,13 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                      Supplier<Scheduler> blockingSchedulerSupplier,
                                                      Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                      Supplier<Scheduler> retrySupportSchedulerSupplier,
-                                                     int maxConcurrency, boolean isThreadLoggingEnabled)
+                                                     int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                                     boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, CORES, maxConcurrency,
-            isThreadLoggingEnabled);
+            maxConcurrencyEagerCheck, isThreadLoggingEnabled);
     }
 
     TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
@@ -91,11 +90,12 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                      Supplier<Scheduler> blockingSchedulerSupplier,
                                                      Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                      Supplier<Scheduler> retrySupportSchedulerSupplier,
-                                                     int maxConcurrency)
+                                                     int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, maxConcurrency, false);
+           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, maxConcurrency,
+           maxConcurrencyEagerCheck, false);
     }
 
     @Override

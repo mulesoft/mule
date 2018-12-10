@@ -42,7 +42,7 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends W
                                                                  1,
                                                                  DEFAULT_WAIT_STRATEGY,
                                                                  () -> blocking,
-                                                                 4);
+                                                                 4, true);
   }
 
   @Override
