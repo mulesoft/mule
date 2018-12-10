@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -23,35 +22,35 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExecutionContextAdapter operationContext;
 
-  @Mock
+  @Mock(lenient = true)
   private ConfigurationInstance configurationInstance;
 
-  @Mock
+  @Mock(lenient = true)
   private PetStoreConnector config;
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionConnectionSupplier connectionSupplier;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ConnectionHandler connectionHandler;
 
   private ConnectionInterceptor interceptor;

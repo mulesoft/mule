@@ -35,7 +35,7 @@ import reactor.core.publisher.Mono;
 @RunWith(MockitoJUnitRunner.class)
 public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTestCase {
 
-  @Mock
+  @Mock(lenient = true)
   private MessageProcessorChain messageProcessor;
 
   @Mock

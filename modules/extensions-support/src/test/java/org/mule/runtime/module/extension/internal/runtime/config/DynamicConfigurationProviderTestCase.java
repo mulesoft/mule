@@ -31,7 +31,6 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -51,6 +50,11 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.HashMap;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,11 +64,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.HashMap;
-import java.util.List;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -78,7 +77,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   @Mock
   private ResolverSet resolverSet;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)

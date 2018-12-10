@@ -76,7 +76,6 @@ public class ClusterSupportEnricherTestCase extends AbstractMuleTestCase {
     when(sourceDeclaration.getParameterGroup(DEFAULT_GROUP_NAME)).thenReturn(parameterGroup);
     when(sourceDeclaration.getSuccessCallback()).thenReturn(empty());
     when(sourceDeclaration.getErrorCallback()).thenReturn(empty());
-    when(sourceDeclaration.getBackPressureCallback()).thenReturn(empty());
   }
 
   @Test

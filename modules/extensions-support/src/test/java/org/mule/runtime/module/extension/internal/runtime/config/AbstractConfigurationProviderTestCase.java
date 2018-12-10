@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -22,6 +21,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
+import java.util.Map;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,24 +30,22 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Map;
-
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase {
 
   protected static final String CONFIG_NAME = "config";
 
-  @Mock
+  @Mock(lenient = true)
   protected ExtensionModel extensionModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected ConfigurationModel configurationModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected DefaultExecutionContext operationContext;
 
-  @Mock
+  @Mock(lenient = true)
   protected CoreEvent event;
 
   protected TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());

@@ -43,7 +43,7 @@ public class PrivilegedApiValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
   }
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
 
   private PrivilegedApiValidator validator = new PrivilegedApiValidator();

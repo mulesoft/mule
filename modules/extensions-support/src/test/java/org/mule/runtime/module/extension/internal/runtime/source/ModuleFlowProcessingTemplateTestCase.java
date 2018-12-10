@@ -53,7 +53,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
   @Mock
   private SourceCompletionHandler completionHandler;
 
-  @Mock
+  @Mock(lenient = true)
   private MessagingException messagingException;
 
   @Mock

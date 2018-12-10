@@ -28,7 +28,6 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVIT
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -46,6 +45,8 @@ import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,8 +54,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -92,13 +91,13 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
       newError("CUSTOM", MULE)
           .withParent(newError(ANY, MULE).build()).build();
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationWithError;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationWithoutErrors;
 
   @Rule

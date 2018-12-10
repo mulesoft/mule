@@ -44,16 +44,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ParameterPluralNameModelValidatorTestCase extends AbstractMuleTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ParameterModel validParameterModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ParameterModel invalidParameterModel;
 
   private ParameterPluralNameModelValidator validator = new ParameterPluralNameModelValidator();

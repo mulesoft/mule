@@ -40,16 +40,16 @@ public class DeprecationModelValidatorTestCase extends AbstractMuleTestCase {
 
   private DeprecationModelValidator validator = new DeprecationModelValidator();
 
-  @Mock
+  @Mock(lenient = true)
   private ParameterModel parameterModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ParameterGroupModel parameterGroupModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
   @Before

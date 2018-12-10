@@ -48,7 +48,6 @@ public class OperationParametersTypeModelValidatorTestCase extends AbstractMuleT
 
   @Before
   public void before() {
-    when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(parameterModel.getName()).thenReturn("parameterName");
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));

@@ -48,7 +48,6 @@ public class ComponentLocationModelValidatorTestCase extends AbstractMuleTestCas
 
   @Before
   public void before() {
-    when(extensionModel.getName()).thenReturn("test");
     when(extensionModel.getSourceModels()).thenReturn(singletonList(sourceModel));
     when(sourceModel.getSuccessCallback()).thenReturn(empty());
     when(sourceModel.getErrorCallback()).thenReturn(empty());

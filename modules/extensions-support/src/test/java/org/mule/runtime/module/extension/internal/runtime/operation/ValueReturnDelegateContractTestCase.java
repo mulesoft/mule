@@ -76,7 +76,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
   public static final String HELLO_WORLD_MSG = "Hello world!";
 
-  @Mock
+  @Mock(lenient = true)
   protected ExecutionContextAdapter operationContext;
 
   @Mock
@@ -87,7 +87,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Mock
   protected Object attributes;
 
-  @Mock
+  @Mock(lenient = true)
   protected OutputModel outputModel;
 
   @Mock

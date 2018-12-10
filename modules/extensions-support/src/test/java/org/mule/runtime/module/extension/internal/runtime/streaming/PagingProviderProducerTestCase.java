@@ -54,7 +54,6 @@ public class PagingProviderProducerTestCase {
 
   @Before
   public void setUp() throws MuleException {
-    when(config.getValue()).thenReturn("config");
     ConnectionHandler handler = mock(ConnectionHandler.class);
     when(handler.getConnection()).thenReturn(new Object());
     when(extensionConnectionSupplier.getConnection(executionContext)).thenReturn(handler);

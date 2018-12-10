@@ -17,13 +17,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
@@ -40,7 +40,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -102,6 +101,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -109,10 +112,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
@@ -122,85 +121,86 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected static final String OPERATION_NAME = "operation";
   protected static final String TARGET_VAR = "myFlowVar";
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected ExtensionModel extensionModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected ConfigurationModel configurationModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected OperationModel operationModel;
 
-  @Mock
+  @Mock(lenient = true)
   protected ExtensionManager extensionManager;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConnectionManagerAdapter connectionManagerAdapter;
-  @Mock
+
+  @Mock(lenient = true)
   protected ComponentExecutorFactory operationExecutorFactory;
 
-  @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class})
+  @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class}, lenient = true)
   protected ComponentExecutor operationExecutor;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected ResolverSet resolverSet;
 
-  @Mock
+  @Mock(lenient = true)
   protected ResolverSetResult parameters;
 
   protected CoreEvent event;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected InternalMessage message;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected MuleContextWithRegistry context;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConfigurationInstance configurationInstance;
 
-  @Mock
+  @Mock(lenient = true)
   protected Object configuration;
 
-  @Mock
+  @Mock(lenient = true)
   protected ExceptionHandlerFactory exceptionHandlerFactory;
 
-  @Mock
+  @Mock(lenient = true)
   protected MetadataResolverFactory metadataResolverFactory;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConnectionProviderWrapper connectionProviderWrapper;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel contentMock;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel keyParamMock;
 
-  @Mock
+  @Mock(lenient = true)
   protected OutputModel outputMock;
 
-  @Mock
+  @Mock(lenient = true)
   protected StringType stringType;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConfigurationProvider configurationProvider;
 
   protected ParameterGroupModel parameterGroupModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected PolicyManager mockPolicyManager;
 
-  @Mock
+  @Mock(lenient = true)
   private ExecutionContextAdapter<OperationModel> executionContext;
 
-  @Mock
+  @Mock(lenient = true)
   private MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
 
-  @Mock
+  @Mock(lenient = true)
   private MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
 
-  @Mock
+  @Mock(lenient = true)
   private MetadataCacheManager metadataCacheManager;
 
   protected OperationMessageProcessor messageProcessor;

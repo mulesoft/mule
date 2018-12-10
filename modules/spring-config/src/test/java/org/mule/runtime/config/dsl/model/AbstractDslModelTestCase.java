@@ -42,6 +42,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,6 @@ import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.mockito.Mock;
-import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
 public abstract class AbstractDslModelTestCase {
 
@@ -148,7 +148,7 @@ public abstract class AbstractDslModelTestCase {
     when(parameterGroupModel.getParameterModels()).thenReturn(defaultGroupParameterModels);
     when(parameterGroupModel.getParameter(anyString()))
         .then(invocation -> {
-          String paramName = invocation.getArgumentAt(0, String.class);
+          String paramName = invocation.getArgument(0);
           switch (paramName) {
             case CONTENT_NAME:
               return Optional.of(contentParameter);

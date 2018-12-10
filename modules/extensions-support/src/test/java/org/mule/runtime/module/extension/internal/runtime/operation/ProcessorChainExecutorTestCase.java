@@ -41,7 +41,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase {
 
-  @Mock
+  @Mock(lenient = true)
   private MessageProcessorChain chain;
 
   @Mock

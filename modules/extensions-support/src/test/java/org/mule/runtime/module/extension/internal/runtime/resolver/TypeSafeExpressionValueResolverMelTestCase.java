@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -129,7 +130,7 @@ public class TypeSafeExpressionValueResolverMelTestCase extends AbstractMuleCont
   }
 
   private void verifyExpressionManager(VerificationMode mode) {
-    verify(expressionManager, mode).parse(anyString(), any(CoreEvent.class), any(ComponentLocation.class));
+    verify(expressionManager, mode).parse(anyString(), any(CoreEvent.class), nullable(ComponentLocation.class));
   }
 
   private <T> ValueResolver<T> getResolver(String expression, MetadataType expectedType) throws Exception {

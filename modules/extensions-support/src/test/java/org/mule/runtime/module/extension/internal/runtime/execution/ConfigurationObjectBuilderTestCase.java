@@ -55,7 +55,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
     return resolverSet;
   }
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ConfigurationModel configurationModel;
 
   @Mock

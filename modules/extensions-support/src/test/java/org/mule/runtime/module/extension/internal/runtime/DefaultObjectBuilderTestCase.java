@@ -46,7 +46,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   @Mock
   private CoreEvent event;
 
-  @Mock
+  @Mock(lenient = true)
   private ValueResolvingContext resolvingContext;
 
   @Mock

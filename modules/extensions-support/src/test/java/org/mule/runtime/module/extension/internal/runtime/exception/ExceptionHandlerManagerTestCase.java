@@ -39,10 +39,10 @@ public class ExceptionHandlerManagerTestCase {
 
   private static final String ERROR_MESSAGE = "ERROR MESSAGE";
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   private SourceModel sourceModel;
 
   @Mock

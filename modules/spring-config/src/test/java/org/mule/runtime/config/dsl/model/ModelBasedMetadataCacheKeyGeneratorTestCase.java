@@ -531,7 +531,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     when(parameterGroupModel.getParameterModels()).thenReturn(parameterModels);
     when(parameterGroupModel.getParameter(anyString()))
         .then(invocation -> {
-          String paramName = invocation.getArgumentAt(0, String.class);
+          String paramName = invocation.getArgument(0);
           switch (paramName) {
             case CONTENT_NAME:
               return Optional.of(contentParameter);
@@ -567,7 +567,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     when(metadataKeyIdGroup.getParameterModels()).thenReturn(partParameterModels);
     when(metadataKeyIdGroup.getParameter(anyString()))
         .then(invocation -> {
-          String paramName = invocation.getArgumentAt(0, String.class);
+          String paramName = invocation.getArgument(0);
           switch (paramName) {
             case METADATA_KEY_PART_1:
               return Optional.of(partOne);

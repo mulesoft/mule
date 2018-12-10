@@ -31,7 +31,6 @@ import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -58,6 +57,12 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,13 +72,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.verification.VerificationMode;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -91,13 +89,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExecutionContextAdapter operationContext;
 
-  @Mock(extraInterfaces = Interceptable.class)
+  @Mock(extraInterfaces = Interceptable.class, lenient = true)
   private ConfigurationInstance configurationInstance;
 
   @Mock
   private MutableConfigurationStats configurationStats;
 
-  @Mock(extraInterfaces = Interceptable.class)
+  @Mock(extraInterfaces = Interceptable.class, lenient = true)
   private ComponentExecutor operationExecutor;
 
   @Mock
@@ -121,7 +119,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Mock
   private ConfigurationModel configurationModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
   @Mock

@@ -41,9 +41,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -106,45 +104,45 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private static final String EXTENSION1_VERSION = "3.6.0";
   private static final String EXTENSION2_VERSION = "3.6.0";
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel1;
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel2;
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel3WithRepeatedName;
 
   private MuleContextWithRegistry muleContext;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ConfigurationModel extension1ConfigurationModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ConnectionProviderModel connectionProviderModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ConnectionManagerAdapter connectionManagerAdapter;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel extension1OperationModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ExecutionContextAdapter extension1OperationContext;
 
-  @Mock
+  @Mock(lenient = true)
   private ConfigurationProvider extension1ConfigurationProvider;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
-  @Mock
+  @Mock(lenient = true)
   private ComponentExecutorFactory executorFactory;
 
-  @Mock
+  @Mock(lenient = true)
   private ComponentExecutor executor;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private CoreEvent event;
 
   private ClassLoader classLoader;

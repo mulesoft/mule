@@ -28,8 +28,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class StaticValueResolverTestCase extends AbstractMuleTestCase {
 
-
-  @Mock
+  @Mock(lenient = true)
   private ExpressionManager expressionManager;
 
   @Mock
