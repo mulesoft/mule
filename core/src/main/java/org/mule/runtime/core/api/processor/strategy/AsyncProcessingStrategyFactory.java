@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
+
 import org.mule.api.annotation.NoImplement;
 
 /**
@@ -30,4 +31,13 @@ public interface AsyncProcessingStrategyFactory extends ProcessingStrategyFactor
    */
   void setMaxConcurrency(int maxConcurrency);
 
+  /**
+   * Configures whether {@code maxConcurrency} should be enforced when dispatching an event to the pipeline by rejecting it.
+   * <p>
+   * If set to {@code false}, the event will be received but it may be queued or otherwise delayed due to {@code maxConcurrency},
+   * but it will not be rejected.
+   *
+   * @param maxConcurrencyEagerCheck
+   */
+  void setMaxConcurrencyEagerCheck(boolean maxConcurrencyEagerCheck);
 }

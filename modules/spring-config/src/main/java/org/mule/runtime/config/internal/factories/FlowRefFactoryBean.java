@@ -18,7 +18,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
@@ -31,12 +30,15 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -60,7 +62,6 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> implements ApplicationContextAware {
 
@@ -122,14 +123,34 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                            flowRefMessageProcessor);
     }
 
-
     // for subflows, we create a new one so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
         MessageProcessorChainBuilder chainBuilder = (MessageProcessorChainBuilder) referencedFlow;
 
         locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
-            .ifPresent(f -> chainBuilder.setProcessingStrategy(f.getProcessingStrategy()));
+            .ifPresent(f -> {
+              ProcessingStrategy callerFlowPs = f.getProcessingStrategy();
+              chainBuilder.setProcessingStrategy(new ProcessingStrategy() {
+
+                @Override
+                public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
+                  return callerFlowPs.createSink(flowConstruct, pipeline);
+                }
+
+                @Override
+                public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+                  // Do not make any change in `onPipeline`, so it emulates the behavior of copy/pasting the content of the
+                  // sub-flow into the caller flow, without applying any additional logic.
+                  return pipeline;
+                }
+
+                @Override
+                public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+                  return callerFlowPs.onProcessor(processor);
+                }
+              });
+            });
 
         referencedFlow = chainBuilder.build();
       }

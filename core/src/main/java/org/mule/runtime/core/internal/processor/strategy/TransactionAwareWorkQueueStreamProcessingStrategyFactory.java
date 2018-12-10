@@ -11,13 +11,13 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
@@ -46,7 +46,7 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
                                                                  () -> muleContext.getSchedulerService()
                                                                      .ioScheduler(muleContext.getSchedulerBaseConfig()
                                                                          .withName(schedulersNamePrefix + "." + BLOCKING.name())),
-                                                                 getMaxConcurrency());
+                                                                 getMaxConcurrency(), isMaxConcurrencyEagerCheck());
   }
 
   @Override
@@ -60,8 +60,9 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
                                                                 int subscribers,
                                                                 String waitStrategy,
                                                                 Supplier<Scheduler> blockingSchedulerSupplier,
-                                                                int maxConcurrency) {
-      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, blockingSchedulerSupplier, maxConcurrency);
+                                                                int maxConcurrency, boolean maxConcurrencyEagerCheck) {
+      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, blockingSchedulerSupplier, maxConcurrency,
+            maxConcurrencyEagerCheck);
     }
 
     @Override

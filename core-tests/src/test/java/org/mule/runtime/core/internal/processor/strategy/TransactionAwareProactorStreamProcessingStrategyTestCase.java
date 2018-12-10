@@ -46,7 +46,7 @@ public class TransactionAwareProactorStreamProcessingStrategyTestCase extends Pr
                                                                 () -> blocking,
                                                                 () -> cpuIntensive,
                                                                 () -> custom,
-                                                                MAX_VALUE);
+                                                                MAX_VALUE, true);
   }
 
   @Override

@@ -13,11 +13,13 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
@@ -54,6 +56,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -62,6 +65,8 @@ import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -92,13 +97,13 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private static final String DYNAMIC_NON_EXISTANT = "#['nonExistant']";
 
   private CoreEvent result;
-  private ProcessingStrategy callerFlowProcessingStrategy = mock(ProcessingStrategy.class);
-  private Flow callerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
-  private Flow targetFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
-  private MessageProcessorChain targetSubFlow = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
-  private Processor targetSubFlowChild = (Processor) mock(Object.class, INITIALIZABLE_MESSAGE_PROCESSOR);
-  private SubflowMessageProcessorChainBuilder targetSubFlowChainBuilder = spy(new SubflowMessageProcessorChainBuilder());
-  private ApplicationContext applicationContext = mock(ApplicationContext.class);
+  private final ProcessingStrategy callerFlowProcessingStrategy = mock(ProcessingStrategy.class);
+  private final Flow callerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
+  private final Flow targetFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
+  private final MessageProcessorChain targetSubFlow = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
+  private final Processor targetSubFlowChild = (Processor) mock(Object.class, INITIALIZABLE_MESSAGE_PROCESSOR);
+  private final SubflowMessageProcessorChainBuilder targetSubFlowChainBuilder = spy(new SubflowMessageProcessorChainBuilder());
+  private final ApplicationContext applicationContext = mock(ApplicationContext.class);
   private ExtendedExpressionManager expressionManager;
   private MuleContext mockMuleContext;
 
@@ -162,7 +167,26 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     assertThat(targetSubFlow, not(equalTo(getFlowRefProcessor(flowRefFactoryBean))));
 
     verifyProcess(flowRefFactoryBean, targetSubFlowChild, 1);
-    verify(targetSubFlowChainBuilder).setProcessingStrategy(callerFlowProcessingStrategy);
+    verify(targetSubFlowChainBuilder).setProcessingStrategy(argThat(new BaseMatcher<ProcessingStrategy>() {
+
+      @Override
+      public boolean matches(Object item) {
+        ReactiveProcessor pipeline = mock(ReactiveProcessor.class);
+        ReactiveProcessor processor = mock(ReactiveProcessor.class);
+        ProcessingStrategy ps = (ProcessingStrategy) item;
+
+        ps.onProcessor(processor);
+        verify(callerFlowProcessingStrategy).onProcessor(processor);
+        assertThat(ps.onPipeline(pipeline), sameInstance(pipeline));
+        return true;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("The ProcessingStrategy for the referenced sub-flow did changed the pipeline.");
+      }
+
+    }));
   }
 
   @Test
@@ -174,7 +198,26 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     assertNotSame(targetSubFlow, getFlowRefProcessor(flowRefFactoryBean));
 
     verifyProcess(flowRefFactoryBean, targetSubFlowChild, 1);
-    verify(targetSubFlowChainBuilder).setProcessingStrategy(callerFlowProcessingStrategy);
+    verify(targetSubFlowChainBuilder).setProcessingStrategy(argThat(new BaseMatcher<ProcessingStrategy>() {
+
+      @Override
+      public boolean matches(Object item) {
+        ReactiveProcessor pipeline = mock(ReactiveProcessor.class);
+        ReactiveProcessor processor = mock(ReactiveProcessor.class);
+        ProcessingStrategy ps = (ProcessingStrategy) item;
+
+        ps.onProcessor(processor);
+        verify(callerFlowProcessingStrategy).onProcessor(processor);
+        assertThat(ps.onPipeline(pipeline), sameInstance(pipeline));
+        return true;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("The ProcessingStrategy for the referenced sub-flow did changed the pipeline.");
+      }
+
+    }));
   }
 
   @Test

@@ -95,7 +95,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     // Create the final chain using the current tempList after reserve iteration is complete. This temp
     // list contains the first n processors in the chain that are not intercepting.. with processor n+1
     // having been injected as the listener of processor n
-    Processor head = tempList.size() == 1 ? tempList.get(0) : createSimpleChain(tempList, ofNullable(processingStrategy));
+    Processor head = createSimpleChain(tempList, ofNullable(processingStrategy));
     processorsForLifecycle.addFirst(head);
     return createInterceptingChain(head, processors, processorsForLifecycle);
   }
@@ -160,8 +160,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
   protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
 
-    private Processor head;
-    private List<Processor> processorsForLifecycle;
+    private final Processor head;
+    private final List<Processor> processorsForLifecycle;
 
     protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional, Processor head,
                                            List<Processor> processors,

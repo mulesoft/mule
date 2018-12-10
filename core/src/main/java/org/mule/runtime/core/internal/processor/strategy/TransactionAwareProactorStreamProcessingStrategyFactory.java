@@ -52,11 +52,9 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                         .withName(schedulersNamePrefix + "."
                                                                             + CPU_INTENSIVE.name())),
-                                                                () -> muleContext.getSchedulerService()
-                                                                    .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                                        .withName(schedulersNamePrefix + ".retrySupport")
-                                                                        .withMaxConcurrentTasks(CORES)),
-                                                                getMaxConcurrency());
+                                                                () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
+                                                                getMaxConcurrency(),
+                                                                isMaxConcurrencyEagerCheck());
   }
 
   @Override
@@ -74,11 +72,12 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
                                                      Supplier<Scheduler> blockingSchedulerSupplier,
                                                      Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                      Supplier<Scheduler> retrySupportSchedulerSupplier,
-                                                     int maxConcurrency)
+                                                     int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, CORES, maxConcurrency);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, CORES, maxConcurrency,
+            maxConcurrencyEagerCheck);
     }
 
     @Override
