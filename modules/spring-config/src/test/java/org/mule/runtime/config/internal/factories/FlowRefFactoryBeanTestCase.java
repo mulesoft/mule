@@ -106,8 +106,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   @Inject
   private ConfigurationComponentLocator locator;
 
-  public FlowRefFactoryBeanTestCase() throws MuleException {
-  }
+  public FlowRefFactoryBeanTestCase() throws MuleException {}
 
   @Before
   public void setup() throws MuleException {
