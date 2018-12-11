@@ -37,25 +37,29 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareProactorStreamWorkQueueProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
-                                                                getBufferSize(),
-                                                                getSubscriberCount(),
-                                                                getWaitStrategy(), () -> muleContext.getSchedulerService()
-                                                                    .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
-                                                                        .withName(schedulersNamePrefix + "."
-                                                                            + CPU_LITE.name())),
-                                                                () -> muleContext.getSchedulerService()
-                                                                    .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                                        .withName(schedulersNamePrefix + "."
-                                                                            + BLOCKING.name())),
-                                                                () -> muleContext.getSchedulerService()
-                                                                    .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
-                                                                        .withName(schedulersNamePrefix + "."
-                                                                            + CPU_INTENSIVE.name())),
-                                                                () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
-                                                                getMaxConcurrency(),
-                                                                isMaxConcurrencyEagerCheck(),
-                                                                muleContext.getConfiguration().isThreadLoggingEnabled());
+    return new TransactionAwareProactorStreamWorkQueueProcessingStrategy(getRingBufferSchedulerSupplier(muleContext,
+                                                                                                        schedulersNamePrefix),
+                                                                         getBufferSize(),
+                                                                         getSubscriberCount(),
+                                                                         getWaitStrategy(),
+                                                                         () -> muleContext.getSchedulerService()
+                                                                             .cpuLightScheduler(muleContext
+                                                                                 .getSchedulerBaseConfig()
+                                                                                 .withName(schedulersNamePrefix + "."
+                                                                                     + CPU_LITE.name())),
+                                                                         () -> muleContext.getSchedulerService()
+                                                                             .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                                                 .withName(schedulersNamePrefix + "."
+                                                                                     + BLOCKING.name())),
+                                                                         () -> muleContext.getSchedulerService()
+                                                                             .cpuIntensiveScheduler(muleContext
+                                                                                 .getSchedulerBaseConfig()
+                                                                                 .withName(schedulersNamePrefix + "."
+                                                                                     + CPU_INTENSIVE.name())),
+                                                                         () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
+                                                                         getMaxConcurrency(),
+                                                                         isMaxConcurrencyEagerCheck(),
+                                                                         muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override
@@ -65,16 +69,16 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
 
   static class TransactionAwareProactorStreamWorkQueueProcessingStrategy extends ProactorStreamWorkQueueProcessingStrategy {
 
-      TransactionAwareProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                     int bufferSize,
-                                                     int subscriberCount,
-                                                     String waitStrategy,
-                                                     Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                                     Supplier<Scheduler> blockingSchedulerSupplier,
-                                                     Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                     Supplier<Scheduler> retrySupportSchedulerSupplier,
-                                                     int maxConcurrency, boolean maxConcurrencyEagerCheck,
-                                                     boolean isThreadLoggingEnabled)
+    TransactionAwareProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                              int bufferSize,
+                                                              int subscriberCount,
+                                                              String waitStrategy,
+                                                              Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                              Supplier<Scheduler> blockingSchedulerSupplier,
+                                                              Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                              Supplier<Scheduler> retrySupportSchedulerSupplier,
+                                                              int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                                              boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
@@ -82,15 +86,15 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
             maxConcurrencyEagerCheck, isThreadLoggingEnabled);
     }
 
-      TransactionAwareProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                     int bufferSize,
-                                                     int subscriberCount,
-                                                     String waitStrategy,
-                                                     Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                                     Supplier<Scheduler> blockingSchedulerSupplier,
-                                                     Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                     Supplier<Scheduler> retrySupportSchedulerSupplier,
-                                                     int maxConcurrency, boolean maxConcurrencyEagerCheck)
+    TransactionAwareProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                              int bufferSize,
+                                                              int subscriberCount,
+                                                              String waitStrategy,
+                                                              Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                              Supplier<Scheduler> blockingSchedulerSupplier,
+                                                              Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                              Supplier<Scheduler> retrySupportSchedulerSupplier,
+                                                              int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,

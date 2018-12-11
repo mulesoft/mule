@@ -57,7 +57,8 @@ public abstract class ProactorStreamProcessingStrategy
                                           boolean maxConcurrencyEagerCheck)
 
   {
-    super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
+    super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism,
+          maxConcurrency, maxConcurrencyEagerCheck);
     this.blockingSchedulerSupplier = blockingSchedulerSupplier;
     this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
     this.retrySupportSchedulerSupplier = retrySupportSchedulerSupplier;

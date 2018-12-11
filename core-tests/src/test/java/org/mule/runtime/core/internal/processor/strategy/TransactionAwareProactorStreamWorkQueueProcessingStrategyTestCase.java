@@ -40,14 +40,14 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new TransactionAwareProactorStreamWorkQueueProcessingStrategy(() -> blocking,
-                                                                XS_BUFFER_SIZE,
-                                                                1,
-                                                                DEFAULT_WAIT_STRATEGY,
-                                                                () -> cpuLight,
-                                                                () -> blocking,
-                                                                () -> cpuIntensive,
-                                                                () -> custom,
-                                                                MAX_VALUE, true);
+                                                                         XS_BUFFER_SIZE,
+                                                                         1,
+                                                                         DEFAULT_WAIT_STRATEGY,
+                                                                         () -> cpuLight,
+                                                                         () -> blocking,
+                                                                         () -> cpuIntensive,
+                                                                         () -> custom,
+                                                                         MAX_VALUE, true);
   }
 
   @Override

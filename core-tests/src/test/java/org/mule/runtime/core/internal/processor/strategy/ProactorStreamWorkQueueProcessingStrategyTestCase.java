@@ -87,15 +87,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix,
                                                         int maxConcurrency) {
     return new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                XS_BUFFER_SIZE,
-                                                1,
-                                                DEFAULT_WAIT_STRATEGY,
-                                                () -> cpuLight,
-                                                () -> blocking,
-                                                () -> cpuIntensive,
-                                                () -> custom,
-                                                CORES,
-                                                maxConcurrency, true);
+                                                         XS_BUFFER_SIZE,
+                                                         1,
+                                                         DEFAULT_WAIT_STRATEGY,
+                                                         () -> cpuLight,
+                                                         () -> blocking,
+                                                         () -> cpuIntensive,
+                                                         () -> custom,
+                                                         CORES,
+                                                         maxConcurrency, true);
   }
 
   @Override
@@ -246,15 +246,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
     flow = flowBuilder.get().processors(blockingProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                             1,
-                                                                                             DEFAULT_WAIT_STRATEGY,
-                                                                                             () -> cpuLight,
-                                                                                             () -> rejectingSchedulerSpy,
-                                                                                             () -> cpuIntensive,
-                                                                                             () -> custom,
-                                                                                             1,
-                                                                                             2, true))
+                                                                                                      DEFAULT_BUFFER_SIZE,
+                                                                                                      1,
+                                                                                                      DEFAULT_WAIT_STRATEGY,
+                                                                                                      () -> cpuLight,
+                                                                                                      () -> rejectingSchedulerSpy,
+                                                                                                      () -> cpuIntensive,
+                                                                                                      () -> custom,
+                                                                                                      1,
+                                                                                                      2, true))
         .build();
     flow.initialise();
     flow.start();
@@ -276,15 +276,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
     flow = flowBuilder.get().processors(cpuIntensiveProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                             1,
-                                                                                             DEFAULT_WAIT_STRATEGY,
-                                                                                             () -> cpuLight,
-                                                                                             () -> blocking,
-                                                                                             () -> rejectingSchedulerSpy,
-                                                                                             () -> custom,
-                                                                                             1,
-                                                                                             2, true))
+                                                                                                      DEFAULT_BUFFER_SIZE,
+                                                                                                      1,
+                                                                                                      DEFAULT_WAIT_STRATEGY,
+                                                                                                      () -> cpuLight,
+                                                                                                      () -> blocking,
+                                                                                                      () -> rejectingSchedulerSpy,
+                                                                                                      () -> custom,
+                                                                                                      1,
+                                                                                                      2, true))
         .build();
     flow.initialise();
     flow.start();
@@ -304,15 +304,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                             1,
-                                                                                             DEFAULT_WAIT_STRATEGY,
-                                                                                             () -> cpuLight,
-                                                                                             () -> blocking,
-                                                                                             () -> cpuIntensive,
-                                                                                             () -> custom,
-                                                                                             CORES,
-                                                                                             1, true)),
+                                                                                                      DEFAULT_BUFFER_SIZE,
+                                                                                                      1,
+                                                                                                      DEFAULT_WAIT_STRATEGY,
+                                                                                                      () -> cpuLight,
+                                                                                                      () -> blocking,
+                                                                                                      () -> cpuIntensive,
+                                                                                                      () -> custom,
+                                                                                                      CORES,
+                                                                                                      1, true)),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
@@ -327,15 +327,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   public void singleCpuLightConcurrentMaxConcurrency2() throws Exception {
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                             1,
-                                                                                             DEFAULT_WAIT_STRATEGY,
-                                                                                             () -> cpuLight,
-                                                                                             () -> blocking,
-                                                                                             () -> cpuIntensive,
-                                                                                             () -> custom,
-                                                                                             CORES,
-                                                                                             2, true)),
+                                                                                                      DEFAULT_BUFFER_SIZE,
+                                                                                                      1,
+                                                                                                      DEFAULT_WAIT_STRATEGY,
+                                                                                                      () -> cpuLight,
+                                                                                                      () -> blocking,
+                                                                                                      () -> cpuIntensive,
+                                                                                                      () -> custom,
+                                                                                                      CORES,
+                                                                                                      2, true)),
                        true, CPU_LITE, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads, not(hasItem(startsWith(RING_BUFFER))));
@@ -351,15 +351,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                             1,
-                                                                                             DEFAULT_WAIT_STRATEGY,
-                                                                                             () -> cpuLight,
-                                                                                             () -> blocking,
-                                                                                             () -> cpuIntensive,
-                                                                                             () -> custom,
-                                                                                             CORES,
-                                                                                             1, true)),
+                                                                                                      DEFAULT_BUFFER_SIZE,
+                                                                                                      1,
+                                                                                                      DEFAULT_WAIT_STRATEGY,
+                                                                                                      () -> cpuLight,
+                                                                                                      () -> blocking,
+                                                                                                      () -> cpuIntensive,
+                                                                                                      () -> custom,
+                                                                                                      CORES,
+                                                                                                      1, true)),
                        true, BLOCKING, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
@@ -374,15 +374,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   public void singleBlockingConcurrentMaxConcurrency2() throws Exception {
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                             1,
-                                                                                             DEFAULT_WAIT_STRATEGY,
-                                                                                             () -> cpuLight,
-                                                                                             () -> blocking,
-                                                                                             () -> cpuIntensive,
-                                                                                             () -> custom,
-                                                                                             1,
-                                                                                             2, true)),
+                                                                                                      DEFAULT_BUFFER_SIZE,
+                                                                                                      1,
+                                                                                                      DEFAULT_WAIT_STRATEGY,
+                                                                                                      () -> cpuLight,
+                                                                                                      () -> blocking,
+                                                                                                      () -> cpuIntensive,
+                                                                                                      () -> custom,
+                                                                                                      1,
+                                                                                                      2, true)),
                        true, BLOCKING, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(2l));
@@ -424,15 +424,15 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   public void concurrencyLessThanParallelism() throws Exception {
     flow = flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
-                                                                                             XS_BUFFER_SIZE,
-                                                                                             1,
-                                                                                             DEFAULT_WAIT_STRATEGY,
-                                                                                             () -> cpuLight,
-                                                                                             () -> blocking,
-                                                                                             () -> cpuIntensive,
-                                                                                             () -> custom,
-                                                                                             4,
-                                                                                             2, true))
+                                                                                                      XS_BUFFER_SIZE,
+                                                                                                      1,
+                                                                                                      DEFAULT_WAIT_STRATEGY,
+                                                                                                      () -> cpuLight,
+                                                                                                      () -> blocking,
+                                                                                                      () -> cpuIntensive,
+                                                                                                      () -> custom,
+                                                                                                      4,
+                                                                                                      2, true))
         .processors(blockingProcessor)
         .build();
     flow.initialise();

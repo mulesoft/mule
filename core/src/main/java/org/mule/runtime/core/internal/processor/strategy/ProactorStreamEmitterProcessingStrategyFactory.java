@@ -114,7 +114,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+            maxConcurrencyEagerCheck);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
 
@@ -132,7 +133,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
-           maxConcurrencyEagerCheck ,false);
+           maxConcurrencyEagerCheck, false);
     }
 
     @Override

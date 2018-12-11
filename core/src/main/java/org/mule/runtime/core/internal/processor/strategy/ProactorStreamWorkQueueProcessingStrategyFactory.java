@@ -62,21 +62,21 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new ProactorStreamWorkQueueProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
-                                                getBufferSize(),
-                                                getSubscriberCount(),
-                                                getWaitStrategy(),
-                                                getCpuLightSchedulerSupplier(muleContext, schedulersNamePrefix),
-                                                () -> muleContext.getSchedulerService()
-                                                    .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                        .withName(schedulersNamePrefix + "." + BLOCKING.name())),
-                                                () -> muleContext.getSchedulerService()
-                                                    .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
-                                                        .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
-                                                resolveParallelism(),
-                                                getMaxConcurrency(),
-                                                isMaxConcurrencyEagerCheck(),
-                                                muleContext.getConfiguration().isThreadLoggingEnabled());
+                                                         getBufferSize(),
+                                                         getSubscriberCount(),
+                                                         getWaitStrategy(),
+                                                         getCpuLightSchedulerSupplier(muleContext, schedulersNamePrefix),
+                                                         () -> muleContext.getSchedulerService()
+                                                             .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                                 .withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                                         () -> muleContext.getSchedulerService()
+                                                             .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
+                                                                 .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
+                                                         () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
+                                                         resolveParallelism(),
+                                                         getMaxConcurrency(),
+                                                         isMaxConcurrencyEagerCheck(),
+                                                         muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override
@@ -166,36 +166,39 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     private final boolean isThreadLoggingEnabled;
 
     public ProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                            int bufferSize,
-                                            int subscriberCount,
-                                            String waitStrategy,
-                                            Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                            Supplier<Scheduler> blockingSchedulerSupplier,
-                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                            Supplier<Scheduler> retrySupportSchedulerSupplier,
-                                            int parallelism,
-                                            int maxConcurrency, boolean maxConcurrencyEagerCheck, boolean isThreadLoggingEnabled)
+                                                     int bufferSize,
+                                                     int subscriberCount,
+                                                     String waitStrategy,
+                                                     Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                     Supplier<Scheduler> blockingSchedulerSupplier,
+                                                     Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                     Supplier<Scheduler> retrySupportSchedulerSupplier,
+                                                     int parallelism,
+                                                     int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                                     boolean isThreadLoggingEnabled)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
+      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+            maxConcurrencyEagerCheck);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
 
     public ProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                            int bufferSize,
-                                            int subscriberCount,
-                                            String waitStrategy,
-                                            Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                            Supplier<Scheduler> blockingSchedulerSupplier,
-                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                            Supplier<Scheduler> retrySupportSchedulerSupplier,
-                                            int parallelism,
-                                            int maxConcurrency, boolean maxConcurrencyEagerCheck)
+                                                     int bufferSize,
+                                                     int subscriberCount,
+                                                     String waitStrategy,
+                                                     Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                     Supplier<Scheduler> blockingSchedulerSupplier,
+                                                     Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                     Supplier<Scheduler> retrySupportSchedulerSupplier,
+                                                     int parallelism,
+                                                     int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
-        this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-                blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
-                maxConcurrencyEagerCheck, false);
+      this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+           maxConcurrencyEagerCheck, false);
     }
 
     @Override
