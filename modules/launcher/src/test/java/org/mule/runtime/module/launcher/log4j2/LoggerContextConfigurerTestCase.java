@@ -65,7 +65,6 @@ import org.mockito.stubbing.Answer;
 public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
   private static final String CURRENT_DIRECTORY = ".";
-  private static final String INTERVAL_PROPERTY = "interval";
   private static final String SHUTDOWN_HOOK_PROPERTY = "isShutdownHookEnabled";
   private static final int MONITOR_INTERVAL = 60000;
   private static final String CONVERTER_COMPONENT = "Converter";
@@ -169,14 +168,13 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     String filePatternTemplateDateSuffix = filePatternTemplate.substring(filePatternTemplate.lastIndexOf('.') + 1);
     assertThat(filePatternTemplateDateSuffix, equalTo(FILE_PATTERN_TEMPLATE_DATE_SECTION));
 
-    LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+    LoggerConfig rootLogger = context.getConfiguration().getRootLogger();
     verify(rootLogger).addAppender(perAppAppender, Level.ALL, null);
   }
 
   @Test
   public void noAppendersForMutedApplication() throws Exception {
     when(context.isArtifactClassloader()).thenReturn(true);
-    when(context.isApplicationClassloader()).thenReturn(true);
     ArtifactDescriptor descriptor = mock(ArtifactDescriptor.class);
 
     Properties properties = new Properties();

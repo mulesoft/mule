@@ -205,7 +205,7 @@ public final class ExtensionsTestUtils {
   }
 
   private static ParameterModel getParameter() {
-    ParameterModel parameterModel = mock(ParameterModel.class);
+    ParameterModel parameterModel = mock(ParameterModel.class, withSettings().lenient());
     when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
     when(parameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(parameterModel.getRole()).thenReturn(BEHAVIOUR);
