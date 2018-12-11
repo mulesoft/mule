@@ -152,7 +152,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
           try {
             if (!completionLatch.await(max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
               LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
-                      shutdownTimeout);
+                          shutdownTimeout);
             }
           } catch (InterruptedException e) {
             currentThread().interrupt();
