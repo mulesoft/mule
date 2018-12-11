@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Integer.getInteger;
+import static java.lang.Long.max;
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
-import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -25,13 +23,13 @@ import static reactor.retry.Retry.onlyIf;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -99,7 +97,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
   static class ProactorStreamEmitterProcessingStrategy extends ProactorStreamProcessingStrategy {
 
     private static Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
-    private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
     private boolean isThreadLoggingEnabled;
 
@@ -140,14 +137,27 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
+      final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
       int concurrency = maxConcurrency < subscribers ? maxConcurrency : subscribers;
       for (int i = 0; i < concurrency; i++) {
+        Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-            .transform(function).subscribe();
+            .transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
+
         ReactorSink<CoreEvent> sink = new DefaultReactorSink<>(processor.sink(), () -> {
+          long start = currentTimeMillis();
+          try {
+            if (!completionLatch.await(max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
+              LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
+                      shutdownTimeout);
+            }
+          } catch (InterruptedException e) {
+            currentThread().interrupt();
+            throw new MuleRuntimeException(e);
+          }
         }, createOnEventConsumer(), bufferSize);
         sinks.add(new ProactorSinkWrapper<>(sink));
       }

@@ -11,7 +11,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +24,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.SYSTEM_PROPERTY_PREFIX;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
@@ -35,9 +33,7 @@ public abstract class ProactorStreamProcessingStrategy
   protected static final int STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
       getInteger(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
 
-  private static Logger LOGGER =
-      getLogger(ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy.class);
-  private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+  protected static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
   private final Supplier<Scheduler> blockingSchedulerSupplier;
   private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;

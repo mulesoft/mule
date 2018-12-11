@@ -162,7 +162,6 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     }
 
     private static Logger LOGGER = getLogger(ProactorStreamWorkQueueProcessingStrategy.class);
-    private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
     private final boolean isThreadLoggingEnabled;
 
