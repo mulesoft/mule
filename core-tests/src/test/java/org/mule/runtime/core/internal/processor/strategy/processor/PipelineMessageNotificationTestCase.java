@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy.processor;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -14,8 +13,8 @@ import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,7 +29,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -64,7 +62,9 @@ import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import org.hamcrest.Description;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -73,9 +73,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 @RunWith(Parameterized.class)
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
@@ -193,7 +190,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   private void verifySucess() {
-    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(FlowConstructNotification.class)));
+    verify(notificationFirer, times(2)).dispatch(any(FlowConstructNotification.class));
 
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
@@ -201,13 +198,13 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
-    verify(notificationFirer, times(3)).dispatch(argThat(instanceOf(PipelineMessageNotification.class)));
+    verify(notificationFirer, times(3)).dispatch(any(PipelineMessageNotification.class));
   }
 
   private void verifyException() {
-    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(FlowConstructNotification.class)));
-    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(PipelineMessageNotification.class)));
-    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(ErrorHandlerNotification.class)));
+    verify(notificationFirer, times(2)).dispatch(any(FlowConstructNotification.class));
+    verify(notificationFirer, times(2)).dispatch(any(PipelineMessageNotification.class));
+    verify(notificationFirer, times(2)).dispatch(any(ErrorHandlerNotification.class));
 
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
@@ -255,7 +252,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   }
 
-  private class PipelineMessageNotificiationArgumentMatcher extends ArgumentMatcher<Notification> {
+  private class PipelineMessageNotificiationArgumentMatcher implements ArgumentMatcher<Notification> {
 
     private int expectedAction;
     private boolean exceptionExpected;
@@ -268,7 +265,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     }
 
     @Override
-    public boolean matches(Object argument) {
+    public boolean matches(Notification argument) {
       if (!(argument instanceof PipelineMessageNotification || argument instanceof ErrorHandlerNotification)) {
         return false;
       }
@@ -285,13 +282,6 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
               && exceptionExpected == (exception != null);
 
       return result;
-    }
-
-    @Override
-    public void describeTo(Description description) {
-      super.describeTo(description);
-      description.appendText(format("expectedAction = %d, exceptionExpected = %s, event = %s", expectedAction, exceptionExpected,
-                                    event));
     }
   }
 

@@ -31,6 +31,7 @@ import org.mule.runtime.extension.internal.loader.validator.ParameterModelValida
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.model.HealthStatus;
 
 import java.util.Optional;
 
@@ -40,8 +41,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.test.heisenberg.extension.model.HealthStatus;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -50,16 +50,16 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   private static final String COMPONENT_ID_ERROR_PREFIX =
       "Parameter 'url' in the operation 'dummyOperation' is declared as a Component ID, but ";
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ParameterModel validParameterModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ParameterModel invalidParameterModel;
 
   @Rule

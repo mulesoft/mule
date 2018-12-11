@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -31,13 +30,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.nio.charset.Charset;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.nio.charset.Charset;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -47,7 +46,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   private ExpressionManager expressionManager;
 
-  @Mock
+  @Mock(lenient = true)
   protected ExecutionContextAdapter operationContext;
 
   @Mock(answer = RETURNS_DEEP_STUBS)

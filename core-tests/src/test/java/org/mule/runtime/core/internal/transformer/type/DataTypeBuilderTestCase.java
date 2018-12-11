@@ -9,7 +9,15 @@ package org.mule.runtime.core.internal.transformer.type;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
@@ -21,20 +29,6 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-
-import static java.util.Collections.singletonList;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.nullValue;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.message.Message;
@@ -52,10 +46,6 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.report.HeapDumpOnFailure;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Proxy;
@@ -65,6 +55,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
@@ -282,32 +278,21 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void cglibInterfaceProxy() {
-    final Message muleMessageProxy = mock(Message.class);
-
+    final Message muleMessageProxy =
+        (Message) Enhancer.create(Message.class, (MethodInterceptor) (o, method, objects, methodProxy) -> null);
     final DataType dataType = DataType.fromObject(muleMessageProxy);
-
     assertThat(dataType.getType(), is(equalTo(Message.class)));
   }
 
   @Test
   public void cglibClassProxy() {
-    final Message muleMessageProxy = mock(MessageTestImpl.class);
-
+    final Message muleMessageProxy =
+        (Message) Enhancer.create(MessageTestImpl.class, (MethodInterceptor) (o, method, objects, methodProxy) -> null);
     final DataType dataType = DataType.fromObject(muleMessageProxy);
-
     assertThat(dataType.getType(), is(equalTo(MessageTestImpl.class)));
   }
 
-  @Test
-  public void cglibSpyProxy() {
-    final Message muleMessageProxy = spy(new MessageTestImpl());
-
-    final DataType dataType = DataType.fromObject(muleMessageProxy);
-
-    assertThat(dataType.getType(), is(equalTo(MessageTestImpl.class)));
-  }
-
-  private static class MessageTestImpl implements Message {
+  public static class MessageTestImpl implements Message {
 
     @Override
     public <T> TypedValue<T> getPayload() {

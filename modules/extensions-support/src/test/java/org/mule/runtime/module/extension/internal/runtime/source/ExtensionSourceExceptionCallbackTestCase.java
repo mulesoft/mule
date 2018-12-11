@@ -11,31 +11,29 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.function.Consumer;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -58,7 +56,7 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
   @Mock
   private MessageSource messageSource;
 
-  @Mock
+  @Mock(lenient = true)
   private ErrorType errorType;
 
   private ExtensionSourceExceptionCallback callback;
@@ -79,20 +77,10 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
   @Test
   public void onException() {
     callback.onException(exception);
-    verify(responseCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(exception);
-      }
-    }), argThat(new ArgumentMatcher<CoreEvent>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return o instanceof CoreEvent && ((CoreEvent) o).getError().isPresent()
-            && ((CoreEvent) o).getError().get().getErrorType().equals(errorType);
-      }
-    }));
+    verify(responseCallback).responseSentWithFailure(
+                                                     argThat(e -> e.getRootCause().equals(exception)),
+                                                     argThat(event -> event.getError().isPresent()
+                                                         && event.getError().get().getErrorType().equals(errorType)));
   }
 
   @Test

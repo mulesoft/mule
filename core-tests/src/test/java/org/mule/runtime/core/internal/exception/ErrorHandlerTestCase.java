@@ -15,8 +15,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -26,8 +26,6 @@ import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepositor
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -40,20 +38,19 @@ import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAccep
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
@@ -66,6 +63,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Mock
   private MessagingExceptionHandlerAcceptor mockTestExceptionStrategy1;
+
   @Mock
   private MessagingExceptionHandlerAcceptor mockTestExceptionStrategy2;
   private DefaultMessagingExceptionHandlerAcceptor defaultMessagingExceptionHandler =
@@ -86,11 +84,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     event = getEventBuilder().message(Message.of("")).error(mockError).build();
 
     mockException = new MessagingException(event, new Exception());
-    CoreEvent handledEvent = testEvent();
-    when(mockTestExceptionStrategy1.accept(any(CoreEvent.class))).thenReturn(true);
-    when(mockTestExceptionStrategy1.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
     when(mockTestExceptionStrategy2.accept(any(CoreEvent.class))).thenReturn(true);
-    when(mockTestExceptionStrategy2.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
   }
 
   @Test

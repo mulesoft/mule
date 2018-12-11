@@ -14,10 +14,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -28,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -52,7 +51,6 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
 
   private void stubConnectionProvider() throws org.mule.runtime.api.connection.ConnectionException {
     when(connectionProvider.connect()).thenReturn(connection);
-    when(connectionProvider.validate(connection)).thenReturn(success());
   }
 
   @Test

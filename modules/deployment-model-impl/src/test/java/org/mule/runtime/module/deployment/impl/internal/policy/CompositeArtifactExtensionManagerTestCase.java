@@ -44,7 +44,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -52,7 +52,7 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
 
   public static final String PROVIDER_NAME = "providerName";
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionManager parentExtensionManager;
 
   @Mock(extraInterfaces = Lifecycle.class)

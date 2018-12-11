@@ -11,14 +11,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
@@ -37,16 +34,15 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
-
-import io.qameta.allure.Issue;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -88,7 +84,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   public void setup() throws RegistrationException {
     when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mockMuleEvent);
     when(mockMuleEvent.getMessage()).thenReturn(mockMessageCollection);
-    when(mockMessageCollection.getPayload()).thenReturn(new TypedValue<>(null, OBJECT));
   }
 
   @Test(expected = CorrelationTimeoutException.class)

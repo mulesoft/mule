@@ -6,30 +6,27 @@
  */
 package org.mule.runtime.core.api;
 
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.eq;
-import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
-
 import static org.hamcrest.CoreMatchers.is;
-
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
+import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.LocatedMuleException;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -85,6 +82,5 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     when(component.getLocation()).thenReturn(mockComponentLocation);
     when(mockComponentLocation.getFileName()).thenReturn(Optional.of("muleApp.xml"));
     when(mockComponentLocation.getLineInFile()).thenReturn(Optional.of(10));
-    when(mockComponentLocation.getLocation()).thenReturn("Mock@1");
   }
 }

@@ -9,9 +9,8 @@ package org.mule.runtime.core.internal.metadata.cache;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.charThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,7 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultMetadataCacheManagerTestCase {
@@ -91,7 +90,6 @@ public class DefaultMetadataCacheManagerTestCase {
   @Test
   public void updateCache() throws ObjectStoreException {
     when(objectStore.contains(SOME_KEY)).thenReturn(true);
-    when(objectStore.retrieve(SOME_KEY)).thenReturn(mockCache);
     when(objectStore.remove(SOME_KEY)).thenReturn(mockCache);
 
     DefaultMetadataCache cache = new DefaultMetadataCache();

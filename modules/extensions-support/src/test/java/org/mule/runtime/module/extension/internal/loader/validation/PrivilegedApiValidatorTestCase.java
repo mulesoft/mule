@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -43,7 +43,7 @@ public class PrivilegedApiValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
   }
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
 
   private PrivilegedApiValidator validator = new PrivilegedApiValidator();

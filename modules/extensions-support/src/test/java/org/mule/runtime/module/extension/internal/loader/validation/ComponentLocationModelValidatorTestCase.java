@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -48,7 +48,6 @@ public class ComponentLocationModelValidatorTestCase extends AbstractMuleTestCas
 
   @Before
   public void before() {
-    when(extensionModel.getName()).thenReturn("test");
     when(extensionModel.getSourceModels()).thenReturn(singletonList(sourceModel));
     when(sourceModel.getSuccessCallback()).thenReturn(empty());
     when(sourceModel.getErrorCallback()).thenReturn(empty());

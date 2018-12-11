@@ -11,6 +11,7 @@ import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
@@ -44,16 +45,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
   @Mock
@@ -106,7 +107,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
   public void repeatedEncodingOperationArgumentObjectFields() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "argumentWithRepeatedEncodingFields");
-    ParameterModel parameterModel = mock(ParameterModel.class);
+    ParameterModel parameterModel = mock(ParameterModel.class, withSettings().lenient());
     when(parameterModel.getType()).thenReturn(toMetadataType(RepeatedEncoding.class));
     mockParameters(operationModel, parameterModel);
     validate(extensionModel, validator);

@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +37,8 @@ import org.junit.Test;
 
 public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
 
+  private static final String GROUP_NAME = "group";
+
   private EventCorrelator eventCorrelator;
   private final EventCorrelatorCallback eventCorrelatorCallback = mock(EventCorrelatorCallback.class);
   private final Processor messageProcessor = mock(Processor.class);
@@ -55,11 +57,14 @@ public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
     setAnswers();
     eventCorrelator = new EventCorrelator(eventCorrelatorCallback, messageProcessor,
                                           muleContext, flowConstruct, partitionableObjectStore, "prefix", objectStore);
+
+    when(eventGroup.getGroupId()).thenReturn(GROUP_NAME);
   }
 
   @Test
   public void testEventGroupFreedInRoutingException() throws Exception {
     CoreEvent event = mock(CoreEvent.class);
+    when(event.getCorrelationId()).thenReturn(GROUP_NAME);
     try {
       eventCorrelator.process(event);
       fail("Routing Exception must be catched.");

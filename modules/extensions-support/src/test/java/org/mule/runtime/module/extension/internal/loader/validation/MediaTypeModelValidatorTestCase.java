@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static java.util.Optional.ofNullable;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -39,17 +39,17 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
-import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,31 +62,31 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
 
   private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OperationModel operationModel;
 
-  @Mock
+  @Mock(lenient = true)
   private SourceModel sourceModel;
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionTypeDescriptorModelProperty descriptorModelProperty;
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionOperationDescriptorModelProperty operationDescriptorModelProperty;
 
-  @Mock
+  @Mock(lenient = true)
   private OutputModel sourceOutputModel;
 
-  @Mock
+  @Mock(lenient = true)
   private OutputModel operationOutputModel;
 
-  @Mock
+  @Mock(lenient = true)
   private MetadataType operationOutputType;
 
-  @Mock
+  @Mock(lenient = true)
   private MetadataType sourceOutputType;
 
   private MediaTypeModelValidator validator = new MediaTypeModelValidator();

@@ -23,25 +23,26 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.value.Value;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.values.ValueProvider;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.ValueProviderFactoryModelPropertyBuilder;
 import org.mule.tck.size.SmallTest;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -54,25 +55,25 @@ public class ValueProviderModelValidatorTestCase {
 
   private ProblemsReporter problemsReporter;
 
-  @Mock
+  @Mock(lenient = true)
   ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(lenient = true)
   OperationModel operationModel;
 
-  @Mock
+  @Mock(lenient = true)
   ParameterModel operationParameter;
 
-  @Mock
+  @Mock(lenient = true)
   ParameterModel configrationParameter;
 
-  @Mock
+  @Mock(lenient = true)
   ConfigurationModel configurationModel;
 
-  @Mock
+  @Mock(lenient = true)
   ParameterGroupModel parameterGroupModel;
 
-  @Mock
+  @Mock(lenient = true)
   ParameterGroupModel configurationParameterGroupModel;
 
   private ValueProviderFactoryModelPropertyBuilder operationParameterBuilder;

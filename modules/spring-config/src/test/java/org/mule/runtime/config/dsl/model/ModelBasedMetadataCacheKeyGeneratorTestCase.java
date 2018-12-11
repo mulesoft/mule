@@ -11,8 +11,8 @@ import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -77,7 +77,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -531,7 +531,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     when(parameterGroupModel.getParameterModels()).thenReturn(parameterModels);
     when(parameterGroupModel.getParameter(anyString()))
         .then(invocation -> {
-          String paramName = invocation.getArgumentAt(0, String.class);
+          String paramName = invocation.getArgument(0);
           switch (paramName) {
             case CONTENT_NAME:
               return Optional.of(contentParameter);
@@ -567,7 +567,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     when(metadataKeyIdGroup.getParameterModels()).thenReturn(partParameterModels);
     when(metadataKeyIdGroup.getParameter(anyString()))
         .then(invocation -> {
-          String paramName = invocation.getArgumentAt(0, String.class);
+          String paramName = invocation.getArgument(0);
           switch (paramName) {
             case METADATA_KEY_PART_1:
               return Optional.of(partOne);

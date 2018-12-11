@@ -17,9 +17,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -29,7 +29,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.TypeBuilder;
@@ -87,6 +86,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.core.streaming.SimpleByteBufferManager;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -99,8 +100,6 @@ import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.hamcrest.Matcher;
 import org.mockito.Mockito;
-
-import com.google.common.collect.ImmutableList;
 
 public final class ExtensionsTestUtils {
 
@@ -299,7 +298,7 @@ public final class ExtensionsTestUtils {
 
   public static ParameterGroupModel mockParameters(ParameterizedModel parameterizedModel, String groupName,
                                                    ParameterModel... parameterModels) {
-    ParameterGroupModel group = mock(ParameterGroupModel.class);
+    ParameterGroupModel group = mock(ParameterGroupModel.class, withSettings().lenient());
     when(group.getName()).thenReturn(groupName);
     when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(parameterizedModel.getParameterGroupModels()).thenReturn(asList(group));

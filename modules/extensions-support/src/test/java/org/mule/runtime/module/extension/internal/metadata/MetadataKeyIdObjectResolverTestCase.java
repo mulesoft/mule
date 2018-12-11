@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -35,16 +34,16 @@ import org.mule.runtime.module.extension.internal.loader.java.property.QueryPara
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.test.metadata.extension.LocationKey;
 
+import java.lang.reflect.Field;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataKeyIdObjectResolverTestCase {
@@ -234,7 +233,6 @@ public class MetadataKeyIdObjectResolverTestCase {
     setParameters(continentParam, countryParam, cityParam);
     setMetadataKeyIdModelProperty(LocationKey.class);
     when(continentParam.getDefaultValue()).thenReturn(AMERICA);
-    when(cityParam.getDefaultValue()).thenReturn(SFO);
 
     keyIdObjectResolver = new MetadataKeyIdObjectResolver(componentModel);
     keyIdObjectResolver.resolve();

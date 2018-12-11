@@ -9,18 +9,13 @@ package org.mule.runtime.core.api.execution;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
@@ -47,7 +42,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -55,20 +50,24 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   protected MuleContext mockMuleContext = mockContextWithServices();
 
-  protected FlowConstruct mockFlow =
-      mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class).defaultAnswer(RETURNS_DEEP_STUBS));
   @Mock
   protected CoreEvent RETURN_VALUE;
+
   @Spy
   protected TestTransaction mockTransaction = new TestTransaction(mockMuleContext);
+
   @Spy
   protected TestTransaction mockNewTransaction = new TestTransaction(mockMuleContext);
+
   @Mock
   protected ExternalTransactionAwareTransactionFactory mockExternalTransactionFactory;
-  @Mock
+
+  @Mock(lenient = true)
   protected MessagingException mockMessagingException;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   protected CoreEvent mockEvent;
+
   @Mock
   protected FlowExceptionHandler mockMessagingExceptionHandler;
 
@@ -136,7 +135,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   @Test
   public void testActionNoneAndTxForRollback() throws Exception {
-    when(mockTransaction.isRollbackOnly()).thenReturn(true);
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
@@ -212,7 +210,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Test(expected = IllegalTransactionStateException.class)
   public void testActionAlwaysBeginAndRollbackTxAndCommitNewTx() throws Exception {
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    when(mockTransaction.isRollbackOnly()).thenReturn(true);
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
@@ -228,7 +225,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Test(expected = IllegalTransactionStateException.class)
   public void testActionAlwaysBeginAndRollbackTxAndRollbackNewTx() throws Exception {
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    when(mockTransaction.isRollbackOnly()).thenReturn(true);
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
@@ -256,14 +252,13 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     verify(mockTransaction).resume();
     verify(mockTransaction, never()).commit();
     verify(mockTransaction, never()).rollback();
-    assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
+    assertThat(TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
   }
 
   @Test
   public void testActionAlwaysBeginAndSuspendXaTxAndRollbackNewTx() throws Exception {
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     mockTransaction.setXA(true);
-    when(mockTransaction.isRollbackOnly()).thenReturn(true);
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
@@ -275,7 +270,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     verify(mockTransaction).resume();
     verify(mockTransaction, never()).commit();
     verify(mockTransaction, never()).rollback();
-    assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
+    assertThat(TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
   }
 
 

@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -91,7 +91,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   public void setup() {
     processingStrategy = mock(ProcessingStrategy.class);
     when(processingStrategy.onPipeline(any(ReactiveProcessor.class)))
-        .thenAnswer(invocation -> invocation.getArgumentAt(0, ReactiveProcessor.class));
+        .thenAnswer(invocation -> invocation.getArgument(0));
     scheduler = muleContext.getSchedulerService().ioScheduler();
     timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
     setupConcurrentProcessingStrategy();
@@ -337,7 +337,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     Function<ReactiveProcessor, ReactiveProcessor> scheduleFunction =
         processor -> publisher -> from(publisher).publishOn(fromExecutorService(scheduler)).transform(processor);
     when(processingStrategy.onPipeline(any(ReactiveProcessor.class)))
-        .thenAnswer(invocation -> scheduleFunction.apply(invocation.getArgumentAt(0, ReactiveProcessor.class)));
+        .thenAnswer(invocation -> scheduleFunction.apply(invocation.getArgument(0)));
   }
 
   private CompositeRoutingException assertCompositeRoutingException(Throwable throwable, int errors) {

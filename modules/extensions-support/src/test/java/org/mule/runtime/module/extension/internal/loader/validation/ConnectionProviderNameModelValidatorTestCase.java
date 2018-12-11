@@ -25,14 +25,13 @@ import org.mule.tck.size.SmallTest;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -43,11 +42,6 @@ public class ConnectionProviderNameModelValidatorTestCase extends AbstractMuleTe
 
   @Rule
   public ExpectedException expectedException = none();
-
-  @Before
-  public void before() {
-    when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
-  }
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;

@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -48,19 +48,26 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  @Mock
+
+  @Mock(lenient = true)
   private ArchiveDeployer<Domain> mockDomainDeployer;
-  @Mock
+
+  @Mock(lenient = true)
   private Domain mockDomain;
-  @Mock
+
+  @Mock(lenient = true)
   private ArchiveDeployer<Application> mockApplicationDeployer;
-  @Mock
+
+  @Mock(lenient = true)
   private DeploymentService mockDeploymentService;
-  @Mock
+
+  @Mock(lenient = true)
   private Application mockApplication1;
-  @Mock
+
+  @Mock(lenient = true)
   private Application mockApplication2;
-  @Mock
+
+  @Mock(lenient = true)
   private ArtifactDeployer<Application> mockApplicationArtifactDeployer;
 
   private File domainsFolder;

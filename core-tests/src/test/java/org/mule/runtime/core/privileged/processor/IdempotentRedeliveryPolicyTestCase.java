@@ -17,9 +17,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
@@ -109,7 +109,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
           return error(me).doOnError(e -> count.getAndIncrement());
         });
     when(mockWaitingMessageProcessor.apply(any(Publisher.class))).thenAnswer(invocationOnMock -> {
-      Mono<CoreEvent> mono = from(invocationOnMock.getArgumentAt(0, Publisher.class));
+      Mono<CoreEvent> mono = from(invocationOnMock.getArgument(0));
       return mono.doOnNext(checkedConsumer(event1 -> {
         waitingMessageProcessorExecutionLatch.countDown();
         waitLatch.await(2000, MILLISECONDS);
@@ -150,9 +150,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessageRedeliveryUsingMemory() throws Exception {
     when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> {
-          return new TypedValue<>("" + inv.getArgumentAt(3, CoreEvent.class).getMessage().getPayload().hashCode(), STRING);
-        });
+        .thenAnswer(inv -> new TypedValue<>("" + ((CoreEvent) inv.getArgument(3)).getMessage().getPayload().hashCode(), STRING));
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.initialise();
@@ -163,7 +161,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessageRedeliveryUsingSerializationStore() throws Exception {
     when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> new TypedValue<>("" + inv.getArgumentAt(3, CoreEvent.class).getMessage().getPayload().hashCode(),
+        .thenAnswer(inv -> new TypedValue<>("" + ((CoreEvent) inv.getArgument(3)).getMessage().getPayload().hashCode(),
                                             STRING));
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
@@ -178,7 +176,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void testThreadSafeObjectStoreUsage() throws Exception {
     when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> new TypedValue<>("" + inv.getArgumentAt(3, CoreEvent.class).getMessage().getPayload().hashCode(),
+        .thenAnswer(inv -> new TypedValue<>("" + ((CoreEvent) inv.getArgument(3)).getMessage().getPayload().hashCode(),
                                             STRING));
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
@@ -233,6 +231,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
       }
     }
   }
+
 
   public static class SerializationObjectStore extends TemplateObjectStore<RedeliveryCounter> {
 
@@ -293,6 +292,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
                                                          .deserialize((byte[]) entry.getValue())));
     }
   }
+
 
   public static class InMemoryObjectStore extends TemplateObjectStore<RedeliveryCounter> {
 

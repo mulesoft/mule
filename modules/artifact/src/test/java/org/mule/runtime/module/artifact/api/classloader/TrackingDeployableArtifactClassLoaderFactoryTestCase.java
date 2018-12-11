@@ -8,7 +8,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static java.util.Collections.emptyList;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

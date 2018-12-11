@@ -12,8 +12,8 @@ import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
@@ -42,6 +42,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,6 @@ import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.mockito.Mock;
-import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
 public abstract class AbstractDslModelTestCase {
 
@@ -71,37 +71,37 @@ public abstract class AbstractDslModelTestCase {
   protected static final String ITEM_VALUE = "itemValue";
   protected static final String ITEM_NAME = "list-name-item";
 
-  @Mock
+  @Mock(lenient = true)
   protected ExtensionModel mockExtension;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConfigurationModel configuration;
 
-  @Mock
+  @Mock(lenient = true)
   protected OperationModel operation;
 
-  @Mock
+  @Mock(lenient = true)
   protected ConnectionProviderModel connectionProvider;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel contentParameter;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel behaviourParameter;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterModel listParameter;
 
-  @Mock
+  @Mock(lenient = true)
   protected ParameterGroupModel parameterGroupModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected SourceModel source;
 
-  @Mock
+  @Mock(lenient = true)
   protected DslResolvingContext dslContext;
 
-  @Mock
+  @Mock(lenient = true)
   protected TypeCatalog typeCatalog;
 
   protected ObjectType complexType;
@@ -148,7 +148,7 @@ public abstract class AbstractDslModelTestCase {
     when(parameterGroupModel.getParameterModels()).thenReturn(defaultGroupParameterModels);
     when(parameterGroupModel.getParameter(anyString()))
         .then(invocation -> {
-          String paramName = invocation.getArgumentAt(0, String.class);
+          String paramName = invocation.getArgument(0);
           switch (paramName) {
             case CONTENT_NAME:
               return Optional.of(contentParameter);

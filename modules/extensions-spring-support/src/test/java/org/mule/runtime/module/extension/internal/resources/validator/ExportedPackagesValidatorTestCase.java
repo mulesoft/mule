@@ -15,10 +15,10 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -31,7 +31,6 @@ import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.shapes.Shape;
@@ -39,25 +38,26 @@ import org.mule.test.module.extension.api.ApiTestClass;
 import org.mule.test.module.extension.internal.InternalTestClass;
 import org.mule.test.vegan.extension.VeganAttributes;
 
+import com.google.common.reflect.TypeToken;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.common.reflect.TypeToken;
 import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExportedPackagesValidatorTestCase {
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  @Mock
+  @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
   @Before
@@ -134,7 +134,7 @@ public class ExportedPackagesValidatorTestCase {
   }
 
   private OutputModel mockOutputModel(Type type) {
-    OutputModel om = mock(OutputModel.class);
+    OutputModel om = mock(OutputModel.class, withSettings().lenient());
     when(om.getType()).thenReturn(loader.load(type));
     return om;
   }
@@ -146,7 +146,7 @@ public class ExportedPackagesValidatorTestCase {
   }
 
   private OperationModel mockOperationModel(OutputModel output, OutputModel attributes, ParameterModel... params) {
-    OperationModel op = mock(OperationModel.class);
+    OperationModel op = mock(OperationModel.class, withSettings().lenient());
     when(op.getOutput()).thenReturn(output);
     when(op.getOutputAttributes()).thenReturn(attributes);
     if (params != null) {

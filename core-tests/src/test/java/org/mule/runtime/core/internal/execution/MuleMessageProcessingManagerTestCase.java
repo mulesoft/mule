@@ -11,7 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.inOrder;
@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -39,6 +38,9 @@ import org.mule.runtime.core.privileged.execution.ValidationPhaseTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,30 +48,37 @@ import org.mockito.Answers;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
 
   private MuleContextWithRegistry mockMuleContext = mockContextWithServices();
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Registry registry;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private TestMessageProcessTemplateAndContext completeMessageProcessTemplateAndContext;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SystemExceptionHandler mockExceptionListener;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowConstruct flowConstruct;
 
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS, lenient = true)
+  private CoreEvent mockEvent;
+
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     String flowName = "root";
     when(completeMessageProcessTemplateAndContext.getMessageSource().getRootContainerLocation())
         .thenReturn(Location.builder().globalName(flowName).build());
+    when(completeMessageProcessTemplateAndContext.getOriginalMessage()).thenReturn("");
+    when(completeMessageProcessTemplateAndContext.getEvent()).thenReturn(mockEvent);
+
     when(registry.lookupByName(flowName)).thenReturn(of(flowConstruct));
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 

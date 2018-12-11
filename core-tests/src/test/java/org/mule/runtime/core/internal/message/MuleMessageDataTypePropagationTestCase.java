@@ -13,9 +13,8 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,7 +23,6 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -37,11 +35,11 @@ import org.mule.runtime.core.privileged.transformer.ExtendedTransformationServic
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.InputStream;
 import java.nio.charset.Charset;
+
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase {
@@ -49,10 +47,8 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public static final Charset DEFAULT_ENCODING = UTF_8;
   public static final Charset CUSTOM_ENCODING = UTF_16;
   public static final String TEST_PROPERTY = "testProperty";
-  public static final MediaType CUSTOM_MIME_TYPE = MediaType.TEXT;
   public static final MediaType APPLICATION_XML_DEFAULT = APPLICATION_XML.withCharset(DEFAULT_ENCODING);
   public static final MediaType APPLICATION_XML_CUSTOM = APPLICATION_XML.withCharset(CUSTOM_ENCODING);
-  public static final String CUSTOM_CONTENT_TYPE = CUSTOM_MIME_TYPE + "; charset=" + CUSTOM_ENCODING;
 
   private MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);
   private ExtendedTransformationService transformationService;
@@ -157,7 +153,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
     DataType outputDataType = DataType.builder().type(Integer.class).mediaType(APPLICATION_XML).build();
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
-    when(transformer.transform(anyString())).thenReturn(1);
+    when(transformer.transform(any(Message.class))).thenReturn(1);
 
     CoreEvent muleEvent = mock(CoreEvent.class);
 

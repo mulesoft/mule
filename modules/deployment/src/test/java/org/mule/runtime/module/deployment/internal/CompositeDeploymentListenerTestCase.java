@@ -9,8 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -47,7 +45,6 @@ public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
-    when(muleContext.getCustomizationService()).thenReturn(customizationService);
     compositeDeploymentListener = new CompositeDeploymentListener();
     compositeDeploymentListener.addDeploymentListener(listener1);
     compositeDeploymentListener.addDeploymentListener(listener2);

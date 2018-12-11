@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -29,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -44,7 +43,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   @Mock
   private CoreEvent event;
 
-  @Mock
+  @Mock(lenient = true)
   private ValueResolvingContext resolvingContext;
 
   @Mock
