@@ -225,7 +225,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private ReactiveProcessor processAsyncChainFunction() {
     return innerPublisher -> from(innerPublisher)
         .doOnNext(fireAsyncScheduledNotification())
-        .transform(scheduleAsync(delegate))
+        .transform(processingStrategy.onPipeline(scheduleAsync(delegate)))
         .doOnNext(event -> {
           fireAsyncCompleteNotification(event, null);
           ((BaseEventContext) event.getContext()).success(event);
