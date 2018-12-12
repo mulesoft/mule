@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util.journal.queue;
 
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.queue.QueueProvider;
 import org.mule.runtime.core.internal.util.queue.RecoverableQueueStore;
@@ -16,9 +17,7 @@ import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.commons.collections.Predicate;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Process for recover pending transactions after a server crash.
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LocalTxQueueTransactionRecoverer {
 
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(LocalTxQueueTransactionRecoverer.class);
 
   private final LocalTxQueueTransactionJournal localTxQueueTransactionJournal;
   private final QueueProvider queueProvider;
@@ -46,23 +45,19 @@ public class LocalTxQueueTransactionRecoverer {
    * Clears the transaction log after processing all the log entries since does entries are not longer required.
    */
   public void recover() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Executing transaction recovery");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Executing transaction recovery");
     }
-    Multimap<Integer, LocalQueueTxJournalEntry> allEntries = this.localTxQueueTransactionJournal.getAllLogEntries();
-    if (logger.isDebugEnabled()) {
-      logger.debug("Found " + allEntries.size() + " txs to recover");
+    Multimap<Integer, LocalQueueTxJournalEntry> allEntries = localTxQueueTransactionJournal.getAllLogEntries();
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Found " + allEntries.size() + " txs to recover");
     }
     int txRecovered = 0;
     for (Integer txId : allEntries.keySet()) {
       Collection<LocalQueueTxJournalEntry> entries = allEntries.get(txId);
-      Object commitOrRollback = find(entries, new Predicate() {
-
-        @Override
-        public boolean evaluate(Object object) {
-          LocalQueueTxJournalEntry logEntry = (LocalQueueTxJournalEntry) object;
-          return logEntry.isCommit() || logEntry.isRollback();
-        }
+      Object commitOrRollback = find(entries, object -> {
+        LocalQueueTxJournalEntry logEntry = (LocalQueueTxJournalEntry) object;
+        return logEntry.isCommit() || logEntry.isRollback();
       });
       if (commitOrRollback != null) {
         continue;
@@ -74,8 +69,8 @@ public class LocalTxQueueTransactionRecoverer {
           RecoverableQueueStore queue = queueProvider.getRecoveryQueue(queueName);
           Serializable polledValue = logEntry.getValue();
           if (!queue.contains(polledValue)) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("re-adding polled element that was not commited to queue " + queue.getName());
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("re-adding polled element that was not commited to queue " + queue.getName());
             }
             try {
               queue.putNow(polledValue);
@@ -88,16 +83,16 @@ public class LocalTxQueueTransactionRecoverer {
           String queueName = logEntry.getQueueName();
           RecoverableQueueStore queue = queueProvider.getRecoveryQueue(queueName);
           if (queue.contains(offeredValue)) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("removing offer element that was not commited to queue " + queue.getName());
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("removing offer element that was not commited to queue " + queue.getName());
             }
             queue.remove(offeredValue);
           }
         }
       }
     }
-    if (logger.isDebugEnabled()) {
-      logger.debug("Recovered " + txRecovered + " txs to recover");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Recovered " + txRecovered + " txs to recover");
     }
     this.localTxQueueTransactionJournal.clear();
   }
