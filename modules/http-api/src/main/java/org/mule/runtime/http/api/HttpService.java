@@ -14,6 +14,7 @@ import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerFactory;
 import org.mule.runtime.http.api.utils.RequestMatcherRegistry;
 import org.mule.runtime.http.api.utils.RequestMatcherRegistry.RequestMatcherRegistryBuilder;
+import org.mule.runtime.http.api.ws.WebSocketBroadcaster;
 
 /**
  * Provides HTTP server and client factories.
@@ -38,5 +39,16 @@ public interface HttpService extends Service {
    * @since 4.1.5
    */
   RequestMatcherRegistryBuilder getRequestMatcherRegistryBuilder();
+
+  /**
+   * Returns a new {@link WebSocketBroadcaster}. Instances are not be assumed reusable. Unless specific implementation
+   * says otherwise, create a new broadcaster per each message to be broadcasted.
+   *
+   * @return A new {@link WebSocketBroadcaster}
+   * @since 4.2.0
+   */
+  default WebSocketBroadcaster newWebSocketBroadcaster() {
+    throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
 
 }
