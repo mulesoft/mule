@@ -49,11 +49,10 @@ import reactor.retry.BackoffDelay;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
- * de-multiplexing incoming events onto a single event-loop using a ring-buffer and then using using the
- * {@link SchedulerService#cpuLightScheduler()} to process these events from the ring-buffer. In contrast to the
- * {@link ReactorStreamProcessingStrategy} the proactor pattern treats {@link ProcessingType#CPU_INTENSIVE} and
- * {@link ProcessingType#BLOCKING} processors differently and schedules there execution on dedicated
- * {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
+ * de-multiplexing incoming events onto a multiple emitter using the {@link SchedulerService#cpuLightScheduler()} to process
+ * these events from each emitter. In contrast to the {@link ReactorStreamProcessingStrategy} the proactor pattern treats
+ * {@link ProcessingType#CPU_INTENSIVE} and {@link ProcessingType#BLOCKING} processors differently and schedules there execution
+ * on dedicated {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
@@ -74,10 +73,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                        () -> muleContext.getSchedulerService()
                                                            .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                       () -> muleContext.getSchedulerService()
-                                                           .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                               .withName(schedulersNamePrefix + ".retrySupport")
-                                                               .withMaxConcurrentTasks(CORES)),
+                                                       () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck(),

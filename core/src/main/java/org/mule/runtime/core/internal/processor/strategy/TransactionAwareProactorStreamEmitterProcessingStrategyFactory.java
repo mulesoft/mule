@@ -55,10 +55,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                                                .getSchedulerBaseConfig()
                                                                                .withName(schedulersNamePrefix + "."
                                                                                    + CPU_INTENSIVE.name())),
-                                                                       () -> muleContext.getSchedulerService()
-                                                                           .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                                               .withName(schedulersNamePrefix + ".retrySupport")
-                                                                               .withMaxConcurrentTasks(CORES)),
+                                                                       () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                                        resolveParallelism(),
                                                                        getMaxConcurrency(),
                                                                        muleContext.getConfiguration().isThreadLoggingEnabled());

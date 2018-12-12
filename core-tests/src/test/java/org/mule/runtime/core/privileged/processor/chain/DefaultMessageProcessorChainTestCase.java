@@ -72,12 +72,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.*;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -123,12 +118,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         {new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
         {new ReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorStreamWorkQueueProcessingStrategyFactory(), BLOCKING},
+        {new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), BLOCKING},
         {new BlockingProcessingStrategyFactory(), BLOCKING},
         {new DirectProcessingStrategyFactory(), BLOCKING},
         {new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new BlockingProcessingStrategyFactory(), NON_BLOCKING},
         {new DirectProcessingStrategyFactory(), NON_BLOCKING}});
