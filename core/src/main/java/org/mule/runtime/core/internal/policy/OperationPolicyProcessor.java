@@ -19,14 +19,16 @@ import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,12 +53,12 @@ public class OperationPolicyProcessor implements Processor {
   private final Policy policy;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
-  private final Processor nextProcessor;
+  private final ReactiveProcessor nextProcessor;
   private final PolicyStateIdFactory stateIdFactory;
 
   public OperationPolicyProcessor(Policy policy,
                                   PolicyStateHandler policyStateHandler,
-                                  Processor nextProcessor) {
+                                  ReactiveProcessor nextProcessor) {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
@@ -114,7 +116,7 @@ public class OperationPolicyProcessor implements Processor {
                                      () -> getMessageAttributesAsString(event), "After operation"));
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent,
+  private Processor buildOperationExecutionWithPolicyFunction(ReactiveProcessor nextOperation, PrivilegedEvent operationEvent,
                                                               PolicyStateId policyStateId) {
     return new Processor() {
 

@@ -40,6 +40,10 @@ final public class Either<L, R> {
     return new Either<>(ofNullable(value), empty());
   }
 
+  public static <L, R> Either<L, R> left(L value, Class<R> rightClass) {
+    return new Either<>(ofNullable(value), empty());
+  }
+
   /**
    * Creates an {@code Either} with a right value.
    *
@@ -49,6 +53,10 @@ final public class Either<L, R> {
    * @return the created {@code Either instance}
    */
   public static <L, R> Either<L, R> right(R value) {
+    return new Either<>(empty(), ofNullable(value));
+  }
+
+  public static <L, R> Either<L, R> right(Class<L> leftClass, R value) {
     return new Either<>(empty(), ofNullable(value));
   }
 

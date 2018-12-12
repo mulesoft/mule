@@ -17,9 +17,11 @@ public interface OperationPolicy {
    * next-operation of the chain.
    *
    * @param operationEvent the event with the data to execute the operation
+   * @param operationExecutionFunction the function that executes the operation.
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  Publisher<CoreEvent> process(CoreEvent operationEvent, OperationParametersProcessor parametersProcessor);
+  Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
+                               OperationParametersProcessor parametersProcessor);
 
 }

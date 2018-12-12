@@ -40,6 +40,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -74,6 +75,7 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
+import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -101,10 +103,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -112,6 +110,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.Collections;
+import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
@@ -349,13 +350,14 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(stringType.getAnnotation(anyObject())).thenReturn(empty());
 
-    when(mockPolicyManager.createOperationPolicy(any(), any(), any(), any())).thenAnswer(invocationOnMock -> {
+    when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenAnswer(invocationOnMock -> {
       if (mockOperationPolicy == null) {
         mockOperationPolicy = mock(OperationPolicy.class);
-        when(mockOperationPolicy.process(any(), any()))
-            .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
-                .execute((Map<String, Object>) invocationOnMock.getArguments()[2],
-                         (CoreEvent) invocationOnMock.getArguments()[1]));
+        when(mockOperationPolicy.process(any(), any(), any()))
+            .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) operationPolicyInvocationMock
+                .getArguments()[1])
+                    .execute(((OperationParametersProcessor) invocationOnMock.getArguments()[2]).getOperationParameters(),
+                             (CoreEvent) invocationOnMock.getArguments()[1]));
       }
       return mockOperationPolicy;
     });

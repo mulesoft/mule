@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 /**
  * Default implementation for {@link OperationPolicyProcessorFactory}.
@@ -29,7 +30,7 @@ public class DefaultOperationPolicyProcessorFactory implements OperationPolicyPr
   }
 
   @Override
-  public Processor createOperationPolicy(Policy policy, Processor nextProcessor) {
+  public Processor createOperationPolicy(Policy policy, ReactiveProcessor nextProcessor) {
     return new OperationPolicyProcessor(policy, policyStateHandler, nextProcessor);
   }
 }
