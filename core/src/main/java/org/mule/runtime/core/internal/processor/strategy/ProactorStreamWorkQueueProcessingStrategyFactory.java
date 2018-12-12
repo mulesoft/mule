@@ -27,14 +27,10 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -106,60 +102,6 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
   }
 
   static class ProactorStreamWorkQueueProcessingStrategy extends ProactorStreamProcessingStrategy {
-
-    private final AtomicInteger inFlightEvents = new AtomicInteger();
-    private final BiConsumer<CoreEvent, Throwable> IN_FLIGHT_DECREMENT_CALLBACK = (e, t) -> inFlightEvents.decrementAndGet();
-
-    private final class ProactorSinkWrapper<E> implements ReactorSink<E> {
-
-      private final ReactorSink<E> innerSink;
-
-      private ProactorSinkWrapper(ReactorSink<E> innerSink) {
-        this.innerSink = innerSink;
-      }
-
-      @Override
-      public final void accept(CoreEvent event) {
-        if (!checkCapacity(event)) {
-          throw new RejectedExecutionException();
-        }
-
-        innerSink.accept(event);
-      }
-
-      @Override
-      public final boolean emit(CoreEvent event) {
-        return checkCapacity(event) && innerSink.emit(event);
-      }
-
-      private boolean checkCapacity(CoreEvent event) {
-        if (retryingCounter.get() > 0) {
-          return false;
-        }
-        if (maxConcurrencyEagerCheck) {
-          if (inFlightEvents.incrementAndGet() > maxConcurrency) {
-            inFlightEvents.decrementAndGet();
-            return false;
-          }
-
-          // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
-          // an async, for instance)
-          ((BaseEventContext) event.getContext()).onResponse(IN_FLIGHT_DECREMENT_CALLBACK);
-        }
-
-        return true;
-      }
-
-      @Override
-      public E intoSink(CoreEvent event) {
-        return innerSink.intoSink(event);
-      }
-
-      @Override
-      public final void dispose() {
-        innerSink.dispose();
-      }
-    }
 
     private static Logger LOGGER = getLogger(ProactorStreamWorkQueueProcessingStrategy.class);
 
