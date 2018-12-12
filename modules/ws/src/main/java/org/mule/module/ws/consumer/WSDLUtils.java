@@ -6,13 +6,18 @@
  */
 package org.mule.module.ws.consumer;
 
+import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.transport.http.HttpConnector.HTTPS_URL_PROTOCOL;
+import static org.mule.transport.http.HttpConnector.HTTP_URL_PROTOCOL;
 
 import org.mule.util.StringUtils;
 import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,6 +54,33 @@ public class WSDLUtils
     private static final String XML_INCLUDE_ELEMENT = "include";
     private static final String XML_SCHEMA_LOCATION_ATTRIBUTE = "schemaLocation";
 
+    
+    /**
+     * Normalizes the import location.
+     * 
+     * @param basePath basePath to retrieve the import types
+     * @param importLocation the import location relative to the base path
+     * 
+     * @return normalized location
+     * 
+     * @throws URISyntaxException error in the URI to be normalized
+     */
+    public static String normalizeBasePathURL(String basePath, String importLocation) throws URISyntaxException
+    {
+        if (isHttpAddress(basePath))
+        {
+            return new URI(basePath + importLocation).normalize().toString();
+        }
+        
+        return normalize(basePath + importLocation);
+    }
+    
+
+    public static boolean isHttpAddress(String url)
+    {
+        return url.startsWith(HTTP_URL_PROTOCOL) || url.startsWith(HTTPS_URL_PROTOCOL);
+    }
+    
     /**
      * Returns all the XML schemas from a WSDL definition.
      *

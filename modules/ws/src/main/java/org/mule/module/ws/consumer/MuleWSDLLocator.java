@@ -6,19 +6,11 @@
  */
 package org.mule.module.ws.consumer;
 
+import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.xmlbeans.impl.schema.StscImporter.resolveRelativePathInArchives;
 import static org.mule.module.ws.consumer.WSDLUtils.getBasePath;
-import static org.mule.transport.http.HttpConnector.HTTPS_URL_PROTOCOL;
-import static org.mule.transport.http.HttpConnector.HTTP_URL_PROTOCOL;
-import static org.apache.commons.io.FilenameUtils.normalize;
-
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.ws.consumer.wsdl.strategy.factory.HttpRequesterWsdlRetrieverStrategyFactory;
-import org.mule.module.ws.consumer.wsdl.strategy.factory.URLWSDLRetrieverStrategyFactory;
-import org.mule.transport.ssl.api.TlsContextFactory;
-import org.mule.util.IOUtils;
+import static org.mule.module.ws.consumer.WSDLUtils.isHttpAddress;
+import static org.mule.module.ws.consumer.WSDLUtils.normalizeBasePathURL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +22,13 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.xml.WSDLLocator;
 
 import org.apache.xmlbeans.impl.common.HttpRetriever;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.module.ws.consumer.wsdl.strategy.factory.HttpRequesterWsdlRetrieverStrategyFactory;
+import org.mule.module.ws.consumer.wsdl.strategy.factory.URLWSDLRetrieverStrategyFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -105,16 +104,6 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
         }
     }
 
-    private String normalizeBasePathURL(String basePath, String importLocation)
-    {
-        if (isHttpAddress(basePath))
-        {
-            return basePath + importLocation;
-        }
-        
-        return normalize(basePath + importLocation);
-    }
-
     private boolean mustResolveRelativePaths(URL url)
     {
         return url.getProtocol().equals(JAR) || url.getProtocol().equals(ZIP);
@@ -169,11 +158,6 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
                 logger.warn("Error closing stream during WSDL retrieval");
             }
         }
-    }
-
-    private boolean isHttpAddress(String url)
-    {
-        return url.startsWith(HTTP_URL_PROTOCOL) || url.startsWith(HTTPS_URL_PROTOCOL);
     }
 
     @Override
