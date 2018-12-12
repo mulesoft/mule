@@ -6,6 +6,10 @@
  */
 package org.mule.module.ws.functional;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.mule.module.ws.consumer.WSDLUtils.normalizeBasePathURL;
+
 import org.junit.Test;
 import org.mule.api.MuleException;
 import org.mule.module.ws.consumer.MuleWSDLLocator;
@@ -31,5 +35,24 @@ public class MuleWSDLLocatorTestCase
                     .build();
         MuleWSDLLocator wsdlLocator = new MuleWSDLLocator(locatorConfig);
         wsdlLocator.getImportInputSource("jar:file:./src/test/resources/wsdl.jar!/wsdl/Dummy.wsdl", "Test.wsdl");
+    }
+
+    @Test
+    public void testLocationNormalizedInHttp() throws Exception
+    {
+        assertThat(normalizeBasePathURL("http://localhost/route/", "../dummy"), equalTo("http://localhost/dummy"));
+    }
+
+    @Test
+    public void testLocationNormalizedInHttps() throws Exception
+    {
+        assertThat(normalizeBasePathURL("https://localhost/route/", "../dummy"), equalTo("https://localhost/dummy"));
+    }
+
+
+    @Test
+    public void testLocationNormalizedInFiles() throws Exception
+    {
+        assertThat(normalizeBasePathURL("/Users/folder/", "../file"), equalTo("/Users/file"));
     }
 }
