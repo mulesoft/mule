@@ -42,7 +42,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
    */
   private static final int MINIMUM_ENTRIES_TO_CLEAR_FILE = 10000;
 
-  private static Logger LOGGER = getLogger(TransactionJournalFile.class);
+  private static final Logger LOGGER = getLogger(TransactionJournalFile.class);
 
   private final File journalFile;
   private final JournalEntrySerializer<T, K> journalEntrySerializer;

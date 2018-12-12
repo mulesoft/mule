@@ -26,7 +26,7 @@ import org.slf4j.Logger;
  */
 public class LocalTxQueueTransactionRecoverer {
 
-  private static Logger LOGGER = getLogger(LocalTxQueueTransactionRecoverer.class);
+  private static final Logger LOGGER = getLogger(LocalTxQueueTransactionRecoverer.class);
 
   private final LocalTxQueueTransactionJournal localTxQueueTransactionJournal;
   private final QueueProvider queueProvider;
