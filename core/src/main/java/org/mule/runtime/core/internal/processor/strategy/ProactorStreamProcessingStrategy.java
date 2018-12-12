@@ -6,11 +6,21 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.reactivestreams.Publisher;
+
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+
 import static java.lang.Integer.getInteger;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Math.max;
-import static java.time.Duration.ofMillis;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -18,23 +28,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.SYSTEM_PROPERTY_PREFIX;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.retry.Retry.onlyIf;
-
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
-import reactor.retry.BackoffDelay;
-
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public abstract class ProactorStreamProcessingStrategy
     extends ReactorStreamProcessingStrategyFactory.ReactorStreamProcessingStrategy {
@@ -42,7 +35,7 @@ public abstract class ProactorStreamProcessingStrategy
   protected static final int STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
       getInteger(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
 
-  private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+  protected static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
   private final Supplier<Scheduler> blockingSchedulerSupplier;
   private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
@@ -51,7 +44,7 @@ public abstract class ProactorStreamProcessingStrategy
   private Scheduler cpuIntensiveScheduler;
   private Scheduler retrySupportScheduler;
 
-  private final AtomicInteger retryingCounter = new AtomicInteger();
+  protected final AtomicInteger retryingCounter = new AtomicInteger();
 
   public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                           int bufferSize,
@@ -115,7 +108,7 @@ public abstract class ProactorStreamProcessingStrategy
             .transform(processor)
             .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
       } else {
-        return withRetry(scheduleProcessor(processor, scheduler, event), scheduler);
+        return scheduleProcessor(processor, scheduler, event);
       }
     }, max(maxConcurrency / (getParallelism() * subscribers), 1));
   }
@@ -125,28 +118,8 @@ public abstract class ProactorStreamProcessingStrategy
         && event.getMessage().getPayload().getByteLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
   }
 
-  protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
-                                                       CoreEvent event);
-
-  protected abstract Logger getLogger();
-
-  private Publisher<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
-    return scheduledFlux.retryWhen(onlyIf(ctx -> {
-      final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
-      if (schedulerBusy) {
-        getLogger().trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                          processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-        retryingCounter.incrementAndGet();
-      }
-      return schedulerBusy;
-    }).doOnRetry(ctx -> getRetrySupportScheduler().schedule(() -> {
-      // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
-      // again by the retry mechanism.
-      retryingCounter.decrementAndGet();
-    }, SCHEDULER_BUSY_RETRY_INTERVAL_MS * 2, MILLISECONDS))
-        .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
-        .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
-  }
+  protected abstract Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
+                                                            CoreEvent event);
 
   protected Scheduler getBlockingScheduler() {
     return this.blockingScheduler;
