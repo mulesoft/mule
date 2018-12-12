@@ -48,6 +48,8 @@ public final class ArtifactObjectSerializer implements ObjectSerializer, Initial
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+    javaExternalSerializerProtocol.setMuleContext(context);
+    javaInternalSerializerProtocol.setMuleContext(context);
   }
 
   @Override

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.journal;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -26,7 +27,6 @@ import java.util.Collections;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Manages a transaction journal file.
@@ -42,7 +42,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
    */
   private static final int MINIMUM_ENTRIES_TO_CLEAR_FILE = 10000;
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(TransactionJournalFile.class);
 
   private final File journalFile;
   private final JournalEntrySerializer<T, K> journalEntrySerializer;
@@ -95,8 +95,8 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
 
   protected void doClearEntriesForTransaction(T txId) {
     Collection<K> entries = this.entries.removeAll(txId);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Evicted from tx log file " + entries.size() + " entries from txid " + txId);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Evicted from tx log file " + entries.size() + " entries from txid " + txId);
     }
   }
 
@@ -123,9 +123,9 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
     try {
       logFileOutputStream.close();
     } catch (IOException e) {
-      logger.warn(e.getMessage());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Error closing transaction journal file", e);
+      LOGGER.warn(e.getMessage());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Error closing transaction journal file", e);
       }
     }
   }
@@ -205,13 +205,13 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
             logEntryCreationFailed = true;
           }
         } catch (EOFException e) {
-          logger.debug("Expected exception since there are no more log entries", e);
+          LOGGER.debug("Expected exception since there are no more log entries", e);
           logEntryCreationFailed = true;
         } catch (Exception e) {
-          logger.warn("Exception reading transaction content. This is normal if the mule server was shutdown due to a failure"
+          LOGGER.warn("Exception reading transaction content. This is normal if the mule server was shutdown due to a failure"
               + e.getMessage());
-          if (logger.isDebugEnabled()) {
-            logger.debug("Error reading transaction journal file", e);
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Error reading transaction journal file", e);
           }
           logEntryCreationFailed = true;
         }
@@ -225,7 +225,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
           dataInputStream.close();
         }
       } catch (IOException e) {
-        logger.error("Error loading transaction journal file entries", e);
+        LOGGER.error("Error loading transaction journal file entries", e);
       }
     }
   }
