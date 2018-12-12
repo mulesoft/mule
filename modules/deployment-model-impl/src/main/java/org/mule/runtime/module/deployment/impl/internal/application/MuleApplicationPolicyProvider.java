@@ -41,6 +41,9 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   private final List<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProviders = new LinkedList<>();
   private Application application;
 
+  private Runnable policiesChangedCallback = () -> {
+  };
+
   /**
    * Creates a new provider
    *
@@ -85,6 +88,8 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
           .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance, parametrization.getId()));
       registeredPolicyInstanceProviders.sort(null);
       registeredPolicyTemplate.get().count++;
+
+      policiesChangedCallback.run();
     } catch (Exception e) {
       throw new PolicyRegistrationException(createPolicyRegistrationError(parametrization.getId()), e);
     }
@@ -115,7 +120,16 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
       }
     });
 
+    policiesChangedCallback.run();
+
     return registeredPolicyInstanceProvider.isPresent();
+  }
+
+
+  @Override
+  public void onPoliciesChanged(Runnable policiesChangedCallback) {
+    this.policiesChangedCallback = policiesChangedCallback;
+
   }
 
   @Override

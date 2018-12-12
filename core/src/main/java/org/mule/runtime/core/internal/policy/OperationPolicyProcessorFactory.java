@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 /**
  * Factory for {@link OperationPolicy} instances.
@@ -21,9 +22,9 @@ public interface OperationPolicyProcessorFactory {
    *
    * @param policy the policy from which the {@link OperationPolicy} gets created.
    * @param nextProcessor the next-operation processor implementation
-   * 
+   *
    * @return an {@link OperationPolicy} that performs the common logic related to policies.
    */
-  Processor createOperationPolicy(Policy policy, Processor nextProcessor);
+  Processor createOperationPolicy(Policy policy, ReactiveProcessor nextProcessor);
 
 }

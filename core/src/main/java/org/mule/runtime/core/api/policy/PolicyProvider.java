@@ -39,4 +39,13 @@ public interface PolicyProvider {
    */
   List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters);
 
+  /**
+   * Register a callback to be executed any time a policy is added or removed.
+   *
+   * @param policiesChangedCallback
+   */
+  default void onPoliciesChanged(Runnable policiesChangedCallback) {
+    // Nothing to do
+  };
+
 }

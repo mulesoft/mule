@@ -125,7 +125,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     policyManager = mock(PolicyManager.class);
     sourcePolicy = mock(SourcePolicy.class);
-    when(policyManager.createSourcePolicyInstance(any(), any(), any(), any())).thenReturn(sourcePolicy);
+    when(policyManager.createSourcePolicyInstance(any(), any(), any())).thenReturn(sourcePolicy);
     successResult = mock(SourcePolicySuccessResult.class);
     when(successResult.getResult()).then(invocation -> event);
     when(successResult.getResponseParameters()).thenReturn(() -> emptyMap());
@@ -133,7 +133,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     failureResult = mock(SourcePolicyFailureResult.class);
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
-    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
+    when(sourcePolicy.process(any(), any(Processor.class), any())).thenAnswer(invocation -> {
       event = invocation.getArgument(0);
       return just(right(successResult));
     });
@@ -343,7 +343,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failurePolicyManager() throws Exception {
-    when(policyManager.createSourcePolicyInstance(any(Component.class), any(CoreEvent.class), any(Processor.class),
+    when(policyManager.createSourcePolicyInstance(any(Component.class), any(CoreEvent.class),
                                                   any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
 
@@ -400,7 +400,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   }
 
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
-    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
+    when(sourcePolicy.process(any(), any(Processor.class), any())).thenAnswer(invocation -> {
       messagingException = buildFailingFlowException(invocation.getArgument(0), failure);
       return just(left(failureResult));
     });

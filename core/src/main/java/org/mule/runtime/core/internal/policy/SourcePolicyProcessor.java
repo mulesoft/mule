@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
@@ -48,7 +49,7 @@ public class SourcePolicyProcessor implements Processor {
   private final Policy policy;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
-  private final Processor nextProcessor;
+  private final ReactiveProcessor nextProcessor;
   private final PolicyStateIdFactory stateIdFactory;
 
   /**
@@ -58,8 +59,7 @@ public class SourcePolicyProcessor implements Processor {
    * @param policyStateHandler the state handler for the policy.
    * @param nextProcessor the next-operation processor implementation, it may be another policy or the flow execution.
    */
-  public SourcePolicyProcessor(Policy policy,
-                               PolicyStateHandler policyStateHandler, Processor nextProcessor) {
+  public SourcePolicyProcessor(Policy policy, PolicyStateHandler policyStateHandler, ReactiveProcessor nextProcessor) {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
