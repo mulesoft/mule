@@ -74,6 +74,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
@@ -129,6 +130,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         {new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new BlockingProcessingStrategyFactory(), NON_BLOCKING},
         {new DirectProcessingStrategyFactory(), NON_BLOCKING}});

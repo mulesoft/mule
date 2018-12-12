@@ -14,7 +14,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -42,6 +41,7 @@ import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingE
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,11 +49,10 @@ import reactor.retry.BackoffDelay;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
- * de-multiplexing incoming events onto a single event-loop using a ring-buffer and then using using the
- * {@link SchedulerService#cpuLightScheduler()} to process these events from the ring-buffer. In contrast to the
- * {@link ReactorStreamProcessingStrategy} the proactor pattern treats {@link ProcessingType#CPU_INTENSIVE} and
- * {@link ProcessingType#BLOCKING} processors differently and schedules there execution on dedicated
- * {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
+ * de-multiplexing incoming events onto a multiple emitter using the {@link SchedulerService#cpuLightScheduler()} to process
+ * these events from each emitter. In contrast to the {@link ReactorStreamProcessingStrategy} the proactor pattern treats
+ * {@link ProcessingType#CPU_INTENSIVE} and {@link ProcessingType#BLOCKING} processors differently and schedules there execution
+ * on dedicated {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
@@ -74,10 +73,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                        () -> muleContext.getSchedulerService()
                                                            .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                       () -> muleContext.getSchedulerService()
-                                                           .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                               .withName(schedulersNamePrefix + ".retrySupport")
-                                                               .withMaxConcurrentTasks(CORES)),
+                                                       () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck(),
@@ -96,7 +92,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
   static class ProactorStreamEmitterProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    private static Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(ProactorStreamEmitterProcessingStrategy.class);
 
     private boolean isThreadLoggingEnabled;
 
@@ -144,7 +140,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       int concurrency = maxConcurrency < subscribers ? maxConcurrency : subscribers;
       for (int i = 0; i < concurrency; i++) {
         Latch completionLatch = new Latch();
-        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
+        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize / concurrency);
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
             .transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
@@ -176,29 +172,14 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     @Override
-    protected Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
       return scheduleWithLogging(processor, processorScheduler, event)
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
+          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler));
+    }
 
-          .retryWhen(onlyIf(ctx -> {
-            final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
-            if (schedulerBusy) {
-              LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                           processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-
-              retryingCounter.incrementAndGet();
-            }
-            return schedulerBusy;
-          })
-              .doOnRetry(ctx -> {
-                getRetrySupportScheduler().schedule(() -> {
-                  // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
-                  // again by the retry mechanism.
-                  retryingCounter.decrementAndGet();
-                }, SCHEDULER_BUSY_RETRY_INTERVAL_MS * 2, MILLISECONDS);
-              })
-              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
-              .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
+    @Override
+    protected Logger getLogger() {
+      return LOGGER;
     }
 
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {

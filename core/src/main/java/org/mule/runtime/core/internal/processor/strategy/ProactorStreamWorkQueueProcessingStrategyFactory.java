@@ -8,16 +8,12 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.time.Duration.ofMillis;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -28,17 +24,16 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.slf4j.LoggerFactory;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.retry.BackoffDelay;
 import reactor.util.context.Context;
 
 /**
@@ -103,7 +98,7 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
 
   static class ProactorStreamWorkQueueProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    private static Logger LOGGER = getLogger(ProactorStreamWorkQueueProcessingStrategy.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(ProactorStreamWorkQueueProcessingStrategy.class);
 
     private final boolean isThreadLoggingEnabled;
 
@@ -144,29 +139,14 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     }
 
     @Override
-    protected Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
       reactor.core.scheduler.Scheduler eventLoopScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-      return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event)
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
-          .retryWhen(onlyIf(ctx -> {
-            final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
-            if (schedulerBusy) {
-              LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                           processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+      return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event);
+    }
 
-              retryingCounter.incrementAndGet();
-            }
-            return schedulerBusy;
-          })
-              .doOnRetry(ctx -> {
-                getRetrySupportScheduler().schedule(() -> {
-                  // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
-                  // again by the retry mechanism.
-                  retryingCounter.decrementAndGet();
-                }, SCHEDULER_BUSY_RETRY_INTERVAL_MS * 2, MILLISECONDS);
-              })
-              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
-              .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
+    @Override
+    protected Logger getLogger() {
+      return LOGGER;
     }
 
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, reactor.core.scheduler.Scheduler eventLoopScheduler,
