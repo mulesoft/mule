@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static com.google.common.collect.ImmutableMap.of;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.error;
@@ -87,11 +90,10 @@ public class CompositeOperationPolicy
   protected Publisher<CoreEvent> processNextOperation(Publisher<CoreEvent> eventPub) {
     return from(eventPub)
         .flatMap(event -> {
-          final Map<String, ?> internalParams = ((InternalEvent) event).getInternalParameters();
           Map<String, Object> parametersMap = new HashMap<>();
           try {
             OperationParametersProcessor parametersProcessor =
-                (OperationParametersProcessor) internalParams.get(POLICY_OPERATION_PARAMETERS_PROCESSOR);
+                ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
             parametersMap.putAll(parametersProcessor.getOperationParameters());
           } catch (Exception e) {
             return error(e);
@@ -101,13 +103,10 @@ public class CompositeOperationPolicy
           }
 
           OperationExecutionFunction operationExecutionFunction =
-              (OperationExecutionFunction) internalParams.get(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
+              ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
           return from(operationExecutionFunction.execute(parametersMap, event));
         })
-        .map(response -> InternalEvent.builder(response)
-            .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)
-            .build())
-        .cast(CoreEvent.class);
+        .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
 
   /**
@@ -126,13 +125,11 @@ public class CompositeOperationPolicy
         .map(policyResponse -> {
 
           if (policy.getPolicyChain().isPropagateMessageTransformations()) {
-            return InternalEvent.builder(policyResponse)
-                .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, policyResponse)
-                .build();
+            return quickCopy(policyResponse, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, policyResponse));
           }
 
-          final InternalEvent nextOperationResponse = (InternalEvent) ((InternalEvent) policyResponse).getInternalParameters()
-              .get(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
+          final InternalEvent nextOperationResponse =
+              ((InternalEvent) policyResponse).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
           return nextOperationResponse != null ? nextOperationResponse : policyResponse;
         })
         .cast(CoreEvent.class);
@@ -141,10 +138,9 @@ public class CompositeOperationPolicy
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                       OperationParametersProcessor parametersProcessor) {
-    CoreEvent operationEventForPolicy = InternalEvent.builder(operationEvent)
-        .addInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor)
-        .addInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction)
-        .build();
+    CoreEvent operationEventForPolicy = quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
+                                                                     POLICY_OPERATION_OPERATION_EXEC_FUNCTION,
+                                                                     operationExecutionFunction));
 
     try {
       if (getParametersTransformer().isPresent()) {

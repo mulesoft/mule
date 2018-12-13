@@ -86,8 +86,7 @@ public class PolicyPointcutParametersManager {
       }
     }
 
-    PolicyPointcutParameters sourceParameters =
-        (PolicyPointcutParameters) ((InternalEvent) event).getInternalParameters().get(POLICY_SOURCE_POINTCUT_PARAMETERS);
+    PolicyPointcutParameters sourceParameters = ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS);
 
     if (found != null) {
       try {
