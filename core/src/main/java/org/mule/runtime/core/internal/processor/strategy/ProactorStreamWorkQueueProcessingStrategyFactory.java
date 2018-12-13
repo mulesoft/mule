@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -103,8 +104,6 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
 
   static class ProactorStreamWorkQueueProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ProactorStreamWorkQueueProcessingStrategy.class);
-
     private final boolean isThreadLoggingEnabled;
 
     public ProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
@@ -141,11 +140,6 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
            maxConcurrencyEagerCheck, false);
-    }
-
-    @Override
-    protected Logger getLogger() {
-      return LOGGER;
     }
 
     @Override

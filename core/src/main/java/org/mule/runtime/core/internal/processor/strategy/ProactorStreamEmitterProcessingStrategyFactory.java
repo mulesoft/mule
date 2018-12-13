@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -21,7 +22,6 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
@@ -40,7 +40,6 @@ import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingE
 
 import org.slf4j.Logger;
 
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -90,7 +89,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
   static class ProactorStreamEmitterProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ProactorStreamEmitterProcessingStrategy.class);
+    private static Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
 
     private boolean isThreadLoggingEnabled;
 
@@ -128,11 +127,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
            maxConcurrencyEagerCheck, false);
-    }
-
-    @Override
-    protected Logger getLogger() {
-      return LOGGER;
     }
 
     @Override

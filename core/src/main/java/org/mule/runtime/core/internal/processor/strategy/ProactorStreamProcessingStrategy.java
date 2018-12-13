@@ -11,8 +11,8 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.retry.BackoffDelay;
 
@@ -31,6 +31,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.SYSTEM_PROPERTY_PREFIX;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -41,6 +42,7 @@ public abstract class ProactorStreamProcessingStrategy
 
   protected static final int STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
       getInteger(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
+  private static Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
 
   private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
@@ -126,8 +128,6 @@ public abstract class ProactorStreamProcessingStrategy
         && event.getMessage().getPayload().getByteLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
   }
 
-  protected abstract Logger getLogger();
-
   protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
                                                        CoreEvent event);
 
@@ -135,8 +135,8 @@ public abstract class ProactorStreamProcessingStrategy
     return scheduledFlux.retryWhen(onlyIf(ctx -> {
       final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
       if (schedulerBusy) {
-        getLogger().trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                          processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+        LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                     processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         retryingCounter.incrementAndGet();
       }
       return schedulerBusy;
