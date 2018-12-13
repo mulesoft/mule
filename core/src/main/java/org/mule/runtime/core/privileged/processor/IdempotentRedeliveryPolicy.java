@@ -19,7 +19,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
@@ -37,6 +39,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
+import org.slf4j.Logger;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,8 +51,6 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.slf4j.Logger;
 
 /**
  * Implement a retry policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
@@ -87,8 +89,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
     private static final long serialVersionUID = 5513487261745816555L;
 
-    private AtomicInteger counter = new AtomicInteger();
-    private List<Error> errors = new LinkedList<>();
+    private final AtomicInteger counter = new AtomicInteger();
+    private final List<Error> errors = new LinkedList<>();
 
   }
 
@@ -218,6 +220,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     } finally {
       lock.unlock();
     }
+  }
+
+  @Override
+  public ProcessingType getProcessingType() {
+    // This is because the execution of the flow happens with a lock taken, and if the thread is changed because of a non-blocking
+    // execution, the lock cannot be released (reentrant locks can only be released in the same thread that acquired it).
+    return BLOCKING;
   }
 
   private MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor) {
