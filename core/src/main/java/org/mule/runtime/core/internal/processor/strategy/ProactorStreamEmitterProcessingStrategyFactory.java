@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Long.max;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
-import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -18,11 +17,12 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.retry.Retry.onlyIf;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -38,14 +38,12 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.retry.BackoffDelay;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
@@ -145,7 +143,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       int concurrency = maxConcurrency < subscribers ? maxConcurrency : subscribers;
       for (int i = 0; i < concurrency; i++) {
         Latch completionLatch = new Latch();
-        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize);
+        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize / concurrency);
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
             .transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
@@ -202,9 +200,12 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     private final List<AbstractProcessingStrategy.ReactorSink<E>> fluxSinks;
     private final AtomicInteger index = new AtomicInteger(0);
+    // Saving update function to avoid creating the lambda every time
+    private final IntUnaryOperator update;
 
     public RoundRobinReactorSink(List<AbstractProcessingStrategy.ReactorSink<E>> sinks) {
       this.fluxSinks = sinks;
+      this.update = (value) -> (value + 1) % fluxSinks.size();
     }
 
     @Override
@@ -218,7 +219,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     private int nextIndex() {
-      return index.getAndUpdate(v -> (v + 1) % fluxSinks.size());
+      return index.getAndUpdate(update);
     }
 
     @Override
