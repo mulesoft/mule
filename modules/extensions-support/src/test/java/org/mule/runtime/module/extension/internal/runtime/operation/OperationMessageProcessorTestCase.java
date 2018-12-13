@@ -73,6 +73,7 @@ import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
+import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;

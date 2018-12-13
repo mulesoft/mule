@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -70,8 +69,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   @Override
   public SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
                                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
-    final PolicyPointcutParameters sourcePointcutParameters = (PolicyPointcutParameters) ((InternalEvent) sourceEvent)
-        .getInternalParameters().get(POLICY_SOURCE_POINTCUT_PARAMETERS);
+    final PolicyPointcutParameters sourcePointcutParameters = ((InternalEvent) sourceEvent)
+        .getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS);
 
     final ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
     final Pair<ComponentIdentifier, PolicyPointcutParameters> policyKey = new Pair<>(sourceIdentifier, sourcePointcutParameters);

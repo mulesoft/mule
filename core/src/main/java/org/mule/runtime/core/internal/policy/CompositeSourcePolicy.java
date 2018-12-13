@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -89,13 +91,11 @@ public class CompositeSourcePolicy
   protected Publisher<CoreEvent> processNextOperation(Publisher<CoreEvent> eventPub) {
     return from(eventPub)
         .flatMap(event -> {
-          final Map<String, ?> internalParameters = ((InternalEvent) event).getInternalParameters();
-
-          Processor flowExecutionProcessor = (Processor) internalParameters.get(POLICY_SOURCE_FLOW_PROCESSOR);
+          Processor flowExecutionProcessor = ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_FLOW_PROCESSOR);
           return from(flowExecutionProcessor.apply(just(event)))
               .map(flowExecutionResponse -> {
                 MessageSourceResponseParametersProcessor parametersProcessor =
-                    (MessageSourceResponseParametersProcessor) internalParameters.get(POLICY_SOURCE_PARAMETERS_PROCESSOR);
+                    ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
 
                 Map<String, Object> originalResponseParameters =
                     parametersProcessor.getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);
@@ -114,8 +114,7 @@ public class CompositeSourcePolicy
         .cast(CoreEvent.class)
         .onErrorMap(MessagingException.class, messagingException -> {
           MessageSourceResponseParametersProcessor parametersProcessor =
-              (MessageSourceResponseParametersProcessor) ((InternalEvent) messagingException.getEvent()).getInternalParameters()
-                  .get(POLICY_SOURCE_PARAMETERS_PROCESSOR);
+              ((InternalEvent) messagingException.getEvent()).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
 
           Map<String, Object> originalFailureResponseParameters =
               parametersProcessor.getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
@@ -172,23 +171,21 @@ public class CompositeSourcePolicy
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
                                                                                          Processor flowExecutionProcessor,
                                                                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
-    CoreEvent sourceEventForPolicy = InternalEvent.builder(sourceEvent)
-        .addInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR, messageSourceResponseParametersProcessor)
-        .addInternalParameter(POLICY_SOURCE_FLOW_PROCESSOR, flowExecutionProcessor)
-        .build();
+    CoreEvent sourceEventForPolicy =
+        quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, messageSourceResponseParametersProcessor,
+                                  POLICY_SOURCE_FLOW_PROCESSOR, flowExecutionProcessor));
 
     return from(MessageProcessors.process(sourceEventForPolicy, getExecutionProcessor()))
         .map(policiesResultEvent -> {
-          final Map<String, Object> originalResponseParameters = (Map<String, Object>) ((InternalEvent) policiesResultEvent)
-              .getInternalParameters().get(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS);
+          final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
+              .getInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS);
           Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer
                   .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage())))
               .orElse(originalResponseParameters);
           return right(SourcePolicyFailureResult.class, new SourcePolicySuccessResult(policiesResultEvent, responseParameters,
-                                                                                      (MessageSourceResponseParametersProcessor) ((InternalEvent) policiesResultEvent)
-                                                                                          .getInternalParameters()
-                                                                                          .get(POLICY_SOURCE_PARAMETERS_PROCESSOR)));
+                                                                                      ((InternalEvent) policiesResultEvent)
+                                                                                          .getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR)));
         })
         .doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
         .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
@@ -204,8 +201,8 @@ public class CompositeSourcePolicy
   }
 
   protected Supplier<Map<String, Object>> resolveErrorResponseParameters(MessagingException e) {
-    final Map<String, Object> originalFailureResponseParameters = (Map<String, Object>) ((InternalEvent) e.getEvent())
-        .getInternalParameters().get(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS);
+    final Map<String, Object> originalFailureResponseParameters =
+        ((InternalEvent) e.getEvent()).getInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS);
 
     return () -> getParametersTransformer()
         .map(parametersTransformer -> concatMaps(originalFailureResponseParameters,
