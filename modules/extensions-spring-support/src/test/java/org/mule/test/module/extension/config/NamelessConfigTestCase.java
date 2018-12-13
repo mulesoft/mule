@@ -24,8 +24,6 @@ public class NamelessConfigTestCase extends AbstractMuleTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-
-
   private ExtensionModelValidator validator = new ConfigurationModelValidator();
 
   @Test

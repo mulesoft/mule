@@ -21,15 +21,4 @@ public interface HttpClientFactory {
    * @return a newly built {@link HttpClient} based on the {@code configuration}.
    */
   HttpClient create(HttpClientConfiguration configuration);
-
-  /**
-   * Allows to retrieve a previously created {@link HttpClient}, if used from the same context. Keep in mind lifecycle changes to
-   * the retrieved instance won't take effect since only the owner of the client can modify it's status.
-   *
-   * @param name the name the desired {@link HttpClient} was given when created (see {@link HttpClientConfiguration#getName()})
-   * @return the client found
-   * @throws ClientNotFoundException when the desired client was not found
-   * @since 4.2.0.
-   */
-  HttpClient lookup(String name) throws ClientNotFoundException;
 }
