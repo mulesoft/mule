@@ -21,7 +21,7 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory.TransactionAwareProactorStreamProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory.TransactionAwareProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import io.qameta.allure.Description;
@@ -30,23 +30,24 @@ import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
-public class TransactionAwareProactorStreamProcessingStrategyTestCase extends ProactorStreamProcessingStrategyTestCase {
+public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
+    extends ProactorStreamWorkQueueProcessingStrategyTestCase {
 
-  public TransactionAwareProactorStreamProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
+  public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
     super(mode);
   }
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareProactorStreamProcessingStrategy(() -> blocking,
-                                                                XS_BUFFER_SIZE,
-                                                                1,
-                                                                DEFAULT_WAIT_STRATEGY,
-                                                                () -> cpuLight,
-                                                                () -> blocking,
-                                                                () -> cpuIntensive,
-                                                                () -> custom,
-                                                                MAX_VALUE, true);
+    return new TransactionAwareProactorStreamWorkQueueProcessingStrategy(() -> blocking,
+                                                                         XS_BUFFER_SIZE,
+                                                                         1,
+                                                                         DEFAULT_WAIT_STRATEGY,
+                                                                         () -> cpuLight,
+                                                                         () -> blocking,
+                                                                         () -> cpuIntensive,
+                                                                         () -> custom,
+                                                                         MAX_VALUE, true);
   }
 
   @Override
