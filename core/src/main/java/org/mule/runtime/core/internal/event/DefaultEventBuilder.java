@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseIns
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -50,6 +51,9 @@ import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -58,9 +62,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
@@ -248,8 +249,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
+      final Message message = requireNonNull(messageFactory.apply(context));
       initVariables();
-      return new InternalEventImplementation(context, requireNonNull(messageFactory.apply(context)),
+      return new InternalEventImplementation(context, message,
                                              varsModified ? flowVariables : originalVars,
                                              internalParameters, session, securityContext, itemSequenceInfo, error,
                                              legacyCorrelationId,
@@ -485,6 +487,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Map<String, ?> getInternalParameters() {
       return unmodifiableMap(internalParameters);
+    }
+
+    @Override
+    public <T> T getInternalParameter(String key) {
+      return (T) internalParameters.get(key);
     }
 
     @Override
