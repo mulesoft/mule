@@ -26,9 +26,10 @@ import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
-public class ProactorStreamProcessingStrategyFactoryTestCase extends AbstractMuleContextTestCase {
+public class ProactorStreamWorkQueueProcessingStrategyFactoryTestCase extends AbstractMuleContextTestCase {
 
-  private ProactorStreamProcessingStrategyFactory processingStrategy = new ProactorStreamProcessingStrategyFactory();
+  private ProactorStreamWorkQueueProcessingStrategyFactory processingStrategy =
+      new ProactorStreamWorkQueueProcessingStrategyFactory();
 
   @Test
   @Description("Number of CPU Light threads is limited to number of cores when max concurrency is MAX_VALUE.")
