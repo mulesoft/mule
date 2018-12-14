@@ -49,7 +49,7 @@ import reactor.core.publisher.Flux;
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
- * @since 4.2.0
+ * @since 4.1.6
  */
 public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
 
