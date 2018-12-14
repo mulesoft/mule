@@ -107,7 +107,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
         .thenReturn(new DeployableMavenClassLoaderModelLoader(mavenClientProvider.createMavenClient(newMavenConfigurationBuilder()
             .localMavenRepositoryLocation(mavenClientProvider
                 .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get())
-                                                                                                            .build())));
+            .build())));
 
     when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, POLICY, BundleDescriptorLoader.class))
         .thenReturn(new PropertiesBundleDescriptorLoader());
@@ -198,8 +198,6 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
     PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).describedBy(policyModelBuilder.build())
         .dependingOn(plugin1).dependingOn(plugin2);
-/
-    Users / guillermo.fernandes / Development / mule - uber / mule - runtime - tooling - client / mule - runtime - tooling - client / src / main / java / org / mule / tooling / client / internal / ToolingDescriptorLoaderRepository.java
     File tempFolder = createTempFolder();
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
