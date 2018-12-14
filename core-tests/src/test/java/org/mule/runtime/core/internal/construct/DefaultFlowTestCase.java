@@ -32,6 +32,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static reactor.core.publisher.Mono.just;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -284,6 +285,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   }
 
   @Test
+  @Ignore("MULE-16210")
   public void originalExceptionThrownWhenStartAndStopOfProcessorBothFail() throws Exception {
     final Exception startException = new IllegalArgumentException();
     final Exception stopException = new IllegalStateException();
@@ -308,6 +310,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   }
 
   @Test
+  @Ignore("MULE-16210")
   public void originalExceptionThrownWhenStartAndStopOfSourceBothFail() throws Exception {
     final Exception startException = new IllegalArgumentException();
     final Exception stopException = new IllegalStateException();
