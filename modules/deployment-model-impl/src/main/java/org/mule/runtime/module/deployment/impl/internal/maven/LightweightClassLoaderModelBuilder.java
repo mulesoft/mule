@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -46,17 +45,15 @@ import org.apache.maven.model.Plugin;
  */
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
+  private static final String POM = "pom";
   private MavenClient mavenClient;
   private Set<BundleDependency> nonProvidedDependencies;
-  private File temporaryFolder;
 
   public LightweightClassLoaderModelBuilder(File artifactFolder,
-                                            MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies,
-                                            File temporaryFolder) {
+                                            MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies) {
     super(artifactFolder);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;
-    this.temporaryFolder = temporaryFolder;
   }
 
   @Override
@@ -146,11 +143,6 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    File temporaryPomFolder = new File(temporaryFolder, "temporary-poms");
-    if (!temporaryPomFolder.exists() && !temporaryPomFolder.mkdirs()) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
-          + temporaryPomFolder.getAbsolutePath()));
-    }
     Map<BundleDescriptor, Set<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
         super.doProcessAdditionalPluginLibraries(packagingPlugin);
     Map<BundleDescriptor, Set<BundleDescriptor>> effectivePluginsAdditionalLibrariesMap =
@@ -160,8 +152,15 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .forEach(bundleDependency -> {
           Model effectiveModel;
           try {
-            effectiveModel =
-                mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryPomFolder));
+            BundleDescriptor descriptor = bundleDependency.getDescriptor();
+            effectiveModel = mavenClient.getEffectiveModel(toFile(mavenClient
+                .resolveBundleDescriptor(new org.mule.maven.client.api.model.BundleDescriptor.Builder()
+                    .setGroupId(descriptor.getGroupId())
+                    .setArtifactId(descriptor.getArtifactId())
+                    .setVersion(descriptor.getVersion())
+                    .setType(POM)
+                    .build())
+                .getBundleUri().toURL()), empty());
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }

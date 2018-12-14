@@ -21,10 +21,10 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.maven.client.api.model.BundleScope.COMPILE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.maven.client.api.MavenClient;
@@ -46,9 +46,7 @@ import java.util.stream.Collectors;
 
 import io.qameta.allure.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class DeployableMavenClassLoaderModelLoaderTestCase {
 
@@ -65,9 +63,6 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
       createBundleDependency("some.company", "dummy-trait", "1.0.3", "raml-fragment");
   private static final String POM_FORMAT = "%s-%s.pom";
   private List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES = asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
-
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
 
@@ -233,9 +228,9 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   }
 
   private ClassLoaderModel buildClassLoaderModel(File rootApplication)
-      throws InvalidDescriptorLoaderException, IOException {
+      throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mockMavenClient, temporaryFolder.newFolder());
+        new DeployableMavenClassLoaderModelLoader(mockMavenClient);
 
     return deployableMavenClassLoaderModelLoader.load(rootApplication, emptyMap(), APP);
   }
