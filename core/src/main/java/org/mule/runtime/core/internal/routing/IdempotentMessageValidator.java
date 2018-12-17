@@ -39,6 +39,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 
 /**
@@ -73,8 +75,8 @@ public class IdempotentMessageValidator extends AbstractComponent
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
       storePrefix =
-          format("%s.%s.%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(),
-                 this.getClass().getName());
+          format("%s.%s.%s.%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(),
+                 this.getClass().getName(), UUID.randomUUID());
     }
     setupObjectStore();
   }
