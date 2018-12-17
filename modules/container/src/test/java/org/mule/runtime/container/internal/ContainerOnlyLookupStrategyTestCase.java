@@ -8,7 +8,7 @@
 package org.mule.runtime.container.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -27,7 +27,7 @@ public class ContainerOnlyLookupStrategyTestCase extends AbstractMuleTestCase {
 
     List<ClassLoader> classLoaders = lookupStrategy.getClassLoaders(mock(ClassLoader.class));
 
-    assertThat(classLoaders, contains(containerClassLoader));
+    assertThat(classLoaders, hasItem(containerClassLoader));
   }
 
   @Test(expected = IllegalArgumentException.class)
