@@ -14,6 +14,8 @@ import java.io.InputStream;
 
 /**
  * A message received into an inbound {@link WebSocket}
+ *
+ * @since 4.2.0
  */
 @NoImplement
 public interface WebSocketMessage {

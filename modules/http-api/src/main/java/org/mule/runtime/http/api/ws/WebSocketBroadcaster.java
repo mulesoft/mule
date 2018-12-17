@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
 /**
  * Broadcasts a given content to a group of supplied {@link WebSocket sockets}.
  *
- * Instances are not be assumed reusable.
+ * Instances are not to be assumed reusable.
  *
  * @since 4.2.0
  */

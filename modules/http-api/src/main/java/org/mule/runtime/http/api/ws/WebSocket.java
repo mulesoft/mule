@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * Sockets can also be labeled with groups, which allow to logically gather sets of sockets by a random taxonomy.
  *
- * @since 4.1.5
+ * @since 4.2.0
  */
 @NoImplement
 public interface WebSocket {

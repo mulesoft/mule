@@ -19,6 +19,8 @@ import java.net.URI;
 
 /**
  * Represents an HTTP request with an upgrade header to initiate a {@link WebSocket}
+ *
+ * @since 4.2.0
  */
 @NoImplement
 public interface WebSocketRequest extends MessageWithHeaders {

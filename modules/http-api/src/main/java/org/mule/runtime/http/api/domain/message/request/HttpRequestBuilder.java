@@ -84,6 +84,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   /**
    * @param protocol the HTTP protocol of the {@link HttpRequest} desired. Non null.
    * @return this builder
+   * @since 4.2.0
    */
   public HttpRequestBuilder protocol(HttpProtocol protocol) {
     this.protocol = protocol;
