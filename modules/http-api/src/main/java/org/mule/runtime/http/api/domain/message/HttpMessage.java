@@ -6,59 +6,15 @@
  */
 package org.mule.runtime.http.api.domain.message;
 
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
-
-import java.util.Collection;
 
 /**
  * Represents common parts of an HTTP message.
  *
  * @since 4.0
  */
-public interface HttpMessage {
-
-  /**
-   * @return all headers name
-   */
-  Collection<String> getHeaderNames();
-
-  /**
-   * @param headerName name of the header
-   * @return first value of the header
-   */
-  String getHeaderValue(String headerName);
-
-  /**
-   * @param headerName name of the header
-   * @return first value of the header, regardless of the case
-   *
-   * @deprecated The underlying implementation is already case-insensitive. Use {@link #getHeaderValue(String)}
-   */
-  @Deprecated
-  String getHeaderValueIgnoreCase(String headerName);
-
-  /**
-   * @param headerName name of the header
-   * @return an immutable {@link Collection} containing all the values of that headers. If not such headers exists return null,
-   *         otherwise the collection of header values
-   */
-  Collection<String> getHeaderValues(String headerName);
-
-  /**
-   * @param headerName name of the header
-   * @return an immutable {@link Collection} containing all the values of that headers, regardless of the case. If not such
-   *         headers exists return null, otherwise the collection of header values
-   * @deprecated The underlying implementation is already case-insensitive. Use {@link #getHeaderValues(String)}
-   */
-  @Deprecated
-  Collection<String> getHeaderValuesIgnoreCase(String headerName);
-
-  /**
-   * @return an immutable {@link MultiMap} containing all headers
-   */
-  MultiMap<String, String> getHeaders();
+public interface HttpMessage extends MessageWithHeaders {
 
   /**
    * @return the entity of the message. If there's no entity an {@link EmptyHttpEntity} is returned

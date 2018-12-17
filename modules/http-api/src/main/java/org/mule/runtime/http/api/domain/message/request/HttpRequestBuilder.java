@@ -8,11 +8,13 @@ package org.mule.runtime.http.api.domain.message.request;
 
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
 import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.MultiMap.StringMultiMap;
 import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.message.HttpMessage;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 
@@ -31,6 +33,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   private URI uri;
   private String method = GET.name();
   private MultiMap<String, String> queryParams = new StringMultiMap();
+  private HttpProtocol protocol = HTTP_1_1;
 
   HttpRequestBuilder(boolean preserveHeadersCase) {
     headers = new CaseInsensitiveMultiMap(!preserveHeadersCase);
@@ -75,6 +78,16 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    */
   public HttpRequestBuilder method(Method method) {
     this.method = method.name();
+    return this;
+  }
+
+  /**
+   * @param protocol the HTTP protocol of the {@link HttpRequest} desired. Non null.
+   * @return this builder
+   * @since 4.2.0
+   */
+  public HttpRequestBuilder protocol(HttpProtocol protocol) {
+    this.protocol = protocol;
     return this;
   }
 
@@ -128,7 +141,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   @Override
   public HttpRequest build() {
     requireNonNull(uri, "URI must be specified to create an HTTP request");
-    return new DefaultHttpRequest(uri, path, method, headers, queryParams, entity);
+    return new DefaultHttpRequest(uri, path, method, protocol, headers, queryParams, entity);
 
   }
 

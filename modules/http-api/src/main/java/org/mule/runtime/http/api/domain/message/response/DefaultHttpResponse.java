@@ -7,12 +7,9 @@
 package org.mule.runtime.http.api.domain.message.response;
 
 import static java.lang.System.lineSeparator;
-
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.BaseHttpMessage;
-
-import java.util.Collection;
 
 /**
  * Basic implementation of {@link HttpResponse}. Instances can only be obtained through an {@link HttpResponseBuilder}.
@@ -21,37 +18,17 @@ class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
 
   private final HttpEntity body;
   private final ResponseStatus responseStatus;
-  private final MultiMap<String, String> headers;
+
 
   DefaultHttpResponse(ResponseStatus responseStatus, MultiMap<String, String> headers, HttpEntity body) {
+    super(headers);
     this.responseStatus = responseStatus;
-    this.headers = headers != null ? headers.toImmutableMultiMap() : null;
     this.body = body;
   }
 
   @Override
   public HttpEntity getEntity() {
     return body;
-  }
-
-  @Override
-  public Collection<String> getHeaderNames() {
-    return headers.keySet();
-  }
-
-  @Override
-  public String getHeaderValue(String headerName) {
-    return headers.get(headerName);
-  }
-
-  @Override
-  public Collection<String> getHeaderValues(String headerName) {
-    return headers.getAll(headerName);
-  }
-
-  @Override
-  public MultiMap<String, String> getHeaders() {
-    return headers;
   }
 
   @Override

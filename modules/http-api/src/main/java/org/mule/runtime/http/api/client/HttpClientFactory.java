@@ -21,5 +21,4 @@ public interface HttpClientFactory {
    * @return a newly built {@link HttpClient} based on the {@code configuration}.
    */
   HttpClient create(HttpClientConfiguration configuration);
-
 }
