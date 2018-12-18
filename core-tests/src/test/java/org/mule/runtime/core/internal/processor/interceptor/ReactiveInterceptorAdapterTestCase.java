@@ -1891,7 +1891,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static final class ProcessorParameterValueMatcher extends TypeSafeMatcher<ProcessorParameterValue> {
 
-    private Matcher<Object> resolvedValueMatcher;
+    private final Matcher<Object> resolvedValueMatcher;
     private Throwable thrown;
 
     public ProcessorParameterValueMatcher(Matcher<Object> resolvedValueMatcher) {
@@ -1923,7 +1923,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static final class ProcessorParameterValueErrorMatcher extends TypeSafeMatcher<ProcessorParameterValue> {
 
-    private Matcher<Throwable> resolutionErrorMatcher;
+    private final Matcher<Throwable> resolutionErrorMatcher;
 
     public ProcessorParameterValueErrorMatcher(Matcher<Throwable> resolutionErrorMatcher) {
       this.resolutionErrorMatcher = resolutionErrorMatcher;
@@ -1948,7 +1948,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static final class EventPayloadMatcher extends TypeSafeMatcher<CoreEvent> {
 
-    private Matcher<Object> payloadMatcher;
+    private final Matcher<Object> payloadMatcher;
 
     public EventPayloadMatcher(Matcher<Object> payloadMatcher) {
       this.payloadMatcher = payloadMatcher;
@@ -1972,7 +1972,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static final class InterceptionPayloadMatcher extends TypeSafeMatcher<InterceptionEvent> {
 
-    private Matcher<Object> payloadMatcher;
+    private final Matcher<Object> payloadMatcher;
 
     public InterceptionPayloadMatcher(Matcher<Object> payloadMatcher) {
       this.payloadMatcher = payloadMatcher;
@@ -1996,7 +1996,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private class TestProcessorInterceptor implements ProcessorInterceptor {
 
-    private String name;
+    private final String name;
 
     public TestProcessorInterceptor(String name) {
       this.name = name;

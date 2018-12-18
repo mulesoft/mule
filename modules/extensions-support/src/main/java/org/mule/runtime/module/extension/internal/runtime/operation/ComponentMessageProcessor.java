@@ -175,18 +175,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .flatMap(checkedFunction(event -> {
-          Optional<ConfigurationInstance> configuration;
-
-          if (getLocation() != null
-              && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-            // If the event already contains an execution context, use that one.
-            // Only for interceptable components!
-            ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
-            configuration = operationContext.getConfiguration();
-          } else {
-            // Otherwise, generate the context as usual.
-            configuration = getConfiguration(event);
-          }
+          Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
 
           final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
 
@@ -195,8 +184,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             final Scheduler currentScheduler =
                 ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
 
+            final PrecalculatedExecutionContextAdapter<T> precalculatedEvent = getPrecalculatedContext(event);
             if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
-                && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+                && precalculatedEvent != null) {
               ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
               operationExecutionFunction = (parameters, operationEvent) -> {
@@ -218,8 +208,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             if (getLocation() != null) {
               ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolvedProcessorRepresentation);
               return Mono.from(policyManager
-                  .createOperationPolicy(this, event, resolutionResult,
-                                         operationExecutionFunction)
+                  .createOperationPolicy(this, event, resolutionResult, operationExecutionFunction)
                   .process(event, () -> resolutionResult));
             } else {
               // If this operation has no component location then it is internal. Don't apply policies on internal operations.
@@ -227,6 +216,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             }
           });
         }));
+  }
+
+  private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {
+    if (getLocation() != null && getPrecalculatedContext(event) != null) {
+      // If the event already contains an execution context, use that one.
+      // Only for interceptable components!
+      return getPrecalculatedContext(event).getConfiguration();
+    } else {
+      // Otherwise, generate the context as usual.
+      return getConfiguration(event);
+    }
   }
 
   /**
@@ -243,8 +243,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(CoreEvent event) {
-    return (PrecalculatedExecutionContextAdapter) (((InternalEvent) event).getInternalParameters()
-        .get(INTERCEPTION_RESOLVED_CONTEXT));
+    return ((InternalEvent) event).getInternalParameter(INTERCEPTION_RESOLVED_CONTEXT);
   }
 
   protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext) {
@@ -523,8 +522,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private boolean isInterceptedComponent(ComponentLocation location, InternalEvent event) {
-    if (event.getInternalParameters().containsKey(INTERCEPTION_COMPONENT)) {
-      Component component = (Component) event.getInternalParameters().get(INTERCEPTION_COMPONENT);
+    final Component component = event.getInternalParameter(INTERCEPTION_COMPONENT);
+    if (component != null) {
       return location.equals(component.getLocation());
     }
     return false;

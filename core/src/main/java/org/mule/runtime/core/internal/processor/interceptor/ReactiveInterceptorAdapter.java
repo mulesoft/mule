@@ -62,7 +62,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
   private static final String BEFORE_METHOD_NAME = "before";
   private static final String AFTER_METHOD_NAME = "after";
 
-  private ProcessorInterceptorFactory interceptorFactory;
+  private final ProcessorInterceptorFactory interceptorFactory;
 
   public ReactiveInterceptorAdapter(ProcessorInterceptorFactory interceptorFactory) {
     this.interceptorFactory = interceptorFactory;
@@ -213,17 +213,13 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       }));
     }
 
-    InternalEvent.Builder builder = InternalEvent.builder(event);
-
-    setInternalParamsForNotParamResolver(component, resolvedParameters, builder);
-
-    return builder.build();
+    return setInternalParamsForNotParamResolver(component, resolvedParameters, event, InternalEvent.builder(event));
   }
 
   @Override
-  protected void setInternalParamsForNotParamResolver(Component component,
-                                                      Map<String, ProcessorParameterValue> resolvedParameters,
-                                                      InternalEvent.Builder builder) {
+  protected InternalEvent setInternalParamsForNotParamResolver(Component component,
+                                                               Map<String, ProcessorParameterValue> resolvedParameters,
+                                                               InternalEvent event, InternalEvent.Builder builder) {
     if (component instanceof ParametersResolverProcessor) {
       try {
         ((ParametersResolverProcessor<?>) component).resolveParameters(builder, (params, context) -> {
@@ -237,15 +233,16 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
 
           builder.internalParameters(interceptionEventParams);
         });
+        return builder.build();
       } catch (ExpressionRuntimeException e) {
         // Some operation parameter threw an expression exception.
         // Continue with the interception as it it were not an operation so that the call to `before` is guaranteed.
-        super.setInternalParamsForNotParamResolver(component, resolvedParameters, builder);
+        return super.setInternalParamsForNotParamResolver(component, resolvedParameters, event, builder);
       } catch (MuleException e) {
         throw new InterceptionException(e);
       }
     } else {
-      super.setInternalParamsForNotParamResolver(component, resolvedParameters, builder);
+      return super.setInternalParamsForNotParamResolver(component, resolvedParameters, event, builder);
     }
   }
 }
