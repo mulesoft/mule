@@ -38,6 +38,12 @@ public interface InternalEvent extends PrivilegedEvent {
   Map<String, ?> getInternalParameters();
 
   /**
+   * Internal parameters used by the runtime to pass information around.
+   *
+   */
+  <T> T getInternalParameter(String key);
+
+  /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
