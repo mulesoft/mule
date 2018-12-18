@@ -258,8 +258,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
+      final Message message = requireNonNull(messageFactory.apply(context));
       initVariables();
-      return new InternalEventImplementation(context, requireNonNull(messageFactory.apply(context)),
+      return new InternalEventImplementation(context, message,
                                              varsModified ? flowVariables : originalVars,
                                              internalParameters, session, securityContext, replyToDestination,
                                              replyToHandler, itemSequenceInfo, error,
@@ -540,6 +541,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Map<String, ?> getInternalParameters() {
       return unmodifiableMap(internalParameters);
+    }
+
+    @Override
+    public <T> T getInternalParameter(String key) {
+      return (T) internalParameters.get(key);
     }
 
     @Override
