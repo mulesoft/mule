@@ -8,9 +8,11 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -19,6 +21,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
@@ -31,6 +34,7 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 
@@ -38,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +87,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
       resolveGlobalElement(elementModel)
           .ifPresent(keyParts::add);
 
-      return Optional.of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
+      return of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
     }
 
     Optional<MetadataCacheId> configId = resolveConfigId(elementModel);
@@ -90,7 +95,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
       keyParts.add(configId.get());
       resolveCategoryId(elementModel)
           .ifPresent(keyParts::add);
-      return Optional.of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
+      return of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
     }
 
     return resolveDslTagId(elementModel);
@@ -127,7 +132,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
           .ifPresent(keyParts::add);
     }
 
-    return Optional.of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
+    return of(new MetadataCacheId(keyParts, getSourceElementName(elementModel)));
   }
 
   private Optional<MetadataCacheId> resolveDslTagId(DslElementModel<?> elementModel) {
@@ -158,9 +163,11 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
   private Optional<MetadataCacheId> resolveGlobalElement(DslElementModel<?> elementModel) {
     List<MetadataCacheId> parts = new ArrayList<>();
-
+    Predicate isRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(elementModel.getModel())
+        .map((names) -> (Predicate) ((model) -> isRequiredForMetadata(names, model))).orElse((model) -> true);
     elementModel.getContainedElements().stream()
         .filter(containedElement -> containedElement.getModel() != null)
+        .filter(containedElement -> isRequiredForMetadata.test(containedElement.getModel()))
         .forEach(containedElement -> {
           if (containedElement.getValue().isPresent()) {
             resolveKeyFromSimpleValue(containedElement).ifPresent(parts::add);
@@ -173,7 +180,23 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
       return empty();
     }
 
-    return Optional.of(new MetadataCacheId(parts, getModelName(elementModel.getModel()).orElse(null)));
+    return of(new MetadataCacheId(parts, getModelName(elementModel.getModel()).orElse(null)));
+  }
+
+  private boolean isRequiredForMetadata(List<String> parameterNamesRequiredForMetadataCacheId, Object model) {
+    if (model instanceof ParameterModel && parameterNamesRequiredForMetadataCacheId != null) {
+      return parameterNamesRequiredForMetadataCacheId.contains(((ParameterModel) model).getName());
+    } else {
+      return true;
+    }
+  }
+
+  private Optional<List<String>> parameterNamesRequiredForMetadataCacheId(Object model) {
+    if (model instanceof EnrichableModel) {
+      return ((EnrichableModel) model).getModelProperty(RequiredForMetadataModelProperty.class)
+          .map(RequiredForMetadataModelProperty::getRequiredParameters);
+    }
+    return empty();
   }
 
   private Optional<MetadataCacheId> resolveMetadataKeyParts(DslElementModel<?> elementModel, ComponentModel componentModel,
@@ -203,7 +226,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
         .filter(partElement -> partElement.getValue().isPresent())
         .forEach(partElement -> resolveKeyFromSimpleValue(partElement).ifPresent(parts::add));
 
-    return parts.isEmpty() ? empty() : Optional.of(new MetadataCacheId(parts, "metadataKey"));
+    return parts.isEmpty() ? empty() : of(new MetadataCacheId(parts, "metadataKey"));
   }
 
   private Optional<MetadataCacheId> resolveKeyFromSimpleValue(DslElementModel<?> element) {
@@ -218,7 +241,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
     final MetadataCacheId valuePart = new MetadataCacheId(value.hashCode(), sourceElementName);
     if (value.contains(DEFAULT_EXPRESSION_PREFIX)) {
-      return Optional.of(valuePart);
+      return of(valuePart);
     }
 
     Reference<MetadataCacheId> reference = new Reference<>();
@@ -274,7 +297,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
                          element.getIdentifier().map(Object::toString).orElse(sourceElementName)));
     }
 
-    return Optional.of(reference.get() == null ? valuePart : reference.get());
+    return of(reference.get() == null ? valuePart : reference.get());
   }
 
   private Optional<MetadataCacheId> getHashedGlobal(String name) {
@@ -287,7 +310,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
   private Optional<String> getModelName(Object model) {
     if (model instanceof NamedObject) {
-      return Optional.of(((NamedObject) model).getName());
+      return of(((NamedObject) model).getName());
     }
 
     if (model instanceof ObjectType) {
