@@ -315,7 +315,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1, true)),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
-    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, hasItem(startsWith(CPU_LIGHT)));
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
