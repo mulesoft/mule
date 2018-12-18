@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,12 +163,11 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
   private Optional<MetadataCacheId> resolveGlobalElement(DslElementModel<?> elementModel) {
     List<MetadataCacheId> parts = new ArrayList<>();
-    List<String> parameterNamesRequiredForMetadataCacheId =
-        parameterNamesRequiredForMetadataCacheId(elementModel.getModel()).orElse(null);
-
+    Predicate isRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(elementModel.getModel())
+        .map((names) -> (Predicate) ((model) -> isRequiredForMetadata(names, model))).orElse((model) -> true);
     elementModel.getContainedElements().stream()
-        .filter(containedElement -> containedElement.getModel() != null
-            && isRequiredForMetadata(parameterNamesRequiredForMetadataCacheId, containedElement.getModel()))
+        .filter(containedElement -> containedElement.getModel() != null)
+        .filter(containedElement -> isRequiredForMetadata.test(containedElement.getModel()))
         .forEach(containedElement -> {
           if (containedElement.getValue().isPresent()) {
             resolveKeyFromSimpleValue(containedElement).ifPresent(parts::add);
@@ -192,12 +192,9 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   }
 
   private Optional<List<String>> parameterNamesRequiredForMetadataCacheId(Object model) {
-    if (model != null && model instanceof EnrichableModel) {
-      Optional<RequiredForMetadataModelProperty> modelProperty =
-          ((EnrichableModel) model).getModelProperty(RequiredForMetadataModelProperty.class);
-      if (modelProperty.isPresent()) {
-        return of(modelProperty.get().getRequiredParameters());
-      }
+    if (model instanceof EnrichableModel) {
+      return ((EnrichableModel) model).getModelProperty(RequiredForMetadataModelProperty.class)
+          .map(RequiredForMetadataModelProperty::getRequiredParameters);
     }
     return empty();
   }
