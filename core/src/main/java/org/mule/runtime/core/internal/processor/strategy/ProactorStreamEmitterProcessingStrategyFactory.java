@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -133,12 +132,12 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
-
       int concurrency = maxConcurrency < subscribers ? maxConcurrency : subscribers;
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       for (int i = 0; i < concurrency; i++) {
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize / concurrency);
-        processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
+        processor.publishOn(scheduler).doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
             .transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
         ReactorSink<CoreEvent> sink = new DefaultReactorSink<>(processor.sink(), () -> {
@@ -161,11 +160,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      if (maxConcurrency <= subscribers) {
-        return pipeline;
-      }
-      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-      return publisher -> from(publisher).publishOn(scheduler).transform(pipeline);
+      return pipeline;
     }
 
     @Override
