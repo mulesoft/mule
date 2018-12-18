@@ -12,11 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Matchers.any;
@@ -315,7 +311,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1, true)),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
-    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
