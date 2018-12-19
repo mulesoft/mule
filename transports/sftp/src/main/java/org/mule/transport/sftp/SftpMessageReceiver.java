@@ -96,6 +96,12 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
             }
             catch (Exception e)
             {
+                if (!connected.get())
+                {
+                    logger.debug("No connection exception will be raised as it is already disconnected");  
+                    return;
+                }
+                
                 connected.set(false);
                 throw new ConnectException(e, this);
             }

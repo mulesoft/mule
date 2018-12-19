@@ -12,7 +12,7 @@
         <spring:import resource="sftp-properties.xml"/>
     </spring:beans>
 
-    <sftp:connector name="sftp" pollingFrequency="100">
+    <sftp:connector name="sftp" pollingFrequency="100" sizeCheckWaitTime="${sizeCheckWaitTime}">
         <reconnect-forever frequency="1000" blocking="false"/>
     </sftp:connector>
 
