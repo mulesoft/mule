@@ -538,10 +538,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                        fromSimpleParameter("maxQueueTransactionFilesSize").build())
         .withSetterParameterDefinition("defaultTransactionTimeout", fromSimpleParameter("defaultTransactionTimeout").build())
         .withSetterParameterDefinition("shutdownTimeout", fromSimpleParameter("shutdownTimeout").build())
-        .withSetterParameterDefinition("defaultTransactionTimeout", fromSimpleParameter("defaultTransactionTimeout").build())
-        .withSetterParameterDefinition("useExtendedTransformations", fromSimpleParameter("useExtendedTransformations").build())
-        .withSetterParameterDefinition("flowEndingWithOneWayEndpointReturnsNull",
-                                       fromSimpleParameter("flowEndingWithOneWayEndpointReturnsNull").build())
         .withSetterParameterDefinition("defaultObjectSerializer",
                                        fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
