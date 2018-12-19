@@ -33,7 +33,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({FileUtils.class})
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({"javax.management.*", "com.sun.org.apache.xerces.*"})
 public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   private static final String ARTIFACT_ID = "test";
