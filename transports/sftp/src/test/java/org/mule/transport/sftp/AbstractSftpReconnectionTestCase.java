@@ -29,7 +29,7 @@ import org.mule.tck.listener.ConnectionListener;
 import org.mule.tck.listener.FlowExecutionListener;
 import org.mule.transport.ConnectException;
 
-public class SftpReconnectionTestCase extends AbstractSftpTestCase
+public class AbstractSftpReconnectionTestCase extends AbstractSftpTestCase
 {
 
     private static final double DELTA = 30.0;
@@ -41,7 +41,7 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
     private static final int TIMEOUT = 15000;
     private TestExceptionStrategy testExceptionHandler;
 
-    public SftpReconnectionTestCase(ConfigVariant variant, String configResources)
+    public AbstractSftpReconnectionTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
