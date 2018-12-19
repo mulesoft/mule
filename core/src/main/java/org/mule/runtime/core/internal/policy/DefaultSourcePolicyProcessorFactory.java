@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 /**
@@ -30,7 +29,7 @@ public class DefaultSourcePolicyProcessorFactory implements SourcePolicyProcesso
   }
 
   @Override
-  public Processor createSourcePolicy(Policy policy, ReactiveProcessor nextProcessor) {
+  public ReactiveProcessor createSourcePolicy(Policy policy, ReactiveProcessor nextProcessor) {
     return new SourcePolicyProcessor(policy, policyStateHandler, nextProcessor);
   }
 }
