@@ -38,7 +38,7 @@ public final class JreExplorer {
 
   private static final Logger LOGGER = getLogger(JreExplorer.class);
 
-  static final String META_INF_SERVICES_PATH = "META-INF/services/";
+  private static final String META_INF_SERVICES_PATH = "META-INF/services/";
   private static final Pattern SLASH_PATTERN = compile("/");
 
   private JreExplorer() {}
