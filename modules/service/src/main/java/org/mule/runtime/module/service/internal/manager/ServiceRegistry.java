@@ -7,7 +7,6 @@
 package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.api.service.Service;
@@ -16,12 +15,9 @@ import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,8 +25,7 @@ import javax.inject.Qualifier;
 
 /**
  * Keeps track of {@link Service} implementations and is capable of injecting them into {@link ServiceProvider} instances
- * with fields annotated with {@link Inject}. Optionality is supported by using {@link Optional} type when declared a field
- * with {@link Inject}. Method injection as {@link Qualifier} and {@link Named} annotations are not
+ * with fields annotated with {@link Inject}. Method injection as {@link Qualifier} and {@link Named} annotations are not
  * supported.
  *
  * @since 4.2
@@ -47,48 +42,22 @@ public class ServiceRegistry {
    */
   public void inject(ServiceProvider serviceProvider) throws ServiceResolutionError {
     for (Field field : getAllFields(serviceProvider.getClass(), withAnnotation(Inject.class))) {
-      Class<?> dependencyType = field.getType();
-
-      boolean nullToOptional = false;
-      if (dependencyType.equals(Optional.class)) {
-        Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
-        if (type instanceof ParameterizedType) {
-          dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
-        }
-        else {
-          dependencyType = (Class<?>) type;
-        }
-        nullToOptional = true;
+      final Object dependency = lookup(field.getType());
+      if (dependency == null) {
+        throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'",
+                                                field.getName(), serviceProvider.getClass().getName()));
       }
 
       try {
         field.setAccessible(true);
-        Object dependency = resolveObjectToInject(dependencyType, nullToOptional);
-        if (dependency != null) {
-          field.set(serviceProvider, dependency);
-        }
-        else if (!nullToOptional) {
-          throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'",
-                                                  field.getName(), serviceProvider.getClass().getName()));
-        }
-      }
-      catch (Exception e) {
+        field.set(serviceProvider, dependency);
+      } catch (Exception e) {
         throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(),
-                                                serviceProvider.getClass().getName()),
+                                                dependency.getClass().getName()),
                                          e);
       }
     }
   }
-
-  private Object resolveObjectToInject(Class<?> dependencyType, boolean nullToOptional) {
-    Object dependency = services.entrySet().stream()
-            .filter(entry -> dependencyType.isAssignableFrom(entry.getKey()))
-            .findFirst()
-            .map(Entry::getValue)
-            .orElse(null);
-    return nullToOptional ? ofNullable(dependency) : dependency;
-  }
-
 
   /**
    * Tracks the given {@code service}
@@ -100,4 +69,11 @@ public class ServiceRegistry {
     services.put(assembly.getServiceContract(), service);
   }
 
+  private Object lookup(Class<?> type) {
+    return services.entrySet().stream()
+        .filter(entry -> type.isAssignableFrom(entry.getKey()))
+        .findFirst()
+        .map(Entry::getValue)
+        .orElse(null);
+  }
 }

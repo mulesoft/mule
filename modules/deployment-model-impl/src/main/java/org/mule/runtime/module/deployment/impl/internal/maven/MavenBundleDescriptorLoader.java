@@ -10,8 +10,8 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
@@ -20,6 +20,7 @@ import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.dese
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -39,19 +40,16 @@ import org.apache.maven.model.Model;
  */
 public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
 
-  private MavenClientProvider mavenClientProvider;
-  private MavenConfiguration mavenRuntimeConfig;
-  private MavenClient mavenClient;
+  private static final String JAR = "jar";
 
-  private StampedLock lock = new StampedLock();
-  private File temporaryFolder;
+  private BundleDescriptorLoader bundleDescriptorLoader;
 
-  //TODO support setting a Maven Client as DeployableClassLoaderModelLoader to propagate mavenConfiguration from Tooling
   public MavenBundleDescriptorLoader() {
-    mavenClientProvider = discoverProvider(MavenClientProvider.class.getClassLoader());
-    mavenRuntimeConfig = getMavenConfig();
+    bundleDescriptorLoader = new MuleContainerBundleDescriptorLoader();
+  }
 
-    mavenClient = mavenClientProvider.createMavenClient(mavenRuntimeConfig);
+  public MavenBundleDescriptorLoader(MavenClient mavenClient) {
+    bundleDescriptorLoader = new FixedMavenBundleDescriptorLoader(mavenClient);
   }
 
   @Override
@@ -60,15 +58,15 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
   }
 
   /**
-   * Looks for the POM file within the current {@code pluginFolder} structure (under
-   * {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder) to retrieve the plugin artifact locator.
+   * Looks for the POM file within the current {@code artifactFile} jar or folder structure (under
+   * {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor#MULE_ARTIFACT_FOLDER} folder)
+   * to retrieve the artifact locator.
    *
    * @param artifactFile {@link File} with the content of the artifact to work with. Non null
    * @param attributes collection of attributes describing the loader. Non null.
    * @param artifactType the type of the artifact of the descriptor to be loaded.
-   * @return a locator of the coordinates of the current plugin
-   * @throws ArtifactDescriptorCreateException if the plugin is missing the {@link ArtifactPluginDescriptor#MULE_PLUGIN_POM} or
-   *         there's an issue while reading that file
+   * @return a locator of the coordinates of the current artifact
+   * @throws ArtifactDescriptorCreateException if the bundle descriptor cannot be loaded.
    */
   @Override
   public BundleDescriptor load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
@@ -86,47 +84,12 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
           .build();
     } else {
-      return getBundleDescriptor(artifactFile);
+      return getBundleDescriptor(artifactFile, artifactType);
     }
   }
 
-  public BundleDescriptor getBundleDescriptor(File artifactFile) {
-    long stamp = lock.readLock();
-    try {
-      MavenConfiguration updatedMavenConfiguration = getMavenConfig();
-      if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
-        long writeStamp = lock.tryConvertToWriteLock(stamp);
-        if (writeStamp == 0L) {
-          lock.unlockRead(stamp);
-          stamp = lock.writeLock();
-        } else {
-          stamp = writeStamp;
-        }
-        if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
-          mavenRuntimeConfig = updatedMavenConfiguration;
-          mavenClient = mavenClientProvider.createMavenClient(mavenRuntimeConfig);
-          File localMavenRepositoryLocation = mavenRuntimeConfig.getLocalMavenRepositoryLocation();
-          temporaryFolder = new File(localMavenRepositoryLocation, ".mule");
-        }
-      }
-
-      Model model;
-      if (artifactFile.isDirectory()) {
-        model = mavenClient.getEffectiveModel(artifactFile, empty());
-      } else {
-        model = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
-      }
-
-      return new BundleDescriptor.Builder()
-          .setArtifactId(model.getArtifactId())
-          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
-          .setType(EXTENSION_BUNDLE_TYPE)
-          .setClassifier(MULE_PLUGIN_CLASSIFIER)
-          .build();
-    } finally {
-      lock.unlock(stamp);
-    }
+  public BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
+    return bundleDescriptorLoader.getBundleDescriptor(artifactFile, artifactType);
   }
 
   private boolean isHeavyPackage(File artifactFile) {
@@ -138,6 +101,97 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       return new File(artifactFile, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION);
     } else {
       return new File(artifactFile.getParent(), CLASSLOADER_MODEL_JSON_DESCRIPTOR);
+    }
+  }
+
+  interface BundleDescriptorLoader {
+
+    BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType);
+
+  }
+
+
+  private class MuleContainerBundleDescriptorLoader implements BundleDescriptorLoader {
+
+    private MavenClientProvider mavenClientProvider;
+    private MavenConfiguration mavenRuntimeConfig;
+
+    private FixedMavenBundleDescriptorLoader fixedMavenBundleDescriptorLoader;
+
+    private StampedLock lock = new StampedLock();
+
+    MuleContainerBundleDescriptorLoader() {
+      mavenClientProvider = discoverProvider(MavenClientProvider.class.getClassLoader());
+      mavenRuntimeConfig = getMavenConfig();
+
+      createFixedMavenBundleDescriptorLoader();
+    }
+
+    private void createFixedMavenBundleDescriptorLoader() {
+      fixedMavenBundleDescriptorLoader = new FixedMavenBundleDescriptorLoader(mavenClientProvider.createMavenClient(mavenRuntimeConfig));
+    }
+
+    @Override
+    public BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
+      long stamp = lock.readLock();
+      try {
+        MavenConfiguration updatedMavenConfiguration = getMavenConfig();
+        if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
+          long writeStamp = lock.tryConvertToWriteLock(stamp);
+          if (writeStamp == 0L) {
+            lock.unlockRead(stamp);
+            stamp = lock.writeLock();
+          }
+          else {
+            stamp = writeStamp;
+          }
+          if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
+            mavenRuntimeConfig = updatedMavenConfiguration;
+            createFixedMavenBundleDescriptorLoader();
+          }
+        }
+
+        return fixedMavenBundleDescriptorLoader.getBundleDescriptor(artifactFile, artifactType);
+      }
+      finally {
+        lock.unlock(stamp);
+      }
+    }
+  }
+
+  private class FixedMavenBundleDescriptorLoader implements BundleDescriptorLoader {
+
+    private MavenClient mavenClient;
+    private File temporaryFolder;
+
+    public FixedMavenBundleDescriptorLoader(MavenClient mavenClient) {
+      this.mavenClient = mavenClient;
+
+      File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
+      temporaryFolder = new File(localMavenRepositoryLocation, ".mule");
+      if (!temporaryFolder.exists() && !temporaryFolder.mkdirs()) {
+        throw new MuleRuntimeException(createStaticMessage("Cannot create a temporary folder for loading bundle descriptor at %s", temporaryFolder.getAbsolutePath()));
+      }
+    }
+
+    @Override
+    public BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
+      Model model;
+      if (artifactFile.isDirectory()) {
+        model = mavenClient.getEffectiveModel(artifactFile, empty());
+      }
+      else {
+        model = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
+      }
+
+      return new BundleDescriptor.Builder()
+              .setArtifactId(model.getArtifactId())
+              .setGroupId(model.getGroupId())
+              .setVersion(model.getVersion())
+              .setType(JAR)
+              // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
+              .setClassifier(artifactType.equals(ArtifactType.PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
+              .build();
     }
   }
 }
