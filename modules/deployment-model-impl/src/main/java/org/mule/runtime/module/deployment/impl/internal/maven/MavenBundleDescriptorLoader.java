@@ -99,8 +99,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
         if (writeStamp == 0L) {
           lock.unlockRead(stamp);
           stamp = lock.writeLock();
-        }
-        else {
+        } else {
           stamp = writeStamp;
         }
         if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
@@ -114,20 +113,18 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       Model model;
       if (artifactFile.isDirectory()) {
         model = mavenClient.getEffectiveModel(artifactFile, empty());
-      }
-      else {
+      } else {
         model = getPomModelFromJar(artifactFile);
       }
 
       return new BundleDescriptor.Builder()
-              .setArtifactId(model.getArtifactId())
-              .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-              .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
-              .setType(EXTENSION_BUNDLE_TYPE)
-              .setClassifier(MULE_PLUGIN_CLASSIFIER)
-              .build();
-    }
-    finally {
+          .setArtifactId(model.getArtifactId())
+          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
+          .setType(EXTENSION_BUNDLE_TYPE)
+          .setClassifier(MULE_PLUGIN_CLASSIFIER)
+          .build();
+    } finally {
       lock.unlock(stamp);
     }
   }

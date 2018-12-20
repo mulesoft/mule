@@ -72,7 +72,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
                                                                                      Map<String, Object> attributes,
                                                                                      Set<BundleDependency> nonProvidedDependencies) {
     final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
-        new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
+            new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
     configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
     return lightweightClassLoaderModelBuilder;
   }
