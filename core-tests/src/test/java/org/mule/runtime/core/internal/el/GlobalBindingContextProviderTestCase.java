@@ -49,7 +49,7 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> objects = new HashMap<>();
 
-    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
+    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
     objects.put(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
     objects.put(KEY, new TestGlobalBindingContextProvider());
 
