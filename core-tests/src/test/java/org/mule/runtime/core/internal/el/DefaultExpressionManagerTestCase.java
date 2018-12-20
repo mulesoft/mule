@@ -369,7 +369,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   protected void disableMel() throws InitialisationException {
     Registry registry = mock(Registry.class);
     when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class))
-        .thenReturn(of(new WeaveDefaultExpressionLanguageFactoryService()));
+        .thenReturn(of(new WeaveDefaultExpressionLanguageFactoryService(null)));
     when(registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
 
     final MuleContextWithRegistry mockMuleContext = mockMuleContext();

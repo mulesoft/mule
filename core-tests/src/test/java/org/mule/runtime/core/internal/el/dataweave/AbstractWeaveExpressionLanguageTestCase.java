@@ -26,7 +26,7 @@ public abstract class AbstractWeaveExpressionLanguageTestCase extends AbstractMu
 
   @Before
   public void setUp() {
-    weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
+    weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
     when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class)).thenReturn(of(weaveExpressionExecutor));
     expressionLanguage = new DataWeaveExpressionLanguageAdaptor(muleContext, registry, weaveExpressionExecutor);
   }
