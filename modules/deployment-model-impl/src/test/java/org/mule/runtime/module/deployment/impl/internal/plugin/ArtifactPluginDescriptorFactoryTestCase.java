@@ -87,8 +87,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
                                                                                                         .getLocalRepositorySuppliers()
                                                                                                         .environmentMavenRepositorySupplier()
                                                                                                         .get())
-                                                                                                    .build()),
-                                                          pluginsTempFolder.newFolder()));
+                                                                                                    .build())));
 
     when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
         .thenReturn(new FileSystemPolicyClassLoaderModelLoader());

@@ -53,13 +53,8 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   private void createClassLoaderModelLoaders() {
     MavenClient mavenClient = mavenClientProvider.createMavenClient(mavenRuntimeConfig);
 
-    File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
-    File temporaryFolder = new File(localMavenRepositoryLocation, ".mule");
-
-    deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mavenClient, temporaryFolder);
-    pluginMavenClassLoaderModelLoader =
-        new PluginMavenClassLoaderModelLoader(mavenClient, temporaryFolder);
+    deployableMavenClassLoaderModelLoader = new DeployableMavenClassLoaderModelLoader(mavenClient);
+    pluginMavenClassLoaderModelLoader = new PluginMavenClassLoaderModelLoader(mavenClient);
 
     libFolderClassLoaderModelLoader = new LibFolderClassLoaderModelLoader();
   }
