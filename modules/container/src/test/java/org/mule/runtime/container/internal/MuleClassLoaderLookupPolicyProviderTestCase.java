@@ -12,7 +12,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
@@ -108,7 +108,7 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
 
     assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS), instanceOf(ContainerOnlyLookupStrategy.class));
     assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS).getClassLoaders(getClass().getClassLoader()),
-               contains(getClass().getClassLoader()));
+               hasItem(getClass().getClassLoader()));
   }
 
   @Test
@@ -123,7 +123,7 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
 
     assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS), instanceOf(ContainerOnlyLookupStrategy.class));
     assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS).getClassLoaders(getClass().getClassLoader()),
-               contains(getClass().getClassLoader()));
+               hasItem(getClass().getClassLoader()));
   }
 
   @Test

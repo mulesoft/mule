@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,6 +42,32 @@ public final class JreExplorer {
 
   private static final String META_INF_SERVICES_PATH = "META-INF/services/";
   private static final Pattern SLASH_PATTERN = compile("/");
+
+  private static Object bootLayer;
+  private static Method getModulePackagesMethod;
+  private static Method getLayerModulesMethod;
+  private static boolean isRequiredReflectionDataPresent;
+
+  static {
+    try {
+      Class moduleLayerClass = Class.forName("java.lang.ModuleLayer");
+      Method getBootLayerMethod = moduleLayerClass.getDeclaredMethod("boot");
+      getLayerModulesMethod = moduleLayerClass.getDeclaredMethod("modules");
+
+      Class moduleClass = Class.forName("java.lang.Module");
+      getModulePackagesMethod = moduleClass.getDeclaredMethod("getPackages");
+
+      bootLayer = getBootLayerMethod.invoke(null);
+
+      isRequiredReflectionDataPresent = true;
+    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER
+            .debug("Error found when trying to access to Java 9+ classes via reflection. If running with Java 8 or older this is the expected behaviour");
+      }
+      isRequiredReflectionDataPresent = false;
+    }
+  }
 
   private JreExplorer() {}
 
@@ -67,6 +95,7 @@ public final class JreExplorer {
     }
 
     explorePaths(jdkPaths, packages, resources, services);
+    exploreJdkModules(packages);
   }
 
   private static void addJdkPath(List<String> jdkPaths, String key) {
@@ -89,6 +118,30 @@ public final class JreExplorer {
 
     for (String jdkPath : jdkPaths) {
       explorePath(packages, resources, services, jdkPath);
+    }
+  }
+
+  /**
+   * Search for packages using the JRE's module architecture. (Java 9 and above).
+   * <p/>
+   * We need to use reflection because we may be running with JDK 8 or older.
+   *
+   * @param packages where to add new found packages
+   */
+  private static void exploreJdkModules(Set<String> packages) {
+    if (isRequiredReflectionDataPresent) {
+      try {
+        Set modules = (Set) getLayerModulesMethod.invoke(bootLayer);
+        modules.stream().forEach(module -> {
+          try {
+            packages.addAll((Set) getModulePackagesMethod.invoke(module));
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new RuntimeException("Error trying to get packages from JDK modules", e);
+      }
     }
   }
 
