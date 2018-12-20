@@ -37,7 +37,7 @@ public class BasicRuntimeServicesConfigurationBuilder extends AbstractConfigurat
           }
         });
 
-    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
+    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
     registerObject(muleContext, weaveExpressionExecutor.getName(), weaveExpressionExecutor);
   }
 }
