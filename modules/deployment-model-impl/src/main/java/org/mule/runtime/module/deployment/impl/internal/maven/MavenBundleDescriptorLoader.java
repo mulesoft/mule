@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
@@ -15,7 +16,6 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
@@ -114,7 +114,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       if (artifactFile.isDirectory()) {
         model = mavenClient.getEffectiveModel(artifactFile, empty());
       } else {
-        model = getPomModelFromJar(artifactFile);
+        model = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
       }
 
       return new BundleDescriptor.Builder()
