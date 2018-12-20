@@ -23,6 +23,8 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -81,13 +83,24 @@ public class MavenClassLoaderModelLoaderTestCase {
       // It is should fail
     }
     properties.put("muleRuntimeConfig.maven.repositories.mavenCentral.url", "https://repo.maven.apache.org/maven2/");
+
+    Map<String, Object> attributes =
+        ImmutableMap.of(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
+                        new org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder()
+                            .setGroupId("groupId")
+                            .setArtifactId("artifactId")
+                            .setVersion("1.0.0")
+                            .setType("jar")
+                            .setClassifier("mule-application")
+                            .build());
+
     try {
       testWithSystemProperties(properties, () -> range(1, 10).parallel().forEach(
                                                                                  number -> {
                                                                                    GlobalConfigLoader.reset();
                                                                                    try {
                                                                                      assertThat(mavenClassLoaderModelLoader
-                                                                                         .load(artifactFile, emptyMap(), APP)
+                                                                                         .load(artifactFile, attributes, APP)
                                                                                          .getDependencies(),
                                                                                                 hasItem(hasProperty("descriptor",
                                                                                                                     (hasProperty("artifactId",

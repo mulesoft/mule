@@ -49,17 +49,20 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   }
 
   @Override
-  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
+  protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
+                                                                                     BundleDescriptor artifactBundleDescriptor,
+                                                                                     MavenClient mavenClient,
                                                                                      Map<String, Object> attributes,
                                                                                      Set<BundleDependency> nonProvidedDependencies) {
-    return new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, nonProvidedDependencies);
+    return new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
   }
 
   @Override
   protected HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,
+                                                                                     BundleDescriptor artifactBundleDescriptor,
                                                                                      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                                                      Map<String, Object> attributes) {
-    return new HeavyweightClassLoaderModelBuilder(artifactFile, packagerClassLoaderModel);
+    return new HeavyweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
   }
 
   @Override

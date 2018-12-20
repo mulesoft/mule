@@ -7,14 +7,19 @@
 
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static java.util.Optional.empty;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -24,6 +29,7 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 
 import java.io.File;
 import java.util.Map;
+import java.util.concurrent.locks.StampedLock;
 
 import org.apache.maven.model.Model;
 
@@ -32,6 +38,21 @@ import org.apache.maven.model.Model;
  * {@value ArtifactPluginDescriptor#MULE_PLUGIN_POM} file.
  */
 public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
+
+  private MavenClientProvider mavenClientProvider;
+  private MavenConfiguration mavenRuntimeConfig;
+  private MavenClient mavenClient;
+
+  private StampedLock lock = new StampedLock();
+  private File temporaryFolder;
+
+  //TODO support setting a Maven Client as DeployableClassLoaderModelLoader to propagate mavenConfiguration from Tooling
+  public MavenBundleDescriptorLoader() {
+    mavenClientProvider = discoverProvider(MavenClientProvider.class.getClassLoader());
+    mavenRuntimeConfig = getMavenConfig();
+
+    mavenClient = mavenClientProvider.createMavenClient(mavenRuntimeConfig);
+  }
 
   @Override
   public String getId() {
@@ -69,21 +90,46 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
     }
   }
 
-  public static BundleDescriptor getBundleDescriptor(File artifactFile) {
-    Model model;
-    if (artifactFile.isDirectory()) {
-      model = getPomModelFolder(artifactFile);
-    } else {
-      model = getPomModelFromJar(artifactFile);
-    }
+  public BundleDescriptor getBundleDescriptor(File artifactFile) {
+    long stamp = lock.readLock();
+    try {
+      MavenConfiguration updatedMavenConfiguration = getMavenConfig();
+      if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
+        long writeStamp = lock.tryConvertToWriteLock(stamp);
+        if (writeStamp == 0L) {
+          lock.unlockRead(stamp);
+          stamp = lock.writeLock();
+        }
+        else {
+          stamp = writeStamp;
+        }
+        if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
+          mavenRuntimeConfig = updatedMavenConfiguration;
+          mavenClient = mavenClientProvider.createMavenClient(mavenRuntimeConfig);
+          File localMavenRepositoryLocation = mavenRuntimeConfig.getLocalMavenRepositoryLocation();
+          temporaryFolder = new File(localMavenRepositoryLocation, ".mule");
+        }
+      }
 
-    return new BundleDescriptor.Builder()
-        .setArtifactId(model.getArtifactId())
-        .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-        .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
-        .setType(EXTENSION_BUNDLE_TYPE)
-        .setClassifier(MULE_PLUGIN_CLASSIFIER)
-        .build();
+      Model model;
+      if (artifactFile.isDirectory()) {
+        model = mavenClient.getEffectiveModel(artifactFile, empty());
+      }
+      else {
+        model = getPomModelFromJar(artifactFile);
+      }
+
+      return new BundleDescriptor.Builder()
+              .setArtifactId(model.getArtifactId())
+              .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+              .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
+              .setType(EXTENSION_BUNDLE_TYPE)
+              .setClassifier(MULE_PLUGIN_CLASSIFIER)
+              .build();
+    }
+    finally {
+      lock.unlock(stamp);
+    }
   }
 
   private boolean isHeavyPackage(File artifactFile) {
