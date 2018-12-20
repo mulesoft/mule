@@ -331,7 +331,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
-                            new WeaveDefaultExpressionLanguageFactoryService());
+                            new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context).getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
@@ -355,7 +355,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
-                            new WeaveDefaultExpressionLanguageFactoryService());
+                            new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context)
         .getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
