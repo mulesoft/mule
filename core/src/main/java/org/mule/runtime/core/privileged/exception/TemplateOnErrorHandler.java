@@ -25,6 +25,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.newCh
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -47,6 +48,8 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import org.reactivestreams.Publisher;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,8 +57,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 @NoExtend
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
@@ -113,7 +114,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private Consumer<MessagingException> onRoutingError() {
     return me -> {
       try {
-        me.setInErrorHandler(true);
         logger.error("Exception during exception strategy execution");
         resolveAndLogException(me);
         TransactionCoordination.getInstance().rollbackCurrentTransaction();
@@ -283,10 +283,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       fireNotification(exception, event);
       logException(exception, event);
       processStatistics();
-      // Reset this flag to apply situation where a error-handler exception is handled in a parent error-handler.
-      if (exception instanceof MessagingException) {
-        ((MessagingException) exception).setInErrorHandler(false);
-      }
       markExceptionAsHandledIfRequired(exception);
       return event;
     };

@@ -259,32 +259,28 @@ public class ModuleFlowProcessingPhase
   }
 
   /*
-   * Send an error response. This may be due to an error being propagated from the Flow or fue to a failure sending a success
+   * Send an error response. This may be due to an error being propagated from the Flow or due to a failure sending a success
    * response. Error caused by failures in the flow error handler do not result in an error message being sent.
    */
   private Mono<Void> sendErrorResponse(MessagingException messagingException,
                                        Function<CoreEvent, Map<String, Object>> errorParameters,
                                        final PhaseContext ctx, FlowConstruct flowConstruct) {
     CoreEvent event = messagingException.getEvent();
-    if (messagingException.inErrorHandler()) {
-      return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, messagingException.getCause(),
-                                            messagingException));
-    } else {
-      try {
-        return from(ctx.template
-            .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
-                .onErrorMap(e -> new SourceErrorException(builder(messagingException.getEvent())
-                    .error(builder(e).errorType(sourceErrorResponseSendErrorType).build()).build(),
-                                                          sourceErrorResponseSendErrorType, e));
-      } catch (Exception e) {
-        return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, e, messagingException));
-      }
+    try {
+      return from(ctx.template
+          .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
+              .onErrorMap(e -> new SourceErrorException(builder(event)
+                  .error(builder(e).errorType(sourceErrorResponseSendErrorType).build()).build(),
+                                                        sourceErrorResponseSendErrorType, e));
+    } catch (Exception e) {
+      return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, e, messagingException));
     }
+    // }
   }
 
   /*
-   * Consumer invoked when processing of fails due to an error sending an error response, of because the error originated from
-   * within an error handler.
+   * Consumer invoked when processing fails due to an error sending an error response, of because the error originated from within
+   * an error handler.
    */
   private Consumer<Throwable> onFailure(FlowConstruct flowConstruct, MessageSource messageSource,
                                         PhaseResultNotifier phaseResultNotifier,

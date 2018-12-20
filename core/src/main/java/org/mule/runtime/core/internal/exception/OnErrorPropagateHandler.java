@@ -18,9 +18,6 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
-//TODO: MULE-9307 re-write junits for rollback exception strategy
-
-
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
  *
