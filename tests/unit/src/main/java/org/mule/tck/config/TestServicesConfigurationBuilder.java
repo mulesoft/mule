@@ -15,7 +15,6 @@ import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
-
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
@@ -28,13 +27,13 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * Registers services instances into the {@link MuleRegistry} of a {@link MuleContext}.
@@ -82,7 +81,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
       // Still have to recreate ever once in a while so global bindings added for each test are accumulated.
       if (cachedExprLanguageFactory == null || cachedExprLanguageFactoryCounter > 20) {
         cachedExprLanguageFactoryCounter = 0;
-        final DefaultExpressionLanguageFactoryService exprExecutor = new WeaveDefaultExpressionLanguageFactoryService();
+        final DefaultExpressionLanguageFactoryService exprExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
         ExpressionLanguage exprLanguage = exprExecutor.create();
         // Force initialization of internal DataWeave stuff
         // This way we avoid doing some heavy initialization on the test itself,
