@@ -148,7 +148,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
-                                               new WeaveDefaultExpressionLanguageFactoryService());
+                                               new WeaveDefaultExpressionLanguageFactoryService(null));
     TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     // This one will process the event on the target endpoint
