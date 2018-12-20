@@ -370,14 +370,28 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 try
                 {
+                    // This is done to recycle the consumer
+                    // by default
                     consumer.setMessageListener(null);
                     started = false;
                 }
-                catch (JMSException e)
+                catch (Exception e)
                 {
+                    // Some JMS implementations does not allow
+                    // for setting the messsage listener as null.
+                    // We catch the exception in case the subreceiver
+                    // is forcefully stopped.
                     if (force)
                     {
-                        logger.warn("Unable to cleanly stop subreceiver", e);
+                        if (e instanceof NullPointerException)
+                        {
+                            logger.warn("Unable to cleanly stop subreceiver. Probably the consumer could not be recycled.");
+                        }
+                        else
+                        {
+                            logger.warn("Unable to cleanly stop subreceiver", e);
+                        }
+
                         started = false;
                     }
                     else

@@ -12,6 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -34,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -68,6 +70,35 @@ public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
     @Test
     public void messageListenerNotSetTwiceOnMessageReceiver() throws Exception
     {
+        MessageConsumer mockMessageConsumer = setupMessageReceiverMocks();
+
+        MultiConsumerJmsMessageReceiver messageReceiver = new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+        messageReceiver.initialise();
+        messageReceiver.doStart();
+        verify(mockMessageConsumer).setMessageListener(any(MessageListener.class));
+        reset(mockMessageConsumer);
+        messageReceiver.startSubReceivers();
+        verify(mockMessageConsumer, never()).setMessageListener(any(MessageListener.class));
+        messageReceiver.doStop();
+    }
+    
+    @Test
+    public void messageListenerIsDisconnectedWhenConsumerCannotBeRecycled() throws Exception
+    {
+        MessageConsumer mockMessageConsumer = setupMessageReceiverMocks();
+        // This is done for the cases where the consumer cannot be recycled.
+        doThrow(NullPointerException.class).when(mockMessageConsumer).setMessageListener(null);
+        MultiConsumerJmsMessageReceiver messageReceiver = new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+        messageReceiver.initialise();
+        messageReceiver.doStart();
+        reset(mockMessageConsumer);
+        messageReceiver.startSubReceivers();
+        messageReceiver.disconnect();
+        assertThat(messageReceiver.isConnected(), is(false));
+    }
+
+    private MessageConsumer setupMessageReceiverMocks() throws JMSException
+    {
         when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(false);
         when(mockJmsConnector.getNumberOfConsumers()).thenReturn(1);
         when(mockJmsConnector.shouldRetryBrokerConnection()).thenReturn(false);
@@ -83,14 +114,7 @@ public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
         when(mockInboundEndpoint.getRetryPolicyTemplate()).thenReturn(retryPolicyTemplate);
         when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY)).thenReturn("false");
         when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY)).thenReturn(null);
-
-        MultiConsumerJmsMessageReceiver messageReceiver = new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
-        messageReceiver.initialise();
-        messageReceiver.doStart();
-        verify(mockMessageConsumer).setMessageListener(any(MessageListener.class));
-        reset(mockMessageConsumer);
-        messageReceiver.startSubReceivers();
-        verify(mockMessageConsumer, never()).setMessageListener(any(MessageListener.class));
+        return mockMessageConsumer;
     }
     
     private abstract class TestMessageConsumer implements MessageConsumer
