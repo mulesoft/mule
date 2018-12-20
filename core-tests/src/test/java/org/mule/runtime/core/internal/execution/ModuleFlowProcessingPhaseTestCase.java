@@ -266,13 +266,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
-    verify(flow.getExceptionListener(), never()).handleException(any(), any());
-    verify(template, never()).sendResponseToClient(any(), any());
-    verify(template, never()).sendFailureResponseToClient(any(), any());
-    verify(template)
-        .afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))));
-    verify(notifier, never()).phaseSuccessfully();
-    verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
+    verifyFlowError();
   }
 
   @Test
@@ -406,7 +400,6 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
     when(sourcePolicy.process(any())).thenAnswer(invocation -> {
       messagingException = buildFailingFlowException(invocation.getArgumentAt(0, CoreEvent.class), failure);
-      messagingException.setInErrorHandler(inErrorHandler);
       return just(left(failureResult));
     });
   }

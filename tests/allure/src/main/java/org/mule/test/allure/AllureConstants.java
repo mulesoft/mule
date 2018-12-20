@@ -113,6 +113,7 @@ public interface AllureConstants {
       String EXCEPTION_MAPPINGS = "Exception Mappings";
       String ERROR_MAPPINGS = "Error Mappings";
       String ON_ERROR_CONTINUE = "On Error Continue";
+      String ON_ERROR_PROPAGATE = "On Error Propagate";
       String DEFAULT_ERROR_HANDLER = "Default Error Handler";
       String RAISE_ERROR = "Raise Errors";
     }
