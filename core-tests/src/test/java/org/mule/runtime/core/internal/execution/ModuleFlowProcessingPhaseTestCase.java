@@ -38,6 +38,7 @@ import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -64,15 +65,16 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
 
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -266,13 +268,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
-    verify(flow.getExceptionListener(), never()).handleException(any(), any());
-    verify(template, never()).sendResponseToClient(any(), any());
-    verify(template, never()).sendFailureResponseToClient(any(), any());
-    verify(template)
-        .afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))));
-    verify(notifier, never()).phaseSuccessfully();
-    verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
+    verifyFlowError();
   }
 
   @Test
@@ -406,7 +402,6 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
     when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
       messagingException = buildFailingFlowException(invocation.getArgument(0), failure);
-      messagingException.setInErrorHandler(inErrorHandler);
       return just(left(failureResult));
     });
   }

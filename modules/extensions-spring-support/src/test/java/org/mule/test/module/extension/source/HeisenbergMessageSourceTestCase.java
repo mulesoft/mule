@@ -31,6 +31,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
+
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
@@ -43,14 +44,14 @@ import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Optional;
-
 import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -215,6 +216,12 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  public void failureInFlowErrorHandlerCallsOnErrorDirectlyAndHandlesItCorrectly() throws Exception {
+    startFlow("failureInFlowErrorHandlerCallsOnErrorDirectly");
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
+  }
+
+  @Test
   public void failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt() throws Exception {
     startFlow("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, false, true));
@@ -290,8 +297,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
-    return HeisenbergSource.executedOnSuccess == executedOnSuccess
-        && HeisenbergSource.executedOnError == executedOnError
-        && HeisenbergSource.executedOnTerminate == executedOnTerminate;
+    assertThat("OnSuccess", HeisenbergSource.executedOnSuccess, is(executedOnSuccess));
+    assertThat("OnError", HeisenbergSource.executedOnError, is(executedOnError));
+    assertThat("OnTerminate", HeisenbergSource.executedOnTerminate, is(executedOnTerminate));
+
+    return true;
   }
 }

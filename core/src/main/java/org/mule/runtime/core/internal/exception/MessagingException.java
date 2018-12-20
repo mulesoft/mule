@@ -51,7 +51,6 @@ public class MessagingException extends EventProcessingException {
   protected transient CoreEvent processedEvent;
 
   private boolean handled;
-  private boolean inErrorHandler;
   private transient Component failingComponent;
 
   public MessagingException(I18nMessage message, CoreEvent event) {
@@ -272,24 +271,6 @@ public class MessagingException extends EventProcessingException {
    */
   public boolean handled() {
     return handled;
-  }
-
-  /**
-   * Marks the exception so that onTerminate is called on the source instead of onError if not handled
-   *
-   * @param inErrorHandler true if the exception has occurred in an error handler, false otherwise
-   */
-  public void setInErrorHandler(boolean inErrorHandler) {
-    this.inErrorHandler = inErrorHandler;
-  }
-
-  /**
-   * Signals if the exception occurred in an error handler
-   *
-   * @return true if happened inside error handler
-   */
-  public boolean inErrorHandler() {
-    return inErrorHandler;
   }
 
   /**

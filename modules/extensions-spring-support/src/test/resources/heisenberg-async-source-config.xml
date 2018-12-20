@@ -178,6 +178,28 @@
         <set-payload value="#[hi ++]"/>
     </flow>
 
+    <flow name="failureInFlowErrorHandlerCallsOnErrorDirectly" initialState="stopped">
+        <heisenberg:async-listen-payments config-ref="heisenberg" initialBatchNumber="0">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="#[32]">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:async-listen-payments>
+
+        <set-payload value="#[hi ++]"/>
+
+        <error-handler>
+            <on-error-propagate>
+                <set-payload value="#[bye ++]"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+
     <flow name="failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt" initialState="stopped">
         <heisenberg:async-listen-payments config-ref="heisenberg" initialBatchNumber="0">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
