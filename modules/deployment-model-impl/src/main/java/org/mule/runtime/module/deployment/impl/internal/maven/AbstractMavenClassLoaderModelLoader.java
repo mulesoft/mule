@@ -83,12 +83,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private static final String POM_LOCATION_FORMAT = "%s/%s-%s.pom";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final File temporaryFolder;
   private MavenClient mavenClient;
 
-  public AbstractMavenClassLoaderModelLoader(MavenClient mavenClient, File temporaryFolder) {
+  public AbstractMavenClassLoaderModelLoader(MavenClient mavenClient) {
     this.mavenClient = mavenClient;
-    this.temporaryFolder = temporaryFolder;
   }
 
   @Override
@@ -258,7 +256,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
           .map(this::convertBundleDependency).collect(Collectors.toSet());
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-          newLightweightClassLoaderModelBuilder(artifactFile, mavenClient, attributes, nonProvidedDependencies, temporaryFolder);
+          newLightweightClassLoaderModelBuilder(artifactFile, mavenClient, attributes, nonProvidedDependencies);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -282,8 +280,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   protected abstract LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
                                                                                               MavenClient mavenClient,
                                                                                               Map<String, Object> attributes,
-                                                                                              Set<BundleDependency> nonProvidedDependencies,
-                                                                                              File temporaryFolder);
+                                                                                              Set<BundleDependency> nonProvidedDependencies);
 
   protected abstract HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,
                                                                                               org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,

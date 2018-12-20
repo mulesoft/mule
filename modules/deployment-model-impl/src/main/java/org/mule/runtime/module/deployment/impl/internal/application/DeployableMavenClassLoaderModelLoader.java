@@ -40,8 +40,8 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient, File temporaryFolder) {
-    super(mavenClient, temporaryFolder);
+  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient) {
+    super(mavenClient);
   }
 
   @Override
@@ -52,9 +52,8 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   @Override
   protected LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile, MavenClient mavenClient,
                                                                                      Map<String, Object> attributes,
-                                                                                     Set<BundleDependency> nonProvidedDependencies,
-                                                                                     File temporaryFolder) {
-    return new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, nonProvidedDependencies, temporaryFolder);
+                                                                                     Set<BundleDependency> nonProvidedDependencies) {
+    return new LightweightClassLoaderModelBuilder(artifactFile, mavenClient, nonProvidedDependencies);
   }
 
   @Override
