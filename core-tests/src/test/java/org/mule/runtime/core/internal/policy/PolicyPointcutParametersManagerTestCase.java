@@ -147,8 +147,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     sourcePointcutFactories.add(mockSourceFactory(true));
     PolicyPointcutParameters sourceParameters =
         parametersManager.createSourcePointcutParameters(component, event.getMessage().getAttributes());
-    Map singletonMap = singletonMap(POLICY_SOURCE_POINTCUT_PARAMETERS, sourceParameters);
-    when(event.getInternalParameters()).thenReturn(singletonMap);
+    when(event.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourceParameters);
 
     PolicyPointcutParameters parameters =
         parametersManager.createOperationPointcutParameters(component, event, operationParameters);
@@ -161,7 +160,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
   public void createOperationParametersWhenEmptyFactoryAndEmptySourceParameters() {
     Map<String, Object> operationParameters = new HashMap<>();
 
-    when(event.getInternalParameters()).thenReturn(emptyMap());
+    when(event.getInternalParameter(any())).thenReturn(null);
     PolicyPointcutParameters parameters =
         parametersManager.createOperationPointcutParameters(component, event, operationParameters);
 
@@ -174,8 +173,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     Map<String, Object> operationParameters = new HashMap<>();
     PolicyPointcutParameters sourceParameters =
         parametersManager.createSourcePointcutParameters(component, event.getMessage().getAttributes());
-    Map singletonMap = singletonMap(POLICY_SOURCE_POINTCUT_PARAMETERS, sourceParameters);
-    when(event.getInternalParameters()).thenReturn(singletonMap);
+    when(event.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourceParameters);
 
     OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true, sourceParameters);
     operationPointcutFactories.add(factory);
@@ -195,8 +193,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     Map<String, Object> operationParameters = new HashMap<>();
     PolicyPointcutParameters sourceParameters =
         parametersManager.createSourcePointcutParameters(component, event.getMessage().getAttributes());
-    Map singletonMap = singletonMap(POLICY_SOURCE_POINTCUT_PARAMETERS, sourceParameters);
-    when(event.getInternalParameters()).thenReturn(singletonMap);
+    when(event.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourceParameters);
 
     OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true, sourceParameters);
     operationPointcutFactories.add(factory);
@@ -217,8 +214,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     Map<String, Object> operationParameters = new HashMap<>();
     PolicyPointcutParameters sourceParameters =
         parametersManager.createSourcePointcutParameters(component, event.getMessage().getAttributes());
-    Map singletonMap = singletonMap(POLICY_SOURCE_POINTCUT_PARAMETERS, sourceParameters);
-    when(event.getInternalParameters()).thenReturn(singletonMap);
+    when(event.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourceParameters);
 
     OperationPolicyPointcutParametersFactory factory = mockOperationFactory(false, sourceParameters);
     operationPointcutFactories.add(factory);
@@ -238,8 +234,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     Map<String, Object> operationParameters = new HashMap<>();
     PolicyPointcutParameters sourceParameters =
         parametersManager.createSourcePointcutParameters(component, event.getMessage().getAttributes());
-    Map singletonMap = singletonMap(POLICY_SOURCE_POINTCUT_PARAMETERS, sourceParameters);
-    when(event.getInternalParameters()).thenReturn(singletonMap);
+    when(event.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourceParameters);
 
     OperationPolicyPointcutParametersFactory factory1 = mockOperationFactory(true, sourceParameters);
     OperationPolicyPointcutParametersFactory factory2 = mockOperationFactory(false, sourceParameters);
@@ -273,8 +268,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     Map<String, Object> operationParameters = new HashMap<>();
     PolicyPointcutParameters sourceParameters =
         parametersManager.createSourcePointcutParameters(component, event.getMessage().getAttributes());
-    Map singletonMap = singletonMap(POLICY_SOURCE_POINTCUT_PARAMETERS, sourceParameters);
-    when(event.getInternalParameters()).thenReturn(singletonMap);
+    when(event.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourceParameters);
 
     OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true, sourceParameters);
     PolicyPointcutParameters parameters = mock(PolicyPointcutParameters.class);

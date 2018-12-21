@@ -96,7 +96,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
           .thenAnswer(policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
               .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
               .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
-              .map(e -> firstPolicyResultEvent));
+              .map(e -> CoreEvent.builder(e).message(firstPolicyResultEvent.getMessage()).build()));
       return firstPolicySourcePolicyProcessor;
     });
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
@@ -104,7 +104,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
           .thenAnswer(policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
               .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
               .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
-              .map(e -> secondPolicyResultEvent));
+              .map(e -> CoreEvent.builder(e).message(secondPolicyResultEvent.getMessage()).build()));
       return secondPolicySourcePolicyProcessor;
     });
   }
