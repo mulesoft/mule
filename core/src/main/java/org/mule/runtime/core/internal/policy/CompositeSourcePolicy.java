@@ -81,50 +81,74 @@ public class CompositeSourcePolicy
 
     AtomicReference<FluxSink<CoreEvent>> sinkRef = new AtomicReference<>();
 
-    Flux.<CoreEvent>create(sink -> {
+    Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
+        Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
 
-      sinkRef.set(sink);
 
-    })
-        // ;
-        // final EmitterProcessor<CoreEvent> emitterProcessor = EmitterProcessor.create();
+            // .transform(getExecutionProcessor())
+            // .onErrorContinue(t -> !(t instanceof MessagingException), (t, e) -> new MessagingException((CoreEvent) e, t))
+            // // .doOnSuccess(MessageProcessors.completeSuccessIfNeeded(true))
+            // .doOnNext(MessageProcessors.completeSuccessIfNeeded(true))
+            // .doOnError(MessageProcessors.completeErrorIfNeeded(true))
 
-        //
-        //
-        // emitterProcessor
-        .flatMap(event -> from(MessageProcessors.process(event, getExecutionProcessor())))
-        .map(policiesResultEvent -> {
-          final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
-              .getInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS);
-          Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
-              .map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer
-                  .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage())))
-              .orElse(originalResponseParameters);
-          return right(SourcePolicyFailureResult.class,
-                       new SourcePolicySuccessResult(policiesResultEvent, responseParameters,
-                                                     ((InternalEvent) policiesResultEvent)
-                                                         .getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR)));
-        })
-        .doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
-        .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
-                   e -> LOGGER.error(e.getMessage(), e))
-        .onErrorResume(FlowExecutionException.class, e -> {
-          return just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e))));
-        })
-        .onErrorResume(MessagingException.class, e -> {
-          return just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e)),
-                           SourcePolicySuccessResult.class))
-                               .doOnNext(result -> logSourcePolicyFailureResult(result.getLeft()));
-        })
-        .doOnNext(result -> result
-            .apply(spfr -> ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) ((InternalEvent) spfr
-                .getMessagingException().getEvent()).getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result),
-                   spsr -> ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) ((InternalEvent) spsr
-                       .getResult()).getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result)))
-        .subscribe();
+
+
+            .flatMap(event -> from(MessageProcessors.process(event, getExecutionProcessor())))
+            .map(policiesResultEvent -> {
+              final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
+                  .getInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS);
+              Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
+                  .map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer
+                      .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage())))
+                  .orElse(originalResponseParameters);
+              return right(SourcePolicyFailureResult.class,
+                           new SourcePolicySuccessResult(policiesResultEvent, responseParameters,
+                                                         ((InternalEvent) policiesResultEvent)
+                                                             .getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR)));
+            })
+            .doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
+            .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
+                       e -> LOGGER.error(e.getMessage(), e))
+            .onErrorResume(FlowExecutionException.class, e -> {
+              return just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e))));
+            })
+            .onErrorResume(MessagingException.class, e -> {
+              return just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e)),
+                               SourcePolicySuccessResult.class))
+                                   .doOnNext(result -> logSourcePolicyFailureResult(result.getLeft()));
+            })
+            .doOnNext(result -> result
+                .apply(spfr -> ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) ((InternalEvent) spfr
+                    .getMessagingException().getEvent()).getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result),
+                       spsr -> ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) ((InternalEvent) spsr
+                           .getResult()).getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result)));
+
+    policyFlux.subscribe();
 
     policySink = sinkRef.get();
   }
+
+  // /**
+  // * Process an {@link CoreEvent} with a given {@link ReactiveProcessor} returning a {@link Publisher<CoreEvent>} via which the
+  // * future {@link CoreEvent} or {@link Throwable} will be published.
+  // * <p/>
+  // * The {@link CoreEvent} returned by this method <b>will</b> be completed with the same {@link CoreEvent} instance and if an
+  // * error occurs during processing the {@link EventContext} will be completed with the error.
+  // *
+  // * @param event event to process
+  // * @param processor processor to use
+  // * @return future result
+  // */
+  // public static Publisher<CoreEvent> process(CoreEvent event, ReactiveProcessor processor) {
+  // return just(event).transform(processor)
+  //
+  // .onErrorMap(t -> !(t instanceof MessagingException), t -> {
+  // return new MessagingException(event, t);
+  // })
+  // // .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
+  // .doOnSuccess(MessageProcessors.completeSuccessIfNeeded(true))
+  // .doOnError(MessageProcessors.completeErrorIfNeeded(true));
+  // }
 
   /**
    * Executes the flow.
@@ -144,7 +168,8 @@ public class CompositeSourcePolicy
    */
   @Override
   protected Publisher<CoreEvent> processNextOperation(Publisher<CoreEvent> eventPub) {
-    return from(eventPub)
+    System.out.println("Process next operation!");
+    return Flux.from(eventPub)
         .flatMap(event -> {
           ReactiveProcessor flowExecutionProcessor = ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_FLOW_PROCESSOR);
           return from(flowExecutionProcessor.apply(just(event)))
@@ -201,7 +226,8 @@ public class CompositeSourcePolicy
    */
   @Override
   protected Publisher<CoreEvent> processPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
-    return from(eventPub)
+    System.out.println("Process policy!");
+    return Flux.from(eventPub)
         .doOnNext(s -> logEvent(getCoreEventId(s), getPolicyName(policy), () -> getCoreEventAttributesAsString(s),
                                 "Starting Policy "))
         .transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
