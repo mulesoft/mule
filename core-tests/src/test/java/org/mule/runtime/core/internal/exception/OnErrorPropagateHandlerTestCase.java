@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
