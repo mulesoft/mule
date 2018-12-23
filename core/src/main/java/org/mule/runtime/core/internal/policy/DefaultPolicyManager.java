@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
@@ -25,17 +24,13 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
-
-import org.reactivestreams.Publisher;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -86,7 +81,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     return sourcePolicyInstances.get(policyKey, k -> {
       List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
       if (parameterizedPolicies.isEmpty()) {
-        return (event, flowExecutionProcessor, respParamProcessor) -> from(process(event, flowExecutionProcessor))
+        return (event, flowExecutionProcessor, respParamProcessor) -> just(event)
+            .transform(flowExecutionProcessor)
             .map(flowExecutionResult -> right(SourcePolicyFailureResult.class,
                                               new SourcePolicySuccessResult(flowExecutionResult,
                                                                             () -> respParamProcessor
@@ -97,27 +93,24 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
               return just(left(new SourcePolicyFailureResult(messagingException, () -> respParamProcessor
                   .getFailedExecutionResponseParametersFunction()
                   .apply(messagingException.getEvent()))));
-            });
+            })
+            .doOnNext(result -> result.apply(spfr -> {
+              final InternalEvent ev = (InternalEvent) spfr.getMessagingException().getEvent();
+              if (!ev.getContext().isComplete()) {
+                ev.getContext().error(spfr.getMessagingException());
+              }
+            }, spsr -> {
+              final InternalEvent ev = (InternalEvent) spsr.getResult();
+              if (!ev.getContext().isComplete()) {
+                ev.getContext().success(ev);
+              }
+            }));
       } else {
         return new CompositeSourcePolicy(parameterizedPolicies,
                                          lookupSourceParametersTransformer(sourceIdentifier),
                                          sourcePolicyProcessorFactory);
       }
     });
-  }
-
-  public static Publisher<CoreEvent> process(CoreEvent event, ReactiveProcessor processor) {
-    return just(event).transform(processor)
-        // .onErrorMap(t -> !(t instanceof MessagingException), t -> {
-        // if (processor instanceof Component) {
-        // return new MessagingException(event, t, (Component) processor);
-        // } else {
-        // return new MessagingException(event, t);
-        // }
-        // })
-        // .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
-        .doOnSuccess(MessageProcessors.completeSuccessIfNeeded((event.getContext()), true))
-        .doOnError(MessageProcessors.completeErrorIfNeeded((event.getContext()), true));
   }
 
   @Override

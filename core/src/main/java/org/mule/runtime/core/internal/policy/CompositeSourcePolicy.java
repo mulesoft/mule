@@ -149,24 +149,24 @@ public class CompositeSourcePolicy
     return Flux.from(eventPub)
         .flatMap(event -> {
           ReactiveProcessor flowExecutionProcessor = ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_FLOW_PROCESSOR);
-          return from(flowExecutionProcessor.apply(just(event)))
-              .map(flowExecutionResponse -> {
-                MessageSourceResponseParametersProcessor parametersProcessor =
-                    ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
+          return from(flowExecutionProcessor.apply(just(event)));
+        })
+        .map(flowExecutionResponse -> {
+          MessageSourceResponseParametersProcessor parametersProcessor =
+              ((InternalEvent) flowExecutionResponse).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
 
-                Map<String, Object> originalResponseParameters =
-                    parametersProcessor.getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);
+          Map<String, Object> originalResponseParameters =
+              parametersProcessor.getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);
 
-                Message message = getParametersTransformer()
-                    .map(parametersTransformer -> parametersTransformer
-                        .fromSuccessResponseParametersToMessage(originalResponseParameters))
-                    .orElseGet(flowExecutionResponse::getMessage);
+          Message message = getParametersTransformer()
+              .map(parametersTransformer -> parametersTransformer
+                  .fromSuccessResponseParametersToMessage(originalResponseParameters))
+              .orElseGet(flowExecutionResponse::getMessage);
 
-                return InternalEvent.builder(event)
-                    .message(message)
-                    .addInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS, originalResponseParameters)
-                    .build();
-              });
+          return InternalEvent.builder(flowExecutionResponse)
+              .message(message)
+              .addInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS, originalResponseParameters)
+              .build();
         })
         .cast(CoreEvent.class)
         .onErrorMap(MessagingException.class, messagingException -> {
