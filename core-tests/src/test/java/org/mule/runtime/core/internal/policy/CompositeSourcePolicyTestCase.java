@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -160,7 +161,9 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
   public void policyExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
-      when(secondPolicySourcePolicyProcessor.apply(any(Publisher.class))).thenReturn(error(policyException));
+      when(secondPolicySourcePolicyProcessor.apply(any(Publisher.class)))
+          .thenAnswer(inv -> from((Publisher<CoreEvent>) inv.getArgument(0))
+              .flatMap(event -> error(new MessagingException(event, policyException))));
       return secondPolicySourcePolicyProcessor;
     });
 
@@ -170,26 +173,23 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         from(compositeSourcePolicy.process(initialEvent, flowExecutionProcessor, sourceParametersProcessor)).block();
     assertThat(sourcePolicyResult.isLeft(), is(true));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause().getCause(), is(policyException));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause(), is(policyException));
   }
 
   @Test
   public void nextProcessorExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
     reset(flowExecutionProcessor);
-    when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      Mono<CoreEvent> mono = from(invocation.getArgument(0));
-      return mono.map(event -> {
-        throw policyException;
-      });
-    });
+    when(flowExecutionProcessor.apply(any()))
+        .thenAnswer(invocation -> from((Publisher<CoreEvent>) invocation.getArgument(0))
+            .flatMap(event -> error(new MessagingException(event, policyException))));
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), sourcePolicyParametersTransformer,
                                                       sourcePolicyProcessorFactory);
 
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         from(compositeSourcePolicy.process(initialEvent, flowExecutionProcessor, sourceParametersProcessor)).block();
     assertThat(sourcePolicyResult.isLeft(), is(true));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause().getCause(), is(policyException));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause(), is(policyException));
   }
 
   private CoreEvent createTestEvent() {
