@@ -208,8 +208,8 @@ public class MessageProcessors {
           }
         })
         .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
-        .doOnSuccess(completeSuccessIfNeeded(true))
-        .doOnError(completeErrorIfNeeded(true));
+        .doOnSuccess(completeSuccessIfNeeded((event.getContext()), true))
+        .doOnError(completeErrorIfNeeded((event.getContext()), true));
   }
 
   /**
@@ -278,32 +278,6 @@ public class MessageProcessors {
             ((BaseEventContext) event.getContext()).success();
           }
         });
-  }
-
-  public static Consumer<CoreEvent> completeSuccessIfNeeded(boolean complete) {
-    if (complete) {
-      return result -> {
-        if (!((BaseEventContext) result.getContext()).isComplete()) {
-          ((BaseEventContext) result.getContext()).success(result);
-        }
-      };
-    } else {
-      return result -> {
-      };
-    }
-  }
-
-  public static Consumer<Throwable> completeErrorIfNeeded(boolean complete) {
-    if (complete) {
-      return me -> {
-        if (!((BaseEventContext) ((MessagingException) me).getEvent().getContext()).isComplete()) {
-          ((BaseEventContext) ((MessagingException) me).getEvent().getContext()).error(me);
-        }
-      };
-    } else {
-      return me -> {
-      };
-    }
   }
 
   public static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
