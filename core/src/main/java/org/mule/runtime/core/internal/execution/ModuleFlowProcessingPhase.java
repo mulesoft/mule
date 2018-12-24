@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -68,6 +67,8 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import org.reactivestreams.Publisher;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,8 +80,6 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
-
-import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 

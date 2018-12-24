@@ -46,7 +46,9 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.reactivestreams.Publisher;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import reactor.core.publisher.Mono;
 
@@ -76,6 +78,8 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
   private final Processor firstPolicySourcePolicyProcessor = mock(Processor.class);
   private final Processor secondPolicySourcePolicyProcessor = mock(Processor.class);
   private final ArgumentCaptor<Publisher> publisherArgumentCaptor = forClass(Publisher.class);
+  private CoreEvent firstPolicyActualResultEvent;
+  private CoreEvent secondPolicyActualResultEvent;
 
   @Before
   public void setUp() throws Exception {
@@ -95,6 +99,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       when(firstPolicySourcePolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
+              .doOnNext(ev -> firstPolicyActualResultEvent = ev)
               .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
               .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
               .map(e -> CoreEvent.builder(e).message(firstPolicyResultEvent.getMessage()).build()));
@@ -103,6 +108,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       when(secondPolicySourcePolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
+              .doOnNext(ev -> secondPolicyActualResultEvent = ev)
               .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
               .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
               .map(e -> CoreEvent.builder(e).message(secondPolicyResultEvent.getMessage()).build()));
@@ -122,9 +128,10 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     verify(flowExecutionProcessor).apply(publisherArgumentCaptor.capture());
     assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
                equalTo(modifiedEvent.getMessage()));
+
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(firstPolicy), any());
     verify(firstPolicySourcePolicyProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(firstPolicyActualResultEvent.getMessage(),
                equalTo(initialEvent.getMessage()));
   }
 
@@ -143,11 +150,13 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
                equalTo(modifiedEvent.getMessage()));
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(firstPolicy), any());
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(secondPolicy), any());
+
     verify(firstPolicySourcePolicyProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(firstPolicyActualResultEvent.getMessage(),
                equalTo(initialEvent.getMessage()));
+
     verify(secondPolicySourcePolicyProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(secondPolicyActualResultEvent.getMessage(),
                equalTo(modifiedEvent.getMessage()));
   }
 
@@ -192,9 +201,62 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause(), is(policyException));
   }
 
+  @Test
+  public void reactorPipelinesBuiltJustOnce() {
+    InvocationsRecordingCompositeSourcePolicy.reset();
+    final InvocationsRecordingCompositeSourcePolicy sourcePolicy =
+        new InvocationsRecordingCompositeSourcePolicy(asList(firstPolicy),
+                                                      sourcePolicyParametersTransformer,
+                                                      sourcePolicyProcessorFactory);
+
+    assertThat(sourcePolicy.getNextOperationCount(), is(1));
+    assertThat(sourcePolicy.getPolicyCount(), is(1));
+
+    from(sourcePolicy.process(initialEvent, flowExecutionProcessor, sourceParametersProcessor)).block();
+
+    assertThat(sourcePolicy.getNextOperationCount(), is(1));
+    assertThat(sourcePolicy.getPolicyCount(), is(1));
+  }
+
   private CoreEvent createTestEvent() {
     return CoreEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
         .message(Message.builder().nullValue().build()).build();
   }
 
+  public static final class InvocationsRecordingCompositeSourcePolicy extends CompositeSourcePolicy {
+
+    private static final AtomicInteger nextOperation = new AtomicInteger();
+    private static final AtomicInteger policy = new AtomicInteger();
+
+    public InvocationsRecordingCompositeSourcePolicy(List<Policy> parameterizedPolicies,
+                                                     Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
+                                                     SourcePolicyProcessorFactory sourcePolicyProcessorFactory) {
+      super(parameterizedPolicies, sourcePolicyParametersTransformer, sourcePolicyProcessorFactory);
+    }
+
+    public static void reset() {
+      nextOperation.set(0);
+      policy.set(0);
+    }
+
+    @Override
+    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
+      nextOperation.incrementAndGet();
+      return super.applyNextOperation(eventPub);
+    }
+
+    @Override
+    protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
+      InvocationsRecordingCompositeSourcePolicy.policy.incrementAndGet();
+      return super.applyPolicy(policy, nextProcessor, eventPub);
+    }
+
+    public int getNextOperationCount() {
+      return nextOperation.get();
+    }
+
+    public int getPolicyCount() {
+      return policy.get();
+    }
+  }
 }
