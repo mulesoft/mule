@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Message;
@@ -82,8 +81,7 @@ public class CompositeSourcePolicy
 
     Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
         Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
-            // .transform(getExecutionProcessor())
-            .flatMap(event -> Mono.just(event).transform(getExecutionProcessor()))
+            .transform(getExecutionProcessor())
             .map(policiesResultEvent -> {
               final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
                   .getInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS);
@@ -99,14 +97,12 @@ public class CompositeSourcePolicy
             .doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
             .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
                        e -> LOGGER.error(e.getMessage(), e))
-            .onErrorResume(FlowExecutionException.class, e -> {
-              return just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e))));
-            })
-            .onErrorResume(MessagingException.class, e -> {
-              return just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e)),
-                               SourcePolicySuccessResult.class))
-                                   .doOnNext(result -> logSourcePolicyFailureResult(result.getLeft()));
-            })
+            .onErrorResume(FlowExecutionException.class,
+                           e -> just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e)))))
+            .onErrorResume(MessagingException.class,
+                           e -> just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e)),
+                                          SourcePolicySuccessResult.class))
+                                              .doOnNext(result -> logSourcePolicyFailureResult(result.getLeft())))
             .doOnNext(result -> result.apply(spfr -> {
               final InternalEvent event = (InternalEvent) spfr.getMessagingException().getEvent();
               if (!event.getContext().isComplete()) {
@@ -145,11 +141,11 @@ public class CompositeSourcePolicy
    * {@link MessagingException} to signal that the failure was through the the flow exception and not the policy logic.
    */
   @Override
-  protected Publisher<CoreEvent> processNextOperation(Publisher<CoreEvent> eventPub) {
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
     return Flux.from(eventPub)
         .flatMap(event -> {
           ReactiveProcessor flowExecutionProcessor = ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_FLOW_PROCESSOR);
-          return from(flowExecutionProcessor.apply(just(event)));
+          return just(event).transform(flowExecutionProcessor);
         })
         .map(flowExecutionResponse -> {
           MessageSourceResponseParametersProcessor parametersProcessor =
@@ -202,11 +198,12 @@ public class CompositeSourcePolicy
    * wrapped policy / flow.
    */
   @Override
-  protected Publisher<CoreEvent> processPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
+  protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
+    final ReactiveProcessor createSourcePolicy = sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor);
     return Flux.from(eventPub)
         .doOnNext(s -> logEvent(getCoreEventId(s), getPolicyName(policy), () -> getCoreEventAttributesAsString(s),
                                 "Starting Policy "))
-        .transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
+        .transform(createSourcePolicy)
         .doOnNext(responseEvent -> logEvent(getCoreEventId(responseEvent), getPolicyName(policy),
                                             () -> getCoreEventAttributesAsString(responseEvent), "At the end of the Policy "));
   }
@@ -229,12 +226,9 @@ public class CompositeSourcePolicy
                                                                                          ReactiveProcessor flowExecutionProcessor,
                                                                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     return Mono.create(callerSink -> {
-      CoreEvent sourceEventForPolicy =
-          quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, messageSourceResponseParametersProcessor,
-                                    POLICY_SOURCE_FLOW_PROCESSOR, flowExecutionProcessor,
-                                    POLICY_SOURCE_CALLER_SINK, callerSink));
-
-      policySink.next(sourceEventForPolicy);
+      policySink.next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, messageSourceResponseParametersProcessor,
+                                                POLICY_SOURCE_FLOW_PROCESSOR, flowExecutionProcessor,
+                                                POLICY_SOURCE_CALLER_SINK, callerSink)));
     });
   }
 

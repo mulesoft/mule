@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.reverse;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -65,10 +65,10 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
   public final ReactiveProcessor getPolicyProcessor() {
     List<Function<ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
     for (Policy policy : parameterizedPolicies) {
-      interceptors.add(next -> eventPub -> from(processPolicy(policy, next, eventPub))
+      interceptors.add(next -> eventPub -> from(applyPolicy(policy, next, eventPub))
           .onErrorMap(throwable -> !(throwable instanceof MuleException), throwable -> new DefaultMuleException(throwable)));
     }
-    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(processNextOperation(eventPub))
+    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub))
         .onErrorMap(throwable -> !(throwable instanceof MuleException), throwable -> new DefaultMuleException(throwable));
     // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
     reverse(interceptors);
@@ -99,7 +99,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Publisher<CoreEvent> processNextOperation(Publisher<CoreEvent> eventPub);
+  protected abstract Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub);
 
   /**
    * Template method for executing a policy.
@@ -111,7 +111,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
    * @return the result to use for the next policy in the chain.
    * @throws Exception if the execution of the policy fails.
    */
-  protected abstract Publisher<CoreEvent> processPolicy(Policy policy, ReactiveProcessor nextProcessor,
-                                                        Publisher<CoreEvent> eventPub);
+  protected abstract Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor,
+                                                      Publisher<CoreEvent> eventPub);
 
 }

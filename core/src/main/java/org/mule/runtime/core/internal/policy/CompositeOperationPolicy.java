@@ -87,7 +87,7 @@ public class CompositeOperationPolicy
    * @param eventPub the event to execute the operation.
    */
   @Override
-  protected Publisher<CoreEvent> processNextOperation(Publisher<CoreEvent> eventPub) {
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
     return from(eventPub)
         .flatMap(event -> {
           Map<String, Object> parametersMap = new HashMap<>();
@@ -118,7 +118,7 @@ public class CompositeOperationPolicy
    * @param eventPub the event to use to execute the policy chain.
    */
   @Override
-  protected Publisher<CoreEvent> processPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
+  protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
     Processor defaultOperationPolicy = operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
     return from(eventPub)
         .transform(defaultOperationPolicy)
