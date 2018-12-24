@@ -29,7 +29,7 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
   @Test
   public void messageModifiedBeforeNextProcessorIsNotPropagatedToItWhenPropagationDisabled() throws MuleException {
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
-    when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
+    mockFlowReturningEvent(modifiedMessageEvent);
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(false);
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));

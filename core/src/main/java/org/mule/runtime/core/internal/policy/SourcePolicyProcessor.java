@@ -106,13 +106,10 @@ public class SourcePolicyProcessor implements Processor {
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return Flux.from(publisher)
-            // .doOnNext(event -> saveState((PrivilegedEvent) event))
             .map(event -> (CoreEvent) policyEventConverter
                 .createEvent(saveState((PrivilegedEvent) event), sourceEvent,
                              policy.getPolicyChain().isPropagateMessageTransformations()))
-            .flatMap(e -> just(e).transform(nextProcessor))
-            // .transform(nextProcessor)
-            // .compose(nextProcessor)
+            .transform(nextProcessor)
             .map(result -> (CoreEvent) policyEventConverter.createEvent((PrivilegedEvent) result, loadState()))
             .onErrorMap(MessagingException.class,
                         me -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),

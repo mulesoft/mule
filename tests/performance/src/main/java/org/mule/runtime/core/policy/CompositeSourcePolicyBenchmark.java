@@ -46,7 +46,6 @@ public class CompositeSourcePolicyBenchmark extends AbstractBenchmark {
 
   @Setup(Level.Trial)
   public void setUp() {
-    System.out.println("Trial?");
     handler = new CompositeSourcePolicy(asList(new Policy(new PolicyChain() {
 
       @Override
