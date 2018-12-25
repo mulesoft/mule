@@ -268,9 +268,9 @@ public class MessageProcessors {
                                                                       Publisher<CoreEvent> responsePublisher) {
     return just(quickCopy(child, event))
         .transform(processor)
-        .doOnNext(completeSuccessIfNeeded(child, true))
         .switchIfEmpty(from(responsePublisher))
         .map(result -> quickCopy(event.getContext(), result))
+        .doOnNext(completeSuccessIfNeeded(child, true))
         .doOnError(MessagingException.class,
                    me -> me.setProcessedEvent(quickCopy(event.getContext(), me.getEvent())))
         .doOnSuccess(result -> {
