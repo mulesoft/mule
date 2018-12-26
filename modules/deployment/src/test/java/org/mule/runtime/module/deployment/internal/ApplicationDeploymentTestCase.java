@@ -95,7 +95,6 @@ import org.apache.commons.io.IOUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -601,7 +600,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  @Ignore
   public void redeploysBrokenExplodedAppAfterStartup() throws Exception {
     startDeployment();
 

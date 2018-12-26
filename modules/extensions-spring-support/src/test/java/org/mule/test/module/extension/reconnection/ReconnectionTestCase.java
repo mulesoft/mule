@@ -18,10 +18,8 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static List<CoreEvent> capturedEvents;
