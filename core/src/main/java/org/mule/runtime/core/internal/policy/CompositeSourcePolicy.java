@@ -12,8 +12,6 @@ import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Message;
@@ -38,6 +36,7 @@ import java.util.function.Supplier;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
 /**
@@ -143,7 +142,7 @@ public class CompositeSourcePolicy
    */
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
-    return from(eventPub)
+    return Flux.from(eventPub)
         .flatMap(event -> {
           ReactiveProcessor flowExecutionProcessor = ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_FLOW_PROCESSOR);
           return just(event).transform(flowExecutionProcessor);
@@ -201,7 +200,7 @@ public class CompositeSourcePolicy
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
     final ReactiveProcessor createSourcePolicy = sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor);
-    return from(eventPub)
+    return Flux.from(eventPub)
         .doOnNext(s -> logEvent(getCoreEventId(s), getPolicyName(policy), () -> getCoreEventAttributesAsString(s),
                                 "Starting Policy "))
         .transform(createSourcePolicy)
@@ -226,7 +225,7 @@ public class CompositeSourcePolicy
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
                                                                                          ReactiveProcessor flowExecutionProcessor,
                                                                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
-    return create(callerSink -> {
+    return Mono.create(callerSink -> {
       policySink.next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, messageSourceResponseParametersProcessor,
                                                 POLICY_SOURCE_FLOW_PROCESSOR, flowExecutionProcessor,
                                                 POLICY_SOURCE_CALLER_SINK, callerSink)));
