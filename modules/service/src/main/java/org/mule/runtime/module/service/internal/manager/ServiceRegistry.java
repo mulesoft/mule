@@ -49,7 +49,7 @@ public class ServiceRegistry {
     for (Field field : getAllFields(serviceProvider.getClass(), withAnnotation(Inject.class))) {
       Class<?> dependencyType = field.getType();
 
-      boolean nullToOptional = false;
+      boolean asOptional = false;
       if (dependencyType.equals(Optional.class)) {
         Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
         if (type instanceof ParameterizedType) {
@@ -57,15 +57,15 @@ public class ServiceRegistry {
         } else {
           dependencyType = (Class<?>) type;
         }
-        nullToOptional = true;
+        asOptional = true;
       }
 
       try {
         field.setAccessible(true);
-        Object dependency = resolveObjectToInject(dependencyType, nullToOptional);
+        Object dependency = resolveObjectToInject(dependencyType, asOptional);
         if (dependency != null) {
           field.set(serviceProvider, dependency);
-        } else if (!nullToOptional) {
+        } else if (!asOptional) {
           throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'",
                                                   field.getName(), dependencyType.getName()));
         }
@@ -77,13 +77,13 @@ public class ServiceRegistry {
     }
   }
 
-  private Object resolveObjectToInject(Class<?> dependencyType, boolean nullToOptional) {
+  private Object resolveObjectToInject(Class<?> dependencyType, boolean asOptional) {
     Object dependency = services.entrySet().stream()
         .filter(entry -> dependencyType.isAssignableFrom(entry.getKey()))
         .findFirst()
         .map(Entry::getValue)
         .orElse(null);
-    return nullToOptional ? ofNullable(dependency) : dependency;
+    return asOptional ? ofNullable(dependency) : dependency;
   }
 
 
