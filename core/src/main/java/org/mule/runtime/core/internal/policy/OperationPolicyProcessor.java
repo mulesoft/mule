@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
