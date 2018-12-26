@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -23,6 +22,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
+
+import reactor.core.publisher.Flux;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
@@ -79,7 +80,7 @@ public class SourcePolicyProcessor implements Processor {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
+    return Flux.from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(sourceEvent -> {
           PolicyStateId policyStateId = stateIdFactory.create(sourceEvent);
@@ -104,7 +105,7 @@ public class SourcePolicyProcessor implements Processor {
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-        return from(publisher)
+        return Flux.from(publisher)
             .map(event -> (CoreEvent) policyEventConverter
                 .createEvent(saveState((PrivilegedEvent) event), sourceEvent,
                              policy.getPolicyChain().isPropagateMessageTransformations()))
