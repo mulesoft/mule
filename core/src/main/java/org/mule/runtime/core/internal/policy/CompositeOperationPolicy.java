@@ -13,7 +13,6 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -29,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import reactor.core.publisher.Mono;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -88,7 +89,7 @@ public class CompositeOperationPolicy
    */
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
-    return from(eventPub)
+    return Mono.from(eventPub)
         .flatMap(event -> {
           Map<String, Object> parametersMap = new HashMap<>();
           try {
@@ -104,7 +105,7 @@ public class CompositeOperationPolicy
 
           OperationExecutionFunction operationExecutionFunction =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
-          return from(operationExecutionFunction.execute(parametersMap, event));
+          return Mono.from(operationExecutionFunction.execute(parametersMap, event));
         })
         .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
@@ -120,7 +121,7 @@ public class CompositeOperationPolicy
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
     Processor defaultOperationPolicy = operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
-    return from(eventPub)
+    return Mono.from(eventPub)
         .transform(defaultOperationPolicy)
         .map(policyResponse -> {
 
@@ -143,13 +144,9 @@ public class CompositeOperationPolicy
                                                                      operationExecutionFunction));
 
     try {
-      if (getParametersTransformer().isPresent()) {
-        return processWithChildContext(CoreEvent.builder(operationEventForPolicy)
-            .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
-            .build(), getExecutionProcessor(), empty());
-      } else {
-        return processWithChildContext(operationEventForPolicy, getExecutionProcessor(), empty());
-      }
+      return Mono.from(processWithChildContext(getParametersTransformer().isPresent() ? CoreEvent.builder(operationEventForPolicy)
+          .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
+          .build() : operationEventForPolicy, getExecutionProcessor(), empty()));
     } catch (Exception e) {
       return error(e);
     }
