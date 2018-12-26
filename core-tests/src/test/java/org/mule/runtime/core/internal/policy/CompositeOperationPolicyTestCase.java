@@ -11,86 +11,103 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
-import org.mule.runtime.core.api.policy.Policy;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
-//TODO MULE-10927 - create a common class between CompositeOperationPolicyTestCase and CompositeSourcePolicyTestCase
-public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public ExpectedException expectedException = none();
+public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTestCase {
 
   private CompositeOperationPolicy compositeOperationPolicy;
 
   private final Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
       of(mock(OperationPolicyParametersTransformer.class, RETURNS_DEEP_STUBS));
   private final OperationParametersProcessor operationParametersProcessor = mock(OperationParametersProcessor.class);
-  private final Policy firstPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
-  private final Policy secondPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
-  private final FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
-  private CoreEvent initialEvent;
-  private CoreEvent firstPolicyProcessorResultEvent;
-  private CoreEvent secondPolicyResultProcessorEvent;
+
   private final OperationExecutionFunction operationExecutionFunction = mock(OperationExecutionFunction.class);
-  private CoreEvent nextProcessResultEvent;
 
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory = mock(OperationPolicyProcessorFactory.class);
-  private final Processor firstPolicyOperationPolicyProcessor = mock(Processor.class);
-  private final Processor secondPolicyOperationPolicyProcessor = mock(Processor.class);
 
+  @Override
   @Before
   public void setUp() throws Exception {
-    initialEvent = createTestEvent();
-    firstPolicyProcessorResultEvent = createTestEvent();
-    secondPolicyResultProcessorEvent = createTestEvent();
-    nextProcessResultEvent = CoreEvent.builder(createTestEvent()).message(Message.of("HELLO")).build();
+    super.setUp();
+
     when(operationPolicyParametersTransformer.get().fromParametersToMessage(any())).thenReturn(Message.of(null));
-    when(operationExecutionFunction.execute(any(), any())).thenAnswer(invocationOnMock -> just(nextProcessResultEvent));
-    when(firstPolicy.getPolicyChain().apply(any())).thenReturn(just(firstPolicyProcessorResultEvent));
-    when(secondPolicy.getPolicyChain().apply(any())).thenReturn(just(secondPolicyResultProcessorEvent));
+    when(operationExecutionFunction.execute(any(), any()))
+        .thenAnswer(operationExecInv -> just((CoreEvent) operationExecInv.getArgument(1))
+            .map(e -> CoreEvent.builder(e).message(nextProcessResultEvent.getMessage()).build()));
     when(operationPolicyProcessorFactory.createOperationPolicy(same(secondPolicy), any()))
-        .thenReturn(secondPolicyOperationPolicyProcessor);
+        .thenReturn(secondPolicyProcessor);
+
+    ////
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
-      when(firstPolicyOperationPolicyProcessor.apply(any()))
+      when(firstPolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
               .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1]));
-      return firstPolicyOperationPolicyProcessor;
+      return firstPolicyProcessor;
     });
     when(operationPolicyProcessorFactory.createOperationPolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
-      when(secondPolicyOperationPolicyProcessor.apply(any()))
+      when(secondPolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
               .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1]));
-      return secondPolicyOperationPolicyProcessor;
+      return secondPolicyProcessor;
     });
+    ///
+
+    // when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation ->
+    // {
+    // when(firstPolicyProcessor.apply(any())).thenAnswer(firstPolicyProcessorAnswer(policyFactoryInvocation, ev -> {
+    // }));
+    // return firstPolicyProcessor;
+    // });
+    // when(operationPolicyProcessorFactory.createOperationPolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation
+    // -> {
+    // when(secondPolicyProcessor.apply(any())).thenAnswer(secondPolicyProcessorAnswer(policyFactoryInvocation, ev -> {
+    // }));
+    // return secondPolicyProcessor;
+    // });
+  }
+
+  private Answer<?> firstPolicyProcessorAnswer(InvocationOnMock policyFactoryInvocation,
+                                               Consumer<CoreEvent> eventInputCallback) {
+    return policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
+        .doOnNext(eventInputCallback)
+        // .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
+        .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
+        .map(e -> CoreEvent.builder(e).message(firstPolicyResultEvent.getMessage()).build());
+  }
+
+  private Answer<?> secondPolicyProcessorAnswer(InvocationOnMock policyFactoryInvocation,
+                                                Consumer<CoreEvent> eventInputCallback) {
+    return policyProcessorInvocation -> from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
+        .doOnNext(eventInputCallback)
+        // .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
+        .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
+        .map(e -> CoreEvent.builder(e).message(secondPolicyResultEvent.getMessage()).build());
   }
 
   @Test
@@ -106,7 +123,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
     assertThat(result.getMessage(), is(nextProcessResultEvent.getMessage()));
     verify(operationExecutionFunction).execute(any(), any());
     verify(operationPolicyProcessorFactory).createOperationPolicy(same(firstPolicy), any());
-    verify(firstPolicyOperationPolicyProcessor).apply(any());
+    verify(firstPolicyProcessor).apply(any());
   }
 
   @Test
@@ -121,8 +138,8 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
     verify(operationExecutionFunction).execute(any(), any());
     verify(operationPolicyProcessorFactory).createOperationPolicy(same(firstPolicy), any());
     verify(operationPolicyProcessorFactory).createOperationPolicy(same(secondPolicy), any());
-    verify(firstPolicyOperationPolicyProcessor).apply(any());
-    verify(firstPolicyOperationPolicyProcessor).apply(any());
+    verify(firstPolicyProcessor).apply(any());
+    verify(firstPolicyProcessor).apply(any());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -136,8 +153,11 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
   public void policyExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
-      when(firstPolicyOperationPolicyProcessor.apply(any())).thenReturn(error(policyException));
-      return firstPolicyOperationPolicyProcessor;
+      when(firstPolicyProcessor.apply(any()))
+          .thenAnswer(invocation -> from((Publisher<CoreEvent>) invocation.getArgument(0))
+              // Internal policy exceptions are already mapped to messaging exceptions
+              .flatMap(event -> error(new MessagingException(event, policyException))));
+      return firstPolicyProcessor;
     });
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
@@ -154,7 +174,11 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void nextProcessorExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
-    when(operationExecutionFunction.execute(any(), any())).thenReturn(error(policyException));
+    doAnswer(invocation -> just((CoreEvent) invocation.getArgument(1))
+        // Internal operation exceptions are already mapped to messaging exceptions
+        .flatMap(event -> error(new MessagingException(event, policyException))))
+            .when(operationExecutionFunction).execute(any(), any());
+
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
@@ -165,10 +189,6 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
     } catch (Throwable throwable) {
       throw rxExceptionToMuleException(throwable);
     }
-  }
-
-  private CoreEvent createTestEvent() {
-    return CoreEvent.builder(create(mockFlowConstruct, fromSingleComponent("http"))).message(Message.of(null)).build();
   }
 
 }
