@@ -67,11 +67,11 @@ public class ServiceRegistry {
           field.set(serviceProvider, dependency);
         } else if (!nullToOptional) {
           throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'",
-                                                  field.getName(), serviceProvider.getClass().getName()));
+                                                  field.getName(), dependencyType.getName()));
         }
       } catch (Exception e) {
         throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(),
-                                                serviceProvider.getClass().getName()),
+                                                dependencyType.getName()),
                                          e);
       }
     }

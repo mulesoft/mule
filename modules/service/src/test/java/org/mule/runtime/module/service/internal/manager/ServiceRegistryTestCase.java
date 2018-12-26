@@ -71,7 +71,8 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
     ServiceProviderRequiredDependencyToServiceA serviceProviderRequiredDependencyToServiceA =
         new ServiceProviderRequiredDependencyToServiceA();
     expectedException.expect(ServiceResolutionError.class);
-    expectedException.expectMessage(containsString("Could not inject dependency on field serviceA"));
+    expectedException
+        .expectMessage(containsString("Could not inject dependency on field serviceA of type " + ServiceA.class.getName()));
     serviceRegistry.inject(serviceProviderRequiredDependencyToServiceA);
   }
 
