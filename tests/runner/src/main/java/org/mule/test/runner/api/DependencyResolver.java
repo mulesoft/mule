@@ -7,19 +7,9 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.base.Joiner.on;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherRepositoryState;
 import org.mule.maven.client.internal.AetherResolutionContext;
-
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.eclipse.aether.RepositorySystem;
@@ -41,10 +31,22 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import static com.google.common.base.Joiner.on;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 /**
  * Provides {@link Dependency}s resolutions for Maven {@link Artifact} based on {@link RepositorySystem} and
@@ -63,7 +65,7 @@ public class DependencyResolver {
    * Creates an instance of the resolver.
    *
    * @param mavenConfiguration {@link MavenConfiguration} that defines the configuration to be used by Aether.
-   * @param workspaceReader {@link WorkspaceReader} used to resolve {@link Dependency dependencies} within  the workspace.
+   * @param workspaceReader {@link WorkspaceReader} used to resolve {@link Dependency dependencies} within the workspace.
    */
   public DependencyResolver(MavenConfiguration mavenConfiguration, Optional<WorkspaceReader> workspaceReader) {
     checkNotNull(mavenConfiguration, "mavenConfiguration cannot be null");
@@ -205,7 +207,8 @@ public class DependencyResolver {
    *        {@code null}
    * @param dependencyFilter {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve operation.
    *        May be {@code null} to no filter
-   * @param remoteRepositories {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already defined in the context.
+   * @param remoteRepositories {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already
+   *        defined in the context.
    * @return a {@link List} of {@link File}s for each dependency resolved
    * @throws {@link DependencyCollectionException} if the dependency tree could not be built
    * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
@@ -236,9 +239,8 @@ public class DependencyResolver {
       DependencyRequest dependencyRequest = new DependencyRequest();
       dependencyRequest.setRoot(node);
       dependencyRequest.setCollectRequest(collectRequest);
-      if (dependencyFilter != null) {
-        dependencyRequest.setFilter(dependencyFilter);
-      }
+      dependencyRequest.setFilter((node1, parents) -> !node1.getData().containsKey(ConflictResolver.CONFIG_PROP_VERBOSE)
+          && (dependencyFilter == null || dependencyFilter.accept(node1, parents)));
 
       node = repositoryState.getSystem().resolveDependencies(repositoryState.getSession(), dependencyRequest).getRoot();
     } catch (DependencyResolutionException e) {
