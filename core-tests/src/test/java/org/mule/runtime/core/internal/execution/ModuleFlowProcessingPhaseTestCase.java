@@ -48,7 +48,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -134,7 +133,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     failureResult = mock(SourcePolicyFailureResult.class);
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
-    when(sourcePolicy.process(any(), any(Processor.class), any())).thenAnswer(invocation -> {
+    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
       event = invocation.getArgument(0);
       return just(right(successResult));
     });
@@ -401,7 +400,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   }
 
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
-    when(sourcePolicy.process(any(), any(Processor.class), any())).thenAnswer(invocation -> {
+    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
       messagingException = buildFailingFlowException(invocation.getArgument(0), failure);
       return just(left(failureResult));
     });

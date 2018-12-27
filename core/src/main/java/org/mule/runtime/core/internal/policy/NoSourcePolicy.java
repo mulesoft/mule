@@ -96,7 +96,6 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
 
   @Override
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
-                                                                                         ReactiveProcessor flowExecutionProcessor,
                                                                                          MessageSourceResponseParametersProcessor respParamProcessor) {
     return create(callerSink -> {
       policySink.next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,

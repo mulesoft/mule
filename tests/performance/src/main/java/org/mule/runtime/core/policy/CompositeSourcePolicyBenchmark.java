@@ -52,7 +52,7 @@ public class CompositeSourcePolicyBenchmark extends AbstractBenchmark {
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return publisher;
       }
-    }, "")), empty(), (policy, nextProcessor) -> nextProcessor);
+    }, "")), eventPub -> eventPub, empty(), (policy, nextProcessor) -> nextProcessor);
 
     sourceRpp = new MessageSourceResponseParametersProcessor() {
 
@@ -76,7 +76,7 @@ public class CompositeSourcePolicyBenchmark extends AbstractBenchmark {
         CoreEvent.builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance())).message(messageBuilder.build());
     event = eventBuilder.build();
 
-    return from(handler.process(event, eventPub -> eventPub, sourceRpp)).block();
+    return from(handler.process(event, sourceRpp)).block();
   }
 
 }

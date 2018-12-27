@@ -161,7 +161,7 @@ public class ModuleFlowProcessingPhase
             .doOnNext(onMessageReceived(template, messageProcessContext, flowConstruct))
             // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when
             // complete.
-            .flatMap(request -> from(policy.process(request, flowExecutionProcessor, template))
+            .flatMap(request -> from(policy.process(request, template))
                 // Perform processing of result by sending success or error response and handle errors that occur.
                 // Returns Publisher<Void> to signal when this is complete or if it failed.
                 .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct, messageSource),

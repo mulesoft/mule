@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.policy;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import org.reactivestreams.Publisher;
 
@@ -27,13 +26,11 @@ public interface SourcePolicy {
    *
    * @param sourceEvent the event with the data created from the source message that must be used to execute the source policy.
    *        execute the successful or failure response function of the source.
-   * @param flowExecutionProcessor the processor that executes the flow.
    * @param messageSourceResponseParametersProcessor processor to generate the response and error response parameters of the
    *        source.
    * @return the result of processing the {@code event} through the policy chain.
    */
   Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
-                                                                                  ReactiveProcessor flowExecutionProcessor,
                                                                                   MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
 }
