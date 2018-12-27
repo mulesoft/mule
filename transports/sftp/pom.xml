@@ -52,7 +52,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.mule.jsch</groupId>
+            <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>${jschVersion}</version>
         </dependency>

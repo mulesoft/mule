@@ -196,7 +196,7 @@
         <jdom2Version>2.0.6</jdom2Version>
         <jettyVersion>9.2.26.v20180806</jettyVersion>
         <jodaTimeVersion>2.9.7</jodaTimeVersion>
-        <jschVersion>1.0.0</jschVersion>
+        <jschVersion>0.1.54</jschVersion>
         <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
         <junitVersion>4.12</junitVersion>
         <jythonVersion>2.7.1</jythonVersion>
