@@ -381,33 +381,43 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // lazy components
   }
 
+  @Override
+  public void close() {
+    doUnregisterBeans(trackingPostProcessor.getBeansTracked());
+    super.close();
+  }
+
   private void unregisterBeans(List<String> beanNames) {
     if (muleContext.isStarted()) {
-      beanNames.forEach(beanName -> {
-        try {
-          getRegistry().lookupByName(beanName)
-              .ifPresent(object -> {
-                if (object instanceof MessageProcessorChainBuilder) {
-                  disposeIfNeeded(muleContext.getRegistry().get(messageProcessorChainInstancesKey(beanName)), LOGGER);
-                  try {
-                    unregisterObject(muleContext, messageProcessorChainInstancesKey(beanName));
-                  } catch (RegistrationException e) {
-                    throw new RuntimeException(e);
-                  }
-                }
-              });
-          unregisterObject(muleContext, beanName);
-        } catch (Exception e) {
-          logger
-              .warn(format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
-                           beanName, e.getMessage()));
-          if (logger.isDebugEnabled()) {
-            logger.debug(e.getMessage(), e);
-          }
-        }
-      });
+      doUnregisterBeans(beanNames);
     }
     removeFromComponentLocator(beanNames);
+  }
+
+  private void doUnregisterBeans(List<String> beanNames) {
+    beanNames.forEach(beanName -> {
+      try {
+        getRegistry().lookupByName(beanName)
+            .ifPresent(object -> {
+              if (object instanceof MessageProcessorChainBuilder) {
+                disposeIfNeeded(muleContext.getRegistry().get(messageProcessorChainInstancesKey(beanName)), LOGGER);
+                try {
+                  unregisterObject(muleContext, messageProcessorChainInstancesKey(beanName));
+                } catch (RegistrationException e) {
+                  throw new RuntimeException(e);
+                }
+              }
+            });
+        unregisterObject(muleContext, beanName);
+      } catch (Exception e) {
+        logger
+            .warn(format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
+                         beanName, e.getMessage()));
+        if (logger.isDebugEnabled()) {
+          logger.debug(e.getMessage(), e);
+        }
+      }
+    });
   }
 
   private String messageProcessorChainInstancesKey(String componentName) {
