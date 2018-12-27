@@ -24,15 +24,16 @@ import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.DATETI
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.STRING;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.TIME;
-import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
-import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-import static org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier.createFromPluginClassloaders;
+import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
+import static org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
@@ -43,16 +44,21 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
@@ -109,11 +115,14 @@ import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegist
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.source.scheduler.CronScheduler;
+import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.SimpleConfigAttribute;
 import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -884,6 +893,42 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               declarer.withParameterGroup(newParameterGroup()
                   .withParameter(TLS_PARAMETER_NAME, tls.build())
                   .getDeclaration());
+            });
+        return;
+
+      case SCHEDULING_STRATEGY_PARAMETER_NAME:
+        findAnyMatchingChildById(declaredConfigs, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER)
+            .ifPresent(config -> {
+              ParameterObjectValue.Builder schedulingStrategy = newObjectValue().ofType(config.getIdentifier());
+              copyExplicitAttributes(config.getConfigAttributes(), schedulingStrategy, paramModel.getType());
+              config.getChildren().stream()
+                  .filter(child -> child.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER)
+                      || child.getIdentifier().equals(CRON_STRATEGY_ELEMENT_IDENTIFIER))
+                  .findFirst()
+                  .ifPresent(strategy -> {
+                    ParameterObjectValue.Builder strategyObject = newObjectValue();
+
+                    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+                    MetadataType strategyType;
+                    if (strategy.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER)) {
+                      strategyType = typeLoader.load(FixedFrequencyScheduler.class);
+                    } else if (strategy.getIdentifier().equals(CRON_STRATEGY_ELEMENT_IDENTIFIER)) {
+                      strategyType = typeLoader.load(CronScheduler.class);
+                    } else {
+                      throw new IllegalArgumentException("Unknown type found for scheduling-strategy parameter: "
+                          + strategy.getIdentifier());
+                    }
+
+                    cloneAsDeclaration(strategy, strategyObject, strategyType);
+                    String typeId = getId(strategyType)
+                        .orElseThrow(() -> new IllegalArgumentException("Missing TypeId for scheduling strategy implementation: "
+                            + strategy.getIdentifier()));
+                    strategyObject.ofType(typeId);
+
+                    declarer.withParameterGroup(newParameterGroup()
+                        .withParameter(SCHEDULING_STRATEGY_PARAMETER_NAME, strategyObject.build())
+                        .getDeclaration());
+                  });
             });
         return;
     }
