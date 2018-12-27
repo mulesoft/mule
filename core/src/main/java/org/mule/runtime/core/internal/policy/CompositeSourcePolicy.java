@@ -236,7 +236,6 @@ public class CompositeSourcePolicy
    */
   @Override
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
-                                                                                         ReactiveProcessor flowExecutionProcessor,
                                                                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     return create(callerSink -> {
       policySink.next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, messageSourceResponseParametersProcessor,
