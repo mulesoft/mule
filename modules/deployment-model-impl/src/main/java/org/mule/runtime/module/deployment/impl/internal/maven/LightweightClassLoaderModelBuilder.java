@@ -153,7 +153,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     File temporaryPomFolder = new File(temporaryFolder, "temporary-poms");
     if (!temporaryPomFolder.exists() && !temporaryPomFolder.mkdirs()) {
       throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
-                                                         + temporaryPomFolder.getAbsolutePath()));
+          + temporaryPomFolder.getAbsolutePath()));
     }
 
     Map<BundleDescriptor, Set<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
@@ -168,18 +168,17 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
             // system scope dependencies are always availables and are not looked up in a repository
             if (bundleDependency.getScope().equals(SYSTEM)) {
               effectiveModel =
-                      mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryPomFolder));
-            }
-            else {
+                  mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryPomFolder));
+            } else {
               BundleDescriptor descriptor = bundleDependency.getDescriptor();
               effectiveModel = mavenClient.getEffectiveModel(toFile(mavenClient
-                                                                            .resolveBundleDescriptor(new org.mule.maven.client.api.model.BundleDescriptor.Builder()
-                                                                                                             .setGroupId(descriptor.getGroupId())
-                                                                                                             .setArtifactId(descriptor.getArtifactId())
-                                                                                                             .setVersion(descriptor.getVersion())
-                                                                                                             .setType(POM)
-                                                                                                             .build())
-                                                                            .getBundleUri().toURL()), empty());
+                  .resolveBundleDescriptor(new org.mule.maven.client.api.model.BundleDescriptor.Builder()
+                      .setGroupId(descriptor.getGroupId())
+                      .setArtifactId(descriptor.getArtifactId())
+                      .setVersion(descriptor.getVersion())
+                      .setType(POM)
+                      .build())
+                  .getBundleUri().toURL()), empty());
             }
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
