@@ -313,7 +313,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.1.5-SNAPSHOT</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.1.5</oldMuleArtifactVersion>
     </properties>
 
     <dependencies>
