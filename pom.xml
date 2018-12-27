@@ -221,7 +221,6 @@
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <unirestVersion>1.4.9</unirestVersion>
         <weaveVersion>2.2.0-SNAPSHOT</weaveVersion>
-        <muleSchedulerServiceVersion>1.2.0-SNAPSHOT</muleSchedulerServiceVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
@@ -720,16 +719,11 @@
             </dependency>
             <dependency>
                 <groupId>org.mule.services</groupId>
-                <artifactId>mule-service-scheduler</artifactId>
-                <classifier>mule-service</classifier>
-                <version>${muleSchedulerServiceVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.services</groupId>
                 <artifactId>mule-service-weave</artifactId>
                 <classifier>mule-service</classifier>
                 <version>${weaveVersion}</version>
             </dependency>
+
             <!--Logging-->
             <dependency>
                 <groupId>org.slf4j</groupId>
