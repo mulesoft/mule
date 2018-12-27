@@ -46,7 +46,9 @@ import java.util.stream.Collectors;
 
 import io.qameta.allure.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class DeployableMavenClassLoaderModelLoaderTestCase {
 
@@ -65,6 +67,9 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   private List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES = asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
 
   private MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
+
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Test
   @Description("Heavyweight packaged apps will deploy ok with shared libraries information in classloader-model.json")
@@ -173,7 +178,9 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   private ClassLoaderModel buildAndValidateModel(int expectedDependencies) throws Exception {
     File app = toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "no-dependencies").toString()));
 
-    when(mockMavenClient.getMavenConfiguration()).thenReturn(mock(MavenConfiguration.class, RETURNS_DEEP_STUBS));
+    MavenConfiguration mockMavenConfiguration = mock(MavenConfiguration.class, RETURNS_DEEP_STUBS);
+    when(mockMavenConfiguration.getLocalMavenRepositoryLocation()).thenReturn(temporaryFolder.newFolder());
+    when(mockMavenClient.getMavenConfiguration()).thenReturn(mockMavenConfiguration);
 
     ClassLoaderModel classLoaderModel = buildClassLoaderModel(app);
     assertThat(classLoaderModel.getDependencies(), hasSize(expectedDependencies));
