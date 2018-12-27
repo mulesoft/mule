@@ -15,6 +15,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -39,7 +40,8 @@ import reactor.core.publisher.Mono;
  * @since 4.0
  */
 public class CompositeOperationPolicy
-    extends AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationExecutionFunction> implements OperationPolicy {
+    extends AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationExecutionFunction>
+    implements OperationPolicy, Disposable {
 
   private static final String POLICY_OPERATION_NEXT_OPERATION_RESPONSE = "policy.operation.nextOperationResponse";
   public static final String POLICY_OPERATION_PARAMETERS_PROCESSOR = "policy.operation.parametersProcessor";
@@ -151,4 +153,7 @@ public class CompositeOperationPolicy
       return error(e);
     }
   }
+
+  @Override
+  public void dispose() {}
 }

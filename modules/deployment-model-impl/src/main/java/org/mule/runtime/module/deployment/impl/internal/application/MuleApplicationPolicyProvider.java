@@ -125,6 +125,10 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     return registeredPolicyInstanceProvider.isPresent();
   }
 
+  @Override
+  public synchronized boolean isPoliciesAvailable() {
+    return !registeredPolicyInstanceProviders.isEmpty();
+  }
 
   @Override
   public void onPoliciesChanged(Runnable policiesChangedCallback) {
