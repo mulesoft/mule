@@ -14,8 +14,8 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.create;
-import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -48,34 +48,38 @@ import reactor.core.publisher.MonoSink;
  * @since 4.0
  */
 public class CompositeSourcePolicy
-    extends AbstractCompositePolicy<SourcePolicyParametersTransformer, Processor> implements SourcePolicy {
+    extends AbstractCompositePolicy<SourcePolicyParametersTransformer, Processor> implements SourcePolicy, Disposable {
 
   private static final String POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS =
       "policy.source.originalFailureResponseParameters";
   private static final String POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS = "policy.source.originalResponseParameters";
 
   public static final String POLICY_SOURCE_PARAMETERS_PROCESSOR = "policy.source.parametersProcessor";
-  public static final String POLICY_SOURCE_FLOW_PROCESSOR = "policy.source.flowExecutionProcessor";
 
   public static final String POLICY_SOURCE_CALLER_SINK = "policy.source.callerSink";
 
   private static final Logger LOGGER = getLogger(CompositeSourcePolicy.class);
 
+  private final reactor.core.Disposable fluxSubscription;
   private final FluxSink<CoreEvent> policySink;
+
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
+  private final ReactiveProcessor flowExecutionProcessor;
 
   /**
    * Creates a new source policies composed by several {@link Policy} that will be chain together.
    *
    * @param parameterizedPolicies the list of policies to use in this composite policy.
+   * @param flowExecutionProcessor the operation that executes the flow
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
    * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
-   * @param flowExecutionProcessor the operation that executes the flow
    */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
+                               ReactiveProcessor flowExecutionProcessor,
                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
                                SourcePolicyProcessorFactory sourcePolicyProcessorFactory) {
     super(parameterizedPolicies, sourcePolicyParametersTransformer);
+    this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
 
     AtomicReference<FluxSink<CoreEvent>> sinkRef = new AtomicReference<>();
@@ -98,12 +102,24 @@ public class CompositeSourcePolicy
             .doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
             .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
                        e -> LOGGER.error(e.getMessage(), e))
-            .onErrorResume(FlowExecutionException.class,
-                           e -> just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e)))))
-            .onErrorResume(MessagingException.class,
-                           e -> just(left(new SourcePolicyFailureResult(e, resolveErrorResponseParameters(e)),
-                                          SourcePolicySuccessResult.class))
-                                              .doOnNext(result -> logSourcePolicyFailureResult(result.getLeft())))
+            .onErrorContinue(MessagingException.class, (t, e) -> {
+              final MessagingException me = (MessagingException) t;
+
+              Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result =
+                  left(new SourcePolicyFailureResult(me, resolveErrorResponseParameters(me)), SourcePolicySuccessResult.class);
+
+              if (!(me instanceof FlowExecutionException)) {
+                logSourcePolicyFailureResult(result.getLeft());
+              }
+
+              final InternalEvent event = (InternalEvent) me.getEvent();
+              if (!event.getContext().isComplete()) {
+                event.getContext().error(me);
+              }
+
+              ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
+                  .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
+            })
             .doOnNext(result -> result.apply(spfr -> {
               final InternalEvent event = (InternalEvent) spfr.getMessagingException().getEvent();
               if (!event.getContext().isComplete()) {
@@ -120,8 +136,7 @@ public class CompositeSourcePolicy
                   .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
             }));
 
-    policyFlux.subscribe();
-
+    fluxSubscription = policyFlux.subscribe();
     policySink = sinkRef.get();
   }
 
@@ -144,10 +159,7 @@ public class CompositeSourcePolicy
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
     return from(eventPub)
-        .flatMap(event -> {
-          ReactiveProcessor flowExecutionProcessor = ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_FLOW_PROCESSOR);
-          return just(event).transform(flowExecutionProcessor);
-        })
+        .transform(flowExecutionProcessor)
         .map(flowExecutionResponse -> {
           MessageSourceResponseParametersProcessor parametersProcessor =
               ((InternalEvent) flowExecutionResponse).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
@@ -228,7 +240,6 @@ public class CompositeSourcePolicy
                                                                                          MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     return create(callerSink -> {
       policySink.next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, messageSourceResponseParametersProcessor,
-                                                POLICY_SOURCE_FLOW_PROCESSOR, flowExecutionProcessor,
                                                 POLICY_SOURCE_CALLER_SINK, callerSink)));
     });
   }
@@ -292,5 +303,11 @@ public class CompositeSourcePolicy
           + "\nFinished processing with failure. \n" +
           "Error message: " + result.getMessagingException().getMessage());
     }
+  }
+
+  @Override
+  public void dispose() {
+    policySink.complete();
+    fluxSubscription.dispose();
   }
 }

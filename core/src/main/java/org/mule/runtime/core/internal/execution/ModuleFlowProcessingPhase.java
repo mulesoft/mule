@@ -81,6 +81,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -152,7 +153,7 @@ public class ModuleFlowProcessingPhase
       try {
         FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
         final SourcePolicy policy =
-            policyManager.createSourcePolicyInstance(messageSource, templateEvent, template);
+            policyManager.createSourcePolicyInstance(messageSource, templateEvent, flowExecutionProcessor, template);
         final PhaseContext phaseContext =
             new PhaseContext(template, messageProcessContext, phaseResultNotifier, terminateConsumer);
 
@@ -398,7 +399,7 @@ public class ModuleFlowProcessingPhase
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      return from(publisher)
+      return Flux.from(publisher)
           .flatMap(event -> from(processWithChildContext(event,
                                                          p -> template.routeEventAsync(p),
                                                          Optional.empty(), flowConstruct.getExceptionListener())));
