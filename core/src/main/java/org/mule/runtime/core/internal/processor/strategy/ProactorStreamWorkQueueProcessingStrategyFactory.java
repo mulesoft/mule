@@ -8,16 +8,12 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.time.Duration.ofMillis;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -28,18 +24,13 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.retry.BackoffDelay;
 import reactor.util.context.Context;
 
 /**
@@ -69,7 +60,6 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
                                                          () -> muleContext.getSchedulerService()
                                                              .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                  .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                         () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                          resolveParallelism(),
                                                          getMaxConcurrency(),
                                                          isMaxConcurrencyEagerCheck(),
@@ -113,14 +103,13 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
                                                      Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                      Supplier<Scheduler> blockingSchedulerSupplier,
                                                      Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                     Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                      int parallelism,
                                                      int maxConcurrency, boolean maxConcurrencyEagerCheck,
                                                      boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
             maxConcurrencyEagerCheck);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
@@ -132,13 +121,12 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
                                                      Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                      Supplier<Scheduler> blockingSchedulerSupplier,
                                                      Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                     Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                      int parallelism,
                                                      int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+           blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
            maxConcurrencyEagerCheck, false);
     }
 

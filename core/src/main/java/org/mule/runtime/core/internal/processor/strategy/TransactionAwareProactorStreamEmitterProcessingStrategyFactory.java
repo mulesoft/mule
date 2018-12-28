@@ -55,7 +55,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                                                .getSchedulerBaseConfig()
                                                                                .withName(schedulersNamePrefix + "."
                                                                                    + CPU_INTENSIVE.name())),
-                                                                       () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                                        resolveParallelism(),
                                                                        getMaxConcurrency(),
                                                                        isMaxConcurrencyEagerCheck(),
@@ -76,13 +75,12 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                            Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                             int parallelism, int maxConcurrency,
                                                             boolean isMaxConcurrencyEagerCheck, boolean isThreadLoggingEnabled)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
             isMaxConcurrencyEagerCheck, isThreadLoggingEnabled);
     }
 
@@ -93,12 +91,11 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                            Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                             int maxConcurrency, boolean isMaxConcurrencyEagerCheck)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, CORES, maxConcurrency,
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency,
             isMaxConcurrencyEagerCheck, false);
     }
 
