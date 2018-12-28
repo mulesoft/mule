@@ -197,9 +197,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             // no invalid storage of the group in the correlation map is performed.
             try
             {
-                if (isGroupAlreadyProcessed(groupId))
+                if (isGroupAlreadyProcessed(groupId + event.getId()))
                 {
-                    fireMissedAggregationGroupEvent(event, groupId);
+                    fireMissedAggregationGroupEvent(event, groupId + event.getId());
                     return null;
                 }
             }
@@ -268,12 +268,25 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     }
                     if (returnEvent != null && !returnEvent.equals(VoidMuleEvent.getInstance()))
                     {
-                        returnEvent.getMessage().setCorrelationId(groupId);
-                        
                         String rootId = group.getCommonRootId();
                         if (rootId != null)
                         {
                             returnEvent.getMessage().setMessageRootId(rootId);
+                        }
+
+                        try
+                        {
+                            if (isGroupAlreadyProcessed(groupId))
+                            {
+                                returnEvent.getMessage().setCorrelationId(groupId + event.getId());
+                            }
+                            else
+                            {
+                                returnEvent.getMessage().setCorrelationId(groupId);
+                            }
+                        }
+                        catch (ObjectStoreException e){
+                            returnEvent.getMessage().setCorrelationId(groupId);
                         }
                     }
 
