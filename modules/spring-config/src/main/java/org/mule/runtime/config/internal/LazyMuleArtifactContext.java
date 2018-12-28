@@ -299,14 +299,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
 
-    List<String> alreadyCreatedApplicationComponents = new ArrayList<>();
-    // SecurityManager has to be unregistered explicitly in order to allow registering providers on each request.
-    if (!trackingPostProcessor.getBeansTracked().isEmpty()) {
-      alreadyCreatedApplicationComponents.add(OBJECT_SECURITY_MANAGER);
-    }
-    alreadyCreatedApplicationComponents.addAll(trackingPostProcessor.getBeansTracked());
-    reverse(alreadyCreatedApplicationComponents);
-
+    List<String> alreadyCreatedApplicationComponents = generateListOfComponentsToBeDisposed();
     trackingPostProcessor.startTracking();
 
     Reference<List<String>> createdComponents = new Reference<>();
@@ -375,6 +368,20 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     return createdComponentNames;
   }
 
+  private List<String> generateListOfComponentsToBeDisposed() {
+    List<String> alreadyCreatedApplicationComponents = new ArrayList<>();
+    // SecurityManager has to be unregistered explicitly in order to allow registering providers on each request.
+    if (!trackingPostProcessor.getBeansTracked().isEmpty()) {
+      alreadyCreatedApplicationComponents.add(OBJECT_SECURITY_MANAGER);
+    }
+    alreadyCreatedApplicationComponents.addAll(trackingPostProcessor.getBeansTracked());
+    // Reset the tracker
+    trackingPostProcessor.reset();
+
+    reverse(alreadyCreatedApplicationComponents);
+    return alreadyCreatedApplicationComponents;
+  }
+
   @Override
   protected void prepareObjectProviders() {
     // Do not prepare object providers at this point. No components are going to be created yet. This will be done when creating
@@ -383,7 +390,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void close() {
-    doUnregisterBeans(trackingPostProcessor.getBeansTracked());
+    doUnregisterBeans(generateListOfComponentsToBeDisposed());
     super.close();
   }
 
