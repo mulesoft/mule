@@ -36,6 +36,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -57,6 +58,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   @Inject
   private PolicyStateHandler policyStateHandler;
+
+  private final AtomicBoolean isPoliciesAvailable = new AtomicBoolean(false);
 
   private final Cache<ComponentIdentifier, SourcePolicy> noPolicySourceInstances =
       Caffeine.newBuilder()
@@ -83,7 +86,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     final ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
 
-    if (!policyProvider.isPoliciesAvailable()) {
+    if (!isPoliciesAvailable.get()) {
       final SourcePolicy policy = noPolicySourceInstances.getIfPresent(sourceIdentifier);
 
       if (policy != null) {
@@ -127,7 +130,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   @Override
   public OperationPolicy createOperationPolicy(Component operation, CoreEvent event,
                                                OperationParametersProcessor operationParameters) {
-    if (!policyProvider.isPoliciesAvailable()) {
+    if (!isPoliciesAvailable.get()) {
       return NO_POLICY_OPERATION;
     }
 
@@ -178,7 +181,10 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       noPolicySourceInstances.invalidateAll();
       sourcePolicyInstances.invalidateAll();
       operationPolicyInstances.invalidateAll();
+      isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
     });
+
+    isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
 
     policyPointcutParametersManager =
         new PolicyPointcutParametersManager(registry.lookupAllByType(SourcePolicyPointcutParametersFactory.class),
