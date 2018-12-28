@@ -47,7 +47,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
     Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
         Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
             .parallel()
-            .runOn(Schedulers.immediate(), 1)
+            .runOn(Schedulers.immediate())
             .composeGroup(flowExecutionProcessor)
             .map(flowExecutionResult -> {
               MessageSourceResponseParametersProcessor parametersProcessor =
@@ -75,7 +75,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
               ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
                   .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
             }))
-            .sequential(1)
+            .sequential()
             .onErrorContinue((t, e) -> {
               final MessagingException me = (MessagingException) t;
               final InternalEvent event = (InternalEvent) me.getEvent();
@@ -94,9 +94,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
                           .apply(me.getEvent()))));
             });
 
-    fluxSubscription = policyFlux.subscribe(null, t -> {
-    }, () -> {
-    });
+    fluxSubscription = policyFlux.subscribe();
     policySink = sinkRef.get();
   }
 

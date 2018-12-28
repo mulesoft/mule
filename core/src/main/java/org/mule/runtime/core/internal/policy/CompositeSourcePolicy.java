@@ -88,7 +88,7 @@ public class CompositeSourcePolicy
     Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
         Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
             .parallel()
-            .runOn(Schedulers.immediate(), 1)
+            .runOn(Schedulers.immediate())
             .composeGroup(getExecutionProcessor())
             .map(policiesResultEvent -> {
               final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
@@ -121,7 +121,7 @@ public class CompositeSourcePolicy
                     .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
               });
             })
-            .sequential(1)
+            .sequential()
             .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
                        e -> LOGGER.error(e.getMessage(), e))
             .onErrorContinue(MessagingException.class, (t, e) -> {
@@ -143,9 +143,7 @@ public class CompositeSourcePolicy
                   .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
             });
 
-    fluxSubscription = policyFlux.subscribe(null, t -> {
-    }, () -> {
-    });
+    fluxSubscription = policyFlux.subscribe();
     policySink = sinkRef.get();
   }
 
