@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.MonoSink;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * {@link SourcePolicy} created when no policies have to be applied.
@@ -45,7 +46,9 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
 
     Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
         Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
-            .transform(flowExecutionProcessor)
+            .parallel()
+            .runOn(Schedulers.immediate(), 1)
+            .composeGroup(flowExecutionProcessor)
             .map(flowExecutionResult -> {
               MessageSourceResponseParametersProcessor parametersProcessor =
                   ((InternalEvent) flowExecutionResult).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
@@ -57,6 +60,22 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
                                                              .apply(flowExecutionResult),
                                                          parametersProcessor));
             })
+            .doOnNext(result -> result.apply(spfr -> {
+              final InternalEvent event = (InternalEvent) spfr.getMessagingException().getEvent();
+              if (!event.getContext().isComplete()) {
+                event.getContext().error(spfr.getMessagingException());
+              }
+              ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
+                  .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
+            }, spsr -> {
+              final InternalEvent event = (InternalEvent) spsr.getResult();
+              if (!event.getContext().isComplete()) {
+                event.getContext().success(event);
+              }
+              ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
+                  .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
+            }))
+            .sequential(1)
             .onErrorContinue((t, e) -> {
               final MessagingException me = (MessagingException) t;
               final InternalEvent event = (InternalEvent) me.getEvent();
@@ -73,24 +92,11 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
                       .success(left(new SourcePolicyFailureResult(me, () -> parametersProcessor
                           .getFailedExecutionResponseParametersFunction()
                           .apply(me.getEvent()))));
-            })
-            .doOnNext(result -> result.apply(spfr -> {
-              final InternalEvent event = (InternalEvent) spfr.getMessagingException().getEvent();
-              if (!event.getContext().isComplete()) {
-                event.getContext().error(spfr.getMessagingException());
-              }
-              ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
-                  .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
-            }, spsr -> {
-              final InternalEvent event = (InternalEvent) spsr.getResult();
-              if (!event.getContext().isComplete()) {
-                event.getContext().success(event);
-              }
-              ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
-                  .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
-            }));
+            });
 
-    fluxSubscription = policyFlux.subscribe();
+    fluxSubscription = policyFlux.subscribe(null, t -> {
+    }, () -> {
+    });
     policySink = sinkRef.get();
   }
 
