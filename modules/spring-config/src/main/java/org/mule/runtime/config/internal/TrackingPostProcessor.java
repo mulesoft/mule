@@ -48,7 +48,6 @@ public class TrackingPostProcessor implements BeanPostProcessor {
 
   public void startTracking() {
     tracking = true;
-    trackingList.clear();
   }
 
   public void stopTracking() {
@@ -58,4 +57,9 @@ public class TrackingPostProcessor implements BeanPostProcessor {
   public void intersection(List<String> beanNames) {
     trackingList.removeIf(name -> !beanNames.contains(name));
   }
+
+  public void reset() {
+    trackingList.clear();
+  }
+
 }
