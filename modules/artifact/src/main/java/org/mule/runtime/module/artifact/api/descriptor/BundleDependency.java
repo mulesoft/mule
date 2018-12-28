@@ -23,7 +23,6 @@ public final class BundleDependency {
   private BundleScope scope;
   private URI bundleUri;
   private Set<BundleDependency> additionalDependencies;
-  private Set<BundleDependency> transitiveDependencies;
 
   private BundleDependency() {}
 
@@ -41,10 +40,6 @@ public final class BundleDependency {
 
   public Set<BundleDependency> getAdditionalDependencies() {
     return additionalDependencies;
-  }
-
-  public Set<BundleDependency> getTransitiveDependencies() {
-    return transitiveDependencies;
   }
 
   @Override
@@ -75,7 +70,6 @@ public final class BundleDependency {
       bundleDependency.descriptor = template.descriptor;
       bundleDependency.scope = template.scope;
       bundleDependency.additionalDependencies = template.additionalDependencies;
-      bundleDependency.transitiveDependencies = template.transitiveDependencies;
     }
 
     /**
@@ -111,11 +105,6 @@ public final class BundleDependency {
 
     public Builder setAdditionalDependencies(Set<BundleDependency> additionalDependencies) {
       this.bundleDependency.additionalDependencies = additionalDependencies;
-      return this;
-    }
-
-    public Builder setTransitiveDependencies(Set<BundleDependency> transitiveDependencies) {
-      this.bundleDependency.transitiveDependencies = transitiveDependencies;
       return this;
     }
 

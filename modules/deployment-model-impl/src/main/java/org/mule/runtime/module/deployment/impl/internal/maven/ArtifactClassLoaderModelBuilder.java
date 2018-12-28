@@ -64,7 +64,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   private boolean processSharedLibraries = false;
   private boolean processAdditionalPluginLibraries = false;
-  protected FileJarExplorer fileJarExplorer = new FileJarExplorer();
+  private FileJarExplorer fileJarExplorer = new FileJarExplorer();
 
   protected File artifactFolder;
   protected DeployableArtifactDescriptor deployableArtifactDescriptor;
