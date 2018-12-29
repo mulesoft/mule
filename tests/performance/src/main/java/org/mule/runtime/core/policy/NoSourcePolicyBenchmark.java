@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.policy;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static reactor.core.publisher.Mono.from;
@@ -18,11 +16,9 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.policy.Policy;
-import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.internal.policy.CompositeSourcePolicy;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
+import org.mule.runtime.core.internal.policy.NoSourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
@@ -34,26 +30,24 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Threads;
-import org.reactivestreams.Publisher;
 
 import java.util.Map;
 
-@BenchmarkMode(Mode.Throughput)
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(MICROSECONDS)
-public class CompositeSourcePolicyBenchmark extends AbstractBenchmark {
+public class NoSourcePolicyBenchmark extends AbstractBenchmark {
 
   private SourcePolicy handler;
   private MessageSourceResponseParametersProcessor sourceRpp;
 
   @Setup(Level.Trial)
   public void setUp() {
-    handler = new CompositeSourcePolicy(asList(new Policy(new PolicyChain() {
-
-      @Override
-      public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-        return publisher;
-      }
-    }, "")), eventPub -> eventPub, empty(), (policy, nextProcessor) -> nextProcessor);
+    handler = new NoSourcePolicy(eventPub -> Flux.from(eventPub)
+        .flatMap(e -> Mono.just(e)));
+    // handler = new NoSourcePolicy(eventPub -> eventPub);
 
     sourceRpp = new MessageSourceResponseParametersProcessor() {
 
