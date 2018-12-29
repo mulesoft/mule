@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -45,7 +47,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class DefaultPolicyManager implements PolicyManager, Initialisable {
+public class DefaultPolicyManager implements PolicyManager, Initialisable, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPolicyManager.class);
 
@@ -53,7 +55,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       (operationEvent, operationExecutionFunction, opParamProcessor) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent);
 
-  @Inject
   private Registry registry;
 
   @Inject
@@ -65,13 +66,28 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       Caffeine.newBuilder()
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
           .build();
-  private final Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, SourcePolicy> sourcePolicyInstances =
+
+  // These next caches contain the Composite Policies for a given sequence of policies to be applied.
+
+  private final Cache<Pair<ComponentIdentifier, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
       Caffeine.newBuilder()
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
           .build();
-  private final Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyInstances =
+  private final Cache<List<Policy>, OperationPolicy> operationPolicyInnerCache =
       Caffeine.newBuilder()
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
+          .build();
+
+  // These next caches cache the actual composite policies for a given parameters. Since many parameters combinations may result
+  // in a same set of policies to be applied, many entries of this cache may reference the same composite policy instance.
+
+  private final Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, SourcePolicy> sourcePolicyOuterCache =
+      Caffeine.newBuilder()
+          .expireAfterAccess(60, SECONDS)
+          .build();
+  private final Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
+      Caffeine.newBuilder()
+          .expireAfterAccess(60, SECONDS)
           .build();
 
   private PolicyProvider policyProvider;
@@ -101,21 +117,19 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
     final Pair<ComponentIdentifier, PolicyPointcutParameters> policyKey = new Pair<>(sourceIdentifier, sourcePointcutParameters);
 
-    final SourcePolicy policy = sourcePolicyInstances.getIfPresent(policyKey);
+    final SourcePolicy policy = sourcePolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
       return policy;
     }
 
-    return sourcePolicyInstances.get(policyKey, k -> {
-      List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
-      if (parameterizedPolicies.isEmpty()) {
-        return new NoSourcePolicy(flowExecutionProcessor);
-      } else {
-        return new CompositeSourcePolicy(parameterizedPolicies, flowExecutionProcessor,
-                                         lookupSourceParametersTransformer(sourceIdentifier),
-                                         sourcePolicyProcessorFactory);
-      }
-    });
+    return sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
+        .get(new Pair<>(sourceIdentifier,
+                        policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
+             innerKey -> innerKey.getSecond().isEmpty()
+                 ? new NoSourcePolicy(flowExecutionProcessor)
+                 : new CompositeSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
+                                             lookupSourceParametersTransformer(outerKey.getFirst()),
+                                             sourcePolicyProcessorFactory)));
   }
 
   @Override
@@ -142,21 +156,18 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     final Pair<ComponentIdentifier, PolicyPointcutParameters> policyKey =
         new Pair<>(operationIdentifier, operationPointcutParameters);
 
-    final OperationPolicy policy = operationPolicyInstances.getIfPresent(policyKey);
+    final OperationPolicy policy = operationPolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
       return policy;
     }
 
-    return operationPolicyInstances.get(policyKey, k -> {
-      List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(operationPointcutParameters);
-      if (parameterizedPolicies.isEmpty()) {
-        return NO_POLICY_OPERATION;
-      } else {
-        return new CompositeOperationPolicy(parameterizedPolicies,
-                                            lookupOperationParametersTransformer(operationIdentifier),
-                                            operationPolicyProcessorFactory);
-      }
-    });
+    return operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
+        .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
+             innerKey -> innerKey.isEmpty()
+                 ? NO_POLICY_OPERATION
+                 : new CompositeOperationPolicy(innerKey,
+                                                lookupOperationParametersTransformer(outerKey.getFirst()),
+                                                operationPolicyProcessorFactory)));
   }
 
   private Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {
@@ -178,9 +189,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
     policyProvider = registry.lookupByType(PolicyProvider.class).orElse(new NullPolicyProvider());
     policyProvider.onPoliciesChanged(() -> {
-      noPolicySourceInstances.invalidateAll();
-      sourcePolicyInstances.invalidateAll();
-      operationPolicyInstances.invalidateAll();
+      evictCaches();
       isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
     });
 
@@ -192,8 +201,25 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   }
 
   @Override
+  public void dispose() {
+    evictCaches();
+  }
+
+  private void evictCaches() {
+    noPolicySourceInstances.invalidateAll();
+    sourcePolicyOuterCache.invalidateAll();
+    operationPolicyOuterCache.invalidateAll();
+    sourcePolicyInnerCache.invalidateAll();
+    operationPolicyInnerCache.invalidateAll();
+  }
+
+  @Override
   public void disposePoliciesResources(String executionIdentifier) {
     policyStateHandler.destroyState(executionIdentifier);
   }
 
+  @Inject
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
+  }
 }
