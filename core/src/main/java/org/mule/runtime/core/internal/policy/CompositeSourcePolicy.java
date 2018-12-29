@@ -89,7 +89,7 @@ public class CompositeSourcePolicy
     PoolConfig config = new PoolConfig()
         .setPartitionSize(getRuntime().availableProcessors())
         .setMaxSize(1)
-        .setMinSize(1)
+        .setMinSize(0)
         .setMaxIdleMilliseconds(MAX_VALUE)
         .setScavengeIntervalMilliseconds(0);
 
