@@ -35,7 +35,6 @@ import cn.danielw.fop.Poolable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.MonoSink;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * {@link SourcePolicy} created when no policies have to be applied.
@@ -52,11 +51,12 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
   private final ObjectPool<FluxSink<CoreEvent>> pool;
 
   public NoSourcePolicy(ReactiveProcessor flowExecutionProcessor) {
-    PoolConfig config = new PoolConfig();
-    config.setPartitionSize(getRuntime().availableProcessors());
-    config.setMaxSize(1);
-    config.setMinSize(1);
-    config.setMaxIdleMilliseconds(MAX_VALUE);
+    PoolConfig config = new PoolConfig()
+        .setPartitionSize(getRuntime().availableProcessors())
+        .setMaxSize(1)
+        .setMinSize(1)
+        .setMaxIdleMilliseconds(MAX_VALUE)
+        .setScavengeIntervalMilliseconds(0);
 
     pool = new ObjectPool<>(config, new SourceFluxObjectFactory(flowExecutionProcessor));
   }
@@ -75,9 +75,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
           Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
-              .parallel()
-              .runOn(Schedulers.immediate())
-              .composeGroup(flowExecutionProcessor)
+              .transform(flowExecutionProcessor)
               .map(flowExecutionResult -> {
                 MessageSourceResponseParametersProcessor parametersProcessor =
                     ((InternalEvent) flowExecutionResult).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
@@ -104,7 +102,6 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
                 ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
                     .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
               }))
-              .sequential()
               .onErrorContinue((t, e) -> {
                 final MessagingException me = (MessagingException) t;
                 final InternalEvent event = (InternalEvent) me.getEvent();

@@ -46,7 +46,6 @@ import cn.danielw.fop.Poolable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.MonoSink;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * {@link SourcePolicy} created from a list of {@link Policy}.
@@ -87,11 +86,12 @@ public class CompositeSourcePolicy
     this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
 
-    PoolConfig config = new PoolConfig();
-    config.setPartitionSize(getRuntime().availableProcessors());
-    config.setMaxSize(1);
-    config.setMinSize(1);
-    config.setMaxIdleMilliseconds(MAX_VALUE);
+    PoolConfig config = new PoolConfig()
+        .setPartitionSize(getRuntime().availableProcessors())
+        .setMaxSize(1)
+        .setMinSize(1)
+        .setMaxIdleMilliseconds(MAX_VALUE)
+        .setScavengeIntervalMilliseconds(0);
 
     pool = new ObjectPool<>(config, new SourceWithPoliciesFluxObjectFactory());
   }
@@ -104,9 +104,7 @@ public class CompositeSourcePolicy
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
           Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
-              .parallel()
-              .runOn(Schedulers.immediate())
-              .composeGroup(getExecutionProcessor())
+              .transform(getExecutionProcessor())
               .map(policiesResultEvent -> {
                 final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
                     .getInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS);
@@ -138,7 +136,6 @@ public class CompositeSourcePolicy
                       .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
                 });
               })
-              .sequential()
               .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
                          e -> LOGGER.error(e.getMessage(), e))
               .onErrorContinue(MessagingException.class, (t, e) -> {
