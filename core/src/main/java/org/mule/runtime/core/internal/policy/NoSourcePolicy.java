@@ -6,14 +6,8 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static com.google.common.collect.ImmutableMap.of;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Runtime.getRuntime;
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static reactor.core.publisher.Mono.create;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -23,18 +17,12 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.danielw.fop.ObjectFactory;
-import cn.danielw.fop.ObjectPool;
-import cn.danielw.fop.PoolConfig;
-import cn.danielw.fop.Poolable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.MonoSink;
 
 /**
  * {@link SourcePolicy} created when no policies have to be applied.
@@ -43,25 +31,13 @@ import reactor.core.publisher.MonoSink;
  */
 public class NoSourcePolicy implements SourcePolicy, Disposable {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(NoSourcePolicy.class);
-
-  public static final String POLICY_SOURCE_PARAMETERS_PROCESSOR = "policy.source.parametersProcessor";
-  public static final String POLICY_SOURCE_CALLER_SINK = "policy.source.callerSink";
-
-  private final ObjectPool<FluxSink<CoreEvent>> pool;
+  private final CommonSourcePolicy commonPolicy;
 
   public NoSourcePolicy(ReactiveProcessor flowExecutionProcessor) {
-    PoolConfig config = new PoolConfig()
-        .setPartitionSize(getRuntime().availableProcessors())
-        .setMaxSize(1)
-        .setMinSize(0)
-        .setMaxIdleMilliseconds(MAX_VALUE)
-        .setScavengeIntervalMilliseconds(0);
-
-    pool = new ObjectPool<>(config, new SourceFluxObjectFactory(flowExecutionProcessor));
+    commonPolicy = new CommonSourcePolicy(new SourceFluxObjectFactory(flowExecutionProcessor));
   }
 
-  private static final class SourceFluxObjectFactory implements ObjectFactory<FluxSink<CoreEvent>> {
+  private final class SourceFluxObjectFactory implements ObjectFactory<FluxSink<CoreEvent>> {
 
     private final ReactiveProcessor flowExecutionProcessor;
 
@@ -78,7 +54,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
               .transform(flowExecutionProcessor)
               .map(flowExecutionResult -> {
                 MessageSourceResponseParametersProcessor parametersProcessor =
-                    ((InternalEvent) flowExecutionResult).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
+                    commonPolicy.getResponseParamsProcessor(flowExecutionResult);
 
                 return right(SourcePolicyFailureResult.class,
                              new SourcePolicySuccessResult(flowExecutionResult,
@@ -87,37 +63,18 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
                                                                .apply(flowExecutionResult),
                                                            parametersProcessor));
               })
-              .doOnNext(result -> result.apply(spfr -> {
-                final InternalEvent event = (InternalEvent) spfr.getMessagingException().getEvent();
-                if (!event.getContext().isComplete()) {
-                  event.getContext().error(spfr.getMessagingException());
-                }
-                ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
-                    .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
-              }, spsr -> {
-                final InternalEvent event = (InternalEvent) spsr.getResult();
-                if (!event.getContext().isComplete()) {
-                  event.getContext().success(event);
-                }
-                ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
-                    .getInternalParameter(POLICY_SOURCE_CALLER_SINK)).success(result);
-              }))
+              .doOnNext(result -> result.apply(spfr -> commonPolicy.finishFlowProcessing(spfr.getMessagingException().getEvent(),
+                                                                                         result, spfr.getMessagingException()),
+                                               spsr -> commonPolicy.finishFlowProcessing(spsr.getResult(), result)))
               .onErrorContinue((t, e) -> {
                 final MessagingException me = (MessagingException) t;
                 final InternalEvent event = (InternalEvent) me.getEvent();
 
-                if (!event.getContext().isComplete()) {
-                  event.getContext().error(t);
-                }
-
-                MessageSourceResponseParametersProcessor parametersProcessor =
-                    event.getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
-
-                ((MonoSink<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>) event
-                    .getInternalParameter(POLICY_SOURCE_CALLER_SINK))
-                        .success(left(new SourcePolicyFailureResult(me, () -> parametersProcessor
-                            .getFailedExecutionResponseParametersFunction()
-                            .apply(me.getEvent()))));
+                commonPolicy.finishFlowProcessing(event,
+                                                  left(new SourcePolicyFailureResult(me, () -> commonPolicy
+                                                      .getResponseParamsProcessor(event)
+                                                      .getFailedExecutionResponseParametersFunction().apply(me.getEvent()))),
+                                                  me);
               });
 
       policyFlux.subscribe();
@@ -136,25 +93,14 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
 
   }
 
-
   @Override
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
                                                                                          MessageSourceResponseParametersProcessor respParamProcessor) {
-    return create(callerSink -> {
-      try (Poolable<FluxSink<CoreEvent>> noPolicySink = pool.borrowObject()) {
-        noPolicySink.getObject().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
-                                                                POLICY_SOURCE_CALLER_SINK, callerSink)));
-      }
-    });
+    return commonPolicy.process(sourceEvent, respParamProcessor);
   }
 
   @Override
   public void dispose() {
-    try {
-      pool.shutdown();
-    } catch (InterruptedException e) {
-      LOGGER.debug("Pool shutdown interrupted.");
-      currentThread().interrupt();
-    }
+    commonPolicy.dispose();
   }
 }
