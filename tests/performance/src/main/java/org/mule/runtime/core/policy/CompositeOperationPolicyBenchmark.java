@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.policy;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static reactor.core.publisher.Mono.from;
@@ -15,13 +17,10 @@ import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
-import org.mule.runtime.core.internal.policy.NoSourcePolicy;
-import org.mule.runtime.core.internal.policy.SourcePolicy;
-import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
-import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
+import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyChain;
+import org.mule.runtime.core.internal.policy.CompositeOperationPolicy;
+import org.mule.runtime.core.internal.policy.OperationPolicy;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -30,48 +29,37 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Threads;
+import org.reactivestreams.Publisher;
 
-import java.util.Map;
-
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(MICROSECONDS)
-public class NoSourcePolicyBenchmark extends AbstractBenchmark {
+public class CompositeOperationPolicyBenchmark extends AbstractBenchmark {
 
-  private SourcePolicy handler;
-  private MessageSourceResponseParametersProcessor sourceRpp;
+  private OperationPolicy handler;
 
   @Setup(Level.Trial)
   public void setUp() {
-    handler = new NoSourcePolicy(eventPub -> Flux.from(eventPub)
-        .flatMap(e -> Mono.just(e)));
-
-    sourceRpp = new MessageSourceResponseParametersProcessor() {
+    handler = new CompositeOperationPolicy(asList(new Policy(new PolicyChain() {
 
       @Override
-      public CheckedFunction<CoreEvent, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
-        return event -> emptyMap();
+      public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+        return publisher;
       }
-
-      @Override
-      public CheckedFunction<CoreEvent, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
-        return event -> emptyMap();
-      }
-    };
+    }, "")), empty(), (policy, nextProcessor) -> nextProcessor);
   }
 
   @Benchmark
   @Threads(Threads.MAX)
-  public Either<SourcePolicyFailureResult, SourcePolicySuccessResult> source() {
+  public CoreEvent source() {
     CoreEvent event;
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     CoreEvent.Builder eventBuilder =
         CoreEvent.builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance())).message(messageBuilder.build());
     event = eventBuilder.build();
 
-    return from(handler.process(event, sourceRpp)).block();
+    return from(handler.process(event, (params, e) -> Mono.just(e), () -> emptyMap())).block();
   }
 
 }

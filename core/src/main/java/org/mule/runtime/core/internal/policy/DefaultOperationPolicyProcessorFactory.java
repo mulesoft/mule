@@ -30,7 +30,7 @@ public class DefaultOperationPolicyProcessorFactory implements OperationPolicyPr
   }
 
   @Override
-  public Processor createOperationPolicy(Policy policy, ReactiveProcessor nextProcessor) {
+  public ReactiveProcessor createOperationPolicy(Policy policy, ReactiveProcessor nextProcessor) {
     return new OperationPolicyProcessor(policy, policyStateHandler, nextProcessor);
   }
 }
