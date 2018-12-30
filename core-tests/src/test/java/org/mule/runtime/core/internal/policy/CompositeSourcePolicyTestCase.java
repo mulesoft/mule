@@ -89,7 +89,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
 
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      return from((Publisher<CoreEvent>) invocation.getArgument(0))
+      return Flux.from((Publisher<CoreEvent>) invocation.getArgument(0))
           .doOnNext(ev -> flowActualResultEvent = ev)
           .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
     });
@@ -100,7 +100,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
       Processor firstPolicySourcePolicyProcessor = mock(Processor.class);
       when(firstPolicySourcePolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> {
-            return from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
+            return Flux.from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
                 .doOnNext(ev -> firstPolicyActualResultEvent = ev)
                 .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
                 .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
@@ -112,7 +112,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
       Processor secondPolicySourcePolicyProcessor = mock(Processor.class);
       when(secondPolicySourcePolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> {
-            return from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
+            return Flux.from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
                 .doOnNext(ev -> secondPolicyActualResultEvent = ev)
                 .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
                 .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
@@ -208,7 +208,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void reactorPipelinesBuiltJustOnce() {
+  public void reactorPipelinesReused() {
     InvocationsRecordingCompositeSourcePolicy.reset();
     final InvocationsRecordingCompositeSourcePolicy sourcePolicy =
         new InvocationsRecordingCompositeSourcePolicy(asList(firstPolicy), flowExecutionProcessor,
