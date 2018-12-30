@@ -25,6 +25,6 @@ public interface OperationPolicyProcessorFactory {
    *
    * @return an {@link OperationPolicy} that performs the common logic related to policies.
    */
-  Processor createOperationPolicy(Policy policy, ReactiveProcessor nextProcessor);
+  ReactiveProcessor createOperationPolicy(Policy policy, ReactiveProcessor nextProcessor);
 
 }

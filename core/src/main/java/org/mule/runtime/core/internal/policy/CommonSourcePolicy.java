@@ -39,7 +39,7 @@ class CommonSourcePolicy {
   public static final String POLICY_SOURCE_PARAMETERS_PROCESSOR = "policy.source.parametersProcessor";
   public static final String POLICY_SOURCE_CALLER_SINK = "policy.source.callerSink";
 
-  private final ObjectPool<FluxSink<CoreEvent>> pool;
+  private final ObjectPool<FluxSink<CoreEvent>> policySinkPool;
 
   CommonSourcePolicy(ObjectFactory<FluxSink<CoreEvent>> sinkFactory) {
     PoolConfig config = new PoolConfig()
@@ -49,14 +49,14 @@ class CommonSourcePolicy {
         .setMaxIdleMilliseconds(MAX_VALUE)
         .setScavengeIntervalMilliseconds(0);
 
-    pool = new ObjectPool<>(config, sinkFactory);
+    policySinkPool = new ObjectPool<>(config, sinkFactory);
 
   }
 
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
                                                                                          MessageSourceResponseParametersProcessor respParamProcessor) {
     return create(callerSink -> {
-      try (Poolable<FluxSink<CoreEvent>> noPolicySink = pool.borrowObject()) {
+      try (Poolable<FluxSink<CoreEvent>> noPolicySink = policySinkPool.borrowObject()) {
         noPolicySink.getObject().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
                                                                 POLICY_SOURCE_CALLER_SINK, callerSink)));
       }
@@ -88,7 +88,7 @@ class CommonSourcePolicy {
 
   public void dispose() {
     try {
-      pool.shutdown();
+      policySinkPool.shutdown();
     } catch (InterruptedException e) {
       LOGGER.debug("Pool shutdown interrupted.");
       currentThread().interrupt();
