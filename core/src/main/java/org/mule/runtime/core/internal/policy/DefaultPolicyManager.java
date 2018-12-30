@@ -62,14 +62,14 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   private final AtomicBoolean isPoliciesAvailable = new AtomicBoolean(false);
 
-  private final Cache<ComponentIdentifier, SourcePolicy> noPolicySourceInstances =
+  private final Cache<String, SourcePolicy> noPolicySourceInstances =
       Caffeine.newBuilder()
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
           .build();
 
   // These next caches contain the Composite Policies for a given sequence of policies to be applied.
 
-  private final Cache<Pair<ComponentIdentifier, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
+  private final Cache<Pair<String, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
       Caffeine.newBuilder()
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
           .build();
@@ -81,7 +81,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   // These next caches cache the actual composite policies for a given parameters. Since many parameters combinations may result
   // in a same set of policies to be applied, many entries of this cache may reference the same composite policy instance.
 
-  private final Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, SourcePolicy> sourcePolicyOuterCache =
+  private final Cache<Pair<String, PolicyPointcutParameters>, SourcePolicy> sourcePolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
           .build();
@@ -103,19 +103,20 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     final ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
 
     if (!isPoliciesAvailable.get()) {
-      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(sourceIdentifier);
+      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getLocation().getLocation());
 
       if (policy != null) {
         return policy;
       }
 
-      return noPolicySourceInstances.get(sourceIdentifier, k -> new NoSourcePolicy(flowExecutionProcessor));
+      return noPolicySourceInstances.get(source.getLocation().getLocation(), k -> new NoSourcePolicy(flowExecutionProcessor));
     }
 
     final PolicyPointcutParameters sourcePointcutParameters = ((InternalEvent) sourceEvent)
         .getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS);
 
-    final Pair<ComponentIdentifier, PolicyPointcutParameters> policyKey = new Pair<>(sourceIdentifier, sourcePointcutParameters);
+    final Pair<String, PolicyPointcutParameters> policyKey =
+        new Pair<>(source.getLocation().getLocation(), sourcePointcutParameters);
 
     final SourcePolicy policy = sourcePolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
@@ -123,12 +124,12 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     }
 
     return sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
-        .get(new Pair<>(sourceIdentifier,
+        .get(new Pair<>(source.getLocation().getLocation(),
                         policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
              innerKey -> innerKey.getSecond().isEmpty()
                  ? new NoSourcePolicy(flowExecutionProcessor)
                  : new CompositeSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
-                                             lookupSourceParametersTransformer(outerKey.getFirst()),
+                                             lookupSourceParametersTransformer(sourceIdentifier),
                                              sourcePolicyProcessorFactory)));
   }
 
@@ -207,8 +208,10 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   private void evictCaches() {
     noPolicySourceInstances.invalidateAll();
+
     sourcePolicyOuterCache.invalidateAll();
     operationPolicyOuterCache.invalidateAll();
+
     sourcePolicyInnerCache.invalidateAll();
     operationPolicyInnerCache.invalidateAll();
   }

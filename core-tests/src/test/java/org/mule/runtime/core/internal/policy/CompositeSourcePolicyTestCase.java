@@ -101,9 +101,9 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
       when(firstPolicySourcePolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> {
             return from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
-              .doOnNext(ev -> firstPolicyActualResultEvent = ev)
-              .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
-              .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
+                .doOnNext(ev -> firstPolicyActualResultEvent = ev)
+                .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
+                .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
                 .map(e -> CoreEvent.builder(e).message(firstPolicyResultEvent.getMessage()).build());
           });
       return firstPolicySourcePolicyProcessor;
@@ -113,9 +113,9 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
       when(secondPolicySourcePolicyProcessor.apply(any()))
           .thenAnswer(policyProcessorInvocation -> {
             return from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
-              .doOnNext(ev -> secondPolicyActualResultEvent = ev)
-              .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
-              .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
+                .doOnNext(ev -> secondPolicyActualResultEvent = ev)
+                .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
+                .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
                 .map(e -> CoreEvent.builder(e).message(secondPolicyResultEvent.getMessage()).build());
           });
       return secondPolicySourcePolicyProcessor;
@@ -218,7 +218,9 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     assertThat(sourcePolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
     assertThat(sourcePolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
 
-    from(sourcePolicy.process(initialEvent, sourceParametersProcessor)).block();
+    for (int i = 0; i < getRuntime().availableProcessors() * 2; ++i) {
+      from(sourcePolicy.process(initialEvent, sourceParametersProcessor)).block();
+    }
 
     assertThat(sourcePolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
     assertThat(sourcePolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
