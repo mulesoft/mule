@@ -50,7 +50,6 @@ class CommonSourcePolicy {
         .setScavengeIntervalMilliseconds(0);
 
     policySinkPool = new ObjectPool<>(config, sinkFactory);
-
   }
 
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,

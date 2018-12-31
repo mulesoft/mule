@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static com.google.common.collect.ImmutableMap.of;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
@@ -22,14 +27,22 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
+import cn.danielw.fop.ObjectFactory;
+import cn.danielw.fop.ObjectPool;
+import cn.danielw.fop.PoolConfig;
+import cn.danielw.fop.Poolable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -46,15 +59,17 @@ public class CompositeOperationPolicy
     extends AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationExecutionFunction>
     implements OperationPolicy, Disposable {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CompositeOperationPolicy.class);
+
   private static final String POLICY_OPERATION_NEXT_OPERATION_RESPONSE = "policy.operation.nextOperationResponse";
   public static final String POLICY_OPERATION_PARAMETERS_PROCESSOR = "policy.operation.parametersProcessor";
   public static final String POLICY_OPERATION_OPERATION_EXEC_FUNCTION = "policy.operation.operationExecutionFunction";
-  public static final String POLICY_OPERATION_CHILD_CTX = "policy.operation.childContext";
-  public static final String POLICY_OPERATION_CALLER_SINK = "policy.operation.callerSink";
+  private static final String POLICY_OPERATION_CHILD_CTX = "policy.operation.childContext";
+  private static final String POLICY_OPERATION_CALLER_SINK = "policy.operation.callerSink";
 
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
-  private final FluxSink<CoreEvent> policySink;
+  private final LoadingCache<String, ObjectPool<FluxSink<CoreEvent>>> policySinkPools;
 
   /**
    * Creates a new composite policy.
@@ -75,30 +90,63 @@ public class CompositeOperationPolicy
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
 
-    AtomicReference<FluxSink<CoreEvent>> sinkRef = new AtomicReference<>();
+    PoolConfig config = new PoolConfig()
+        .setPartitionSize(getRuntime().availableProcessors())
+        .setMaxSize(1)
+        .setMinSize(1)
+        .setMaxIdleMilliseconds(MAX_VALUE)
+        .setScavengeIntervalMilliseconds(0);
 
-    Flux<CoreEvent> policyFlux =
-        Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
-            .transform(getExecutionProcessor())
-            .doOnNext(result -> {
-              final BaseEventContext childContext = getStoredChildContext(result);
-              if (!childContext.isComplete()) {
-                childContext.success(result);
-              }
-              ((MonoSink<CoreEvent>) ((InternalEvent) result).getInternalParameter(POLICY_OPERATION_CALLER_SINK))
-                  .success(quickCopy(childContext.getParentContext().get(), result));
-            })
-            .onErrorContinue(MessagingException.class, (t, e) -> {
-              final MessagingException me = (MessagingException) t;
+    policySinkPools = newBuilder()
+        .removalListener((String key, ObjectPool value, RemovalCause cause) -> {
+          try {
+            value.shutdown();
+          } catch (InterruptedException e) {
+            currentThread().interrupt();
+          }
+        })
+        .build(componentLocation -> new ObjectPool<>(config, new OperationWithPoliciesFluxObjectFactory()));
+  }
 
-              me.setProcessedEvent(quickCopy(getStoredChildContext(me.getEvent()).getParentContext().get(),
-                                             me.getEvent()));
-              ((MonoSink<CoreEvent>) ((InternalEvent) me.getEvent()).getInternalParameter(POLICY_OPERATION_CALLER_SINK))
-                  .error(me);
-            });
+  private final class OperationWithPoliciesFluxObjectFactory implements ObjectFactory<FluxSink<CoreEvent>> {
 
-    policyFlux.subscribe();
-    this.policySink = sinkRef.get();
+    @Override
+    public FluxSink<CoreEvent> create() {
+      AtomicReference<FluxSink<CoreEvent>> sinkRef = new AtomicReference<>();
+
+      Flux<CoreEvent> policyFlux =
+          Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
+              .transform(getExecutionProcessor())
+              .doOnNext(result -> {
+                final BaseEventContext childContext = getStoredChildContext(result);
+                if (!childContext.isComplete()) {
+                  childContext.success(result);
+                }
+                ((MonoSink<CoreEvent>) ((InternalEvent) result).getInternalParameter(POLICY_OPERATION_CALLER_SINK))
+                    .success(quickCopy(childContext.getParentContext().get(), result));
+              })
+              .onErrorContinue(MessagingException.class, (t, e) -> {
+                final MessagingException me = (MessagingException) t;
+
+                me.setProcessedEvent(quickCopy(getStoredChildContext(me.getEvent()).getParentContext().get(),
+                                               me.getEvent()));
+                ((MonoSink<CoreEvent>) ((InternalEvent) me.getEvent()).getInternalParameter(POLICY_OPERATION_CALLER_SINK))
+                    .error(me);
+              });
+
+      policyFlux.subscribe();
+      return sinkRef.get();
+    }
+
+    @Override
+    public void destroy(FluxSink<CoreEvent> t) {
+      t.complete();
+    }
+
+    @Override
+    public boolean validate(FluxSink<CoreEvent> t) {
+      return !t.isCancelled();
+    }
   }
 
   /**
@@ -155,22 +203,17 @@ public class CompositeOperationPolicy
 
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
-                                      OperationParametersProcessor parametersProcessor) {
+                                      OperationParametersProcessor parametersProcessor, ComponentLocation operationLocation) {
     return Mono.<CoreEvent>create(callerSink -> {
-      policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, empty()), operationEvent),
-                                              operationExecutionFunction,
-                                              parametersProcessor, callerSink));
+      try (Poolable<FluxSink<CoreEvent>> policySink =
+          policySinkPools.get(operationLocation.getLocation()).borrowObject()) {
+        policySink.getObject()
+            .next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
+                                          operationExecutionFunction,
+                                          parametersProcessor, callerSink));
+      }
     });
   }
-
-  public static Consumer<CoreEvent> completeSuccessIfNeeded() {
-    return result -> {
-      if (!getStoredChildContext(result).isComplete()) {
-        getStoredChildContext(result).success(result);
-      }
-    };
-  }
-
 
   private CoreEvent operationEventForPolicy(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                             OperationParametersProcessor parametersProcessor, MonoSink<CoreEvent> callerSink) {
@@ -193,5 +236,7 @@ public class CompositeOperationPolicy
   }
 
   @Override
-  public void dispose() {}
+  public void dispose() {
+    policySinkPools.invalidateAll();
+  }
 }
