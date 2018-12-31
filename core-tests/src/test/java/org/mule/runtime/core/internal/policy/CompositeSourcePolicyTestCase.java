@@ -22,14 +22,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
@@ -38,7 +34,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,40 +47,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import reactor.core.publisher.Flux;
 
-//TODO MULE-10927 - create a common class between CompositeOperationPolicyTestCase and CompositeSourcePolicyTestCase
-public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
+public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
 
   private CompositeSourcePolicy compositeSourcePolicy;
 
-  private final FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
   private final Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer =
       of(mock(SourcePolicyParametersTransformer.class));
   private final MessageSourceResponseParametersProcessor sourceParametersProcessor =
       mock(MessageSourceResponseParametersProcessor.class, RETURNS_DEEP_STUBS);
-  private final Policy firstPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
-  private final Policy secondPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
+
   private CoreEvent initialEvent;
   private CoreEvent modifiedEvent;
-  private CoreEvent firstPolicyResultEvent;
-  private CoreEvent secondPolicyResultEvent;
   private final Processor flowExecutionProcessor = mock(Processor.class);
   private final CoreEvent nextProcessResultEvent = mock(CoreEvent.class);
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory =
       mock(SourcePolicyProcessorFactory.class, RETURNS_DEEP_STUBS);
 
   private CoreEvent flowActualResultEvent;
-  private CoreEvent firstPolicyActualResultEvent;
-  private CoreEvent secondPolicyActualResultEvent;
 
   @Before
   public void setUp() throws Exception {
     initialEvent = createTestEvent();
     modifiedEvent = createTestEvent();
-    firstPolicyResultEvent = createTestEvent();
-    secondPolicyResultEvent = createTestEvent();
 
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
@@ -93,32 +79,16 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
           .doOnNext(ev -> flowActualResultEvent = ev)
           .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
     });
-    when(firstPolicy.getPolicyChain().apply(any())).thenReturn(just(firstPolicyResultEvent));
-    when(secondPolicy.getPolicyChain().apply(any())).thenReturn(just(secondPolicyResultEvent));
 
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
-      Processor firstPolicySourcePolicyProcessor = mock(Processor.class);
-      when(firstPolicySourcePolicyProcessor.apply(any()))
-          .thenAnswer(policyProcessorInvocation -> {
-            return Flux.from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
-                .doOnNext(ev -> firstPolicyActualResultEvent = ev)
-                .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
-                .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
-                .map(e -> CoreEvent.builder(e).message(firstPolicyResultEvent.getMessage()).build());
-          });
-      return firstPolicySourcePolicyProcessor;
+      return firstPolicyProcessor(policyFactoryInvocation,
+                                  e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build(),
+                                  e -> CoreEvent.builder(e).message(firstPolicyResultEvent.getMessage()).build());
     });
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
-      Processor secondPolicySourcePolicyProcessor = mock(Processor.class);
-      when(secondPolicySourcePolicyProcessor.apply(any()))
-          .thenAnswer(policyProcessorInvocation -> {
-            return Flux.from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
-                .doOnNext(ev -> secondPolicyActualResultEvent = ev)
-                .map(e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build())
-                .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])
-                .map(e -> CoreEvent.builder(e).message(secondPolicyResultEvent.getMessage()).build());
-          });
-      return secondPolicySourcePolicyProcessor;
+      return secondPolicyProcessor(policyFactoryInvocation,
+                                   e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build(),
+                                   e -> CoreEvent.builder(e).message(secondPolicyResultEvent.getMessage()).build());
     });
   }
 
@@ -136,8 +106,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
                equalTo(modifiedEvent.getMessage()));
 
     verify(sourcePolicyProcessorFactory, atLeastOnce()).createSourcePolicy(same(firstPolicy), any());
-    assertThat(firstPolicyActualResultEvent.getMessage(),
-               equalTo(initialEvent.getMessage()));
+    assertThat(getFirstPolicyActualResultEvent().getMessage(), equalTo(initialEvent.getMessage()));
   }
 
   @Test
@@ -156,11 +125,8 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     verify(sourcePolicyProcessorFactory, atLeastOnce()).createSourcePolicy(same(firstPolicy), any());
     verify(sourcePolicyProcessorFactory, atLeastOnce()).createSourcePolicy(same(secondPolicy), any());
 
-    assertThat(firstPolicyActualResultEvent.getMessage(),
-               equalTo(initialEvent.getMessage()));
-
-    assertThat(secondPolicyActualResultEvent.getMessage(),
-               equalTo(modifiedEvent.getMessage()));
+    assertThat(getFirstPolicyActualResultEvent().getMessage(), equalTo(initialEvent.getMessage()));
+    assertThat(getSecondPolicyActualResultEvent().getMessage(), equalTo(modifiedEvent.getMessage()));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -224,11 +190,6 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
 
     assertThat(sourcePolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
     assertThat(sourcePolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
-  }
-
-  private CoreEvent createTestEvent() {
-    return CoreEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
-        .message(Message.builder().nullValue().build()).build();
   }
 
   public static final class InvocationsRecordingCompositeSourcePolicy extends CompositeSourcePolicy {
