@@ -23,17 +23,26 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.invocation.InvocationOnMock;
 import org.reactivestreams.Publisher;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 
+@RunWith(Parameterized.class)
 public abstract class AbstractCompositePolicyTestCase extends AbstractMuleContextTestCase {
 
   private final FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
+
+  protected ReactiveProcessor processor;
 
   protected CoreEvent firstPolicyResultEvent;
   protected CoreEvent secondPolicyResultEvent;
@@ -42,6 +51,30 @@ public abstract class AbstractCompositePolicyTestCase extends AbstractMuleContex
 
   private CoreEvent firstPolicyActualResultEvent;
   private CoreEvent secondPolicyActualResultEvent;
+
+  @Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        {"Policy: blocking;     Processor: blocking", false,
+            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.sameThreadProcess()},
+        {"Policy: non-blocking; Processor: blocking", true,
+            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.sameThreadProcess()},
+        {"Policy: blocking;     Processor: non-blocking", false,
+            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.changeThreadProcess()},
+        {"Policy: non-blocking; Processor: non-blocking", true,
+            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.changeThreadProcess()}
+    });
+  }
+
+  private final boolean policyChangeThread;
+  protected abstract ReactiveProcessor sameThreadProcess();
+  protected abstract ReactiveProcessor changeThreadProcess();
+
+  public AbstractCompositePolicyTestCase(String description, boolean policyChangeThread,
+                                         Function<AbstractCompositePolicyTestCase, ReactiveProcessor> processorFactory) {
+    this.policyChangeThread = policyChangeThread;
+    this.processor = processorFactory.apply(this);
+  }
 
   @Before
   public void commonBefore() {
@@ -63,7 +96,13 @@ public abstract class AbstractCompositePolicyTestCase extends AbstractMuleContex
     Processor firstPolicyProcessor = mock(Processor.class);
     when(firstPolicyProcessor.apply(any()))
         .thenAnswer(policyProcessorInvocation -> {
-          return Flux.from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0])
+          Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) policyProcessorInvocation.getArguments()[0]);
+
+          if (policyChangeThread) {
+            baseFlux = baseFlux.publishOn(Schedulers.single());
+          }
+
+          return baseFlux
               .doOnNext(ev -> firstPolicyActualResultEvent = ev)
               .map(beforeMapper)
               .transform((ReactiveProcessor) policyFactoryInvocation.getArguments()[1])

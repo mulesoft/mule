@@ -197,15 +197,16 @@ public class CompositeOperationPolicy
 
   private CoreEvent operationEventForPolicy(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                             OperationParametersProcessor parametersProcessor, MonoSink<CoreEvent> callerSink) {
-    CoreEvent operationEventForPolicy = quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
-                                                                     POLICY_OPERATION_OPERATION_EXEC_FUNCTION,
-                                                                     operationExecutionFunction,
-                                                                     POLICY_OPERATION_CALLER_SINK, callerSink));
-
-    final CoreEvent event = getParametersTransformer().isPresent() ? CoreEvent.builder(operationEventForPolicy)
-        .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
-        .build() : operationEventForPolicy;
-    return event;
+    return getParametersTransformer().isPresent()
+        ? InternalEvent.builder(operationEvent)
+            .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
+            .addInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor)
+            .addInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction)
+            .addInternalParameter(POLICY_OPERATION_CALLER_SINK, callerSink)
+            .build()
+        : quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
+                                       POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
+                                       POLICY_OPERATION_CALLER_SINK, callerSink));
   }
 
   @Override

@@ -44,8 +44,10 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCase {
 
@@ -68,6 +70,11 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
   private CoreEvent flowActualResultEvent;
 
+  public CompositeSourcePolicyTestCase(String description, boolean policyChangeThread,
+                                       Function<AbstractCompositePolicyTestCase, ReactiveProcessor> processor) {
+    super(description, policyChangeThread, processor);
+  }
+
   @Before
   public void setUp() throws Exception {
     initialEvent = createTestEvent();
@@ -75,9 +82,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      return Flux.from((Publisher<CoreEvent>) invocation.getArgument(0))
-          .doOnNext(ev -> flowActualResultEvent = ev)
-          .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
+      return processor.apply(invocation.getArgument(0));
     });
 
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
@@ -90,6 +95,21 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
                                    e -> CoreEvent.builder(e).message(modifiedEvent.getMessage()).build(),
                                    e -> CoreEvent.builder(e).message(secondPolicyResultEvent.getMessage()).build());
     });
+  }
+
+  @Override
+  protected ReactiveProcessor sameThreadProcess() {
+    return eventPub -> Flux.from(eventPub)
+        .doOnNext(ev -> flowActualResultEvent = ev)
+        .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
+  }
+
+  @Override
+  protected ReactiveProcessor changeThreadProcess() {
+    return eventPub -> Flux.from(eventPub)
+        .publishOn(Schedulers.single())
+        .doOnNext(ev -> flowActualResultEvent = ev)
+        .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
   }
 
   @Test
