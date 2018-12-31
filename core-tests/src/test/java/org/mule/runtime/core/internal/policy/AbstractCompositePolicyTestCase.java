@@ -42,8 +42,6 @@ public abstract class AbstractCompositePolicyTestCase extends AbstractMuleContex
 
   private final FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
 
-  protected ReactiveProcessor processor;
-
   protected CoreEvent firstPolicyResultEvent;
   protected CoreEvent secondPolicyResultEvent;
   protected final Policy firstPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
@@ -52,28 +50,22 @@ public abstract class AbstractCompositePolicyTestCase extends AbstractMuleContex
   private CoreEvent firstPolicyActualResultEvent;
   private CoreEvent secondPolicyActualResultEvent;
 
-  @Parameters(name = "{0}")
+  @Parameters(name = "Policy NB: {0}; Processor NB: {1}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        {"Policy: blocking;     Processor: blocking", false,
-            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.sameThreadProcess()},
-        {"Policy: non-blocking; Processor: blocking", true,
-            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.sameThreadProcess()},
-        {"Policy: blocking;     Processor: non-blocking", false,
-            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.changeThreadProcess()},
-        {"Policy: non-blocking; Processor: non-blocking", true,
-            (Function<AbstractCompositePolicyTestCase, ReactiveProcessor>) t -> t.changeThreadProcess()}
+        {false, false},
+        {true, false},
+        {false, true},
+        {true, true}
     });
   }
 
-  private final boolean policyChangeThread;
-  protected abstract ReactiveProcessor sameThreadProcess();
-  protected abstract ReactiveProcessor changeThreadProcess();
+  protected final boolean policyChangeThread;
+  protected final boolean processChangeThread;
 
-  public AbstractCompositePolicyTestCase(String description, boolean policyChangeThread,
-                                         Function<AbstractCompositePolicyTestCase, ReactiveProcessor> processorFactory) {
+  public AbstractCompositePolicyTestCase(boolean policyChangeThread, boolean processChangeThread) {
     this.policyChangeThread = policyChangeThread;
-    this.processor = processorFactory.apply(this);
+    this.processChangeThread = processChangeThread;
   }
 
   @Before
