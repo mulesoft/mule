@@ -44,7 +44,6 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -67,9 +66,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory = mock(OperationPolicyProcessorFactory.class);
 
-  public CompositeOperationPolicyTestCase(String description, boolean policyChangeThread,
-                                          Function<AbstractCompositePolicyTestCase, ReactiveProcessor> processor) {
-    super(description, policyChangeThread, processor);
+  public CompositeOperationPolicyTestCase(boolean policyChangeThread, boolean processChangeThread) {
+    super(policyChangeThread, processChangeThread);
   }
 
   @Before
@@ -78,7 +76,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     nextProcessResultEvent = CoreEvent.builder(createTestEvent()).message(Message.of("HELLO")).build();
     when(operationPolicyParametersTransformer.get().fromParametersToMessage(any())).thenReturn(Message.of(null));
     when(operationExecutionFunction.execute(any(), any()))
-        .thenAnswer(invocation -> processor.apply(Mono.just((CoreEvent) invocation.getArgument(1))));
+        .thenAnswer(invocation -> processor().apply(Mono.just((CoreEvent) invocation.getArgument(1))));
 
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       return firstPolicyProcessor(policyFactoryInvocation,
@@ -92,17 +90,15 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     });
   }
 
-  @Override
-  protected ReactiveProcessor sameThreadProcess() {
-    return eventPub -> Flux.from(eventPub)
-        .map(e -> CoreEvent.builder(e).message(nextProcessResultEvent.getMessage()).build());
-  }
-
-  @Override
-  protected ReactiveProcessor changeThreadProcess() {
-    return eventPub -> Flux.from(eventPub)
-        .publishOn(Schedulers.single())
-        .map(e -> CoreEvent.builder(e).message(nextProcessResultEvent.getMessage()).build());
+  protected ReactiveProcessor processor() {
+    return eventPub -> {
+      Flux<CoreEvent> baseFlux = Flux.from(eventPub);
+      if (processChangeThread) {
+        baseFlux = baseFlux.publishOn(Schedulers.single());
+      }
+      return baseFlux
+          .map(e -> CoreEvent.builder(e).message(nextProcessResultEvent.getMessage()).build());
+    };
   }
 
   @Test
@@ -152,8 +148,13 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       Processor firstPolicyOperationPolicyProcessor = mock(Processor.class);
       when(firstPolicyOperationPolicyProcessor.apply(any()))
-          .thenAnswer(inv -> Flux.from((Publisher<CoreEvent>) inv.getArgument(0))
-              .flatMap(event -> error(new MessagingException(event, policyException))));
+          .thenAnswer(inv -> {
+            Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) inv.getArgument(0));
+            if (policyChangeThread) {
+              baseFlux = baseFlux.publishOn(Schedulers.single());
+            }
+            return baseFlux.flatMap(event -> error(new MessagingException(event, policyException)));
+          });
       return firstPolicyOperationPolicyProcessor;
     });
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
@@ -171,7 +172,14 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   @Test
   public void nextProcessorExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
-    doAnswer(inv -> error(new MessagingException(inv.getArgument(1), policyException))).when(operationExecutionFunction)
+    doAnswer(inv -> {
+      Mono<CoreEvent> baseMono = Mono.just((CoreEvent) inv.getArgument(1));
+      if (processChangeThread) {
+        baseMono = baseMono.publishOn(Schedulers.single());
+      }
+      return baseMono.flatMap(e -> error(new MessagingException(e, policyException)));
+    })
+        .when(operationExecutionFunction)
         .execute(any(), any());
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,

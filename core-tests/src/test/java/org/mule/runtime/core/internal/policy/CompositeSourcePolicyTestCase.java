@@ -44,7 +44,6 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -70,9 +69,8 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
   private CoreEvent flowActualResultEvent;
 
-  public CompositeSourcePolicyTestCase(String description, boolean policyChangeThread,
-                                       Function<AbstractCompositePolicyTestCase, ReactiveProcessor> processor) {
-    super(description, policyChangeThread, processor);
+  public CompositeSourcePolicyTestCase(boolean policyChangeThread, boolean processChangeThread) {
+    super(policyChangeThread, processChangeThread);
   }
 
   @Before
@@ -82,7 +80,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      return processor.apply(invocation.getArgument(0));
+      return processor().apply(invocation.getArgument(0));
     });
 
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
@@ -97,19 +95,16 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     });
   }
 
-  @Override
-  protected ReactiveProcessor sameThreadProcess() {
-    return eventPub -> Flux.from(eventPub)
-        .doOnNext(ev -> flowActualResultEvent = ev)
-        .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
-  }
-
-  @Override
-  protected ReactiveProcessor changeThreadProcess() {
-    return eventPub -> Flux.from(eventPub)
-        .publishOn(Schedulers.single())
-        .doOnNext(ev -> flowActualResultEvent = ev)
-        .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
+  protected ReactiveProcessor processor() {
+    return eventPub -> {
+      Flux<CoreEvent> baseFlux = Flux.from(eventPub);
+      if (processChangeThread) {
+        baseFlux = baseFlux.publishOn(Schedulers.single());
+      }
+      return baseFlux
+          .doOnNext(ev -> flowActualResultEvent = ev)
+          .doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
+    };
   }
 
   @Test
@@ -161,8 +156,13 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       Processor secondPolicySourcePolicyProcessor = mock(Processor.class);
       when(secondPolicySourcePolicyProcessor.apply(any(Publisher.class)))
-          .thenAnswer(inv -> Flux.from((Publisher<CoreEvent>) inv.getArgument(0))
-              .flatMap(event -> error(new MessagingException(event, policyException))));
+          .thenAnswer(inv -> {
+            Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) inv.getArgument(0));
+            if (policyChangeThread) {
+              baseFlux = baseFlux.publishOn(Schedulers.single());
+            }
+            return baseFlux.flatMap(event -> error(new MessagingException(event, policyException)));
+          });
       return secondPolicySourcePolicyProcessor;
     });
 
@@ -181,8 +181,13 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     RuntimeException policyException = new RuntimeException("policy failure");
     reset(flowExecutionProcessor);
     when(flowExecutionProcessor.apply(any()))
-        .thenAnswer(invocation -> Flux.from((Publisher<CoreEvent>) invocation.getArgument(0))
-            .flatMap(event -> error(new MessagingException(event, policyException))));
+        .thenAnswer(invocation -> {
+          Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) invocation.getArgument(0));
+          if (processChangeThread) {
+            baseFlux = baseFlux.publishOn(Schedulers.single());
+          }
+          return baseFlux.flatMap(event -> error(new MessagingException(event, policyException)));
+        });
     compositeSourcePolicy =
         new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor, sourcePolicyParametersTransformer,
                                   sourcePolicyProcessorFactory);
