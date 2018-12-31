@@ -56,9 +56,9 @@ class CommonSourcePolicy {
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
                                                                                          MessageSourceResponseParametersProcessor respParamProcessor) {
     return create(callerSink -> {
-      try (Poolable<FluxSink<CoreEvent>> noPolicySink = policySinkPool.borrowObject()) {
-        noPolicySink.getObject().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
-                                                                POLICY_SOURCE_CALLER_SINK, callerSink)));
+      try (Poolable<FluxSink<CoreEvent>> policySink = policySinkPool.borrowObject()) {
+        policySink.getObject().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
+                                                              POLICY_SOURCE_CALLER_SINK, callerSink)));
       }
     });
   }
