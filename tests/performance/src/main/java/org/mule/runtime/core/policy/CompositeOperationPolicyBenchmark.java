@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.message.Message;
@@ -30,8 +31,6 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Threads;
 import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Mono;
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(MICROSECONDS)
@@ -59,7 +58,7 @@ public class CompositeOperationPolicyBenchmark extends AbstractBenchmark {
         CoreEvent.builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance())).message(messageBuilder.build());
     event = eventBuilder.build();
 
-    return from(handler.process(event, (params, e) -> Mono.just(e), () -> emptyMap())).block();
+    return from(handler.process(event, (params, e) -> just(e), () -> emptyMap(), CONNECTOR_LOCATION)).block();
   }
 
 }

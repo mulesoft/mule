@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.reactivestreams.Publisher;
@@ -22,6 +23,6 @@ public interface OperationPolicy {
    * @throws Exception
    */
   Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
-                               OperationParametersProcessor parametersProcessor);
+                               OperationParametersProcessor parametersProcessor, ComponentLocation componentLocation);
 
 }
