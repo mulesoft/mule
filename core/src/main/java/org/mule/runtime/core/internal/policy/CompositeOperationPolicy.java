@@ -9,11 +9,15 @@ package org.mule.runtime.core.internal.policy;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.completeSuccessIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -23,6 +27,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
 
@@ -168,47 +173,44 @@ public class CompositeOperationPolicy
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                       OperationParametersProcessor parametersProcessor) {
+    BaseEventContext childContext = newChildContext(operationEvent, empty());
+
     return Mono.<CoreEvent>create(callerSink -> {
-      Mono.from(processWithChildContext(operationEvent,
-                                        childPub -> Mono.from(childPub)
-                                            .doOnNext(childEvent -> policySink
-                                                .next(operationEventForPolicy(childEvent, operationExecutionFunction,
-                                                                              parametersProcessor, callerSink))),
-                                        empty()))
-          .subscribe();
+      internalProcessWithChildContext(operationEvent,
+                                      childPub -> Mono.from(childPub)
+                                          .doOnNext(childEvent -> policySink
+                                              .next(operationEventForPolicy(childEvent, operationExecutionFunction,
+                                                                            parametersProcessor, callerSink))),
+                                      childContext)
+                                          .subscribe();
     })
-        .map(result -> quickCopy(operationEvent.getContext(), result))
+        .doOnNext(completeSuccessIfNeeded(childContext, true))
+        .switchIfEmpty(from(childContext.getResponsePublisher()))
+        .map(result -> quickCopy(childContext.getParentContext().get(), result))
         .doOnError(MessagingException.class,
-                   me -> me.setProcessedEvent(quickCopy(operationEvent.getContext(), me.getEvent())));
+                   me -> me.setProcessedEvent(quickCopy(childContext.getParentContext().get(), me.getEvent())))
+        .doOnSuccess(result -> {
+          if (result == null) {
+            childContext.getParentContext().get().success();
+          }
+        });
   }
 
-  // public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
-  // Optional<ComponentLocation> componentLocation) {
-  // BaseEventContext childContext = newChildContext(event, componentLocation);
-  // return internalProcessWithChildContext(event, processor, childContext, true, childContext.getResponsePublisher());
-  // }
-  //
-  // public static BaseEventContext newChildContext(CoreEvent event, Optional<ComponentLocation> componentLocation) {
-  // return child(((BaseEventContext) event.getContext()), componentLocation);
-  // }
-  //
-  // private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
-  // BaseEventContext child, boolean completeParentOnEmpty,
-  // Publisher<CoreEvent> responsePublisher) {
-  // return just(quickCopy(child, event))
-  // .transform(processor)
-  // .doOnNext(MessageProcessors.completeSuccessIfNeeded(child, true))
-  // // .switchIfEmpty(from(responsePublisher))
-  // .map(result -> quickCopy(child.getParentContext().get(), result))
-  // .doOnError(MessagingException.class,
-  // me -> me.setProcessedEvent(quickCopy(child.getParentContext().get(), me.getEvent())))
-  // // .doOnSuccess(result -> {
-  // // if (result == null && completeParentOnEmpty) {
-  // // ((BaseEventContext) event.getContext()).success();
-  // // }
-  // // })
-  // ;
-  // }
+  /**
+   * Creates a new {@link BaseEventContext} which is child of the one in the given {@code event}
+   *
+   * @param event the parent event
+   * @param componentLocation the location of the component creating the child context
+   * @return a child {@link BaseEventContext}
+   */
+  public static BaseEventContext newChildContext(CoreEvent event, Optional<ComponentLocation> componentLocation) {
+    return child(((BaseEventContext) event.getContext()), componentLocation);
+  }
+
+  private static Mono<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
+                                                                 BaseEventContext child) {
+    return just(quickCopy(child, event)).transform(processor);
+  }
 
   private CoreEvent operationEventForPolicy(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                             OperationParametersProcessor parametersProcessor, MonoSink<CoreEvent> callerSink) {
