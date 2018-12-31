@@ -18,13 +18,13 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,6 +44,9 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTestCase {
 
@@ -66,7 +70,9 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     initialEvent = createTestEvent();
     nextProcessResultEvent = CoreEvent.builder(createTestEvent()).message(Message.of("HELLO")).build();
     when(operationPolicyParametersTransformer.get().fromParametersToMessage(any())).thenReturn(Message.of(null));
-    when(operationExecutionFunction.execute(any(), any())).thenAnswer(invocationOnMock -> just(nextProcessResultEvent));
+    when(operationExecutionFunction.execute(any(), any()))
+        .thenAnswer(invocation -> Mono.just((CoreEvent) invocation.getArgument(1))
+            .map(e -> CoreEvent.builder(e).message(nextProcessResultEvent.getMessage()).build()));
 
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       return firstPolicyProcessor(policyFactoryInvocation,
@@ -126,7 +132,9 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     RuntimeException policyException = new RuntimeException("policy failure");
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       Processor firstPolicyOperationPolicyProcessor = mock(Processor.class);
-      when(firstPolicyOperationPolicyProcessor.apply(any())).thenReturn(error(policyException));
+      when(firstPolicyOperationPolicyProcessor.apply(any()))
+          .thenAnswer(inv -> Flux.from((Publisher<CoreEvent>) inv.getArgument(0))
+              .flatMap(event -> error(new MessagingException(event, policyException))));
       return firstPolicyOperationPolicyProcessor;
     });
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
@@ -144,7 +152,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   @Test
   public void nextProcessorExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
-    when(operationExecutionFunction.execute(any(), any())).thenReturn(error(policyException));
+    doAnswer(inv -> error(new MessagingException(inv.getArgument(1), policyException))).when(operationExecutionFunction)
+        .execute(any(), any());
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
