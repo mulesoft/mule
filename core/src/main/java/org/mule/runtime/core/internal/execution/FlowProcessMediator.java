@@ -489,7 +489,7 @@ public class FlowProcessMediator implements Initialisable {
    *        parameter.
    */
   private void onTerminate(PhaseContext ctx, Either<Throwable, CoreEvent> result) {
-    safely(() -> ctx.terminateConsumer.accept(result.mapLeft(throwable -> {
+    final Either<MessagingException, CoreEvent> withMappedException = result.mapLeft(throwable -> {
       if (throwable instanceof MessagingException) {
         return (MessagingException) throwable;
       } else if (throwable instanceof SourceErrorException) {
@@ -498,7 +498,8 @@ public class FlowProcessMediator implements Initialisable {
       } else {
         return null;
       }
-    })));
+    });
+    safely(() -> ctx.terminateConsumer.accept(withMappedException));
   }
 
   private void fireNotification(Component source, CoreEvent event, FlowConstruct flow, int action) {

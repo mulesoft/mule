@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static com.google.common.base.Functions.identity;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
@@ -323,7 +324,7 @@ public class SourceAdapter implements Lifecycle {
 
     @Override
     public void onTerminate(Either<MessagingException, CoreEvent> result) throws Exception {
-      CoreEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
+      CoreEvent event = result.reduce(me -> me.getEvent(), identity());
       onTerminateExecutor.execute(event, emptyMap(), context, always(context::releaseConnection));
     }
 

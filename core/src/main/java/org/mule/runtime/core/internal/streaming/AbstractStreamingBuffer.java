@@ -10,9 +10,10 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,8 +56,8 @@ public abstract class AbstractStreamingBuffer {
     checkState(!closed.get(), "Buffer is closed");
   }
 
-  protected void closeSafely(CheckedRunnable task) {
-    safely(task, e -> LOGGER.debug("Found exception closing buffer", e));
+  protected <T> void closeSafely(T item, CheckedConsumer<T> task) {
+    safely(item, task, e -> LOGGER.debug("Found exception closing buffer", e));
   }
 
   public final class LockReleaser {

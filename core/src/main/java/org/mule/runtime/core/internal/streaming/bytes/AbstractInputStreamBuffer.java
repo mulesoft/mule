@@ -67,7 +67,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           return null;
         } finally {
           if (stream != null) {
-            closeSafely(stream::close);
+            closeSafely(stream, InputStream::close);
           }
         }
       });
@@ -149,7 +149,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
   protected boolean deallocate(ByteBuffer byteBuffer) {
     if (byteBuffer != null) {
-      closeSafely(() -> bufferManager.deallocate(byteBuffer));
+      closeSafely(byteBuffer, bufferManager::deallocate);
       return true;
     }
 
