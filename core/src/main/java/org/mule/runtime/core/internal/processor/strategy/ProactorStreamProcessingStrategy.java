@@ -153,7 +153,7 @@ public abstract class ProactorStreamProcessingStrategy
   private final AtomicInteger inFlightEvents = new AtomicInteger();
   private final BiConsumer<CoreEvent, Throwable> IN_FLIGHT_DECREMENT_CALLBACK = (e, t) -> inFlightEvents.decrementAndGet();
   private final LongUnaryOperator LAST_RETRY_TIMESTAMP_CHECK_OPERATOR =
-      v -> nanoTime() - lastRetryTimestamp.get() < SCHEDULER_BUSY_RETRY_INTERVAL_NS * 2
+      v -> nanoTime() - v < SCHEDULER_BUSY_RETRY_INTERVAL_NS * 2
           ? v
           : MIN_VALUE;
 
