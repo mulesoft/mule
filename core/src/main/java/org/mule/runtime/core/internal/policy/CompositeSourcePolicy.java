@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -30,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import cn.danielw.fop.ObjectFactory;
@@ -81,10 +81,10 @@ public class CompositeSourcePolicy
 
     @Override
     public FluxSink<CoreEvent> create() {
-      AtomicReference<FluxSink<CoreEvent>> sinkRef = new AtomicReference<>();
+      final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
-          Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
+          Flux.<CoreEvent>create(sinkRef)
               .transform(getExecutionProcessor())
               .map(policiesResultEvent -> {
                 final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
@@ -123,7 +123,7 @@ public class CompositeSourcePolicy
               });
 
       policyFlux.subscribe();
-      return sinkRef.get();
+      return sinkRef.getFluxSink();
     }
 
     @Override
