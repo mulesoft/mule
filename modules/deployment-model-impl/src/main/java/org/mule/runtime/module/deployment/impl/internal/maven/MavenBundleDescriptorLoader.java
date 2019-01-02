@@ -128,7 +128,8 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
     }
 
     private void createFixedMavenBundleDescriptorLoader() {
-      fixedMavenBundleDescriptorLoader = new FixedMavenBundleDescriptorLoader(mavenClientProvider.createMavenClient(mavenRuntimeConfig));
+      fixedMavenBundleDescriptorLoader =
+          new FixedMavenBundleDescriptorLoader(mavenClientProvider.createMavenClient(mavenRuntimeConfig));
     }
 
     @Override
@@ -141,8 +142,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           if (writeStamp == 0L) {
             lock.unlockRead(stamp);
             stamp = lock.writeLock();
-          }
-          else {
+          } else {
             stamp = writeStamp;
           }
           if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
@@ -152,8 +152,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
         }
 
         return fixedMavenBundleDescriptorLoader.getBundleDescriptor(artifactFile, artifactType);
-      }
-      finally {
+      } finally {
         lock.unlock(stamp);
       }
     }
@@ -170,7 +169,8 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
       temporaryFolder = new File(localMavenRepositoryLocation, ".mule");
       if (!temporaryFolder.exists() && !temporaryFolder.mkdirs()) {
-        throw new MuleRuntimeException(createStaticMessage("Cannot create a temporary folder for loading bundle descriptor at %s", temporaryFolder.getAbsolutePath()));
+        throw new MuleRuntimeException(createStaticMessage("Cannot create a temporary folder for loading bundle descriptor at %s",
+                                                           temporaryFolder.getAbsolutePath()));
       }
     }
 
@@ -179,19 +179,18 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       Model model;
       if (artifactFile.isDirectory()) {
         model = mavenClient.getEffectiveModel(artifactFile, empty());
-      }
-      else {
+      } else {
         model = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
       }
 
       return new BundleDescriptor.Builder()
-              .setArtifactId(model.getArtifactId())
-              .setGroupId(model.getGroupId())
-              .setVersion(model.getVersion())
-              .setType(JAR)
-              // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
-              .setClassifier(artifactType.equals(ArtifactType.PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
-              .build();
+          .setArtifactId(model.getArtifactId())
+          .setGroupId(model.getGroupId())
+          .setVersion(model.getVersion())
+          .setType(JAR)
+          // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
+          .setClassifier(artifactType.equals(ArtifactType.PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
+          .build();
     }
   }
 }
