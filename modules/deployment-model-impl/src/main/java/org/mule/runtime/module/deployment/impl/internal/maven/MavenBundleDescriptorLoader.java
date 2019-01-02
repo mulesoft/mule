@@ -11,11 +11,17 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
@@ -177,19 +183,30 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
     @Override
     public BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
       Model model;
-      if (artifactFile.isDirectory()) {
-        model = mavenClient.getEffectiveModel(artifactFile, empty());
+
+      // Only user defined artifacts could support properties place holder and require to resolve an effective pom. Services are kind of
+      // mixed packaging where they have a heavy packaging but still pom.xml has to be read to retrieve the bundle descriptor data.
+      if (artifactType.equals(APP) || artifactType.equals(DOMAIN) || artifactType.equals(POLICY) || artifactType.equals(PLUGIN)) {
+        if (artifactFile.isDirectory()) {
+          model = mavenClient.getEffectiveModel(artifactFile, empty());
+        } else {
+          model = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
+        }
       } else {
-        model = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
+        if (artifactFile.isDirectory()) {
+          model = getPomModelFolder(artifactFile);
+        } else {
+          model = getPomModelFromJar(artifactFile);
+        }
       }
 
       return new BundleDescriptor.Builder()
           .setArtifactId(model.getArtifactId())
-          .setGroupId(model.getGroupId())
-          .setVersion(model.getVersion())
+          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
           .setType(JAR)
           // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
-          .setClassifier(artifactType.equals(ArtifactType.PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
+          .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
           .build();
     }
   }
