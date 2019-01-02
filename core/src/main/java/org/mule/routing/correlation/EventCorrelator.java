@@ -74,6 +74,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     // @GuardedBy groupsLock
     protected ObjectStore<Long> processedGroups = null;
 
+    protected static int processedMessage = 0;
+
     private long timeout = -1; // undefined
 
     private boolean failOnTimeout = true;
@@ -158,7 +160,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        final String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
+        String groupId = messageInfoMapping.getCorrelationId(event.getMessage()) + processedMessage;
 
         if (logger.isTraceEnabled())
         {
@@ -197,9 +199,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             // no invalid storage of the group in the correlation map is performed.
             try
             {
-                if (isGroupAlreadyProcessed(groupId + event.getId()))
+                if (isGroupAlreadyProcessed(groupId))
                 {
-                    fireMissedAggregationGroupEvent(event, groupId + event.getId());
+                    fireMissedAggregationGroupEvent(event, groupId);
                     return null;
                 }
             }
@@ -273,27 +275,15 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                         {
                             returnEvent.getMessage().setMessageRootId(rootId);
                         }
+                        returnEvent.getMessage().setCorrelationId(groupId);
 
-                        try
-                        {
-                            if (isGroupAlreadyProcessed(groupId))
-                            {
-                                returnEvent.getMessage().setCorrelationId(groupId + event.getId());
-                            }
-                            else
-                            {
-                                returnEvent.getMessage().setCorrelationId(groupId);
-                            }
-                        }
-                        catch (ObjectStoreException e){
-                            returnEvent.getMessage().setCorrelationId(groupId);
-                        }
                     }
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate
                     try
                     {
+
                         this.removeEventGroup(group);
                         group.clear();
                     }
@@ -301,7 +291,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     {
                         throw new RoutingException(event, timeoutMessageProcessor, e);
                     }
-
+                    processedMessage++;
                     return returnEvent;
                 }
                 else
