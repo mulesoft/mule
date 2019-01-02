@@ -39,9 +39,9 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   private org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
 
-  public HeavyweightClassLoaderModelBuilder(File applicationFolder,
+  public HeavyweightClassLoaderModelBuilder(File applicationFolder, BundleDescriptor artifactBundleDescriptor,
                                             org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
-    super(applicationFolder);
+    super(applicationFolder, artifactBundleDescriptor);
     this.packagerClassLoaderModel = packagerClassLoaderModel;
   }
 
