@@ -14,17 +14,20 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
@@ -33,11 +36,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import java.io.File;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
 
 public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
@@ -55,8 +60,20 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
+    BundleDescriptorLoader bundleDescriptorLoaderMock = mock(BundleDescriptorLoader.class);
+    when(bundleDescriptorLoaderMock.supportsArtifactType(ArtifactType.SERVICE)).thenReturn(true);
+    when(bundleDescriptorLoaderMock.load(Mockito.any(File.class), Mockito.any(Map.class), eq(ArtifactType.SERVICE)))
+        .thenReturn(new BundleDescriptor.Builder()
+            .setGroupId("mockGroupId")
+            .setArtifactId("mockArtifactId")
+            .setVersion("1.0.0")
+            .setClassifier("mule-service")
+            .setType("jar")
+            .build());
+
+
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(BundleDescriptorLoader.class))))
-        .thenReturn(mock(BundleDescriptorLoader.class));
+        .thenReturn(bundleDescriptorLoaderMock);
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderModelLoader.class))))
         .thenReturn(mock(ClassLoaderModelLoader.class));
 

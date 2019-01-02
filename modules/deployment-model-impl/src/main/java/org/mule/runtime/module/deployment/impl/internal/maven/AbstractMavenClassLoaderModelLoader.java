@@ -134,7 +134,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     File deployableArtifactRepositoryFolder = getDeployableArtifactRepositoryFolder(artifactFile);
 
     final ArtifactClassLoaderModelBuilder classLoaderModelBuilder =
-        newHeavyWeightClassLoaderModelBuilder(artifactFile, packagerClassLoaderModel, attributes);
+        newHeavyWeightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
+                                              packagerClassLoaderModel, attributes);
     classLoaderModelBuilder
         .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
         .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -255,7 +256,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
           .map(this::convertBundleDependency).collect(Collectors.toSet());
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-          newLightweightClassLoaderModelBuilder(artifactFile, mavenClient, attributes, nonProvidedDependencies);
+              newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
+                                                    mavenClient, attributes, nonProvidedDependencies);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -277,11 +279,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   }
 
   protected abstract LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
+                                                                                              BundleDescriptor bundleDescriptor,
                                                                                               MavenClient mavenClient,
                                                                                               Map<String, Object> attributes,
                                                                                               Set<BundleDependency> nonProvidedDependencies);
 
   protected abstract HeavyweightClassLoaderModelBuilder newHeavyWeightClassLoaderModelBuilder(File artifactFile,
+                                                                                              BundleDescriptor artifactBundleDescriptor,
                                                                                               org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                                                               Map<String, Object> attributes);
 

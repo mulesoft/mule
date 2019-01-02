@@ -20,20 +20,19 @@ import static org.mule.tck.SimpleUnitTestSupportSchedulerService.UNIT_TEST_THREA
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.test.petstore.extension.PetStoreOperationsWithFailures.getConnectionThreads;
 import static org.mule.test.petstore.extension.PetStoreOperationsWithFailures.resetConnectionThreads;
-
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Set;
 
 public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExtensionFunctionalTestCase {
 

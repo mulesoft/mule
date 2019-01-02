@@ -52,9 +52,9 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   private Set<BundleDependency> nonProvidedDependencies;
   private File temporaryFolder;
 
-  public LightweightClassLoaderModelBuilder(File artifactFolder,
+  public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
                                             MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies) {
-    super(artifactFolder);
+    super(artifactFolder, artifactBundleDescriptor);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;
     File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
