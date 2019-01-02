@@ -17,7 +17,6 @@ import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMav
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.getBundleDescriptor;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
@@ -71,9 +70,10 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   protected DeployableArtifactDescriptor deployableArtifactDescriptor;
   protected BundleDescriptor artifactBundleDescriptor;
 
-  public ArtifactClassLoaderModelBuilder(File artifactFolder) {
+  public ArtifactClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor) {
     requireNonNull(artifactFolder, "artifactFolder cannot be null");
-    this.artifactBundleDescriptor = getBundleDescriptor(artifactFolder);
+    requireNonNull(artifactBundleDescriptor, "artifactBundleDescriptor cannot be null");
+    this.artifactBundleDescriptor = artifactBundleDescriptor;
     this.artifactFolder = artifactFolder;
   }
 

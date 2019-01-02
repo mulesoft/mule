@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static java.lang.System.lineSeparator;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 
 import com.vdurmont.semver4j.Semver;
 
@@ -31,14 +35,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-import static java.lang.System.lineSeparator;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 
 /**
  * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} responsible of resolving dependencies
@@ -53,10 +52,9 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   private Set<BundleDependency> nonProvidedDependencies;
   private File temporaryFolder;
 
-  public LightweightClassLoaderModelBuilder(File artifactFolder,
-                                            MavenClient mavenClient,
-                                            Set<BundleDependency> nonProvidedDependencies) {
-    super(artifactFolder);
+  public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
+                                            MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies) {
+    super(artifactFolder, artifactBundleDescriptor);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;
     File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
