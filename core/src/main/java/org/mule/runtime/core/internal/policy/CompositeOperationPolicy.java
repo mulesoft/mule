@@ -24,11 +24,10 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import cn.danielw.fop.ObjectFactory;
 import cn.danielw.fop.ObjectPool;
@@ -58,8 +56,6 @@ import reactor.core.publisher.MonoSink;
 public class CompositeOperationPolicy
     extends AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationExecutionFunction>
     implements OperationPolicy, Disposable {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(CompositeOperationPolicy.class);
 
   private static final String POLICY_OPERATION_NEXT_OPERATION_RESPONSE = "policy.operation.nextOperationResponse";
   public static final String POLICY_OPERATION_PARAMETERS_PROCESSOR = "policy.operation.parametersProcessor";
@@ -112,10 +108,10 @@ public class CompositeOperationPolicy
 
     @Override
     public FluxSink<CoreEvent> create() {
-      AtomicReference<FluxSink<CoreEvent>> sinkRef = new AtomicReference<>();
+      final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<CoreEvent> policyFlux =
-          Flux.<CoreEvent>create(sink -> sinkRef.set(sink))
+          Flux.<CoreEvent>create(sinkRef)
               .transform(getExecutionProcessor())
               .doOnNext(result -> {
                 final BaseEventContext childContext = getStoredChildContext(result);
@@ -135,7 +131,7 @@ public class CompositeOperationPolicy
               });
 
       policyFlux.subscribe();
-      return sinkRef.get();
+      return sinkRef.getFluxSink();
     }
 
     @Override
