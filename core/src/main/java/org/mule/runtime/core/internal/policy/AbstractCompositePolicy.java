@@ -62,7 +62,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
    * in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation
    * execution.
    */
-  public final ReactiveProcessor getPolicyProcessor() {
+  private final ReactiveProcessor getPolicyProcessor() {
     List<Function<ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
     for (Policy policy : parameterizedPolicies) {
       interceptors.add(next -> eventPub -> from(applyPolicy(policy, next, eventPub))
