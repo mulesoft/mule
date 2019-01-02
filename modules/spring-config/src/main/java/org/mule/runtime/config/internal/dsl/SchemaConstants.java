@@ -21,7 +21,7 @@ public final class SchemaConstants {
   public static final String XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
   public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
   public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION =
-      "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
+      "http://www.springframework.org/schema/beans/spring-beans.xsd";
   public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
   public static final String EE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd";
 
