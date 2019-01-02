@@ -256,8 +256,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
           .map(this::convertBundleDependency).collect(Collectors.toSet());
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-              newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
-                                                    mavenClient, attributes, nonProvidedDependencies);
+          newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
+                                                mavenClient, attributes, nonProvidedDependencies);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
