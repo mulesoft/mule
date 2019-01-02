@@ -128,7 +128,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.petstore.extension.PetCage"
               },
               "hasDynamicType": false,
@@ -203,7 +202,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.petstore.extension.Aquarium"
               },
               "hasDynamicType": false,
@@ -2275,7 +2273,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.petstore.extension.PetCage"
             },
             "hasDynamicType": false,
@@ -2399,7 +2396,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.petstore.extension.PetStoreClient"
             },
             "hasDynamicType": false,
@@ -2680,7 +2676,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.petstore.extension.PetStoreClient"
             },
             "hasDynamicType": false,
@@ -3066,7 +3061,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.petstore.extension.PetStoreConnector"
             },
             "hasDynamicType": false,
@@ -8895,7 +8889,6 @@
                 },
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
                   },
                   "hasDynamicType": false,
@@ -10138,7 +10131,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.petstore.extension.Aquarium"
         },
         "hasDynamicType": false,
@@ -10177,7 +10169,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.petstore.extension.Aquarium"
               },
               "hasDynamicType": false,
@@ -10304,7 +10295,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.petstore.extension.ExclusivePetBreeder"
         },
         "hasDynamicType": false,
@@ -10505,7 +10495,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.petstore.extension.ExclusiveCashier"
         },
         "hasDynamicType": false,
@@ -11492,7 +11481,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.petstore.extension.PhoneNumber"
               },
               "hasDynamicType": false,
@@ -12233,7 +12221,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.petstore.extension.PetStoreDeal"
         },
         "hasDynamicType": false,
@@ -12272,7 +12259,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.petstore.extension.PetStoreDeal"
               },
               "hasDynamicType": false,
@@ -12814,7 +12800,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.petstore.extension.PhoneNumber"
               },
               "hasDynamicType": false,
@@ -18728,7 +18713,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
               },
               "hasDynamicType": false,
@@ -19101,7 +19085,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
               },
               "hasDynamicType": false,
@@ -19474,7 +19457,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
               },
               "hasDynamicType": false,

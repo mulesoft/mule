@@ -15,44 +15,36 @@
   "subTypes": [
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.Square"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.Triangle"
         }
       ]
     },
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.subtypes.extension.Door"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.HouseDoor"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.CarDoor"
         }
       ]
     },
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.Revolver"
         }
       ]
@@ -367,7 +359,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
               },
               "hasDynamicType": false,
@@ -394,7 +385,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Door"
               },
               "hasDynamicType": false,
@@ -421,7 +411,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Square"
               },
               "hasDynamicType": false,
@@ -448,7 +437,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.FinalPojo"
               },
               "hasDynamicType": false,
@@ -475,7 +463,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
               },
               "hasDynamicType": false,
@@ -502,7 +489,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
               },
               "hasDynamicType": false,
@@ -529,7 +515,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
               },
               "hasDynamicType": false,
@@ -556,7 +541,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ExtensiblePojo"
               },
               "hasDynamicType": false,
@@ -910,7 +894,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.subtypes.extension.SubTypesMappingConnector"
             },
             "hasDynamicType": true,
@@ -1043,7 +1026,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.subtypes.extension.SubTypesConnectorConnection"
             },
             "hasDynamicType": true,
@@ -1347,7 +1329,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
                   },
                   "hasDynamicType": false,
@@ -1374,7 +1355,6 @@
                 },
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.subtypes.extension.Door"
                   },
                   "hasDynamicType": false,
@@ -1666,7 +1646,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.Door"
         },
         "hasDynamicType": true,
@@ -1705,7 +1684,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Door"
               },
               "hasDynamicType": false,
@@ -1841,7 +1819,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.NoGlobalPojo"
         },
         "hasDynamicType": true,
@@ -1880,7 +1857,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.NoGlobalPojo"
               },
               "hasDynamicType": false,
@@ -2097,7 +2073,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Door"
               },
               "hasDynamicType": false,
@@ -2281,7 +2256,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
         },
         "hasDynamicType": true,
@@ -2320,7 +2294,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
               },
               "hasDynamicType": false,
@@ -2535,7 +2508,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
               },
               "hasDynamicType": false,
@@ -2562,7 +2534,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Door"
               },
               "hasDynamicType": false,
@@ -2589,7 +2560,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.FinalPojo"
               },
               "hasDynamicType": false,
@@ -2616,7 +2586,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.VeganCookBook"
               },
               "hasDynamicType": false,
@@ -2643,7 +2612,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
               },
               "hasDynamicType": false,
@@ -2670,7 +2638,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
               },
               "hasDynamicType": false,
@@ -2697,7 +2664,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.NoReferencePojo"
               },
               "hasDynamicType": false,
@@ -2849,7 +2815,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
               },
               "hasDynamicType": false,
@@ -2876,7 +2841,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Door"
               },
               "hasDynamicType": false,
@@ -3177,7 +3141,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.tck.message.StringAttributes"
         },
         "hasDynamicType": false,
@@ -3207,7 +3170,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.subtypes.extension.Door"
               },
               "hasDynamicType": false,

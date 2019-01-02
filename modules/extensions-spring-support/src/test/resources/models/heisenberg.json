@@ -17,40 +17,33 @@
   "subTypes": [
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
         }
       ]
     },
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.drugs.Drug"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.drugs.Meta"
         }
       ]
     },
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.Investment"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.CarWash"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.CarDealer"
         }
       ]
@@ -479,7 +472,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
               },
               "hasDynamicType": false,
@@ -1093,7 +1085,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
               },
               "hasDynamicType": false,
@@ -3165,7 +3156,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.heisenberg.extension.model.BarberPreferences"
             },
             "hasDynamicType": false,
@@ -3555,7 +3545,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.heisenberg.extension.HeisenbergConnection"
             },
             "hasDynamicType": false,
@@ -3847,7 +3836,6 @@
           },
           "outputAttributes": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.heisenberg.extension.model.types.IntegerAttributes"
             },
             "hasDynamicType": false,
@@ -9462,7 +9450,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
                     },
                     "hasDynamicType": false,
@@ -9854,7 +9841,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.Methylamine"
                     },
                     "hasDynamicType": false,
@@ -9970,7 +9956,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
                     },
                     "hasDynamicType": false,
@@ -11354,7 +11339,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
                     },
                     "hasDynamicType": false,
@@ -11749,7 +11733,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.Methylamine"
                     },
                     "hasDynamicType": false,
@@ -11865,7 +11848,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
                     },
                     "hasDynamicType": false,
@@ -13296,7 +13278,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
                     },
                     "hasDynamicType": false,
@@ -13691,7 +13672,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.Methylamine"
                     },
                     "hasDynamicType": false,
@@ -13807,7 +13787,6 @@
                   },
                   {
                     "type": {
-                      "format": "java",
                       "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
                     },
                     "hasDynamicType": false,
@@ -15627,7 +15606,6 @@
       "executionType": "CPU_INTENSIVE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.Investment"
         },
         "hasDynamicType": false,
@@ -15662,7 +15640,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Investment"
               },
               "hasDynamicType": false,
@@ -15689,7 +15666,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.RecursivePojo"
               },
               "hasDynamicType": false,
@@ -15716,7 +15692,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.RecursiveChainB"
               },
               "hasDynamicType": false,
@@ -15743,7 +15718,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.RecursiveChainA"
               },
               "hasDynamicType": false,
@@ -15967,7 +15941,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
               },
               "hasDynamicType": false,
@@ -18893,7 +18866,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.BarberPreferences"
         },
         "hasDynamicType": false,
@@ -19100,7 +19072,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
         },
         "hasDynamicType": false,
@@ -21050,7 +21021,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
               },
               "hasDynamicType": false,
@@ -21114,7 +21084,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes"
               },
               "hasDynamicType": false,
@@ -21285,7 +21254,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
               },
               "hasDynamicType": false,
@@ -23133,7 +23101,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
         },
         "hasDynamicType": true,
@@ -23168,7 +23135,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
               },
               "hasDynamicType": false,
@@ -23731,7 +23697,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
         },
         "hasDynamicType": true,
@@ -23766,7 +23731,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
               },
               "hasDynamicType": false,
@@ -24671,7 +24635,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.runtime.api.store.ObjectStore"
               },
               "hasDynamicType": false,
@@ -27822,7 +27785,6 @@
     {
       "notification": "HEISENBERG:BATCH_DELIVERY_FAILED",
       "metadataType": {
-        "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
       }
     },
@@ -27877,14 +27839,12 @@
     {
       "notification": "HEISENBERG:KNOCKING_DOOR",
       "metadataType": {
-        "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
       }
     },
     {
       "notification": "HEISENBERG:KNOCKED_DOOR",
       "metadataType": {
-        "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
       }
     }

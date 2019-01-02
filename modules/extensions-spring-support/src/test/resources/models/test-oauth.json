@@ -320,7 +320,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.oauth.TestOAuthConnection"
             },
             "hasDynamicType": false,

@@ -32,7 +32,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.substitutiongroup.extension.SomePojo"
               },
               "hasDynamicType": false,
@@ -59,7 +58,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.substitutiongroup.extension.MuleSGPojo"
               },
               "hasDynamicType": false,

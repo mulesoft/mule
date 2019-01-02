@@ -15,16 +15,13 @@
   "subTypes": [
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.RottenFood"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
         }
       ]
@@ -185,7 +182,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
               },
               "hasDynamicType": false,
@@ -239,7 +235,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.VeganCookBook"
               },
               "hasDynamicType": false,
@@ -826,7 +821,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
             },
             "hasDynamicType": false,
@@ -865,7 +859,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
                   },
                   "hasDynamicType": false,
@@ -2027,7 +2020,6 @@
           "runsOnPrimaryNodeOnly": false,
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Fruit"
             },
             "hasDynamicType": true,
@@ -2359,7 +2351,6 @@
           },
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Apple"
             },
             "hasDynamicType": true,
@@ -2368,7 +2359,6 @@
           },
           "outputAttributes": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.vegan.extension.HarvestApplesAttributes"
             },
             "hasDynamicType": false,
@@ -2532,7 +2522,6 @@
                 },
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.GroupedFood"
                   },
                   "hasDynamicType": false,
@@ -2753,7 +2742,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
                   },
                   "hasDynamicType": false,
@@ -2795,7 +2783,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
                   },
                   "hasDynamicType": false,
@@ -2821,7 +2808,6 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty": {
                       "defaultType": {
-                        "format": "java",
                         "type": "@ref:org.mule.test.vegan.extension.RottenFood"
                       }
                     }
@@ -2984,7 +2970,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
               },
               "hasDynamicType": false,
@@ -3038,7 +3023,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
               },
               "hasDynamicType": false,
@@ -3200,7 +3184,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Banana"
             },
             "hasDynamicType": false,
@@ -3481,7 +3464,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Banana"
             },
             "hasDynamicType": false,
@@ -3520,7 +3502,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.tck.testmodels.fruit.Banana"
                   },
                   "hasDynamicType": false,
@@ -3647,7 +3628,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.vegan.extension.BananaConfig"
             },
             "hasDynamicType": false,
@@ -3771,7 +3751,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
             },
             "hasDynamicType": false,
@@ -3810,7 +3789,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
                   },
                   "hasDynamicType": false,
@@ -3937,7 +3915,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Fruit"
             },
             "hasDynamicType": true,
@@ -5148,7 +5125,6 @@
           "runsOnPrimaryNodeOnly": false,
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Fruit"
             },
             "hasDynamicType": true,
@@ -5564,7 +5540,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.vegan.extension.VeganPolicy"
             },
             "hasDynamicType": false,
@@ -5859,7 +5834,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.VeganPolicy"
                   },
                   "hasDynamicType": false,
@@ -6113,7 +6087,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Kiwi"
             },
             "hasDynamicType": false,
@@ -6844,7 +6817,6 @@
           },
           "outputAttributes": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.message.StringAttributes"
             },
             "hasDynamicType": false,
@@ -7489,7 +7461,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.VeganPolicy"
         },
         "hasDynamicType": false,
@@ -7528,7 +7499,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.VeganPolicy"
               },
               "hasDynamicType": false,
@@ -7760,7 +7730,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.GroupedFood"
               },
               "hasDynamicType": false,
@@ -7802,7 +7771,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
               },
               "hasDynamicType": false,
@@ -7828,7 +7796,6 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty": {
                   "defaultType": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.RottenFood"
                   }
                 }
@@ -8262,7 +8229,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.tck.testmodels.fruit.WaterMelon"
         },
         "hasDynamicType": false,
@@ -8301,7 +8267,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.tck.testmodels.fruit.WaterMelon"
               },
               "hasDynamicType": false,
@@ -8665,7 +8630,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
         },
         "hasDynamicType": true,
@@ -8704,7 +8668,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
               },
               "hasDynamicType": false,
@@ -8885,7 +8848,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
         },
         "hasDynamicType": true,
@@ -8924,7 +8886,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
               },
               "hasDynamicType": false,
@@ -8950,7 +8911,6 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty": {
                   "defaultType": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
                   }
                 }

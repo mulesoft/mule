@@ -41,15 +41,12 @@
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.ram.MiniverseDispatcherProvider"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.ram.DefaultPortalGunDispatcherProvider"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.ram.TestHttpMessageDispatcherProvider"
         }
       ]

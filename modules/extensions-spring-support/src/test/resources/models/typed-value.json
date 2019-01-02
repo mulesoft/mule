@@ -84,7 +84,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"
               },
               "hasDynamicType": false,
@@ -246,7 +245,6 @@
           "executionType": "CPU_LITE",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.typed.value.extension.extension.TypedValueExtension"
             },
             "hasDynamicType": false,
@@ -685,7 +683,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.typed.value.extension.extension.SimplePojo"
               },
               "hasDynamicType": false,
@@ -712,7 +709,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.typed.value.extension.extension.SimplePojo"
               },
               "hasDynamicType": false,
@@ -1658,7 +1654,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"
         },
         "hasDynamicType": false,
@@ -1697,7 +1692,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"
               },
               "hasDynamicType": false,
@@ -2240,7 +2234,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
         },
         "hasDynamicType": false,
@@ -2279,7 +2272,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
               },
               "hasDynamicType": false,
@@ -2406,7 +2398,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.VeganProductInformation"
         },
         "hasDynamicType": false,

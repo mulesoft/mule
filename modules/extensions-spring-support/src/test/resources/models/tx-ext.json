@@ -192,7 +192,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.transactional.connection.TestTransactionalConnection"
             },
             "hasDynamicType": true,
@@ -1717,7 +1716,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.transactional.connection.TestTransactionalConnection"
                   },
                   "hasDynamicType": false,
@@ -3471,7 +3469,6 @@
           },
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.transactional.connection.TestTransactionalConnection"
             },
             "hasDynamicType": true,

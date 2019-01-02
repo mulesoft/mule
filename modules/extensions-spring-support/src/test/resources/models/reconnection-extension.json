@@ -428,7 +428,6 @@
           "runsOnPrimaryNodeOnly": false,
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.extension.test.extension.reconnection.ReconnectableConnection"
             },
             "hasDynamicType": false,

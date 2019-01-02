@@ -15,56 +15,46 @@
   "subTypes": [
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.animals.Bear"
         }
       ]
     },
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.metadata.extension.model.shapes.Shape"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.shapes.Circle"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.shapes.Rectangle"
         }
       ]
     },
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes"
         },
         {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes"
         }
       ]
     },
     {
       "baseType": {
-        "format": "java",
         "type": "@ref:org.mule.test.metadata.extension.model.shapes.Rectangle"
       },
       "subTypes": [
         {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.shapes.Square"
         }
       ]
@@ -8800,7 +8790,6 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
                     "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
                   },
                   "hasDynamicType": false,
@@ -10402,7 +10391,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.metadata.extension.LocationKey"
             },
             "hasDynamicType": false,
@@ -10868,7 +10856,6 @@
             },
             "metadataKeyId": {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.LocationKey"
               },
               "parameterName": "key",
@@ -11660,7 +11647,6 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.test.metadata.extension.LocationKey"
             },
             "hasDynamicType": false,
@@ -12126,7 +12112,6 @@
             },
             "metadataKeyId": {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.LocationKey"
               },
               "parameterName": "key",
@@ -12474,7 +12459,6 @@
           },
           "outputAttributes": {
             "type": {
-              "format": "java",
               "type": "@ref:org.mule.tck.message.StringAttributes"
             },
             "hasDynamicType": false,
@@ -13220,7 +13204,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.model.animals.Bear"
               },
               "hasDynamicType": true,
@@ -13281,7 +13264,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "csv",
           "type": "@ref:csv-object"
         },
         "hasDynamicType": false,
@@ -13290,7 +13272,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "json",
           "type": "@ref:json-object"
         },
         "hasDynamicType": false,
@@ -13405,7 +13386,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:custom-java"
         },
         "hasDynamicType": false,
@@ -13444,7 +13424,6 @@
           "parameters": [
             {
               "type": {
-                "format": "json",
                 "type": "@ref:json-object"
               },
               "hasDynamicType": false,
@@ -13610,7 +13589,6 @@
           "parameters": [
             {
               "type": {
-                "format": "json",
                 "type": "@ref:json-object"
               },
               "hasDynamicType": false,
@@ -13737,7 +13715,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "csv",
           "type": "@ref:csv-object"
         },
         "hasDynamicType": false,
@@ -13924,7 +13901,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.tck.testmodels.fruit.Banana"
         },
         "hasDynamicType": false,
@@ -14969,7 +14945,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.shops.Dessert"
         },
         "hasDynamicType": false,
@@ -15170,7 +15145,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.shops.Order"
         },
         "hasDynamicType": false,
@@ -15209,7 +15183,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.model.shops.Order"
               },
               "hasDynamicType": false,
@@ -17200,7 +17173,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.tck.message.StringAttributes"
         },
         "hasDynamicType": false,
@@ -17681,7 +17653,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.shapes.Shape"
         },
         "hasDynamicType": false,
@@ -17690,7 +17661,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
         },
         "hasDynamicType": false,
@@ -17833,7 +17803,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
         },
         "hasDynamicType": true,
@@ -19067,7 +19036,6 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.model.shapes.Shape"
               },
               "hasDynamicType": false,
@@ -19094,7 +19062,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.model.shapes.Rectangle"
               },
               "hasDynamicType": false,
@@ -19121,7 +19088,6 @@
             },
             {
               "type": {
-                "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
               },
               "hasDynamicType": false,
@@ -19274,7 +19240,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "xml",
           "type": "@ref:shiporder"
         },
         "hasDynamicType": false,
@@ -19389,7 +19354,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "xml",
           "type": "@ref:shiporder"
         },
         "hasDynamicType": false,
@@ -19428,7 +19392,6 @@
           "parameters": [
             {
               "type": {
-                "format": "xml",
                 "type": "@ref:shiporder"
               },
               "hasDynamicType": false,
@@ -19555,7 +19518,6 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "xml",
           "type": "@ref:shiporder"
         },
         "hasDynamicType": false,
@@ -20218,7 +20180,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.tck.message.StringAttributes"
         },
         "hasDynamicType": false,
@@ -20571,7 +20532,6 @@
         },
         "metadataKeyId": {
           "type": {
-            "format": "java",
             "type": "@ref:org.mule.test.metadata.extension.LocationKey"
           },
           "parameterName": "Location",
@@ -20589,7 +20549,6 @@
             "parameters": [
               {
                 "type": {
-                  "format": "xml",
                   "type": "@ref:shiporder"
                 },
                 "hasDynamicType": false,
@@ -20725,7 +20684,6 @@
       },
       "output": {
         "type": {
-          "format": "java",
           "type": "@ref:custom-java"
         },
         "hasDynamicType": false,
@@ -20734,7 +20692,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "java",
           "type": "@ref:org.mule.tck.message.StringAttributes"
         },
         "hasDynamicType": false,
@@ -20965,7 +20922,6 @@
       "runsOnPrimaryNodeOnly": false,
       "output": {
         "type": {
-          "format": "xml",
           "type": "@ref:shiporder"
         },
         "hasDynamicType": false,
@@ -20974,7 +20930,6 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "xml",
           "type": "@ref:shiporder"
         },
         "hasDynamicType": false,
