@@ -16,12 +16,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntUnaryOperator;
-import java.util.function.Supplier;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -35,6 +29,12 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntUnaryOperator;
+import java.util.function.Supplier;
 
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
@@ -65,7 +65,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                        () -> muleContext.getSchedulerService()
                                                            .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                                .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                       () -> RETRY_SUPPORT_SCHEDULER_PROVIDER.get(muleContext),
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck());
@@ -92,13 +91,12 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                    Supplier<Scheduler> blockingSchedulerSupplier,
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                   Supplier<Scheduler> retrySupportSchedulerSupplier,
                                                    int parallelism,
                                                    int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, retrySupportSchedulerSupplier, parallelism, maxConcurrency,
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
             maxConcurrencyEagerCheck);
     }
 

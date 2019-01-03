@@ -93,7 +93,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                        () -> cpuLight,
                                                        () -> blocking,
                                                        () -> cpuIntensive,
-                                                       () -> custom,
                                                        CORES,
                                                        maxConcurrency, true);
   }
@@ -252,7 +251,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     () -> cpuLight,
                                                                                                     () -> rejectingSchedulerSpy,
                                                                                                     () -> cpuIntensive,
-                                                                                                    () -> custom,
                                                                                                     1,
                                                                                                     2, true))
         .build();
@@ -282,7 +280,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> rejectingSchedulerSpy,
-                                                                                                    () -> custom,
                                                                                                     1,
                                                                                                     2, true))
         .build();
@@ -310,7 +307,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
-                                                                                                    () -> custom,
                                                                                                     CORES,
                                                                                                     1, true)),
                        true, CPU_LITE, 1);
@@ -332,7 +328,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
-                                                                                                    () -> custom,
                                                                                                     CORES,
                                                                                                     2, true)),
                        true, CPU_LITE, 2);
@@ -354,7 +349,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
-                                                                                                    () -> custom,
                                                                                                     CORES,
                                                                                                     1, true)),
                        true, BLOCKING, 1);
@@ -376,7 +370,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
-                                                                                                    () -> custom,
                                                                                                     1,
                                                                                                     2, true)),
                        true, BLOCKING, 2);
@@ -426,7 +419,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
-                                                                                                    () -> custom,
                                                                                                     4,
                                                                                                     2, true))
         .processors(blockingProcessor)

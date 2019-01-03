@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
@@ -23,9 +22,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-
 import java.util.function.Supplier;
 
 
@@ -39,18 +35,6 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProcessingStrategyFactory {
-
-  protected static final LoadingCache<MuleContext, Scheduler> RETRY_SUPPORT_SCHEDULER_PROVIDER =
-      newBuilder().weakKeys()
-          .removalListener((MuleContext key, Scheduler value, RemovalCause cause) -> value.stop())
-          .<MuleContext, Scheduler>build(mCtx -> {
-            Scheduler retrySupportScheduler = mCtx.getSchedulerService()
-                .customScheduler(mCtx.getSchedulerBaseConfig()
-                    .withName("retrySupport")
-                    .withMaxConcurrentTasks(1));
-
-            return retrySupportScheduler;
-          });
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
