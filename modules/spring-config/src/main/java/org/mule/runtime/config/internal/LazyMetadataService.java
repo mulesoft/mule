@@ -39,8 +39,6 @@ import java.util.function.Supplier;
  */
 public class LazyMetadataService implements MetadataService, Initialisable {
 
-  public static final String NON_LAZY_METADATA_SERVICE = "_muleNonLazyMetadataService";
-
   private final LazyMuleArtifactContext lazyMuleArtifactContext;
   private final Supplier<MetadataService> metadataServiceSupplier;
 
