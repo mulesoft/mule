@@ -10,10 +10,11 @@
 
     <flow name="splitter">
         <collection-splitter/>
-        <collection-aggregator timeout="2000" failOnTimeout="false" persistentStores="false"/>
+        <collection-aggregator/>
         <collection-splitter/>
-        <collection-aggregator timeout="2000" failOnTimeout="false" persistentStores="false"/>
+        <collection-aggregator/>
         <vm:outbound-endpoint path="out" exchange-pattern="one-way" connector-ref="queue"/>
+
     </flow>
 
     <flow name="splitter2">

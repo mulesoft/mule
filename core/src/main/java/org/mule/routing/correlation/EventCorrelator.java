@@ -10,7 +10,9 @@ import static org.mule.MessageExchangePattern.ONE_WAY;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -74,8 +76,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     // @GuardedBy groupsLock
     protected ObjectStore<Long> processedGroups = null;
 
-    protected static int processedMessage = 0;
-
     private long timeout = -1; // undefined
 
     private boolean failOnTimeout = true;
@@ -87,6 +87,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     private EventCorrelatorCallback callback;
 
     private MessageProcessor timeoutMessageProcessor;
+
+    private static int processedMessages = -1;
 
     /**
      * A map of EventGroup objects in a partition. These represent one or more messages to be agregated, keyed by
@@ -160,7 +162,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        String groupId = messageInfoMapping.getCorrelationId(event.getMessage()) + processedMessage;
+        String groupId = messageInfoMapping.getCorrelationId(event.getMessage()) + ((processedMessages >= 0) ? processedMessages : "");
 
         if (logger.isTraceEnabled())
         {
@@ -199,9 +201,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             // no invalid storage of the group in the correlation map is performed.
             try
             {
-                if (isGroupAlreadyProcessed(groupId))
+                if (isGroupAlreadyProcessed(groupId +  ((processedMessages >= 0) ? processedMessages : "")))
                 {
-                    fireMissedAggregationGroupEvent(event, groupId);
+                    fireMissedAggregationGroupEvent(event, groupId +  ((processedMessages >= 0) ? processedMessages : ""));
                     return null;
                 }
             }
@@ -270,20 +272,19 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     }
                     if (returnEvent != null && !returnEvent.equals(VoidMuleEvent.getInstance()))
                     {
+                        returnEvent.getMessage().setCorrelationId(groupId);
+
                         String rootId = group.getCommonRootId();
                         if (rootId != null)
                         {
                             returnEvent.getMessage().setMessageRootId(rootId);
                         }
-                        returnEvent.getMessage().setCorrelationId(groupId);
-
                     }
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate
                     try
                     {
-
                         this.removeEventGroup(group);
                         group.clear();
                     }
@@ -291,7 +292,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     {
                         throw new RoutingException(event, timeoutMessageProcessor, e);
                     }
-                    processedMessage++;
+
+                    processedMessages++;
+
                     return returnEvent;
                 }
                 else
