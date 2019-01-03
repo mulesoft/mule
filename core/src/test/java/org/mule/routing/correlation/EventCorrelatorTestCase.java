@@ -51,7 +51,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
 
     public static final String OBJECT_STOR_NAME_PREFIX = "prefix";
     public static final String TEST_GROUP_ID = "groupId";
-    private static int processedMessage = -1;
     public static final boolean USE_PERSISTENT_STORE = false;
 
     private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
@@ -85,7 +84,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         try
         {
             EventCorrelator eventCorrelator = createEventCorrelator();
-            eventCorrelator.forceGroupExpiry(getTestGroupId());
+            eventCorrelator.forceGroupExpiry(TEST_GROUP_ID);
         }
         finally
         {
@@ -104,7 +103,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Test
     public void initAfterDeserializationAfterProcess() throws Exception
     {
-        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(getNewTestGroupId());
+        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.process(mockMuleEvent);
@@ -121,7 +120,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Test
     public void whenCollectionIsAggregatedInAVoidMessageTheReturnMessageIsHandledSuccessfully() throws Exception
     {
-        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(getTestGroupId());
+        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(true);
         when(mockEventCorrelatorCallback.aggregateEvents(mockEventGroup)).thenReturn(VoidMuleEvent.getInstance());
         EventCorrelator eventCorrelator = createEventCorrelator();
@@ -155,7 +154,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockMuleContext.isPrimaryPollingInstance()).thenReturn(primaryNode);
 
         EventCorrelator eventCorrelator = createEventCorrelator();
-        when(mockEventCorrelatorCallback.createEventGroup(mockMuleEvent, getTestGroupId())).thenReturn(mockEventGroup);
+        when(mockEventCorrelatorCallback.createEventGroup(mockMuleEvent, TEST_GROUP_ID)).thenReturn(mockEventGroup);
 
         eventCorrelator.start();
 
@@ -168,7 +167,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
                 {
                     try
                     {
-                        return !memoryObjectStore.contains(getTestGroupId(), "prefix.eventGroups");
+                        return !memoryObjectStore.contains(TEST_GROUP_ID, "prefix.eventGroups");
                     }
                     catch (ObjectStoreException e)
                     {
@@ -225,24 +224,13 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     
     private EventCorrelator createEventCorrelator() throws Exception
     {
-        String groupId = getTestGroupId();
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
-        memoryObjectStore.store(groupId, mockEventGroup, "prefix.eventGroups");
-        when(mockEventGroup.getGroupId()).thenReturn(groupId);
+        memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup, "prefix.eventGroups");
+        when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
         when(mockFlowConstruct.getName()).thenReturn("flowName");
         return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, memoryObjectStore,
                 "prefix", mockProcessedGroups);
-    }
-
-    private String getNewTestGroupId(){
-        String groupId = TEST_GROUP_ID + ((processedMessage >= 0) ? processedMessage : "");
-        processedMessage++;
-        return groupId;
-    }
-
-    private String getTestGroupId() {
-        return TEST_GROUP_ID + ((processedMessage >= 0) ? processedMessage : "");
     }
 
     public interface DisposableListableObjectStore extends ListableObjectStore, Disposable
