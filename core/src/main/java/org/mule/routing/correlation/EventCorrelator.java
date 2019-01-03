@@ -10,9 +10,7 @@ import static org.mule.MessageExchangePattern.ONE_WAY;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -52,7 +50,6 @@ import org.mule.routing.EventProcessingThread;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.lock.LockFactory;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -88,7 +85,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private MessageProcessor timeoutMessageProcessor;
 
-    private static int processedMessages = -1;
+    private static int processedMessages = 0;
 
     /**
      * A map of EventGroup objects in a partition. These represent one or more messages to be agregated, keyed by
@@ -162,7 +159,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        String groupId = messageInfoMapping.getCorrelationId(event.getMessage()) + ((processedMessages >= 0) ? processedMessages : "");
+        final String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
 
         if (logger.isTraceEnabled())
         {
@@ -201,9 +198,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             // no invalid storage of the group in the correlation map is performed.
             try
             {
-                if (isGroupAlreadyProcessed(groupId +  ((processedMessages >= 0) ? processedMessages : "")))
+                if (isGroupAlreadyProcessed(groupId))
                 {
-                    fireMissedAggregationGroupEvent(event, groupId +  ((processedMessages >= 0) ? processedMessages : ""));
+                    fireMissedAggregationGroupEvent(event, groupId);
                     return null;
                 }
             }
@@ -218,7 +215,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 // ..apparently not, so create a new one & add it
                 try
                 {
-                    EventGroup eventGroup = callback.createEventGroup(event, groupId);
+                    EventGroup eventGroup = callback.createEventGroup(event, groupId + processedMessages);
                     eventGroup.initEventsStore(correlatorStore);
                     group = this.addEventGroup(eventGroup);
                 }
@@ -292,9 +289,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     {
                         throw new RoutingException(event, timeoutMessageProcessor, e);
                     }
-
                     processedMessages++;
-
                     return returnEvent;
                 }
                 else
