@@ -6,24 +6,11 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
-import reactor.retry.BackoffDelay;
-
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
 import static java.lang.Integer.getInteger;
 import static java.lang.Long.MAX_VALUE;
+import static java.lang.Long.MIN_VALUE;
 import static java.lang.Math.max;
+import static java.lang.System.nanoTime;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.DataUnit.KB;
@@ -37,6 +24,24 @@ import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+
+import org.slf4j.Logger;
+
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
+import java.util.function.LongUnaryOperator;
+import java.util.function.Supplier;
+
+import reactor.core.publisher.Flux;
+import reactor.retry.BackoffDelay;
+
 public abstract class ProactorStreamProcessingStrategy
     extends ReactorStreamProcessingStrategyFactory.ReactorStreamProcessingStrategy {
 
@@ -44,16 +49,15 @@ public abstract class ProactorStreamProcessingStrategy
       getInteger(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
   private static Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
 
-  private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+  private static long SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+  private static long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
 
   private final Supplier<Scheduler> blockingSchedulerSupplier;
   private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
-  private final Supplier<Scheduler> retrySupportSchedulerSupplier;
   private Scheduler blockingScheduler;
   private Scheduler cpuIntensiveScheduler;
-  private Scheduler retrySupportScheduler;
 
-  private final AtomicInteger retryingCounter = new AtomicInteger();
+  private final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
 
   public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                           int bufferSize,
@@ -62,7 +66,6 @@ public abstract class ProactorStreamProcessingStrategy
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
                                           Supplier<Scheduler> blockingSchedulerSupplier,
                                           Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                          Supplier<Scheduler> retrySupportSchedulerSupplier,
                                           int parallelism,
                                           int maxConcurrency,
                                           boolean maxConcurrencyEagerCheck)
@@ -72,7 +75,6 @@ public abstract class ProactorStreamProcessingStrategy
           maxConcurrency, maxConcurrencyEagerCheck);
     this.blockingSchedulerSupplier = blockingSchedulerSupplier;
     this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
-    this.retrySupportSchedulerSupplier = retrySupportSchedulerSupplier;
   }
 
   @Override
@@ -80,7 +82,6 @@ public abstract class ProactorStreamProcessingStrategy
     super.start();
     this.blockingScheduler = blockingSchedulerSupplier.get();
     this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
-    this.retrySupportScheduler = retrySupportSchedulerSupplier.get();
   }
 
   @Override
@@ -90,9 +91,6 @@ public abstract class ProactorStreamProcessingStrategy
     }
     if (cpuIntensiveScheduler != null) {
       cpuIntensiveScheduler.stop();
-    }
-    if (retrySupportScheduler != null) {
-      retrySupportScheduler.stop();
     }
     super.stop();
   }
@@ -137,15 +135,10 @@ public abstract class ProactorStreamProcessingStrategy
       if (schedulerBusy) {
         LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
                      processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-        retryingCounter.incrementAndGet();
+        lastRetryTimestamp.set(nanoTime());
       }
       return schedulerBusy;
-    }).doOnRetry(ctx -> getRetrySupportScheduler().schedule(() -> {
-      // Eventually cleanup the retrying counter for this one. If it is still retrying, the counter will be increased
-      // again by the retry mechanism.
-      retryingCounter.decrementAndGet();
-    }, SCHEDULER_BUSY_RETRY_INTERVAL_MS * 2, MILLISECONDS))
-        .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
+    }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
         .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
   }
 
@@ -157,12 +150,12 @@ public abstract class ProactorStreamProcessingStrategy
     return this.cpuIntensiveScheduler;
   }
 
-  protected Scheduler getRetrySupportScheduler() {
-    return this.retrySupportScheduler;
-  }
-
   private final AtomicInteger inFlightEvents = new AtomicInteger();
   private final BiConsumer<CoreEvent, Throwable> IN_FLIGHT_DECREMENT_CALLBACK = (e, t) -> inFlightEvents.decrementAndGet();
+  private final LongUnaryOperator LAST_RETRY_TIMESTAMP_CHECK_OPERATOR =
+      v -> nanoTime() - v < SCHEDULER_BUSY_RETRY_INTERVAL_NS * 2
+          ? v
+          : MIN_VALUE;
 
   protected final class ProactorSinkWrapper<E> implements ReactorSink<E> {
 
@@ -187,9 +180,12 @@ public abstract class ProactorStreamProcessingStrategy
     }
 
     private boolean checkCapacity(CoreEvent event) {
-      if (retryingCounter.get() > 0) {
-        return false;
+      if (lastRetryTimestamp.get() != MIN_VALUE) {
+        if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
+          return false;
+        }
       }
+
       if (maxConcurrencyEagerCheck) {
         if (inFlightEvents.incrementAndGet() > maxConcurrency) {
           inFlightEvents.decrementAndGet();
