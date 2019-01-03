@@ -9,10 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,7 +22,6 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.rx.Exceptions;
@@ -45,12 +43,9 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
-
-import reactor.core.publisher.Mono;
 
 
 /**
@@ -81,9 +76,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
 
   @Inject
   private ReflectionCache reflectionCache;
-
-  @Inject
-  private ExpressionManager expressionManager;
 
   private final CoreEvent event;
 
@@ -118,18 +110,10 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
     OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-    Mono<Result<T, A>> resultMono = process(processor)
+    return just(getEvent()).transform(processor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate(() -> disposeProcessor(processor));
-    return resultMono.toFuture();
-  }
-
-  private Mono<CoreEvent> process(OperationMessageProcessor omp) {
-    if (event != null) {
-      return from(processWithChildContext(event, omp, Optional.empty()));
-    }
-    return from(omp.apply(just(getInitialiserEvent(muleContext))));
+        .doAfterTerminate(() -> disposeProcessor(processor)).toFuture();
   }
 
   @Override
