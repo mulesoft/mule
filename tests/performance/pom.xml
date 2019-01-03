@@ -43,6 +43,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>-Djmh.ignoreLock=true</argLine>
                     <systemPropertyVariables>
                         <contiperf.active>false</contiperf.active>
                         <enablePerformanceTests>false</enablePerformanceTests>
@@ -137,6 +138,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>-Djmh.ignoreLock=false</argLine>
                             <systemPropertyVariables>
                                 <enablePerformanceTests>true</enablePerformanceTests>
                                 <contiperf.active>true</contiperf.active>
@@ -155,6 +157,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>-Djmh.ignoreLock=false</argLine>
                             <systemPropertyVariables>
                                 <enablePerformanceTests>false</enablePerformanceTests>
                                 <contiperf.active>false</contiperf.active>
@@ -228,6 +231,13 @@
             <id>benchmark-jar</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-Djmh.ignoreLock=false</argLine>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
