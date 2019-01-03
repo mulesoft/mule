@@ -14,7 +14,6 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -115,10 +114,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
     OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-
-
-    Mono<Result<T, A>> resultMono = Mono.just(event).transform(processor)
-        // Mono<Result<T, A>> resultMono = process(processor)
+    Mono<Result<T, A>> resultMono = process(processor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
         .doAfterTerminate(() -> disposeProcessor(processor));
