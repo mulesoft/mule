@@ -46,7 +46,6 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
                                                                          () -> cpuLight,
                                                                          () -> blocking,
                                                                          () -> cpuIntensive,
-                                                                         () -> custom,
                                                                          MAX_VALUE, true);
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
 import static java.lang.Long.max;
 import static java.lang.Runtime.getRuntime;
@@ -158,7 +159,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
       this.bufferSize = requireNonNull(bufferSize);
       this.ringBufferSchedulerSupplier = requireNonNull(ringBufferSchedulerSupplier);
       this.maxConcurrency = requireNonNull(maxConcurrency);
-      this.maxConcurrencyEagerCheck = maxConcurrencyEagerCheck;
+      this.maxConcurrencyEagerCheck = maxConcurrency < MAX_VALUE && maxConcurrencyEagerCheck;
       this.executionClassloader = currentThread().getContextClassLoader();
     }
 
