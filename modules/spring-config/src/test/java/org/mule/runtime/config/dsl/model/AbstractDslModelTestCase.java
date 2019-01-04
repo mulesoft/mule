@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,12 +22,14 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -43,9 +46,12 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
+import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -70,6 +76,8 @@ public abstract class AbstractDslModelTestCase {
   protected static final String CONTENT_VALUE = "#[{field: value}]";
   protected static final String ITEM_VALUE = "itemValue";
   protected static final String ITEM_NAME = "list-name-item";
+  protected static final String ANOTHER_OPERATION_NAME = "anotherMockOperation";
+  protected static final String ANOTHER_CONTENT_NAME = "anotherMyCamelCaseName";
 
   @Mock(lenient = true)
   protected ExtensionModel mockExtension;
@@ -81,10 +89,16 @@ public abstract class AbstractDslModelTestCase {
   protected OperationModel operation;
 
   @Mock(lenient = true)
+  protected OperationModel anotherOperation;
+
+  @Mock(lenient = true)
   protected ConnectionProviderModel connectionProvider;
 
   @Mock(lenient = true)
   protected ParameterModel contentParameter;
+
+  @Mock(lenient = true)
+  protected ParameterModel anotherContentParameter;
 
   @Mock(lenient = true)
   protected ParameterModel behaviourParameter;
@@ -94,6 +108,9 @@ public abstract class AbstractDslModelTestCase {
 
   @Mock(lenient = true)
   protected ParameterGroupModel parameterGroupModel;
+
+  @Mock(lenient = true)
+  protected ParameterGroupModel anotherParameterGroupModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected SourceModel source;
@@ -108,6 +125,7 @@ public abstract class AbstractDslModelTestCase {
 
   protected ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected List<ParameterModel> defaultGroupParameterModels;
+  protected List<ParameterModel> anotherDefaultGroupParameterModels;
 
   @Before
   public void before() {
@@ -138,9 +156,17 @@ public abstract class AbstractDslModelTestCase {
     when(contentParameter.getLayoutModel()).thenReturn(empty());
     when(contentParameter.getRole()).thenReturn(CONTENT);
 
+    when(anotherContentParameter.getName()).thenReturn(ANOTHER_CONTENT_NAME);
+    when(anotherContentParameter.getExpressionSupport()).thenReturn(ExpressionSupport.SUPPORTED);
+    when(anotherContentParameter.getModelProperty(any())).thenReturn(empty());
+    when(anotherContentParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
+    when(anotherContentParameter.getLayoutModel()).thenReturn(empty());
+    when(anotherContentParameter.getRole()).thenReturn(CONTENT);
+
     ObjectTypeBuilder type = TYPE_BUILDER.objectType();
     type.addField().key("field").value(TYPE_LOADER.load(String.class)).build();
     when(contentParameter.getType()).thenReturn(type.build());
+    when(anotherContentParameter.getType()).thenReturn(type.build());
 
     this.defaultGroupParameterModels = asList(contentParameter, behaviourParameter, listParameter);
     when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
@@ -151,11 +177,27 @@ public abstract class AbstractDslModelTestCase {
           String paramName = invocation.getArgument(0);
           switch (paramName) {
             case CONTENT_NAME:
-              return Optional.of(contentParameter);
+              return of(contentParameter);
             case LIST_NAME:
-              return Optional.of(listParameter);
+              return of(listParameter);
             case BEHAVIOUR_NAME:
-              return Optional.of(behaviourParameter);
+              return of(behaviourParameter);
+          }
+          return Optional.empty();
+        });
+
+    this.anotherDefaultGroupParameterModels = asList(anotherContentParameter, listParameter);
+    when(anotherParameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(anotherParameterGroupModel.isShowInDsl()).thenReturn(false);
+    when(anotherParameterGroupModel.getParameterModels()).thenReturn(anotherDefaultGroupParameterModels);
+    when(anotherParameterGroupModel.getParameter(anyString()))
+        .then(invocation -> {
+          String paramName = invocation.getArgument(0);
+          switch (paramName) {
+            case ANOTHER_CONTENT_NAME:
+              return of(anotherContentParameter);
+            case LIST_NAME:
+              return of(listParameter);
           }
           return Optional.empty();
         });
@@ -174,9 +216,9 @@ public abstract class AbstractDslModelTestCase {
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
 
     when(configuration.getModelProperty(RequiredForMetadataModelProperty.class))
-        .thenReturn(Optional.of(requiredForMetadataModelProperty));
+        .thenReturn(of(requiredForMetadataModelProperty));
     when(connectionProvider.getModelProperty(RequiredForMetadataModelProperty.class))
-        .thenReturn(Optional.of(requiredForMetadataModelProperty));
+        .thenReturn(of(requiredForMetadataModelProperty));
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
@@ -184,7 +226,22 @@ public abstract class AbstractDslModelTestCase {
     when(source.getErrorCallback()).thenReturn(empty());
     when(operation.getName()).thenReturn(OPERATION_NAME);
     when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
-    visitableMock(operation, source);
+    when(anotherOperation.getName()).thenReturn(ANOTHER_OPERATION_NAME);
+    when(anotherOperation.getParameterGroupModels()).thenReturn(asList(anotherParameterGroupModel));
+    visitableMock(operation, source, anotherOperation);
+
+    Map<String, String> parameterResolversNames = new HashMap<>();
+    parameterResolversNames.put(LIST_NAME, LIST_NAME);
+    parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
+    mockTypeResolversInformationModelProperty(operation, "category", "outputResolverName",
+                                              "attributesResolverName", parameterResolversNames);
+    mockTypeResolversInformationModelProperty(source, "category", "outputResolverName",
+                                              "attributesResolverName", parameterResolversNames);
+    Map<String, String> anotherParameterResolversNames = new HashMap<>();
+    anotherParameterResolversNames.put(LIST_NAME, LIST_NAME);
+    anotherParameterResolversNames.put(ANOTHER_CONTENT_NAME, ANOTHER_CONTENT_NAME);
+    mockTypeResolversInformationModelProperty(anotherOperation, "category", "outputResolverName",
+                                              "attributesResolverName", anotherParameterResolversNames);
 
     when(typeCatalog.getSubTypes(any())).thenReturn(emptySet());
     when(typeCatalog.getSuperTypes(any())).thenReturn(emptySet());
@@ -193,15 +250,16 @@ public abstract class AbstractDslModelTestCase {
     when(typeCatalog.getTypes()).thenReturn(emptySet());
 
     complexType = (ObjectType) TYPE_LOADER.load(ComplexTypePojo.class);
-    when(typeCatalog.getType(any())).thenReturn(Optional.of(complexType));
+    when(typeCatalog.getType(any())).thenReturn(of(complexType));
     when(typeCatalog.containsBaseType(any())).thenReturn(false);
 
-    when(dslContext.getExtension(any())).thenReturn(Optional.of(mockExtension));
+    when(dslContext.getExtension(any())).thenReturn(of(mockExtension));
     when(dslContext.getExtensions()).thenReturn(singleton(mockExtension));
     when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
     Stream.of(configuration, operation, connectionProvider, source)
         .forEach(model -> when(model.getAllParameterModels()).thenReturn(defaultGroupParameterModels));
+    when(anotherOperation.getAllParameterModels()).thenReturn(anotherDefaultGroupParameterModels);
   }
 
   protected void initializeExtensionMock(ExtensionModel extension) {
@@ -224,13 +282,55 @@ public abstract class AbstractDslModelTestCase {
         .build());
 
     when(extension.getConfigurationModels()).thenReturn(asList(configuration));
-    when(extension.getConfigurationModel(anyString())).thenReturn(Optional.of(configuration));
-    when(extension.getOperationModels()).thenReturn(asList(operation));
-    when(extension.getOperationModel(anyString())).thenReturn(Optional.of(operation));
+    when(extension.getConfigurationModel(anyString())).thenReturn(of(configuration));
+    when(extension.getOperationModels()).thenReturn(asList(operation, anotherOperation));
+    when(extension.getOperationModel(anyString())).then(invocation -> {
+      String operationName = invocation.getArgument(0);
+      switch (operationName) {
+        case OPERATION_NAME:
+          return of(operation);
+        case ANOTHER_OPERATION_NAME:
+          return of(anotherOperation);
+      }
+      return Optional.empty();
+    });
     when(extension.getSourceModels()).thenReturn(asList(source));
-    when(extension.getSourceModel(anyString())).thenReturn(Optional.of(source));
+    when(extension.getSourceModel(anyString())).thenReturn(of(source));
     when(extension.getConnectionProviders()).thenReturn(asList(connectionProvider));
-    when(extension.getConnectionProviderModel(anyString())).thenReturn(Optional.of(connectionProvider));
+    when(extension.getConnectionProviderModel(anyString())).thenReturn(of(connectionProvider));
+  }
+
+  protected void removeTypeResolversInformationModelPropertyfromMock(EnrichableModel model) {
+    when(model.getModelProperty(TypeResolversInformationModelProperty.class)).thenReturn(empty());
+  }
+
+  protected void mockTypeResolversInformationModelPropertyWithOutputType(EnrichableModel model, String category,
+                                                                         String outputResolverName) {
+    mockTypeResolversInformationModelProperty(model, category, outputResolverName, null, null);
+  }
+
+  protected void mockTypeResolversInformationModelPropertyWithAttributeType(EnrichableModel model, String category,
+                                                                            String attributesResolverName) {
+    mockTypeResolversInformationModelProperty(model, category, null, attributesResolverName, null);
+  }
+
+  protected void mockTypeResolversInformationModelPropertyWithInputTypes(EnrichableModel model, String category,
+                                                                         Map<String, String> parameterResolversNames) {
+    mockTypeResolversInformationModelProperty(model, category, null, null, parameterResolversNames);
+  }
+
+  protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
+                                                           String attributesResolverName,
+                                                           Map<String, String> parameterResolversNames) {
+    when(model.getModelProperty(TypeResolversInformationModelProperty.class))
+        .thenReturn(of(new TypeResolversInformationModelProperty(category,
+                                                                 parameterResolversNames,
+                                                                 outputResolverName,
+                                                                 attributesResolverName,
+                                                                 null,
+                                                                 false,
+                                                                 false)));
+
   }
 
   @TypeDsl(allowTopLevelDefinition = true)
