@@ -12,9 +12,12 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.ThreadSafeAccess;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

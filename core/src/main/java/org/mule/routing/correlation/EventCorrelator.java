@@ -159,7 +159,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        final String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
+        String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
 
         if (logger.isTraceEnabled())
         {
@@ -215,7 +215,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 // ..apparently not, so create a new one & add it
                 try
                 {
-                    EventGroup eventGroup = callback.createEventGroup(event, groupId + processedMessages);
+                    EventGroup eventGroup = callback.createEventGroup(event, groupId);
                     eventGroup.initEventsStore(correlatorStore);
                     group = this.addEventGroup(eventGroup);
                 }
@@ -237,6 +237,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 // add the incoming event to the group
                 try
                 {
+                    event.getMessage().setCorrelationId(groupId + processedMessages);
                     group.addEvent(event);
                 }
                 catch (ObjectStoreException e)
@@ -269,7 +270,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     }
                     if (returnEvent != null && !returnEvent.equals(VoidMuleEvent.getInstance()))
                     {
-                        returnEvent.getMessage().setCorrelationId(groupId);
+
+                        returnEvent.getMessage().setCorrelationId(groupId + processedMessages);
+
 
                         String rootId = group.getCommonRootId();
                         if (rootId != null)
@@ -282,6 +285,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     // for this group once we aggregate
                     try
                     {
+
                         this.removeEventGroup(group);
                         group.clear();
                     }
