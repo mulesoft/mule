@@ -1,0 +1,5 @@
+{
+  "title": "Some enum example",
+  "type": "enum",
+  "enum": ["first", "second", "third"]
+}
