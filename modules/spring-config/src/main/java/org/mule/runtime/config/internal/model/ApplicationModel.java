@@ -349,10 +349,10 @@ public class ApplicationModel {
       indexComponentModels();
     }
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
-    // and crafted declared extesion models)
+    // and crafted declared extension models)
     resolveComponentTypes();
     resolveTypedComponentIdentifier(extensionModelHelper);
-    executeOnEveryMuleComponentTree(new ComponentLocationVisitor(extensionModelHelper));
+    executeOnEveryMuleComponentTree(componentModel -> new ComponentLocationVisitor().accept(componentModel));
   }
 
   private void indexComponentModels() {

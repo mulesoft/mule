@@ -72,11 +72,6 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   private static final ComponentIdentifier CHOICE_WHEN_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:when");
   private static final ComponentIdentifier CHOICE_OTHERWISE_COMPONENT_IDENTIFIER =
       buildFromStringRepresentation("mule:otherwise");
-  private final ExtensionModelHelper extensionModelHelper;
-
-  public ComponentLocationVisitor(ExtensionModelHelper extensionModelHelper) {
-    this.extensionModelHelper = extensionModelHelper;
-  }
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
@@ -204,7 +199,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
 
   private boolean isRootProcessorScope(ComponentModel componentModel) {
     ComponentIdentifier identifier = componentModel.getIdentifier();
-    return identifier.equals(FLOW_IDENTIFIER) || identifier.equals(MUNIT_BEFORE_SUITE_IDENTIFIER) ||
+    return identifier.equals(FLOW_IDENTIFIER) || identifier.equals(MUNIT_BEFORE_SUITE_IDENTIFIER)
+        || identifier.equals(SUBFLOW_IDENTIFIER) ||
         identifier.equals(MUNIT_BEFORE_TEST_IDENTIFIER) || identifier.equals(MUNIT_AFTER_SUITE_IDENTIFIER) ||
         identifier.equals(MUNIT_AFTER_TEST_IDENTIFIER);
   }
