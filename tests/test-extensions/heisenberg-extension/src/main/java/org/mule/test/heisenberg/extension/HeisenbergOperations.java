@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.metadata.TypedValue.of;
@@ -78,6 +79,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
 
@@ -216,6 +218,15 @@ public class HeisenbergOperations implements Disposable {
   @MediaType(TEXT_PLAIN)
   public String callGusFring() throws HeisenbergException {
     throw new HeisenbergException(CALL_GUS_MESSAGE);
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public void callGusFringNonBlocking(CompletionCallback<Void, Void> callback) {
+    final ExecutorService executor = newSingleThreadExecutor();
+
+    executor.execute(() -> {
+      callback.error(new HeisenbergException(CALL_GUS_MESSAGE));
+    });
   }
 
   @OnException(CureCancerExceptionEnricher.class)

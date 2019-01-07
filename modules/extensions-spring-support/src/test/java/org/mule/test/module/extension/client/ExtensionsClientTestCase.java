@@ -31,15 +31,15 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 import org.mule.test.vegan.extension.VeganPolicy;
 
-import java.util.Collection;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.Collection;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -182,6 +182,16 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     exception.expectMessage("You are not allowed to speak with gus.");
     OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
     doExecute(HEISENBERG_EXT_NAME, "callGusFring", params);
+  }
+
+  @Test
+  @Description("Executes an operation that fails using the client and checks the throwed exception")
+  public void executeFailureNonBlockingOperation() throws Throwable {
+    exception.expect(MuleException.class);
+    exception.expectCause(instanceOf(ConnectionException.class));
+    exception.expectMessage("You are not allowed to speak with gus.");
+    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
+    doExecute(HEISENBERG_EXT_NAME, "callGusFringNonBlocking", params);
   }
 
   @Test
