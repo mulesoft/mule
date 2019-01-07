@@ -21,7 +21,8 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import org.reactivestreams.Publisher;
 
-import cn.danielw.fop.ObjectFactory;
+import java.util.function.Supplier;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -38,7 +39,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
     commonPolicy = new CommonSourcePolicy(new SourceFluxObjectFactory(flowExecutionProcessor));
   }
 
-  private final class SourceFluxObjectFactory implements ObjectFactory<FluxSink<CoreEvent>> {
+  private final class SourceFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
     private final ReactiveProcessor flowExecutionProcessor;
 
@@ -47,7 +48,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
     }
 
     @Override
-    public FluxSink<CoreEvent> create() {
+    public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
@@ -96,16 +97,6 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
-    }
-
-    @Override
-    public void destroy(FluxSink<CoreEvent> t) {
-      t.complete();
-    }
-
-    @Override
-    public boolean validate(FluxSink<CoreEvent> t) {
-      return !t.isCancelled();
     }
 
   }

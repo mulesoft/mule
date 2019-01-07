@@ -8,9 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static com.google.common.collect.ImmutableMap.of;
-import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
@@ -25,6 +23,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSink;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
@@ -36,11 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
-import cn.danielw.fop.ObjectFactory;
-import cn.danielw.fop.ObjectPool;
-import cn.danielw.fop.PoolConfig;
-import cn.danielw.fop.Poolable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -65,7 +61,7 @@ public class CompositeOperationPolicy
 
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
-  private final LoadingCache<String, ObjectPool<FluxSink<CoreEvent>>> policySinkPools;
+  private final LoadingCache<String, FluxSink<CoreEvent>> policySinks;
 
   /**
    * Creates a new composite policy.
@@ -86,28 +82,18 @@ public class CompositeOperationPolicy
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
 
-    PoolConfig config = new PoolConfig()
-        .setPartitionSize(getRuntime().availableProcessors())
-        .setMaxSize(1)
-        .setMinSize(1)
-        .setMaxIdleMilliseconds(MAX_VALUE)
-        .setScavengeIntervalMilliseconds(0);
-
-    policySinkPools = newBuilder()
-        .removalListener((String key, ObjectPool value, RemovalCause cause) -> {
-          try {
-            value.shutdown();
-          } catch (InterruptedException e) {
-            currentThread().interrupt();
-          }
+    policySinks = newBuilder()
+        .removalListener((String key, FluxSink<CoreEvent> value, RemovalCause cause) -> {
+          value.complete();
         })
-        .build(componentLocation -> new ObjectPool<>(config, new OperationWithPoliciesFluxObjectFactory()));
+        .build(componentLocation -> new RoundRobinFluxSink<>(getRuntime().availableProcessors(),
+                                                             new OperationWithPoliciesFluxObjectFactory()));
   }
 
-  private final class OperationWithPoliciesFluxObjectFactory implements ObjectFactory<FluxSink<CoreEvent>> {
+  private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
     @Override
-    public FluxSink<CoreEvent> create() {
+    public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<CoreEvent> policyFlux =
@@ -132,16 +118,6 @@ public class CompositeOperationPolicy
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
-    }
-
-    @Override
-    public void destroy(FluxSink<CoreEvent> t) {
-      t.complete();
-    }
-
-    @Override
-    public boolean validate(FluxSink<CoreEvent> t) {
-      return !t.isCancelled();
     }
   }
 
@@ -201,13 +177,10 @@ public class CompositeOperationPolicy
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                       OperationParametersProcessor parametersProcessor, ComponentLocation operationLocation) {
     return Mono.<CoreEvent>create(callerSink -> {
-      try (Poolable<FluxSink<CoreEvent>> policySink =
-          policySinkPools.get(operationLocation.getLocation()).borrowObject()) {
-        policySink.getObject()
-            .next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
-                                          operationExecutionFunction,
-                                          parametersProcessor, callerSink));
-      }
+      FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation());
+      policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
+                                              operationExecutionFunction,
+                                              parametersProcessor, callerSink));
     });
   }
 
@@ -233,6 +206,6 @@ public class CompositeOperationPolicy
 
   @Override
   public void dispose() {
-    policySinkPools.invalidateAll();
+    policySinks.invalidateAll();
   }
 }

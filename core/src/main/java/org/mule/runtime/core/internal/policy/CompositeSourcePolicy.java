@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import cn.danielw.fop.ObjectFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -77,10 +76,10 @@ public class CompositeSourcePolicy
     commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory());
   }
 
-  private final class SourceWithPoliciesFluxObjectFactory implements ObjectFactory<FluxSink<CoreEvent>> {
+  private final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
     @Override
-    public FluxSink<CoreEvent> create() {
+    public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
@@ -124,16 +123,6 @@ public class CompositeSourcePolicy
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
-    }
-
-    @Override
-    public void destroy(FluxSink<CoreEvent> t) {
-      t.complete();
-    }
-
-    @Override
-    public boolean validate(FluxSink<CoreEvent> t) {
-      return !t.isCancelled();
     }
 
   }

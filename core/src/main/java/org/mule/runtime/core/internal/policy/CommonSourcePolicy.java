@@ -7,25 +7,20 @@
 package org.mule.runtime.core.internal.policy;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static reactor.core.publisher.Mono.create;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSink;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import cn.danielw.fop.ObjectFactory;
-import cn.danielw.fop.ObjectPool;
-import cn.danielw.fop.PoolConfig;
-import cn.danielw.fop.Poolable;
+import java.util.function.Supplier;
+
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.MonoSink;
 
@@ -34,31 +29,20 @@ import reactor.core.publisher.MonoSink;
  */
 class CommonSourcePolicy {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CommonSourcePolicy.class);
-
   public static final String POLICY_SOURCE_PARAMETERS_PROCESSOR = "policy.source.parametersProcessor";
   public static final String POLICY_SOURCE_CALLER_SINK = "policy.source.callerSink";
 
-  private final ObjectPool<FluxSink<CoreEvent>> policySinkPool;
+  private final FluxSink<CoreEvent> policySink;
 
-  CommonSourcePolicy(ObjectFactory<FluxSink<CoreEvent>> sinkFactory) {
-    PoolConfig config = new PoolConfig()
-        .setPartitionSize(getRuntime().availableProcessors())
-        .setMaxSize(1)
-        .setMinSize(1)
-        .setMaxIdleMilliseconds(MAX_VALUE)
-        .setScavengeIntervalMilliseconds(0);
-
-    policySinkPool = new ObjectPool<>(config, sinkFactory);
+  CommonSourcePolicy(Supplier<FluxSink<CoreEvent>> sinkFactory) {
+    policySink = new RoundRobinFluxSink<>(getRuntime().availableProcessors(), sinkFactory);
   }
 
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
                                                                                          MessageSourceResponseParametersProcessor respParamProcessor) {
     return create(callerSink -> {
-      try (Poolable<FluxSink<CoreEvent>> policySink = policySinkPool.borrowObject()) {
-        policySink.getObject().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
-                                                              POLICY_SOURCE_CALLER_SINK, callerSink)));
-      }
+      policySink.next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
+                                                POLICY_SOURCE_CALLER_SINK, callerSink)));
     });
   }
 
@@ -86,11 +70,6 @@ class CommonSourcePolicy {
   }
 
   public void dispose() {
-    try {
-      policySinkPool.shutdown();
-    } catch (InterruptedException e) {
-      LOGGER.debug("Pool shutdown interrupted.");
-      currentThread().interrupt();
-    }
+    policySink.complete();
   }
 }

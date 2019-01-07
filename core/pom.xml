@@ -215,11 +215,6 @@
             <artifactId>caffeine</artifactId>
             <version>${caffeineVersion}</version>
         </dependency>
-        <dependency>
-            <groupId>cn.danielw</groupId>
-            <artifactId>fast-object-pool</artifactId>
-            <version>${fastObjectPoolVersion}</version>
-        </dependency>
 
         <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>
