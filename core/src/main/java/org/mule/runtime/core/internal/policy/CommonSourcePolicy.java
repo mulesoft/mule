@@ -14,7 +14,7 @@ import static reactor.core.publisher.Mono.create;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSink;
+import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
@@ -32,17 +32,17 @@ class CommonSourcePolicy {
   public static final String POLICY_SOURCE_PARAMETERS_PROCESSOR = "policy.source.parametersProcessor";
   public static final String POLICY_SOURCE_CALLER_SINK = "policy.source.callerSink";
 
-  private final FluxSink<CoreEvent> policySink;
+  private final RoundRobinFluxSinkSupplier<CoreEvent> policySink;
 
   CommonSourcePolicy(Supplier<FluxSink<CoreEvent>> sinkFactory) {
-    policySink = new RoundRobinFluxSink<>(getRuntime().availableProcessors(), sinkFactory);
+    policySink = new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), sinkFactory);
   }
 
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
                                                                                          MessageSourceResponseParametersProcessor respParamProcessor) {
     return create(callerSink -> {
-      policySink.next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
-                                                POLICY_SOURCE_CALLER_SINK, callerSink)));
+      policySink.get().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
+                                                      POLICY_SOURCE_CALLER_SINK, callerSink)));
     });
   }
 
@@ -70,6 +70,6 @@ class CommonSourcePolicy {
   }
 
   public void dispose() {
-    policySink.complete();
+    policySink.dispose();
   }
 }

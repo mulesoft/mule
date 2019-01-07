@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSink;
+import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
@@ -61,7 +61,7 @@ public class CompositeOperationPolicy
 
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
-  private final LoadingCache<String, FluxSink<CoreEvent>> policySinks;
+  private final LoadingCache<String, RoundRobinFluxSinkSupplier<CoreEvent>> policySinks;
 
   /**
    * Creates a new composite policy.
@@ -83,11 +83,11 @@ public class CompositeOperationPolicy
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
 
     policySinks = newBuilder()
-        .removalListener((String key, FluxSink<CoreEvent> value, RemovalCause cause) -> {
-          value.complete();
+        .removalListener((String key, RoundRobinFluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
+          value.dispose();
         })
-        .build(componentLocation -> new RoundRobinFluxSink<>(getRuntime().availableProcessors(),
-                                                             new OperationWithPoliciesFluxObjectFactory()));
+        .build(componentLocation -> new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
+                                                                     new OperationWithPoliciesFluxObjectFactory()));
   }
 
   private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -177,7 +177,7 @@ public class CompositeOperationPolicy
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                       OperationParametersProcessor parametersProcessor, ComponentLocation operationLocation) {
     return Mono.<CoreEvent>create(callerSink -> {
-      FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation());
+      FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
       policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
                                               operationExecutionFunction,
                                               parametersProcessor, callerSink));
