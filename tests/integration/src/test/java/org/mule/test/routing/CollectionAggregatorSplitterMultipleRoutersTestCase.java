@@ -49,8 +49,8 @@ public class CollectionAggregatorSplitterMultipleRoutersTestCase extends Functio
 
         MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out?connector=queue", 10000);
 
-        //assertNotNull(request);
-        //assertEquals(list.size(), request.size());
+        assertNotNull(request);
+        assertEquals(list.size(), request.size());
         assertEquals(Arrays.asList(24, 48, 72), Arrays.asList(request.getPayloadsAsArray()));
     }
 }

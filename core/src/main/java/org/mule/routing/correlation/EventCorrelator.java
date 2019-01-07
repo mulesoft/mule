@@ -66,6 +66,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
 
+    private static int processedMessages = 0;
+
     protected long groupTimeToLive = ONE_DAY_IN_MILLI;
 
     protected final Object groupsLock = new Object();
@@ -85,7 +87,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private MessageProcessor timeoutMessageProcessor;
 
-    private static int processedMessages = 0;
 
     /**
      * A map of EventGroup objects in a partition. These represent one or more messages to be agregated, keyed by
@@ -237,6 +238,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 // add the incoming event to the group
                 try
                 {
+
                     event.getMessage().setCorrelationId(groupId + processedMessages);
                     group.addEvent(event);
                 }
@@ -271,8 +273,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     if (returnEvent != null && !returnEvent.equals(VoidMuleEvent.getInstance()))
                     {
 
-                        returnEvent.getMessage().setCorrelationId(groupId + processedMessages);
-
+                        returnEvent.getMessage().setCorrelationId(groupId);
 
                         String rootId = group.getCommonRootId();
                         if (rootId != null)
@@ -306,6 +307,10 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 getLock().unlock();
             }
         }
+    }
+
+    public static void setProcessedMessages(int processedMessages) {
+        EventCorrelator.processedMessages = processedMessages;
     }
 
     private void fireMissedAggregationGroupEvent(MuleEvent event, final String groupId)

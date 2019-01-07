@@ -8,9 +8,13 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.junit.Before;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.routing.correlation.EventCorrelator;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mockito.internal.util.reflection.Whitebox;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,6 +47,11 @@ public class ExceptionAfterAggregationTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return configResources;
+    }
+
+    @Before
+    public void initialize() throws NoSuchFieldException {
+        EventCorrelator.setProcessedMessages(0);
     }
 
     @Test
