@@ -1651,6 +1651,14 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="CallGusFringNonBlockingType" substitutionGroup="heisenberg-empire" name="call-gus-fring-non-blocking"></xs:element>
+  <xs:complexType name="CallGusFringNonBlockingType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ColorizeMethType" substitutionGroup="heisenberg-empire" name="colorize-meth"></xs:element>
   <xs:complexType name="ColorizeMethType">
     <xs:complexContent>

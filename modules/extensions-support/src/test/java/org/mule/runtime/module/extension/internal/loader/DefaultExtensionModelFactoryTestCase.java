@@ -46,6 +46,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.StringType;
@@ -103,14 +104,14 @@ import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
@@ -148,7 +149,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void blockingExecutionTypes() {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
-                                                             "blockingNonBlocking");
+                                                             "blockingNonBlocking", "callGusFringNonBlocking");
 
     ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
     Reference<Boolean> cpuIntensive = new Reference<>(false);
