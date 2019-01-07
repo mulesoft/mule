@@ -9,7 +9,6 @@ package org.mule.runtime.deployment.model.api;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
-
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -27,6 +26,9 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
   public static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
   public static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
+
+  public static final String MULE_POM = "pom.xml";
+  public static final String MULE_POM_PROPERTIES = "pom.properties";
 
   private boolean redeploymentEnabled = true;
   private File location;
