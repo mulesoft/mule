@@ -32,6 +32,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -85,7 +86,14 @@ public class MavenUtils {
     URL possibleUrl;
     try {
       possibleUrl = getUrlWithinJar(artifactFile, pomFilePath);
-      try (InputStream ignored = possibleUrl.openStream()) {
+      /*
+       * A specific implementation of JarURLConnection is required to read jar content because not all implementations
+       * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
+       */
+      JarURLConnection jarConnection =
+          new sun.net.www.protocol.jar.JarURLConnection(possibleUrl, new sun.net.www.protocol.jar.Handler());
+      jarConnection.setUseCaches(false);
+      try (InputStream ignored = jarConnection.getInputStream()) {
         return possibleUrl;
       } catch (Exception e) {
         List<URL> jarMavenUrls = getUrlsWithinJar(artifactFile, META_INF + "/" + "maven");
