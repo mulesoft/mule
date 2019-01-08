@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isPagingProvider;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -28,6 +29,7 @@ import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -40,6 +42,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithOperationConta
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
+import org.mule.runtime.module.extension.internal.runtime.execution.PagedReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 
 import java.lang.reflect.Method;
@@ -126,10 +129,17 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       Optional<Class<?>> declaringClass = enclosingType.getDeclaringClass();
 
       if (method.isPresent() && declaringClass.isPresent()) {
-        operationDeclarer
-            .withModelProperty(new ImplementingMethodModelProperty(method.get()))
-            .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
-                                                                                                           method.get())));
+        operationDeclarer.withModelProperty(new ImplementingMethodModelProperty(method.get()));
+        if (isPagingProvider(operationMethod.getReturnType())) {
+          operationDeclarer
+              .withModelProperty(new ComponentExecutorModelProperty(new PagedReflectiveOperationExecutorFactory<>(declaringClass
+                  .get(),
+                                                                                                                  method.get())));
+        } else {
+          operationDeclarer
+              .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
+                                                                                                             method.get())));
+        }
       }
 
       loader.addExceptionEnricher(operationMethod, operationDeclarer);
