@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
 
@@ -18,6 +19,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -54,6 +56,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   private static final OperationPolicy NO_POLICY_OPERATION =
       (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent);
+
+  private MuleContext muleContext;
 
   private Registry registry;
 
@@ -189,10 +193,14 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory(policyStateHandler);
 
     policyProvider = registry.lookupByType(PolicyProvider.class).orElse(new NullPolicyProvider());
-    policyProvider.onPoliciesChanged(() -> {
-      evictCaches();
-      isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
-    });
+
+    if (muleContext.getArtifactType().equals(APP)) {
+      policyProvider.onPoliciesChanged(() -> {
+        evictCaches();
+        isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
+      });
+    }
+
 
     isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
 
@@ -224,5 +232,10 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   @Inject
   public void setRegistry(Registry registry) {
     this.registry = registry;
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }
