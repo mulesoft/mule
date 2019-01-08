@@ -148,10 +148,9 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    File temporaryPomFolder = new File(temporaryFolder, "temporary-poms");
-    if (!temporaryPomFolder.exists() && !temporaryPomFolder.mkdirs()) {
+    if (!temporaryFolder.exists() && !temporaryFolder.mkdirs()) {
       throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
-          + temporaryPomFolder.getAbsolutePath()));
+          + temporaryFolder.getAbsolutePath()));
     }
 
     Map<BundleDescriptor, Set<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
@@ -166,7 +165,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
             // system scope dependencies are always availables and are not looked up in a repository
             if (bundleDependency.getScope().equals(SYSTEM)) {
               effectiveModel =
-                  mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryPomFolder));
+                  mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryFolder));
             } else {
               BundleDescriptor descriptor = bundleDependency.getDescriptor();
               effectiveModel = mavenClient.getEffectiveModel(toFile(mavenClient
