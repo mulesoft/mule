@@ -161,7 +161,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         {
             throw new RequestAuthenticationException(createStaticMessage(String.format("Evaluation of %s return an empty resourceOwnerId", localAuthorizationUrlResourceOwnerIdEvaluator.getRawValue())));
         }
-        final String accessToken = getUserOAuthContext().getContextForResourceOwner(resourceOwnerId).getAccessToken();
+        final String accessToken = getAccessToken(getUserOAuthContext(), resourceOwnerId);       
         if (accessToken == null)
         {
             throw new RequestAuthenticationException(createStaticMessage(String.format("No access token for the %s user. Verify that you have authenticated the user before trying to execute an operation to the API.", resourceOwnerId)));

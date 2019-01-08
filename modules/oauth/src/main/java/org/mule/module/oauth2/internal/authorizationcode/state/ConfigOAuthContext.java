@@ -41,7 +41,9 @@ public class ConfigOAuthContext
         if (!oauthContextStore.containsKey(resourceOwnerId))
         {
             final Lock lock = lockFactory.createLock(configName + "-config-oauth-context");
+            final Lock resourceLock = createLockForResourceOwner(resourceOwnerId);
             lock.lock();
+            resourceLock.lock();
             try
             {
                 if (!oauthContextStore.containsKey(resourceOwnerId))
@@ -52,6 +54,7 @@ public class ConfigOAuthContext
             }
             finally
             {
+                resourceLock.unlock();
                 lock.unlock();
             }
         }

@@ -103,7 +103,8 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
             refreshAccessToken();
         }
 
-        final String accessToken = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
+        final String accessToken = getAccessToken(tokenManagerConfig.getConfigOAuthContext(), ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+
         if (accessToken == null)
         {
             throw new RequestAuthenticationException(createStaticMessage(String.format("No access token found. Verify that you have authenticated before trying to execute an operation to the API.")));
