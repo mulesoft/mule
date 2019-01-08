@@ -21,7 +21,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class CollectionAggregatorSplitterMultipleRoutersTestCase extends FunctionalTestCase {
+public class CollectionAggregatorSplitterMultipleRoutersTestCase extends FunctionalTestCase
+{
 
     private final static List<Integer> TEST_LIST = asList(1, 2, 3);
 
@@ -32,7 +33,8 @@ public class CollectionAggregatorSplitterMultipleRoutersTestCase extends Functio
     }
 
     @Test
-    public void multipleCollectionSplitterAggregatorPreservesPayload() throws Exception {
+    public void multipleCollectionSplitterAggregatorPreservesPayload() throws Exception
+    {
         MuleClient client = muleContext.getClient();
         runFlow("multiple-splitter-aggregator-payload-preserved", getTestMuleMessage(TEST_LIST));
 
@@ -44,7 +46,8 @@ public class CollectionAggregatorSplitterMultipleRoutersTestCase extends Functio
     }
 
     @Test
-    public void multipleCollectionSplitterAggregatorTransformedPayloadIsPreserved() throws Exception {
+    public void multipleCollectionSplitterAggregatorTransformedPayloadIsPreserved() throws Exception
+    {
         MuleClient client = muleContext.getClient();
         List<Integer> resultList = asList(24, 48, 72);
 
