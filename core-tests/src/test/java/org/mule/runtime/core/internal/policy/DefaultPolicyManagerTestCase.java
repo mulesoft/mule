@@ -23,6 +23,8 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyProvider;
@@ -54,6 +56,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     final Registry registry = mock(Registry.class);
     when(registry.lookupByType(PolicyProvider.class)).thenReturn(of(policyProvider));
     policyManager.setRegistry(registry);
+
+    final MuleContext muleContext = mock(MuleContext.class);
+    when(muleContext.getArtifactType()).thenReturn(ArtifactType.APP);
+    policyManager.setMuleContext(muleContext);
 
     policyManager.initialise();
 

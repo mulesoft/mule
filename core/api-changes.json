@@ -198,6 +198,48 @@
       ]
     }
   },
+  "4.1.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method <L, R> org.mule.runtime.core.api.functional.Either<L, R> org.mule.runtime.core.api.functional.Either<L, R>::left(L, java.lang.Class<R>)",
+          "package": "org.mule.runtime.core.api.functional",
+          "classSimpleName": "Either",
+          "methodName": "left",
+          "elementKind": "method",
+          "justification": "Added for code readability"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method <L, R> org.mule.runtime.core.api.functional.Either<L, R> org.mule.runtime.core.api.functional.Either<L, R>::right(java.lang.Class<L>, R)",
+          "package": "org.mule.runtime.core.api.functional",
+          "classSimpleName": "Either",
+          "methodName": "right",
+          "elementKind": "method",
+          "justification": "Added for code readability"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.policy.PolicyProvider::isPoliciesAvailable()",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "PolicyProvider",
+          "methodName": "isPoliciesAvailable",
+          "elementKind": "method",
+          "justification": "Added for performance, has default implementation"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.core.api.policy.PolicyProvider::onPoliciesChanged(java.lang.Runnable)",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "PolicyProvider",
+          "methodName": "onPoliciesChanged",
+          "elementKind": "method",
+          "justification": "Added for performance, has default implementation"
+        }
+      ]
+    }
+  },
   "4.1.5": {
     "revapi": {
       "ignore": [
