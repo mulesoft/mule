@@ -32,7 +32,7 @@ public interface ReactiveProcessor extends Function<Publisher<CoreEvent>, Publis
    * {@link ProcessingType#CPU_INTENSIVE} intensive or neither ({@link ProcessingType#CPU_LITE}).
    * <p>
    * This method must return the same value for the same processor every time.
-   * 
+   *
    * @return the processing type for this processor.
    */
   default ProcessingType getProcessingType() {

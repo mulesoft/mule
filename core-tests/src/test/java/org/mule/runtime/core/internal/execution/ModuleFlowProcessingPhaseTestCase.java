@@ -48,7 +48,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -343,7 +343,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failurePolicyManager() throws Exception {
-    when(policyManager.createSourcePolicyInstance(any(Component.class), any(CoreEvent.class), any(Processor.class),
+    when(policyManager.createSourcePolicyInstance(any(Component.class), any(CoreEvent.class), any(ReactiveProcessor.class),
                                                   any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
 

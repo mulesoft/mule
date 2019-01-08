@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -18,12 +18,11 @@ import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Flux;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
@@ -48,7 +47,7 @@ public class SourcePolicyProcessor implements Processor {
   private final Policy policy;
   private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
-  private final Processor nextProcessor;
+  private final ReactiveProcessor nextProcessor;
   private final PolicyStateIdFactory stateIdFactory;
 
   /**
@@ -58,8 +57,7 @@ public class SourcePolicyProcessor implements Processor {
    * @param policyStateHandler the state handler for the policy.
    * @param nextProcessor the next-operation processor implementation, it may be another policy or the flow execution.
    */
-  public SourcePolicyProcessor(Policy policy,
-                               PolicyStateHandler policyStateHandler, Processor nextProcessor) {
+  public SourcePolicyProcessor(Policy policy, PolicyStateHandler policyStateHandler, ReactiveProcessor nextProcessor) {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
@@ -88,7 +86,7 @@ public class SourcePolicyProcessor implements Processor {
           policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(),
                                                  buildSourceExecutionWithPolicyFunction(policyStateId, sourceEvent));
           return just(sourceEvent)
-              .map(event -> policyEventConverter.createEvent(sourceEvent, noVariablesEvent(sourceEvent)))
+              .map(event -> policyEventConverter.createEvent(event, noVariablesEvent(event)))
               .cast(CoreEvent.class)
               .transform(policy.getPolicyChain())
               .cast(PrivilegedEvent.class)
@@ -106,20 +104,21 @@ public class SourcePolicyProcessor implements Processor {
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-        return Flux.from(publisher)
-            .doOnNext(event -> saveState((PrivilegedEvent) event))
+        return from(publisher)
             .map(event -> (CoreEvent) policyEventConverter
-                .createEvent((PrivilegedEvent) event, sourceEvent, policy.getPolicyChain().isPropagateMessageTransformations()))
-            .flatMap(e -> just(e).transform(nextProcessor)
-                .map(result -> (CoreEvent) policyEventConverter.createEvent((PrivilegedEvent) result, loadState()))
-                .onErrorMap(MessagingException.class,
-                            me -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
-                                                                                          loadState()),
-                                                         me)));
+                .createEvent(saveState((PrivilegedEvent) event), sourceEvent,
+                             policy.getPolicyChain().isPropagateMessageTransformations()))
+            .transform(nextProcessor)
+            .map(result -> (CoreEvent) policyEventConverter.createEvent((PrivilegedEvent) result, loadState()))
+            .onErrorMap(MessagingException.class,
+                        me -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
+                                                                                      loadState()),
+                                                     me));
       }
 
-      private void saveState(PrivilegedEvent event) {
+      private PrivilegedEvent saveState(PrivilegedEvent event) {
         policyStateHandler.updateState(policyStateId, event);
+        return event;
       }
 
       private PrivilegedEvent loadState() {

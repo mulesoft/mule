@@ -73,6 +73,7 @@ import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
+import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -406,9 +407,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     messageProcessor.process(event);
 
-    verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor), same(event), any(Map.class),
-                                                    any(OperationExecutionFunction.class));
-    verify(mockOperationPolicy).process(same(event), any());
+    verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor), same(event), any(OperationParametersProcessor.class));
+    verify(mockOperationPolicy).process(same(event), any(OperationExecutionFunction.class), any(), any());
   }
 
   @Test
@@ -417,8 +417,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor.process(event);
 
     assertThat(mockOperationPolicy, is(nullValue()));
-    verify(mockPolicyManager, never()).createOperationPolicy(eq(messageProcessor), same(event), any(Map.class),
-                                                             any(OperationExecutionFunction.class));
+    verify(mockPolicyManager, never()).createOperationPolicy(eq(messageProcessor), same(event),
+                                                             any(OperationParametersProcessor.class));
   }
 
   @Test

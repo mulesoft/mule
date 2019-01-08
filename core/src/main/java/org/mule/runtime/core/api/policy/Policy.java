@@ -18,11 +18,11 @@ import org.mule.api.annotation.NoExtend;
 public class Policy {
 
   private final PolicyChain policyChain;
-  private String id;
+  private final String id;
 
   /**
    * Creates a new {@code ParameterizedPolicy}.
-   * 
+   *
    * @param policyChain the chain of {@link org.mule.runtime.core.api.processor.Processor}s to be applied.
    * @param policyId unique id of this policy.
    */
@@ -45,6 +45,36 @@ public class Policy {
    */
   public PolicyChain getPolicyChain() {
     return policyChain;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    Policy other = (Policy) obj;
+    if (id == null) {
+      if (other.id != null) {
+        return false;
+      }
+    } else if (!id.equals(other.id)) {
+      return false;
+    }
+    return true;
   }
 
 }

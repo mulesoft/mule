@@ -39,4 +39,25 @@ public interface PolicyProvider {
    */
   List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters);
 
+  /**
+   * Returns whether there are policies registered or not. In case this returns {@code false}, the caller may do certain
+   * optimization by skipping altogether the policies code.
+   *
+   * @since 4.2
+   */
+  default boolean isPoliciesAvailable() {
+    return true;
+  };
+
+  /**
+   * Register a callback to be executed any time a policy is added or removed.
+   *
+   * @param policiesChangedCallback
+   *
+   * @since 4.2
+   */
+  default void onPoliciesChanged(Runnable policiesChangedCallback) {
+    // Nothing to do
+  };
+
 }
