@@ -8,7 +8,7 @@
 
     <vm:connector name="queue"/>
 
-    <flow name="splitter">
+    <flow name="multiple-splitter-aggregator-payload-preserved">
         <collection-splitter/>
         <collection-aggregator/>
         <collection-splitter/>
@@ -17,7 +17,7 @@
 
     </flow>
 
-    <flow name="splitter2">
+    <flow name="multiple-splitter-aggregator-successive-payload-transformations">
         <collection-splitter/>
         <set-payload value="#[payload * 2]"/>
         <collection-aggregator timeout="2000" failOnTimeout="false" persistentStores="false"/>

@@ -49,11 +49,6 @@ public class ExceptionAfterAggregationTestCase extends FunctionalTestCase
         return configResources;
     }
 
-    @Before
-    public void initialize() throws NoSuchFieldException {
-        EventCorrelator.setProcessedMessages(0);
-    }
-
     @Test
     public void testReceiveCorrectExceptionAfterAggregation() throws Exception
     {

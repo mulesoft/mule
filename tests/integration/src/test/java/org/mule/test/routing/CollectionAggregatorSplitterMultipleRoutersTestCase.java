@@ -6,19 +6,24 @@
  */
 package org.mule.test.routing;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static java.util.Arrays.asList;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
 
 public class CollectionAggregatorSplitterMultipleRoutersTestCase extends FunctionalTestCase {
+
+    private final static List<Integer> TEST_LIST = asList(1, 2, 3);
 
     @Override
     protected String getConfigFile()
@@ -29,28 +34,26 @@ public class CollectionAggregatorSplitterMultipleRoutersTestCase extends Functio
     @Test
     public void multipleCollectionSplitterAggregatorPreservesPayload() throws Exception {
         MuleClient client = muleContext.getClient();
-        List<Integer> list = Arrays.asList(1, 2, 3);
-
-        runFlow("splitter", getTestMuleMessage(list));
+        runFlow("multiple-splitter-aggregator-payload-preserved", getTestMuleMessage(TEST_LIST));
 
         MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out?connector=queue", 10000);
 
-        assertNotNull(request);
-        assertEquals(list.size(), request.size());
-        assertEquals(Arrays.asList(1, 2, 3), Arrays.asList(request.getPayloadsAsArray()));
+        assertThat(request, is(notNullValue()));
+        assertThat(TEST_LIST, hasSize(request.size()));
+        assertThat(TEST_LIST, contains(request.getPayloadsAsArray()));
     }
 
     @Test
     public void multipleCollectionSplitterAggregatorTransformedPayloadIsPreserved() throws Exception {
         MuleClient client = muleContext.getClient();
-        List<Integer> list = Arrays.asList(1, 2, 3);
+        List<Integer> resultList = asList(24, 48, 72);
 
-        runFlow("splitter2", getTestMuleMessage(list));
+        runFlow("multiple-splitter-aggregator-successive-payload-transformations", getTestMuleMessage(TEST_LIST));
 
         MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out?connector=queue", 10000);
 
-        assertNotNull(request);
-        assertEquals(list.size(), request.size());
-        assertEquals(Arrays.asList(24, 48, 72), Arrays.asList(request.getPayloadsAsArray()));
+        assertThat(request, is(notNullValue()));
+        assertThat(resultList, hasSize(request.size()));
+        assertThat(resultList, contains(request.getPayloadsAsArray()));
     }
 }

@@ -66,8 +66,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
 
-    private static int processedMessages = 0;
-
     protected long groupTimeToLive = ONE_DAY_IN_MILLI;
 
     protected final Object groupsLock = new Object();
@@ -239,7 +237,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 try
                 {
 
-                    event.getMessage().setCorrelationId(groupId + processedMessages);
+                    event.getMessage().setCorrelationId(groupId + event.getMessageSourceName());
                     group.addEvent(event);
                 }
                 catch (ObjectStoreException e)
@@ -294,7 +292,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     {
                         throw new RoutingException(event, timeoutMessageProcessor, e);
                     }
-                    processedMessages++;
                     return returnEvent;
                 }
                 else
@@ -307,10 +304,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 getLock().unlock();
             }
         }
-    }
-
-    public static void setProcessedMessages(int processedMessages) {
-        EventCorrelator.processedMessages = processedMessages;
     }
 
     private void fireMissedAggregationGroupEvent(MuleEvent event, final String groupId)
