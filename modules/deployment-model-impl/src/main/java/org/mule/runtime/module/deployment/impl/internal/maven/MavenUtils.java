@@ -88,10 +88,24 @@ public class MavenUtils {
    * @return the URL to the pom file.
    */
   public static URL getPomUrlFromJar(File artifactFile) {
-    String pomFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_PLUGIN_POM;
+    return lookMavenMetadataFileUrlFromJar(artifactFile, MULE_POM);
+  }
+
+  /**
+   * Finds the URL of the {@code pom.properties} file within the artifact file.
+   *
+   * @param artifactFile the artifact file to search for the {@code pom.properties} file.
+   * @return the URL to the {@code pom.properties} file.
+   */
+  public static URL getPomPropertiesUrlFromJar(File artifactFile) {
+    return lookMavenMetadataFileUrlFromJar(artifactFile, MULE_POM_PROPERTIES);
+  }
+
+  private static URL lookMavenMetadataFileUrlFromJar(File artifactFile, String mavenMetadataFileName) {
+    String mavenMetadataFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + mavenMetadataFileName;
     URL possibleUrl;
     try {
-      possibleUrl = getUrlWithinJar(artifactFile, pomFilePath);
+      possibleUrl = getUrlWithinJar(artifactFile, mavenMetadataFilePath);
       /*
        * A specific implementation of JarURLConnection is required to read jar content because not all implementations
        * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
@@ -103,41 +117,14 @@ public class MavenUtils {
         return possibleUrl;
       } catch (Exception e) {
         List<URL> jarMavenUrls = getUrlsWithinJar(artifactFile, META_INF + "/" + "maven");
-        Optional<URL> pomUrl = jarMavenUrls.stream().filter(url -> url.toString().endsWith(MULE_PLUGIN_POM)).findAny();
-        if (!pomUrl.isPresent()) {
+        Optional<URL> mavenMetadataUrl =
+            jarMavenUrls.stream().filter(url -> url.toString().endsWith(mavenMetadataFileName)).findAny();
+        if (!mavenMetadataUrl.isPresent()) {
           throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' within the artifact(error found while reading artifact '%s')",
-                                                             artifactFile.getName(), MULE_PLUGIN_POM,
+                                                             artifactFile.getName(), mavenMetadataFileName,
                                                              artifactFile.getAbsolutePath()));
         }
-        return pomUrl.get();
-      }
-    } catch (IOException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  /**
-   * Finds the URL of the {@code pom.properties} file within the artifact file.
-   *
-   * @param artifactFile the artifact file to search for the {@code pom.properties} file.
-   * @return the URL to the {@code pom.properties} file.
-   */
-  public static URL getPomPropertiesUrlFromJar(File artifactFile) {
-    String pomPropertiesFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_POM_PROPERTIES;
-    URL possibleUrl;
-    try {
-      possibleUrl = getUrlWithinJar(artifactFile, pomPropertiesFilePath);
-      try (InputStream ignored = possibleUrl.openStream()) {
-        return possibleUrl;
-      } catch (Exception e) {
-        List<URL> jarMavenUrls = getUrlsWithinJar(artifactFile, META_INF + "/" + "maven");
-        Optional<URL> pomUrl = jarMavenUrls.stream().filter(url -> url.toString().endsWith(MULE_POM_PROPERTIES)).findAny();
-        if (!pomUrl.isPresent()) {
-          throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' within the artifact(error found while reading artifact '%s')",
-                                                             artifactFile.getName(), MULE_POM_PROPERTIES,
-                                                             artifactFile.getAbsolutePath()));
-        }
-        return pomUrl.get();
+        return mavenMetadataUrl.get();
       }
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
