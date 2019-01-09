@@ -34,16 +34,25 @@ public abstract class AbstractMetadataResolutionTypeInformation implements Metad
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isDynamicType() {
     return resolverCategory != null && resolverName != null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Optional<String> getResolverName() {
     return ofNullable(resolverName);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Optional<String> getResolverCategory() {
     return ofNullable(resolverCategory);

@@ -14,6 +14,7 @@ import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -27,7 +28,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;

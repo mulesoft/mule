@@ -155,7 +155,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
         .map(name -> new MetadataCacheId(name.hashCode(), "category:" + name));
   }
 
-  private Optional<MetadataCacheId> doResolveType(DslElementModel<?> component, MetadataResolutionTypeInformation typeInformation) {
+  private Optional<MetadataCacheId> doResolveType(DslElementModel<?> component,
+                                                  MetadataResolutionTypeInformation typeInformation) {
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     if (typeInformation.isDynamicType()) {
