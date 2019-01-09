@@ -5775,7 +5775,7 @@
                 <xsd:attribute name="entryTTL" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The time-to-live for each message ID, specified in seconds, or '-1' for entries that should never expire. DO NOT combine this with an unbounded store!
+                            The time-to-live for each message ID, specified in milliseconds, or '-1' for entries that should never expire. DO NOT combine this with an unbounded store!
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
