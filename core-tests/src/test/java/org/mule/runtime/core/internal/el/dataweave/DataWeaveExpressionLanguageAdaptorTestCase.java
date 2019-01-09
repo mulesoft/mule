@@ -58,7 +58,6 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -66,7 +65,6 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -88,9 +86,10 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.weave.v2.model.structure.QualifiedName;
 
-import javax.xml.namespace.QName;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import java.io.IOException;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -100,8 +99,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import javax.xml.namespace.QName;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -514,8 +513,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(result.getValue(), instanceOf(List.class));
     assertThat(((List) result.getValue()).get(0), instanceOf(Map.class));
     Map entry = (Map) ((List) result.getValue()).get(0);
-    assertThat(entry.get("key"), instanceOf(QualifiedName.class));
-    assertThat(((QualifiedName) entry.get("key")).name(), equalTo(key));
+    assertThat(entry.get("key"), instanceOf(QName.class));
+    assertThat(((QName) entry.get("key")).getLocalPart(), equalTo(key));
     assertThat(entry.get("value"), equalTo(value));
   }
 
