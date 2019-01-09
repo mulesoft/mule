@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.http.api.client;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.http.api.tcp.TcpClientSocketProperties;
-
-import java.util.Optional;
 
 /**
  * Configuration component that specifies how an {@link HttpClient} should be created. Instances can only be obtained through an
@@ -31,7 +28,7 @@ public class HttpClientConfiguration {
   private final boolean streaming;
   private final int responseBufferSize;
   private final String name;
-  private final Optional<Boolean> decompress;
+  private final Boolean decompress;
 
   HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
                           TcpClientSocketProperties clientSocketProperties, int maxConnections, Boolean decompress,
@@ -46,7 +43,7 @@ public class HttpClientConfiguration {
     this.streaming = streaming;
     this.responseBufferSize = responseBufferSize;
     this.name = name;
-    this.decompress = ofNullable(decompress);
+    this.decompress = decompress;
   }
 
   public TlsContextFactory getTlsContextFactory() {
@@ -85,7 +82,7 @@ public class HttpClientConfiguration {
     return name;
   }
 
-  public Optional<Boolean> isDecompress() {
+  public Boolean isDecompress() {
     return decompress;
   }
 
