@@ -7,6 +7,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -52,6 +53,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     private final MessageProcessor messageProcessor = mock(MessageProcessor.class);
     private final MessageInfoMapping messageInfoMapping = mock(MessageInfoMapping.class);
     private final FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    private final MuleMessage muleMessage = mock(DefaultMuleMessage.class);
     private PartitionableObjectStore<EventGroup> partitionableObjectStore = mock(PartitionableObjectStore.class);
     private ObjectStore<Long> objectStore =  mock(ObjectStore.class);
     private MuleEvent event = mock(MuleEvent.class);
@@ -78,6 +80,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     public void testEventGroupFreedInRoutingException() throws Exception
     {
         MuleEvent event = mock(MuleEvent.class);
+        when(event.getMessage()).thenReturn(muleMessage);
         try
         {
             eventCorrelator.process(event);
