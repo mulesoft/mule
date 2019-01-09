@@ -10,6 +10,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
@@ -230,4 +231,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.listener = listener;
   }
 
+  @Override
+  public BackPressureStrategy getBackPressureStrategy() {
+    return FAIL;
+  }
 }
