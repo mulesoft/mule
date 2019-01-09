@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.http.api.client;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.http.api.tcp.TcpClientSocketProperties;
+
+import java.util.Optional;
 
 /**
  * Configuration component that specifies how an {@link HttpClient} should be created. Instances can only be obtained through an
@@ -28,9 +31,11 @@ public class HttpClientConfiguration {
   private final boolean streaming;
   private final int responseBufferSize;
   private final String name;
+  private final Optional<Boolean> decompress;
 
   HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
-                          TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections,
+                          TcpClientSocketProperties clientSocketProperties, int maxConnections, Boolean decompress,
+                          boolean usePersistentConnections,
                           int connectionIdleTimeout, boolean streaming, int responseBufferSize, String name) {
     this.tlsContextFactory = tlsContextFactory;
     this.proxyConfig = proxyConfig;
@@ -41,6 +46,7 @@ public class HttpClientConfiguration {
     this.streaming = streaming;
     this.responseBufferSize = responseBufferSize;
     this.name = name;
+    this.decompress = ofNullable(decompress);
   }
 
   public TlsContextFactory getTlsContextFactory() {
@@ -79,6 +85,10 @@ public class HttpClientConfiguration {
     return name;
   }
 
+  public Optional<Boolean> isDecompress() {
+    return decompress;
+  }
+
   /**
    * Builder of {@link HttpClientConfiguration}s. At the very least, a name must be provided.
    */
@@ -93,6 +103,7 @@ public class HttpClientConfiguration {
     private boolean streaming = false;
     private int responseBufferSize = -1;
     private String name;
+    private Boolean decompress;
 
     /**
      * Required exclusively for HTTPS, this defines through a {@link TlsContextFactory} all the TLS related data to establish
@@ -204,11 +215,24 @@ public class HttpClientConfiguration {
     }
 
     /**
+     * Defines whether responses should be decompressed automatically by the {@link HttpClient}, {@code false} by default. Note 
+     * that only GZIP encoding is supported.
+     *
+     * @param decompress whether or not responses should be decompressed
+     * @return this builder
+     * @since 1.3
+     */
+    public Builder setDecompress(Boolean decompress) {
+      this.decompress = decompress;
+      return this;
+    }
+
+    /**
      * @return an {@link HttpClientConfiguration} as specified.
      */
     public HttpClientConfiguration build() {
       checkNotNull(name, "Name is mandatory.");
-      return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
+      return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections, decompress,
                                          usePersistentConnections, connectionIdleTimeout, streaming, responseBufferSize, name);
     }
   }
