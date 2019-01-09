@@ -78,7 +78,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
     }
   }
 
-  public static BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
+  private BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
     BundleDescriptor.Builder builder = new BundleDescriptor.Builder();
 
     if (artifactType.equals(APP) || artifactType.equals(DOMAIN)) {
