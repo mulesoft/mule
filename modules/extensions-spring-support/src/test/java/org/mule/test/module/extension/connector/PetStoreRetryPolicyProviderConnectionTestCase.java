@@ -169,4 +169,26 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
     assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
                everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }
+
+  @Test
+  public void retryPolicyExhaustedWhenExecutingConnectedPagedOperationStickyConnection() throws Exception {
+    flowRunner("fail-paged-with-connection")
+        .withVariable("sticky", true)
+        .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(3));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
+
+  @Test
+  public void retryPolicyNotExecutedWhenIteratingPagingProviderStickyConnection() throws Exception {
+    flowRunner("fail-paged-with-connection")
+        .withVariable("pageNumber", 5).withVariable("sticky", true)
+        .runExpectingException(errorType("MULE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(1));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
 }

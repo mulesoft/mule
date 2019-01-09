@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -86,14 +87,14 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
                          HasOperationDeclarer ownerDeclarer,
-                         OperationContainerElement methodOwnerClass,
+                         OperationContainerElement methodOwnerElement,
                          List<OperationElement> operations,
                          boolean supportsConfig) {
 
     for (OperationElement operationMethod : operations) {
       OperationContainerElement methodOwner = operationMethod.getEnclosingType();
 
-      OperationContainerElement enclosingType = methodOwnerClass != null ? methodOwnerClass : methodOwner;
+      OperationContainerElement enclosingType = methodOwnerElement != null ? methodOwnerElement : methodOwner;
       checkOperationIsNotAnExtension(methodOwner);
 
       final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(operationMethod);
@@ -125,21 +126,19 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       final OperationDeclarer operationDeclarer = actualDeclarer.withOperation(operationMethod.getAlias());
       operationDeclarer.withModelProperty(new ExtensionOperationDescriptorModelProperty(operationMethod));
 
-      Optional<Method> method = operationMethod.getMethod();
-      Optional<Class<?>> declaringClass = enclosingType.getDeclaringClass();
+      Optional<Method> optionalMethod = operationMethod.getMethod();
+      Optional<Class<?>> optionalClass = enclosingType.getDeclaringClass();
 
-      if (method.isPresent() && declaringClass.isPresent()) {
-        operationDeclarer.withModelProperty(new ImplementingMethodModelProperty(method.get()));
-        if (isPagingProvider(operationMethod.getReturnType())) {
-          operationDeclarer
-              .withModelProperty(new ComponentExecutorModelProperty(new PagedReflectiveOperationExecutorFactory<>(declaringClass
-                  .get(),
-                                                                                                                  method.get())));
-        } else {
-          operationDeclarer
-              .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
-                                                                                                             method.get())));
-        }
+      if (optionalMethod.isPresent() && optionalClass.isPresent()) {
+        Method classMethod = optionalMethod.get();
+        operationDeclarer.withModelProperty(new ImplementingMethodModelProperty(classMethod));
+
+        Class<?> methodOwnerClass = optionalClass.get();
+        ComponentExecutorFactory componentExecutorFactory = isPagingProvider(operationMethod.getReturnType())
+            ? new PagedReflectiveOperationExecutorFactory<>(methodOwnerClass, classMethod)
+            : new ReflectiveOperationExecutorFactory<>(methodOwnerClass, classMethod);
+
+        operationDeclarer.withModelProperty(new ComponentExecutorModelProperty(componentExecutorFactory));
       }
 
       loader.addExceptionEnricher(operationMethod, operationDeclarer);

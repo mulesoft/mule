@@ -8,7 +8,9 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,6 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionT
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -37,6 +40,7 @@ import java.util.function.Function;
 public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   private static final String PAGE_ERROR = "An error occurred trying to obtain a Page";
+  private static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier connectionSupplier;
@@ -47,7 +51,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
                                 ExtensionConnectionSupplier connectionSupplier) {
-    this.delegate = new PagingProviderWrapper(delegate);
+    this.delegate = new PagingProviderWrapper<>(delegate);
     this.config = config;
     this.executionContext = executionContext;
     this.connectionSupplier = connectionSupplier;
@@ -84,8 +88,12 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
       return function.apply(connectionSupplier.getConnection());
     } catch (Throwable e) {
-      ConnectionSupplier finalConnectionSupplier = connectionSupplier;
-      ExceptionUtils.extractConnectionException(e).ifPresent(c -> finalConnectionSupplier.invalidate());
+      if (connectionSupplier != null) {
+        Optional<ConnectionException> connectionException = extractConnectionException(e);
+        if (connectionException.isPresent()) {
+          connectionSupplier.invalidate();
+        }
+      }
       throw new MuleRuntimeException(createStaticMessage(PAGE_ERROR), e);
     } finally {
       if (connectionSupplier != null) {
@@ -104,7 +112,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
       delegate.close(connectionSupplier.getConnection());
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(PAGE_ERROR), e);
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
       if (connectionSupplier != null) {
         connectionSupplier.close();

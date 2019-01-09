@@ -9,12 +9,10 @@ package org.mule.test.petstore.extension;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
@@ -55,7 +53,7 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
     throw new Throwable(CONNECTION_FAIL);
   }
 
-  public PagingProvider<PetStoreClient, Integer> failPagedOperation(int failOnPage) {
+  public PagingProvider<PetStoreClient, Integer> failPagedOperation(int failOnPage, @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false") boolean stickyConnections) {
     return new PagingProvider<PetStoreClient, Integer>() {
 
       private int index = 0;
@@ -79,6 +77,11 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
       @Override
       public void close(PetStoreClient petStoreClient) throws MuleException {
 
+      }
+
+      @Override
+      public boolean useStickyConnections() {
+        return stickyConnections;
       }
     };
   }
