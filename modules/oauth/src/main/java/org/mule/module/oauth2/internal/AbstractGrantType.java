@@ -8,6 +8,7 @@ package org.mule.module.oauth2.internal;
 
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 
@@ -70,5 +71,20 @@ public abstract class AbstractGrantType implements HttpAuthentication, Applicati
     public String getClientId()
     {
         return clientId;
+    }
+    
+    protected String getAccessToken(final ConfigOAuthContext context, final String resourceOwnerId)
+    {
+        final String accessToken;
+        context.getContextForResourceOwner(resourceOwnerId).getRefreshUserOAuthContextLock().lock();
+        try
+        {
+            accessToken = context.getContextForResourceOwner(resourceOwnerId).getAccessToken();
+        }
+        finally
+        {
+            context.getContextForResourceOwner(resourceOwnerId).getRefreshUserOAuthContextLock().unlock();
+        }
+        return accessToken;
     }
 }
