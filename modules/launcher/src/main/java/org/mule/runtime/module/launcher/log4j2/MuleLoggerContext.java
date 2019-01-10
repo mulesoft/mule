@@ -12,15 +12,15 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import java.beans.PropertyChangeListener;
-import java.net.URI;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+
+import java.beans.PropertyChangeListener;
+import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Subclass of {@link org.apache.logging.log4j.core.LoggerContext} which adds some information about the mule artifact being
@@ -108,6 +108,20 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     removePropertyChangeListener(logConfigChangeListener);
   }
 
+  @Override
+  public Logger getLogger(String name) {
+    // TODO Auto-generated method stub
+    final Logger logger2 = super.getLogger(name);
+    return logger2;
+  }
+
+  @Override
+  public Logger getLogger(String name, MessageFactory messageFactory) {
+    // TODO Auto-generated method stub
+    final Logger logger2 = super.getLogger(name, messageFactory);
+    return logger2;
+  }
+
   /**
    * Override to return a {@link DispatchingLogger} instead of a simple logger {@inheritDoc}
    *
@@ -116,16 +130,23 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   @Override
   protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory) {
 
-    return new DispatchingLogger(super.newInstance(ctx, name, messageFactory), ownerClassLoaderHash, this, contextSelector,
-                                 messageFactory) {
+    return new MuleDispatchingLogger(super.newInstance(ctx, name, messageFactory), ownerClassLoaderHash, this, contextSelector,
+                                     messageFactory);
+  }
 
-      // force the name due to log4j2's cyclic constructor dependencies
-      // aren't a friend of the wrapper pattern
-      @Override
-      public String getName() {
-        return name;
-      }
-    };
+  private static final class MuleDispatchingLogger extends DispatchingLogger {
+
+    private MuleDispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext,
+                                  ContextSelector contextSelector, MessageFactory messageFactory) {
+      super(originalLogger, ownerClassLoaderHash, loggerContext, contextSelector, messageFactory);
+    }
+
+    // force the name due to log4j2's cyclic constructor dependencies
+    // aren't a friend of the wrapper pattern
+    @Override
+    public String getName() {
+      return name;
+    }
   }
 
   protected URI getConfigFile() {
