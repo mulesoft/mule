@@ -8,7 +8,9 @@ package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.transformer.types.DataTypeFactory.TEXT_STRING;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.transport.NullPayload;
@@ -51,9 +53,10 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
     {
         Flow flow = (Flow) getFlowConstruct("customSourceFlow");
         MuleEvent event = getTestEvent(payload);
-        event.setFlowVariable("customSource", "customValue");
+        event.setFlowVariable("customSource", "customValue", TEXT_STRING);
         flow.process(event);
         assertThat(body, equalTo("customValue"));
+        assertThat(getFirstReceivedHeader("Content-Type"), is("text/plain"));
     }
 
     @Test
