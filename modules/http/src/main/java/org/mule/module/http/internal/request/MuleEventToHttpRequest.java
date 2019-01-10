@@ -36,6 +36,7 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.transformer.types.MimeTypes;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.DataTypeUtils;
@@ -138,16 +139,6 @@ public class MuleEventToHttpRequest
             }
         }
 
-        if (!outboundPropertyNames.contains(CONTENT_TYPE_PROPERTY) && !builder.getHeaders().containsKey(CONTENT_TYPE_PROPERTY) &&
-          !isEmptyBody(event, resolvedMethod))
-        {
-            DataType<?> dataType = event.getMessage().getDataType();
-            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
-            {
-                builder.addHeader(CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
-            }
-        }
-
         if (requester.getConfig().isEnableCookies())
         {
             try
@@ -170,7 +161,9 @@ public class MuleEventToHttpRequest
 
         }
 
-        builder.setEntity(createRequestEntity(builder, event, resolvedMethod));
+        boolean noContentType =
+          !outboundPropertyNames.contains(CONTENT_TYPE_PROPERTY) && !builder.getHeaders().containsKey(CONTENT_TYPE_PROPERTY);
+        builder.setEntity(createRequestEntity(builder, event, resolvedMethod, noContentType));
 
         return builder;
     }
@@ -192,7 +185,7 @@ public class MuleEventToHttpRequest
         });
     }
 
-    private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod) throws MessagingException
+    private HttpEntity createRequestEntity(HttpRequestBuilder builder, MuleEvent muleEvent, String resolvedMethod, boolean addContentType) throws MessagingException
     {
         boolean customSource = false;
         Object oldPayload = null;
@@ -200,19 +193,29 @@ public class MuleEventToHttpRequest
 
         if (!StringUtils.isEmpty(requester.getSource()) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getSource())))
         {
-            Object newPayload = muleContext.getExpressionManager().evaluate(requester.getSource(), muleEvent);
+            TypedValue result = muleContext.getExpressionManager().evaluateTyped(requester.getSource(), muleEvent.getMessage());
             oldPayload = muleEvent.getMessage().getPayload();
-            muleEvent.getMessage().setPayload(newPayload);
+            muleEvent.getMessage().setPayload(result.getValue(), result.getDataType());
             customSource = true;
         }
 
-        if (isEmptyBody(muleEvent, resolvedMethod))
+        boolean emptyBody = isEmptyBody(muleEvent, resolvedMethod);
+        if (addContentType && !emptyBody)
+        {
+            DataType<?> dataType = muleEvent.getMessage().getDataType();
+            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            {
+                builder.addHeader(CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
+            }
+        }
+
+        if (emptyBody)
         {
             entity = new EmptyHttpEntity();
         }
         else
         {
-            entity = createRequestEntityFromPayload(requestBuilder, muleEvent);
+            entity = createRequestEntityFromPayload(builder, muleEvent);
         }
 
         if (customSource)
