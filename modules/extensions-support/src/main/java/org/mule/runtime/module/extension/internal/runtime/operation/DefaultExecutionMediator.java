@@ -81,25 +81,16 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   private final ConnectionManagerAdapter connectionManager;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
-  private final List<ValueTransformer> valueTransformers;
-
   private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
-
-  @FunctionalInterface
-  public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
-
-  }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   T operationModel,
                                   ConnectionManagerAdapter connectionManager,
-                                  ErrorTypeRepository typeRepository,
-                                  ValueTransformer... valueTransformers) {
+                                  ErrorTypeRepository typeRepository) {
     this.connectionManager = connectionManager;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
-    this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
   }
 
 
@@ -139,7 +130,6 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
       Mono<Object> result;
       if (beforeExecutionResult.isOk()) {
         result = from(withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context)))
-            .map(value -> transform(context, value))
             .doOnSuccess(value -> {
               onSuccess(context, value, interceptors);
               stats.ifPresent(s -> s.discountInflightOperation());
@@ -171,14 +161,6 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     e = onError(context, e, interceptors);
 
     return e;
-  }
-
-  private Object transform(ExecutionContextAdapter context, Object value) {
-    for (ValueTransformer transformer : valueTransformers) {
-      value = transformer.apply(context, value);
-    }
-
-    return value;
   }
 
   InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
