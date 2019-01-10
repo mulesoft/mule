@@ -10,7 +10,6 @@ import static java.util.Comparator.comparing;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
-
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -28,14 +27,14 @@ import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ScheduledFuture;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The MonitoredObjectStoreWrapper wraps an ObjectStore which does not support direct expiry and adds this behavior
@@ -159,7 +158,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     try {
       final long now = System.currentTimeMillis();
       List<String> keys = allKeys();
-      int excess = (allKeys().size() - maxEntries);
+      int excess = maxEntries != null ? (allKeys().size() - maxEntries) : 0;
 
       PriorityQueue<StoredObject<T>> sortedMaxEntries = null;
 
