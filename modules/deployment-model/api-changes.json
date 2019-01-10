@@ -1,7 +1,25 @@
 {
-  "4.1.4": {
+  "4.1.5": {
     "revapi": {
       "ignore": [
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "fieldName": "MULE_POM",
+          "elementKind": "field",
+          "justification": "MULE-16230"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM_PROPERTIES",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "fieldName": "MULE_POM_PROPERTIES",
+          "elementKind": "field",
+          "justification": "MULE-16230"
+        },
         {
           "code": "java.method.added",
           "new": "method org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder::setRuntimeComponentBuildingDefinitionProvider(org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider)",
