@@ -225,10 +225,12 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
           resolvedParameters.putAll(params.entrySet().stream()
               .collect(toMap(e -> e.getKey(),
                              e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
+          Map<String, Object> interceptionEventParams = new HashMap<>();
+          interceptionEventParams.put(INTERCEPTION_RESOLVED_CONTEXT, context);
+          interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
+          interceptionEventParams.put(INTERCEPTION_COMPONENT, component);
 
-          builder.addInternalParameter(INTERCEPTION_RESOLVED_CONTEXT, context);
-          builder.addInternalParameter(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
-          builder.addInternalParameter(INTERCEPTION_COMPONENT, component);
+          builder.internalParameters(interceptionEventParams);
         });
         return builder.build();
       } catch (ExpressionRuntimeException e) {
