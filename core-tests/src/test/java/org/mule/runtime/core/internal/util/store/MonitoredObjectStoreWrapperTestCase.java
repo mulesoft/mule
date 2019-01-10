@@ -9,14 +9,15 @@ package org.mule.runtime.core.internal.util.store;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.probe.PollingProber.check;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.internal.util.store.MonitoredObjectStoreWrapper.StoredObject;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,23 +34,28 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
 
   @Mock
   private ObjectStore objectStore;
-
   private MonitoredObjectStoreWrapper wrapper;
 
-  @Before
-  public void before() throws Exception {
+  @Test
+  public void expireWithoutMaxEntries() throws Exception {
+    when(settings.getMaxEntries()).thenReturn(empty());
+    when(settings.getEntryTTL()).thenReturn(of(1L));
+
     StoredObject value = new StoredObject("", 0L, KEY);
     when(objectStore.retrieve(KEY)).thenReturn(value);
-    when(objectStore.allKeys()).thenReturn(asList(value));
-  }
+    when(objectStore.allKeys()).thenReturn(asList(KEY));
+    when(objectStore.contains(KEY)).thenReturn(true);
+    when(objectStore.remove(KEY)).thenReturn(value);
 
-  @Test
-  public void expireWithoutMaxEntries() {
-    when(settings.getMaxEntries()).thenReturn(empty());
-    when(settings.getEntryTTL()).thenReturn(of(500L));
     wrapper = new MonitoredObjectStoreWrapper(objectStore, settings);
 
     wrapper.expire();
+
+    check(5000, 100, () -> {
+      verify(objectStore).remove(KEY);
+      return true;
+    });
+    //check(5000, 100, () -> wrapper.allKeys().isEmpty());
   }
 
 
