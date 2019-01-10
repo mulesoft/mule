@@ -19,7 +19,6 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -40,14 +39,14 @@ import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -102,7 +101,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
               .transform(next)
               .onErrorMap(MessagingException.class,
                           error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
-                              .apply((InternalEvent) error.getEvent()),
+                                                                .apply((InternalEvent) error.getEvent()),
                                                             error.getCause(), (Component) component, of(error)))
               .cast(InternalEvent.class)
               .map(doAfter(interceptor, (Component) component, empty()))
@@ -161,7 +160,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       return !(interceptor.getClass().getMethod(BEFORE_METHOD_NAME, ComponentLocation.class, Map.class, InterceptionEvent.class)
           .isDefault()
           && interceptor.getClass()
-              .getMethod(AFTER_METHOD_NAME, ComponentLocation.class, InterceptionEvent.class, Optional.class).isDefault());
+          .getMethod(AFTER_METHOD_NAME, ComponentLocation.class, InterceptionEvent.class, Optional.class).isDefault());
     } catch (NoSuchMethodException | SecurityException e) {
       throw new MuleRuntimeException(e);
     }
@@ -224,14 +223,12 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       try {
         ((ParametersResolverProcessor<?>) component).resolveParameters(builder, (params, context) -> {
           resolvedParameters.putAll(params.entrySet().stream()
-              .collect(toMap(e -> e.getKey(),
-                             e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
-          Map<String, Object> interceptionEventParams = new HashMap<>();
-          interceptionEventParams.put(INTERCEPTION_RESOLVED_CONTEXT, context);
-          interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
-          interceptionEventParams.put(INTERCEPTION_COMPONENT, component);
+                                        .collect(toMap(e -> e.getKey(),
+                                                       e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
 
-          builder.internalParameters(interceptionEventParams);
+          builder.addInternalParameter(INTERCEPTION_RESOLVED_CONTEXT, context);
+          builder.addInternalParameter(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
+          builder.addInternalParameter(INTERCEPTION_COMPONENT, component);
         });
         return builder.build();
       } catch (ExpressionRuntimeException e) {
