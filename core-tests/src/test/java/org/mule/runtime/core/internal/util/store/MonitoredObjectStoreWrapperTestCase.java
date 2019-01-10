@@ -55,8 +55,5 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
       verify(objectStore).remove(KEY);
       return true;
     });
-    //check(5000, 100, () -> wrapper.allKeys().isEmpty());
   }
-
-
 }
