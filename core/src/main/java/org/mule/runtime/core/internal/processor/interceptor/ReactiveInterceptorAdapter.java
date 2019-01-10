@@ -101,7 +101,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
               .transform(next)
               .onErrorMap(MessagingException.class,
                           error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
-                                                                .apply((InternalEvent) error.getEvent()),
+                              .apply((InternalEvent) error.getEvent()),
                                                             error.getCause(), (Component) component, of(error)))
               .cast(InternalEvent.class)
               .map(doAfter(interceptor, (Component) component, empty()))
@@ -160,7 +160,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       return !(interceptor.getClass().getMethod(BEFORE_METHOD_NAME, ComponentLocation.class, Map.class, InterceptionEvent.class)
           .isDefault()
           && interceptor.getClass()
-          .getMethod(AFTER_METHOD_NAME, ComponentLocation.class, InterceptionEvent.class, Optional.class).isDefault());
+              .getMethod(AFTER_METHOD_NAME, ComponentLocation.class, InterceptionEvent.class, Optional.class).isDefault());
     } catch (NoSuchMethodException | SecurityException e) {
       throw new MuleRuntimeException(e);
     }
@@ -223,8 +223,8 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       try {
         ((ParametersResolverProcessor<?>) component).resolveParameters(builder, (params, context) -> {
           resolvedParameters.putAll(params.entrySet().stream()
-                                        .collect(toMap(e -> e.getKey(),
-                                                       e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
+              .collect(toMap(e -> e.getKey(),
+                             e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
 
           builder.addInternalParameter(INTERCEPTION_RESOLVED_CONTEXT, context);
           builder.addInternalParameter(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
