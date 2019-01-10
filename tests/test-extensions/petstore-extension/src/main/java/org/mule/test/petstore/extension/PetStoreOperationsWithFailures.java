@@ -9,6 +9,7 @@ package org.mule.test.petstore.extension;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
