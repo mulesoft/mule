@@ -434,7 +434,7 @@ public final class IntrospectionUtils {
         || type.isAssignableTo(Disposable.class);
   }
 
-  private static boolean isPagingProvider(Type type) {
+  public static boolean isPagingProvider(Type type) {
     return type.isAssignableTo(PagingProvider.class);
   }
 

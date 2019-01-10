@@ -14,7 +14,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -38,13 +37,6 @@ public final class OperationMessageProcessorBuilder
 
   @Override
   protected OperationMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
-    if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                arguments,
-                                                cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                reflectionCache, extensionConnectionSupplier);
-    }
-
     if (supportsOAuth(extensionModel)) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments,

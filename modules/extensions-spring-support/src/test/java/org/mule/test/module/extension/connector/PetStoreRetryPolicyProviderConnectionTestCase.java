@@ -150,4 +150,46 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
   public void retryPolicyNotExecutedDueToNotConnectionExceptionWithThrowable() throws Throwable {
     flowRunner("fail-operation-with-not-handled-throwable").runExpectingException();
   }
+
+  @Test
+  public void retryPolicyExhaustedWhenExecutingConnectedPagedOperation() throws Exception {
+    flowRunner("fail-paged-with-connection").runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(3));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
+
+  @Test
+  public void retryPolicyNotExecutedWhenIteratingPagingProvider() throws Exception {
+    flowRunner("fail-paged-with-connection")
+        .withVariable("pageNumber", 5)
+        .runExpectingException(errorType("MULE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(1));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
+
+  @Test
+  public void retryPolicyExhaustedWhenExecutingConnectedPagedOperationStickyConnection() throws Exception {
+    flowRunner("fail-paged-with-connection")
+        .withVariable("sticky", true)
+        .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(3));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
+
+  @Test
+  public void retryPolicyNotExecutedWhenIteratingPagingProviderStickyConnection() throws Exception {
+    flowRunner("fail-paged-with-connection")
+        .withVariable("pageNumber", 5).withVariable("sticky", true)
+        .runExpectingException(errorType("MULE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(1));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
 }

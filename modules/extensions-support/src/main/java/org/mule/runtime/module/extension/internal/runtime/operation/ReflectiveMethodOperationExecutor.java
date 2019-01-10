@@ -32,6 +32,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMe
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
@@ -47,12 +48,20 @@ public class ReflectiveMethodOperationExecutor<M extends ComponentModel>
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
 
-  private final ReflectiveMethodComponentExecutor<M> executor;
+  final ReflectiveMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
+  private BiFunction<Object, ExecutionContext<M>, Object> resultTransformer = (o, e) -> o;
 
   public ReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
-    executor =
+    this.executor =
         new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
+  }
+
+  public ReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance,
+                                           BiFunction<Object, ExecutionContext<M>, Object> resultTransformer) {
+    this.executor =
+        new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
+    this.resultTransformer = resultTransformer;
   }
 
   /**
@@ -61,7 +70,9 @@ public class ReflectiveMethodOperationExecutor<M extends ComponentModel>
   @Override
   public Publisher<Object> execute(ExecutionContext<M> executionContext) {
     try {
-      return justOrEmpty(executor.execute(executionContext));
+      Object result = executor.execute(executionContext);
+      result = resultTransformer.apply(result, executionContext);
+      return justOrEmpty(result);
     } catch (Exception e) {
       return handleError(e, (ExecutionContextAdapter<M>) executionContext);
     } catch (Throwable t) {
@@ -85,6 +96,7 @@ public class ReflectiveMethodOperationExecutor<M extends ComponentModel>
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(executor, true, muleContext);
+    initialiseIfNeeded(resultTransformer, true, muleContext);
   }
 
   @Override

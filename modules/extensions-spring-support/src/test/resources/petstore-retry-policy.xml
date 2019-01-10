@@ -39,6 +39,13 @@
         <petstore:fail-connection config-ref="petstore-invalid"/>
     </flow>
 
+    <flow name="fail-paged-with-connection">
+        <petstore:fail-paged-operation failOnPage="#[vars.pageNumber default 0]" stickyConnections="#[vars.sticky default false]" config-ref="petstore-invalid"/>
+        <foreach>
+            <logger message="#[payload]"/>
+        </foreach>
+    </flow>
+
     <flow name="fail-operation-with-connection-exception-tx">
         <try transactionalAction="ALWAYS_BEGIN">
             <petstore:fail-connection config-ref="petstore-valid"/>
