@@ -20,16 +20,14 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
+import org.mule.runtime.core.api.processor.ContextClassloaderAwareProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -53,8 +51,7 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @NoExtend
-public class PolicyChain extends AbstractComponent
-    implements Initialisable, Startable, Stoppable, Disposable, Processor {
+public class PolicyChain extends AbstractComponent    implements Lifecycle, ContextClassloaderAwareProcessor {
 
   @Inject
   private MuleContext muleContext;

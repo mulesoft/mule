@@ -57,6 +57,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.processor.ContextClassloaderAwareProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.rx.Exceptions;
@@ -132,7 +133,7 @@ import reactor.util.context.Context;
  * @since 4.0
  */
 public abstract class ComponentMessageProcessor<T extends ComponentModel> extends ExtensionComponent<T>
-    implements Processor, ParametersResolverProcessor<T>, Lifecycle {
+    implements ContextClassloaderAwareProcessor, ParametersResolverProcessor<T>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
 

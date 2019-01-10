@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.ContextClassloaderAwareProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -147,6 +148,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           .onErrorContinue(getContinueStrategyErrorHandler(processor));
     }
     return stream.subscriberContext(ctx -> {
+      if (ctx.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY).isPresent()) {
+        return ctx;
+      }
+
       ClassLoader tccl = currentThread().getContextClassLoader();
       if (tccl == null || tccl.getParent() == null
           || appClClass == null || !appClClass.isAssignableFrom(tccl.getClass())) {
@@ -236,32 +241,42 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
 
     // Set thread context
-    interceptors.add((processor, next) -> stream -> from(stream)
-        // #2 Wrap execution, after processing strategy, on processor execution thread.
-        .doOnNext(event -> {
-          currentMuleContext.set(muleContext);
-          setCurrentEvent((PrivilegedEvent) event);
-        })
-        // #1 Update TCCL with the one from the Region of the processor to execute once in execution thread.
-        .transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_CONSUMER)
+    interceptors.add((processor, next) -> stream -> {
+      final Flux<CoreEvent> baseFlux = from(stream)
+          // #2 Wrap execution, after processing strategy, on processor execution thread.
+          .doOnNext(event -> {
+            currentMuleContext.set(muleContext);
+            setCurrentEvent((PrivilegedEvent) event);
+          });
+
+      if (processor instanceof ContextClassloaderAwareProcessor) {
+        return baseFlux.transform(next);
+      } else {
+        return baseFlux.transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_CONSUMER)
             .andThen(next)
             // #1 Set back previous TCCL.
-            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER))));
+            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER)));
+      }
+    });
 
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
-      if (muleContext.getConfiguration().isThreadLoggingEnabled()) {
-        interceptors.add((processor, next) -> stream -> from(stream)
-            .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
-            .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId(), true))
-            .transform(processingStrategy
-                .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
-            .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId())));
-      } else {
-        interceptors.add((processor, next) -> processingStrategy
-            .onProcessor(new InterceptedReactiveProcessor(processor, next, null)));
-      }
+      interceptors.add((processor, next) -> {
+        if (processor instanceof MessageProcessorChain) {
+          return stream -> from(stream).transform(next);
+        } else if (muleContext.getConfiguration().isThreadLoggingEnabled()) {
+          return stream -> from(stream)
+              .subscriberContext(context -> context.put(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY, threadNotificationLogger))
+              .doOnNext(event -> threadNotificationLogger.setStartingThread(event.getContext().getId(), true))
+              .transform(processingStrategy
+                  .onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
+              .doOnNext(event -> threadNotificationLogger.setFinishThread(event.getContext().getId()));
+        } else {
+          return processingStrategy
+              .onProcessor(new InterceptedReactiveProcessor(processor, next, null));
+        }
+      });
     }
 
     // Apply processor interceptors around processor and other core logic
@@ -271,12 +286,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     interceptors.add((processor, next) -> stream -> from(stream)
         .doOnNext(preNotification(processor))
         .transform(next)
-        .map(result -> {
+        // If the processor returns a CursorProvider, then have the StreamingManager manage it
+        .map(updateEventForStreaming(streamingManager).compose(result -> {
           postNotification(processor).accept(result);
           setCurrentEvent((PrivilegedEvent) result);
-          // If the processor returns a CursorProvider, then have the StreamingManager manage it
-          return updateEventForStreaming(streamingManager).apply(result);
-        }));
+          return result;
+        })));
 
     return interceptors;
   }

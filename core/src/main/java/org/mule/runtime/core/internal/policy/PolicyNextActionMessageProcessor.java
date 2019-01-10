@@ -28,6 +28,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.ContextClassloaderAwareProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -54,7 +55,8 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
+public class PolicyNextActionMessageProcessor extends AbstractComponent
+    implements ContextClassloaderAwareProcessor, Initialisable {
 
   private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
