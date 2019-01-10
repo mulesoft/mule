@@ -54,7 +54,9 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
     throw new Throwable(CONNECTION_FAIL);
   }
 
-  public PagingProvider<PetStoreClient, Integer> failPagedOperation(int failOnPage, @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false") boolean stickyConnections) {
+  public PagingProvider<PetStoreClient, Integer> failPagedOperation(int failOnPage,
+                                                                    @org.mule.runtime.extension.api.annotation.param.Optional(
+                                                                        defaultValue = "false") boolean stickyConnections) {
     return new PagingProvider<PetStoreClient, Integer>() {
 
       private int index = 0;
