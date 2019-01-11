@@ -151,7 +151,7 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
     MetadataType type = typed.getType();
     assertThat(typed.hasDynamicType(), is(false));
     assertThat(type.getMetadataFormat(), is(XML));
-    assertThat(type.toString(), is("shiporder"));
+    assertThat(type.toString(), is("#root:shiporder"));
   }
 
   private void assertJsonPerson(Typed typed) {
