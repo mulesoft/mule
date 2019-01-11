@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 
 public class MockExpressionLanguageFactoryService implements DefaultExpressionLanguageFactoryService {
 
@@ -22,5 +23,10 @@ public class MockExpressionLanguageFactoryService implements DefaultExpressionLa
   @Override
   public ExpressionLanguage create() {
     return new MockExpressionLanguage();
+  }
+
+  @Override
+  public ExpressionLanguage create(ExpressionLanguageConfiguration configuration) {
+    return create();
   }
 }
