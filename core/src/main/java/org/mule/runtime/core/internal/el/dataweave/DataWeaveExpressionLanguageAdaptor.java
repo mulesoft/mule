@@ -15,6 +15,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
@@ -33,7 +34,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
@@ -58,7 +58,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service) {
     this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
-        .defaultEncoding(SystemUtils.getDefaultEncoding(muleContext))
+        .defaultEncoding(getDefaultEncoding(muleContext))
         .build());
     this.muleContext = muleContext;
     registerGlobalBindings(registry);
