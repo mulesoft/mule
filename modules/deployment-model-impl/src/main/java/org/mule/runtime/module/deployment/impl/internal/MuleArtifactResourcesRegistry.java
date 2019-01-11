@@ -117,7 +117,7 @@ public class MuleArtifactResourcesRegistry {
      */
     public MuleArtifactResourcesRegistry build() {
       if (moduleRepository == null) {
-        moduleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(this.getClass().getClassLoader()));
+        moduleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(getClass().getClassLoader()));
       }
 
       return new MuleArtifactResourcesRegistry(moduleRepository);
