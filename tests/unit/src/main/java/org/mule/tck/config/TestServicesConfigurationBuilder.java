@@ -17,6 +17,7 @@ import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.MuleContext;
@@ -92,6 +93,11 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
           @Override
           public ExpressionLanguage create() {
+            return exprLanguage;
+          }
+
+          @Override
+          public ExpressionLanguage create(ExpressionLanguageConfiguration configuration) {
             return exprLanguage;
           }
 
