@@ -16,6 +16,11 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Abstract implementation of {@link MetadataResolutionTypeInformation} that is based on a {@link DslElementModel}
+ *
+ * @since 4.2.0
+ */
 public abstract class AbstractMetadataResolutionTypeInformation implements MetadataResolutionTypeInformation {
 
   private String resolverCategory;

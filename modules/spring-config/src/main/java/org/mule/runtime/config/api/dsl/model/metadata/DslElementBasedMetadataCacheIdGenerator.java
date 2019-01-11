@@ -73,9 +73,9 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
    */
   @Override
   public Optional<MetadataCacheId> getIdForComponentOutputMetadata(DslElementModel<?> component) {
-    checkArgument(component.getModel() != null, "Cannot generate an Output Cache Key for a 'null' component");
-    checkArgument(component.getModel() instanceof HasOutputModel,
-                  "Cannot generate an Output Cache Key for a component with no output");
+    if (component.getModel() == null || !(component.getModel() instanceof HasOutputModel)) {
+      return empty();
+    }
     return doResolveType(component, new OutputMetadataResolutionTypeInformation(component));
   }
 
@@ -84,9 +84,9 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
    */
   @Override
   public Optional<MetadataCacheId> getIdForComponentAttributesMetadata(DslElementModel<?> component) {
-    checkArgument(component.getModel() != null, "Cannot generate an Attribute Cache Key for a 'null' component");
-    checkArgument(component.getModel() instanceof HasOutputModel,
-                  "Cannot generate an Attribute Cache Key for a component with no output");
+    if (component.getModel() == null || !(component.getModel() instanceof HasOutputModel)) {
+      return empty();
+    }
     return doResolveType(component, new AttributesMetadataResolutionTypeInformation(component));
   }
 

@@ -16,9 +16,14 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 
 import java.util.Optional;
 
+/**
+ * Implementation of {@link MetadataResolutionTypeInformation} that describes Output Types from a {@link DslElementModel}
+ *
+ * @since 4.2.0
+ */
 public class OutputMetadataResolutionTypeInformation extends AbstractMetadataResolutionTypeInformation {
 
-  private static final String TYPE_IDENTIFIER = "Output Type";
+  private static final String TYPE_IDENTIFIER = "Output";
   private static final MetadataCacheId COMPONENT_TYPE_METADATA_CACHE_ID =
       new MetadataCacheId(TYPE_IDENTIFIER.hashCode(), TYPE_IDENTIFIER);
 

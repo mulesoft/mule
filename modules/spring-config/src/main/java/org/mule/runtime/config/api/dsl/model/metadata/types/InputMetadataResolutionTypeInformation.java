@@ -16,9 +16,14 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 
 import java.util.Optional;
 
+/**
+ * Implementation of {@link MetadataResolutionTypeInformation} that describes Input Types from a {@link DslElementModel}
+ *
+ * @since 4.2.0
+ */
 public class InputMetadataResolutionTypeInformation extends AbstractMetadataResolutionTypeInformation {
 
-  public static final String TYPE_IDENTIFIER = "Input Type";
+  public static final String TYPE_IDENTIFIER = "Input";
   private final MetadataCacheId componentTypeMetadataCacheId;
 
   public InputMetadataResolutionTypeInformation(DslElementModel<?> component, String parameterName) {

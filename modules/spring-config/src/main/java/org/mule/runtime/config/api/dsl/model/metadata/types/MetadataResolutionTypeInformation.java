@@ -13,6 +13,8 @@ import java.util.Optional;
 
 /**
  * Inteface defined to handle a component type to create a {@link MetadataCacheId} that describes it
+ *
+ * @since 4.2.0
  */
 @NoImplement
 public interface MetadataResolutionTypeInformation {
