@@ -9,6 +9,24 @@
           "classSimpleName": "DeployableArtifactDescriptor",
           "fieldName": "MULE_POM",
           "elementKind": "field",
+          "justification": "Adding static field for pom.xml file"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM_PROPERTIES",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "fieldName": "MULE_POM_PROPERTIES",
+          "elementKind": "field",
+          "justification": "Adding static field for pom.properties file"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "fieldName": "MULE_POM",
+          "elementKind": "field",
           "justification": "MULE-16230"
         },
         {
