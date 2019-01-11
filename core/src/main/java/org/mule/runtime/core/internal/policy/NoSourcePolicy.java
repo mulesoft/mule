@@ -8,9 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
-import static reactor.core.publisher.FluxSink.OverflowStrategy.ERROR;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -52,7 +50,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
-          Flux.<CoreEvent>create(sinkRef, ERROR)
+          Flux.<CoreEvent>create(sinkRef)
               .transform(flowExecutionProcessor)
               .map(flowExecutionResult -> {
                 MessageSourceResponseParametersProcessor parametersProcessor =
@@ -68,31 +66,15 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
               .doOnNext(result -> result.apply(spfr -> commonPolicy.finishFlowProcessing(spfr.getMessagingException().getEvent(),
                                                                                          result, spfr.getMessagingException()),
                                                spsr -> commonPolicy.finishFlowProcessing(spsr.getResult(), result)))
-              .onErrorContinue((t, e) -> {
-                if (t instanceof IllegalStateException) {
-                  // Indicate the flow to do back-pressure for this event.
-                  // IllegalStateException is what is thrown when this flows is overflow.
-                  CoreEvent event = (CoreEvent) e;
-                  commonPolicy.finishFlowProcessing(event,
-                                                    left(new SourcePolicyFailureResult(new FlowExecutionException(event, t,
-                                                                                                                  (Component) flowExecutionProcessor),
-                                                                                       () -> commonPolicy
+              .onErrorContinue(MessagingException.class, (t, e) -> {
+                final MessagingException me = (MessagingException) t;
+                final InternalEvent event = (InternalEvent) me.getEvent();
 
-                                                                                           .getResponseParamsProcessor(event)
-                                                                                           .getFailedExecutionResponseParametersFunction()
-                                                                                           .apply(event))),
-                                                    t);
-                } else {
-                  final MessagingException me = (MessagingException) t;
-                  final InternalEvent event = (InternalEvent) me.getEvent();
-
-                  commonPolicy.finishFlowProcessing(event,
-                                                    left(new SourcePolicyFailureResult(me, () -> commonPolicy
-                                                        .getResponseParamsProcessor(event)
-                                                        .getFailedExecutionResponseParametersFunction().apply(me.getEvent()))),
-                                                    me);
-                }
-
+                commonPolicy.finishFlowProcessing(event,
+                                                  left(new SourcePolicyFailureResult(me, () -> commonPolicy
+                                                      .getResponseParamsProcessor(event)
+                                                      .getFailedExecutionResponseParametersFunction().apply(me.getEvent()))),
+                                                  me);
               });
 
       policyFlux.subscribe();
