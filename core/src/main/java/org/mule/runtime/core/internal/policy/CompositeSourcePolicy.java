@@ -183,12 +183,13 @@ public class CompositeSourcePolicy extends
 
   private Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,
                                          Map<String, Object> policyResponseParameters) {
-    Map<String, Object> concatMap = new HashMap<>();
-    if (originalResponseParameters != null) {
-      concatMap.putAll(originalResponseParameters);
+    if (originalResponseParameters == null) {
+      return policyResponseParameters;
+    } else {
+      Map<String, Object> concatMap = new HashMap<>(originalResponseParameters);
+      policyResponseParameters.forEach((k, v) -> concatMap.merge(k, v, (v1, v2) -> v2));
+      return concatMap;
     }
-    concatMap.putAll(policyResponseParameters);
-    return concatMap;
   }
 
   private void logEvent(String eventId, String policyName, Supplier<String> message, String startingMessage) {
