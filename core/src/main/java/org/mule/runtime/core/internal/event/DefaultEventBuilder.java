@@ -60,6 +60,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -127,8 +128,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder variables(Map<String, ?> flowVariables) {
-    initVariables();
-
     copyFromTo(flowVariables, this.flowVariables);
     this.varsModified = true;
     return this;
@@ -267,8 +266,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private void copyFromTo(Map<String, ?> source, Map<String, TypedValue<?>> target) {
     target.clear();
-    source.forEach((s, o) -> target
-        .put(s, o instanceof TypedValue ? (TypedValue<Object>) o : new TypedValue<>(o, DataType.fromObject(o))));
+
+    for (Entry<String, ?> entry : source.entrySet()) {
+      if (entry.getValue() instanceof TypedValue) {
+        target.put(entry.getKey(), (TypedValue<?>) entry.getValue());
+      } else {
+        target.put(entry.getKey(), new TypedValue<>(entry.getValue(), DataType.fromObject(entry.getValue())));
+      }
+    }
     this.modified = true;
   }
 

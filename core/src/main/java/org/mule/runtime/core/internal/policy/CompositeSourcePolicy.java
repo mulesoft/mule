@@ -241,9 +241,8 @@ public class CompositeSourcePolicy
     if (originalResponseParameters == null) {
       return policyResponseParameters;
     } else {
-      Map<String, Object> concatMap = new HashMap<>();
-      concatMap.putAll(originalResponseParameters);
-      concatMap.putAll(policyResponseParameters);
+      Map<String, Object> concatMap = new HashMap<>(originalResponseParameters);
+      policyResponseParameters.forEach((k, v) -> concatMap.merge(k, v, (v1, v2) -> v2));
       return concatMap;
     }
   }
