@@ -882,8 +882,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -914,8 +914,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -1368,8 +1368,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -1400,8 +1400,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -1827,8 +1827,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -1859,8 +1859,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -2305,8 +2305,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -2337,8 +2337,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -2764,8 +2764,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -2796,8 +2796,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -3557,8 +3557,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -3589,8 +3589,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -4794,8 +4794,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -4826,8 +4826,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -5285,8 +5285,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -5317,8 +5317,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -5776,8 +5776,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -5808,8 +5808,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -6214,8 +6214,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -6246,8 +6246,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -6742,8 +6742,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -6774,8 +6774,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -7237,8 +7237,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -7269,8 +7269,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -7688,8 +7688,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -7720,8 +7720,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -8113,8 +8113,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -8145,8 +8145,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -8546,8 +8546,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -8578,8 +8578,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -11473,8 +11473,8 @@
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 },
@@ -11505,8 +11505,8 @@
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {
-                    "Since MuleVersion": {
-                      "sinceMuleVersion": "4.2.0"
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
                     }
                   }
                 }
@@ -14729,8 +14729,8 @@
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
-                "Since MuleVersion": {
-                  "sinceMuleVersion": "4.2.0"
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
                 }
               }
             },
@@ -14761,8 +14761,8 @@
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
-                "Since MuleVersion": {
-                  "sinceMuleVersion": "4.2.0"
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
                 }
               }
             }
@@ -17051,8 +17051,8 @@
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
-                "Since MuleVersion": {
-                  "sinceMuleVersion": "4.2.0"
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
                 }
               }
             }
@@ -17228,8 +17228,8 @@
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
-                "Since MuleVersion": {
-                  "sinceMuleVersion": "4.2.0"
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
                 }
               }
             },
@@ -17260,8 +17260,8 @@
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
-                "Since MuleVersion": {
-                  "sinceMuleVersion": "4.2.0"
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
                 }
               }
             }
@@ -18896,8 +18896,8 @@
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
-                "Since MuleVersion": {
-                  "sinceMuleVersion": "4.2.0"
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
                 }
               }
             },
@@ -18928,8 +18928,8 @@
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
-                "Since MuleVersion": {
-                  "sinceMuleVersion": "4.2.0"
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
                 }
               }
             }

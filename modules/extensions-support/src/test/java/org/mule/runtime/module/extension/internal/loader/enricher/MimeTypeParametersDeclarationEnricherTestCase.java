@@ -351,8 +351,8 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
           assertThat(parameter.getModelProperty(SinceMuleVersionModelProperty.class).isPresent(),
                      is(shouldAddSinceMuleVersionModelProperty));
           if (shouldAddSinceMuleVersionModelProperty) {
-            assertThat(parameter.getModelProperty(SinceMuleVersionModelProperty.class).get().getSinceMuleVersion(),
-                       is(SINCE_MULE_VERSION_MODEL_PROPERTY.getSinceMuleVersion()));
+            assertThat(parameter.getModelProperty(SinceMuleVersionModelProperty.class).get().getVersion(),
+                       is(SINCE_MULE_VERSION_MODEL_PROPERTY.getVersion()));
           }
         });
   }
