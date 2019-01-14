@@ -25,7 +25,7 @@
       "output": {
         "type": {
           "format": "xml",
-          "type": "@ref:{http://validationnamespace.raml.org}User"
+          "type": "@ref:#root:{http://validationnamespace.raml.org}User"
         },
         "hasDynamicType": false,
         "description": "",
@@ -64,7 +64,7 @@
             {
               "type": {
                 "format": "xml",
-                "type": "@ref:{http://validationnamespace.raml.org}User"
+                "type": "@ref:#root:{http://validationnamespace.raml.org}User"
               },
               "hasDynamicType": false,
               "required": true,
@@ -179,7 +179,7 @@
       "output": {
         "type": {
           "format": "xml",
-          "type": "@ref:{http://validationnamespace.raml.org}User"
+          "type": "@ref:#root:{http://validationnamespace.raml.org}User"
         },
         "hasDynamicType": false,
         "description": "",
@@ -335,7 +335,7 @@
             {
               "type": {
                 "format": "xml",
-                "type": "@ref:{http://validationnamespace.raml.org}User"
+                "type": "@ref:#root:{http://validationnamespace.raml.org}User"
               },
               "hasDynamicType": false,
               "required": true,
@@ -450,7 +450,7 @@
       "output": {
         "type": {
           "format": "xml",
-          "type": "@ref:{http://uri}Root0"
+          "type": "@ref:#root:{http://uri}Root0"
         },
         "hasDynamicType": false,
         "description": "",
@@ -489,7 +489,7 @@
             {
               "type": {
                 "format": "xml",
-                "type": "@ref:{http://validationnamespace.raml.org}User"
+                "type": "@ref:#root:{http://validationnamespace.raml.org}User"
               },
               "hasDynamicType": false,
               "required": true,
@@ -517,7 +517,7 @@
             {
               "type": {
                 "format": "xml",
-                "type": "@ref:Root"
+                "type": "@ref:#root:Root"
               },
               "hasDynamicType": false,
               "required": true,
@@ -646,7 +646,7 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "Root"
+        "typeId": "#root:Root"
       },
       "fields": [
         {
@@ -710,7 +710,7 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "{http://uri}Root0"
+        "typeId": "#root:{http://uri}Root0"
       },
       "fields": [
         {
@@ -787,7 +787,7 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "{http://validationnamespace.raml.org}User"
+        "typeId": "#root:{http://validationnamespace.raml.org}User"
       },
       "fields": [
         {
