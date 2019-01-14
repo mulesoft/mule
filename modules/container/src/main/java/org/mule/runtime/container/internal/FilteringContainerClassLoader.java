@@ -7,9 +7,9 @@
 
 package org.mule.runtime.container.internal;
 
-import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 
 import java.io.IOException;
@@ -27,6 +27,19 @@ public class FilteringContainerClassLoader extends FilteringArtifactClassLoader 
 
   static {
     registerAsParallelCapable();
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param parent The parent class loader
+   * @param containerClassLoader delegate classLoader. Not null.
+   * @param filter filter used to determine which classes and resources are exported on the delegate classLoader.
+   * @param exportedServices service providers that will be available from the filtered class loader. Non null.
+   */
+  public FilteringContainerClassLoader(ClassLoader parent, ArtifactClassLoader containerClassLoader, ClassLoaderFilter filter,
+                                       List<ExportedService> exportedServices) {
+    super(parent, containerClassLoader, filter, exportedServices);
   }
 
   /**
