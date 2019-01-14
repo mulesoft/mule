@@ -119,7 +119,6 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
     @Override
     protected File getArtifactInstallationDirectory() {
       return MuleDomainClassloaderTestCase.artifactInstallationDirectory.getRoot();
-      //return mock(File.class);
     }
   }
 
