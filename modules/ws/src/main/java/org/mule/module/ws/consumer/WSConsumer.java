@@ -9,6 +9,31 @@ package org.mule.module.ws.consumer;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.wsdl.Binding;
+import javax.wsdl.BindingOperation;
+import javax.wsdl.Definition;
+import javax.wsdl.Port;
+import javax.wsdl.Service;
+import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.soap.SOAPOperation;
+import javax.wsdl.extensions.soap12.SOAP12Operation;
+import javax.xml.namespace.QName;
+
+import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -29,40 +54,12 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
-import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transport.http.HttpConnector;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.wsdl.extensions.soap.SOAPOperation;
-import javax.wsdl.extensions.soap12.SOAP12Operation;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
-import javax.xml.namespace.QName;
-
-import org.apache.cxf.attachment.AttachmentImpl;
-import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
-import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.message.Attachment;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,14 +78,12 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private String requestBody;
     private SoapVersion soapVersion;
     private boolean mtomEnabled;
-    private MuleWSDLLocator wsdlLocator;
 
     @Override
     public void initialise() throws InitialisationException
     {
         initializeConfiguration();
-        initializeWSDLLocator();
-        parseWsdl();
+        resolveWsdlData();
 
         try
         {
@@ -105,55 +100,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         return messageProcessor.process(event);
-    }
-
-
-    private void initializeWSDLLocator() throws InitialisationException
-    {
-        HttpRequesterConfig httpRequesterConfig = config.getConnectorConfig();
-        String url = config.getWsdlLocation();
-
-        MuleWSDLLocatorConfig locatorConfig = createWSDLLocator(httpRequesterConfig, url);
-        try
-        {
-            wsdlLocator = new MuleWSDLLocator(locatorConfig);
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-    }
-
-
-    private MuleWSDLLocatorConfig createWSDLLocator(HttpRequesterConfig httpRequesterConfig, String url) throws InitialisationException
-    {
-        MuleWSDLLocatorConfig locatorConfig = null;
-        
-        if (httpRequesterConfig == null && config.isUseConnectorToRetrieveWsdl())
-        {
-            logger.warn("The useConnectorToRetrieveWsdl option requires connectorConfig to work");
-        }
-        
-        if (httpRequesterConfig == null)
-        {
-
-            locatorConfig = new MuleWSDLLocatorConfig.Builder()
-                                                               .setBaseURI(url)
-                                                               .setContext(muleContext)
-                                                               .build();
-        }
-        else
-        {
-            locatorConfig = new MuleWSDLLocatorConfig.Builder()
-                    .setBaseURI(url)
-                    .setTlsContextFactory(httpRequesterConfig.getTlsContext())
-                    .setContext(muleContext)
-                    .setUseConnectorToRetrieveWsdl(config.isUseConnectorToRetrieveWsdl())
-                    .setProxyConfig(httpRequesterConfig.getProxyConfig())
-                    .build();
-
-        }
-        return locatorConfig;
     }
 
     /**
@@ -388,18 +334,16 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Parses the WSDL file in order to validate the service, port and operation, to get the SOAP Action (if defined)
+     * Resolves the WSDL file in order to validate the service, port and operation, to get the SOAP Action (if defined)
      * and to check if the operation requires input parameters or not.
      */
-    private void parseWsdl() throws InitialisationException
+    private void resolveWsdlData() throws InitialisationException
     {
         Definition wsdlDefinition = null;
 
         try
         {
-            WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-            wsdlDefinition = wsdlReader.readWSDL(wsdlLocator);
-
+            wsdlDefinition = config.getWsdlDefinition();
         }
         catch (Exception e)
         {
@@ -433,8 +377,15 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         this.soapVersion = WSDLUtils.getSoapVersion(binding);
         this.soapAction = getSoapAction(bindingOperation);
 
-        RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition, wsdlLocator);
-        this.requestBody = requestBodyGenerator.generateRequestBody(bindingOperation);
+        try
+        {
+            RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition, config.getWsdlLocator());
+            this.requestBody = requestBodyGenerator.generateRequestBody(bindingOperation);
+        }
+        catch (WSDLException e)
+        {
+            throw new InitialisationException(e, this);
+        }
 
     }
 

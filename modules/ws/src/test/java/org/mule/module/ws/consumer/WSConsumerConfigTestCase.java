@@ -6,10 +6,14 @@
  */
 package org.mule.module.ws.consumer;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import javax.wsdl.WSDLException;
+
+import org.junit.Test;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -18,8 +22,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConnector;
-
-import org.junit.Test;
 
 @SmallTest
 public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
@@ -79,15 +81,42 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         config.createOutboundMessageProcessor();
     }
 
-    private WSConsumerConfig createConsumerConfig()
+    @Test
+    public void getWsdlParsesWsdlOnlyOnce() throws Exception
     {
-        WSConsumerConfig config = new WSConsumerConfig();
+        TestWSConsumerConfig config = createConsumerConfig();
+        config.getWsdlDefinition();
+        config.getWsdlDefinition();
+        assertThat(config.getWsdlLocatorInitializationsCount(), equalTo(1));
+    }
+
+    private TestWSConsumerConfig createConsumerConfig()
+    {
+        TestWSConsumerConfig config = new TestWSConsumerConfig();
         config.setMuleContext(muleContext);
-        config.setWsdlLocation("TestWsdlLocation");
+        config.setWsdlLocation("Test.wsdl");
         config.setServiceAddress(SERVICE_ADDRESS);
         config.setService("TestService");
         config.setPort("TestPort");
         return config;
+    }
+
+    public static class TestWSConsumerConfig extends WSConsumerConfig
+    {
+        private int wsdlLocatorInitializationsCount = 0;
+
+        @Override
+        protected void initializeWSDLLocator() throws WSDLException
+        {
+            wsdlLocatorInitializationsCount++;
+            super.initializeWSDLLocator();
+        }
+
+        public int getWsdlLocatorInitializationsCount()
+        {
+            return wsdlLocatorInitializationsCount;
+        }
+
     }
 
 }

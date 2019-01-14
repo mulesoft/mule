@@ -7,11 +7,18 @@
 package org.mule.module.ws.consumer;
 
 
+import static javax.wsdl.WSDLException.OTHER_ERROR;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.api.config.MuleProperties.MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL;
 import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+
+import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLReader;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -49,6 +56,8 @@ public class WSConsumerConfig implements MuleContextAware
     private Connector connector;
     private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
+    private volatile Definition wsdlDefinition;
+    private volatile MuleWSDLLocator wsdlLocator;
 
     public WSConsumerConfig()
     {
@@ -242,5 +251,88 @@ public class WSConsumerConfig implements MuleContextAware
     public boolean isUseConnectorToRetrieveWsdl()
     {
         return useConnectorToRetrieveWsdl;
+    }
+
+    public void setUseConnectorToRetrieveWsdl(boolean useConnectorToRetrieveWsdl)
+    {
+        this.useConnectorToRetrieveWsdl = useConnectorToRetrieveWsdl;
+    }
+
+    public Definition getWsdlDefinition() throws Exception
+    {
+        if (wsdlDefinition == null)
+        {
+            synchronized (this)
+            {
+                if (wsdlDefinition == null)
+                {
+                    initializeWSDLLocator();
+                    WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
+                    wsdlDefinition = wsdlReader.readWSDL(wsdlLocator);
+                }
+            }
+        }
+
+        return wsdlDefinition;
+
+    }
+
+    protected void initializeWSDLLocator() throws WSDLException
+    {
+        try
+        {
+            MuleWSDLLocatorConfig locatorConfig = createWSDLLocator(connectorConfig, wsdlLocation);
+            wsdlLocator = new MuleWSDLLocator(locatorConfig);
+        }
+        catch (Exception e)
+        {
+            throw new WSDLException(OTHER_ERROR, e.getMessage(), e);
+        }
+    }
+
+
+    private MuleWSDLLocatorConfig createWSDLLocator(HttpRequesterConfig httpRequesterConfig, String url) throws Exception
+    {
+        MuleWSDLLocatorConfig locatorConfig = null;
+
+        if (httpRequesterConfig == null && useConnectorToRetrieveWsdl)
+        {
+            throw new Exception("The useConnectorToRetrieveWsdl option requires connectorConfig to work");
+        }
+
+        if (httpRequesterConfig == null)
+        {
+
+            locatorConfig = new MuleWSDLLocatorConfig.Builder()
+                                                               .setBaseURI(url)
+                                                               .setContext(muleContext)
+                                                               .build();
+        }
+        else
+        {
+            locatorConfig = new MuleWSDLLocatorConfig.Builder()
+                                                               .setBaseURI(url)
+                                                               .setTlsContextFactory(httpRequesterConfig.getTlsContext())
+                                                               .setContext(muleContext)
+                                                               .setUseConnectorToRetrieveWsdl(useConnectorToRetrieveWsdl)
+                                                               .setProxyConfig(httpRequesterConfig.getProxyConfig())
+                                                               .build();
+
+        }
+        return locatorConfig;
+    }
+
+    public MuleWSDLLocator getWsdlLocator() throws WSDLException
+    {
+        if (wsdlLocator == null)
+        {
+            synchronized (this)
+            {
+                initializeWSDLLocator();
+            }
+
+        }
+
+        return wsdlLocator;
     }
 }
