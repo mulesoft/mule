@@ -56,12 +56,15 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   /**
    * Creates a new filtering classLoader
    *
+   * @param parent The parent class loader
    * @param artifactClassLoader artifact classLoader to filter. Non null
    * @param filter filters access to classes and resources from the artifact classLoader. Non null
    * @param exportedServices service providers that will be available from the filtered class loader. Non null.
    */
-  public FilteringArtifactClassLoader(ArtifactClassLoader artifactClassLoader, ClassLoaderFilter filter,
+  public FilteringArtifactClassLoader(ClassLoader parent, ArtifactClassLoader artifactClassLoader, ClassLoaderFilter filter,
                                       List<ExportedService> exportedServices) {
+    super(parent);
+
     checkArgument(artifactClassLoader != null, "ArtifactClassLoader cannot be null");
     checkArgument(filter != null, "Filter cannot be null");
     checkArgument(exportedServices != null, "exportedServiceProviders cannot be null");
@@ -69,6 +72,18 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     this.artifactClassLoader = artifactClassLoader;
     this.filter = filter;
     this.exportedServices = exportedServices;
+  }
+
+  /**
+   * Creates a new filtering classLoader
+   *
+   * @param artifactClassLoader artifact classLoader to filter. Non null
+   * @param filter filters access to classes and resources from the artifact classLoader. Non null
+   * @param exportedServices service providers that will be available from the filtered class loader. Non null.
+   */
+  public FilteringArtifactClassLoader(ArtifactClassLoader artifactClassLoader, ClassLoaderFilter filter,
+                                      List<ExportedService> exportedServices) {
+    this(getSystemClassLoader(), artifactClassLoader, filter, exportedServices);
   }
 
   @Override

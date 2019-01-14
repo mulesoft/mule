@@ -13,6 +13,7 @@ import static java.util.Arrays.stream;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
@@ -127,7 +128,7 @@ public class ContainerClassLoaderFactory {
   /**
    * Creates the container lookup policy to be used by child class loaders.
    *
-   * @param parentClassLoader classloader used as parent of the container's. Is the classLoader that will load Mule classes.  
+   * @param parentClassLoader classloader used as parent of the container's. Is the classLoader that will load Mule classes.
    * @param muleModules list of modules that would be used to register in the filter based of the class loader.
    * @return a non null {@link ClassLoaderLookupPolicy} that contains the lookup policies for boot, system packages. plus exported
    *         packages by the given list of {@link MuleModule}.
@@ -152,7 +153,7 @@ public class ContainerClassLoaderFactory {
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules,
                                                           final ClassLoaderLookupPolicy containerLookupPolicy,
                                                           ArtifactDescriptor artifactDescriptor) {
-    return createContainerFilteringClassLoader(muleModules,
+    return createContainerFilteringClassLoader(parentClassLoader, muleModules,
                                                new MuleContainerClassLoader(artifactDescriptor, new URL[0], parentClassLoader,
                                                                             containerLookupPolicy));
   }
@@ -187,15 +188,17 @@ public class ContainerClassLoaderFactory {
    * Creates a {@link FilteringArtifactClassLoader} to filter the {@link ArtifactClassLoader} containerClassLoader given based on
    * {@link List<MuleModule>} of muleModules.
    *
+   * @param parentClassLoader the parent {@link ClassLoader} for the container
    * @param muleModules the list of {@link MuleModule}s to be used for defining the filter
    * @param containerClassLoader the {@link ArtifactClassLoader} for the container that will be used to delegate by the
    *        {@link FilteringContainerClassLoader}
    * @return a {@link FilteringContainerClassLoader} that would be the one used as the parent of plugins and applications
    *         {@link ArtifactClassLoader}
    */
-  protected FilteringArtifactClassLoader createContainerFilteringClassLoader(List<MuleModule> muleModules,
+  protected FilteringArtifactClassLoader createContainerFilteringClassLoader(final ClassLoader parentClassLoader,
+                                                                             List<MuleModule> muleModules,
                                                                              ArtifactClassLoader containerClassLoader) {
-    return new FilteringContainerClassLoader(containerClassLoader,
+    return new FilteringContainerClassLoader(parentClassLoader, containerClassLoader,
                                              new ContainerClassLoaderFilterFactory().create(getBootPackages(),
                                                                                             muleModules),
                                              getExportedServices(muleModules));
