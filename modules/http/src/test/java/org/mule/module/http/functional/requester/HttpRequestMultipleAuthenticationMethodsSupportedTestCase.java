@@ -12,6 +12,19 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static sun.net.www.protocol.http.AuthScheme.NTLM;
 
+import org.mule.api.MuleEvent;
+import org.mule.construct.Flow;
+import org.mule.module.http.internal.request.ResponseValidatorException;
+import org.mule.util.FileUtils;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.security.*;
 import org.eclipse.jetty.server.Authentication;
@@ -23,19 +36,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.security.Constraint;
-
 import org.junit.Test;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-import org.mule.module.http.internal.request.ResponseValidatorException;
-import org.mule.util.FileUtils;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends AbstractHttpRequestTestCase
 {
