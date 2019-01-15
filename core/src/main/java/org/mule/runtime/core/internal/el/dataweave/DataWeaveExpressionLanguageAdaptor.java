@@ -15,10 +15,10 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -26,6 +26,7 @@ import org.mule.runtime.api.el.BindingContext.Builder;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
@@ -56,7 +57,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service) {
-    this.expressionExecutor = service.create();
+    this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
+        .defaultEncoding(getDefaultEncoding(muleContext))
+        .build());
     this.muleContext = muleContext;
     registerGlobalBindings(registry);
   }
