@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,25 +25,34 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.TypedException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.error.ImmutableErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
+import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -52,16 +62,12 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
+import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ValueTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
+import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -72,6 +78,13 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.verification.VerificationMode;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -127,8 +140,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Mock
   private ConnectionManagerAdapter connectionManagerAdapter;
-  private ConnectionException connectionException = new ConnectionException("Connection failure");
-  private Exception exception = new Exception();
+  private final ConnectionException connectionException = new ConnectionException("Connection failure");
+  private final Exception exception = new Exception();
   private InOrder inOrder;
   private List<Interceptor> orderedInterceptors;
   private ExecutionMediator mediator;
@@ -162,7 +175,14 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     Optional<ConnectionProvider> connectionProvider = Optional.of(connectionProviderWrapper);
 
     when(configurationInstance.getConnectionProvider()).thenReturn(connectionProvider);
-    when(exceptionEnricher.enrichException(exception)).thenReturn(new HeisenbergException(ERROR));
+    when(exceptionEnricher.enrichException(any())).thenAnswer(inv -> {
+      final Throwable toEnrich = inv.getArgument(0);
+      if (toEnrich == exception || toEnrich.getCause() == exception) {
+        return new HeisenbergException(ERROR, toEnrich);
+      } else {
+        return toEnrich;
+      }
+    });
 
     setInterceptors((Interceptable) configurationInstance, configurationInterceptor1, configurationInterceptor2);
     setInterceptors((Interceptable) operationExecutor, operationInterceptor1, operationInterceptor2);
@@ -244,14 +264,104 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void enrichThrownException() throws Throwable {
+    expectedException.expect(hasRootCause(sameInstance(exception)));
     expectedException.expectCause(instanceOf(HeisenbergException.class));
     expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
-    when(operationExecutor.execute(any())).thenReturn(Mono.error(new Exception()));
+    when(operationExecutor.execute(any())).thenReturn(Mono.error(exception));
     Mono.from(new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
                                            muleContext.getErrorTypeRepository())
                                                .execute(operationExceptionExecutor, operationContext))
         .block();
+  }
+
+  @Test
+  public void notEnrichThrownException() throws Throwable {
+    expectedException.expectCause(sameInstance(exception));
+    mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
+    when(operationExecutor.execute(any())).thenReturn(Mono.error(exception));
+    Mono.from(new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                           muleContext.getErrorTypeRepository())
+                                               .execute(operationExceptionExecutor, operationContext))
+        .block();
+  }
+
+  @Test
+  public void enrichThrownExceptionInValueTransformer() throws Throwable {
+    final Exception exceptionToThrow = new RuntimeException(ERROR, exception);
+    expectedException.expect(hasRootCause(sameInstance(exception)));
+    expectedException.expectCause(instanceOf(HeisenbergException.class));
+    expectedException.expectMessage(ERROR);
+    mockExceptionEnricher(operationModel, () -> exceptionEnricher);
+    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    when(failingTransformer.apply(any(), any())).thenThrow(exceptionToThrow);
+
+    Mono.from(new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                           muleContext.getErrorTypeRepository(), failingTransformer)
+                                               .execute(operationExecutor, operationContext))
+        .block();
+  }
+
+  @Test
+  public void enrichThrownModuleExceptionInValueTransformer() throws Throwable {
+    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
+    expectedException.expectCause(instanceOf(HeisenbergException.class));
+    expectedException.expectMessage(ERROR);
+    mockExceptionEnricher(operationModel, () -> exceptionEnricher);
+    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
+
+    ErrorTypeRepository errorTypeRepository = mockErrorModel();
+
+    Mono.from(new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                           errorTypeRepository, failingTransformer)
+                                               .execute(operationExecutor, operationContext))
+        .block();
+  }
+
+  @Test
+  public void notEnrichThrownExceptionInValueTransformer() throws Throwable {
+    final Exception exceptionToThrow = new RuntimeException(ERROR, exception);
+    expectedException.expectCause(sameInstance(exception));
+    expectedException.expectMessage(ERROR);
+    mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
+    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    when(failingTransformer.apply(any(), any())).thenThrow(exceptionToThrow);
+
+    Mono.from(new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                           muleContext.getErrorTypeRepository(), failingTransformer)
+                                               .execute(operationExecutor, operationContext))
+        .block();
+  }
+
+  @Test
+  public void notEnrichThrownModuleExceptionInValueTransformer() throws Throwable {
+    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
+    expectedException.expect(instanceOf(TypedException.class));
+    expectedException.expectCause(sameInstance(exception));
+    mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
+    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
+
+    ErrorTypeRepository errorTypeRepository = mockErrorModel();
+
+    Mono.from(new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                           errorTypeRepository, failingTransformer)
+                                               .execute(operationExecutor, operationContext))
+        .block();
+  }
+
+  private ErrorTypeRepository mockErrorModel() {
+    final ErrorType parentErrorType = mock(ErrorType.class);
+    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
+    when(errorTypeRepository.lookupErrorType(any())).thenReturn(Optional.of(ErrorTypeBuilder.builder()
+        .namespace("testNs")
+        .identifier("test")
+        .parentErrorType(parentErrorType)
+        .build()));
+
+    when(operationModel.getErrorModels()).thenReturn(singleton(new ImmutableErrorModel("test", "testNs", true, null)));
+    return errorTypeRepository;
   }
 
   @Test
