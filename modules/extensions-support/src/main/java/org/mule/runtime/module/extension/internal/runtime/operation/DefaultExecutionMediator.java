@@ -134,12 +134,11 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
       }
 
-      result.map(value -> transform(context, value))
-          .doOnSuccess(value -> {
-            onSuccess(context, value, interceptors);
-            stats.ifPresent(s -> s.discountInflightOperation());
-            sink.success(value);
-          }).onErrorMap(t -> mapError(context, interceptors, t))
+      result.doOnSuccess(value -> {
+        onSuccess(context, value, interceptors);
+        stats.ifPresent(s -> s.discountInflightOperation());
+        sink.success(value);
+      }).onErrorMap(t -> mapError(context, interceptors, t))
           .subscribe(v -> {
           }, sink::error);
     })
