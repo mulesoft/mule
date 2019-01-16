@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static com.google.common.hash.Hashing.sha256;
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -15,7 +16,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static jdk.nashorn.internal.objects.NativeArray.join;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
