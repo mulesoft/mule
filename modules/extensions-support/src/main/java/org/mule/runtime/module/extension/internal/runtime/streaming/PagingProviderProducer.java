@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -18,15 +20,14 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -86,15 +87,15 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     ConnectionSupplier connectionSupplier = null;
     try {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
+      executionContext.setVariable(CONNECTION_PARAM, connectionSupplier.getHandler());
       return function.apply(connectionSupplier.getConnection());
     } catch (Throwable e) {
-      if (connectionSupplier != null) {
-        Optional<ConnectionException> connectionException = extractConnectionException(e);
-        if (connectionException.isPresent()) {
-          connectionSupplier.invalidate();
-        }
+      Optional<ModuleException> moduleException = extractOfType(e, ModuleException.class);
+      if(moduleException.isPresent()) {
+        throw moduleException.get();
+      } else {
+        throw new MuleRuntimeException(createStaticMessage(PAGE_ERROR), e);
       }
-      throw new MuleRuntimeException(createStaticMessage(PAGE_ERROR), e);
     } finally {
       if (connectionSupplier != null) {
         connectionSupplier.close();
@@ -188,6 +189,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
     Object getConnection() throws MuleException;
 
+    ConnectionHandler getHandler();
+
     void close();
 
     void invalidate();
@@ -204,6 +207,11 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
     public Object getConnection() throws MuleException {
       return connectionHandler.getConnection();
+    }
+
+    @Override
+    public ConnectionHandler getHandler() {
+      return connectionHandler;
     }
 
     public void close() {
@@ -230,6 +238,11 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     @Override
     public Object getConnection() throws MuleException {
       return connection;
+    }
+
+    @Override
+    public ConnectionHandler getHandler() {
+      return connectionHandler;
     }
 
     @Override
