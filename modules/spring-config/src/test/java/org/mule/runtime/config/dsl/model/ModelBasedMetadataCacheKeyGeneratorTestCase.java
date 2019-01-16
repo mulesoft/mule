@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -81,6 +82,7 @@ import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.creation.MockSettingsImpl;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -676,7 +678,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ParameterModel partThree = mockKeyPart(METADATA_KEY_PART_3, 3);
     List<ParameterModel> partParameterModels = asList(partOne, partTwo, partThree);
 
-    ParameterGroupModel metadataKeyIdGroup = mock(ParameterGroupModel.class);
+    ParameterGroupModel metadataKeyIdGroup =
+        mock(ParameterGroupModel.class, new MockSettingsImpl<>().lenient().defaultAnswer(RETURNS_DEFAULTS));
     when(metadataKeyIdGroup.getName()).thenReturn(METADATA_KEY_GROUP);
     when(metadataKeyIdGroup.isShowInDsl()).thenReturn(false);
     when(metadataKeyIdGroup.getParameterModels()).thenReturn(partParameterModels);

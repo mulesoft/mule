@@ -19,10 +19,48 @@ import java.util.Optional;
  */
 public interface MetadataCacheIdGenerator<T> {
 
+
   /**
-   * Calculates the {@link MetadataCacheId} required to identify the MetadataTypes associated to the given {@code component}.
-   * This method will take into account the values of the configured {@link org.mule.runtime.api.metadata.MetadataKey} to provide
-   * an unique identifier of the {@code component}'s type definitions.
+   * Calculates the {@link MetadataCacheId} required to identify the MetadataType associated to the output of the given
+   * {@code component}. This method will take into account the values of the configured
+   * {@link org.mule.runtime.api.metadata.MetadataKey} to provide an unique identifier of the {@code component} output type
+   * definition.
+   *
+   * @param component the configured component
+   * @return a {@link MetadataCacheId} that identifies the component output type with all its current configuration or
+   *         {@link Optional#empty} if no valid identifier can be created.
+   */
+  Optional<MetadataCacheId> getIdForComponentOutputMetadata(T component);
+
+  /**
+   * Calculates the {@link MetadataCacheId} required to identify the MetadataType associated to the attributes of the given
+   * {@code component}. This method will take into account the values of the configured
+   * {@link org.mule.runtime.api.metadata.MetadataKey} to provide an unique identifier of the {@code component} attributes type
+   * definition.
+   *
+   * @param component the configured component
+   * @return a {@link MetadataCacheId} that identifies the component attributes type with all its current configuration or
+   *         {@link Optional#empty} if no valid identifier can be created.
+   */
+  Optional<MetadataCacheId> getIdForComponentAttributesMetadata(T component);
+
+  /**
+   * Calculates the {@link MetadataCacheId} required to identify the MetadataType associated to the parameter named
+   * {@code parameterName} of the given {@code component}. This method will take into account the values of the configured
+   * {@link org.mule.runtime.api.metadata.MetadataKey} to provide an unique identifier of the {@code component} attributes type
+   * definition.
+   *
+   * @param component the configured component
+   * @param parameterName the name of the parameter
+   * @return a {@link MetadataCacheId} that identifies the component's parameter type with all its current configuration or
+   *         {@link Optional#empty} if no valid identifier can be created.
+   */
+  Optional<MetadataCacheId> getIdForComponentInputMetadata(T component, String parameterName);
+
+  /**
+   * Calculates the {@link MetadataCacheId} required to identify the MetadataTypes associated to the given {@code component}. This
+   * method will take into account the values of the configured {@link org.mule.runtime.api.metadata.MetadataKey} to provide an
+   * unique identifier of the {@code component}'s type definitions.
    *
    * @param component the configured component
    * @return a {@link MetadataCacheId} that identifies the component Types with all its current configuration or

@@ -39,6 +39,36 @@ public class ComponentBasedMetadataCacheIdGenerator implements MetadataCacheIdGe
    * {@inheritDoc}
    */
   @Override
+  public Optional<MetadataCacheId> getIdForComponentOutputMetadata(ComponentConfiguration component) {
+    checkArgument(component != null, "Cannot generate a Cache Key for a 'null' component");
+    return elementModelFactory.create(component)
+        .map(e -> delegate.getIdForComponentOutputMetadata(e).orElse(null));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<MetadataCacheId> getIdForComponentAttributesMetadata(ComponentConfiguration component) {
+    checkArgument(component != null, "Cannot generate a Cache Key for a 'null' component");
+    return elementModelFactory.create(component)
+        .map(e -> delegate.getIdForComponentAttributesMetadata(e).orElse(null));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<MetadataCacheId> getIdForComponentInputMetadata(ComponentConfiguration component, String parameterName) {
+    checkArgument(component != null, "Cannot generate a Cache Key for a 'null' component");
+    return elementModelFactory.create(component)
+        .map(e -> delegate.getIdForComponentInputMetadata(e, parameterName).orElse(null));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Optional<MetadataCacheId> getIdForComponentMetadata(ComponentConfiguration component) {
     checkArgument(component != null, "Cannot generate a Cache Key for a 'null' component");
     return elementModelFactory.create(component)
