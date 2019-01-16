@@ -406,8 +406,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asScope().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SPLIT_AGGREGATE)
         .withTypeDefinition(fromType(SplitAggregateScope.class))
-        /*.withSetterParameterDefinition("collectionExpression",
-                                       fromChildConfiguration(String.class).withIdentifier("collection").build())*/
         .withSetterParameterDefinition("collectionExpression", fromSimpleParameter("collection").build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
