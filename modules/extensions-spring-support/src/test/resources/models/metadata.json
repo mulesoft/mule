@@ -570,6 +570,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -621,6 +637,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -1051,6 +1083,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -1102,6 +1150,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -1529,6 +1593,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -1580,6 +1660,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -1980,6 +2076,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -2031,6 +2143,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -2450,6 +2578,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -2501,6 +2645,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -2901,6 +3061,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -2952,6 +3128,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -3213,6 +3405,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -3264,6 +3472,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -3686,6 +3910,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -3737,6 +3977,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -4006,6 +4262,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -4057,6 +4329,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -4426,6 +4714,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -4477,6 +4781,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -4915,6 +5235,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -4966,6 +5302,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -5398,6 +5750,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -5449,6 +5817,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -5881,6 +6265,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -5932,6 +6332,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -6311,6 +6727,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -6362,6 +6794,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -6831,6 +7279,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -6882,6 +7346,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -7318,6 +7798,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -7369,6 +7865,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -7761,6 +8273,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -7812,6 +8340,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -8178,6 +8722,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -8229,6 +8789,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -8603,6 +9179,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -8654,6 +9246,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -9128,6 +9736,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -9179,6 +9803,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -9678,6 +10318,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -9729,6 +10385,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -10264,6 +10936,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -10315,6 +11003,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -10742,6 +11446,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -10793,6 +11513,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -11061,6 +11797,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -11112,6 +11864,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -11522,6 +12290,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -11573,6 +12357,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -12000,6 +12800,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -12051,6 +12867,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -12294,6 +13126,22 @@
                                 },
                                 {
                                   "key": {
+                                    "name": "blocking"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "true"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
                                     "name": "count"
                                   },
                                   "model": {
@@ -12345,6 +13193,22 @@
                                   "annotations": {
                                     "description": {
                                       "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "blocking"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "true"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                                     }
                                   }
                                 }
@@ -12775,6 +13639,22 @@
                           },
                           {
                             "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
                               "name": "count"
                             },
                             "model": {
@@ -12826,6 +13706,22 @@
                             "annotations": {
                               "description": {
                                 "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -13864,7 +14760,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13878,7 +14773,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -15365,7 +16261,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -15379,7 +16274,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -15588,7 +16484,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -15600,7 +16495,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -15806,7 +16702,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -15820,7 +16715,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -15987,7 +16883,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -16001,7 +16896,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -20038,6 +20934,22 @@
                             },
                             {
                               "key": {
+                                "name": "blocking"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "true"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
                                 "name": "count"
                               },
                               "model": {
@@ -20089,6 +21001,22 @@
                               "annotations": {
                                 "description": {
                                   "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "blocking"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "true"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                                 }
                               }
                             }
@@ -20635,7 +21563,6 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
-                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -20649,7 +21576,8 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "label": "Person"
                   },
                   "open": {
                     "type": "Any"
