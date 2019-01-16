@@ -485,6 +485,8 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionInt" use="required" name="failOnPage"></xs:attribute>
+        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="stickyConnections"></xs:attribute>
+        <xs:attribute type="mule:expressionBoolean" use="optional" default="true" name="throwConnectivity"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
