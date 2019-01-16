@@ -62,19 +62,29 @@ abstract class DispatchingLogger extends Logger {
 
 
   private Logger getLogger() {
-    final ClassLoader currentClassLoader = resolveLoggerContextClassLoader(currentThread().getContextClassLoader());
-    if (useThisLoggerContextClassLoader(currentClassLoader)) {
+    return getLogger(resolveLoggerContextClassLoader(currentThread().getContextClassLoader()));
+  }
+
+  private Logger getLogger(final ClassLoader resolvedCtxClassLoader) {
+    if (useThisLoggerContextClassLoader(resolvedCtxClassLoader)) {
       return originalLogger;
     }
 
+    Logger logger;
     // trick - this is probably a logger declared in a static field
     // the classloader used to create it and the TCCL can be different
     // ask contextSelector for the correct context
     if (contextSelector instanceof ArtifactAwareContextSelector) {
-      return ((ArtifactAwareContextSelector) contextSelector).getContextWithResolvedContextClassLoader(currentClassLoader)
+      logger = ((ArtifactAwareContextSelector) contextSelector).getContextWithResolvedContextClassLoader(resolvedCtxClassLoader)
           .getLogger(getName(), getMessageFactory());
     } else {
-      return contextSelector.getContext(getName(), currentClassLoader, true).getLogger(getName(), getMessageFactory());
+      logger = contextSelector.getContext(getName(), resolvedCtxClassLoader, true).getLogger(getName(), getMessageFactory());
+    }
+
+    if (logger instanceof DispatchingLogger) {
+      return ((DispatchingLogger) logger).getLogger(resolvedCtxClassLoader);
+    } else {
+      return logger;
     }
   }
 
