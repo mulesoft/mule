@@ -8,8 +8,8 @@ package org.mule.module.http.functional.requester;
 
 import static org.junit.Assert.fail;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static sun.net.www.protocol.http.AuthScheme.NTLM;
 
 import org.mule.api.MuleEvent;
@@ -25,8 +25,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Test;
 import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.security.*;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.ServerAuthException;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.Handler;
@@ -36,7 +41,6 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.security.Constraint;
-import org.junit.Test;
 
 public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends AbstractHttpRequestTestCase
 {
@@ -45,15 +49,6 @@ public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends A
 
     @Override
     protected String getConfigFile() { return "http-request-multiple-auth-methods-config.xml"; }
-
-    @Override
-    protected void writeResponse(HttpServletResponse response) throws IOException
-    {
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().print(DEFAULT_RESPONSE);
-
-    }
 
     @Test
     public void onMultipleAuthMethodChoiceLocalAuthSchemeIsSet() throws Exception
@@ -84,7 +79,6 @@ public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends A
     protected AbstractHandler createHandler(Server server)
     {
         AbstractHandler handler = super.createHandler(server);
-
         String realmPath = null;
 
         try
@@ -108,13 +102,13 @@ public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends A
         digestConstraintMapping.setConstraint(digestConstraint);
         digestConstraintMapping.setPathSpec("/*");
 
-        ConstraintSecurityHandler digestSecurityHandler = new ConstraintSecurityHandler(){
+        ConstraintSecurityHandler digestSecurityHandler = new ConstraintSecurityHandler()
+        {
             @Override
             public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
             {
                 digestRequestCount++;
                 super.handle(pathInContext, baseRequest, request, response);
-
             }
         };
 
