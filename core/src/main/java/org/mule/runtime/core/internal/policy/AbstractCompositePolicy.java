@@ -10,7 +10,6 @@ import static java.util.Collections.reverse;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static reactor.core.publisher.Flux.from;
 
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
@@ -65,11 +64,9 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
   private final ReactiveProcessor getPolicyProcessor() {
     List<Function<ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
     for (Policy policy : parameterizedPolicies) {
-      interceptors.add(next -> eventPub -> from(applyPolicy(policy, next, eventPub))
-          .onErrorMap(throwable -> !(throwable instanceof MuleException), throwable -> new DefaultMuleException(throwable)));
+      interceptors.add(next -> eventPub -> from(applyPolicy(policy, next, eventPub)));
     }
-    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub))
-        .onErrorMap(throwable -> !(throwable instanceof MuleException), throwable -> new DefaultMuleException(throwable));
+    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub));
     // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
     reverse(interceptors);
     for (Function<ReactiveProcessor, ReactiveProcessor> interceptor : interceptors) {

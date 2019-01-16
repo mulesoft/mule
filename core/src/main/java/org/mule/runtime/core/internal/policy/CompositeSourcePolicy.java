@@ -9,9 +9,12 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.internal.util.MessagingExceptionResolver.INFO_LAST_HANDLER_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -31,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import reactor.core.publisher.Flux;
@@ -106,10 +110,21 @@ public class CompositeSourcePolicy
                                                                        spfr.getMessagingException()),
                              spsr -> commonPolicy.finishFlowProcessing(spsr.getResult(), result));
               })
-              .doOnError(e -> !(e instanceof FlowExecutionException || e instanceof MessagingException),
-                         e -> LOGGER.error(e.getMessage(), e))
+              .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e))
               .onErrorContinue(MessagingException.class, (t, e) -> {
-                final MessagingException me = (MessagingException) t;
+                MessagingException me = (MessagingException) t;
+
+                // Check whether the error was generated in the flow or in the policy to generate the proper response
+                if (!(me.getFailingComponent() != null
+                    && me.getFailingComponent().getLocation().getParts().get(0).getPartIdentifier()
+                        .filter(isPolicy())
+                        .isPresent())
+                    && !(me.getInfo().containsKey(INFO_LAST_HANDLER_KEY)
+                        && ((Component) me.getInfo().get(INFO_LAST_HANDLER_KEY)).getLocation().getParts().get(0)
+                            .getPartIdentifier()
+                            .filter(isPolicy()).isPresent())) {
+                  me = mapErrorInInnerExecution(me);
+                }
 
                 Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result =
                     left(new SourcePolicyFailureResult(me, resolveErrorResponseParameters(me)), SourcePolicySuccessResult.class);
@@ -123,6 +138,12 @@ public class CompositeSourcePolicy
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
+    }
+
+    private Predicate<? super TypedComponentIdentifier> isPolicy() {
+      // TODO MULE-16344: Use the component type instead
+      return id -> "proxy".equals(id.getIdentifier().getName())
+          && "http-policy".equals(id.getIdentifier().getNamespace());
     }
 
   }
@@ -164,31 +185,32 @@ public class CompositeSourcePolicy
               .build();
         })
         .cast(CoreEvent.class)
-        .onErrorMap(MessagingException.class, messagingException -> {
-          Map<String, Object> originalFailureResponseParameters = commonPolicy
-              .getResponseParamsProcessor(messagingException.getEvent())
-              .getFailedExecutionResponseParametersFunction()
-              .apply(messagingException.getEvent());
+        .onErrorMap(MessagingException.class, this::mapErrorInInnerExecution);
+  }
 
-          Message message = getParametersTransformer()
-              .map(parametersTransformer -> parametersTransformer
-                  .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
-              .orElse(messagingException.getEvent().getMessage());
+  private MessagingException mapErrorInInnerExecution(MessagingException messagingException) {
+    Map<String, Object> originalFailureResponseParameters = commonPolicy
+        .getResponseParamsProcessor(messagingException.getEvent())
+        .getFailedExecutionResponseParametersFunction()
+        .apply(messagingException.getEvent());
 
-          MessagingException flowExecutionException =
-              new FlowExecutionException(InternalEvent.builder(messagingException.getEvent())
-                  .message(message)
-                  .addInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS, originalFailureResponseParameters)
-                  .build(),
-                                         messagingException.getCause(),
-                                         messagingException.getFailingComponent());
-          if (messagingException.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
-            flowExecutionException.addInfo(INFO_ALREADY_LOGGED_KEY,
-                                           messagingException.getInfo().get(INFO_ALREADY_LOGGED_KEY));
-          }
-          return flowExecutionException;
-        })
-        .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e));
+    Message message = getParametersTransformer()
+        .map(parametersTransformer -> parametersTransformer
+            .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
+        .orElse(messagingException.getEvent().getMessage());
+
+    MessagingException flowExecutionException =
+        new FlowExecutionException(InternalEvent.builder(messagingException.getEvent())
+            .message(message)
+            .addInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS, originalFailureResponseParameters)
+            .build(),
+                                   messagingException.getCause(),
+                                   messagingException.getFailingComponent());
+    if (messagingException.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
+      flowExecutionException.addInfo(INFO_ALREADY_LOGGED_KEY,
+                                     messagingException.getInfo().get(INFO_ALREADY_LOGGED_KEY));
+    }
+    return flowExecutionException;
   }
 
   /**
