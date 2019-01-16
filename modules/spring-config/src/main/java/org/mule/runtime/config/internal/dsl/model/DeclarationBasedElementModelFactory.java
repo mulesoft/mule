@@ -28,6 +28,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -389,23 +390,6 @@ class DeclarationBasedElementModelFactory {
           }
         }
       }
-
-      // TODO Remove in EE-5855
-      group.getParameter("schedulingStrategy")
-          .ifPresent(param -> {
-            if (!parameterizedDeclaration.getParameterGroup(group.getName())
-                .map(g -> g.getParameter("schedulingStrategy").orElse(null))
-                .isPresent()) {
-
-              addParameter("schedulingStrategy", newObjectValue()
-                  .ofType("org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler")
-                  .withParameter("frequency", "1")
-                  .withParameter("timeUnit", "MINUTES")
-                  .build(),
-                           group.getParameter("schedulingStrategy").get(),
-                           parentDsl.getContainedElement("schedulingStrategy").get(), parentConfig, parentElement);
-            }
-          });
     });
   }
 
