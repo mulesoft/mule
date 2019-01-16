@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
@@ -40,6 +41,7 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -65,6 +67,8 @@ import java.util.List;
 import java.util.OptionalLong;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
@@ -651,6 +655,69 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         });
       }
     }
+  }
+
+  @Ignore("MULE-16282")
+  @Test
+  public void backpressureOnInnerCpuLightSchedulerThrowsRejectedExecution() throws Exception {
+    if (!mode.equals(SOURCE)) {
+      return;
+    }
+
+    final Scheduler cpuLightBusy = new TestScheduler(2, CPU_LIGHT, true) {
+
+      private AtomicInteger countdown = new AtomicInteger(0);
+
+      private void countAndThrow() {
+        int v = countdown.getAndIncrement();
+        if (v == 1 || v == 2) {
+          throw new RejectedExecutionException();
+        }
+      }
+
+      @Override
+      public Future<?> submit(Runnable task) {
+        countAndThrow();
+        return super.submit(task);
+      }
+
+      @Override
+      public Future<?> submit(Callable task) {
+        countAndThrow();
+        return super.submit(task);
+      }
+    };
+
+    triggerableMessageSource = new TriggerableMessageSource(FAIL);
+
+    flow = flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
+                                                                                                    XS_BUFFER_SIZE,
+                                                                                                    1,
+                                                                                                    DEFAULT_WAIT_STRATEGY,
+                                                                                                    () -> cpuLightBusy,
+                                                                                                    () -> blocking,
+                                                                                                    () -> cpuIntensive,
+                                                                                                    4,
+                                                                                                    2, true))
+        .source(triggerableMessageSource)
+        .processors(cpuLightProcessor, cpuIntensiveProcessor).build();
+    flow.initialise();
+    flow.start();
+
+    for (int i = 0; i < 10; i++) {
+      try {
+        processFlow(newEvent());
+        if (i < 2) {
+          fail("First attempts should have failed");
+        }
+      } catch (MessagingException e) {
+        if (i >= 2) {
+          fail("Next attempts shouldn't have failed");
+        }
+      }
+    }
+
   }
 
 }
