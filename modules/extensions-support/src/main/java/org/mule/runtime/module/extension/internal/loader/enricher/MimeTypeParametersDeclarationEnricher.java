@@ -14,6 +14,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toM
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -45,6 +46,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
@@ -68,6 +70,14 @@ import java.util.function.Function;
  * @since 4.0
  */
 public final class MimeTypeParametersDeclarationEnricher implements DeclarationEnricher {
+
+  /**
+   * Certain enrichments of this {@link DeclarationEnricher} where added in a newer version of mule than the one when it was
+   * introduced. This {@link org.mule.runtime.api.meta.model.ModelProperty} has to be added to these new enrichments so that if
+   * the {@link org.mule.runtime.api.meta.model.ExtensionModel} of an extension need to be recreated for a former muleVersion, the
+   * new enrichments can be filtered.
+   */
+  private static SinceMuleVersionModelProperty SINCE_MULE_VERSION_MODEL_PROPERTY = new SinceMuleVersionModelProperty("4.2.0");
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
@@ -108,12 +118,22 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
       }.walk(declaration);
     }
 
+    private void declareOutputEncodingParameter(ParameterGroupDeclaration group, boolean shouldAddSinceMuleVersionModelProperty) {
+      group.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs.",
+                                      shouldAddSinceMuleVersionModelProperty));
+    }
+
+    private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group, boolean shouldAddSinceMuleVersionModelProperty) {
+      group.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs.",
+                                      shouldAddSinceMuleVersionModelProperty));
+    }
+
     private void declareOutputEncodingParameter(ParameterGroupDeclaration group) {
-      group.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
+      declareOutputEncodingParameter(group, false);
     }
 
     private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group) {
-      group.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
+      declareOutputMimeTypeParameter(group, false);
     }
 
     private void declareMimeTypeParameters(ExecutableComponentDeclaration<?> declaration, Optional<MetadataType> outputType) {
@@ -152,11 +172,11 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
           if (itemType instanceof StringType && !itemType.getAnnotation(EnumAnnotation.class).isPresent()) {
             ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
-            declareOutputMimeTypeParameter(group);
-          } else if (itemType instanceof BinaryType) {
+            declareOutputMimeTypeParameter(group, true);
+          } else if (itemType instanceof BinaryType || itemType instanceof AnyType) {
             ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
-            declareOutputMimeTypeParameter(group);
-            declareOutputEncodingParameter(group);
+            declareOutputMimeTypeParameter(group, true);
+            declareOutputEncodingParameter(group, true);
           }
         }
 
@@ -187,9 +207,10 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
           }
 
           if (!property.isStrict()) {
+            boolean shouldAddSinceMuleVersionModelProperty = !isInputStream(anyType);
             ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
-            declareOutputMimeTypeParameter(group);
-            declareOutputEncodingParameter(group);
+            declareOutputMimeTypeParameter(group, shouldAddSinceMuleVersionModelProperty);
+            declareOutputEncodingParameter(group, shouldAddSinceMuleVersionModelProperty);
           }
 
           replaceOutputType(declaration, property, format -> {
@@ -230,12 +251,19 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
     }
 
     private ParameterDeclaration newParameter(String name, String description) {
+      return newParameter(name, description, false);
+    }
+
+    private ParameterDeclaration newParameter(String name, String description, boolean shouldAddSinceMuleVersionModelProperty) {
       ParameterDeclaration parameter = new ParameterDeclaration(name);
       parameter.setRequired(false);
       parameter.setExpressionSupport(SUPPORTED);
       parameter.setType(typeLoader.load(String.class), false);
       parameter.setDescription(description);
       parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB_NAME).build());
+      if (shouldAddSinceMuleVersionModelProperty) {
+        parameter.addModelProperty(SINCE_MULE_VERSION_MODEL_PROPERTY);
+      }
       return parameter;
     }
   }

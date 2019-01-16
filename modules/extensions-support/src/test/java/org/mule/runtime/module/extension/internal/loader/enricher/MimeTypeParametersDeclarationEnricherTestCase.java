@@ -26,18 +26,14 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENC
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
-import org.mockito.internal.stubbing.defaultanswers.ReturnsDeepStubs;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
-import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -50,19 +46,18 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
-import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -76,13 +71,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.core.ResolvableType;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private static final BaseTypeBuilder builder = BaseTypeBuilder.create(JAVA);
+
+  private static SinceMuleVersionModelProperty SINCE_MULE_VERSION_MODEL_PROPERTY = new SinceMuleVersionModelProperty("4.2.0");
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionLoadingContext extensionLoadingContext;
@@ -266,6 +262,69 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     assertStringMimeTypeParams(source);
   }
 
+  @Test
+  public void objectMethodHasModelProperty() throws Exception {
+    mockExtensionOperationDescriptorModelProperty("objectMethod");
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(operation, true);
+  }
+
+  @Test
+  public void listResultStringHasModelProperty() throws Exception {
+    mockExtensionOperationDescriptorModelProperty("listResultString");
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(operation, true);
+  }
+
+  @Test
+  public void pagedResultStringHasModelProperty() throws Exception {
+    mockExtensionOperationDescriptorModelProperty("pagedResultString");
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(operation, true);
+  }
+
+  @Test
+  public void listResultStreamHasModelProperty() throws Exception {
+    mockExtensionOperationDescriptorModelProperty("listResultStream");
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(operation, true);
+  }
+
+  @Test
+  public void pagedResultCursorProviderHasModelProperty() throws Exception {
+    mockExtensionOperationDescriptorModelProperty("pagedResultCursorProvider");
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(operation, true);
+  }
+
+  @Test
+  public void listResultStringSourceHasModelProperty() throws Exception {
+    mockExtensionTypeDescriptorModelProperty(TestListResultStringSource.class);
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(source, true);
+  }
+
+  @Test
+  public void resultStringDoesNotHaveModelProperty() throws Exception {
+    mockExtensionOperationDescriptorModelProperty("pagedResultApple");
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(operation, false);
+  }
+
+  @Test
+  public void inputStreamMethodDoesNotHaveModelProperty() throws Exception {
+    mockExtensionOperationDescriptorModelProperty("pagedResultApple");
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(operation, false);
+  }
+
+  @Test
+  public void resultStringSourceDoesNotHaveModelProperty() throws Exception {
+    mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
+    enricher.enrich(extensionLoadingContext);
+    assertParametersSinceMuleVersionModelProperty(source, false);
+  }
+
   private void assertNoMimeTypeParams(ParameterizedDeclaration<?> withParams) {
     List<ParameterDeclaration> parameters = withParams.getParameterGroup(DEFAULT_GROUP_NAME).getParameters();
     assertThat(parameters, hasSize(0));
@@ -282,6 +341,20 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     assertThat(parameters, hasSize(2));
     assertParameter(parameters.get(0), MIME_TYPE_PARAMETER_NAME);
     assertParameter(parameters.get(1), ENCODING_PARAMETER_NAME);
+  }
+
+  private void assertParametersSinceMuleVersionModelProperty(ParameterizedDeclaration<?> withParams,
+                                                             boolean shouldAddSinceMuleVersionModelProperty) {
+    List<ParameterDeclaration> parameters = withParams.getParameterGroup(DEFAULT_GROUP_NAME).getParameters();
+    parameters.stream()
+        .forEach(parameter -> {
+          assertThat(parameter.getModelProperty(SinceMuleVersionModelProperty.class).isPresent(),
+                     is(shouldAddSinceMuleVersionModelProperty));
+          if (shouldAddSinceMuleVersionModelProperty) {
+            assertThat(parameter.getModelProperty(SinceMuleVersionModelProperty.class).get().getVersion(),
+                       is(SINCE_MULE_VERSION_MODEL_PROPERTY.getVersion()));
+          }
+        });
   }
 
   private void assertParameter(ParameterDeclaration parameter, String name) {

@@ -881,7 +881,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -909,7 +913,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -1359,7 +1367,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -1387,7 +1399,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -1810,7 +1826,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -1838,7 +1858,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -2280,7 +2304,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -2308,7 +2336,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -2731,7 +2763,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -2759,7 +2795,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -3516,7 +3556,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -3544,7 +3588,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -4745,7 +4793,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -4773,7 +4825,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -5228,7 +5284,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -5256,7 +5316,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -5711,7 +5775,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -5739,7 +5807,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -6141,7 +6213,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -6169,7 +6245,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -6661,7 +6741,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -6689,7 +6773,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -7148,7 +7236,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -7176,7 +7268,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -7591,7 +7687,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -7619,7 +7719,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -8008,7 +8112,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -8036,7 +8144,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -8433,7 +8545,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -8461,7 +8577,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -11352,7 +11472,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 },
                 {
                   "type": {
@@ -11380,7 +11504,11 @@
                   "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "sinceMuleVersion": {
+                      "version": "4.2.0"
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -13864,7 +13992,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13878,7 +14005,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -14573,6 +14701,70 @@
                   "providedByKeyResolver": false
                 }
               }
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "outputMimeType",
+              "description": "The mime type of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "outputEncoding",
+              "description": "The encoding of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
             }
           ],
           "exclusiveParametersModels": [],
@@ -14609,7 +14801,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14641,7 +14833,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15365,7 +15557,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -15379,7 +15570,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -15588,7 +15780,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -15600,7 +15791,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -15806,7 +15998,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -15820,7 +16011,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -15987,7 +16179,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -16001,7 +16192,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -16858,7 +17050,11 @@
               "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
             }
           ],
           "exclusiveParametersModels": [],
@@ -17031,7 +17227,11 @@
               "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
             },
             {
               "type": {
@@ -17059,7 +17259,11 @@
               "allowedStereotypeModels": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
-              "modelProperties": {}
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
             }
           ],
           "exclusiveParametersModels": [],
@@ -18691,7 +18895,11 @@
               "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
             },
             {
               "type": {
@@ -18719,7 +18927,11 @@
               "allowedStereotypeModels": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
-              "modelProperties": {}
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
             }
           ],
           "exclusiveParametersModels": [],
@@ -20635,7 +20847,6 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
-                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -20649,7 +20860,8 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "label": "Person"
                   },
                   "open": {
                     "type": "Any"
