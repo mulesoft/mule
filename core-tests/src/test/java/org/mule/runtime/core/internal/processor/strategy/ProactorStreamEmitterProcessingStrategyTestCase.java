@@ -384,6 +384,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
+  @Ignore("MULE-16282")
   @Test
   @Description("Notifications are invoked on CPU_LITE thread")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {

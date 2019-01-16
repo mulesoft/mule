@@ -40,6 +40,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.junit.*;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -73,10 +74,6 @@ import org.mule.tck.probe.PollingProber;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -392,6 +389,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     processFlow(testEvent());
   }
 
+  @Ignore("MULE-16282")
   @Test
   public void asyncCpuLightConcurrent() throws Exception {
     internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1, asyncProcessor);

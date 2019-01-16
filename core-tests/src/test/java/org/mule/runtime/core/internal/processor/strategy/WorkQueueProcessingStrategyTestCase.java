@@ -29,6 +29,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.WORK_QUEUE;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -260,6 +261,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
+  @Ignore("MULE-16282")
   @Test
   @Description("Notifications are invoked on IO thread")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {

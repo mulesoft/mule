@@ -24,6 +24,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -228,6 +229,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
     }
   }
 
+  @Ignore("MULE-16282")
   @Test
   @Description("Notifications are invoked on CPU_LITE thread")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {
