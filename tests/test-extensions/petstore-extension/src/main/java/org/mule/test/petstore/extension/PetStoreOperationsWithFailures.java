@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -54,9 +55,12 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
     throw new Throwable(CONNECTION_FAIL);
   }
 
+  @Throws(PetStoreCustomErrorProvider.class)
   public PagingProvider<PetStoreClient, Integer> failPagedOperation(int failOnPage,
                                                                     @org.mule.runtime.extension.api.annotation.param.Optional(
-                                                                        defaultValue = "false") boolean stickyConnections) {
+                                                                        defaultValue = "false") boolean stickyConnections,
+                                                                    @org.mule.runtime.extension.api.annotation.param.Optional(
+                                                                        defaultValue = "true") boolean throwConnectivity) {
     return new PagingProvider<PetStoreClient, Integer>() {
 
       private int index = 0;
@@ -66,7 +70,11 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
       public List<Integer> getPage(PetStoreClient petStoreClient) {
         if (index == failOnPage) {
           connectionThreads.add(currentThread());
-          throw new ModuleException(CONNECTIVITY, new ConnectionException(CONNECTION_FAIL));
+          if (throwConnectivity) {
+            throw new ModuleException(CONNECTIVITY, new ConnectionException(CONNECTION_FAIL));
+          } else {
+            throw new ModuleException(PetstoreErrorTypeDefinition.PET_ERROR, new RuntimeException("Some Error"));
+          }
         }
         index++;
         return returnValue;
