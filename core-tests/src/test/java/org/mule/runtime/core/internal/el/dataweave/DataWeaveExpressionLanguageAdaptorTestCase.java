@@ -519,8 +519,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(result.getValue(), instanceOf(List.class));
     assertThat(((List) result.getValue()).get(0), instanceOf(Map.class));
     Map entry = (Map) ((List) result.getValue()).get(0);
-    assertThat(entry.get("key"), instanceOf(QName.class));
-    assertThat(((QName) entry.get("key")).getLocalPart(), equalTo(key));
+    assertThat(entry.get("key"), equalTo(key));
     assertThat(entry.get("value"), equalTo(value));
   }
 
