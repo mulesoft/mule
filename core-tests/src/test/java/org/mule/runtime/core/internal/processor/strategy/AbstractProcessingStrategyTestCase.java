@@ -75,6 +75,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -392,6 +393,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     processFlow(testEvent());
   }
 
+  @Ignore("MULE-16282")
   @Test
   public void asyncCpuLightConcurrent() throws Exception {
     internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1, asyncProcessor);

@@ -42,6 +42,7 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -260,6 +261,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
+  @Ignore("MULE-16282")
   @Test
   @Description("Notifications are invoked on IO thread")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {

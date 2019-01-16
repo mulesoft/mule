@@ -206,7 +206,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * and how overload is handled depends on the Source back-pressure strategy.
    */
   private ReactiveProcessor dispatchToFlow() {
-    return publisher -> Mono.from(publisher)
+    return publisher -> from(publisher)
         .doOnNext(assertStarted())
         .flatMap(source.getBackPressureStrategy() == WAIT ? flowWaitMapper() : flowFailDropMapper());
   }

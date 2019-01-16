@@ -34,6 +34,7 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.hamcrest.Matcher;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -228,6 +229,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
     }
   }
 
+  @Ignore("MULE-16282")
   @Test
   @Description("Notifications are invoked on CPU_LITE thread")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {
