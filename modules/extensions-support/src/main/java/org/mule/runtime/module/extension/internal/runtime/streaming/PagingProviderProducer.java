@@ -91,7 +91,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return function.apply(connectionSupplier.getConnection());
     } catch (Throwable e) {
       Optional<ModuleException> moduleException = extractOfType(e, ModuleException.class);
-      if(moduleException.isPresent()) {
+      if (moduleException.isPresent()) {
         throw moduleException.get();
       } else {
         throw new MuleRuntimeException(createStaticMessage(PAGE_ERROR), e);
