@@ -197,7 +197,7 @@
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaMailVersion>1.6.2</javaMailVersion>
-        <javaXmlBindVersion>2.3.1-MULE-001-SNAPSHOT</javaXmlBindVersion>
+        <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
