@@ -9,7 +9,11 @@ package org.mule.module.ws.consumer;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.Message;
+
+import static org.mule.config.DefaultMuleConfiguration.isVerboseExceptions;
 
 import javax.xml.namespace.QName;
 
@@ -56,5 +60,16 @@ public class SoapFaultException extends MessagingException
     public Element getDetail()
     {
         return detail;
+    }
+    
+    @Override
+    protected String generateMessage(Message message)
+    {
+        if (message != null && !isVerboseExceptions())
+        {
+            return message.getMessage();
+        }
+        
+        return super.generateMessage(message);
     }
 }
