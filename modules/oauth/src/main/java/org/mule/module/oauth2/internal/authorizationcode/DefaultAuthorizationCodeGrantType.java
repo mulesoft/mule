@@ -16,6 +16,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.oauth2.api.RequestAuthenticationException;
@@ -34,7 +35,7 @@ import org.apache.commons.lang.StringUtils;
  * - If the authorization-request is defined then it will create a flow listening for an user call to begin the oauth login.
  * - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the authentication code and retrieve the access token
  */
-public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Initialisable, AuthorizationCodeGrantType, Startable, MuleContextAware
+public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Initialisable, AuthorizationCodeGrantType, Startable, Stoppable, MuleContextAware
 {
 
     public static final String EXTERNAL_REDIRECT_URL_PROPERTY = SYSTEM_PROPERTY_PREFIX + "oauth2.externalRedirectUrl";
@@ -221,4 +222,9 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         }
     }
 
+    @Override
+    public void stop() throws MuleException
+    {
+        tokenRequestHandler.dispose();
+    }
 }
