@@ -74,7 +74,7 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, D
 
     public void buildHttpRequestOptions(final TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig) throws MuleException
     {
-        if(httpRequesterConfig == null)
+        if (httpRequesterConfig == null)
         {
             Protocols protocol = tlsContextFactory != null ? HTTPS : HTTP;
             httpRequesterConfig = new HttpRequesterConfigBuilder(muleContext).setProxyConfig(proxyConfig).setProtocol(protocol).setTlsContext(tlsContextFactory).build();
@@ -123,6 +123,6 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware, D
         {
             throw new MuleRuntimeException(e);
         }
-        disposeIfNeeded( httpRequesterConfig, logger);
+        disposeIfNeeded(httpRequesterConfig, logger);
     }
 }
