@@ -150,7 +150,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
       private boolean isPojoWithDefaultConstructor(Class<?> clazz) {
         return (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())
-                && Stream.of(clazz.getConstructors())
+            && Stream.of(clazz.getConstructors())
                 .noneMatch((c) -> c.getParameterCount() == 0));
       }
     });
