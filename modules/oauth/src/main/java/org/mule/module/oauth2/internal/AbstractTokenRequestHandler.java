@@ -6,6 +6,7 @@
  */
 package org.mule.module.oauth2.internal;
 
+import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -15,7 +16,11 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.module.http.api.HttpConstants.Protocols;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
@@ -27,13 +32,14 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractTokenRequestHandler implements MuleContextAware
+public abstract class AbstractTokenRequestHandler implements MuleContextAware, Disposable
 {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
     private MuleContext muleContext;
     private String refreshTokenWhen = OAuthConstants.DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
     private String tokenUrl;
+    private HttpRequesterConfig httpRequesterConfig;
     private HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().build();
     private TlsContextFactory tlsContextFactory;
 
@@ -66,11 +72,14 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware
         this.tokenUrl = tokenUrl;
     }
 
-    public void buildHttpRequestOptions (final TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig) throws MuleException
+    public void buildHttpRequestOptions(final TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig) throws MuleException
     {
-        Protocols protocol = tlsContextFactory != null ? HTTPS : HTTP;
-        HttpRequesterConfig httpRequesterConfig = new HttpRequesterConfigBuilder(muleContext).setProxyConfig(proxyConfig).setProtocol(protocol).setTlsContext(tlsContextFactory).build();
-        httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().requestConfig(httpRequesterConfig).build();
+        if (httpRequesterConfig == null)
+        {
+            Protocols protocol = tlsContextFactory != null ? HTTPS : HTTP;
+            httpRequesterConfig = new HttpRequesterConfigBuilder(muleContext).setProxyConfig(proxyConfig).setProtocol(protocol).setTlsContext(tlsContextFactory).build();
+            httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().requestConfig(httpRequesterConfig).build();
+        }
     }
 
     protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException, TokenUrlResponseException
@@ -101,5 +110,19 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware
         {
             return tokenUrlResponse;
         }
+    }
+    
+    @Override
+    public void dispose()
+    {
+        try
+        {
+            httpRequesterConfig.stop();
+        }
+        catch (MuleException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+        disposeIfNeeded(httpRequesterConfig, logger);
     }
 }
