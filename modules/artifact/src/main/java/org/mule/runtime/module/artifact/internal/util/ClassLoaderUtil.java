@@ -32,18 +32,19 @@ public class ClassLoaderUtil {
    * @return the platform classloader or empty.
    */
   public static Optional<ClassLoader> getPlatformClassLoader() {
-    if (platformClassLoader == null) {
-      try {
-        Method getPlatformClassLoader = ClassLoader.class.getMethod("getPlatformClassLoader", new Class[0]);
-        platformClassLoader = of((ClassLoader) getPlatformClassLoader.invoke(null, new Object[0]));
-
-      } catch (NoSuchMethodException e) {
-        platformClassLoader = empty();
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }
-    return platformClassLoader;
+    return empty();
+    //if (platformClassLoader == null) {
+    //  try {
+    //    Method getPlatformClassLoader = ClassLoader.class.getMethod("getPlatformClassLoader", new Class[0]);
+    //    platformClassLoader = of((ClassLoader) getPlatformClassLoader.invoke(null, new Object[0]));
+    //
+    //  } catch (NoSuchMethodException e) {
+    //    platformClassLoader = empty();
+    //  } catch (IllegalAccessException | InvocationTargetException e) {
+    //    throw new MuleRuntimeException(e);
+    //  }
+    //}
+    //return platformClassLoader;
   }
 
 }
