@@ -67,8 +67,15 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
                 ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
                 MuleContext muleContext = applicationContextBuilder.build();
                 
-                expectedException.expectCause(isA(IOException.class));
-                ((Flow)(muleContext.getRegistry().lookupFlowConstruct("testFlow"))).process(MuleTestUtils.getTestEvent("", muleContext));
+                try
+                {
+                    expectedException.expectCause(isA(IOException.class));
+                    ((Flow)(muleContext.getRegistry().lookupFlowConstruct("testFlow"))).process(MuleTestUtils.getTestEvent("", muleContext));
+                }
+                finally
+                {
+                    muleContext.dispose();
+                }
             }
         });
     }
