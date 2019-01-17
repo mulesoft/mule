@@ -10,20 +10,24 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import org.junit.Test;
+
+import reactor.core.publisher.Mono;
 
 public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCase {
 
   @Override
-  protected Processor getProcessor() {
-    return new SourcePolicyProcessor(policy, policyStateHandler, flowProcessor);
+  protected ReactiveProcessor getProcessor() {
+    return new SourcePolicyProcessor(policy, flowProcessor);
   }
 
   @Test
@@ -31,8 +35,8 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     mockFlowReturningEvent(modifiedMessageEvent);
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(false);
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
+    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
+        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0)).transform(ctx.get(POLICY_NEXT_OPERATION))));
 
     just(initialEvent).transform(policyProcessor).block();
 

@@ -169,6 +169,9 @@ public interface InternalEvent extends PrivilegedEvent {
     Builder removeVariable(String key);
 
     @Override
+    Builder clearVariables();
+
+    @Override
     @Deprecated
     Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
 

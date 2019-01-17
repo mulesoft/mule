@@ -103,7 +103,6 @@ public final class EventQuickCopy {
     public String getCorrelationId() {
       return getLegacyCorrelationId() != null ? getLegacyCorrelationId() : getContext().getCorrelationId();
     }
-
   }
 
   private static class EventQuickCopyInternalParametersDecorator extends BaseEventDecorator {

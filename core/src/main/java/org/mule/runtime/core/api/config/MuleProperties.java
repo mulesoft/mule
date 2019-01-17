@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.config;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 
@@ -159,7 +160,6 @@ public class MuleProperties {
   public static final String OBJECT_CONFIGURATION_PROPERTIES = "_muleConfigurationAttributesResolver";
   public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
   public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
-  public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
   public static final String OBJECT_REGISTRY = "_muleRegistry";
   public static final String OBJECT_CURSOR_MANAGER = "_muleStreamingManager";

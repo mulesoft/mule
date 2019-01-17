@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyProvider;
-import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -60,9 +59,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   private MuleContext muleContext;
 
   private Registry registry;
-
-  @Inject
-  private PolicyStateHandler policyStateHandler;
 
   private final AtomicBoolean isPoliciesAvailable = new AtomicBoolean(false);
 
@@ -189,8 +185,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   @Override
   public void initialise() throws InitialisationException {
-    operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory(policyStateHandler);
-    sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory(policyStateHandler);
+    operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory();
+    sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory();
 
     policyProvider = registry.lookupByType(PolicyProvider.class).orElse(new NullPolicyProvider());
 
@@ -222,11 +218,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
     sourcePolicyInnerCache.invalidateAll();
     operationPolicyInnerCache.invalidateAll();
-  }
-
-  @Override
-  public void disposePoliciesResources(String executionIdentifier) {
-    policyStateHandler.destroyState(executionIdentifier);
   }
 
   @Inject

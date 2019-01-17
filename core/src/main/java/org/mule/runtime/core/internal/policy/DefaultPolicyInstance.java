@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.policy;
+package org.mule.runtime.core.internal.policy;
 
 import static java.time.Duration.ofMillis;
 import static java.util.Optional.ofNullable;
@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
@@ -31,7 +30,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
@@ -41,28 +39,26 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.policy.PolicyChain;
+import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
-import org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 
-import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
-
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import reactor.core.Exceptions;
+import java.util.Optional;
+
+import javax.inject.Inject;
+
 import reactor.core.publisher.Flux;
 import reactor.retry.BackoffDelay;
 
@@ -77,18 +73,22 @@ public class DefaultPolicyInstance extends AbstractComponent
 
   private ProcessingStrategy processingStrategy;
 
+  private String name;
+
   private PolicyChain operationPolicyChain;
   private PolicyChain sourcePolicyChain;
 
-  private FlowConstructStatistics flowConstructStatistics = new DefaultFlowConstructStatistics("policy", getName());
-  private String name = "proxy-policy-" + UUID.getUUID();
+  private FlowConstructStatistics flowConstructStatistics;
   private MuleContext muleContext;
-  private DefaultLifecycleManager lifecycleStateManager = new DefaultLifecycleManager(this.name, this);
+  private final DefaultLifecycleManager<DefaultPolicyInstance> lifecycleStateManager =
+      new DefaultLifecycleManager<>("proxy-policy-" + UUID.getUUID(), this);
 
   @Override
   public void initialise() throws InitialisationException {
+    flowConstructStatistics = new DefaultFlowConstructStatistics("policy", getName());
+
     processingStrategy =
-        new PolicyProcessingStrategy(schedulerService, muleContext.getSchedulerBaseConfig(), getLocation().getLocation());
+        new PolicyProcessingStrategy(schedulerService, muleContext.getSchedulerBaseConfig(), getName());
 
     if (operationPolicyChain != null) {
       operationPolicyChain.setProcessingStrategy(processingStrategy);
@@ -154,6 +154,10 @@ public class DefaultPolicyInstance extends AbstractComponent
     return this.name;
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
+
   @Override
   public LifecycleState getLifecycleState() {
     return lifecycleStateManager.getState();
@@ -214,9 +218,9 @@ public class DefaultPolicyInstance extends AbstractComponent
     private static Logger LOGGER = getLogger(PolicyProcessingStrategy.class);
     private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
-    private SchedulerService schedulerService;
-    private SchedulerConfig schedulerBaseConfig;
-    private String schedulersNamePrefix;
+    private final SchedulerService schedulerService;
+    private final SchedulerConfig schedulerBaseConfig;
+    private final String schedulersNamePrefix;
 
     private Scheduler ioScheduler;
     private Scheduler cpuIntensiveScheduler;
