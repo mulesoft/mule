@@ -112,9 +112,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
                     ? type.getGenerics().get(0).getConcreteType().getDeclaringClass().get()
                     : type.getDeclaringClass().get();
 
-                if (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())
-                    && Stream.of(clazz.getConstructors())
-                        .noneMatch((c) -> c.getParameterCount() == 0)) {
+                if (isPojoWithDefaultConstructor(clazz)) {
                   problemsReporter
                       .addError(new Problem(parameter, format("Type '%s' does not have a default constructor", typeName)));
                 }
@@ -148,6 +146,12 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
                                                          typeName, field.getName(), annotation.getSimpleName())));
           }
         }
+      }
+
+      private boolean isPojoWithDefaultConstructor(Class<?> clazz) {
+        return (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())
+                && Stream.of(clazz.getConstructors())
+                .noneMatch((c) -> c.getParameterCount() == 0));
       }
     });
   }
