@@ -11,6 +11,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static sun.net.www.protocol.http.AuthScheme.NTLM;
+import static org.eclipse.jetty.http.HttpHeader.WWW_AUTHENTICATE;
+import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
@@ -26,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
-import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.ServerAuthException;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -130,22 +131,22 @@ public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends A
         public Authentication validateRequest(ServletRequest req, ServletResponse res, boolean mandatory) throws ServerAuthException
         {
             HttpServletRequest request = (HttpServletRequest)req;
-            String wwwAuthHeader = ((HttpServletRequest) req).getHeader(HttpHeader.WWW_AUTHENTICATE.asString());
-            String authHeader = ((HttpServletRequest) req).getHeader(HttpHeader.AUTHORIZATION.asString());
+            String wwwAuthHeader = ((HttpServletRequest) req).getHeader(WWW_AUTHENTICATE.asString());
+            String authHeader = ((HttpServletRequest) req).getHeader(AUTHORIZATION.asString());
             if(wwwAuthHeader == null && authHeader == null)
             {
                 try
                 {
                     HttpServletResponse response = (HttpServletResponse)res;
-                    response.setHeader(HttpHeader.WWW_AUTHENTICATE.asString(), "Basic realm=\"" + this._loginService.getName() + "\"");
-                    response.addHeader(HttpHeader.WWW_AUTHENTICATE.asString(), NTLM.toString());
-                    response.addHeader(HttpHeader.WWW_AUTHENTICATE.asString(), "Digest realm=\"" + this._loginService.getName() + "\", domain=\"/digest\", nonce=\"" + this.newNonce((Request)request) + "\", algorithm=MD5, qop=\"auth\", stale=false");
+                    response.setHeader(WWW_AUTHENTICATE.asString(), "Basic realm=\"" + this._loginService.getName() + "\"");
+                    response.addHeader(WWW_AUTHENTICATE.asString(), NTLM.toString());
+                    response.addHeader(WWW_AUTHENTICATE.asString(), "Digest realm=\"" + this._loginService.getName() + "\", domain=\"/digest\", nonce=\"" + this.newNonce((Request)request) + "\", algorithm=MD5, qop=\"auth\", stale=false");
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     return Authentication.SEND_CONTINUE;
                 }
-                catch (IOException var14)
+                catch (IOException e)
                 {
-                    throw new ServerAuthException(var14);
+                    throw new ServerAuthException(e);
                 }
             }
             else
