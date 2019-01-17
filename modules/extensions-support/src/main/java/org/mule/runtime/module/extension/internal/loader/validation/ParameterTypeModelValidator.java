@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
@@ -35,9 +36,11 @@ import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Validates that the parameter types are valid
@@ -98,10 +101,24 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
           objectType.getOpenRestriction().get().accept(this);
         } else {
+
           parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
               .map(descriptor -> descriptor.getExtensionParameter().getType())
               .ifPresent(type -> {
+
                 final String typeName = type.getName();
+
+                Class<?> clazz = type.getDeclaringClass().get().equals(TypedValue.class)
+                    ? type.getGenerics().get(0).getConcreteType().getDeclaringClass().get()
+                    : type.getDeclaringClass().get();
+
+                if (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())
+                    && Stream.of(clazz.getConstructors())
+                        .noneMatch((c) -> c.getParameterCount() == 0)) {
+                  problemsReporter
+                      .addError(new Problem(parameter, format("Type '%s' does not have a default constructor", typeName)));
+                }
+
                 type.getFields()
                     .forEach(field -> checkInvalidFieldAnnotations(parameter, typeName, field,
                                                                    ConfigOverride.class, ComponentId.class,
