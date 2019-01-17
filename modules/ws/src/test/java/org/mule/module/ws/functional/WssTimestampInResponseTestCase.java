@@ -49,7 +49,7 @@ public class WssTimestampInResponseTestCase extends FunctionalTestCase
                                                       "<text>Hello</text>" +
                                                       "</ns2:echoWithHeadersResponse>";
 
-    protected static final String EXPECTED_ERROR_NO_TIMESTAMP_RESPONSE = "An error was discovered processing the <wsse:Security> header.";
+    protected static final String EXPECTED_ERROR_NO_TIMESTAMP_RESPONSE = "An error was discovered processing the <wsse:Security> header";
 
     @Override
     protected String getConfigFile()
