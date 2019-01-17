@@ -24,7 +24,7 @@ Get Started
 
 1. Download, then unzip Mule – either the Standalone version (Mule runtime engine) or Anypoint Studio (the runtime engine + the Eclipse-based graphical IDE) – from [mulesoft.com](https://www.mulesoft.com).
 
-1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 8 Update 152.
+1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 8 Update 192.
 
 1. Launch Mule Studio by double-clicking AnypointStudio.app (Mac) or AnypointStudio.exe (Windows).  
      Launch Mule as a standalone from the command line by executing ./bin/mule (Mac) or mule.bat (Windows). 
