@@ -27,10 +27,7 @@ public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCa
 {
     protected static final int TIMEOUT = 5000;
 
-    private final List<List<String>> collectionValuesNested = new ArrayList<>();
-    private final List<String> collectionValuesSimple = new ArrayList<>();
-
-
+    private final List<List<String>> collectionValues = new ArrayList<>();
 
     @Override
     protected String getConfigFile()
@@ -42,40 +39,25 @@ public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCa
     public void setUp() throws Exception
     {
         super.setUp();
-        collectionValuesNested.add(new ArrayList<String>());
-        collectionValuesNested.add(new ArrayList<String>());
-        collectionValuesNested.get(0).add("value1");
-        collectionValuesNested.get(0).add("value2");
-        collectionValuesNested.get(0).add("value3");
-        collectionValuesNested.get(1).add("value4");
-        collectionValuesNested.get(1).add("value5");
-
-        collectionValuesSimple.add("item1");
-        collectionValuesSimple.add("item2");
-        collectionValuesSimple.add("item3");
-        collectionValuesSimple.add("item4");
-        collectionValuesSimple.add("item5");
+        collectionValues.add(new ArrayList<String>());
+        collectionValues.add(new ArrayList<String>());
+        collectionValues.get(0).add("value1");
+        collectionValues.get(0).add("value2");
+        collectionValues.get(0).add("value3");
+        collectionValues.get(1).add("value4");
+        collectionValues.get(1).add("value5");
     }
 
     @Test
     public void testRequestReplyWithNestedForEachWithSplitAggregate() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(collectionValuesNested, mock(Map.class) , muleContext);
+        MuleMessage message = new DefaultMuleMessage(collectionValues, mock(Map.class) , muleContext);
         client.dispatch("vm://foreach-spag", message);
-        for(List<String> sublist: collectionValuesNested)
+        for(List<String> sublist: collectionValues)
         {
             assertResultCollection(client, sublist, "-processed", "test-foreach-spag-reply");
         }
-    }
-
-    @Test
-    public void testRequestReplyWithSimpleForEachWithSplitAggregate() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(collectionValuesSimple, mock(Map.class), muleContext);
-        client.dispatch("vm://foreach-spag", message);
-        assertResultCollection(client, collectionValuesSimple,"-processed","test-foreach-spag-reply");
     }
 
 
