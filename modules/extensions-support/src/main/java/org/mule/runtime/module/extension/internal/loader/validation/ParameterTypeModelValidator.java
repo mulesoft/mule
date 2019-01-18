@@ -33,10 +33,11 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
+import static java.lang.reflect.Modifier.isAbstract;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -101,15 +102,13 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
           objectType.getOpenRestriction().get().accept(this);
         } else {
-
           parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
               .map(descriptor -> descriptor.getExtensionParameter().getType())
               .ifPresent(type -> {
-
                 final String typeName = type.getName();
 
                 Class<?> clazz = type.getDeclaringClass().get().equals(TypedValue.class)
-                    ? type.getGenerics().get(0).getConcreteType().getDeclaringClass().get()
+                    ? getTypedValueGenericClass(type)
                     : type.getDeclaringClass().get();
 
                 if (isPojoWithDefaultConstructor(clazz)) {
@@ -149,9 +148,14 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
       }
 
       private boolean isPojoWithDefaultConstructor(Class<?> clazz) {
-        return (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())
+        return (!clazz.isInterface() && !isAbstract(clazz.getModifiers())
             && Stream.of(clazz.getConstructors())
                 .noneMatch((c) -> c.getParameterCount() == 0));
+      }
+
+      private Class<?> getTypedValueGenericClass(Type type) {
+        return type.getGenerics().size() != 0 ? type.getGenerics().get(0).getConcreteType().getDeclaringClass().get()
+            : Object.class;
       }
     });
   }
