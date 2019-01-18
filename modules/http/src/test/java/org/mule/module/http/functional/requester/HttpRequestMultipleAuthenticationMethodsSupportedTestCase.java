@@ -13,6 +13,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static sun.net.www.protocol.http.AuthScheme.NTLM;
 import static org.eclipse.jetty.http.HttpHeader.WWW_AUTHENTICATE;
 import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.eclipse.jetty.server.Authentication.SEND_CONTINUE;
 
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
@@ -139,10 +141,10 @@ public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends A
                 {
                     HttpServletResponse response = (HttpServletResponse)res;
                     response.setHeader(WWW_AUTHENTICATE.asString(), "Basic realm=\"" + this._loginService.getName() + "\"");
-                    response.addHeader(WWW_AUTHENTICATE.asString(), NTLM.toString());
+                    response.addHeader(WWW_AUTHENTICATE.asString(), NTLM.name());
                     response.addHeader(WWW_AUTHENTICATE.asString(), "Digest realm=\"" + this._loginService.getName() + "\", domain=\"/digest\", nonce=\"" + this.newNonce((Request)request) + "\", algorithm=MD5, qop=\"auth\", stale=false");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                    return Authentication.SEND_CONTINUE;
+                    response.sendError(SC_UNAUTHORIZED);
+                    return SEND_CONTINUE;
                 }
                 catch (IOException e)
                 {
