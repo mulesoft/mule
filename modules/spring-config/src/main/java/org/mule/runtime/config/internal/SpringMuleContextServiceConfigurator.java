@@ -165,6 +165,8 @@ class SpringMuleContextServiceConfigurator {
   private final CustomServiceRegistry customServiceRegistry;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
 
+  private static final String OBJECT_POLICY_NEXT_CHAINING = "_mulePolicyNextChaining";
+
   private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
       .add(OBJECT_SECURITY_MANAGER)
       .add(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)
@@ -198,7 +200,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_POLICY_MANAGER, getBeanDefinition(DefaultPolicyManager.class))
       .put(INTERCEPTOR_MANAGER_REGISTRY_KEY, getBeanDefinition(DefaultProcessorInterceptorManager.class))
       .put(OBJECT_POLICY_MANAGER_STATE_HANDLER, getBeanDefinition(DefaultPolicyStateHandler.class))
-      .put("_mulePolicyNextChaining", getBeanDefinition(PolicyNextChaining.class))
+      .put(OBJECT_POLICY_NEXT_CHAINING, getBeanDefinition(PolicyNextChaining.class))
       .put(OBJECT_NOTIFICATION_MANAGER, createNotificationManagerBeanDefinition())
       .put(OBJECT_NOTIFICATION_DISPATCHER, getBeanDefinition(DefaultNotificationDispatcher.class))
       .put(NotificationListenerRegistry.REGISTRY_KEY, getBeanDefinition(DefaultNotificationListenerRegistry.class))
