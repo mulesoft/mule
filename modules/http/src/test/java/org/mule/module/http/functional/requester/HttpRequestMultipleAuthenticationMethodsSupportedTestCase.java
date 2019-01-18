@@ -51,7 +51,10 @@ public class HttpRequestMultipleAuthenticationMethodsSupportedTestCase extends A
     private static int digestRequestCount = 0;
 
     @Override
-    protected String getConfigFile() { return "http-request-multiple-auth-methods-config.xml"; }
+    protected String getConfigFile()
+    {
+        return "http-request-multiple-auth-methods-config.xml";
+    }
 
     @Test
     public void onMultipleAuthMethodChoiceLocalAuthSchemeIsSet() throws Exception
