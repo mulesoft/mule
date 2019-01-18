@@ -87,10 +87,17 @@ public final class MuleUrlStreamHandlerFactory extends Object implements URLStre
     while (handler == null && tokenizer.hasMoreTokens()) {
       String packagePrefix = tokenizer.nextToken().trim();
       String className = packagePrefix + "." + protocol + ".Handler";
-      try {
-        handler = (URLStreamHandler) ClassUtils.instantiateClass(className);
-      } catch (Exception ex) {
-        // not much we can do here
+
+      // MULE-15867 - MG says: for some mysterious reason, Java 11 is fine instantiating this class explicitly but logs
+      // a warning when instantiated by reflection.
+      if ("sun.net.www.protocol.jar.Handler".equals(className)) {
+        handler = new sun.net.www.protocol.jar.Handler();
+      } else {
+        try {
+          handler = (URLStreamHandler) ClassUtils.instantiateClass(className);
+        } catch (Exception ex) {
+          // not much we can do here
+        }
       }
     }
 
