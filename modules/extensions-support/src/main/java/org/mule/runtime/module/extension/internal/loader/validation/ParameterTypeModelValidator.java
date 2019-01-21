@@ -41,6 +41,7 @@ import java.lang.annotation.Annotation;
 import static java.lang.reflect.Modifier.isAbstract;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -156,7 +157,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
       private Class<?> getTypedValueGenericClass(Type type) {
         return !CollectionUtils.isEmpty(type.getGenerics())
-            ? type.getGenerics().get(0).getConcreteType().getDeclaringClass().get()
+            ? type.getGenerics().stream().findFirst().get().getConcreteType().getDeclaringClass().get()
             : Object.class;
       }
     });
