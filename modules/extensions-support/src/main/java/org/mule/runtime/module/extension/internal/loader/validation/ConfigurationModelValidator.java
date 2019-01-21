@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.*;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigParametersNamesNotAllowed;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
-
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
