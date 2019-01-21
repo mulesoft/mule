@@ -38,13 +38,13 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * Next-operation message processor implementation.
@@ -62,14 +62,11 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private PolicyStateHandler policyStateHandler;
 
   @Inject
-  private PolicyNextChaining policyNextChaining;
-
-  @Inject
   private MuleContext muleContext;
 
   private PolicyNotificationHelper notificationHelper;
 
-  private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
+  private PolicyEventConverter policyEventConverter = new PolicyEventConverter();
 
   private PolicyStateIdFactory stateIdFactory;
 
@@ -99,7 +96,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
         .flatMap(event -> {
           PolicyStateId policyStateId = stateIdFactory.create(event);
-          Processor nextOperation = policyNextChaining.retrieveNextOperation(policyStateId.getExecutionIdentifier());
+          Processor nextOperation = policyStateHandler.retrieveNextOperation(policyStateId.getExecutionIdentifier());
 
           if (nextOperation == null) {
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "

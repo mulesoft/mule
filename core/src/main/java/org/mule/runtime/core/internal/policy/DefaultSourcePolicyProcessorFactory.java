@@ -18,21 +18,18 @@ import org.mule.runtime.core.api.processor.Processor;
 public class DefaultSourcePolicyProcessorFactory implements SourcePolicyProcessorFactory {
 
   private final PolicyStateHandler policyStateHandler;
-  private final PolicyNextChaining policyNextChaining;
 
   /**
    * Creates a new instance of the default factory for {@link SourcePolicy}s.
    *
    * @param policyStateHandler the state handler for policies.
-   * @param policyNextChaining the object in charge of hooking the corresponding target for the {@code execute-next} processor.
    */
-  public DefaultSourcePolicyProcessorFactory(PolicyStateHandler policyStateHandler, PolicyNextChaining policyNextChaining) {
+  public DefaultSourcePolicyProcessorFactory(PolicyStateHandler policyStateHandler) {
     this.policyStateHandler = policyStateHandler;
-    this.policyNextChaining = policyNextChaining;
   }
 
   @Override
   public Processor createSourcePolicy(Policy policy, Processor nextProcessor) {
-    return new SourcePolicyProcessor(policy, policyStateHandler, policyNextChaining, nextProcessor);
+    return new SourcePolicyProcessor(policy, policyStateHandler, nextProcessor);
   }
 }
