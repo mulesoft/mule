@@ -57,6 +57,15 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   private Collection<OperationPolicyParametersTransformer> operationPolicyParametersTransformerCollection = emptyList();
   private Collection<SourcePolicyParametersTransformer> sourcePolicyParametersTransformerCollection = emptyList();
+
+  @Inject
+  private PolicyNextChaining policyNextChaining;
+
+  private final ConcurrentHashMap<ComponentIdentifier, Optional<SourcePolicyParametersTransformer>> sourceParametersTransformers =
+      new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<ComponentIdentifier, Optional<OperationPolicyParametersTransformer>> operationParametersTransformers =
+      new ConcurrentHashMap<>();
+
   private PolicyProvider policyProvider;
   private OperationPolicyProcessorFactory operationPolicyProcessorFactory;
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
@@ -128,8 +137,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
-    operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory(policyStateHandler);
-    sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory(policyStateHandler);
+    operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory(policyStateHandler, policyNextChaining);
+    sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory(policyStateHandler, policyNextChaining);
     MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
     policyProvider = registry.lookupLocalObjects(PolicyProvider.class).stream().findFirst().orElse(new NullPolicyProvider());
     sourcePolicyParametersTransformerCollection = registry.lookupObjects(SourcePolicyParametersTransformer.class);

@@ -22,11 +22,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -50,15 +51,20 @@ public class OperationPolicyProcessor implements Processor {
 
   private final Policy policy;
   private final PolicyStateHandler policyStateHandler;
+  private final PolicyNextChaining policyNextChaining;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
   private final Processor nextProcessor;
   private final PolicyStateIdFactory stateIdFactory;
 
+  // Force the reference to be kept until this processor is GC'd. On 4.1.x, this is when the event is finished.
+  private Processor nextOperationCall;
+
   public OperationPolicyProcessor(Policy policy,
-                                  PolicyStateHandler policyStateHandler,
+                                  PolicyStateHandler policyStateHandler, PolicyNextChaining policyNextChaining,
                                   Processor nextProcessor) {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
+    this.policyNextChaining = policyNextChaining;
     this.nextProcessor = nextProcessor;
     this.stateIdFactory = new PolicyStateIdFactory(policy.getPolicyId());
   }
@@ -84,8 +90,8 @@ public class OperationPolicyProcessor implements Processor {
           PolicyStateId policyStateId = stateIdFactory.create(operationEvent);
           PrivilegedEvent variablesProviderEvent = variablesProvider(operationEvent, policyStateId);
           PrivilegedEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
-          Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent, policyStateId);
-          policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
+          nextOperationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent, policyStateId);
+          policyNextChaining.updateNextOperation(policyStateId.getExecutionIdentifier(), nextOperationCall);
           return executePolicyChain(operationEvent, policyStateId, policyEvent);
         });
   }
