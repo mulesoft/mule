@@ -7,12 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isAbstract;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.overrideEqualsAndHashCode;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.*;
 
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -22,8 +18,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
@@ -33,7 +27,6 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.HashSet;
@@ -65,29 +58,6 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
     Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders = HashMultimap.create();
 
     new ExtensionWalker() {
-
-      @Override
-      protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-        model.getType().accept(new MetadataTypeVisitor() {
-
-          @Override
-          public void visitObject(ObjectType objectType) {
-            model.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
-                .map(descriptor -> descriptor.getExtensionParameter().getType())
-                .ifPresent(type -> {
-
-                  Class<?> clazz = type.getDeclaringClass().get();
-
-                  if (!clazz.isInterface() &&
-                      !isAbstract(clazz.getModifiers())
-                      && (!overrideEqualsAndHashCode(clazz))) {
-                    problemsReporter
-                        .addError(new Problem(model, format("Type '%s' must override equals and hashCode", type.getName())));
-                  }
-                });
-          }
-        });
-      }
 
       @Override
       public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {

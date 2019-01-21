@@ -54,26 +54,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclar
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.DeprecationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.MediaTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OAuthConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OperationParametersTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PagedOperationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterPluralNameModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.SourceCallbacksModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -87,6 +68,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
                                                                                          new ConfigurationModelValidator(),
                                                                                          new ConnectionProviderModelValidator(),
+                                                                                         new EqualsAndHashCodeModelValidator(),
                                                                                          new DeprecationModelValidator(),
                                                                                          new InputParametersTypeModelValidator(),
                                                                                          new JavaSubtypesModelValidator(),
