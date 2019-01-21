@@ -29,7 +29,7 @@ public class DefaultPolicyStateHandlerBenchmark extends AbstractBenchmark {
 
   private final PolicyStateHandler handler = new DefaultPolicyStateHandler();
 
-  private final Processor dummyProcessor = event -> event;
+  private final static Processor DUMMY_PROCESSOR = event -> event;
 
   @Benchmark
   @Threads(32)
@@ -45,7 +45,7 @@ public class DefaultPolicyStateHandlerBenchmark extends AbstractBenchmark {
     final Optional<CoreEvent> latestState = handler.getLatestState(policyStateId);
 
     ((BaseEventContext) event.getContext()).success();
-    return Pair.of(dummyProcessor, latestState);
+    return Pair.of(DUMMY_PROCESSOR, latestState);
   }
 
   @Benchmark
@@ -66,7 +66,7 @@ public class DefaultPolicyStateHandlerBenchmark extends AbstractBenchmark {
     handler.updateState(policyStateId, event);
 
     ((BaseEventContext) event.getContext()).success();
-    return Pair.of(dummyProcessor, latestState);
+    return Pair.of(DUMMY_PROCESSOR, latestState);
   }
 
 }
