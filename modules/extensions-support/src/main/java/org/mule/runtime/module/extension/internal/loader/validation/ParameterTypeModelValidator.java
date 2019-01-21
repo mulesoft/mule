@@ -35,6 +35,7 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
 import static java.lang.reflect.Modifier.isAbstract;
@@ -111,7 +112,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
                     ? getTypedValueGenericClass(type)
                     : type.getDeclaringClass().get();
 
-                if (isPojoWithDefaultConstructor(clazz)) {
+                if (isPojoWithoutDefaultConstructor(clazz)) {
                   problemsReporter
                       .addError(new Problem(parameter, format("Type '%s' does not have a default constructor", typeName)));
                 }
@@ -147,14 +148,15 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
         }
       }
 
-      private boolean isPojoWithDefaultConstructor(Class<?> clazz) {
+      private boolean isPojoWithoutDefaultConstructor(Class<?> clazz) {
         return (!clazz.isInterface() && !isAbstract(clazz.getModifiers())
             && Stream.of(clazz.getConstructors())
                 .noneMatch(c -> c.getParameterCount() == 0));
       }
 
       private Class<?> getTypedValueGenericClass(Type type) {
-        return type.getGenerics().size() != 0 ? type.getGenerics().get(0).getConcreteType().getDeclaringClass().get()
+        return !CollectionUtils.isEmpty(type.getGenerics())
+            ? type.getGenerics().get(0).getConcreteType().getDeclaringClass().get()
             : Object.class;
       }
     });
