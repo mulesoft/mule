@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
+import java.util.Objects;
 
 @TypeDsl(allowTopLevelDefinition = true)
 public class PhoneNumber {
@@ -41,5 +42,23 @@ public class PhoneNumber {
 
   public List<String> getAreaCodes() {
     return areaCodes;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    PhoneNumber that = (PhoneNumber) o;
+    return Objects.equals(mobile, that.mobile) &&
+        Objects.equals(home, that.home) &&
+        Objects.equals(countryEncoding, that.countryEncoding) &&
+        Objects.equals(areaCodes, that.areaCodes);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(mobile, home, countryEncoding, areaCodes);
   }
 }

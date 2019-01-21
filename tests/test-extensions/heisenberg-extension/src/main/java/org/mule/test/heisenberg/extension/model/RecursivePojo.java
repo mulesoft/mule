@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @TypeDsl(allowTopLevelDefinition = true)
 public class RecursivePojo {
@@ -44,4 +45,20 @@ public class RecursivePojo {
     return mappedChilds;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    RecursivePojo that = (RecursivePojo) o;
+    return Objects.equals(next, that.next) &&
+        Objects.equals(childs, that.childs) &&
+        Objects.equals(mappedChilds, that.mappedChilds);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(next, childs, mappedChilds);
+  }
 }

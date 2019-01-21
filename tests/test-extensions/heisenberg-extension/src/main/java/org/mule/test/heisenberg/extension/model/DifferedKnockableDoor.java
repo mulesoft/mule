@@ -13,6 +13,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
+import java.util.Objects;
+
 @TypeDsl(allowTopLevelDefinition = true)
 public class DifferedKnockableDoor {
 
@@ -38,5 +40,22 @@ public class DifferedKnockableDoor {
 
   public Literal<String> getEncodedPasssword() {
     return encodedPasssword;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    DifferedKnockableDoor that = (DifferedKnockableDoor) o;
+    return Objects.equals(victim, that.victim) &&
+        Objects.equals(address, that.address) &&
+        Objects.equals(encodedPasssword, that.encodedPasssword);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(victim, address, encodedPasssword);
   }
 }

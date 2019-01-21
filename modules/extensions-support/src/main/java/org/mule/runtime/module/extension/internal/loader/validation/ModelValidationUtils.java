@@ -19,7 +19,9 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Utility class for {@link ExtensionModelValidator}s
@@ -61,6 +63,15 @@ final class ModelValidationUtils {
                                                 kind,
                                                 model.getName(),
                                                 NAME_ATTRIBUTE_NAME))));
+  }
+
+  static boolean overrideEqualsAndHashCode(Class<?> clazz) {
+    try {
+      return (!clazz.getMethod("equals", Object.class).getDeclaringClass().equals(Object.class))
+          && (!clazz.getMethod("hashCode").getDeclaringClass().equals(Object.class));
+    } catch (NoSuchMethodException e) {
+    }
+    return false;
   }
 
 }

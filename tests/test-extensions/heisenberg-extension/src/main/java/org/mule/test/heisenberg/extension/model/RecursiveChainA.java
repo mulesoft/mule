@@ -10,6 +10,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
+import java.util.Objects;
 
 @TypeDsl(allowTopLevelDefinition = true)
 public class RecursiveChainA {
@@ -33,5 +34,22 @@ public class RecursiveChainA {
 
   public List<RecursiveChainB> getbChains() {
     return bChains;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    RecursiveChainA that = (RecursiveChainA) o;
+    return Objects.equals(fieldA, that.fieldA) &&
+        Objects.equals(chainB, that.chainB) &&
+        Objects.equals(bChains, that.bChains);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(fieldA, chainB, bChains);
   }
 }

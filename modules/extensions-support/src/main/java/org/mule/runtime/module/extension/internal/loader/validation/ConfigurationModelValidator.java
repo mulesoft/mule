@@ -7,17 +7,21 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static java.lang.reflect.Modifier.*;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigParametersNamesNotAllowed;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.*;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
+
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
@@ -28,7 +32,9 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +51,30 @@ public final class ConfigurationModelValidator implements ExtensionModelValidato
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
     new ExtensionWalker() {
+
+      @Override
+      protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
+        model.getType().accept(new MetadataTypeVisitor() {
+
+          @Override
+          public void visitObject(ObjectType objectType) {
+            model.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+                .map(descriptor -> descriptor.getExtensionParameter().getType())
+                .ifPresent(type -> {
+
+                  Class<?> clazz = type.getDeclaringClass().get();
+
+                  if (!clazz.isInterface() &&
+                      !isAbstract(clazz.getModifiers())
+                      && (!overrideEqualsAndHashCode(clazz))) {
+                    problemsReporter
+                        .addError(new Problem(model, format("Type '%s' must override equals and hashCode", type.getName())));
+                  }
+
+                });
+          }
+        });
+      }
 
       @Override
       public void onOperation(HasOperationModels owner, OperationModel operationModel) {
