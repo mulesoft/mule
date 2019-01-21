@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -93,7 +94,9 @@ public class SourcePolicyProcessor implements Processor {
               .transform(policy.getPolicyChain())
               .cast(PrivilegedEvent.class)
               .map(event -> policyEventConverter.createEvent(event, sourceEvent));
-        });
+        })
+        .cast(CoreEvent.class)
+        .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessor));
   }
 
   private Processor buildSourceExecutionWithPolicyFunction(PolicyStateId policyStateId, PrivilegedEvent sourceEvent) {
