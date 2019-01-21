@@ -23,7 +23,7 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
 
   @Override
   protected Processor getProcessor() {
-    return new SourcePolicyProcessor(policy, policyStateHandler, flowProcessor);
+    return new SourcePolicyProcessor(policy, policyStateHandler, policyNextChaining, flowProcessor);
   }
 
   @Test
@@ -32,7 +32,7 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(false);
     when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
+        .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyNextChaining.retrieveNextOperation(executionId)));
 
     just(initialEvent).transform(policyProcessor).block();
 

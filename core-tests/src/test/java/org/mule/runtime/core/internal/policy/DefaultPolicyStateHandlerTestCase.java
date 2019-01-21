@@ -19,10 +19,10 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.function.BiConsumer;
-
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.function.BiConsumer;
 
 public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
 
@@ -32,10 +32,11 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
   private static final String TEST_POLICY_ID = "test-policy-id";
   private static final String TEST_POLICY_ID2 = "test-policy-id2";
 
-  private InternalEvent eventTestExecutionId = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
-  private InternalEvent eventTestExecutionId2 = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
+  private final InternalEvent eventTestExecutionId = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
+  private final InternalEvent eventTestExecutionId2 = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
 
-  private DefaultPolicyStateHandler defaultPolicyStateHandler = new DefaultPolicyStateHandler();
+  private final DefaultPolicyStateHandler defaultPolicyStateHandler = new DefaultPolicyStateHandler();
+  private final PolicyNextChaining policyNextChaining = new PolicyNextChaining();
 
   @Test
   public void destroyStateWithNoData() {
@@ -67,7 +68,7 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
     PolicyStateId policyStateExecutionId = new PolicyStateId(TEST_EXECUTION_ID, TEST_POLICY_ID);
     defaultPolicyStateHandler.destroyState(policyStateExecutionId.getExecutionIdentifier());
     assertThat(defaultPolicyStateHandler.getLatestState(policyStateExecutionId).isPresent(), is(false));
-    assertThat(defaultPolicyStateHandler.retrieveNextOperation(policyStateExecutionId.getExecutionIdentifier()), nullValue());
+    assertThat(policyNextChaining.retrieveNextOperation(policyStateExecutionId.getExecutionIdentifier()), nullValue());
   }
 
   @Test
@@ -84,8 +85,6 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
     assertThat(defaultPolicyStateHandler.getLatestState(policyStateExecutionId).isPresent(), is(false));
     assertThat(defaultPolicyStateHandler.policyStateIdsByExecutionIdentifier
         .containsKey(policyStateExecutionId.getExecutionIdentifier()), is(false));
-    assertThat(defaultPolicyStateHandler.nextOperationMap.containsKey(policyStateExecutionId.getExecutionIdentifier()),
-               is(false));
     assertThat(defaultPolicyStateHandler.stateMap.containsKey(policyStateExecutionId), is(false));
   }
 
