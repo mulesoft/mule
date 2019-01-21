@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static org.mockito.Mockito.when;
-
 import org.mule.runtime.core.api.processor.Processor;
+
+import static org.mockito.Mockito.when;
 
 public class OperationPolicyProcessorTestCase extends AbstractPolicyProcessorTestCase {
 
   @Override
   protected Processor getProcessor() {
     when(policy.getPolicyId()).thenReturn("id");
-    return new OperationPolicyProcessor(policy, policyStateHandler, policyNextChaining, flowProcessor);
+    return new OperationPolicyProcessor(policy, policyStateHandler, flowProcessor);
   }
 }

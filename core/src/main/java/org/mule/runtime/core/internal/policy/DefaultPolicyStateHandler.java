@@ -24,18 +24,16 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
   protected MultiMap<String, PolicyStateId> policyStateIdsByExecutionIdentifier = new MultiMap<>();
   protected Map<PolicyStateId, CoreEvent> stateMap = new HashMap<>();
+  protected Map<String, Processor> nextOperationMap = new HashMap<>();
 
-  @Override
-  public void updateNextOperation(String identifier, Processor nextOperation) {
-    throw new UnsupportedOperationException("Use 'PolicyNextChaining' instead.");
+  public synchronized void updateNextOperation(String identifier, Processor nextOperation) {
+    nextOperationMap.put(identifier, nextOperation);
   }
 
-  @Override
-  public Processor retrieveNextOperation(String identifier) {
-    throw new UnsupportedOperationException("Use 'PolicyNextChaining' instead.");
+  public synchronized Processor retrieveNextOperation(String identifier) {
+    return nextOperationMap.get(identifier);
   }
 
-  @Override
   public Optional<CoreEvent> getLatestState(PolicyStateId identifier) {
     final CoreEvent state;
     synchronized (this) {
@@ -44,7 +42,6 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     return ofNullable(state);
   }
 
-  @Override
   public void updateState(PolicyStateId identifier, CoreEvent lastStateEvent) {
     ((BaseEventContext) lastStateEvent.getContext()).getRootContext()
         .onTerminated((response, throwable) -> destroyState(identifier.getExecutionIdentifier()));
@@ -54,12 +51,12 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     }
   }
 
-  @Override
   public synchronized void destroyState(String identifier) {
     List<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.removeAll(identifier);
     if (policyStateIds != null) {
       policyStateIds.forEach(stateMap::remove);
     }
+    nextOperationMap.remove(identifier);
   }
 
 }

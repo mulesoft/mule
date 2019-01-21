@@ -18,21 +18,18 @@ import org.mule.runtime.core.api.processor.Processor;
 public class DefaultOperationPolicyProcessorFactory implements OperationPolicyProcessorFactory {
 
   private final PolicyStateHandler policyStateHandler;
-  private final PolicyNextChaining policyNextChaining;
 
   /**
    * Creates a new {@link Processor} from an operation {@link Policy}.
    *
    * @param policyStateHandler the state handler to use for keeping track of the policy chain event modifications.
-   * @param policyNextChaining the object in charge of hooking the corresponding target for the {@code execute-next} processor.
    */
-  public DefaultOperationPolicyProcessorFactory(PolicyStateHandler policyStateHandler, PolicyNextChaining policyNextChaining) {
+  public DefaultOperationPolicyProcessorFactory(PolicyStateHandler policyStateHandler) {
     this.policyStateHandler = policyStateHandler;
-    this.policyNextChaining = policyNextChaining;
   }
 
   @Override
   public Processor createOperationPolicy(Policy policy, Processor nextProcessor) {
-    return new OperationPolicyProcessor(policy, policyStateHandler, policyNextChaining, nextProcessor);
+    return new OperationPolicyProcessor(policy, policyStateHandler, nextProcessor);
   }
 }
