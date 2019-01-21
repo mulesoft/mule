@@ -68,7 +68,7 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
       return (!clazz.getMethod("equals", Object.class).getDeclaringClass().equals(Object.class))
           && (!clazz.getMethod("hashCode").getDeclaringClass().equals(Object.class));
     } catch (NoSuchMethodException e) {
+      return false;
     }
-    return false;
   }
 }

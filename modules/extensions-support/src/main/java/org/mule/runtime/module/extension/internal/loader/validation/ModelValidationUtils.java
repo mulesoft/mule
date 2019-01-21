@@ -19,9 +19,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Utility class for {@link ExtensionModelValidator}s
