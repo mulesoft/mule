@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.loader.validation.Model
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -44,16 +45,7 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
 
             @Override
             public void visitObject(ObjectType objectType) {
-              Class<?> clazz = getType(objectType).orElse(null);
-
-              if ((clazz != null) && !clazz.isInterface() &&
-                  !isAbstract(clazz.getModifiers())
-                  && (!overridesEqualsAndHashCode(clazz))) {
-                problemsReporter
-                    .addError(new Problem(model,
-                                          format("Type '%s' must override equals and hashCode",
-                                                 clazz.getSimpleName())));
-              }
+              validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
             }
           });
         });
@@ -66,21 +58,25 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
 
             @Override
             public void visitObject(ObjectType objectType) {
-              Class<?> clazz = getType(objectType).orElse(null);
-
-              if ((clazz != null) && !clazz.isInterface() &&
-                  !isAbstract(clazz.getModifiers())
-                  && (!overridesEqualsAndHashCode(clazz))) {
-                problemsReporter
-                    .addError(new Problem(model,
-                                          format("Type '%s' must override equals and hashCode",
-                                                 clazz.getSimpleName())));
-              }
+              validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
             }
           });
         });
       }
     }.walk(extensionModel);
+  }
+
+  private void validateOverridesEqualsAndHashCode(ObjectType objectType, ProblemsReporter reporter, NamedObject model) {
+    Class<?> clazz = getType(objectType).orElse(null);
+
+    if ((clazz != null) && !clazz.isInterface() &&
+        !isAbstract(clazz.getModifiers())
+        && (!overridesEqualsAndHashCode(clazz))) {
+      reporter
+          .addError(new Problem(model,
+                                format("Type '%s' must override equals and hashCode",
+                                       clazz.getSimpleName())));
+    }
   }
 
   private boolean overridesEqualsAndHashCode(Class<?> clazz) {
