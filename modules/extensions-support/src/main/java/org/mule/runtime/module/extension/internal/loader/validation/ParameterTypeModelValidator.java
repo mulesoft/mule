@@ -109,8 +109,12 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
               .ifPresent(type -> {
                 final String typeName = type.getName();
 
+                if (!type.getDeclaringClass().isPresent()) {
+                  return;
+                }
+
                 Class<?> clazz = type.getDeclaringClass().get().equals(TypedValue.class)
-                    ? getTypedValueGenericClass(type)
+                    ? getFirstGenericClass(type).orElse(Object.class)
                     : type.getDeclaringClass().get();
 
                 if (isPojoWithoutDefaultConstructor(clazz)) {
@@ -155,12 +159,11 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
                 .noneMatch(c -> c.getParameterCount() == 0));
       }
 
-      private Class<?> getTypedValueGenericClass(Type type) {
-        Optional<Class<?>> clazz = type.getGenerics().stream().findFirst()
+      private Optional<Class<?>> getFirstGenericClass(Type type) {
+        return type.getGenerics().stream().findFirst()
             .map(typeGeneric -> typeGeneric.getConcreteType())
             .map(concreteType -> concreteType.getDeclaringClass()
                 .orElse(Object.class));
-        return clazz.orElse(Object.class);
       }
     });
   }
