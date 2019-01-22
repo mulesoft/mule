@@ -19,17 +19,17 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import java.util.Optional;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Threads;
 
+import java.util.Optional;
+
 public class DefaultPolicyStateHandlerBenchmark extends AbstractBenchmark {
 
-  private PolicyStateHandler handler = new DefaultPolicyStateHandler();
+  private final PolicyStateHandler handler = new DefaultPolicyStateHandler();
 
-  private Processor dummyProcessor = event -> event;
+  private final static Processor DUMMY_PROCESSOR = event -> event;
 
   @Benchmark
   @Threads(32)
@@ -39,15 +39,13 @@ public class DefaultPolicyStateHandlerBenchmark extends AbstractBenchmark {
 
     PolicyStateId policyStateId = new PolicyStateId(event.getContext().getCorrelationId(), "myPolicy");
 
-    handler.updateNextOperation(event.getContext().getCorrelationId(), dummyProcessor);
     handler.updateState(policyStateId, event);
 
     // execute-next
-    final Processor nextOperation = handler.retrieveNextOperation(event.getContext().getCorrelationId());
     final Optional<CoreEvent> latestState = handler.getLatestState(policyStateId);
 
     ((BaseEventContext) event.getContext()).success();
-    return Pair.of(nextOperation, latestState);
+    return Pair.of(DUMMY_PROCESSOR, latestState);
   }
 
   @Benchmark
@@ -60,17 +58,15 @@ public class DefaultPolicyStateHandlerBenchmark extends AbstractBenchmark {
 
     Optional<CoreEvent> latestState = handler.getLatestState(policyStateId);
     handler.updateState(policyStateId, latestState.orElse(event));
-    handler.updateNextOperation(event.getContext().getCorrelationId(), dummyProcessor);
 
     // execute-next
-    final Processor nextOperation = handler.retrieveNextOperation(event.getContext().getCorrelationId());
     latestState = handler.getLatestState(policyStateId);
 
     handler.updateState(policyStateId, event);
     handler.updateState(policyStateId, event);
 
     ((BaseEventContext) event.getContext()).success();
-    return Pair.of(nextOperation, latestState);
+    return Pair.of(DUMMY_PROCESSOR, latestState);
   }
 
 }

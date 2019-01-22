@@ -17,7 +17,7 @@ import java.util.Optional;
  *
  * Keeps track of the operation associated with a certain context of execution. Such context of execution is defined by the unique
  * identifier of the generated {@link CoreEvent}.
- * 
+ *
  * Implementations will be executed concurrently but always using different identifiers. There will be no concurrent invocation
  * for the same identifier.
  *
@@ -28,16 +28,18 @@ public interface PolicyStateHandler {
 
   /**
    * Associated the {@code identifier} with the policy next operation to execute
-   * 
+   *
    * @param executionIdentifier the identifier of the context
    * @param nextOperation the next operation of the policy
    */
+  @Deprecated
   void updateNextOperation(String executionIdentifier, Processor nextOperation);
 
   /**
    * @param executionIdentifier the identifier of the context
    * @return the next operation for the context.
    */
+  @Deprecated
   Processor retrieveNextOperation(String executionIdentifier);
 
   /**
@@ -56,7 +58,7 @@ public interface PolicyStateHandler {
 
   /**
    * Updates the event of the policy for the context with the given identifier.
-   * 
+   *
    * @param identifier the identifier of the context
    * @param lastStateEvent the last state of the event
    */
