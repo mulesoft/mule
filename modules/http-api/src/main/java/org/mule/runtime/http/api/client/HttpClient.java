@@ -139,6 +139,21 @@ public interface HttpClient {
    * Opens a new WebSocket by adding the proper upgrade header to the given {@code request}
    *
    * @param request        a {@link HttpRequest} to the target WebSocket endpoint
+   * @param socketId       the id of the obtained socket
+   * @param callback       the callback that will receive the associated  socket events
+   * @return a future {@link WebSocket}
+   * @since 4.2.0
+   */
+  default CompletableFuture<WebSocket> openWebSocket(HttpRequest request,
+                                                     String socketId,
+                                                     WebSocketCallback callback) {
+    return openWebSocket(request, HttpRequestOptions.builder().build(), socketId, callback);
+  }
+
+  /**
+   * Opens a new WebSocket by adding the proper upgrade header to the given {@code request}
+   *
+   * @param request        a {@link HttpRequest} to the target WebSocket endpoint
    * @param requestOptions the request options
    * @param socketId       the id of the obtained socket
    * @param callback       the callback that will receive the associated  socket events
