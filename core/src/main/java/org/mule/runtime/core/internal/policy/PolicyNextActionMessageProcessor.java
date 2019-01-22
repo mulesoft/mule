@@ -94,35 +94,33 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return from(publisher)
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
-        .flatMap(event -> {
-          return subscriberContext().flatMap(ctx -> {
-            final Processor nextOperation = ctx.get(POLICY_NEXT_OPERATION);
+        .flatMap(event -> subscriberContext().flatMap(ctx -> {
+          final Processor nextOperation = ctx.get(POLICY_NEXT_OPERATION);
 
-            PolicyStateId policyStateId = stateIdFactory.create(event);
+          PolicyStateId policyStateId = stateIdFactory.create(event);
 
-            popBeforeNextFlowFlowStackElement().accept(event);
-            notificationHelper.notification(BEFORE_NEXT).accept(event);
+          popBeforeNextFlowFlowStackElement().accept(event);
+          notificationHelper.notification(BEFORE_NEXT).accept(event);
 
-            return from(processWithChildContext(event, nextOperation, ofNullable(getLocation())))
-                .doOnSuccessOrError(notificationHelper.successOrErrorNotification(AFTER_NEXT)
-                    .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
-                .onErrorResume(MessagingException.class, t -> {
+          return from(processWithChildContext(event, nextOperation, ofNullable(getLocation())))
+              .doOnSuccessOrError(notificationHelper.successOrErrorNotification(AFTER_NEXT)
+                  .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
+              .onErrorResume(MessagingException.class, t -> {
 
-                  policyStateHandler.getLatestState(policyStateId)
-                      .ifPresent(latestStateEvent -> t.setProcessedEvent(policyEventConverter
-                          .createEvent((PrivilegedEvent) t.getEvent(), (PrivilegedEvent) latestStateEvent)));
+                policyStateHandler.getLatestState(policyStateId)
+                    .ifPresent(latestStateEvent -> t.setProcessedEvent(policyEventConverter
+                        .createEvent((PrivilegedEvent) t.getEvent(), (PrivilegedEvent) latestStateEvent)));
 
-                  // Given we've used child context to ensure AFTER_NEXT notifications are fired at exactly the right time we need
-                  // to propagate the error to parent context manually.
-                  ((BaseEventContext) event.getContext())
-                      .error(resolveMessagingException(t.getFailingComponent(), muleContext).apply(t));
-                  return empty();
-                })
-                .doOnNext(coreEvent -> logExecuteNextEvent("After execute-next",
-                                                           coreEvent.getContext(), coreEvent.getMessage(),
-                                                           this.muleContext.getConfiguration().getId()));
-          });
-        });
+                // Given we've used child context to ensure AFTER_NEXT notifications are fired at exactly the right time we need
+                // to propagate the error to parent context manually.
+                ((BaseEventContext) event.getContext())
+                    .error(resolveMessagingException(t.getFailingComponent(), muleContext).apply(t));
+                return empty();
+              })
+              .doOnNext(coreEvent -> logExecuteNextEvent("After execute-next",
+                                                         coreEvent.getContext(), coreEvent.getMessage(),
+                                                         this.muleContext.getConfiguration().getId()));
+        }));
   }
 
   private Function<MessagingException, MessagingException> resolveMessagingException(Component processor,

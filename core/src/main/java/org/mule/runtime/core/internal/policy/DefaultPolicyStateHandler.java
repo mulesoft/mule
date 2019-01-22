@@ -26,14 +26,17 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
   protected Map<PolicyStateId, CoreEvent> stateMap = new HashMap<>();
   protected Map<String, Processor> nextOperationMap = new HashMap<>();
 
+  @Override
   public synchronized void updateNextOperation(String identifier, Processor nextOperation) {
-    nextOperationMap.put(identifier, nextOperation);
+    throw new UnsupportedOperationException("Use a subscriberContext instead.");
   }
 
+  @Override
   public synchronized Processor retrieveNextOperation(String identifier) {
-    return nextOperationMap.get(identifier);
+    throw new UnsupportedOperationException("Use a subscriberContext instead.");
   }
 
+  @Override
   public Optional<CoreEvent> getLatestState(PolicyStateId identifier) {
     final CoreEvent state;
     synchronized (this) {
@@ -42,6 +45,7 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     return ofNullable(state);
   }
 
+  @Override
   public void updateState(PolicyStateId identifier, CoreEvent lastStateEvent) {
     ((BaseEventContext) lastStateEvent.getContext()).getRootContext()
         .onTerminated((response, throwable) -> destroyState(identifier.getExecutionIdentifier()));
@@ -51,6 +55,7 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     }
   }
 
+  @Override
   public synchronized void destroyState(String identifier) {
     List<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.removeAll(identifier);
     if (policyStateIds != null) {
