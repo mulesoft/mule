@@ -28,6 +28,19 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.MavenReactorResolver;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -44,21 +57,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.MavenReactorResolver;
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
-import org.mule.tools.api.classloader.model.Artifact;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,9 +251,12 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                   includeProvidedDependencies, mavenRepository,
                                                   mavenReactorResolver,
                                                   temporaryDirectory);
+
+      DependencyConverter dependencyConverter = new DependencyConverter();
+
       Set<BundleDependency> nonProvidedDependencies = dependencies.stream()
           .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
-          .map(this::convertBundleDependency).collect(Collectors.toSet());
+          .map(dependencyConverter::convert).collect(Collectors.toSet());
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
           newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
                                                 mavenClient, attributes, nonProvidedDependencies);
@@ -270,7 +271,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                      mavenReactorResolver, temporaryDirectory);
       loadUrls(artifactFile, classLoaderModelBuilder, concat(nonProvidedDependencies.stream(),
                                                              missingApiDependencyBundles.stream()).collect(toSet()));
-      Stream<BundleDependency> allBundleDependencies = dependencies.stream().map(this::convertBundleDependency);
+      Stream<BundleDependency> allBundleDependencies = dependencies.stream().map(dependencyConverter::convert);
       classLoaderModelBuilder.dependingOn(concat(allBundleDependencies,
                                                  missingApiDependencyBundles.stream()).collect(toSet()));
       return classLoaderModelBuilder.build();
@@ -318,7 +319,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       }
     }
 
-    return missingApiDependencies.stream().map(this::convertBundleDependency).collect(toSet());
+    DependencyConverter dependencyConverter = new DependencyConverter();
+    return missingApiDependencies.stream().map(dependencyConverter::convert).collect(toSet());
   }
 
   private File getPom(org.mule.maven.client.api.model.BundleDependency dependency) {
@@ -336,23 +338,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
 
-  protected BundleDependency convertBundleDependency(org.mule.maven.client.api.model.BundleDependency mavenClientDependency) {
-    BundleDependency.Builder builder = new BundleDependency.Builder()
-        .setScope(BundleScope.valueOf(mavenClientDependency.getScope().name()))
-        .setBundleUri(mavenClientDependency.getBundleUri())
-        .setDescriptor(convertBundleDescriptor(mavenClientDependency.getDescriptor()));
-    return builder.build();
-  }
 
-  private BundleDescriptor convertBundleDescriptor(org.mule.maven.client.api.model.BundleDescriptor descriptor) {
-    BundleDescriptor.Builder builder = new BundleDescriptor.Builder().setGroupId(descriptor.getGroupId())
-        .setArtifactId(descriptor.getArtifactId())
-        // Use baseVersion as it will refer to the unresolved meta version (case of SNAPSHOTS instead of timestamp versions)
-        .setVersion(descriptor.getBaseVersion())
-        .setType(descriptor.getType());
-    descriptor.getClassifier().ifPresent(builder::setClassifier);
-    return builder.build();
-  }
 
   /**
    * Loads the URLs of the class loader for this artifact.

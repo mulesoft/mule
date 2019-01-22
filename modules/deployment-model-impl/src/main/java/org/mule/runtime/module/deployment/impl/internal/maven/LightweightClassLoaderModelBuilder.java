@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -14,14 +15,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
-import org.mule.maven.client.api.MavenClient;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-
-import com.vdurmont.semver4j.Semver;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -38,6 +31,16 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+
+import org.mule.maven.client.api.MavenClient;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.internal.util.JarInfo;
+
+import com.vdurmont.semver4j.Semver;
 
 /**
  * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} responsible of resolving dependencies
@@ -68,7 +71,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   // TODO: MULE-15768
-  //TODO: MULE-16026 all the following logic is duplicated from the mule-packager.
+  // TODO: MULE-16026 all the following logic is duplicated from the mule-packager.
   private List<org.mule.maven.client.api.model.BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
     List<org.mule.maven.client.api.model.BundleDependency> resolvedAdditionalDependencies = new ArrayList<>();
     additionalDependencies.stream()
@@ -91,6 +94,30 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     resolvedDependencies.add(mavenClient.resolveBundleDescriptor(dependencyBundleDescriptor));
     resolvedDependencies.addAll(mavenClient.resolveBundleDescriptorDependencies(false, false, dependencyBundleDescriptor));
     return resolvedDependencies;
+  }
+
+  @Override
+  protected void findAndExportSharedLibrary(String groupId, String artifactId) {
+    Optional<BundleDependency> matchingLibrary = this.nonProvidedDependencies.stream()
+        .filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId().equals(groupId) &&
+            bundleDependency.getDescriptor().getArtifactId().equals(artifactId))
+        .findAny();
+    BundleDependency bundleDependency = matchingLibrary.orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(
+                                                                                                                              "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
+                                                                                                                              groupId,
+                                                                                                                              artifactId,
+                                                                                                                              artifactFolder
+                                                                                                                                  .getName()))));
+
+    exportBundleDependencyAndTransitiveDependencies(bundleDependency);
+  }
+
+  private void exportBundleDependencyAndTransitiveDependencies(BundleDependency bundleDependency) {
+    JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUri());
+    this.exportingPackages(jarInfo.getPackages());
+    this.exportingResources(jarInfo.getResources());
+    bundleDependency.getTransitiveDependencies()
+        .forEach(this::exportBundleDependencyAndTransitiveDependencies);
   }
 
   private void updateAdditionalDependencyOrFail(List<org.mule.maven.client.api.model.BundleDependency> additionalDependencies,

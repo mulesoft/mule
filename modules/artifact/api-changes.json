@@ -1,4 +1,28 @@
 {
+  "4.1.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder::setTransitiveDependencies(java.util.Set<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "Builder",
+          "methodName": "setTransitiveDependencies",
+          "elementKind": "method",
+          "justification": "Added new method to implementation as well"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Set<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getTransitiveDependencies()",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "BundleDependency",
+          "methodName": "getTransitiveDependencies",
+          "elementKind": "method",
+          "justification": "Added new method to implementation as well"
+        }
+      ]
+    }
+  },
   "4.1.5": {
     "revapi": {
       "ignore": [
