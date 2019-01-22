@@ -14,10 +14,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -48,7 +50,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   private static final String ADDED_VAR_NAME = "addedVarName";
   private static final String ADDED_VAR_VALUE = "addedVarValue";
 
-  private MuleContext muleContext = mockContextWithServices();
+  private final MuleContext muleContext = mockContextWithServices();
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
   protected Processor flowProcessor = mock(Processor.class);
   protected PolicyStateHandler policyStateHandler;
@@ -56,7 +58,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   protected String executionId;
   protected Processor policyProcessor;
   protected ArgumentCaptor<Publisher> eventCaptor = ArgumentCaptor.forClass(Publisher.class);
-  private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
+  private final FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
 
   @Before
   public void before() {
@@ -76,8 +78,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     CoreEvent initialEventWithVars = CoreEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
     CoreEvent modifiedVarsEvent = CoreEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedVarsEvent));
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(initialEventWithVars).transform(policyStateHandler.retrieveNextOperation(executionId)));
+    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> just(initialEventWithVars));
 
     CoreEvent resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
 
@@ -89,8 +90,10 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     CoreEvent initialEventWithVars = CoreEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
     CoreEvent modifiedVarsEvent = CoreEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
     when(flowProcessor.apply(any())).thenReturn(just(initialEventWithVars));
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(modifiedVarsEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
+    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> {
+      return from(invocation.getArgumentAt(0, Publisher.class))
+          .flatMap(e -> subscriberContext().flatMap(ctx -> just(modifiedVarsEvent).transform(ctx.get(POLICY_NEXT_OPERATION))));
+    });
 
     just(initialEventWithVars).transform(policyProcessor).block();
 
@@ -103,8 +106,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   public void messageModifiedByNextProcessorIsPropagated() throws MuleException {
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
+    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> just(initialEvent).transform(flowProcessor));
 
     CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
@@ -116,8 +118,11 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(true);
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
+    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> {
+      return from(invocation.getArgumentAt(0, Publisher.class))
+          .flatMap(e -> subscriberContext()
+              .flatMap(ctx -> just(modifiedMessageEvent).transform(ctx.get(POLICY_NEXT_OPERATION))));
+    });
 
     just(initialEvent).transform(policyProcessor).block();
 
@@ -130,8 +135,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     DefaultMuleSession session = new DefaultMuleSession();
     CoreEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
+    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> just(initialEvent).transform(flowProcessor));
 
     CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
@@ -143,8 +147,11 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     DefaultMuleSession session = new DefaultMuleSession();
     CoreEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> just(modifiedSessionEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
+    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> {
+      return from(invocation.getArgumentAt(0, Publisher.class))
+          .flatMap(e -> subscriberContext()
+              .flatMap(ctx -> just(modifiedSessionEvent).transform(ctx.get(POLICY_NEXT_OPERATION))));
+    });
 
     just(initialEvent).transform(policyProcessor).block();
 
