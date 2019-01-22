@@ -8,9 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
@@ -18,7 +16,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
@@ -41,6 +38,8 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -78,6 +77,9 @@ import io.qameta.allure.Story;
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
 public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
@@ -384,7 +386,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
-  @Ignore("MULE-16282")
   @Test
   @Description("Notifications are invoked on CPU_LITE thread")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {
@@ -658,7 +659,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     }
   }
 
-  @Ignore("MULE-16282")
   @Test
   public void backpressureOnInnerCpuLightSchedulerThrowsRejectedExecution() throws Exception {
     if (!mode.equals(SOURCE)) {
@@ -671,7 +671,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
       private void countAndThrow() {
         int v = countdown.getAndIncrement();
-        if (v == 1 || v == 2) {
+        if (v % 2 == 1) {
           throw new RejectedExecutionException();
         }
       }
@@ -706,19 +706,12 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     flow.initialise();
     flow.start();
 
-    for (int i = 0; i < 10; i++) {
-      try {
-        processFlow(newEvent());
-        if (i < 2) {
-          fail("First attempts should have failed");
-        }
-      } catch (MessagingException e) {
-        if (i >= 2) {
-          fail("Next attempts shouldn't have failed");
-        }
-      }
-    }
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(FlowBackPressureException.class));
 
+    for (int i = 0; i < STREAM_ITERATIONS; i++) {
+        processFlow(newEvent());
+    }
   }
 
 }

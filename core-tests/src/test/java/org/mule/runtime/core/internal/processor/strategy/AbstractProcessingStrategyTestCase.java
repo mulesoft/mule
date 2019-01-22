@@ -393,7 +393,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     processFlow(testEvent());
   }
 
-  @Ignore("MULE-16282")
   @Test
   public void asyncCpuLightConcurrent() throws Exception {
     internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1, asyncProcessor);

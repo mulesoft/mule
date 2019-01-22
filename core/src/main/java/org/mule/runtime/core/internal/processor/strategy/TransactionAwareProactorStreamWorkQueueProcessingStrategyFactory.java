@@ -115,7 +115,8 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
 
     @Override
     protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
+      return new ConditionalExecutorServiceDecorator(new RetrySchedulerWrapper(scheduler),
+                                                     currentScheduler -> isTransactionActive());
     }
 
     @Override

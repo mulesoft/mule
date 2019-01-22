@@ -32,7 +32,17 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.slf4j.Logger;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
@@ -129,7 +139,7 @@ public abstract class ProactorStreamProcessingStrategy
   protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
                                                        CoreEvent event);
 
-  private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
+  protected Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
     return scheduledFlux.retryWhen(onlyIf(ctx -> {
       final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
       if (schedulerBusy) {
@@ -140,6 +150,11 @@ public abstract class ProactorStreamProcessingStrategy
       return schedulerBusy;
     }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
         .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
+  }
+
+  @Override
+  protected ExecutorService decorateScheduler(Scheduler scheduler) {
+    return super.decorateScheduler(new RetrySchedulerWrapper(scheduler));
   }
 
   protected Scheduler getBlockingScheduler() {
@@ -208,6 +223,138 @@ public abstract class ProactorStreamProcessingStrategy
     @Override
     public final void dispose() {
       innerSink.dispose();
+    }
+  }
+
+  protected final class RetrySchedulerWrapper implements Scheduler {
+
+    private Scheduler delegate;
+
+    public RetrySchedulerWrapper(Scheduler scheduler) {
+      this.delegate = scheduler;
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
+      return delegate.scheduleWithCronExpression(command, cronExpression);
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
+      return delegate.scheduleWithCronExpression(command, cronExpression, timeZone);
+    }
+
+    @Override
+    public void stop() {
+      delegate.stop();
+    }
+
+    @Override
+    public String getName() {
+      return delegate.getName();
+    }
+
+    @Override
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+      return delegate.schedule(command, delay, unit);
+    }
+
+    @Override
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+      return delegate.schedule(callable, delay, unit);
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+      return delegate.scheduleAtFixedRate(command, initialDelay, period, unit);
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+      return delegate.scheduleWithFixedDelay(command, initialDelay, delay, unit);
+    }
+
+    @Override
+    public void shutdown() {
+      delegate.shutdown();
+    }
+
+    @Override
+    public List<Runnable> shutdownNow() {
+      return delegate.shutdownNow();
+    }
+
+    @Override
+    public boolean isShutdown() {
+      return delegate.isShutdown();
+    }
+
+    @Override
+    public boolean isTerminated() {
+      return delegate.isTerminated();
+    }
+
+    @Override
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+      return delegate.awaitTermination(timeout, unit);
+    }
+
+    private <T> Future<T> submit(Supplier<Future<T>> realSubmit) {
+      while (!this.isShutdown() && !this.isTerminated()) {
+        try {
+          return realSubmit.get();
+        } catch (Throwable ree) {
+          lastRetryTimestamp.set(nanoTime());
+          try {
+            Thread.sleep(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+          } catch (InterruptedException e) {
+            throw new RejectedExecutionException();
+          }
+        }
+      }
+      throw new RejectedExecutionException();
+    }
+
+    @Override
+    public <T> Future<T> submit(Callable<T> task) {
+      return submit(() -> delegate.submit(task));
+    }
+
+    @Override
+    public <T> Future<T> submit(Runnable task, T result) {
+      return submit(() -> delegate.submit(task, result));
+    }
+
+    @Override
+    public Future<?> submit(Runnable task) {
+      return submit(() -> delegate.submit(task));
+    }
+
+    @Override
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+      return delegate.invokeAll(tasks);
+    }
+
+    @Override
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+        throws InterruptedException {
+      return delegate.invokeAll(tasks, timeout, unit);
+    }
+
+    @Override
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+      return delegate.invokeAny(tasks);
+    }
+
+    @Override
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+        throws InterruptedException, ExecutionException, TimeoutException {
+      return delegate.invokeAny(tasks, timeout, unit);
+    }
+
+    @Override
+    public void execute(Runnable command) {
+      delegate.execute(command);
     }
   }
 }

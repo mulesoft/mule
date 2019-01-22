@@ -11,7 +11,9 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -21,6 +23,7 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.slf4j.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -67,6 +70,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
   }
 
   static class TransactionAwareProactorStreamEmitterProcessingStrategy extends ProactorStreamEmitterProcessingStrategy {
+
+    private static Logger LOGGER = getLogger(TransactionAwareProactorStreamEmitterProcessingStrategy.class);
 
     TransactionAwareProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                                             int bufferSize,
@@ -115,7 +120,9 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
     @Override
     protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
+      LOGGER.error("Decorating!");
+      return new ConditionalExecutorServiceDecorator(new RetrySchedulerWrapper(scheduler),
+                                                     currentScheduler -> isTransactionActive());
     }
 
     @Override
