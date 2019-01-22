@@ -93,6 +93,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.HashMap;
 
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -115,7 +116,11 @@ public final class ExtensionsTestUtils {
   }
 
   public static ProblemsReporter validate(Class<?> clazz, ExtensionModelValidator validator) {
-    return validate(loadExtension(clazz), validator);
+    return validate(loadExtension(clazz, new HashMap<>()), validator);
+  }
+
+  public static ProblemsReporter validate(Class<?> clazz, ExtensionModelValidator validator, Map<String, Object> params) {
+    return validate(loadExtension(clazz, params), validator);
   }
 
   public static ProblemsReporter validate(ExtensionModel model, ExtensionModelValidator validator) {

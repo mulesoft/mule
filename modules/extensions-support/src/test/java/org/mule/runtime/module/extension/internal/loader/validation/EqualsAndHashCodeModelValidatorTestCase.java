@@ -6,111 +6,237 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-import org.junit.Before;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
-import java.util.Objects;
-import java.util.Optional;
-
-import static java.util.Arrays.asList;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.when;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.*;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class EqualsAndHashCodeModelValidatorTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
-    private ExtensionModel extensionModel;
+  private ExtensionModelValidator validator = new EqualsAndHashCodeModelValidator();
 
-    @Mock(lenient = true)
-    private OperationModel operationModel;
+  @Test
+  public void pojoConfigurationMustOverrideEqualsAndHashCode() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException.expectMessage("Type 'InvalidPojoMustOverrideEqualsAndHashCode' must override equals and hashCode");
+    validate(InvalidTestConnector.class);
+  }
 
-    @Mock(lenient = true)
-    private ParameterModel parameter;
+  @Test
+  public void pojoConnectionProviderMustOverrideEqualsAndHashCode() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException.expectMessage("Type 'InvalidPojoMustOverrideEqualsAndHashCode' must override equals and hashCode");
+    validate(InvalidConnectionProviderTestConnector.class);
+  }
 
-    @Mock
-    private ExtensionParameter extensionParameter;
+  @Test
+  public void pojoImplementsEqualsAndHashCode() {
+    validate(ValidTestConnector.class);
+  }
 
-    private EqualsAndHashCodeModelValidator validator = new EqualsAndHashCodeModelValidator();
+  private void validate(Class<?> connectorClass) {
+    ExtensionsTestUtils.validate(connectorClass, validator, new HashMap() {
 
-    @Before
-    public void before() {
-        when(extensionModel.getModelProperty(CompileTimeModelProperty.class)).thenReturn(Optional.of(new CompileTimeModelProperty()));
-        when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+      {
+        put("COMPILATION_MODE", true);
+      }
+    });
+  }
 
-        when(parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class))
-                .thenReturn(Optional.of(new ExtensionParameterDescriptorModelProperty(extensionParameter)));
+  private static class InvalidPojoMustOverrideEqualsAndHashCode {
 
-        mockParameters(operationModel, parameter);
+    private String id;
+  }
+
+  private static class PojoImplementsEqualsAndHashCode {
+
+    private String id;
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (o == null || getClass() != o.getClass())
+        return false;
+      PojoImplementsEqualsAndHashCode that = (PojoImplementsEqualsAndHashCode) o;
+      return Objects.equals(id, that.id);
     }
 
-    @Test
-    public void pojoMustOverrideEqualsAndHashCode() {
-        expectedException.expect(IllegalModelDefinitionException.class);
-        expectedException
-                .expectMessage("Type 'InvalidPojoMustOverrideEqualsAndHashCode' must override equals and hashCode");
-        when(parameter.getType()).thenReturn(TYPE_LOADER.load(InvalidPojoMustOverrideEqualsAndHashCode.class));
-        when(extensionParameter.getType()).thenReturn(new TypeWrapper(InvalidPojoMustOverrideEqualsAndHashCode.class, TYPE_LOADER));
-        validate(extensionModel, validator);
+    @Override
+    public int hashCode() {
+      return Objects.hash(id);
+    }
+  }
+
+  private static class Animal {
+
+    private String name;
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (o == null || getClass() != o.getClass())
+        return false;
+      Animal animal = (Animal) o;
+      return Objects.equals(name, animal.name);
     }
 
-    @Test
-    public void pojoImplementsEqualsAndHashCode() {
-        when(parameter.getType()).thenReturn(TYPE_LOADER.load(PojoImplementsEqualsAndHashCode.class));
-        when(extensionParameter.getType()).thenReturn(new TypeWrapper(PojoImplementsEqualsAndHashCode.class, TYPE_LOADER));
-        validate(extensionModel, validator);
+    @Override
+    public int hashCode() {
+      return Objects.hash(name);
+    }
+  }
+
+  private static class Dog extends Animal {
+
+  }
+
+
+
+  interface Config {
+
+  }
+
+  @Extension(name = "validatorTest")
+  @Configurations({InvalidTestConfig.class})
+  @ConnectionProviders({TestConnectionProvider.class})
+  public static class InvalidTestConnector {
+
+  }
+
+  @Configuration(name = "config")
+  @Operations(ValidTestOperations.class)
+  public static class InvalidTestConfig implements Config {
+
+    @Parameter
+    private InvalidPojoMustOverrideEqualsAndHashCode pojo;
+  }
+
+  public static class ValidTestOperations {
+
+    public void foo(@Connection ValidatorTestConnection connection) {
+
     }
 
-    private static class InvalidPojoMustOverrideEqualsAndHashCode {
+    public void bar(@Connection ValidatorTestConnection connection) {
 
-        @Parameter
-        private String bar;
+    }
+  }
 
-        @Parameter
-        private String id;
+  @Alias("provider1")
+  public static class TestConnectionProvider implements ConnectionProvider<ValidatorTestConnection> {
+
+    @Parameter
+    private Dog pojo;
+
+    @Parameter
+    private Map map;
+
+    @Override
+    public ValidatorTestConnection connect() throws ConnectionException {
+      return new ValidatorTestConnection();
     }
 
-    private static class PojoImplementsEqualsAndHashCode {
+    @Override
+    public void disconnect(ValidatorTestConnection connection) {
 
-        @Parameter
-        private String bar;
-
-        @Parameter
-        private String id;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            PojoImplementsEqualsAndHashCode that = (PojoImplementsEqualsAndHashCode) o;
-            return Objects.equals(bar, that.bar) &&
-                    Objects.equals(id, that.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(bar, id);
-        }
     }
+
+    @Override
+    public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection) {
+      return success();
+    }
+  }
+
+  @Alias("provider1")
+  public static class InvalidTestConnectionProvider implements ConnectionProvider<ValidatorTestConnection> {
+
+    @Parameter
+    private InvalidPojoMustOverrideEqualsAndHashCode pojo;
+
+    @Override
+    public ValidatorTestConnection connect() throws ConnectionException {
+      return new ValidatorTestConnection();
+    }
+
+    @Override
+    public void disconnect(ValidatorTestConnection connection) {
+
+    }
+
+    @Override
+    public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection) {
+      return success();
+    }
+  }
+
+  public static class ValidatorTestConnection {
+
+  }
+
+
+
+  @Extension(name = "validatorTest")
+  @Configurations({ValidTestConfig.class, ValidTestConfig2.class})
+  @ConnectionProviders({TestConnectionProvider.class})
+  public static class ValidTestConnector {
+
+  }
+
+  @Configuration(name = "config")
+  @Operations(ValidTestOperations.class)
+  public static class ValidTestConfig implements Config {
+
+    @Parameter
+    private PojoImplementsEqualsAndHashCode pojo;
+
+    @Parameter
+    private Map map;
+  }
+
+  @Configuration(name = "config2")
+  @Operations(ValidTestOperations.class)
+  public static class ValidTestConfig2 implements Config {
+
+    @Parameter
+    private Dog pojo;
+
+  }
+
+  @Extension(name = "validatorTest")
+  @Configurations({ValidTestConfig.class})
+  @ConnectionProviders({InvalidTestConnectionProvider.class})
+  public static class InvalidConnectionProviderTestConnector {
+
+  }
+
+
 }
