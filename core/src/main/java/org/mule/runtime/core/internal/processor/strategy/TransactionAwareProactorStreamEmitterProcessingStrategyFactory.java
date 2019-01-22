@@ -71,8 +71,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
   static class TransactionAwareProactorStreamEmitterProcessingStrategy extends ProactorStreamEmitterProcessingStrategy {
 
-    private static Logger LOGGER = getLogger(TransactionAwareProactorStreamEmitterProcessingStrategy.class);
-
     TransactionAwareProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                                             int bufferSize,
                                                             int subscriberCount,
