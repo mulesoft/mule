@@ -11,6 +11,8 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
+import static java.lang.reflect.Modifier.isAbstract;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
@@ -35,10 +37,8 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
-import org.springframework.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
-import static java.lang.reflect.Modifier.isAbstract;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -156,9 +156,11 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
       }
 
       private Class<?> getTypedValueGenericClass(Type type) {
-        return !CollectionUtils.isEmpty(type.getGenerics())
-            ? type.getGenerics().stream().findFirst().get().getConcreteType().getDeclaringClass().get()
-            : Object.class;
+        Optional<Class<?>> clazz = type.getGenerics().stream().findFirst()
+            .map(typeGeneric -> typeGeneric.getConcreteType())
+            .map(concreteType -> concreteType.getDeclaringClass()
+                .orElse(Object.class));
+        return clazz.orElse(Object.class);
       }
     });
   }
