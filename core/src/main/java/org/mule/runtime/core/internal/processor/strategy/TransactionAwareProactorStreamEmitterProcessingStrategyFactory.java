@@ -120,7 +120,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
     @Override
     protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      LOGGER.error("Decorating!");
       return new ConditionalExecutorServiceDecorator(new RetrySchedulerWrapper(scheduler),
                                                      currentScheduler -> isTransactionActive());
     }
