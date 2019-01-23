@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isAbstract;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isASTMode;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 
 import org.mule.metadata.api.model.ObjectType;
@@ -32,7 +33,7 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-    if (!isCompiletime(extensionModel)) {
+    if (!isCompiletime(extensionModel) || isASTMode(extensionModel)) {
       return;
     }
 
