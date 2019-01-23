@@ -41,28 +41,24 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
 
       @Override
       protected void onConfiguration(ConfigurationModel model) {
-        model.getAllParameterModels().forEach(parameterModel -> {
-          parameterModel.getType().accept(new MetadataTypeVisitor() {
+        model.getAllParameterModels().forEach(parameterModel -> parameterModel.getType().accept(new MetadataTypeVisitor() {
 
-            @Override
-            public void visitObject(ObjectType objectType) {
-              validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
-            }
-          });
-        });
+          @Override
+          public void visitObject(ObjectType objectType) {
+            validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
+          }
+        }));
       }
 
       @Override
       protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-        model.getAllParameterModels().forEach(parameterModel -> {
-          parameterModel.getType().accept(new MetadataTypeVisitor() {
+        model.getAllParameterModels().forEach(parameterModel -> parameterModel.getType().accept(new MetadataTypeVisitor() {
 
-            @Override
-            public void visitObject(ObjectType objectType) {
-              validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
-            }
-          });
-        });
+          @Override
+          public void visitObject(ObjectType objectType) {
+            validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
+          }
+        }));
       }
     }.walk(extensionModel);
   }
