@@ -36,6 +36,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
@@ -161,7 +162,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
       private Optional<Class<?>> getFirstGenericClass(Type type) {
         return type.getGenerics().stream().findFirst()
-            .map(typeGeneric -> typeGeneric.getConcreteType())
+            .map(TypeGeneric::getConcreteType)
             .map(concreteType -> concreteType.getDeclaringClass()
                 .orElse(Object.class));
       }
