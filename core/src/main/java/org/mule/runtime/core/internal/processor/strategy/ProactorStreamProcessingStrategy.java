@@ -139,7 +139,7 @@ public abstract class ProactorStreamProcessingStrategy
   protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
                                                        CoreEvent event);
 
-  protected Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
+  private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
     return scheduledFlux.retryWhen(onlyIf(ctx -> {
       final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
       if (schedulerBusy) {
