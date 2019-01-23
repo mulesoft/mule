@@ -40,7 +40,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new TransactionAwareProactorStreamEmitterProcessingStrategy(() -> blocking,
                                                                        XS_BUFFER_SIZE,
-                                                                       1,
+                                                                       2,
                                                                        DEFAULT_WAIT_STRATEGY,
                                                                        () -> cpuLight,
                                                                        () -> blocking,
