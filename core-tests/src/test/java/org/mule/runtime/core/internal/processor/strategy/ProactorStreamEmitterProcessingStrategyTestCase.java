@@ -60,7 +60,6 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.apache.commons.io.input.NullInputStream;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
