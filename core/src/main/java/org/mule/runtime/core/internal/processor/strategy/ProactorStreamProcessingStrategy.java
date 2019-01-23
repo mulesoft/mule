@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
@@ -90,6 +89,7 @@ public abstract class ProactorStreamProcessingStrategy
   @Override
   public void start() throws MuleException {
     super.start();
+    this.cpuLightScheduler = new RetrySchedulerWrapper(cpuLightScheduler);
     this.blockingScheduler = blockingSchedulerSupplier.get();
     this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
   }
@@ -150,11 +150,6 @@ public abstract class ProactorStreamProcessingStrategy
       return schedulerBusy;
     }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
         .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
-  }
-
-  @Override
-  protected ExecutorService decorateScheduler(Scheduler scheduler) {
-    return super.decorateScheduler(new RetrySchedulerWrapper(scheduler));
   }
 
   protected Scheduler getBlockingScheduler() {
@@ -226,7 +221,7 @@ public abstract class ProactorStreamProcessingStrategy
     }
   }
 
-  protected final class RetrySchedulerWrapper implements Scheduler {
+  private final class RetrySchedulerWrapper implements Scheduler {
 
     private Scheduler delegate;
 
@@ -303,7 +298,7 @@ public abstract class ProactorStreamProcessingStrategy
       while (!this.isShutdown() && !this.isTerminated()) {
         try {
           return realSubmit.get();
-        } catch (Throwable ree) {
+        } catch (RejectedExecutionException ree) {
           lastRetryTimestamp.set(nanoTime());
           try {
             Thread.sleep(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
