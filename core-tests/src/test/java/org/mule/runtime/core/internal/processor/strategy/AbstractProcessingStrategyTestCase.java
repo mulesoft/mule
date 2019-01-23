@@ -212,7 +212,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     cpuLight = new TestScheduler(2, CPU_LIGHT, false);
     blocking = new TestScheduler(4, IO, true);
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
-    custom = new TestScheduler(4, CUSTOM, true);
+    custom = new RetryScheduler(new TestScheduler(4, CUSTOM, true));
     ringBuffer = new TestScheduler(1, RING_BUFFER, true);
     asyncExecutor = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
@@ -716,6 +716,41 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       } else {
         return delegate.submit(task);
       }
+    }
+  }
+
+  static class RetryScheduler extends TestScheduler {
+
+    private final Scheduler delegate;
+
+    public RetryScheduler(Scheduler delegate) {
+      super(1, "prefix", true);
+      this.delegate = delegate;
+    }
+
+    private Future<?> submit(Supplier<Future<?>> futureSupplier) {
+      while (!delegate.isShutdown() && !delegate.isTerminated()) {
+        try {
+          return futureSupplier.get();
+        } catch (RejectedExecutionException ree) {
+          try {
+            Thread.sleep(5);
+          } catch (InterruptedException e) {
+            // do nothing
+          }
+        }
+      }
+      throw new RejectedExecutionException();
+    }
+
+    @Override
+    public Future<?> submit(Runnable task) {
+      return submit(() -> delegate.submit(task));
+    }
+
+    @Override
+    public Future<?> submit(Callable task) {
+      return submit(() -> delegate.submit(task));
     }
   }
 

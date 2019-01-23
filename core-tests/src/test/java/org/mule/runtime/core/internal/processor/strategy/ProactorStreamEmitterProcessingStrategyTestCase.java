@@ -710,7 +710,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     expectedException.expectCause(instanceOf(FlowBackPressureException.class));
 
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
-        processFlow(newEvent());
+      processFlow(newEvent());
     }
   }
 
