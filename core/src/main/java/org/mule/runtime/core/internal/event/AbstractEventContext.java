@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
@@ -210,11 +211,11 @@ abstract class AbstractEventContext implements BaseEventContext {
   protected void tryComplete() {
     boolean allChildrenComplete;
 
-    childContextsReadWriteLock.readLock().lock();
+    getChildContextsReadLock().lock();
     try {
       allChildrenComplete = childContexts.stream().allMatch(BaseEventContext::isComplete);
     } finally {
-      childContextsReadWriteLock.readLock().unlock();
+      getChildContextsReadLock().unlock();
     }
 
     synchronized (this) {
@@ -250,20 +251,20 @@ abstract class AbstractEventContext implements BaseEventContext {
       }
       onTerminatedConsumerList.clear();
 
-      childContextsReadWriteLock.writeLock().lock();
+      getChildContextsWriteLock().lock();
       try {
         this.childContexts.clear();
       } finally {
-        childContextsReadWriteLock.writeLock().unlock();
+        getChildContextsWriteLock().unlock();
       }
 
       getParentContext().ifPresent(context -> {
         AbstractEventContext parent = (AbstractEventContext) context;
-        parent.childContextsReadWriteLock.writeLock().lock();
+        parent.getChildContextsWriteLock().lock();
         try {
           parent.childContexts.remove(this);
         } finally {
-          parent.childContextsReadWriteLock.writeLock().unlock();
+          parent.getChildContextsWriteLock().unlock();
         }
       });
 
@@ -346,7 +347,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   public void forEachChild(Consumer<BaseEventContext> childConsumer) {
-    childContextsReadWriteLock.readLock().lock();
+    getChildContextsReadLock().lock();
     try {
       childContexts.stream().filter(context -> !context.isTerminated()).forEach(context -> {
         childConsumer.accept(context);
@@ -355,7 +356,7 @@ abstract class AbstractEventContext implements BaseEventContext {
         }
       });
     } finally {
-      childContextsReadWriteLock.readLock().unlock();
+      getChildContextsReadLock().unlock();
     }
   }
 
@@ -402,4 +403,11 @@ abstract class AbstractEventContext implements BaseEventContext {
     return depthLevel;
   }
 
+  public Lock getChildContextsReadLock() {
+    return childContextsReadWriteLock.readLock();
+  }
+
+  public Lock getChildContextsWriteLock() {
+    return childContextsReadWriteLock.writeLock();
+  }
 }
