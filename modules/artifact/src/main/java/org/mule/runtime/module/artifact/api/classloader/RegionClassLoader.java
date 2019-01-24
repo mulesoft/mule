@@ -341,19 +341,30 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   @Override
   public final Enumeration<URL> findResources(final String name) throws IOException {
     String normalizedName = normalize(name, true);
-    final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
     List<Enumeration<URL>> enumerations = new ArrayList<>(registeredClassLoaders.size());
+    if (normalizedName.endsWith("/")) {
+      List<Map.Entry<String, List<ArtifactClassLoader>>> entries = resourceMapping.entrySet()
+          .stream()
+          .filter(entry -> entry.getKey().startsWith(name))
+          .collect(toList());
+      for (Map.Entry<String, List<ArtifactClassLoader>> entry : entries) {
+        List<ArtifactClassLoader> artifactClassLoaders = entry.getValue();
+        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
+          enumerations.add(artifactClassLoader.findResources(name));
+        }
+      }
+    } else {
+      final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
+      if (artifactClassLoaders != null) {
+        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
 
-    if (artifactClassLoaders != null) {
-      for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
-
-        final Enumeration<URL> partialResources = artifactClassLoader.findResources(normalizedName);
-        if (partialResources.hasMoreElements()) {
-          enumerations.add(partialResources);
+          final Enumeration<URL> partialResources = artifactClassLoader.findResources(normalizedName);
+          if (partialResources.hasMoreElements()) {
+            enumerations.add(partialResources);
+          }
         }
       }
     }
-
     return new CompoundEnumeration<>(enumerations.toArray(new Enumeration[0]));
   }
 

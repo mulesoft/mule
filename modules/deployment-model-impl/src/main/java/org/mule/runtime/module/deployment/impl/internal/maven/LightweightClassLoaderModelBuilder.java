@@ -35,6 +35,7 @@ import org.apache.maven.model.Plugin;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -54,6 +55,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   private MavenClient mavenClient;
   private Set<BundleDependency> nonProvidedDependencies;
   private File temporaryFolder;
+  private Map<Pair<String, String>, Boolean> sharedLibraryAlreadyExported = new HashMap<>();
 
   public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
                                             MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies) {
@@ -98,6 +100,11 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected void findAndExportSharedLibrary(String groupId, String artifactId) {
+    Pair<String, String> sharedLibraryKey = new Pair<>(groupId, artifactId);
+    if (sharedLibraryAlreadyExported.containsKey(sharedLibraryKey)) {
+      return;
+    }
+    sharedLibraryAlreadyExported.put(sharedLibraryKey, true);
     Optional<BundleDependency> matchingLibrary = this.nonProvidedDependencies.stream()
         .filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId().equals(groupId) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId))
@@ -112,11 +119,20 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     exportBundleDependencyAndTransitiveDependencies(bundleDependency);
   }
 
-  private void exportBundleDependencyAndTransitiveDependencies(BundleDependency bundleDependency) {
-    JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUri());
+  private void exportBundleDependencyAndTransitiveDependencies(final BundleDependency bundleDependency) {
+    BundleDependency resolvedBundleDependency = bundleDependency;
+    if (bundleDependency.getBundleUri() == null) {
+      resolvedBundleDependency = this.nonProvidedDependencies.stream()
+          .filter(nonProvidedDependency -> nonProvidedDependency.getDescriptor().getGroupId()
+              .equals(bundleDependency.getDescriptor().getGroupId()) &&
+              nonProvidedDependency.getDescriptor().getArtifactId().equals(bundleDependency.getDescriptor().getArtifactId()))
+          .findAny()
+          .orElse(bundleDependency);
+    }
+    JarInfo jarInfo = fileJarExplorer.explore(resolvedBundleDependency.getBundleUri());
     this.exportingPackages(jarInfo.getPackages());
     this.exportingResources(jarInfo.getResources());
-    bundleDependency.getTransitiveDependencies()
+    resolvedBundleDependency.getTransitiveDependencies()
         .forEach(this::exportBundleDependencyAndTransitiveDependencies);
   }
 
