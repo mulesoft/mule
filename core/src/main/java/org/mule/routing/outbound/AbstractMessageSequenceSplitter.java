@@ -50,6 +50,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected MessageInfoMapping messageInfoMapping;
     protected int batchSize;
     protected String counterVariableName;
+    private static int proccessedSequences = 0;
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -104,6 +105,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         String correlationId = messageInfoMapping.getCorrelationId(originalEvent.getMessage());
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 0;
+        proccessedSequences++;
         MessageSequence<?> messageSequence = seq;
         if (batchSize > 1)
         {
@@ -146,7 +148,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-                    message.setCorrelationId(correlationId);
+
+                    message.setCorrelationId(correlationId + proccessedSequences);
                 }
 
                 // take correlation group size from the message properties, set by

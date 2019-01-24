@@ -63,13 +63,13 @@ public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCa
 
     private void assertResultCollection(MuleClient client, List<String> payload, String suffix, String queueName) throws Exception
     {
-        MuleMessage reply = client.request("vm://" + queueName, TIMEOUT);
-        assertThat(reply, is(notNullValue()));
-        List<String> result = (List) reply.getPayload();
-        assertThat(result, hasSize(payload.size()));
-        for (String value : payload)
-        {
-            assertThat(result, hasItem(value + suffix));
-        }
+       MuleMessage reply = client.request("vm://" + queueName, TIMEOUT);
+       assertThat(reply, is(notNullValue()));
+       List<String> result = (List) reply.getPayload();
+       assertThat(result, hasSize(payload.size()));
+       for (String value : payload)
+       {
+           assertThat(result, hasItem(value + suffix));
+       }
     }
 }
