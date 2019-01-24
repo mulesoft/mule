@@ -336,7 +336,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.session = session;
       this.securityContext = securityContext;
       this.message = message;
-      this.variables = new CaseInsensitiveHashMap<>(variables);
+      this.variables = (variables instanceof CaseInsensitiveHashMap
+          ? (CaseInsensitiveHashMap) variables
+          : new CaseInsensitiveHashMap<String, TypedValue<?>>(variables)).toImmutableCaseInsensitiveMap();
       this.internalParameters = internalParameters;
 
       this.replyToHandler = replyToHandler;
