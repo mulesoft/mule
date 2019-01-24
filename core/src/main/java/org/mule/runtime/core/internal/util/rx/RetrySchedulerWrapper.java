@@ -20,6 +20,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Wrapper Scheduler that retries to submit task if {@link RejectedExecutionException} is thrown, applying
+ * a callback each time it needs to retry.
+ * This is needed to avoid terminating a Reactor Flux after a {@link RejectedExecutionException} since
+ * `publishOn` does not support `onErrorContinue`: https://github.com/reactor/reactor-core/issues/1488
+ *
+ * @since 4.2
+ */
 public class RetrySchedulerWrapper implements Scheduler {
 
   private Scheduler delegate;
