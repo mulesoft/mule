@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
@@ -41,39 +42,34 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
 
       @Override
       protected void onConfiguration(ConfigurationModel model) {
-        model.getAllParameterModels().forEach(parameterModel -> parameterModel.getType().accept(new MetadataTypeVisitor() {
-
-          @Override
-          public void visitObject(ObjectType objectType) {
-            validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
-          }
-        }));
+        validateOverridesEqualsAndHashCode(model, problemsReporter);
       }
 
       @Override
       protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-        model.getAllParameterModels().forEach(parameterModel -> parameterModel.getType().accept(new MetadataTypeVisitor() {
-
-          @Override
-          public void visitObject(ObjectType objectType) {
-            validateOverridesEqualsAndHashCode(objectType, problemsReporter, model);
-          }
-        }));
+        validateOverridesEqualsAndHashCode(model, problemsReporter);
       }
     }.walk(extensionModel);
   }
 
-  private void validateOverridesEqualsAndHashCode(ObjectType objectType, ProblemsReporter reporter, NamedObject model) {
-    Class<?> clazz = getType(objectType).orElse(null);
+  private void validateOverridesEqualsAndHashCode(ParameterizedModel model, ProblemsReporter reporter) {
+    model.getAllParameterModels().forEach(parameterModel -> parameterModel.getType().accept(new MetadataTypeVisitor() {
 
-    if ((clazz != null) && !clazz.isInterface() &&
-        !isAbstract(clazz.getModifiers())
-        && (!overridesEqualsAndHashCode(clazz))) {
-      reporter
-          .addError(new Problem(model,
-                                format("Type '%s' must override equals and hashCode",
-                                       clazz.getSimpleName())));
-    }
+      @Override
+      public void visitObject(ObjectType objectType) {
+        Class<?> clazz = getType(objectType).orElse(null);
+
+        if ((clazz != null) && !clazz.isInterface() &&
+            !isAbstract(clazz.getModifiers())
+            && (!overridesEqualsAndHashCode(clazz))) {
+          reporter
+              .addError(new Problem(model,
+                                    format("Type '%s' must override equals and hashCode",
+                                           clazz.getSimpleName())));
+        }
+      }
+    }));
+
   }
 
   private boolean overridesEqualsAndHashCode(Class<?> clazz) {
