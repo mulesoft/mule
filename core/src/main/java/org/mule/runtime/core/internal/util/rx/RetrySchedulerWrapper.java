@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * This is needed to avoid terminating a Reactor Flux when a {@link RejectedExecutionException} occurs, since
  * `publishOn` does not support `onErrorContinue`: https://github.com/reactor/reactor-core/issues/1488
+ * </p>
  *
  * @since 4.2
  */
