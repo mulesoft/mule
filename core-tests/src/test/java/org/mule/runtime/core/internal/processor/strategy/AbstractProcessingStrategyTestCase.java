@@ -213,7 +213,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     cpuLight = new TestScheduler(2, CPU_LIGHT, false);
     blocking = new TestScheduler(4, IO, true);
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
-    custom = new RetrySchedulerWrapper(new TestScheduler(4, CUSTOM, true), 5, () -> {});
+    custom = new RetrySchedulerWrapper(new TestScheduler(4, CUSTOM, true), 5, () -> {
+    });
     ringBuffer = new TestScheduler(1, RING_BUFFER, true);
     asyncExecutor = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
