@@ -255,11 +255,21 @@ public final class IntrospectionUtils {
     return dataType.get();
   }
 
+  /**
+   * Determines if {@link ExtensionModel} is in ast mode
+   * @param model
+   * @return
+   */
   public static boolean isASTMode(ExtensionModel model) {
     Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
     return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
   }
 
+  /**
+   * Determines if {@link BaseDeclaration} is in ast mode
+   * @param model
+   * @return
+   */
   public static boolean isASTMode(BaseDeclaration model) {
     Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
     return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
