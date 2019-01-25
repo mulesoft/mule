@@ -54,6 +54,11 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     this.temporaryFolder = createModulesTemporaryFolder();
   }
 
+  public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder) {
+    this.classLoader = classLoader;
+    this.temporaryFolder = temporaryFolder;
+  }
+
   protected File createModulesTemporaryFolder() {
     File modulesTempFolder = getModulesTempFolder();
     if (modulesTempFolder.exists()) {
