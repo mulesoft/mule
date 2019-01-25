@@ -28,6 +28,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.slf4j.Logger;
@@ -80,6 +81,8 @@ public abstract class ProactorStreamProcessingStrategy
   @Override
   public void start() throws MuleException {
     super.start();
+    this.cpuLightScheduler =
+        new RetrySchedulerWrapper(cpuLightScheduler, SCHEDULER_BUSY_RETRY_INTERVAL_MS, () -> lastRetryTimestamp.set(nanoTime()));
     this.blockingScheduler = blockingSchedulerSupplier.get();
     this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
   }
@@ -210,4 +213,5 @@ public abstract class ProactorStreamProcessingStrategy
       innerSink.dispose();
     }
   }
+
 }

@@ -69,7 +69,7 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
   static class ReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable {
 
     private final Supplier<Scheduler> cpuLightSchedulerSupplier;
-    private Scheduler cpuLightScheduler;
+    protected Scheduler cpuLightScheduler;
     private final int parallelism;
 
     ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,

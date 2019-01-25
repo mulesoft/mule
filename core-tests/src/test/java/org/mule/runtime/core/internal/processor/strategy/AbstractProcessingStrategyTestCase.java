@@ -63,6 +63,7 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
@@ -212,7 +213,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     cpuLight = new TestScheduler(2, CPU_LIGHT, false);
     blocking = new TestScheduler(4, IO, true);
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
-    custom = new TestScheduler(4, CUSTOM, true);
+    custom = new RetrySchedulerWrapper(new TestScheduler(4, CUSTOM, true), 5, () -> {
+    });
     ringBuffer = new TestScheduler(1, RING_BUFFER, true);
     asyncExecutor = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
