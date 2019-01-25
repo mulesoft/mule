@@ -9,12 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isAbstract;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isASTMode;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;

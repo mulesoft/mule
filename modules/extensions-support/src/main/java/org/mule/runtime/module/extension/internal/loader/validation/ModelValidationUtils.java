@@ -18,10 +18,8 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Utility class for {@link ExtensionModelValidator}s
@@ -34,11 +32,6 @@ final class ModelValidationUtils {
 
   static boolean isCompiletime(ExtensionModel model) {
     return model.getModelProperty(CompileTimeModelProperty.class).isPresent();
-  }
-
-  static boolean isASTMode(ExtensionModel model) {
-    Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-    return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
   }
 
   static void validateConfigOverrideParametersNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {

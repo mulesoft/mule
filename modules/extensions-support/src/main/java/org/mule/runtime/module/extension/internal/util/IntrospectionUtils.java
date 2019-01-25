@@ -109,6 +109,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -252,6 +253,16 @@ public final class IntrospectionUtils {
     });
 
     return dataType.get();
+  }
+
+  public static boolean isASTMode(ExtensionModel model) {
+    Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+    return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
+  }
+
+  public static boolean isASTMode(BaseDeclaration model) {
+    Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+    return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
   }
 
   public static MetadataType getMethodReturnType(MethodElement method) {
