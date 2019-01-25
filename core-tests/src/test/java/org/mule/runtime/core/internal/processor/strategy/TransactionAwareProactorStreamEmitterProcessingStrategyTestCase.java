@@ -15,39 +15,41 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
-
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory.TransactionAwareProactorStreamWorkQueueProcessingStrategy;
-import org.mule.tck.testmodels.mule.TestTransaction;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.tck.testmodels.mule.TestTransaction;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory.TransactionAwareProactorStreamEmitterProcessingStrategy;
 
 @Feature(PROCESSING_STRATEGIES)
-public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
-    extends ProactorStreamWorkQueueProcessingStrategyTestCase {
+@Story(DEFAULT)
+public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
+    extends ProactorStreamEmitterProcessingStrategyTestCase {
 
-  public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
+  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareProactorStreamWorkQueueProcessingStrategy(() -> blocking,
-                                                                         XS_BUFFER_SIZE,
-                                                                         1,
-                                                                         DEFAULT_WAIT_STRATEGY,
-                                                                         () -> cpuLight,
-                                                                         () -> blocking,
-                                                                         () -> cpuIntensive,
-                                                                         MAX_VALUE, true);
+    return new TransactionAwareProactorStreamEmitterProcessingStrategy(() -> blocking,
+                                                                       XS_BUFFER_SIZE,
+                                                                       2,
+                                                                       DEFAULT_WAIT_STRATEGY,
+                                                                       () -> cpuLight,
+                                                                       () -> blocking,
+                                                                       () -> cpuIntensive,
+                                                                       MAX_VALUE, true);
   }
 
   @Override
-  @Description("Unlike with the MultiReactorProcessingStrategy, the TransactionAwareWorkQueueProcessingStrategy does not fail if a transaction "
+  @Description("Unlike with the MultiReactorProcessingStrategy, the TransactionAwareEmitterProcessingStrategy does not fail if a transaction "
       + "is active, but rather executes these events synchronously in the caller thread transparently.")
   public void tx() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
