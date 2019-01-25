@@ -66,7 +66,7 @@ import reactor.retry.BackoffDelay;
 public class DefaultPolicyInstance extends AbstractComponent
     implements PolicyInstance, FlowConstruct, MuleContextAware, Lifecycle {
 
-  private final static Logger logger = getLogger(DefaultPolicyInstance.class);
+  private static final Logger LOGGER = getLogger(DefaultPolicyInstance.class);
 
   @Inject
   private SchedulerService schedulerService;
@@ -170,8 +170,8 @@ public class DefaultPolicyInstance extends AbstractComponent
 
   @Override
   public void dispose() {
-    disposeIfNeeded(operationPolicyChain, logger);
-    disposeIfNeeded(sourcePolicyChain, logger);
+    disposeIfNeeded(operationPolicyChain, LOGGER);
+    disposeIfNeeded(sourcePolicyChain, LOGGER);
     lifecycleStateManager.fireDisposePhase((phaseNam, object) -> {
     });
   }
@@ -215,8 +215,8 @@ public class DefaultPolicyInstance extends AbstractComponent
   private static final class PolicyProcessingStrategy extends AbstractProcessingStrategy
       implements ProcessingStrategy, Startable, Stoppable {
 
-    private static Logger LOGGER = getLogger(PolicyProcessingStrategy.class);
-    private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+    private static final Logger LOGGER = getLogger(PolicyProcessingStrategy.class);
+    private static final int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
     private final SchedulerService schedulerService;
     private final SchedulerConfig schedulerBaseConfig;

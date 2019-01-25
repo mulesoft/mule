@@ -16,11 +16,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
  */
 public class DefaultSourcePolicyProcessorFactory implements SourcePolicyProcessorFactory {
 
-  /**
-   * Creates a new instance of the default factory for {@link SourcePolicy}s.
-   */
-  public DefaultSourcePolicyProcessorFactory() {}
-
   @Override
   public ReactiveProcessor createSourcePolicy(Policy policy, ReactiveProcessor nextProcessor) {
     return new SourcePolicyProcessor(policy, nextProcessor);

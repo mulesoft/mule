@@ -123,13 +123,11 @@ public class PolicyChain extends AbstractComponent
                 .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
             .andThen(notificationHelper.notification(PROCESS_START)))
         // TODO MULE-16370 remove this flatMap
-        .flatMap(event -> {
-          return from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
+        .flatMap(event -> from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
               .doOnError(MessagingException.class, t -> {
                 notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
-                this.onError.ifPresent(onError -> onError.accept(t));
-              });
-        })
+              this.onError.ifPresent(onError -> onError.accept(t));
+            }))
         .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
   }
 

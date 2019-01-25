@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.policy.Policy;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 /**
@@ -16,11 +15,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
  * @since 4.0
  */
 public class DefaultOperationPolicyProcessorFactory implements OperationPolicyProcessorFactory {
-
-  /**
-   * Creates a new {@link Processor} from an operation {@link Policy}.
-   */
-  public DefaultOperationPolicyProcessorFactory() {}
 
   @Override
   public ReactiveProcessor createOperationPolicy(Policy policy, ReactiveProcessor nextProcessor) {
