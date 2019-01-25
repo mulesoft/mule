@@ -29,6 +29,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModule() throws Exception {
-    testWithMuleHome(moduleDiscoverer -> {
+    runTest(moduleDiscoverer -> {
       List<URL> moduleProperties = new ArrayList();
       moduleProperties.add(getClass().getClassLoader().getResource("invalidModule.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
@@ -64,7 +65,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedJavaPackages() throws Exception {
-    testWithMuleHome(moduleDiscoverer -> {
+    runTest(moduleDiscoverer -> {
       List<URL> moduleProperties = new ArrayList();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
@@ -84,7 +85,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedResourcePackages() throws Exception {
-    testWithMuleHome(moduleDiscoverer -> {
+    runTest(moduleDiscoverer -> {
       List<URL> moduleProperties = new ArrayList();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleResourcePackages.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
@@ -104,7 +105,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedPrivilegedApi() throws Exception {
-    testWithMuleHome(moduleDiscoverer -> {
+    runTest(moduleDiscoverer -> {
       List<URL> moduleProperties = new ArrayList();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPrivilegedApi.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
@@ -124,7 +125,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedServices() throws Exception {
-    testWithMuleHome(moduleDiscoverer -> {
+    runTest(moduleDiscoverer -> {
       List<URL> moduleProperties = new ArrayList();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleExportedServices.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
@@ -161,7 +162,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void ignoresDuplicateModule() throws Exception {
-    testWithMuleHome(moduleDiscoverer -> {
+    runTest(moduleDiscoverer -> {
       List<URL> moduleProperties = new ArrayList();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
@@ -170,6 +171,16 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
       List<MuleModule> modules = moduleDiscoverer.discover();
       assertThat(modules.size(), equalTo(1));
     });
+  }
+
+  private void runTest(CheckedConsumer<ClasspathModuleDiscoverer> testCallback) throws Exception {
+    testWithMuleHome(testCallback);
+    testWithExplicitFolder(testCallback);
+  }
+
+  private void testWithExplicitFolder(CheckedConsumer<ClasspathModuleDiscoverer> testCallback) throws IOException {
+    ClasspathModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(classLoader, muleHome.newFolder());
+    testCallback.accept(moduleDiscoverer);
   }
 
   private void testWithMuleHome(CheckedConsumer<ClasspathModuleDiscoverer> testCallback) throws Exception {
