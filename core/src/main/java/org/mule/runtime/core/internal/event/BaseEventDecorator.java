@@ -172,4 +172,8 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
     bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + "->" + event.toString();
+  }
 }

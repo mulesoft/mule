@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
@@ -104,7 +106,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     final PolicyPointcutParameters policyParams1 = mock(PolicyPointcutParameters.class);
     final PolicyPointcutParameters policyParams2 = mock(PolicyPointcutParameters.class);
 
-    final Policy policy = mock(Policy.class);
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final PolicyChain policyChain = policy.getPolicyChain();
+    when(policyChain.onChainError(any())).thenReturn(policyChain);
+
     when(policyProvider.findSourceParameterizedPolicies(policyParams1)).thenReturn(asList(policy));
     when(policyProvider.findSourceParameterizedPolicies(policyParams2)).thenReturn(asList(policy));
     when(policyProvider.isPoliciesAvailable()).thenReturn(true);
@@ -131,7 +136,11 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
   public void sourceDifferentPolicyForDifferentFlowSameParams() {
     final PolicyPointcutParameters policyParams = mock(PolicyPointcutParameters.class);
 
-    when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(mock(Policy.class)));
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final PolicyChain policyChain = policy.getPolicyChain();
+    when(policyChain.onChainError(any())).thenReturn(policyChain);
+
+    when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
     when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 

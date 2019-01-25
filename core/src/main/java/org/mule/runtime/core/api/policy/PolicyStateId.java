@@ -11,16 +11,16 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
  * Identifier for a policy state.
- * 
+ * <p>
  * A policy state identifier is the composition of the execution identifier which is unique accross every execution and the policy
  * id which is unique across all available policies.
- * 
+ *
  * @since 4.0
  */
 public final class PolicyStateId {
 
-  private String executionIdentifier;
-  private String policyId;
+  private final String executionIdentifier;
+  private final String policyId;
   public static final String POLICY_ID = "policyID";
 
   /**

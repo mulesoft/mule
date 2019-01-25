@@ -164,6 +164,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
+  public Builder clearVariables() {
+    if (!this.flowVariables.isEmpty()) {
+      this.varsModified = true;
+      this.modified = true;
+      this.flowVariables.clear();
+    }
+    return this;
+  }
+
+  @Override
   public DefaultEventBuilder internalParameters(Map<String, ?> internalParameters) {
     this.internalParameters.clear();
     this.internalParameters.putAll(internalParameters);

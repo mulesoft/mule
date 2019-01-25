@@ -10,12 +10,14 @@ package org.mule.functional.policy.api;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor;
-import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
+
 import org.mule.runtime.core.api.policy.PolicyChain;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.policy.DefaultPolicyInstance;
+import org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
@@ -41,6 +43,7 @@ public class TestPolicyBuildingDefinitionProvider implements ComponentBuildingDe
 
     definitions.add(baseDefinition.withIdentifier("proxy")
         .withTypeDefinition(fromType(DefaultPolicyInstance.class))
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .withSetterParameterDefinition("sourcePolicyChain",
                                        fromChildConfiguration(PolicyChain.class).withWrapperIdentifier("source").build())
         .withSetterParameterDefinition("operationPolicyChain",
