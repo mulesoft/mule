@@ -18,7 +18,6 @@ import static org.mule.runtime.extension.api.client.DefaultOperationParameters.b
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
@@ -80,6 +79,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -508,4 +508,12 @@ public class HeisenbergOperations implements Disposable {
   }
 
   public void blockingNonBlocking(CompletionCallback<Void, Void> completionCallback) {}
+
+  @OutputResolver(output = HeisenbergOutputResolver.class)
+  public Map<String, Object> getInjectedObjects(@Optional Object object, @Optional Serializable serializable) {
+    return ImmutableMap.<String, Object>builder()
+        .put("object", object)
+        .put("serializable", serializable)
+        .build();
+  }
 }

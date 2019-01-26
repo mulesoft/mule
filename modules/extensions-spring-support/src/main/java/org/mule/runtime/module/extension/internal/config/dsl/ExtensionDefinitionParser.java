@@ -33,6 +33,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isReferableType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
@@ -46,7 +47,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
@@ -58,7 +58,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -126,7 +125,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import com.google.common.collect.ImmutableList;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -282,6 +280,7 @@ public abstract class ExtensionDefinitionParser {
           }
         }
 
+
         @Override
         public void visitString(StringType stringType) {
           if (paramDsl.supportsChildDeclaration()) {
@@ -330,8 +329,7 @@ public abstract class ExtensionDefinitionParser {
           // In case that the anyType was assigned to a Java Object or a Java Serializable, handle it as a ObjectType as it
           // used to be done before we assigned AnyType to this kind of parameters. This is done because the Object or
           // Serializable can accept references.
-          if (JavaTypeUtils.getType(anyType).equals(Object.class) ||
-              JavaTypeUtils.getType(anyType).equals(Serializable.class)) {
+          if (isInjectableType(anyType)) {
 
             if (!parseAsContent(anyType)) {
               parseAttributeParameter(getKey(parameter),
@@ -372,6 +370,10 @@ public abstract class ExtensionDefinitionParser {
 
       });
     });
+  }
+
+  private boolean isInjectableType(MetadataType type) {
+    return type instanceof ObjectType || isReferableType(type);
   }
 
   /**

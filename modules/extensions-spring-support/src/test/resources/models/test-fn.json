@@ -695,7 +695,7 @@
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
-                "allowsReferences": false,
+                "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -1324,7 +1324,9 @@
                     "isInstantiable": true,
                     "isAbstract": false,
                     "isFinal": false,
-                    "implementedInterfaces": [],
+                    "implementedInterfaces": [
+                      "java.io.Serializable"
+                    ],
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
