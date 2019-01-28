@@ -49,7 +49,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     private HttpResponseBuilder responseBuilder;
     private HttpResponseBuilder errorResponseBuilder;
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
-    private Map<String, String> extraHeaders = new HashMap<String, String>();
+    private Map<String, String> extraHeaders = new HashMap<>();
 
     public HttpMessageProcessorTemplate(MuleEvent sourceMuleEvent,
                                         MessageProcessor messageProcessor,
@@ -195,9 +195,9 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
             throttledResponseBuilder.addHeader(throttlingHeaderName, throttlingHeaders.get(throttlingHeaderName));
         }
 
-        for (String header : extraHeaders.keySet() )
+        for (Map.Entry<String, String> entry : extraHeaders.entrySet())
         {
-            throttledResponseBuilder.addHeader(header, extraHeaders.get(header));
+            throttledResponseBuilder.addHeader(entry.getKey(), entry.getValue());
         }
     }
 

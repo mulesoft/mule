@@ -37,7 +37,7 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
     private final HttpServletResponse servletResponse;
     private final MuleContext muleContext;
     private boolean failureResponseSentToClient;
-    private Map<String, String> extraHeaders = new HashMap<String, String>();
+    private Map<String, String> extraHeaders = new HashMap<>();
 
     public JettyMessageProcessTemplate(HttpServletRequest request, HttpServletResponse response, AbstractMessageReceiver messageReceiver, MuleContext muleContext)
     {
@@ -107,9 +107,9 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
     private Map<String, String> getThrottlingHeaders() {
         Map<String, String> throttlingHeaders = httpThrottlingHeadersMapBuilder.build();
 
-        for ( String headerName : extraHeaders.keySet() )
+        for (Map.Entry<String, String> entry : extraHeaders.entrySet())
         {
-            throttlingHeaders.put(headerName, extraHeaders.get(headerName));
+            throttlingHeaders.put(entry.getKey(), entry.getValue());
         }
 
         return throttlingHeaders;

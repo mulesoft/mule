@@ -57,7 +57,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private RequestLine requestLine;
     private boolean failureResponseSentToClient;
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder;
-    private Map<String, String> extraHeaders = new HashMap<String, String>();
+    private Map<String, String> extraHeaders = new HashMap<>();
 
     public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection)
     {
@@ -508,9 +508,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     {
         Map<String, String> throttlingHeaders = httpThrottlingHeadersMapBuilder.build();
 
-        for (String headerName : extraHeaders.keySet())
+        for (Map.Entry<String, String> entry : extraHeaders.entrySet())
         {
-            throttlingHeaders.put(headerName, extraHeaders.get(headerName));
+            throttlingHeaders.put(entry.getKey(), entry.getValue());
         }
 
         return throttlingHeaders;
