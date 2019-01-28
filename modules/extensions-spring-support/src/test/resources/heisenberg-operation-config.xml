@@ -290,4 +290,8 @@
         <heisenberg:execute-kill-with-client configName="heisenberg"/>
     </flow>
 
+    <flow name="getInjectedObjects">
+        <heisenberg:get-injected-objects object="ricin-weapon" serializable="door"/>
+    </flow>
+
 </mule>

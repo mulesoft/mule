@@ -2911,7 +2911,7 @@
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
-                    "allowsReferences": false,
+                    "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -2956,7 +2956,7 @@
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
-                    "allowsReferences": false,
+                    "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {

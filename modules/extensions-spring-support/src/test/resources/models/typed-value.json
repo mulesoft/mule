@@ -3937,7 +3937,9 @@
           "isInstantiable": true,
           "isAbstract": false,
           "isFinal": false,
-          "implementedInterfaces": [],
+          "implementedInterfaces": [
+            "java.io.Serializable"
+          ],
           "parent": "",
           "genericTypes": [],
           "isMap": false
