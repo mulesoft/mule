@@ -2651,7 +2651,7 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="split-aggregate" substitutionGroup="abstract-routing-message-processor">
+    <xsd:element name="parallel-foreach" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Splits the same message and processes each part in parallel.
