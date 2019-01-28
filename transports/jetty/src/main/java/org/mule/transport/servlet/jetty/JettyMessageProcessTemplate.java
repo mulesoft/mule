@@ -23,6 +23,7 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.ServletResponseWriter;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
     private final HttpServletResponse servletResponse;
     private final MuleContext muleContext;
     private boolean failureResponseSentToClient;
+    private Map<String, String> extraHeaders = new HashMap<>();
 
     public JettyMessageProcessTemplate(HttpServletRequest request, HttpServletResponse response, AbstractMessageReceiver messageReceiver, MuleContext muleContext)
     {
@@ -89,11 +91,11 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
             final MuleMessage message = muleEvent.getMessage();
             if (message == null)
             {
-                servletResponseWriter.writeEmptyResponse(servletResponse, httpThrottlingHeadersMapBuilder.build());
+                servletResponseWriter.writeEmptyResponse(servletResponse, getThrottlingHeaders());
             }
             else
             {
-                servletResponseWriter.writeResponse(servletResponse, message, httpThrottlingHeadersMapBuilder.build());
+                servletResponseWriter.writeResponse(servletResponse, message, getThrottlingHeaders());
             }
         }
         catch (Exception e)
@@ -102,13 +104,24 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
         }
     }
 
+    private Map<String, String> getThrottlingHeaders() {
+        Map<String, String> throttlingHeaders = httpThrottlingHeadersMapBuilder.build();
+
+        for (Map.Entry<String, String> entry : extraHeaders.entrySet())
+        {
+            throttlingHeaders.put(entry.getKey(), entry.getValue());
+        }
+
+        return throttlingHeaders;
+    }
+
     @Override
     public void sendFailureResponseToClient(MessagingException messagingException) throws MuleException
     {
         try
         {
             int statusCode = retrieveStatusCode(messagingException);
-            servletResponseWriter.writeErrorResponse(servletResponse, messagingException.getEvent().getMessage(), statusCode, messagingException.getMessage(), httpThrottlingHeadersMapBuilder.build());
+            servletResponseWriter.writeErrorResponse(servletResponse, messagingException.getEvent().getMessage(), statusCode, messagingException.getMessage(), getThrottlingHeaders());
         }
         catch (Exception e)
         {
@@ -164,5 +177,10 @@ public class JettyMessageProcessTemplate extends AbstractTransportMessageProcess
     protected HttpServletResponse getServletResponse()
     {
         return servletResponse;
+    }
+
+    @Override
+    public void addExtraHeader(String headerName, String value) {
+        extraHeaders.put(headerName, value);
     }
 }
