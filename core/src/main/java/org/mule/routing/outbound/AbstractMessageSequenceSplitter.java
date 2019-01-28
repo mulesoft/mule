@@ -27,6 +27,7 @@ import org.mule.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.collections.Transformer;
 
@@ -50,7 +51,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected MessageInfoMapping messageInfoMapping;
     protected int batchSize;
     protected String counterVariableName;
-    private static int proccessedSequences = 0;
+    private static AtomicInteger processedSequences = new AtomicInteger(0);
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -105,7 +106,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         String correlationId = messageInfoMapping.getCorrelationId(originalEvent.getMessage());
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 0;
-        proccessedSequences++;
         MessageSequence<?> messageSequence = seq;
         if (batchSize > 1)
         {
@@ -113,10 +113,10 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         }
         int count = messageSequence.size();
         MuleEvent currentEvent = originalEvent;
+
         for (; messageSequence.hasNext();)
         {
             Object payload = messageSequence.next();
-
             if (payload instanceof Collection)
             {
                 payload = CollectionUtils.collect((Collection) payload, new Transformer()
@@ -137,7 +137,9 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             }
 
             MuleMessage message = createMessage(payload, originalEvent.getMessage());
+
             correlationSequence++;
+
             if (counterVariableName != null)
             {
                 message.setInvocationProperty(counterVariableName, correlationSequence);
@@ -148,8 +150,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-
-                    message.setCorrelationId(correlationId + proccessedSequences);
+                    message.setCorrelationId(correlationId + processedSequences.get());
                 }
 
                 // take correlation group size from the message properties, set by
@@ -170,6 +171,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         {
             logger.debug("Splitter only returned a single result. If this is not expected, please check your split expression");
         }
+        processedSequences.incrementAndGet();
         return resultEvents;
     }
 

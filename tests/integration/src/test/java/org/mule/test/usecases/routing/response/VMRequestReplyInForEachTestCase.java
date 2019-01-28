@@ -25,8 +25,6 @@ import org.junit.Test;
 
 public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCase
 {
-    protected static final int TIMEOUT = 5000;
-
     private final List<List<String>> collectionValues = new ArrayList<>();
 
     @Override
