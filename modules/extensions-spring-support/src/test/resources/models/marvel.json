@@ -126,6 +126,33 @@
             {
               "type": {
                 "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": true,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "allowedStereotypeModels": [],
+              "name": "name",
+              "description": "The identifier of this element used to reference it in other components",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
@@ -294,7 +321,63 @@
               }
             }
           },
-          "parameterGroupModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "DR-STRANGE",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
           "name": "crashCar",
           "description": "",
           "modelProperties": {},
@@ -395,6 +478,46 @@
                   "name": "stream",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "DR-STRANGE",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -431,7 +554,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -463,7 +586,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -641,7 +764,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -867,6 +990,46 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 5
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "DR-STRANGE",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Union",
                     "annotations": {
                       "typeId": "ObjectStreamingStrategy"
@@ -1062,7 +1225,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 5,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1094,7 +1257,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 6,
+                    "order": 7,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1272,7 +1435,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 7,
+                    "order": 8,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1446,6 +1609,46 @@
                   "name": "position",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "DR-STRANGE",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -1482,7 +1685,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1514,7 +1717,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1692,7 +1895,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 5,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1823,6 +2026,46 @@
                   "allowedStereotypeModels": [],
                   "name": "data",
                   "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "DR-STRANGE",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 },
                 {
@@ -2048,7 +2291,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2080,7 +2323,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2258,7 +2501,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 5,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2391,6 +2634,46 @@
                   "allowedStereotypeModels": [],
                   "name": "name",
                   "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "DR-STRANGE",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 }
               ],
@@ -3462,6 +3745,46 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "DR-STRANGE",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Boolean"
                   },
                   "hasDynamicType": false,
@@ -3480,7 +3803,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 8,
+                    "order": 9,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3807,7 +4130,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 7,
+                    "order": 8,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -3930,6 +4253,33 @@
                 }
               },
               "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": true,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "allowedStereotypeModels": [],
+              "name": "name",
+              "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
             },
             {
@@ -4103,7 +4453,63 @@
               }
             }
           },
-          "parameterGroupModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "IRON_MAN",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
           "name": "computeFlightPlan",
           "description": "",
           "modelProperties": {},
@@ -4186,6 +4592,46 @@
                   "name": "at",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "IRON_MAN",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -4222,7 +4668,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4254,7 +4700,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4432,7 +4878,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],

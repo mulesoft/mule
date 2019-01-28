@@ -135,6 +135,7 @@ public final class SchemaBuilder {
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final MetadataType OBJECT_STORE_TYPE = typeLoader.load(ObjectStore.class);
+  private final MetadataType STRING_TYPE = typeLoader.load(String.class);
 
   private Schema schema;
   private boolean requiresTls = false;
@@ -279,10 +280,6 @@ public final class SchemaBuilder {
   public SchemaBuilder registerConfigElement(ConfigurationModel configurationModel) {
     configurationSchemaDelegate.registerConfigElement(schema, configurationModel, dslResolver.resolve(configurationModel));
     return this;
-  }
-
-  Attribute createNameAttribute(boolean required) {
-    return createAttribute(NAME_ATTRIBUTE_NAME, load(String.class), required, NOT_SUPPORTED);
   }
 
   public SchemaBuilder registerOperation(ComponentModel operationModel) {
@@ -648,8 +645,7 @@ public final class SchemaBuilder {
       importTlsNamespace();
       requiresTls = true;
     }
-    extensionType.getAttributeOrAttributeGroup()
-        .add(createAttribute(TLS_PARAMETER_NAME, load(String.class), false, NOT_SUPPORTED));
+    extensionType.getAttributeOrAttributeGroup().add(createAttribute(TLS_PARAMETER_NAME, STRING_TYPE, false, NOT_SUPPORTED));
   }
 
   void addTlsSupport(ExtensionType extensionType, List<TopLevelElement> childElements) {
@@ -707,10 +703,6 @@ public final class SchemaBuilder {
     doc.getContent().add(content);
     annotation.getAppinfoOrDocumentation().add(doc);
     return annotation;
-  }
-
-  MetadataType load(Class<?> clazz) {
-    return typeLoader.load(clazz);
   }
 
   TopLevelElement createTopLevelElement(String name, BigInteger minOccurs, String maxOccurs) {

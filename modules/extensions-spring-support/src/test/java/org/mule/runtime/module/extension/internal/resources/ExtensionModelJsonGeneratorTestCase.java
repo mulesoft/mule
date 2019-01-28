@@ -158,7 +158,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void load() throws Exception {
+  public void load() {
     ExtensionModel result = generator.deserialize(expectedJson);
     assertThat(result, is(extensionUnderTest));
   }

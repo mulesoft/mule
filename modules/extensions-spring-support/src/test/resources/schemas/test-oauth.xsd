@@ -15,7 +15,11 @@
             <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -239,13 +243,13 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="request"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="state"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -256,9 +260,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -281,9 +285,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -298,11 +302,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
           <xs:annotation>
             <xs:documentation>The id of the resource owner which access should be invalidated</xs:documentation>

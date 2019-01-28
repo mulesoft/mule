@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 
 import java.util.List;
@@ -54,7 +55,8 @@ final class ModelValidationUtils {
   static void validateConfigParametersNamesNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
 
     model.getAllParameterModels().stream()
-        .filter(parameterModel -> parameterModel.getName().equals(NAME_ATTRIBUTE_NAME))
+        .filter(parameterModel -> parameterModel.getName().equals(NAME_ATTRIBUTE_NAME)
+            && !parameterModel.getModelProperty(SyntheticModelModelProperty.class).isPresent())
         .findAny()
         .ifPresent((parameterModel) -> reporter
             .addError(new Problem(model, format("%s '%s' declares a parameter whose name is '%s', which is not allowed.",

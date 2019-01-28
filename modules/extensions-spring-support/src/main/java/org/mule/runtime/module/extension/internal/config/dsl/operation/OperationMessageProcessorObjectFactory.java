@@ -40,5 +40,4 @@ public class OperationMessageProcessorObjectFactory
   protected OperationMessageProcessorBuilder getMessageProcessorBuilder() {
     return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext, registry);
   }
-
 }

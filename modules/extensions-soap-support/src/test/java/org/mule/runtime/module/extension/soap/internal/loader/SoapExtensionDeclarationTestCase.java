@@ -114,8 +114,8 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
         new ParameterProber(TRANSPORT_HEADERS_PARAM, null, ObjectType.class, false),
         new ParameterProber(ATTACHMENTS_PARAM, null, ObjectType.class, false),
     };
-    // the `3` is added because the sdk adds the target, targetValue, and retryPolicy parameters automatically
-    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 3));
+    // the `3` is added because the sdk adds the config-ref, target, targetValue, and retryPolicy parameters automatically
+    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 4));
     assertParameters(operation.getAllParameterModels(), probers);
   }
 }

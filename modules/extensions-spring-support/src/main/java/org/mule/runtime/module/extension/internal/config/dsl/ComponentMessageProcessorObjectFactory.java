@@ -58,7 +58,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
   }
 
   @Override
-  public P doGetObject() throws Exception {
+  public P doGetObject() {
     if (nestedProcessors != null) {
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)

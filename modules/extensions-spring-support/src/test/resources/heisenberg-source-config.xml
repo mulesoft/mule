@@ -14,8 +14,8 @@
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="0"
                        initialHealth="CANCER"
-                       finalHealth="CANCER"
-                       enemies="#[mel:[]]">
+                       enemies="#[[]]"
+                       finalHealth="CANCER">
         <heisenberg:connection>
             <reconnection failsDeployment="true"/>
         </heisenberg:connection>

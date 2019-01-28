@@ -76,7 +76,6 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     }.loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), new HashMap<>());
   }
 
-
   @Test
   public void assertDeclaration() {
     assertThat(extensionModel.getName(), is(EXTENSION_NAME));
@@ -100,21 +99,19 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
 
   @Test
   public void listenerSource() {
-    SourceModel source =
-        extensionModel.getConfigurationModel(LISTENER_CONFIG_NAME).get().getSourceModel(LISTEN_MESSAGE_SOURCE).get();
+    ConfigurationModel configurationModel = extensionModel.getConfigurationModel(LISTENER_CONFIG_NAME).get();
+    SourceModel source = configurationModel.getSourceModel(LISTEN_MESSAGE_SOURCE).get();
     assertType(source.getOutput().getType(), InputStream.class, BinaryType.class);
     assertType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
-
     List<ParameterModel> parameters = source.getAllParameterModels();
-    assertThat(parameters, hasSize(2));
 
-    ParameterModel parameter = parameters.get(0);
-    assertStreamingStrategyParameter(parameter);
-
-    parameter = parameters.get(1);
-    assertThat(parameter.getName(), is(PORT));
-    assertThat(parameter.isRequired(), is(false));
-    assertType(parameter.getType(), Integer.class, NumberType.class);
+    assertThat(parameters, hasSize(3));
+    assertConfigRefParam(parameters.get(0));
+    assertStreamingStrategyParameter(parameters.get(1));
+    ParameterModel port = parameters.get(2);
+    assertThat(port.getName(), is(PORT));
+    assertThat(port.isRequired(), is(false));
+    assertType(port.getType(), Integer.class, NumberType.class);
   }
 
   @Test
@@ -133,16 +130,14 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(operation.getName(), is(REQUEST_OPERATION_NAME));
     assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     List<ParameterModel> parameterModels = operation.getAllParameterModels();
-    assertThat(parameterModels, hasSize(4));
 
-    ParameterModel parameter = parameterModels.get(0);
-    assertStreamingStrategyParameter(parameter);
-
-    parameter = parameterModels.get(1);
-    assertThat(parameter.getName(), is(PATH));
-    assertType(parameter.getType(), String.class, StringType.class);
-
-    assertTargetParameter(parameterModels.get(2), parameterModels.get(3));
+    assertThat(parameterModels, hasSize(5));
+    assertConfigRefParam(parameterModels.get(0));
+    assertStreamingStrategyParameter(parameterModels.get(1));
+    ParameterModel path = parameterModels.get(2);
+    assertThat(path.getName(), is(PATH));
+    assertType(path.getType(), String.class, StringType.class);
+    assertTargetParameter(parameterModels.get(3), parameterModels.get(4));
   }
 
   private void assertTargetParameter(ParameterModel target, ParameterModel targetValue) {

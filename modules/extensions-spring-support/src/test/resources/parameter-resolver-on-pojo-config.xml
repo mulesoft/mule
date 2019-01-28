@@ -59,7 +59,7 @@
     </flow>
 
     <flow name="sourceWithParameterResolver" initialState="stopped">
-        <parameter-resolver:some-source someString="this is not an expression" literalString="#[literal]" config-ref="config-with-dynamic-parameter-resolvers"/>
+        <parameter-resolver:some-source someString="this is not an expression" literalString="#[literal]" config-ref="config-with-static-parameter-resolvers"/>
         <logger />
     </flow>
 

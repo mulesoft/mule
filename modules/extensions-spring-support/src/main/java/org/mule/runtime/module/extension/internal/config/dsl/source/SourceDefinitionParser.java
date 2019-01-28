@@ -63,8 +63,6 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
             .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
             .withSetterParameterDefinition("primaryNodeOnly", fromSimpleParameter(PRIMARY_NODE_ONLY_PARAMETER_NAME).build())
-            .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
-                                           fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
             .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
                                            fromChildConfiguration(CursorProviderFactory.class).build())
             .withSetterParameterDefinition("backPressureStrategy",

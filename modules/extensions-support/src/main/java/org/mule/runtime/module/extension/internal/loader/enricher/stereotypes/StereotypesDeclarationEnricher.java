@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.ifPresent;
@@ -14,6 +15,10 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -55,6 +60,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Opera
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,6 +89,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
   private static class EnricherDelegate {
 
     private final Map<StereotypeDefinition, StereotypeModel> stereotypes = new HashMap<>();
+    private Multimap<ComponentDeclaration, ConfigurationDeclaration> componentConfigs = LinkedListMultimap.create();
 
     private String namespace;
     private StereotypeModel sourceParent;
@@ -111,12 +118,13 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       return new IdempotentDeclarationWalker() {
 
         @Override
-        protected void onConfiguration(ConfigurationDeclaration declaration) {
-          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONFIG);
-          ifPresent(declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+        protected void onConfiguration(ConfigurationDeclaration config) {
+          final StereotypeModel defaultStereotype = createStereotype(config.getName(), CONFIG);
+          ifPresent(config.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
               .map(ExtensionTypeDescriptorModelProperty::getType),
-                    type -> resolveStereotype(type, declaration, defaultStereotype),
-                    () -> declaration.withStereotype(defaultStereotype));
+                    type -> resolveStereotype(type, config, defaultStereotype),
+                    () -> config.withStereotype(defaultStereotype));
+          componentConfigs = populateComponentConfigsMap(config);
         }
 
         @Override
@@ -136,7 +144,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
               .map((Method method) -> new MethodWrapper(method, typeLoader)),
                     methodElement -> resolveStereotype(methodElement, declaration, defaultStereotype),
                     () -> declaration.withStereotype(defaultStereotype));
-
+          addConfigRefStereoTypesIfNeeded(declaration);
         }
 
         @Override
@@ -147,6 +155,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
               .map(method -> new OperationWrapper(method, typeLoader)),
                     methodElement -> resolveStereotype(methodElement, declaration, defaultStereotype),
                     () -> declaration.withStereotype(defaultStereotype));
+          addConfigRefStereoTypesIfNeeded(declaration);
         }
 
         @Override
@@ -157,7 +166,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
               .map(declaringType -> new TypeWrapper(declaringType, typeLoader)),
                     type -> resolveStereotype(type, declaration, defaultStereotype),
                     () -> declaration.withStereotype(defaultStereotype));
-
+          addConfigRefStereoTypesIfNeeded(declaration);
         }
 
         private void resolveStereotype(Type type, StereotypedDeclaration<?> declaration, StereotypeModel fallback) {
@@ -175,9 +184,10 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       return new IdempotentDeclarationWalker() {
 
         @Override
-        protected void onConfiguration(ConfigurationDeclaration declaration) {
-          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONFIG);
-          declaration.withStereotype(defaultStereotype);
+        protected void onConfiguration(ConfigurationDeclaration config) {
+          final StereotypeModel defaultStereotype = createStereotype(config.getName(), CONFIG);
+          config.withStereotype(defaultStereotype);
+          componentConfigs = populateComponentConfigsMap(config);
         }
 
         @Override
@@ -190,21 +200,22 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
         protected void onConstruct(WithConstructsDeclaration owner, ConstructDeclaration declaration) {
           final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
           declaration.withStereotype(defaultStereotype);
-
+          addConfigRefStereoTypesIfNeeded(declaration);
         }
 
         @Override
         public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
           final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
           declaration.withStereotype(defaultStereotype);
+          addConfigRefStereoTypesIfNeeded(declaration);
         }
 
         @Override
         protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
           final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), sourceParent);
           declaration.withStereotype(defaultStereotype);
+          addConfigRefStereoTypesIfNeeded(declaration);
         }
-
       };
     }
 
@@ -252,6 +263,31 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
     private String getStereotypePrefix(ExtensionDeclarer extensionDeclarer) {
       return extensionDeclarer.getDeclaration().getXmlDslModel().getPrefix().toUpperCase();
+    }
+
+    /**
+     * Creates a map with all the configurations accepted by each of the components declared in the extension.
+     */
+    private Multimap<ComponentDeclaration, ConfigurationDeclaration> populateComponentConfigsMap(ConfigurationDeclaration config) {
+      Multimap<ComponentDeclaration, ConfigurationDeclaration> componentConfigs = LinkedListMultimap.create();
+      config.getConstructs().forEach(construct -> componentConfigs.put(construct, config));
+      config.getMessageSources().forEach(source -> componentConfigs.put(source, config));
+      config.getOperations().forEach(operation -> componentConfigs.put(operation, config));
+      return componentConfigs;
+    }
+
+    /**
+     * Given a component declaration, adds all the stereotypes accepted by the config-ref parameter if it has one.
+     */
+    private void addConfigRefStereoTypesIfNeeded(ComponentDeclaration<?> declaration) {
+      Collection<ConfigurationDeclaration> configs = componentConfigs.get(declaration);
+      if (configs != null && !configs.isEmpty()) {
+        List<StereotypeModel> stereotypes = configs.stream().map(StereotypedDeclaration::getStereotype).collect(toList());
+        declaration.getAllParameters().stream()
+            .filter(p -> CONFIG_ATTRIBUTE_NAME.equals(p.getName()))
+            .findAny()
+            .ifPresent(configRef -> configRef.setAllowedStereotypeModels(stereotypes));
+      }
     }
   }
 }

@@ -88,7 +88,12 @@
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -127,12 +132,16 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" default="10" name="timeToPeel"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -186,9 +195,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
@@ -260,16 +269,16 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="key"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="mainProducers"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="shouldNotOverride"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="flowName"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -286,11 +295,6 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
@@ -300,6 +304,11 @@
         <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
           <xs:annotation>
             <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -328,12 +337,12 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -352,12 +361,12 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -388,15 +397,15 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -417,12 +426,12 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -441,13 +450,13 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="theWord"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -494,12 +503,16 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" default="10" name="timeToPeel"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -523,9 +536,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -546,12 +559,12 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="attributeOnlyBanana"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="attributeOnlyBanana"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -570,9 +583,9 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -593,9 +606,9 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -619,7 +632,11 @@
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -660,9 +677,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -685,7 +702,11 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -708,9 +729,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -733,7 +754,11 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -757,9 +782,9 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">

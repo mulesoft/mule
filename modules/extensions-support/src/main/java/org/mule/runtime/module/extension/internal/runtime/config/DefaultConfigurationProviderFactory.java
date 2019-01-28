@@ -50,6 +50,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                   ReflectionCache reflectionCache,
                                                                   ExpressionManager expressionManager,
                                                                   MuleContext muleContext) {
+
     configureConnectionProviderResolver(name, connectionProviderResolver);
     return new DynamicConfigurationProvider(name, extensionModel, configurationModel, resolverSet, connectionProviderResolver,
                                             expirationPolicy, reflectionCache, expressionManager, muleContext);

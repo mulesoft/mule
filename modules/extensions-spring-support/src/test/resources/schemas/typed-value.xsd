@@ -68,9 +68,13 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="stringTypedValue"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="differedDoor"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -80,9 +84,9 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -103,12 +107,12 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:expressionString" use="optional" default="This is a default string" name="stringValue"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="This is a default string" name="stringValue"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
