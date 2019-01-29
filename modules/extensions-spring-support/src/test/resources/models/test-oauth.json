@@ -1068,8 +1068,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "UNAUTHORIZE",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1099,6 +1107,46 @@
                   "allowedStereotypeModels": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "TEST-OAUTH",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
                 }
               ],
