@@ -84,8 +84,9 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
         Optional<ExtensionTypeDescriptorModelProperty> property =
             declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
 
-        if (!property.isPresent())
+        if (!property.isPresent()) {
           return;
+        }
 
         extensionType = property.get().getType();
 
