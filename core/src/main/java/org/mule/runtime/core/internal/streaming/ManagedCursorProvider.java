@@ -6,8 +6,16 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.util.Collections.newSetFromMap;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+
+import java.lang.ref.WeakReference;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for a {@link CursorProvider} decorator which makes sure that {@link Cursor cursors}
@@ -19,9 +27,12 @@ import org.mule.runtime.api.streaming.CursorProvider;
  */
 public abstract class ManagedCursorProvider<T extends Cursor> implements CursorProvider<T> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ManagedCursorProvider.class);
+
   private final CursorProvider<T> delegate;
   private final CursorManager cursorManager;
   private final CursorContext cursorContext;
+  private final Set<WeakReference<Cursor>> cursors = newSetFromMap(new ConcurrentHashMap<>());
 
   protected ManagedCursorProvider(CursorContext cursorContext, CursorManager cursorManager) {
     this.delegate = (CursorProvider<T>) cursorContext.getCursorProvider();
@@ -40,7 +51,36 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   public final T openCursor() {
     T cursor = delegate.openCursor();
     cursorManager.onOpen(cursor, cursorContext);
-    return managedCursor(cursor, cursorContext);
+    T managedCursor = managedCursor(cursor, cursorContext);
+    synchronized (cursors) {
+      cursors.add(new WeakReference<>(managedCursor));
+    }
+
+    return managedCursor;
+  }
+
+  public void onClose(Cursor cursor) {
+    synchronized (cursors) {
+      if (cursors.remove(cursor)) {
+        if (cursors.isEmpty() && cursor.getProvider().isClosed()) { /// todo mal!!! esto tiene que ser un map <hash, WeakReference>
+          cursor.getProvider().close();
+          cursors.forEach(weakReference -> {
+            Cursor referent = weakReference.get();
+            if (referent == null) {
+              return;
+            }
+            try {
+              referent.release();
+            } catch (Exception e) {
+              LOGGER.warn("Exception was found trying to close cursor. Execution will continue", e);
+            }
+          });
+        }
+      }
+    }
+    if () {
+
+    }
   }
 
   /**
