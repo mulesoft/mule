@@ -9,9 +9,8 @@ package org.mule.functional.api.component;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.flatMap;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.justPublishOn;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -24,11 +23,9 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
-import java.util.function.Supplier;
+import org.reactivestreams.Publisher;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Test async non-blocking {@link Processor} implementation that will return control to the Flow in a custom {@link Scheduler}
@@ -59,13 +56,13 @@ public class TestNonBlockingProcessor extends AbstractComponent
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher).flatMap(event -> {
+    return flatMap(publisher, event -> {
       if (isTransactionActive()) {
         return publisher;
       } else {
-        return just(event).publishOn(fromExecutorService(customScheduler.get()));
+        return justPublishOn(event, customScheduler.get());
       }
-    });
+    }, this);
   }
 
   @Override

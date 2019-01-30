@@ -14,6 +14,7 @@ import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -37,6 +38,7 @@ import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -323,6 +325,19 @@ public class MessageProcessors {
   }
 
   /**
+   * Transform a given {@link Publisher} using a mapper function. Primarily for use in the implementation of mapping in other
+   * class-loaders.
+   *
+   * @param publisher the publisher to transform
+   * @param mapper the mapper to map publisher items with
+   * @return the transformed publisher
+   * @since 4.2
+   */
+  public static Publisher<CoreEvent> map(Publisher<CoreEvent> publisher, Function<CoreEvent, CoreEvent> mapper) {
+    return Flux.from(publisher).map(mapper);
+  }
+
+  /**
    * Perform processing using the provided {@link Function} for each {@link CoreEvent}. Primarily for use in the implementation of
    * {@link ReactiveProcessor} in other class-loaders.
    *
@@ -339,4 +354,15 @@ public class MessageProcessors {
             .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, component)));
   }
 
+  /**
+   * Creates a new {@link Publisher} that will emit the given {@code event}, publishing it on the given {@code executor}.
+   *
+   * @param event the {@link CoreEvent} to emit
+   * @param executor the thread pool where the event will be published.
+   * @return the created publisher
+   * @since 4.2
+   */
+  public static Publisher<CoreEvent> justPublishOn(CoreEvent event, ExecutorService executor) {
+    return Flux.just(event).publishOn(fromExecutorService(executor));
+  }
 }
