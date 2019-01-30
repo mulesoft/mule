@@ -13,6 +13,7 @@ import static org.mule.runtime.api.notification.TransactionNotification.TRANSACT
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.TransactionNotification;
@@ -41,6 +42,7 @@ public abstract class AbstractTransaction implements Transaction {
   protected String id = UUID.getUUID();
 
   protected int timeout;
+  protected ComponentLocation componentLocation;
 
   protected MuleContext muleContext;
   private final NotificationDispatcher notificationFirer;
@@ -194,5 +196,15 @@ public abstract class AbstractTransaction implements Transaction {
   @Override
   public void setTimeout(int timeout) {
     this.timeout = timeout;
+  }
+
+  @Override
+  public void setComponentLocation(ComponentLocation componentLocation) {
+    this.componentLocation = componentLocation;
+  }
+
+  @Override
+  public ComponentLocation getComponentLocation() {
+    return componentLocation;
   }
 }

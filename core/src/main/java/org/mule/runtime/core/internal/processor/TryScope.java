@@ -23,6 +23,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,7 +34,9 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -66,6 +69,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
           createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
       ExecutionCallback<CoreEvent> processingCallback = () -> {
         try {
+          Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+          transaction.setComponentLocation(getLocation());
           CoreEvent e = processToApply(event, p -> from(p)
               .flatMap(request -> processWithChildContext(request, nestedChain, ofNullable(getLocation()),
                                                           messagingExceptionHandler)));

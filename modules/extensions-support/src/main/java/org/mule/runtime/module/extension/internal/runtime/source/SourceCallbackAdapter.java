@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -52,4 +53,5 @@ public interface SourceCallbackAdapter<T, A> extends SourceCallback<T, A> {
    */
   String getOwningExtensionName();
 
+  ComponentLocation getSourceLocation();
 }

@@ -84,6 +84,7 @@ public class DelegateTransaction extends AbstractTransaction {
     this.delegate = transactionFactory.beginTransaction(muleContext);
     delegate.setTimeout(timeout);
     delegate.bindResource(key, resource);
+    delegate.setComponentLocation(componentLocation);
   }
 
   @Override

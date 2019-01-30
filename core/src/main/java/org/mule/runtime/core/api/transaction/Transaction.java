@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.tx.TransactionException;
 
 public interface Transaction {
@@ -97,4 +98,13 @@ public interface Transaction {
    * @return TX identification.
    */
   String getId();
+
+  default ComponentLocation getComponentLocation() {
+    return null;
+  }
+
+  default void setComponentLocation(ComponentLocation componentLocation) {
+
+  }
+
 }

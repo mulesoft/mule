@@ -7,8 +7,11 @@
 package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
@@ -34,11 +37,19 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   protected Function<CoreEvent, CoreEvent> beforeRouting(Exception exception) {
     return event -> {
       event = super.beforeRouting(exception).apply(event);
-      if (!isRedeliveryExhausted(exception)) {
+      if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
         rollback(exception);
       }
       return event;
     };
+  }
+
+  private boolean isOwnedTransaction() {
+    Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+    if (transaction == null || transaction.getComponentLocation() == null) {
+      return false;
+    }
+    return transaction.getComponentLocation().getRootContainerName().equals(this.getRootContainerLocation().getGlobalName());
   }
 
   @Override
