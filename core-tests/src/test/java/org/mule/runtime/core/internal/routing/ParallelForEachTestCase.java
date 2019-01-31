@@ -24,19 +24,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.SplitAggregateStory.SPLIT_AGGREGATE;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ParallelForEachStory.PARALLEL_FOR_EACH;
 import static reactor.core.publisher.Flux.from;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +49,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
@@ -60,7 +56,6 @@ import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrate
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import javax.management.DescriptorKey;
 
@@ -69,13 +64,13 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
-@Story(SPLIT_AGGREGATE)
-public class SplitAggregateScopeTestCase extends AbstractMuleContextTestCase {
+@Story(PARALLEL_FOR_EACH)
+public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
 
-  private SplitAggregateScope router = new SplitAggregateScope();
+  private ParallelForEach router = new ParallelForEach();
   private ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
 
   @Override
