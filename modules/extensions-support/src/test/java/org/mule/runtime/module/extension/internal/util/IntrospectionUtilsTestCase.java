@@ -96,9 +96,7 @@ import java.util.function.Function;
 import javax.annotation.processing.ProcessingEnvironment;
 
 import com.google.testing.compile.CompilationRule;
-import io.qameta.allure.Issue;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
