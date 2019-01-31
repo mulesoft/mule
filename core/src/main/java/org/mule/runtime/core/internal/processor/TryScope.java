@@ -70,10 +70,12 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       ExecutionCallback<CoreEvent> processingCallback = () -> {
         try {
           Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+          ComponentLocation lastLocation = transaction.getComponentLocation();
           transaction.setComponentLocation(getLocation());
           CoreEvent e = processToApply(event, p -> from(p)
               .flatMap(request -> processWithChildContext(request, nestedChain, ofNullable(getLocation()),
                                                           messagingExceptionHandler)));
+          transaction.setComponentLocation(lastLocation);
           return e;
         } catch (Exception e) {
           throw e;
