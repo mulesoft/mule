@@ -7,8 +7,6 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static org.mule.runtime.module.artifact.internal.util.ClassLoaderUtil.getPlatformClassLoader;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,6 @@ public class ChildFirstLookupStrategy implements LookupStrategy {
     if (classLoader.getParent() != null) {
       classLoaders.add(classLoader.getParent());
     }
-    getPlatformClassLoader().map(classLoaders::add);
     return classLoaders;
   }
 }

@@ -51,6 +51,11 @@ import java.util.Optional;
  */
 public class MessagingExceptionResolver {
 
+  /**
+   * Indicates the last handler of the error where the event was modified.
+   */
+  public static final String INFO_LAST_HANDLER_KEY = "Last Handler Element";
+
   private final Component component;
 
   public MessagingExceptionResolver(Component component) {
@@ -123,7 +128,7 @@ public class MessagingExceptionResolver {
           : new MessagingException(event, root, failingComponent);
     }
     propagateAlreadyLogged(me, result);
-    return enrich(result, failingComponent, event, exceptionContextProviders);
+    return enrich(result, failingComponent, component, event, exceptionContextProviders);
   }
 
   private void propagateAlreadyLogged(MessagingException origin, MuleException result) {
@@ -177,7 +182,12 @@ public class MessagingExceptionResolver {
     MessagingException updated =
         me instanceof FlowExecutionException ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)
             : new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
-    return enrich(updated, failingProcessor, errorEvent, exceptionContextProviders);
+
+    if (me.getInfo().containsKey(INFO_LAST_HANDLER_KEY)) {
+      updated.getInfo().put(INFO_LAST_HANDLER_KEY, me.getInfo().get(INFO_LAST_HANDLER_KEY));
+    }
+
+    return enrich(updated, failingProcessor, processor, errorEvent, exceptionContextProviders);
   }
 
   private Optional<Component> getFailingProcessor(MessagingException me, Throwable root) {
@@ -201,7 +211,7 @@ public class MessagingExceptionResolver {
     return cause instanceof MessagingException && ((MessagingException) cause).getEvent().getError().isPresent();
   }
 
-  private <T extends MuleException> T enrich(T me, Component failing, CoreEvent event,
+  private <T extends MuleException> T enrich(T me, Component failing, Component handling, CoreEvent event,
                                              Collection<ExceptionContextProvider> exceptionContextProviders) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
     exceptionContextProviders.forEach(cp -> {

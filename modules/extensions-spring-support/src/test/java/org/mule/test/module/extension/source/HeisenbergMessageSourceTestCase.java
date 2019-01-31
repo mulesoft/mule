@@ -239,7 +239,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
-  public void obtainSourceParameters() throws Exception {
+  public void obtainSourceParameters() {
     Component element = locator.find(Location.builder().globalName("source").addSourcePart().build()).get();
     assertThat(element, is(instanceOf(ParameterizedSource.class)));
 
@@ -250,7 +250,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
-  public void obtainSourceConfigParameters() throws Exception {
+  public void obtainSourceConfigParameters() {
     Component element = locator.find(Location.builder().globalName("source").addSourcePart().build()).get();
     assertThat(element, is(instanceOf(ConfiguredComponent.class)));
 
@@ -260,7 +260,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     Map<String, Object> configParameters = configurationState.getConfigParameters();
 
     assertThat(configParameters.size(), is(13));
-    assertParameter(configParameters, "enemies", hasSize(0));
     assertParameter(configParameters, "monthlyIncomes", hasSize(2));
     assertParameter(configParameters, "cancer", is(true));
     assertParameter(configParameters, "money", equalTo(new BigDecimal("0")));

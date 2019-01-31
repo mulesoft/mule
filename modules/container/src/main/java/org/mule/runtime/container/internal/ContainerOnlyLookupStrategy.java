@@ -8,7 +8,6 @@
 package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.internal.util.ClassLoaderUtil.getPlatformClassLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,6 @@ public class ContainerOnlyLookupStrategy implements LookupStrategy {
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
     classLoaders = new ArrayList<>();
     classLoaders.add(containerClassLoader);
-    getPlatformClassLoader().map(classLoaders::add);
   }
 
   @Override

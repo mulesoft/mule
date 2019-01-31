@@ -157,7 +157,7 @@ import org.mule.runtime.core.internal.routing.Resequencer;
 import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.SimpleCollectionAggregator;
-import org.mule.runtime.core.internal.routing.SplitAggregateScope;
+import org.mule.runtime.core.internal.routing.ParallelForEach;
 import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
@@ -238,7 +238,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
   private static final String SCATTER_GATHER = "scatter-gather";
-  private static final String SPLIT_AGGREGATE = "split-aggregate";
+  private static final String PARALLEL_FOREACH = "parallel-foreach";
   private static final String FORK_JOIN_STRATEGY = "forkJoinStrategyFactory";
   private static final String COLLECT_LIST = "collect-list";
   private static final String ASYNC = "async";
@@ -404,10 +404,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(ROUTES, fromChildCollectionConfiguration(MessageProcessorChain.class).build())
         .withSetterParameterDefinition(FORK_JOIN_STRATEGY, fromChildConfiguration(ForkJoinStrategyFactory.class).build())
         .asScope().build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(SPLIT_AGGREGATE)
-        .withTypeDefinition(fromType(SplitAggregateScope.class))
-        .withSetterParameterDefinition("collectionExpression",
-                                       fromChildConfiguration(String.class).withIdentifier("collection").build())
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(PARALLEL_FOREACH)
+        .withTypeDefinition(fromType(ParallelForEach.class))
+        .withSetterParameterDefinition("collectionExpression", fromSimpleParameter("collection").build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
         .withSetterParameterDefinition("target", fromSimpleParameter("target").build())

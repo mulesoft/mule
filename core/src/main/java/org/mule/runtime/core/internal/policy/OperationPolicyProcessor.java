@@ -6,30 +6,27 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static java.util.Collections.singletonMap;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_STATE_EVENT;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
-import org.mule.runtime.core.api.policy.PolicyStateHandler;
-import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import java.util.Optional;
 import java.util.function.Supplier;
-
-import reactor.core.publisher.Mono;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link Processor}. Currently the only kind of
@@ -40,29 +37,25 @@ import reactor.core.publisher.Mono;
  * {@link Processor}.
  * <p>
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link CoreEvent} modified by the policy behaviour can
- * be stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an
+ * such scoping of variables it uses internal parameters so the last {@link CoreEvent} modified by the policy behaviour can be
+ * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an
  * {@link CoreEvent} from the policy to the next operation {@link CoreEvent} or from the next operation result to the
  * {@link CoreEvent} that must continue the execution of the policy.
  * <p>
  */
-public class OperationPolicyProcessor implements Processor {
+public class OperationPolicyProcessor implements ReactiveProcessor {
 
   private static final Logger LOGGER = getLogger(OperationPolicyProcessor.class);
 
+  public static final String POLICY_OPERATION_ORIGINAL_EVENT = "policy.operation.originalEvent";
+
   private final Policy policy;
-  private final PolicyStateHandler policyStateHandler;
   private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
   private final ReactiveProcessor nextProcessor;
-  private final PolicyStateIdFactory stateIdFactory;
 
-  public OperationPolicyProcessor(Policy policy,
-                                  PolicyStateHandler policyStateHandler,
-                                  ReactiveProcessor nextProcessor) {
+  public OperationPolicyProcessor(Policy policy, ReactiveProcessor nextProcessor) {
     this.policy = policy;
-    this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
-    this.stateIdFactory = new PolicyStateIdFactory(policy.getPolicyId());
   }
 
   /**
@@ -74,78 +67,45 @@ public class OperationPolicyProcessor implements Processor {
    * @throws MuleException
    */
   @Override
-  public CoreEvent process(CoreEvent operationEvent) throws MuleException {
-    return processToApply(operationEvent, this);
-  }
-
-  @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .cast(PrivilegedEvent.class)
-        .flatMap(operationEvent -> {
-          PolicyStateId policyStateId = stateIdFactory.create(operationEvent);
-          PrivilegedEvent variablesProviderEvent = variablesProvider(operationEvent, policyStateId);
-          PrivilegedEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
-          Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent, policyStateId);
-          policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
-          return executePolicyChain(operationEvent, policyStateId, policyEvent);
-        });
-  }
+        .map(operationEvent -> {
+          final InternalEvent eventToUse =
+              quickCopy(operationEvent, singletonMap(POLICY_OPERATION_ORIGINAL_EVENT, operationEvent));
 
-  private void manageError(PolicyStateId policyStateId, PrivilegedEvent operationEvent, MessagingException messagingException) {
-    policyStateHandler.updateState(policyStateId, messagingException.getEvent());
-    PrivilegedEvent newEvent = policyEventConverter.createEvent((PrivilegedEvent) messagingException.getEvent(), operationEvent);
-    messagingException.setProcessedEvent(newEvent);
-  }
-
-  private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
-                                                   PrivilegedEvent policyEvent) {
-
-    PolicyChain policyChain = policy.getPolicyChain();
-    policyChain.onChainError(t -> manageError(policyStateId, operationEvent, (MessagingException) t));
-
-    return just(policyEvent)
-        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyStateId.getPolicyId(),
+          PrivilegedEvent latestPolicyState = eventToUse.getInternalParameter(POLICY_STATE_EVENT);
+          if (latestPolicyState != null) {
+            return policyEventConverter.createEvent(eventToUse, latestPolicyState);
+          } else {
+            return PrivilegedEvent.builder(eventToUse).clearVariables().build();
+          }
+        })
+        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policy.getPolicyId(),
                                      () -> getMessageAttributesAsString(event), "Before operation"))
         .cast(CoreEvent.class)
-        .transform(policyChain)
+        .transform(policy.getPolicyChain().onChainError(t -> manageError((MessagingException) t)))
+        .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessor))
         .cast(PrivilegedEvent.class)
-        .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
-        .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
-        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyStateId.getPolicyId(),
-                                     () -> getMessageAttributesAsString(event), "After operation"));
+        .map(policyChainResult -> {
+          final PrivilegedEvent savedResult = saveState(policyChainResult);
+          return policyEventConverter.createEvent(savedResult,
+                                                  ((InternalEvent) savedResult)
+                                                      .getInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT));
+        })
+        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policy.getPolicyId(),
+                                     () -> getMessageAttributesAsString(event), "After operation"))
+        .cast(CoreEvent.class);
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(ReactiveProcessor nextOperation, PrivilegedEvent operationEvent,
-                                                              PolicyStateId policyStateId) {
-    return new Processor() {
-
-      @Override
-      public CoreEvent process(CoreEvent event) throws MuleException {
-        return processToApply(event, this);
-      }
-
-      @Override
-      public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-        return from(publisher)
-            .cast(PrivilegedEvent.class)
-            .flatMap(policyExecuteNextEvent -> {
-              policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
-              return just(policyExecuteNextEvent)
-                  .map(event -> policyEventConverter.createEvent(event, operationEvent))
-                  .cast(CoreEvent.class)
-                  .transform(nextOperation)
-                  .cast(PrivilegedEvent.class)
-                  .map(operationResult -> policyEventConverter.createEvent(operationResult, policyExecuteNextEvent));
-            });
-      }
-    };
+  private void manageError(MessagingException messagingException) {
+    messagingException
+        .setProcessedEvent(policyEventConverter.createEvent(saveState((PrivilegedEvent) messagingException.getEvent()),
+                                                            ((InternalEvent) messagingException.getEvent())
+                                                                .getInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT)));
   }
 
-  private PrivilegedEvent variablesProvider(CoreEvent event, PolicyStateId policyStateId) {
-    Optional<CoreEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
-    return (PrivilegedEvent) latestPolicyState
-        .orElseGet(() -> PrivilegedEvent.builder(event.getContext()).message(of(null)).build());
+  private PrivilegedEvent saveState(PrivilegedEvent event) {
+    return quickCopy(event, singletonMap(POLICY_STATE_EVENT, event));
   }
 
   private String getMessageAttributesAsString(CoreEvent event) {

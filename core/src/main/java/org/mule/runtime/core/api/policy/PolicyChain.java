@@ -37,13 +37,15 @@ import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -115,20 +117,18 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
-        .flatMap(event -> {
-          pushBeforeNextFlowStackElement()
-              .andThen(req -> ((BaseEventContext) req.getContext())
-                  .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
-              .andThen(notificationHelper.notification(PROCESS_START))
-              .accept(event);
-          return from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
-              .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END))
-              .doOnError(MessagingException.class, t -> {
-                notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
-                this.onError.ifPresent(onError -> onError.accept(t));
-              });
-        });
+    return Flux.from(publisher)
+        .doOnNext(pushBeforeNextFlowStackElement()
+            .andThen(req -> ((BaseEventContext) req.getContext())
+                .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
+            .andThen(notificationHelper.notification(PROCESS_START)))
+        // TODO MULE-16370 remove this flatMap
+        .flatMap(event -> from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
+            .doOnError(MessagingException.class, t -> {
+              notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
+              this.onError.ifPresent(onError -> onError.accept(t));
+            }))
+        .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
   }
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {
@@ -148,7 +148,8 @@ public class PolicyChain extends AbstractComponent
     this.propagateMessageTransformations = propagateMessageTransformations;
   }
 
-  public void onChainError(Consumer<Exception> onError) {
+  public PolicyChain onChainError(Consumer<Exception> onError) {
     this.onError = of(onError);
+    return this;
   }
 }

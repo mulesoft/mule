@@ -10,13 +10,17 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
 
+import org.hamcrest.core.IsCollectionContaining;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ImplicitConfigsAreCreatedOnceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -30,7 +34,13 @@ public class ImplicitConfigsAreCreatedOnceTestCase extends AbstractExtensionFunc
     Integer value = (Integer) flowRunner("implicitConfig").run().getMessage().getPayload().getValue();
     assertThat(value, is(5));
     Collection<ConfigurationProvider> configs = registry.lookupAllByType(ConfigurationProvider.class);
+
     assertThat(configs, hasSize(5));
-    assertThat(configs.stream().filter(c -> c.getName().endsWith("implicit")).collect(toList()), hasSize(2));
+    List<String> names = configs.stream().map(ConfigurationProvider::getName).collect(toList());
+    assertThat(names, hasItems("implicitExclusive-bleconf-implicit",
+                               "implicitExclusive-blaconf-implicit",
+                               "blaexplicit",
+                               "blaexplicit2",
+                               "bleexplicit"));
   }
 }

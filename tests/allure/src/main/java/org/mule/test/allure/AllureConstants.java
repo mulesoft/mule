@@ -400,9 +400,9 @@ public interface AllureConstants {
       String PROCESSOR_CHAIN_ROUTER = "Processor Chain Router";
     }
 
-    interface SplitAggregateStory {
+    interface ParallelForEachStory {
 
-      String SPLIT_AGGREGATE = "Split Aggregate";
+      String PARALLEL_FOR_EACH = "Parallel For Each";
     }
 
   }

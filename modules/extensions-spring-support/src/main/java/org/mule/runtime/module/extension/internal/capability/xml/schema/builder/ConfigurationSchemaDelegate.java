@@ -49,7 +49,6 @@ final class ConfigurationSchemaDelegate {
     this.schema = schema;
 
     ExtensionType config = registerExtension(dslConfigElement.getElementName());
-    config.getAttributeOrAttributeGroup().add(builder.createNameAttribute(true));
     config.setAnnotation(builder.createDocAnnotation(configurationModel.getDescription()));
 
     Optional<TopLevelElement> connectionElement = addConnectionProviderElement(configurationModel);

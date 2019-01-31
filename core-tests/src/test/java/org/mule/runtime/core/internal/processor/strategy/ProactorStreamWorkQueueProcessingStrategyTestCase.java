@@ -58,7 +58,6 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.apache.commons.io.input.NullInputStream;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -385,7 +384,6 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
-  @Ignore("MULE-16282")
   @Test
   @Description("Notifications are invoked on CPU_LITE thread")
   public void asyncProcessorNotificationExecutionThreads() throws Exception {

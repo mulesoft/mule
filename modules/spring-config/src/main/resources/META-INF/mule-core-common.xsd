@@ -2651,7 +2651,7 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="split-aggregate" substitutionGroup="abstract-routing-message-processor">
+    <xsd:element name="parallel-foreach" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Splits the same message and processes each part in parallel.
@@ -2661,19 +2661,19 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:element name="collection" type="xsd:string" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Expression that defines the collection of parts to be processed in parallel.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
                         <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
                     </xsd:sequence>
                     <xsd:attribute name="timeout" type="substitutableLong">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Sets a timeout in milliseconds for each route. The default behaviour is that of no timeout.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="collection" use="optional" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Expression that defines the collection of parts to be processed in parallel.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

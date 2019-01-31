@@ -30,7 +30,7 @@ import java.util.Optional;
 
 /**
  * <p>
- * The <code>Split-Aggregate</code> scope splits the incoming {@link org.mule.runtime.api.message.Message} into n parts will
+ * The <code>Parallel-Foreach</code> scope splits the incoming {@link org.mule.runtime.api.message.Message} into n parts will
  * broadcast copies of the current message to every route in parallel subject to any limitation in concurrency that has been
  * configured
  * <p>
@@ -42,7 +42,7 @@ import java.util.Optional;
  *
  * @since 4.2.0
  */
-public class SplitAggregateScope extends AbstractForkJoinRouter {
+public class ParallelForEach extends AbstractForkJoinRouter {
 
   private String collectionExpression = DEFAULT_SPLIT_EXPRESSION;
   private SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> splittingStrategy;

@@ -79,8 +79,6 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
                                        fromSimpleParameter(TARGET_PARAMETER_NAME).build())
         .withSetterParameterDefinition(TARGET_VALUE_PARAMETER_NAME,
                                        fromSimpleParameter(TARGET_VALUE_PARAMETER_NAME).build())
-        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
-                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
                                        fromChildConfiguration(CursorProviderFactory.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());

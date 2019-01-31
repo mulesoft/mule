@@ -54,12 +54,12 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
   }
 
   @Test
-  public void sourceWithParameterResolver() throws Exception {
+  public void sourceWithParameterResolver() {
     assertParameterResolver(SomeSource.someString, empty(), is("this is not an expression"));
   }
 
   @Test
-  public void sourceWithLiteral() throws Exception {
+  public void sourceWithLiteral() {
     assertThat(SomeSource.literalString.getLiteralValue().get(), equalTo("#[literal]"));
   }
 }

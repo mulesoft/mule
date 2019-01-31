@@ -11,9 +11,11 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.io.Serializable;
+
 @Alias("door")
 @TypeDsl(allowTopLevelDefinition = true)
-public class KnockeableDoor {
+public class KnockeableDoor implements Serializable {
 
   @Parameter
   private String victim;
