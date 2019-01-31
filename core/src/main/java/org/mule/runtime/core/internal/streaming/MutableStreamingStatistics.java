@@ -8,47 +8,13 @@ package org.mule.runtime.core.internal.streaming;
 
 import org.mule.runtime.core.api.streaming.StreamingStatistics;
 
-import java.util.concurrent.atomic.AtomicInteger;
+public interface MutableStreamingStatistics extends StreamingStatistics {
 
-/**
- * Mutable implementation of {@link StreamingStatistics}
- *
- * @since 4.0
- */
-public class MutableStreamingStatistics implements StreamingStatistics {
+  int incrementOpenProviders();
 
-  private final AtomicInteger openProviders = new AtomicInteger(0);
-  private final AtomicInteger openCursors = new AtomicInteger(0);
+  int decrementOpenProviders();
 
-  void incrementOpenProviders() {
-    openProviders.incrementAndGet();
-  }
+  int incrementOpenCursors();
 
-  void decrementOpenProviders() {
-    openProviders.decrementAndGet();
-  }
-
-  void incrementOpenCursors() {
-    openCursors.incrementAndGet();
-  }
-
-  void decrementOpenCursors() {
-    openCursors.decrementAndGet();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public int getOpenCursorProvidersCount() {
-    return openProviders.get();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public int getOpenCursorsCount() {
-    return openCursors.get();
-  }
+  int decrementOpenCursors();
 }

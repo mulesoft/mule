@@ -70,9 +70,9 @@ public class CursorManager {
 
     final CursorContext context = new CursorContext(provider, ownerContext);
     if (provider instanceof CursorStreamProvider) {
-      return new ManagedCursorStreamProvider(context, this);
+      return new ManagedCursorStreamProvider(context, this, statistics);
     } else if (provider instanceof CursorIteratorProvider) {
-      return new ManagedCursorIteratorProvider(context, this);
+      return new ManagedCursorIteratorProvider(context, this, statistics);
     }
 
     throw new MuleRuntimeException(createStaticMessage("Unknown cursor provider type: " + context.getClass().getName()));
@@ -81,7 +81,7 @@ public class CursorManager {
   /**
    * Acknowledges that the given {@code cursor} has been opened
    *
-   * @param cursor the opnened cursor
+   * @param cursor the opened cursor
    * @param providerHandle the handle for the provider that generated it
    */
   public void onOpen(Cursor cursor, CursorContext providerHandle) {

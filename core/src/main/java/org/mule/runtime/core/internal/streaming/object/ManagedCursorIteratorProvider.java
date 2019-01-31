@@ -12,6 +12,7 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.CursorContext;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
+import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -26,8 +27,9 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
   /**
    * {@inheritDoc}
    */
-  public ManagedCursorIteratorProvider(CursorContext cursorContext, CursorManager cursorManager) {
-    super(cursorContext, cursorManager);
+  public ManagedCursorIteratorProvider(CursorContext cursorContext, CursorManager cursorManager,
+                                       MutableStreamingStatistics statistics) {
+    super(cursorContext, cursorManager, statistics);
   }
 
   /**
@@ -35,17 +37,17 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
    */
   @Override
   protected CursorIterator managedCursor(CursorIterator cursor, CursorContext handle) {
-    return new ManagedCursorIterator(cursor, handle);
+    return new ManagedCursorIterator(cursor);
   }
 
   private class ManagedCursorIterator<T> implements CursorIterator<T> {
 
     private final CursorIterator<T> delegate;
-    private final CursorContext cursorContext;
+    //private final CursorContext cursorContext;
 
-    private ManagedCursorIterator(CursorIterator<T> delegate, CursorContext cursorContext) {
+    private ManagedCursorIterator(CursorIterator<T> delegate) {
       this.delegate = delegate;
-      this.cursorContext = cursorContext;
+      //this.cursorContext = cursorContext;
     }
 
     @Override
@@ -53,7 +55,8 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
       try {
         delegate.close();
       } finally {
-        getCursorManager().onClose(delegate, cursorContext);
+        ManagedCursorIteratorProvider.this.onClose(this);
+        //getCursorManager().onClose(delegate, cursorContext);
       }
     }
 

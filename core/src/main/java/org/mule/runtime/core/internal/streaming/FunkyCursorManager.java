@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.util.Collections.newSetFromMap;
+import static java.lang.System.identityHashCode;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
@@ -20,21 +19,16 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FunkyCursorManager extends CursorManager{
+public class FunkyCursorManager extends CursorManager {
 
   private static Logger LOGGER = LoggerFactory.getLogger(CursorManager.class);
 
@@ -63,29 +57,36 @@ public class FunkyCursorManager extends CursorManager{
    * @param ownerContext the root context of the event that created the provider
    * @return a {@link CursorProvider}
    */
+  @Override
   public CursorProvider manage(CursorProvider provider, BaseEventContext ownerContext) {
     registerEventContext(ownerContext);
-    registry.get(ownerContext.getId()).addProvider(provider);
 
     final CursorContext context = new CursorContext(provider, ownerContext);
+
+    ManagedCursorProvider managedProvider;
     if (provider instanceof CursorStreamProvider) {
-      return new ManagedCursorStreamProvider(context, this);
+      managedProvider = new ManagedCursorStreamProvider(context, this, statistics);
     } else if (provider instanceof CursorIteratorProvider) {
-      return new ManagedCursorIteratorProvider(context, this);
+      managedProvider = new ManagedCursorIteratorProvider(context, this, statistics);
+    } else {
+      throw new MuleRuntimeException(createStaticMessage("Unknown cursor provider type: " + context.getClass().getName()));
     }
 
-    throw new MuleRuntimeException(createStaticMessage("Unknown cursor provider type: " + context.getClass().getName()));
+    registry.get(ownerContext.getId()).addProvider(managedProvider);
+
+    return managedProvider;
   }
 
   /**
    * Acknowledges that the given {@code cursor} has been opened
    *
-   * @param cursor the opnened cursor
+   * @param cursor the opened cursor
    * @param providerHandle the handle for the provider that generated it
    */
+  @Override
   public void onOpen(Cursor cursor, CursorContext providerHandle) {
-    registry.get(providerHandle.getOwnerContext().getId()).addCursor(providerHandle.getCursorProvider(), cursor);
-    statistics.incrementOpenCursors();
+    //registry.get(providerHandle.getOwnerContext().getId()).addCursor(providerHandle.getCursorProvider(), cursor);
+    //statistics.incrementOpenCursors();
   }
 
 
@@ -95,13 +96,14 @@ public class FunkyCursorManager extends CursorManager{
    * @param cursor the closed cursor
    * @param handle the handle for the provider that generated it
    */
+  @Override
   public void onClose(Cursor cursor, CursorContext handle) {
-    final String eventId = handle.getOwnerContext().getId();
-    EventStreamingState state = registry.getIfPresent(eventId);
-
-    if (state != null && state.removeCursor(handle.getCursorProvider(), cursor)) {
-      registry.invalidate(eventId);
-    }
+    //final String eventId = handle.getOwnerContext().getId();
+    //EventStreamingState state = registry.getIfPresent(eventId);
+    //
+    //if (state != null && state.removeCursor(handle.getCursorProvider(), cursor)) {
+    //  registry.invalidate(eventId);
+    //}
   }
 
   private void terminated(BaseEventContext rootContext) {
@@ -124,71 +126,76 @@ public class FunkyCursorManager extends CursorManager{
   private class EventStreamingState {
 
     private final AtomicBoolean disposed = new AtomicBoolean(false);
-    private final List<WeakReference<CursorProvider>> providers = new LinkedList<>();
-    private final AtomicInteger cursorCount = new AtomicInteger(0);
+    private final Map<Integer, WeakReference<ManagedCursorProvider>> providers = new ConcurrentHashMap<>();
+    //private final AtomicInteger cursorCount = new AtomicInteger(0);
 
-    private final LoadingCache<CursorProvider<CursorStream>, Set<Cursor>> cursors = Caffeine.newBuilder()
-        .removalListener((CursorProvider<CursorStream> key, Set<Cursor> value, RemovalCause cause) -> {
-          try {
-            closeProvider(key);
-            releaseAll(value);
-          } finally {
-            key.releaseResources();
-          }
-        })
-        .build(key -> {
-          statistics.incrementOpenProviders();
-          return newSetFromMap(new ConcurrentHashMap<>());
-        });
+    //private final LoadingCache<CursorProvider<CursorStream>, Set<Cursor>> cursors = Caffeine.newBuilder()
+    //    .removalListener((CursorProvider<CursorStream> key, Set<Cursor> value, RemovalCause cause) -> {
+    //      try {
+    //        closeProvider(key);
+    //        releaseAll(value);
+    //      } finally {
+    //        key.releaseResources();
+    //      }
+    //    })
+    //    .build(key -> {
+    //      statistics.incrementOpenProviders();
+    //      return newSetFromMap(new ConcurrentHashMap<>());
+    //    });
 
-    private synchronized void addProvider(CursorProvider provider) {
-      //cursors.get(adapter);
-      synchronized (providers) { //TODO: ReadWrite lock? Vector?
-        providers.add(new WeakReference<>(provider));
-      }
+    private void addProvider(ManagedCursorProvider provider) {
+      providers.put(identityHashCode(provider), new WeakReference<>(provider));
     }
 
+    //private void addCursor(CursorProvider provider, Cursor cursor) {
+    //  cursors.get(provider).add(cursor);
+    //  cursorCount.incrementAndGet();
+    //}
 
-    private void addCursor(CursorProvider provider, Cursor cursor) {
-      cursors.get(provider).add(cursor);
-      cursorCount.incrementAndGet();
-    }
-
-    private boolean removeCursor(CursorProvider provider, Cursor cursor) {
-      Set<Cursor> openCursors = cursors.get(provider);
-      if (openCursors.remove(cursor)) {
-        statistics.decrementOpenCursors();
-        if (cursorCount.decrementAndGet() <= 0 && provider.isClosed()) {
-          dispose();
-          return true;
-        }
-      }
-
-      return false;
-    }
+    //private boolean removeCursor(CursorProvider provider, Cursor cursor) {
+    //  Set<Cursor> openCursors = cursors.get(provider);
+    //  if (openCursors.remove(cursor)) {
+    //    statistics.decrementOpenCursors();
+    //    if (cursorCount.decrementAndGet() <= 0 && provider.isClosed()) {
+    //      dispose();
+    //      return true;
+    //    }
+    //  }
+    //
+    //  return false;
+    //}
 
     private void dispose() {
       if (disposed.compareAndSet(false, true)) {
-        cursors.invalidateAll();
+        providers.values().forEach(weakReference -> {
+          ManagedCursorProvider provider = weakReference.get();
+          if (provider != null) {
+            weakReference.clear();
+            provider.close();
+            provider.releaseResources();
+          }
+        });
+
+        providers.clear();
       }
     }
-
-    private void releaseAll(Collection<Cursor> cursors) {
-      cursors.forEach(cursor -> {
-        try {
-          cursor.release();
-          statistics.decrementOpenCursors();
-        } catch (Exception e) {
-          LOGGER.warn("Exception was found trying to close cursor. Execution will continue", e);
-        }
-      });
-    }
-
-    private void closeProvider(CursorProvider provider) {
-      if (!provider.isClosed()) {
-        provider.close();
-        statistics.decrementOpenProviders();
-      }
-    }
+    //
+    //private void releaseAll(Collection<Cursor> cursors) {
+    //  cursors.forEach(cursor -> {
+    //    try {
+    //      cursor.release();
+    //      statistics.decrementOpenCursors();
+    //    } catch (Exception e) {
+    //      LOGGER.warn("Exception was found trying to close cursor. Execution will continue", e);
+    //    }
+    //  });
+    //}
+    //
+    //private void closeProvider(CursorProvider provider) {
+    //  if (!provider.isClosed()) {
+    //    provider.close();
+    //    statistics.decrementOpenProviders();
+    //  }
+    //}
   }
 }

@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.util.Collections.newSetFromMap;
+import static java.lang.System.identityHashCode;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 
 import java.lang.ref.WeakReference;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for a {@link CursorProvider} decorator which makes sure that {@link Cursor cursors}
@@ -27,17 +28,22 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ManagedCursorProvider<T extends Cursor> implements CursorProvider<T> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ManagedCursorProvider.class);
+  private static final Logger LOGGER = getLogger(ManagedCursorProvider.class);
 
   private final CursorProvider<T> delegate;
   private final CursorManager cursorManager;
-  private final CursorContext cursorContext;
-  private final Set<WeakReference<Cursor>> cursors = newSetFromMap(new ConcurrentHashMap<>());
+  private final CursorContext cursorContext; //TODO: Seems no longer necessary
+  private final Map<Integer, WeakReference<Cursor>> cursors = new ConcurrentHashMap<>();
+  private final MutableStreamingStatistics statistics;
 
-  protected ManagedCursorProvider(CursorContext cursorContext, CursorManager cursorManager) {
+  private AtomicBoolean released = new AtomicBoolean(false);
+
+  protected ManagedCursorProvider(CursorContext cursorContext, CursorManager cursorManager,
+                                  MutableStreamingStatistics statistics) {
     this.delegate = (CursorProvider<T>) cursorContext.getCursorProvider();
     this.cursorContext = cursorContext;
     this.cursorManager = cursorManager;
+    this.statistics = statistics;
   }
 
   /**
@@ -52,34 +58,22 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
     T cursor = delegate.openCursor();
     cursorManager.onOpen(cursor, cursorContext);
     T managedCursor = managedCursor(cursor, cursorContext);
-    synchronized (cursors) {
-      cursors.add(new WeakReference<>(managedCursor));
-    }
+    cursors.put(identityHashCode(managedCursor), new WeakReference<>(managedCursor));
 
+    statistics.incrementOpenCursors();
     return managedCursor;
   }
 
-  public void onClose(Cursor cursor) {
-    synchronized (cursors) {
-      if (cursors.remove(cursor)) {
-        if (cursors.isEmpty() && cursor.getProvider().isClosed()) { /// todo mal!!! esto tiene que ser un map <hash, WeakReference>
-          cursor.getProvider().close();
-          cursors.forEach(weakReference -> {
-            Cursor referent = weakReference.get();
-            if (referent == null) {
-              return;
-            }
-            try {
-              referent.release();
-            } catch (Exception e) {
-              LOGGER.warn("Exception was found trying to close cursor. Execution will continue", e);
-            }
-          });
+  public final void onClose(Cursor cursor) {
+    if (cursors.remove(identityHashCode(cursor)) != null) {
+      try {
+        cursor.release();
+      } finally {
+        statistics.decrementOpenCursors();
+        if (isClosed() && cursors.isEmpty()) {
+          releaseResources();
         }
       }
-    }
-    if () {
-
     }
   }
 
@@ -95,8 +89,27 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   protected abstract T managedCursor(T cursor, CursorContext handle);
 
   @Override
-  public void releaseResources() {
-    delegate.releaseResources();
+  public final void releaseResources() {
+    if (!released.compareAndSet(false, true)) {
+      return;
+    }
+
+    try {
+      cursors.forEach((hash, weakReference) -> {
+        try {
+          Cursor cursor = weakReference.get();
+          if (cursor != null) {
+            weakReference.clear();
+            cursor.release();
+            statistics.decrementOpenCursors();
+          }
+        } catch (Exception e) {
+          LOGGER.warn("Exception was found trying to close cursor. Execution will continue", e);
+        }
+      });
+    } finally {
+      delegate.releaseResources();
+    }
   }
 
   @Override
@@ -109,6 +122,7 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
     return delegate.isClosed();
   }
 
+  //TODO: Seems no longer necessary
   protected CursorManager getCursorManager() {
     return cursorManager;
   }

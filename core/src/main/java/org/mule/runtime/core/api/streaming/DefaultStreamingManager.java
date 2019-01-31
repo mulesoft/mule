@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.FunkyCursorManager;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
-import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
+import org.mule.runtime.core.internal.streaming.AtomicStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
@@ -48,7 +48,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private ByteStreamingManager byteStreamingManager;
   private ObjectStreamingManager objectStreamingManager;
   private CursorManager cursorManager;
-  private MutableStreamingStatistics statistics;
+  private AtomicStreamingStatistics statistics;
   private boolean initialised = false;
 
   private Scheduler allocationScheduler;
@@ -65,7 +65,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Override
   public void initialise() throws InitialisationException {
     if (!initialised) {
-      statistics = new MutableStreamingStatistics();
+      statistics = new AtomicStreamingStatistics();
       allocationScheduler =
           schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-allocate"));
       cursorManager = new FunkyCursorManager(statistics);
