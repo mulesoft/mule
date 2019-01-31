@@ -39,6 +39,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -68,6 +69,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -78,7 +80,9 @@ import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrateg
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
@@ -103,7 +107,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -112,8 +119,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   protected MuleContext muleContext;
 
-  private AtomicInteger nonBlockingProcessorsExecuted = new AtomicInteger(0);
-  private ProcessingStrategyFactory processingStrategyFactory;
+  private final AtomicInteger nonBlockingProcessorsExecuted = new AtomicInteger(0);
+  private final ProcessingStrategyFactory processingStrategyFactory;
   private final RuntimeException illegalStateException = new IllegalStateException();
 
   @Rule
@@ -123,6 +130,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
         {new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
+        {new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), BLOCKING},
+        {new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
         {new ReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorStreamWorkQueueProcessingStrategyFactory(), BLOCKING},
         {new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
@@ -130,6 +139,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         {new BlockingProcessingStrategyFactory(), BLOCKING},
         {new DirectProcessingStrategyFactory(), BLOCKING},
         {new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), NON_BLOCKING},
+        {new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
@@ -842,6 +853,67 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     }
   }
 
+  @Test
+  public void subscriptionContextPropagation() throws Exception {
+    final ProcessingStrategy processingStrategy = processingStrategyFactory.create(muleContext, "");
+    initialiseIfNeeded(processingStrategy);
+    startIfNeeded(processingStrategy);
+
+
+    try {
+      final MessageProcessorChain innerChain = newChain(Optional.of(processingStrategy), p -> p);
+      final MessageProcessorChain outerChain = newChain(Optional.of(processingStrategy), new Processor() {
+
+        @Override
+        public CoreEvent process(CoreEvent event) throws MuleException {
+          return processToApply(event, this);
+        }
+
+        @Override
+        public Publisher<CoreEvent> apply(Publisher<CoreEvent> p) {
+          return Flux.from(p)
+              .subscriberContext(ctx -> {
+                ctx.get("key");
+                return ctx;
+              })
+              .transform(innerChain)
+              .subscriberContext(ctx -> {
+                ctx.get("key");
+                return ctx;
+              });
+        };
+      });
+
+      if (innerChain instanceof MuleContextAware) {
+        ((MuleContextAware) innerChain).setMuleContext(muleContext);
+      }
+      if (outerChain instanceof MuleContextAware) {
+        ((MuleContextAware) outerChain).setMuleContext(muleContext);
+      }
+
+      Processor caller = new Processor() {
+
+        @Override
+        public CoreEvent process(CoreEvent event) throws MuleException {
+          return processToApply(event, this);
+        }
+
+        @Override
+        public org.reactivestreams.Publisher<CoreEvent> apply(org.reactivestreams.Publisher<CoreEvent> p) {
+          return Flux.from(p)
+              .transform(outerChain)
+              .subscriberContext(ctx -> ctx.put("key", "value"));
+        };
+      };
+
+
+      process(caller, testEvent());
+    } finally {
+      stopIfNeeded(processingStrategy);
+      disposeIfNeeded(processingStrategy, getLogger(DefaultMessageProcessorChainTestCase.class));
+    }
+  }
+
   private void setupMessageProcessorNotificationListener(List<MessageProcessorNotification> notificationList) {
     muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class,
                                                             MessageProcessorNotification.class);
@@ -1000,7 +1072,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     boolean started;
     boolean stopped;
     boolean disposed;
-    private boolean stopProcessing;
+    private final boolean stopProcessing;
     boolean invoked;
 
     public AppendingInterceptingMP(String appendString) {
@@ -1120,7 +1192,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   public static class ExceptionThrowingMessageProcessor extends AbstractComponent implements Processor, InternalProcessor {
 
-    private Exception exception;
+    private final Exception exception;
 
     public ExceptionThrowingMessageProcessor(Exception exception) {
       this.exception = exception;

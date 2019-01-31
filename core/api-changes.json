@@ -14,6 +14,24 @@
           "parameterIndex": "0",
           "elementKind": "parameter",
           "justification": "This is not exposed"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::justPublishOn(org.mule.runtime.core.api.event.CoreEvent, java.util.concurrent.ExecutorService)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "justPublishOn",
+          "elementKind": "method",
+          "justification": "Utility added, used by internal components"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::map(org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, java.util.function.Function<org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.event.CoreEvent>)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "map",
+          "elementKind": "method",
+          "justification": "Utility added, used by internal components"
         }
       ]
     }
