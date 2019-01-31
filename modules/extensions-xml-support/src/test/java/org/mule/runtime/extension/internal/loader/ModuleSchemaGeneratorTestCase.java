@@ -102,7 +102,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
   }
 
   @Before
-  public void setUp() throws IOException {
+  public void setUp() {
     extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
   }
 

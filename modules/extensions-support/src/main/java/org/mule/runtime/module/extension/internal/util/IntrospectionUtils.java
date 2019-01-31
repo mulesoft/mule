@@ -587,45 +587,6 @@ public final class IntrospectionUtils {
     return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField());
   }
 
-  public static List<? extends TypeMirror> getInterfaceGenerics(TypeMirror type, TypeElement superTypeElement,
-                                                                ProcessingEnvironment processingEnvironment) {
-    TypeElement objectType = processingEnvironment.getElementUtils().getTypeElement(Object.class.getName());
-    TypeMirror superClassTypeMirror = processingEnvironment.getTypeUtils().erasure(superTypeElement.asType());
-
-    if (!processingEnvironment.getTypeUtils().isAssignable(type, superClassTypeMirror)) {
-      throw new IllegalArgumentException(
-                                         format("Class '%s' does not extend the '%s' class", type.toString(),
-                                                superTypeElement.getSimpleName()));
-    }
-
-    if (processingEnvironment.getTypeUtils().isSameType(superClassTypeMirror,
-                                                        processingEnvironment.getTypeUtils().erasure(type))) {
-      return ((DeclaredType) type).getTypeArguments();
-    }
-
-    DeclaredType searchClass = (DeclaredType) type;
-    while (!processingEnvironment.getTypeUtils().isAssignable(objectType.asType(), searchClass)) {
-      for (TypeMirror typeMirror : processingEnvironment.getTypeUtils().directSupertypes(searchClass)) {
-        if (processingEnvironment.getTypeUtils().isSameType(superClassTypeMirror,
-                                                            processingEnvironment.getTypeUtils().erasure(typeMirror))) {
-          if (typeMirror instanceof DeclaredType) {
-            return ((DeclaredType) typeMirror).getTypeArguments();
-          } else {
-            return emptyList();
-          }
-        } else {
-          if (typeMirror instanceof DeclaredType
-              && processingEnvironment.getTypeUtils().isAssignable(typeMirror, superClassTypeMirror)) {
-            searchClass = (DeclaredType) typeMirror;
-          } else if (processingEnvironment.getTypeUtils().isAssignable(objectType.asType(), typeMirror)) {
-            searchClass = (DeclaredType) typeMirror;
-          }
-        }
-      }
-    }
-    return emptyList();
-  }
-
   public static List<java.lang.reflect.Type> getInterfaceGenerics(final java.lang.reflect.Type type,
                                                                   final Class<?> implementedInterface) {
 

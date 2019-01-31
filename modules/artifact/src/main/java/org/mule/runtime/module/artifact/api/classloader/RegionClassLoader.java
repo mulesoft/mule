@@ -18,14 +18,6 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.util.CompoundEnumeration;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -40,6 +32,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.CompoundEnumeration;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import org.slf4j.Logger;
 
@@ -339,19 +340,30 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   @Override
   public final Enumeration<URL> findResources(final String name) throws IOException {
     String normalizedName = normalize(name, true);
-    final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
     List<Enumeration<URL>> enumerations = new ArrayList<>(registeredClassLoaders.size());
+    if (normalizedName.endsWith("/")) {
+      List<Map.Entry<String, List<ArtifactClassLoader>>> entries = resourceMapping.entrySet()
+          .stream()
+          .filter(entry -> entry.getKey().startsWith(name))
+          .collect(toList());
+      for (Map.Entry<String, List<ArtifactClassLoader>> entry : entries) {
+        List<ArtifactClassLoader> artifactClassLoaders = entry.getValue();
+        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
+          enumerations.add(artifactClassLoader.findResources(name));
+        }
+      }
+    } else {
+      final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
+      if (artifactClassLoaders != null) {
+        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
 
-    if (artifactClassLoaders != null) {
-      for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
-
-        final Enumeration<URL> partialResources = artifactClassLoader.findResources(normalizedName);
-        if (partialResources.hasMoreElements()) {
-          enumerations.add(partialResources);
+          final Enumeration<URL> partialResources = artifactClassLoader.findResources(normalizedName);
+          if (partialResources.hasMoreElements()) {
+            enumerations.add(partialResources);
+          }
         }
       }
     }
-
     return new CompoundEnumeration<>(enumerations.toArray(new Enumeration[0]));
   }
 

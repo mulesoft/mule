@@ -160,6 +160,13 @@ public interface CoreEvent extends Serializable, Event {
     Builder removeVariable(String key);
 
     /**
+     * Removes all variables.
+     *
+     * @return the builder instance
+     */
+    Builder clearVariables();
+
+    /**
      * Sets the group correlation information to the produced event.
      *
      * @param groupCorrelation the object containing the group correlation information to set on the produced event

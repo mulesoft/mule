@@ -14,9 +14,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -27,11 +30,13 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Optional;
 
@@ -43,7 +48,6 @@ import java.util.Optional;
 class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider>
     implements ObjectFactory<ConfigurationProvider> {
 
-  private final String name;
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
   private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
@@ -52,13 +56,12 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private Optional<ConnectionProviderValueResolver> connectionProviderResolver = empty();
   private ConfigurationProvider instance;
   private boolean requiresConnection = false;
+  private LazyValue<String> configName = new LazyValue<>(this::getName);
 
-  ConfigurationProviderObjectFactory(String name,
-                                     ExtensionModel extensionModel,
+  ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
                                      ConfigurationModel configurationModel,
                                      MuleContext muleContext) {
     super(muleContext);
-    this.name = name;
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
   }
@@ -86,7 +89,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       try {
         if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
           configurationProvider =
-              configurationProviderFactory.createDynamicConfigurationProvider(name, extensionModel,
+              configurationProviderFactory.createDynamicConfigurationProvider(configName.get(), extensionModel,
                                                                               configurationModel,
                                                                               resolverSet,
                                                                               connectionProviderResolver,
@@ -96,7 +99,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                                               muleContext);
         } else {
           configurationProvider = configurationProviderFactory
-              .createStaticConfigurationProvider(name,
+              .createStaticConfigurationProvider(configName.get(),
                                                  extensionModel,
                                                  configurationModel,
                                                  resolverSet,
@@ -124,10 +127,26 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     return connectionProviderResolver.orElseGet(() -> {
       if (!requiresConnection) {
         return new StaticConnectionProviderResolver<>(null, null);
+      } else {
+        return new ImplicitConnectionProviderValueResolver(getName(), extensionModel, configurationModel, reflectionCache,
+                                                           expressionManager, muleContext);
       }
-      return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, reflectionCache,
-                                                         expressionManager, muleContext);
     });
+  }
+
+  private String getName() {
+    return configurationModel.getAllParameterModels().stream()
+        .filter(ParameterModel::isComponentId)
+        .findAny()
+        .map(p -> ((ValueResolver) parameters.get(p.getName())))
+        .map(vr -> {
+          try {
+            return ((String) vr.resolve(null));
+          } catch (MuleException e) {
+            throw new IllegalStateException("Error obtaining configuration name", e);
+          }
+        })
+        .orElseThrow(() -> new RequiredParameterNotSetException("cannot create a configuration without a name"));
   }
 
   public void setExpirationPolicy(ExpirationPolicy expirationPolicy) {

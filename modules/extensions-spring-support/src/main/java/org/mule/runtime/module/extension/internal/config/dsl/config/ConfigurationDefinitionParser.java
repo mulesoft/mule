@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.config.dsl.config;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -52,7 +51,6 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
     Builder finalBuilder =
         definitionBuilder.withIdentifier(configDsl.getElementName()).withTypeDefinition(fromType(ConfigurationProvider.class))
             .withObjectFactoryType(ConfigurationProviderObjectFactory.class)
-            .withConstructorParameterDefinition(fromSimpleParameter("name").build())
             .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
             .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())

@@ -136,7 +136,7 @@ public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void load() throws Exception {
+  public void load() {
     ExtensionModel result = jsonSerializer.deserialize(expectedJson);
     assertThat(result, is(extensionModel));
   }

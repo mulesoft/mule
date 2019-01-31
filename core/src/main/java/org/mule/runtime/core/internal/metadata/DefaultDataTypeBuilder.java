@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.metadata;
 import static com.google.common.cache.CacheBuilder.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getCollectionType;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getMapKeyType;
@@ -476,8 +475,14 @@ public class DefaultDataTypeBuilder
     if (value == null) {
       return type(Object.class);
     } else {
-      DataTypeBuilder builder = (DataTypeBuilder) type(value.getClass());
-      return getObjectMimeType(value).map(mediaType -> builder.mediaType(mediaType)).orElse(builder);
+      DataTypeParamsBuilder builder = type(value.getClass());
+
+      final String mimeType = getObjectMimeType(value);
+      if (mimeType != null) {
+        builder = builder.mediaType(mimeType);
+      }
+
+      return builder;
     }
   }
 
@@ -488,13 +493,13 @@ public class DefaultDataTypeBuilder
         .parametersType(expressionFunction.parameters());
   }
 
-  private Optional<String> getObjectMimeType(Object value) {
+  private String getObjectMimeType(Object value) {
     if (value instanceof DataHandler) {
-      return of(((DataHandler) value).getContentType());
+      return ((DataHandler) value).getContentType();
     } else if (value instanceof DataSource) {
-      return of(((DataSource) value).getContentType());
+      return ((DataSource) value).getContentType();
     } else {
-      return Optional.empty();
+      return null;
     }
   }
 

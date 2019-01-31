@@ -194,6 +194,43 @@
           "classSimpleName": "RequestReplyReplierMessageProcessor",
           "elementKind": "interface",
           "justification": "deprecated and not used anymore"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.policy.DefaultPolicyInstance",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "DefaultPolicyInstance",
+          "elementKind": "class",
+          "justification": "Use 'org.mule.runtime.core.api.policy.PolicyInstance' instead."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.policy.PolicyStateHandler",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "PolicyStateHandler",
+          "elementKind": "interface",
+          "justification": "Don't expose the internals of the policies infrastructure."
+        },
+        {
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_POLICY_MANAGER_STATE_HANDLER",
+          "elementKind": "field",
+          "justification": "Don't expose the internals of the policies infrastructure."
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method void org.mule.runtime.core.api.policy.PolicyChain::onChainError(java.util.function.Consumer<java.lang.Exception>)",
+          "new": "method org.mule.runtime.core.api.policy.PolicyChain org.mule.runtime.core.api.policy.PolicyChain::onChainError(java.util.function.Consumer<java.lang.Exception>)",
+          "oldType": "void",
+          "newType": "org.mule.runtime.core.api.policy.PolicyChain",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "PolicyChain",
+          "methodName": "onChainError",
+          "elementKind": "method",
+          "justification": "Allow for chaining invocations."
         }
       ]
     }

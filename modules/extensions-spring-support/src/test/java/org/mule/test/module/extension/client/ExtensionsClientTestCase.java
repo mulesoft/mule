@@ -130,7 +130,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     OperationParameters params = builder().configName(HEISENBERG_CONFIG)
         .addParameter("greeting", "jeje")
         .addParameter("age", 23)
-        .addParameter("name", "Juani")
+        .addParameter("myName", "Juani")
         .addParameter("knownAddresses", emptyList())
         .build();
     Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);

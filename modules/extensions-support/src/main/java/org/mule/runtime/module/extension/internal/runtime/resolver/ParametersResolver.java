@@ -137,15 +137,13 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    *
    * @return a {@link ResolverSet}
    */
-  public ResolverSet getParametersAsResolverSet(MuleContext muleContext, ParameterizedModel model,
-                                                List<ParameterGroupModel> groups)
+  public ResolverSet getParametersAsResolverSet(MuleContext context, ParameterizedModel model, List<ParameterGroupModel> groups)
       throws ConfigurationException {
-
     List<ParameterGroupModel> inlineGroups = getInlineGroups(groups);
     List<ParameterModel> allParameters = groups.stream().flatMap(g -> g.getParameterModels().stream()).collect(toList());
-    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, allParameters), muleContext);
+    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, allParameters), context);
     for (ParameterGroupModel group : inlineGroups) {
-      getInlineGroupResolver(group, resolverSet, muleContext);
+      getInlineGroupResolver(group, resolverSet, context);
     }
     return resolverSet;
   }
@@ -186,7 +184,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
 
       group.getParameterModels().forEach(param -> {
-        ValueResolver<Object> parameterValueResolver = getParameterValueResolver(param, param.getName(), muleContext);
+        ValueResolver<Object> parameterValueResolver = getParameterValueResolver(param);
         if (parameterValueResolver != null) {
           keyResolvers.add(new StaticValueResolver<>(param.getName()));
           valueResolvers.add(parameterValueResolver);
@@ -197,43 +195,42 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     }
   }
 
-  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels,
-                                                MuleContext muleContext)
+  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameters, MuleContext context)
       throws ConfigurationException {
-    ResolverSet resolverSet = new ResolverSet(muleContext);
-    return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameterModels, muleContext, resolverSet);
+    ResolverSet resolverSet = new ResolverSet(context);
+    return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameters, resolverSet);
   }
 
   public ResolverSet getParametersAsHashedResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels,
                                                       MuleContext muleContext)
       throws ConfigurationException {
     ResolverSet resolverSet = new HashedResolverSet(muleContext);
-    return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameterModels, muleContext, resolverSet);
+    return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameterModels, resolverSet);
   }
 
   public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels,
                                                 MuleContext muleContext)
       throws ConfigurationException {
     ResolverSet resolverSet = new ResolverSet(muleContext);
-    return getResolverSet(Optional.empty(), groups, parameterModels, muleContext, resolverSet);
+    return getResolverSet(Optional.empty(), groups, parameterModels, resolverSet);
   }
 
   private ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
-                                     List<ParameterModel> parameterModels, MuleContext muleContext,
-                                     ResolverSet resolverSet)
+                                     List<ParameterModel> parameterModels, ResolverSet resolverSet)
       throws ConfigurationException {
     Map<String, String> aliasedParameterNames = new HashMap<>();
     parameterModels.forEach(p -> {
-      final String parameterName = getMemberName(p, p.getName());
-      if (!parameterName.equals(p.getName())) {
-        aliasedParameterNames.put(parameterName, p.getName());
-      }
-      ValueResolver<?> resolver = getParameterValueResolver(p, parameterName, muleContext);
-
-      if (resolver != null) {
-        resolverSet.add(parameterName, resolver);
-      } else if (p.isRequired() && !lazyInitEnabled) {
-        throw new RequiredParameterNotSetException(p);
+      if (!p.isComponentId()) {
+        final String parameterName = getMemberName(p, p.getName());
+        if (!parameterName.equals(p.getName())) {
+          aliasedParameterNames.put(parameterName, p.getName());
+        }
+        ValueResolver<?> resolver = getParameterValueResolver(p);
+        if (resolver != null) {
+          resolverSet.add(parameterName, resolver);
+        } else if (p.isRequired() && !lazyInitEnabled) {
+          throw new RequiredParameterNotSetException(p);
+        }
       }
     });
 
@@ -243,23 +240,23 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return resolverSet;
   }
 
-  private ValueResolver<Object> getParameterValueResolver(ParameterModel parameterModel, String parameterName,
-                                                          MuleContext muleContext) {
+  private ValueResolver<Object> getParameterValueResolver(ParameterModel parameter) {
     ValueResolver<?> resolver;
+    String parameterName = parameter.getName();
     if (parameters.containsKey(parameterName)) {
-      resolver = toValueResolver(parameters.get(parameterName), parameterModel.getModelProperties());
+      resolver = toValueResolver(parameters.get(parameterName), parameter.getModelProperties());
     } else {
       // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
-      resolver = getDefaultValueResolver(parameterModel, this.muleContext);
+      resolver = getDefaultValueResolver(parameter, muleContext);
     }
 
-    if (isNullSafe(parameterModel)) {
+    if (isNullSafe(parameter)) {
       ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
-      MetadataType type = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
+      MetadataType type = parameter.getModelProperty(NullSafeModelProperty.class).get().defaultType();
       resolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, expressionManager, this.muleContext, this);
     }
 
-    if (parameterModel.isOverrideFromConfig()) {
+    if (parameter.isOverrideFromConfig()) {
       resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
                                                        parameterName, reflectionCache, this.muleContext);
     }
@@ -365,7 +362,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                                       key)));
   }
 
-  public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
+  public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model,
+                                               List<ParameterGroupModel> groups,
                                                Set<String> resolverKeys)
       throws ConfigurationException {
     if (!lazyInitEnabled) {

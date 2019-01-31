@@ -32,7 +32,6 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -62,6 +61,7 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -96,6 +96,17 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   @Override
   protected boolean isDisposeContextPerClass() {
     return true;
+  }
+
+  @Test
+  public void operationWithInjectedObjectsFromRegistry() throws Exception {
+    Map<String, Object> result = (Map<String, Object>) runFlow("getInjectedObjects").getMessage().getPayload().getValue();
+    assertThat(result.get("object"), Matchers.instanceOf(Ricin.class));
+    assertThat(result.get("serializable"), Matchers.instanceOf(Serializable.class));
+
+    assertThat(result.get("object"), Matchers.is(registry.lookupByName("ricin-weapon").get()));
+    assertThat(result.get("serializable"), Matchers.is(registry.lookupByName("door").get()));
+
   }
 
   @Test

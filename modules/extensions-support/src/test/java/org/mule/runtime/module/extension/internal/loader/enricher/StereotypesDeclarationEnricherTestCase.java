@@ -34,7 +34,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.CustomStereotypeModelProperty;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionDeclarationTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.marvel.MarvelExtension;
@@ -46,7 +46,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase {
+public class StereotypesDeclarationEnricherTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
   public static final String MARVEL_NAMESPACE = MARVEL_EXTENSION.toUpperCase();
   private final ExtensionModel marvelExtension = loadExtension(MarvelExtension.class);
@@ -101,7 +101,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
   @Test
   public void operationParameterWithFlowReferenceParameter() {
     OperationModel operation = configuration.getOperationModel("withFlowReference").get();
-    assertThat(operation.getAllParameterModels(), hasSize(2));
+    assertThat(operation.getAllParameterModels(), hasSize(3));
     ParameterModel param = operation.getAllParameterModels().get(0);
     List<StereotypeModel> stereotypes = param.getAllowedStereotypes();
     assertThat(stereotypes, hasSize(1));
@@ -111,7 +111,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
   @Test
   public void configurationWithConfigReferenceParameter() {
     List<ParameterModel> params = configuration.getAllParameterModels();
-    assertThat(params, hasSize(3));
+    assertThat(params, hasSize(4));
     ParameterModel param = params.get(0);
     List<StereotypeModel> allowedStereotypes = param.getAllowedStereotypes();
     assertThat(allowedStereotypes, hasSize(1));

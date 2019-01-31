@@ -35,7 +35,6 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="required" name="requiredListObjectsDefaults"></xs:attribute>
           <xs:attribute type="mule:substitutableName" use="required" name="requiredListObjectsNoExpressions"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="required" name="requiredListObjectsExpressionRequireds"></xs:attribute>
@@ -48,6 +47,11 @@
           <xs:attribute type="mule:substitutableName" use="optional" name="optionalListNoExpressions"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="optionalListExpressionRequireds"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="optionalListExpressionSupporteds"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

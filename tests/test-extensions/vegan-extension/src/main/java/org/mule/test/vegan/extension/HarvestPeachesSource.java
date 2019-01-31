@@ -26,7 +26,6 @@ public class HarvestPeachesSource extends Source<String, StringAttributes> {
   @Connection
   private ConnectionProvider<Peach> connection;
 
-
   @Override
   public void onStart(SourceCallback<String, StringAttributes> sourceCallback) throws MuleException {
     isConnected = connection.connect() != null;

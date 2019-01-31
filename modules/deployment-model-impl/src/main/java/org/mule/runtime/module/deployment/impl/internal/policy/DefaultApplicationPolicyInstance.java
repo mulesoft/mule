@@ -7,21 +7,14 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,7 +26,6 @@ import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
@@ -48,6 +40,10 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContext
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Default implementation of {@link ApplicationPolicyInstance} that depends on a {@link PolicyTemplate} artifact.
@@ -66,7 +62,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final MuleContextListener muleContextListener;
   private ArtifactContext policyContext;
   private PolicyInstance policyInstance;
-  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
+  private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   /**
    * Creates a new policy instance
@@ -120,13 +116,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
       Registry applicationRegistry = application.getRegistry();
-      /*
-       * OBJECT_POLICY_MANAGER_STATE_HANDLER is not proxied as it doesn't implement any lifecycle interfaces (Startable, Stoppable
-       * or Disposable)
-       */
-      customizationService.overrideDefaultServiceImpl(OBJECT_POLICY_MANAGER_STATE_HANDLER,
-                                                      applicationRegistry.lookupByName(OBJECT_POLICY_MANAGER_STATE_HANDLER)
-                                                          .get());
       customizationService.overrideDefaultServiceImpl(OBJECT_LOCK_PROVIDER,
                                                       createLifecycleFilterProxy(applicationRegistry
                                                           .lookupByName(OBJECT_LOCK_PROVIDER).get()));
@@ -163,7 +152,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   private void initPolicyInstance() throws InitialisationException {
-    policyInstance = policyContext.getRegistry().lookupByType(DefaultPolicyInstance.class).get();
+    policyInstance = policyContext.getRegistry().lookupByType(PolicyInstance.class).get();
   }
 
   @Override
@@ -202,20 +191,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public Optional<Policy> getSourcePolicy() {
-    if (policyInstance.getSourcePolicyChain().isPresent()) {
-      return of(new Policy(policyInstance.getSourcePolicyChain().get(), parametrization.getId()));
-    } else {
-      return empty();
-    }
+    return policyInstance.getSourcePolicyChain()
+        .map(chain -> new Policy(chain, parametrization.getId()));
   }
 
   @Override
   public Optional<Policy> getOperationPolicy() {
-    if (policyInstance.getOperationPolicyChain().isPresent()) {
-      return of(new Policy(policyInstance.getOperationPolicyChain().get(), parametrization.getId()));
-    } else {
-      return empty();
-    }
+    return policyInstance.getOperationPolicyChain()
+        .map(chain -> new Policy(chain, parametrization.getId()));
   }
 
 }
