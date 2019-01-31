@@ -71,7 +71,9 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
     }.walk(extensionModel);
   }
 
+
   private void validateParameterType(ParameterModel parameter, ProblemsReporter problemsReporter) {
+
     parameter.getType().accept(new MetadataTypeVisitor() {
 
       private Set<MetadataType> visitedTypes = new HashSet<>();
@@ -109,20 +111,6 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
               .map(descriptor -> descriptor.getExtensionParameter().getType())
               .ifPresent(type -> {
                 final String typeName = type.getName();
-
-                if (!type.getDeclaringClass().isPresent()) {
-                  return;
-                }
-
-                Class<?> clazz = type.getDeclaringClass().get().equals(TypedValue.class)
-                    ? getFirstGenericClass(type).orElse(Object.class)
-                    : type.getDeclaringClass().get();
-
-                if (isPojoWithoutDefaultConstructor(clazz)) {
-                  problemsReporter
-                      .addError(new Problem(parameter, format("Type '%s' does not have a default constructor", typeName)));
-                }
-
                 type.getFields()
                     .forEach(field -> checkInvalidFieldAnnotations(parameter, typeName, field,
                                                                    ConfigOverride.class, ComponentId.class,
@@ -152,19 +140,6 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
                                                          typeName, field.getName(), annotation.getSimpleName())));
           }
         }
-      }
-
-      private boolean isPojoWithoutDefaultConstructor(Class<?> clazz) {
-        return (!clazz.isInterface() && !isAbstract(clazz.getModifiers())
-            && Stream.of(clazz.getConstructors())
-                .noneMatch(c -> c.getParameterCount() == 0));
-      }
-
-      private Optional<Class<?>> getFirstGenericClass(Type type) {
-        return type.getGenerics().stream().findFirst()
-            .map(TypeGeneric::getConcreteType)
-            .map(concreteType -> concreteType.getDeclaringClass()
-                .orElse(Object.class));
       }
     });
   }

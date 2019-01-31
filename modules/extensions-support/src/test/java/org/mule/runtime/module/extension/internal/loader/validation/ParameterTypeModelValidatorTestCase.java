@@ -139,17 +139,6 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
-  @Test
-  public void pojoRequiresDefaultConstructor() {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException
-        .expectMessage("Type 'InvalidPojoRequiresDefaultConstructor' does not have a default constructor");
-    when(parameter.getType()).thenReturn(TYPE_LOADER.load(InvalidPojoRequiresDefaultConstructor.class));
-    when(extensionParameter.getType()).thenReturn(new TypeWrapper(InvalidPojoRequiresDefaultConstructor.class, TYPE_LOADER));
-    validate(extensionModel, validator);
-
-  }
-
   private static class InvalidPojoWithConfigOverride {
 
     @Parameter
@@ -168,19 +157,5 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
     @Parameter
     @ComponentId
     private String id;
-  }
-
-  private static class InvalidPojoRequiresDefaultConstructor {
-
-    @Parameter
-    private String bar;
-
-    @Parameter
-    private String id;
-
-    public InvalidPojoRequiresDefaultConstructor(String bar, String id) {
-      this.bar = bar;
-      this.id = id;
-    }
   }
 }
