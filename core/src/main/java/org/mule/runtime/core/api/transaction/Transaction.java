@@ -102,17 +102,13 @@ public interface Transaction {
   /**
    * @return the {@link ComponentLocation} corresponding to this transaction
    */
-  default ComponentLocation getComponentLocation() {
-    return null;
-  }
+  ComponentLocation getComponentLocation();
 
   /**
    * Sets the {@link ComponentLocation} corresponding to this transaction
    *
    * @param componentLocation
    */
-  default void setComponentLocation(ComponentLocation componentLocation) {
-
-  }
+  void setComponentLocation(ComponentLocation componentLocation);
 
 }

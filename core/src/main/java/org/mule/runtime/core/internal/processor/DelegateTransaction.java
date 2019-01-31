@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
@@ -216,6 +217,16 @@ public class DelegateTransaction extends AbstractTransaction {
     @Override
     public String getId() {
       return null;
+    }
+
+    @Override
+    public ComponentLocation getComponentLocation() {
+      return null;
+    }
+
+    @Override
+    public void setComponentLocation(ComponentLocation componentLocation) {
+
     }
   }
 }

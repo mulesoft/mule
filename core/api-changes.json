@@ -282,6 +282,24 @@
           "methodName": "onPoliciesChanged",
           "elementKind": "method",
           "justification": "Added for performance, has default implementation"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.api.component.location.ComponentLocation org.mule.runtime.core.api.transaction.Transaction::getComponentLocation()",
+          "package": "org.mule.runtime.core.api.transaction",
+          "classSimpleName": "Transaction",
+          "methodName": "getComponentLocation",
+          "elementKind": "method",
+          "justification": "Transactions need to have ComponentLocation."
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.core.api.transaction.Transaction::setComponentLocation(org.mule.runtime.api.component.location.ComponentLocation)",
+          "package": "org.mule.runtime.core.api.transaction",
+          "classSimpleName": "Transaction",
+          "methodName": "setComponentLocation",
+          "elementKind": "method",
+          "justification": "Transactions need to have ComponentLocation."
         }
       ]
     }
