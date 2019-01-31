@@ -2,6 +2,24 @@
   "4.1.5": {
     "revapi": {
       "ignore": [
+       {
+          "code": "java.method.added",
+          "new": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::justPublishOn(org.mule.runtime.core.api.event.CoreEvent, java.util.concurrent.ExecutorService)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "justPublishOn",
+          "elementKind": "method",
+          "justification": "cherry-pick"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::map(org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, java.util.function.Function<org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.event.CoreEvent>)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "map",
+          "elementKind": "method",
+          "justification":  "cherry-pick"
+        },
         {
           "code": "java.method.added",
           "new": "method org.mule.runtime.core.api.exception.ErrorTypeMatcher org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::createErrorType(org.mule.runtime.api.exception.ErrorTypeRepository, java.lang.String, org.mule.runtime.api.component.ConfigurationProperties)",
