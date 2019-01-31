@@ -99,10 +99,18 @@ public interface Transaction {
    */
   String getId();
 
+  /**
+   * @return the {@link ComponentLocation} corresponding to this transaction
+   */
   default ComponentLocation getComponentLocation() {
     return null;
   }
 
+  /**
+   * Sets the {@link ComponentLocation} corresponding to this transaction
+   *
+   * @param componentLocation
+   */
   default void setComponentLocation(ComponentLocation componentLocation) {
 
   }
