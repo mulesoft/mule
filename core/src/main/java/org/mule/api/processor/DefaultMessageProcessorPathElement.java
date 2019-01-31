@@ -6,8 +6,9 @@
  */
 package org.mule.api.processor;
 
+import static java.util.Collections.synchronizedList;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -24,7 +25,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     {
         this.messageProcessor = messageProcessor;
         this.name = escape(name);
-        this.children = new ArrayList<MessageProcessorPathElement>();
+        this.children = synchronizedList(new ArrayList<MessageProcessorPathElement>());
     }
 
     @Override
