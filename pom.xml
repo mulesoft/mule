@@ -161,7 +161,7 @@
         <bouncycastleVersion>1.60</bouncycastleVersion>
         <c3p0Version>0.9.5.2-MULE-001</c3p0Version>
         <caffeineVersion>2.6.2</caffeineVersion>
-        <cglibVersion>3.2.6</cglibVersion>
+        <cglibVersion>3.2.10</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
