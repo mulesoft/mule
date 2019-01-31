@@ -55,6 +55,7 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -78,6 +79,13 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainMana
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
+import org.apache.commons.io.IOUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Matcher;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -90,12 +98,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Flaky;
 import io.qameta.allure.Issue;
-import org.apache.commons.io.IOUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Matcher;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * Contains test for application deployment on the default domain
@@ -642,6 +646,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Ignore("MULE-16403")
+  @Flaky
   public void redeploysInvalidExplodedAppAfterSuccessfulDeploymentAfterStartup() throws Exception {
     startDeployment();
 
