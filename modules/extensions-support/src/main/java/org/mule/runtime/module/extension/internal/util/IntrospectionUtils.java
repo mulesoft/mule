@@ -934,8 +934,8 @@ public final class IntrospectionUtils {
     return methodStream.filter(method -> isPublic(method.getModifiers()));
   }
 
-  private static Stream<ExecutableElement> getMethodsStream(TypeElement typeElement, boolean superClasses,
-                                                            ProcessingEnvironment processingEnvironment) {
+  public static Stream<ExecutableElement> getMethodsStream(TypeElement typeElement, boolean superClasses,
+                                                           ProcessingEnvironment processingEnvironment) {
     Stream<ExecutableElement> methodStream;
 
     if (superClasses) {

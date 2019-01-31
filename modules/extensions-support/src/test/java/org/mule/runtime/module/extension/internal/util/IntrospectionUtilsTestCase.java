@@ -59,6 +59,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -426,6 +427,40 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void testGetMethodFromType() {
+    Type pojoWithEqualsAndHashCode = typeSupplier.apply(PojoWithEqualsAndHashCode.class);
+    Optional<MethodElement> equals = pojoWithEqualsAndHashCode.getMethod("equals", Object.class);
+    Optional<MethodElement> equalsWithoutParams = pojoWithEqualsAndHashCode.getMethod("equals");
+    Optional<MethodElement> hashCode = pojoWithEqualsAndHashCode.getMethod("hashCode");
+    Optional<MethodElement> otherMethod = pojoWithEqualsAndHashCode.getMethod("otherMethod");
+
+    assertThat(equals.isPresent(), is(true));
+    assertThat(equalsWithoutParams.isPresent(), is(false));
+    assertThat(hashCode.isPresent(), is(true));
+    assertThat(otherMethod.isPresent(), is(false));
+  }
+
+  @Test
+  public void testGetMethodFromTypeWithInheritance() {
+    Type extendsPojoWithEqualsAndHashCode = typeSupplier.apply(ExtendsPojoWithEqualsAndHashCode.class);
+    Optional<MethodElement> equals = extendsPojoWithEqualsAndHashCode.getMethod("equals", Object.class);
+    Optional<MethodElement> hashCode = extendsPojoWithEqualsAndHashCode.getMethod("hashCode");
+    Optional<MethodElement> otherMethod = extendsPojoWithEqualsAndHashCode.getMethod("otherMethod");
+
+    assertThat(equals.isPresent(), is(true));
+    assertThat(hashCode.isPresent(), is(true));
+    assertThat(otherMethod.isPresent(), is(false));
+  }
+
+  @Test
+  public void testGetMethodFromTypeDefinedInObject() {
+    Type type = typeSupplier.apply(SomePojo.class);
+    Optional<MethodElement> equals = type.getMethod("equals", Object.class);
+
+    assertThat(equals.isPresent(), is(false));
+  }
+
+  @Test
   public void getSourceMetadataType() {
     SourceElement source = sourceSupplier.apply(ThirdLevelSource.class);
     MetadataType returnType = source.getReturnMetadataType();
@@ -658,6 +693,29 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     }
   }
 
+  public static class PojoWithEqualsAndHashCode {
+
+    private String name;
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (o == null || getClass() != o.getClass())
+        return false;
+      PojoWithEqualsAndHashCode that = (PojoWithEqualsAndHashCode) o;
+      return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(name);
+    }
+  }
+
+  public static class ExtendsPojoWithEqualsAndHashCode extends PojoWithEqualsAndHashCode {
+
+  }
 
   private class TestPagingProvider implements PagingProvider<Object, Result<Banana, Apple>> {
 
