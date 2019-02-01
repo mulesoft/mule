@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -90,7 +91,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
-    when(mockTransaction.getComponentLocation()).thenReturn(onErrorPropagateHandler.getLocation());
+    when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(onErrorPropagateHandler.getLocation()));
 
     expectedException.expectCause(sameInstance(mockException));
 
@@ -112,7 +113,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.getEvent()).thenReturn(muleEvent);
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getRootContainerName()).thenReturn("");
-    when(mockTransaction.getComponentLocation()).thenReturn(location);
+    when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(location));
 
     expectedException.expectCause(sameInstance(mockException));
 

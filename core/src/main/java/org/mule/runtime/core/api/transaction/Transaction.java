@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.api.transaction;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tx.TransactionException;
 
+@NoImplement
 public interface Transaction {
 
   int STATUS_ACTIVE = 0;
@@ -98,17 +99,5 @@ public interface Transaction {
    * @return TX identification.
    */
   String getId();
-
-  /**
-   * @return the {@link ComponentLocation} corresponding to this transaction
-   */
-  ComponentLocation getComponentLocation();
-
-  /**
-   * Sets the {@link ComponentLocation} corresponding to this transaction
-   *
-   * @param componentLocation
-   */
-  void setComponentLocation(ComponentLocation componentLocation);
 
 }

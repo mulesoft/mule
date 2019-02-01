@@ -19,6 +19,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
@@ -57,7 +58,7 @@ public class TransactionSourceBinder {
     }
 
     Transaction tx = transactionConfig.getFactory().beginTransaction(muleContext);
-    tx.setComponentLocation(sourceLocation);
+    ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
     tx.setTimeout(transactionConfig.getTimeout());
 
     ConfigurationInstance configuration = ofNullable(configurationInstance)

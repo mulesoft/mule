@@ -20,7 +20,6 @@ import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -31,11 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 /**
  * This base class provides low level features for transactions.
  */
-public abstract class AbstractTransaction implements Transaction {
+public abstract class AbstractTransaction implements TransactionAdapter {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -204,7 +204,7 @@ public abstract class AbstractTransaction implements Transaction {
   }
 
   @Override
-  public ComponentLocation getComponentLocation() {
-    return componentLocation;
+  public Optional<ComponentLocation> getComponentLocation() {
+    return Optional.ofNullable(componentLocation);
   }
 }

@@ -40,11 +40,13 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
@@ -64,31 +66,31 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   public CoreEvent process(final CoreEvent event) throws MuleException {
     if (nestedChain == null) {
       return event;
-    } else {
-      ExecutionTemplate<CoreEvent> executionTemplate =
-          createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
-      ExecutionCallback<CoreEvent> processingCallback = () -> {
-        try {
-          Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-          ComponentLocation lastLocation = transaction.getComponentLocation();
-          transaction.setComponentLocation(getLocation());
-          CoreEvent e = processToApply(event, p -> from(p)
-              .flatMap(request -> processWithChildContext(request, nestedChain, ofNullable(getLocation()),
-                                                          messagingExceptionHandler)));
-          transaction.setComponentLocation(lastLocation);
-          return e;
-        } catch (Exception e) {
-          throw e;
-        }
-      };
-
+    }
+    ExecutionTemplate<CoreEvent> executionTemplate =
+        createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+    ExecutionCallback<CoreEvent> processingCallback = () -> {
       try {
-        return executionTemplate.execute(processingCallback);
-      } catch (MuleException e) {
-        throw e;
+        TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+        ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
+        transaction.setComponentLocation(getLocation());
+        CoreEvent e = processToApply(event,
+                                     p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
+                                                                                             ofNullable(getLocation()),
+                                                                                             messagingExceptionHandler)));
+        transaction.setComponentLocation(lastLocation);
+        return e;
       } catch (Exception e) {
-        throw new DefaultMuleException(errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig), e);
+        throw e;
       }
+    };
+
+    try {
+      return executionTemplate.execute(processingCallback);
+    } catch (MuleException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new DefaultMuleException(errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig), e);
     }
   }
 

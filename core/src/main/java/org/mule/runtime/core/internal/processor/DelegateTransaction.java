@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -13,6 +15,9 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+
+import java.util.Optional;
 
 /**
  * Transaction placeholder to replace with proper transaction once transactional resource is discovered by mule
@@ -85,7 +90,7 @@ public class DelegateTransaction extends AbstractTransaction {
     this.delegate = transactionFactory.beginTransaction(muleContext);
     delegate.setTimeout(timeout);
     delegate.bindResource(key, resource);
-    delegate.setComponentLocation(componentLocation);
+    ((TransactionAdapter) delegate).setComponentLocation(componentLocation);
   }
 
   @Override
@@ -132,7 +137,7 @@ public class DelegateTransaction extends AbstractTransaction {
     delegate.setTimeout(timeout);
   }
 
-  private class NullTransaction implements Transaction {
+  private class NullTransaction implements TransactionAdapter {
 
     private int timeout = muleContext.getConfiguration().getDefaultTransactionTimeout();
 
@@ -220,8 +225,8 @@ public class DelegateTransaction extends AbstractTransaction {
     }
 
     @Override
-    public ComponentLocation getComponentLocation() {
-      return null;
+    public Optional<ComponentLocation> getComponentLocation() {
+      return empty();
     }
 
     @Override
