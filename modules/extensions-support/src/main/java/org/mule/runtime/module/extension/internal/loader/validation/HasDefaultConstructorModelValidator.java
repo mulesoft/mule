@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -23,6 +24,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.util.Optional;
+
+import org.apache.commons.collections.CollectionUtils;
 
 public class HasDefaultConstructorModelValidator implements ExtensionModelValidator {
 
@@ -47,7 +50,10 @@ public class HasDefaultConstructorModelValidator implements ExtensionModelValida
           parameterModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class);
       if (modelProperty.isPresent()) {
         Type type = modelProperty.get().getExtensionParameter().getType();
-        if (type.asMetadataType() instanceof ObjectType) {
+        if (TypedValue.class.getName().equals(type.getClassInformation().getClassname())) {
+          type = getFirstGenericType(type).orElse(null);
+        }
+        if (type != null && type.asMetadataType() instanceof ObjectType) {
           ClassInformationAnnotation classInformationAnnotation = type.getClassInformation();
           if (!classInformationAnnotation.isAbstract() && !classInformationAnnotation.isInterface()
               && !classInformationAnnotation.hasDefaultConstructor()) {
@@ -57,5 +63,10 @@ public class HasDefaultConstructorModelValidator implements ExtensionModelValida
         }
       }
     });
+  }
+
+  private Optional<Type> getFirstGenericType(Type typeWithGenerics) {
+    return !CollectionUtils.isEmpty(typeWithGenerics.getGenerics())
+        ? Optional.ofNullable(typeWithGenerics.getGenerics().get(0).getConcreteType()) : Optional.empty();
   }
 }
