@@ -8,18 +8,18 @@ package org.mule.runtime.core.internal.streaming;
 
 
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import org.mule.runtime.api.scheduler.Scheduler;
 
-import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
-public class CursorProviderGarbageCollector {
+class StreamingGarbageCollector {
 
-  private static final long POLL_INTERVAL = MINUTES.toMillis(1);
+  private static final long POLL_INTERVAL = SECONDS.toMillis(5);
 
   private final Scheduler scheduler;
   private final ReferenceQueue<ManagedCursorProvider> referenceQueue = new ReferenceQueue<>();
@@ -27,23 +27,27 @@ public class CursorProviderGarbageCollector {
   private volatile boolean stopped = false;
   private Future taskHandle;
 
-  public CursorProviderGarbageCollector(Scheduler scheduler) {
+  public StreamingGarbageCollector(Scheduler scheduler) {
     this.scheduler = scheduler;
   }
 
   public void start() {
     try {
-      taskHandle = scheduler.submit();
+      taskHandle = scheduler.submit(this::collectPhantoms);
     } catch (RejectedExecutionException e) {
 
     }
-
     stopped = false;
-
   }
 
-  public PhantomReference<ManagedCursorProvider> track(ManagedCursorProvider cursorProvider) {
-    return new PhantomReference<>(cursorProvider, referenceQueue);
+  public void stop() {
+    stopped = true;
+    taskHandle.cancel(true);
+    taskHandle = null;
+  }
+
+  public WeakReference<ManagedCursorProvider> track(ManagedCursorProvider cursorProvider) {
+    return new WeakReference<>(cursorProvider, referenceQueue);
   }
 
   private void collectPhantoms() {
@@ -51,7 +55,14 @@ public class CursorProviderGarbageCollector {
       try {
         Reference ref = referenceQueue.remove(POLL_INTERVAL);
         if (ref != null) {
-          ref.
+          try {
+            ManagedCursorProvider provider = (ManagedCursorProvider) ref.get();
+            if (provider != null) {
+              provider.releaseResources();
+            }
+          } finally {
+            ref.clear();
+          }
         }
       } catch (InterruptedException e) {
         // log

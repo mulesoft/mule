@@ -8,7 +8,10 @@ package org.mule.runtime.core.internal.streaming;
 
 import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
@@ -36,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class CursorManager {
+public class CursorManager implements Startable, Stoppable {
 
   private static Logger LOGGER = LoggerFactory.getLogger(CursorManager.class);
 
@@ -54,6 +57,16 @@ public class CursorManager {
    */
   public CursorManager(MutableStreamingStatistics statistics) {
     this.statistics = statistics;
+  }
+
+  @Override
+  public void start() throws MuleException {
+
+  }
+
+  @Override
+  public void stop() throws MuleException {
+
   }
 
   /**

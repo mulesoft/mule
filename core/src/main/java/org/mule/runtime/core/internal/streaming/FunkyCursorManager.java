@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static java.lang.System.identityHashCode;
-import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.Cursor;
@@ -22,10 +22,8 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
-import java.lang.ref.PhantomReference;
 import java.lang.ref.WeakReference;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -36,13 +34,16 @@ public class FunkyCursorManager extends CursorManager {
 
   private static Logger LOGGER = LoggerFactory.getLogger(CursorManager.class);
 
-  private final LoadingCache<String, EventStreamingState> registry =
+  private final LoadingCache<StreamingSessionKey, EventStreamingState> registry =
       Caffeine.newBuilder()
           .removalListener((key, value, cause) -> ((EventStreamingState) value).dispose())
-          .build(key -> new EventStreamingState());
+          .build(key -> {
+            registerEventContext(key.getEventContext());
+            return new EventStreamingState();
+          });
 
   private final MutableStreamingStatistics statistics;
-  private final CursorProviderGarbageCollector providerGarbageCollector;
+  private final StreamingGarbageCollector streamingGarbageCollector;
 
   /**
    * Creates a new instance
@@ -52,7 +53,17 @@ public class FunkyCursorManager extends CursorManager {
   public FunkyCursorManager(MutableStreamingStatistics statistics, Scheduler scheduler) {
     super(statistics);
     this.statistics = statistics;
-    providerGarbageCollector = new CursorProviderGarbageCollector(scheduler);
+    streamingGarbageCollector = new StreamingGarbageCollector(scheduler);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    streamingGarbageCollector.start();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    streamingGarbageCollector.stop();
   }
 
   /**
@@ -65,8 +76,6 @@ public class FunkyCursorManager extends CursorManager {
    */
   @Override
   public CursorProvider manage(CursorProvider provider, BaseEventContext ownerContext) {
-    registerEventContext(ownerContext);
-
     final CursorContext context = new CursorContext(provider, ownerContext);
 
     ManagedCursorProvider managedProvider;
@@ -78,7 +87,7 @@ public class FunkyCursorManager extends CursorManager {
       throw new MuleRuntimeException(createStaticMessage("Unknown cursor provider type: " + context.getClass().getName()));
     }
 
-    registry.get(ownerContext.getId()).addProvider(managedProvider);
+    registry.get(new StreamingSessionKey(ownerContext)).addProvider(managedProvider);
 
     return managedProvider;
   }
@@ -133,7 +142,6 @@ public class FunkyCursorManager extends CursorManager {
 
     private final AtomicBoolean disposed = new AtomicBoolean(false);
     private final Map<Integer, WeakReference<ManagedCursorProvider>> providers = new ConcurrentHashMap<>();
-    private final Set<PhantomReference<ManagedCursorProvider>> phantoms = newSetFromMap(new ConcurrentHashMap<>());
 
     //private final AtomicInteger cursorCount = new AtomicInteger(0);
 
@@ -152,8 +160,7 @@ public class FunkyCursorManager extends CursorManager {
     //    });
 
     private void addProvider(ManagedCursorProvider provider) {
-      providers.put(identityHashCode(provider), new WeakReference<>(provider));
-      phantoms.add(providerGarbageCollector.track(provider));
+      providers.put(identityHashCode(provider), streamingGarbageCollector.track(provider));
     }
 
     //private void addCursor(CursorProvider provider, Cursor cursor) {
@@ -203,5 +210,34 @@ public class FunkyCursorManager extends CursorManager {
     //    statistics.decrementOpenProviders();
     //  }
     //}
+  }
+
+  private class StreamingSessionKey {
+
+    private final String id;
+    private final BaseEventContext eventContext;
+
+    public StreamingSessionKey(BaseEventContext eventContext) {
+      id = eventContext.getId();
+      this.eventContext = eventContext;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public BaseEventContext getEventContext() {
+      return eventContext;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return id.equals(((StreamingSessionKey) obj).id);
+    }
+
+    @Override
+    public int hashCode() {
+      return id.hashCode();
+    }
   }
 }

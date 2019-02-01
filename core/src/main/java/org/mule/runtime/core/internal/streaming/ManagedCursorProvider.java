@@ -93,7 +93,7 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
       close();
     } catch (Exception e) {
       LOGGER.warn("Exception was found trying to close CursorProvider. Will try to release its resources anyway. Error was: " +
-                      e.getMessage(), e);
+          e.getMessage(), e);
     }
 
     try {
@@ -108,7 +108,7 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
       cursor.release();
     } catch (Exception e) {
       LOGGER.warn("Exception was found trying to release cursor resources. Execution will continue. Error was: " +
-                      e.getMessage(), e);
+          e.getMessage(), e);
     } finally {
       statistics.decrementOpenCursors();
     }
