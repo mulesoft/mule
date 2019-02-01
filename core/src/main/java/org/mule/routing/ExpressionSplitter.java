@@ -45,10 +45,10 @@ public class ExpressionSplitter extends AbstractSplitter
         // Used by spring
     }
 
-    public ExpressionSplitter(ExpressionConfig config, boolean sequential)
+    public ExpressionSplitter(ExpressionConfig config)
     {
         this.config = config;
-        this.sequential = sequential;
+        this.sequential = true;
         setEvaluator(config.getEvaluator());
     }
 

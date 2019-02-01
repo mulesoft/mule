@@ -191,7 +191,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             ExpressionConfig expressionConfig = new ExpressionConfig();
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
-            splitter = new ExpressionSplitter(expressionConfig, true);
+            splitter = new ExpressionSplitter(expressionConfig);
             if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
             {
                 xpathCollection = true;

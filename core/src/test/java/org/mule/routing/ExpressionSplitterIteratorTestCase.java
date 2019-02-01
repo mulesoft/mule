@@ -37,7 +37,7 @@ public class ExpressionSplitterIteratorTestCase extends AbstractMuleTestCase
     private ExpressionManager expressionManager = mock(ExpressionManager.class);
     private final List<Integer> integers = createListOfIntegers();
     private final ExpressionConfig expressionConfig = mock(ExpressionConfig.class);
-    private final ExpressionSplitter expressionSplitter = new ExpressionSplitter(expressionConfig, false);
+    private final ExpressionSplitter expressionSplitter = new ExpressionSplitter(expressionConfig);
     private final MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
     @Before
