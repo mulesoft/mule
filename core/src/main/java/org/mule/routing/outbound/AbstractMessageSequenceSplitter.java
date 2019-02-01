@@ -146,7 +146,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-                    message.setCorrelationId(correlationId + "-" + (sequential? correlationSequence : ""));
+                    String suffix = sequential? ("-" + correlationSequence) : "";
+                    message.setCorrelationId(correlationId + suffix);
                 }
 
                 // take correlation group size from the message properties, set by
