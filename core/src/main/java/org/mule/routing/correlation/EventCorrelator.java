@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
-import javax.inject.Inject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
@@ -236,7 +234,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 // add the incoming event to the group
                 try
                 {
-
                     event.getMessage().setCorrelationId(groupId + event.getMessageSourceName());
                     group.addEvent(event);
                 }
