@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.util.Arrays.asList;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -17,6 +20,9 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.slf4j.Logger;
@@ -30,6 +36,9 @@ import org.slf4j.LoggerFactory;
  */
 public class LoggerMessageProcessor extends AbstractComponent implements Processor, Initialisable, MuleContextAware {
 
+  private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty("mule.logging.blockingCategories", "");
+  private static final Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
+
   protected transient Logger logger;
 
   protected String message;
@@ -38,6 +47,8 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
 
   protected MuleContext muleContext;
   ExtendedExpressionManager expressionManager;
+
+  private ProcessingType processingType;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -57,6 +68,19 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   public CoreEvent process(CoreEvent event) throws MuleException {
     log(event);
     return event;
+  }
+
+  @Override
+  public ProcessingType getProcessingType() {
+    if (processingType == null) {
+      processingType = isBlocking(category) ? BLOCKING : CPU_LITE;
+    }
+    return processingType;
+  }
+
+  private boolean isBlocking(String category) {
+    return BLOCKING_CATEGORIES.stream().anyMatch(blockingCategory -> blockingCategory.equals(category) ||
+        (category != null && category.startsWith(blockingCategory + ".")));
   }
 
   protected void log(CoreEvent event) {
