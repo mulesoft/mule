@@ -86,6 +86,11 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         return true;
     }
 
+    protected boolean isSequential()
+    {
+        return false;
+    }
+
     /**
      * Converts the event into a {@link MessageSequence} that will retrieve each of the event elements
      * 
@@ -114,7 +119,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         for (; messageSequence.hasNext();)
         {
             Object payload = messageSequence.next();
-
             if (payload instanceof Collection)
             {
                 payload = CollectionUtils.collect((Collection) payload, new Transformer()
@@ -146,7 +150,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-                    message.setCorrelationId(correlationId);
+                    message.setCorrelationId(correlationId + (this.isSequential() ? ("-" + correlationSequence) : ""));
                 }
 
                 // take correlation group size from the message properties, set by
@@ -209,4 +213,5 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     {
         this.counterVariableName = counterVariableName;
     }
+
 }
