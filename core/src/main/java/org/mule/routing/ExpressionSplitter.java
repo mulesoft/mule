@@ -159,5 +159,8 @@ public class ExpressionSplitter extends AbstractSplitter
         this.config.setExpression(expression);
     }
 
-    protected boolean isSequential() { return true; }
+    protected boolean isSequential()
+    {
+        return true;
+    }
 }
