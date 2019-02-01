@@ -24,8 +24,9 @@ import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.routing.MessageSequence;
 import org.mule.util.CollectionUtils;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.collections.Transformer;
 
@@ -50,7 +51,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected int batchSize;
     protected String counterVariableName;
     protected boolean sequential = false;
-    //private static HashSet<String> processedEvents = new HashSet<>();
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -112,7 +112,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         }
         int count = messageSequence.size();
         MuleEvent currentEvent = originalEvent;
-
         for (; messageSequence.hasNext();)
         {
             Object payload = messageSequence.next();
@@ -136,9 +135,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             }
 
             MuleMessage message = createMessage(payload, originalEvent.getMessage());
-
             correlationSequence++;
-
             if (counterVariableName != null)
             {
                 message.setInvocationProperty(counterVariableName, correlationSequence);
@@ -149,11 +146,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-                    /*if(processedEvents.contains(correlationId)){
-                        correlationId += UUID.randomUUID().toString();
-                    }*/
-                    message.setCorrelationId(correlationId + (sequential? correlationSequence : ""));
-
+                    message.setCorrelationId(correlationId + "-" + (sequential? correlationSequence : ""));
                 }
 
                 // take correlation group size from the message properties, set by
@@ -164,7 +157,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             }
             message.propagateRootId(originalEvent.getMessage());
             MuleEvent resultEvent = processNext(RequestContext.setEvent(new DefaultMuleEvent(message, originalEvent, currentEvent.getSession())));
-            message.setCorrelationId(correlationId);
             if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
             {
                 currentEvent = resultEvent;
@@ -175,7 +167,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         {
             logger.debug("Splitter only returned a single result. If this is not expected, please check your split expression");
         }
-        //processedEvents.add(correlationId);
         return resultEvents;
     }
 

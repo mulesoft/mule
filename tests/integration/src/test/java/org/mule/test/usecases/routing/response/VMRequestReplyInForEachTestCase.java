@@ -19,14 +19,14 @@ import org.mule.DefaultMuleMessage;
 
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 import org.junit.Test;
+import com.google.common.collect.ImmutableList;
 
 public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCase
 {
-    private final List<List<String>> collectionValues = new ArrayList<>();
-
+    private ImmutableList<ImmutableList<String>> collectionValues;
+    
     @Override
     protected String getConfigFile()
     {
@@ -37,13 +37,17 @@ public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCa
     public void setUp() throws Exception
     {
         super.setUp();
-        collectionValues.add(new ArrayList<String>());
-        collectionValues.add(new ArrayList<String>());
-        collectionValues.get(0).add("value1");
-        collectionValues.get(0).add("value2");
-        collectionValues.get(0).add("value3");
-        collectionValues.get(1).add("value4");
-        collectionValues.get(1).add("value5");
+
+        ImmutableList<String> nestedListA = ImmutableList.<String>builder().add("value1")
+                .add("value2")
+                .add("value3")
+                .build();
+
+        ImmutableList<String> nestedListB = ImmutableList.<String>builder().add("value4")
+                .add("value5")
+                .build();
+
+        collectionValues = ImmutableList.<ImmutableList<String>>builder().add(nestedListA).add(nestedListB).build();
     }
 
     @Test
