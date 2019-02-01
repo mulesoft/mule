@@ -149,10 +149,7 @@ public class CursorManager implements Startable, Stoppable {
             key.releaseResources();
           }
         })
-        .build(key -> {
-          statistics.incrementOpenProviders();
-          return newSetFromMap(new ConcurrentHashMap<>());
-        });
+        .build(key -> newSetFromMap(new ConcurrentHashMap<>()));
 
     private synchronized void addProvider(CursorProvider adapter) {
       cursors.get(adapter);
@@ -196,7 +193,6 @@ public class CursorManager implements Startable, Stoppable {
     private void closeProvider(CursorProvider provider) {
       if (!provider.isClosed()) {
         provider.close();
-        statistics.decrementOpenProviders();
       }
     }
   }

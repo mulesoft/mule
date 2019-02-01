@@ -13,7 +13,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
@@ -34,15 +33,16 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   private final CursorContext cursorContext; //TODO: Seems no longer necessary
   private final Set<Cursor> cursors = newSetFromMap(new ConcurrentHashMap<>());
   private final MutableStreamingStatistics statistics;
-  private final AtomicBoolean closed = new AtomicBoolean(false);
-  private final AtomicBoolean released = new AtomicBoolean(false);
+  private final CursorProviderJanitor janitor;
 
   protected ManagedCursorProvider(CursorContext cursorContext, CursorManager cursorManager,
                                   MutableStreamingStatistics statistics) {
     this.delegate = (CursorProvider<T>) cursorContext.getCursorProvider();
     this.cursorContext = cursorContext;
     this.cursorManager = cursorManager;
+    this.janitor = new CursorProviderJanitor(delegate, cursors, statistics);
     this.statistics = statistics;
+    statistics.incrementOpenProviders();
   }
 
   /**
@@ -65,7 +65,7 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
 
   public final void onClose(Cursor cursor) {
     if (cursors.remove(cursor)) {
-      releaseCursor(cursor);
+      janitor.releaseCursor(cursor);
       if (isClosed() && cursors.isEmpty()) {
         releaseResources();
       }
@@ -85,40 +85,16 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
 
   @Override
   public final void releaseResources() {
-    if (!released.compareAndSet(false, true)) {
-      return;
-    }
-
-    try {
-      close();
-    } catch (Exception e) {
-      LOGGER.warn("Exception was found trying to close CursorProvider. Will try to release its resources anyway. Error was: " +
-          e.getMessage(), e);
-    }
-
-    try {
-      cursors.forEach(this::releaseCursor);
-    } finally {
-      delegate.releaseResources();
-    }
+    janitor.releaseResources();
   }
 
-  private void releaseCursor(Cursor cursor) {
-    try {
-      cursor.release();
-    } catch (Exception e) {
-      LOGGER.warn("Exception was found trying to release cursor resources. Execution will continue. Error was: " +
-          e.getMessage(), e);
-    } finally {
-      statistics.decrementOpenCursors();
-    }
+  public CursorProviderJanitor getJanitor() {
+    return janitor;
   }
 
   @Override
   public void close() {
-    if (closed.compareAndSet(false, true)) {
-      delegate.close();
-    }
+    janitor.close();
   }
 
   @Override
