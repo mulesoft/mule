@@ -11,7 +11,6 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
-import static java.lang.reflect.Modifier.isAbstract;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
@@ -26,7 +25,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
@@ -35,16 +33,12 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
-import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Validates that the parameter types are valid
@@ -71,9 +65,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
     }.walk(extensionModel);
   }
 
-
   private void validateParameterType(ParameterModel parameter, ProblemsReporter problemsReporter) {
-
     parameter.getType().accept(new MetadataTypeVisitor() {
 
       private Set<MetadataType> visitedTypes = new HashSet<>();
