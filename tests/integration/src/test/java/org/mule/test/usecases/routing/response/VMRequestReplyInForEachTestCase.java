@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
 public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCase
 {
     private ImmutableList<ImmutableList<String>> collectionValues;
-    
+
     @Override
     protected String getConfigFile()
     {

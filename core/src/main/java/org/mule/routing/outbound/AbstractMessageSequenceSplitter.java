@@ -50,7 +50,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected MessageInfoMapping messageInfoMapping;
     protected int batchSize;
     protected String counterVariableName;
-    protected boolean sequential = false;
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -86,6 +85,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     {
         return true;
     }
+
+    protected boolean isSequential() { return false; }
 
     /**
      * Converts the event into a {@link MessageSequence} that will retrieve each of the event elements
@@ -146,8 +147,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-                    String suffix = sequential? ("-" + correlationSequence) : "";
-                    message.setCorrelationId(correlationId + suffix);
+                    message.setCorrelationId(correlationId + (this.isSequential() ? ("-" + correlationSequence) : ""));
                 }
 
                 // take correlation group size from the message properties, set by
@@ -210,4 +210,5 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     {
         this.counterVariableName = counterVariableName;
     }
+
 }
