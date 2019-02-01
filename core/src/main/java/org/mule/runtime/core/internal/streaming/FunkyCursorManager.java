@@ -7,8 +7,10 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static java.lang.System.identityHashCode;
+import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -20,8 +22,10 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
+import java.lang.ref.PhantomReference;
 import java.lang.ref.WeakReference;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,22 +42,24 @@ public class FunkyCursorManager extends CursorManager {
           .build(key -> new EventStreamingState());
 
   private final MutableStreamingStatistics statistics;
+  private final CursorProviderGarbageCollector providerGarbageCollector;
 
   /**
    * Creates a new instance
    *
    * @param statistics statistics which values should be kept updated
    */
-  public FunkyCursorManager(MutableStreamingStatistics statistics) {
+  public FunkyCursorManager(MutableStreamingStatistics statistics, Scheduler scheduler) {
     super(statistics);
     this.statistics = statistics;
+    providerGarbageCollector = new CursorProviderGarbageCollector(scheduler);
   }
 
   /**
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider the provider to be tracked
+   * @param provider     the provider to be tracked
    * @param ownerContext the root context of the event that created the provider
    * @return a {@link CursorProvider}
    */
@@ -80,7 +86,7 @@ public class FunkyCursorManager extends CursorManager {
   /**
    * Acknowledges that the given {@code cursor} has been opened
    *
-   * @param cursor the opened cursor
+   * @param cursor         the opened cursor
    * @param providerHandle the handle for the provider that generated it
    */
   @Override
@@ -127,6 +133,8 @@ public class FunkyCursorManager extends CursorManager {
 
     private final AtomicBoolean disposed = new AtomicBoolean(false);
     private final Map<Integer, WeakReference<ManagedCursorProvider>> providers = new ConcurrentHashMap<>();
+    private final Set<PhantomReference<ManagedCursorProvider>> phantoms = newSetFromMap(new ConcurrentHashMap<>());
+
     //private final AtomicInteger cursorCount = new AtomicInteger(0);
 
     //private final LoadingCache<CursorProvider<CursorStream>, Set<Cursor>> cursors = Caffeine.newBuilder()
@@ -145,6 +153,7 @@ public class FunkyCursorManager extends CursorManager {
 
     private void addProvider(ManagedCursorProvider provider) {
       providers.put(identityHashCode(provider), new WeakReference<>(provider));
+      phantoms.add(providerGarbageCollector.track(provider));
     }
 
     //private void addCursor(CursorProvider provider, Cursor cursor) {
@@ -171,12 +180,9 @@ public class FunkyCursorManager extends CursorManager {
           ManagedCursorProvider provider = weakReference.get();
           if (provider != null) {
             weakReference.clear();
-            provider.close();
             provider.releaseResources();
           }
         });
-
-        providers.clear();
       }
     }
     //

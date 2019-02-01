@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.lang.System.identityHashCode;
+import static java.util.Collections.newSetFromMap;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 
-import java.lang.ref.WeakReference;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,10 +32,10 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   private final CursorProvider<T> delegate;
   private final CursorManager cursorManager;
   private final CursorContext cursorContext; //TODO: Seems no longer necessary
-  private final Map<Integer, WeakReference<Cursor>> cursors = new ConcurrentHashMap<>();
+  private final Set<Cursor> cursors = newSetFromMap(new ConcurrentHashMap<>());
   private final MutableStreamingStatistics statistics;
-
-  private AtomicBoolean released = new AtomicBoolean(false);
+  private final AtomicBoolean closed = new AtomicBoolean(false);
+  private final AtomicBoolean released = new AtomicBoolean(false);
 
   protected ManagedCursorProvider(CursorContext cursorContext, CursorManager cursorManager,
                                   MutableStreamingStatistics statistics) {
@@ -58,21 +57,17 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
     T cursor = delegate.openCursor();
     cursorManager.onOpen(cursor, cursorContext);
     T managedCursor = managedCursor(cursor, cursorContext);
-    cursors.put(identityHashCode(managedCursor), new WeakReference<>(managedCursor));
+    cursors.add(managedCursor);
 
     statistics.incrementOpenCursors();
     return managedCursor;
   }
 
   public final void onClose(Cursor cursor) {
-    if (cursors.remove(identityHashCode(cursor)) != null) {
-      try {
-        cursor.release();
-      } finally {
-        statistics.decrementOpenCursors();
-        if (isClosed() && cursors.isEmpty()) {
-          releaseResources();
-        }
+    if (cursors.remove(cursor)) {
+      releaseCursor(cursor);
+      if (isClosed() && cursors.isEmpty()) {
+        releaseResources();
       }
     }
   }
@@ -95,26 +90,35 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
     }
 
     try {
-      cursors.forEach((hash, weakReference) -> {
-        try {
-          Cursor cursor = weakReference.get();
-          if (cursor != null) {
-            weakReference.clear();
-            cursor.release();
-            statistics.decrementOpenCursors();
-          }
-        } catch (Exception e) {
-          LOGGER.warn("Exception was found trying to close cursor. Execution will continue", e);
-        }
-      });
+      close();
+    } catch (Exception e) {
+      LOGGER.warn("Exception was found trying to close CursorProvider. Will try to release its resources anyway. Error was: " +
+                      e.getMessage(), e);
+    }
+
+    try {
+      cursors.forEach(this::releaseCursor);
     } finally {
       delegate.releaseResources();
     }
   }
 
+  private void releaseCursor(Cursor cursor) {
+    try {
+      cursor.release();
+    } catch (Exception e) {
+      LOGGER.warn("Exception was found trying to release cursor resources. Execution will continue. Error was: " +
+                      e.getMessage(), e);
+    } finally {
+      statistics.decrementOpenCursors();
+    }
+  }
+
   @Override
   public void close() {
-    delegate.close();
+    if (closed.compareAndSet(false, true)) {
+      delegate.close();
+    }
   }
 
   @Override

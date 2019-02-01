@@ -16,6 +16,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -52,6 +53,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private boolean initialised = false;
 
   private Scheduler allocationScheduler;
+  private Scheduler phantomReferenceScheduler;
 
   @Inject
   private MuleContext muleContext;
@@ -66,9 +68,11 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   public void initialise() throws InitialisationException {
     if (!initialised) {
       statistics = new AtomicStreamingStatistics();
-      allocationScheduler =
-          schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-allocate"));
-      cursorManager = new FunkyCursorManager(statistics);
+
+      allocationScheduler = createAllocationScheduler();
+      phantomReferenceScheduler = createPhantomReferenceScheduler();
+
+      cursorManager = new FunkyCursorManager(statistics, phantomReferenceScheduler);
       bufferManager = new PoolingByteBufferManager(allocationScheduler);
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
@@ -166,5 +170,16 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
 
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
+  }
+
+  private Scheduler createAllocationScheduler() {
+    return schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-allocate"));
+  }
+
+  private Scheduler createPhantomReferenceScheduler() {
+    return schedulerService.customScheduler(SchedulerConfig.config()
+                                                .withMaxConcurrentTasks(1)
+                                                .withName("StreamingManager-phantomReference-consumer"));
+
   }
 }
