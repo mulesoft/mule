@@ -86,7 +86,10 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         return true;
     }
 
-    protected boolean isSequential() { return false; }
+    protected boolean isSequential()
+    {
+        return false;
+    }
 
     /**
      * Converts the event into a {@link MessageSequence} that will retrieve each of the event elements
