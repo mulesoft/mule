@@ -431,11 +431,14 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     Optional<MethodElement> equalsWithoutParams = pojoWithEqualsAndHashCode.getMethod("equals");
     Optional<MethodElement> hashCode = pojoWithEqualsAndHashCode.getMethod("hashCode");
     Optional<MethodElement> otherMethod = pojoWithEqualsAndHashCode.getMethod("otherMethod");
+    Optional<MethodElement> parametersWithoutOrder =
+        pojoWithEqualsAndHashCode.getMethod("someMethod", String.class, Object.class);
 
     assertThat(equals.isPresent(), is(true));
     assertThat(equalsWithoutParams.isPresent(), is(false));
     assertThat(hashCode.isPresent(), is(true));
     assertThat(otherMethod.isPresent(), is(false));
+    assertThat(parametersWithoutOrder.isPresent(), is(false));
   }
 
   @Test
@@ -694,6 +697,10 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   public static class PojoWithEqualsAndHashCode {
 
     private String name;
+
+    public boolean someMethod(Object object, String string) {
+      return true;
+    }
 
     @Override
     public boolean equals(Object o) {
