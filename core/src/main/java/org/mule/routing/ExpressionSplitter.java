@@ -36,7 +36,6 @@ import org.w3c.dom.NodeList;
 public class ExpressionSplitter extends AbstractSplitter
     implements Initialisable
 {
-
     protected ExpressionManager expressionManager;
     protected ExpressionConfig config = new ExpressionConfig();
 
@@ -160,4 +159,8 @@ public class ExpressionSplitter extends AbstractSplitter
         this.config.setExpression(expression);
     }
 
+    protected boolean isSequential()
+    {
+        return true;
+    }
 }

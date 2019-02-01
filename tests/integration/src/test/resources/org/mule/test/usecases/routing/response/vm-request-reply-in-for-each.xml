@@ -24,6 +24,22 @@
         </foreach>
     </flow>
 
+    <flow name="forEachSplitAggregateCaseFlow">
+        <vm:inbound-endpoint path="foreach-spag" connector-ref="default"/>
+        <foreach collection="#[payload]" >
+            <logger level="ERROR" message="#[payload]"/>
+            <request-reply storePrefix="foo">
+                <vm:outbound-endpoint path="request" connector-ref="default">
+                    <collection-splitter />
+                </vm:outbound-endpoint>
+                <vm:inbound-endpoint path="foreach-reply-spag" connector-ref="default">
+                    <collection-aggregator />
+                </vm:inbound-endpoint>
+            </request-reply>
+            <vm:outbound-endpoint path="test-foreach-spag-reply" connector-ref="default"/>
+        </foreach>
+    </flow>
+
     <flow name="sequenceCaseFlow">
         <vm:inbound-endpoint path="sequence-call" connector-ref="default"/>
         <set-payload value="first-call"/>
