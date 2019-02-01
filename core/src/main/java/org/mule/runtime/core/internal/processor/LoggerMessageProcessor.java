@@ -48,7 +48,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   protected MuleContext muleContext;
   ExtendedExpressionManager expressionManager;
 
-  private ProcessingType processingType;
+  private volatile ProcessingType processingType;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -73,7 +73,11 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   @Override
   public ProcessingType getProcessingType() {
     if (processingType == null) {
-      processingType = isBlocking(category) ? BLOCKING : CPU_LITE;
+      synchronized (this) {
+        if (processingType == null) {
+          processingType = isBlocking(category) ? BLOCKING : CPU_LITE;
+        }
+      }
     }
     return processingType;
   }
