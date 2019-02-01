@@ -503,6 +503,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
       flow.initialise();
       flow.start();
 
+      Thread.sleep(500);
       List<Future> futures = new ArrayList<>();
 
       try {

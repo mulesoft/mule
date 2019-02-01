@@ -506,6 +506,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       flow.initialise();
       flow.start();
 
+      Thread.sleep(500);
       List<Future> futures = new ArrayList<>();
 
       try {
