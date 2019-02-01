@@ -51,7 +51,7 @@ public class CursorProviderJanitor {
       close();
     } catch (Exception e) {
       LOGGER.warn("Exception was found trying to close CursorProvider. Will try to release its resources anyway. Error was: " +
-                      e.getMessage(), e);
+          e.getMessage(), e);
     }
 
     try {
@@ -66,7 +66,7 @@ public class CursorProviderJanitor {
       cursor.release();
     } catch (Exception e) {
       LOGGER.warn("Exception was found trying to release cursor resources. Execution will continue. Error was: " +
-                      e.getMessage(), e);
+          e.getMessage(), e);
     } finally {
       statistics.decrementOpenCursors();
     }
