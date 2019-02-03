@@ -38,6 +38,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
@@ -61,7 +62,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> implements ApplicationContextAware {
 
@@ -230,16 +231,21 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           return error(e);
         }
 
-        Flux<CoreEvent> flux;
+        Mono<CoreEvent> mono;
         if (referencedProcessor instanceof Flow) {
-          flux = from(processWithChildContext(event, referencedProcessor,
-                                              ofNullable(FlowRefFactoryBean.this.getLocation()),
-                                              ((Flow) referencedProcessor).getExceptionListener()));
+          mono = Mono.from(processWithChildContext(event, referencedProcessor,
+                                                   ofNullable(FlowRefFactoryBean.this.getLocation()),
+                                                   ((Flow) referencedProcessor).getExceptionListener()));
         } else {
-          flux = from(processWithChildContext(event, referencedProcessor,
-                                              ofNullable(FlowRefFactoryBean.this.getLocation())));
+          mono = Mono.from(processWithChildContext(event, referencedProcessor,
+                                                   ofNullable(FlowRefFactoryBean.this.getLocation())));
         }
-        return flux.map(outputToTarget(event, target, targetValue, expressionManager));
+        return from(mono.doOnSuccess(result -> {
+          if (result == null) {
+            ((BaseEventContext) event.getContext()).success();
+          }
+        }))
+            .map(outputToTarget(event, target, targetValue, expressionManager));
       });
     }
 

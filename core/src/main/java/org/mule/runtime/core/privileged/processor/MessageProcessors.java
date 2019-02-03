@@ -180,7 +180,7 @@ public class MessageProcessors {
       BaseEventContext childContext = newChildContext(event, empty());
       return just(event)
           .transform(publisher -> from(publisher).flatMap(request -> {
-            return from(internalProcessWithChildContext(request, processor, childContext, false,
+            return from(internalProcessWithChildContext(request, processor, childContext,
                                                         childContext.getResponsePublisher()));
           }))
           .block();
@@ -226,7 +226,7 @@ public class MessageProcessors {
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation) {
     BaseEventContext childContext = newChildContext(event, componentLocation);
-    return internalProcessWithChildContext(event, processor, childContext, true, childContext.getResponsePublisher());
+    return internalProcessWithChildContext(event, processor, childContext, childContext.getResponsePublisher());
   }
 
   /**
@@ -242,7 +242,7 @@ public class MessageProcessors {
 
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              BaseEventContext childContext) {
-    return internalProcessWithChildContext(event, processor, childContext, true, childContext.getResponsePublisher());
+    return internalProcessWithChildContext(event, processor, childContext, childContext.getResponsePublisher());
   }
 
   /**
@@ -262,11 +262,11 @@ public class MessageProcessors {
                                                              Optional<ComponentLocation> componentLocation,
                                                              FlowExceptionHandler exceptionHandler) {
     BaseEventContext childContext = child(((BaseEventContext) event.getContext()), componentLocation, exceptionHandler);
-    return internalProcessWithChildContext(event, processor, childContext, true, childContext.getResponsePublisher());
+    return internalProcessWithChildContext(event, processor, childContext, childContext.getResponsePublisher());
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
-                                                                      BaseEventContext child, boolean completeParentOnEmpty,
+                                                                      BaseEventContext child,
                                                                       Publisher<CoreEvent> responsePublisher) {
     String originalCtxKey = "originalContext_" + processor.toString();
 
@@ -279,12 +279,7 @@ public class MessageProcessors {
         .switchIfEmpty(from(responsePublisher))
         .map(result -> quickCopy(child.getParentContext().get(), result))
         .doOnError(MessagingException.class,
-                   me -> me.setProcessedEvent(quickCopy(child.getParentContext().get(), me.getEvent())))
-        .doOnSuccess(result -> {
-          if (result == null && completeParentOnEmpty) {
-            child.getParentContext().get().success();
-          }
-        });
+                   me -> me.setProcessedEvent(quickCopy(child.getParentContext().get(), me.getEvent())));
 
 
     // final CoreEvent dsfgs =
@@ -302,12 +297,7 @@ public class MessageProcessors {
     // me -> me.setProcessedEvent(quickCopy(
     // ((InternalEvent) me.getEvent())
     // .getInternalParameter("originalContext_" + processor.toString()),
-    // me.getEvent())))
-    // .doOnSuccess(result -> {
-    // if (result == null && completeParentOnEmpty) {
-    // child.getParentContext().get().success();
-    // }
-    // });
+    // me.getEvent()))) ;
   }
 
   public static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
