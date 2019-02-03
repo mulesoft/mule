@@ -11,13 +11,33 @@ import static java.time.Duration.ofMillis;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.CollectionDataType;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
+import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingResult;
+
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,32 +50,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.CollectionDataType;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
-import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
-import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
-import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
-import org.mule.runtime.core.privileged.routing.RoutingResult;
-
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Abstract {@link ForkJoinStrategy} that provides the base behavior for strategies that will
- * perform parallel invocation of {@link RoutingPair}'s that wish to use the following common behaviour:
+ * Abstract {@link ForkJoinStrategy} that provides the base behavior for strategies that will perform parallel invocation of
+ * {@link RoutingPair}'s that wish to use the following common behaviour:
  * <ul>
  * <li>Emit a single result event once all routes complete.
  * <li>Merge variables using a last-wins strategy.
@@ -94,7 +94,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   /**
    * Template method to be implemented by implementations that defines how the list of result {@link CoreEvent}'s should be
    * aggregated into a result {@link CoreEvent}
-   * 
+   *
    * @param original the original event
    * @param resultBuilder a result builder with the current state of result event builder including flow variable
    * @return the result event
@@ -115,12 +115,16 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
 
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
-          .transform(pair.getRoute())
-          .timeout(ofMillis(timeout), onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair), timeoutScheduler);
+          .transform(pair.getRoute());
       return from(processWithChildContext(pair.getEvent(),
                                           applyProcessingStrategy(processingStrategy, route, maxConcurrency), empty()))
+                                              .timeout(ofMillis(timeout),
+                                                       onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair),
+                                                       timeoutScheduler)
                                               .onErrorResume(MessagingException.class,
-                                                             me -> delayErrors ? just(me.getEvent()) : error(me));
+                                                             me -> delayErrors ? just(me.getEvent()) : error(me))
+
+      ;
     };
   }
 

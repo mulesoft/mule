@@ -30,14 +30,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +43,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Some convenience methods for message processors.
@@ -272,31 +268,54 @@ public class MessageProcessors {
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       BaseEventContext child, boolean completeParentOnEmpty,
                                                                       Publisher<CoreEvent> responsePublisher) {
-    // final CoreEvent dsfgs =
-    // quickCopy(quickCopy(child, event), ImmutableMap.of("originalContext_" + processor.toString(), event.getContext()));
-    return just(event)
-        .map(ev -> quickCopy(quickCopy(child, ev), ImmutableMap.of("originalContext_" + processor.toString(), ev.getContext())))
-        .cast(CoreEvent.class)
+    String originalCtxKey = "originalContext_" + processor.toString();
+
+
+    return just(quickCopy(child, event))
+        // .doOnNext(e -> System.out.println(" > e1 " + (e.getContext()) + " -> " + processor.toString()))
         .transform(processor)
-        .doOnNext(completeSuccessIfNeeded(true))
-        .switchIfEmpty(Mono.from(responsePublisher))
-        .map(result -> quickCopy(((InternalEvent) result).getInternalParameter("originalContext_" + processor.toString()),
-                                 result))
+        // .doOnNext(e -> System.out.println(" > e2 " + (e.getContext())))
+        .doOnNext(completeSuccessIfNeeded(/* child, */true))
+        .switchIfEmpty(from(responsePublisher))
+        .map(result -> quickCopy(child.getParentContext().get(), result))
         .doOnError(MessagingException.class,
-                   me -> me.setProcessedEvent(quickCopy(
-                                                        ((InternalEvent) me.getEvent())
-                                                            .getInternalParameter("originalContext_" + processor.toString()),
-                                                        me.getEvent())))
+                   me -> me.setProcessedEvent(quickCopy(child.getParentContext().get(), me.getEvent())))
         .doOnSuccess(result -> {
           if (result == null && completeParentOnEmpty) {
             child.getParentContext().get().success();
           }
         });
+
+
+    // final CoreEvent dsfgs =
+    // quickCopy(quickCopy(child, event), ImmutableMap.of("originalContext_" + processor.toString(), event.getContext()));
+
+    // return just(event)
+    // .map(ev -> quickCopy(quickCopy(child, ev), ImmutableMap.of("originalContext_" + processor.toString(), ev.getContext())))
+    // .cast(CoreEvent.class)
+    // .transform(processor)
+    // .doOnNext(completeSuccessIfNeeded(true))
+    // .switchIfEmpty(Mono.from(responsePublisher))
+    // .map(result -> quickCopy(((InternalEvent) result).getInternalParameter("originalContext_" + processor.toString()),
+    // result))
+    // .doOnError(MessagingException.class,
+    // me -> me.setProcessedEvent(quickCopy(
+    // ((InternalEvent) me.getEvent())
+    // .getInternalParameter("originalContext_" + processor.toString()),
+    // me.getEvent())))
+    // .doOnSuccess(result -> {
+    // if (result == null && completeParentOnEmpty) {
+    // child.getParentContext().get().success();
+    // }
+    // });
   }
 
   public static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
     return result -> {
       if (complete && !((BaseEventContext) child).isComplete()) {
+        // System.out.println(" > child " + (child));
+        // System.out.println(" > result.ctx " + (result.getContext()));
+
         ((BaseEventContext) child).success(result);
       }
     };
