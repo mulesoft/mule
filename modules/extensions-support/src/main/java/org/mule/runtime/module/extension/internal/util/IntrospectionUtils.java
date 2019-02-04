@@ -256,9 +256,9 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Determines if {@link ExtensionModel} is in ast mode
-   * @param model
-   * @return
+   * Based on a {@link ExtensionModel}, determines if this one has been created using the Java AST.
+   * @param model Extension model to introspect
+   * @return a boolean indicating whether the {@link ExtensionModel} was created using the Java AST or using compiled classes
    */
   public static boolean isASTMode(ExtensionModel model) {
     Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
@@ -266,9 +266,9 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Determines if {@link BaseDeclaration} is in ast mode
-   * @param model
-   * @return
+   * Based on a {@link BaseDeclaration}, determines if this one has been created using the Java AST.
+   * @param model Base Declaration to introspect
+   * @return a boolean indicating whether the {@link BaseDeclaration} was created using the Java AST or using compiled classes
    */
   public static boolean isASTMode(BaseDeclaration model) {
     Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
