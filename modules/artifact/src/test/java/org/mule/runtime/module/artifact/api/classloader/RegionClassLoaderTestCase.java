@@ -104,7 +104,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  public RegionClassLoaderTestCase() throws MalformedURLException, UnsupportedEncodingException {
+  public RegionClassLoaderTestCase() throws MalformedURLException {
     PARENT_LOADED_RESOURCE = new URL("file:///parent.txt");
     APP_LOADED_RESOURCE = new URL("file:///app.txt");
     PLUGIN_LOADED_RESOURCE = new URL("file:///plugin.txt");
