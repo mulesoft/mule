@@ -104,7 +104,6 @@ public class StreamingGhostBuster implements Lifecycle {
   private class StreamingWeakReference extends WeakReference<ManagedCursorProvider> {
 
     private final CursorProviderJanitor janitor;
-    //TODO: usefulness of this to be confirmed
     private boolean clear = false;
 
     public StreamingWeakReference(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> referenceQueue) {
@@ -114,6 +113,7 @@ public class StreamingGhostBuster implements Lifecycle {
 
     public void dispose() {
       if (!clear) {
+        clear = true;
         janitor.releaseResources();
       }
     }
