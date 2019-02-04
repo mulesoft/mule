@@ -6,21 +6,24 @@
  */
 package org.mule.module.json;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.IOUtils;
-
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.ObjectNode;
-import org.junit.Test;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.IOUtils;
 
-public class JsonDataTestCase extends AbstractMuleTestCase
+import com.fasterxml.jackson.databind.JsonNode;
+
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
+import org.junit.Test;
+
+public class JsonDataTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
@@ -101,6 +104,16 @@ public class JsonDataTestCase extends AbstractMuleTestCase
         Object o = jsonData.get("photos");
         assertNotNull(o);
         assertTrue(o instanceof ObjectNode);
+    }
+
+    @Test
+    public void testReadingANumber() throws Exception
+    {
+        JsonParser parser = new DefaultJsonParser(muleContext);
+        String jsonAsString = "{\"value\":210.0}";
+
+        JsonNode json = parser.asJsonNode(jsonAsString);
+        assertThat("JSON has not changed", jsonAsString, equalTo(json.toString()));
     }
 
     private JsonData readJsonData(String filename) throws Exception
