@@ -6,6 +6,7 @@
  */
 package org.mule.module.json;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -111,7 +112,7 @@ public class JsonDataTestCase extends AbstractMuleContextTestCase
         String jsonAsString = "{\"value\":210.0}";
 
         JsonNode json = parser.asJsonNode(jsonAsString);
-        assertEquals(jsonAsString, json.toString());
+        assertThat("JSON has not changed", jsonAsString.equals(json.toString()));
     }
 
     private JsonData readJsonData(String filename) throws Exception
