@@ -18,7 +18,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 
-import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
@@ -52,7 +51,7 @@ public class StreamingGhostBuster implements Lifecycle {
   @Override
   public void start() throws MuleException {
     try {
-      taskHandle = scheduler.submit(this::collectPhantoms);
+      taskHandle = scheduler.submit(this::ghostBust);
     } catch (RejectedExecutionException e) {
       throw new MuleRuntimeException(e);
     }
@@ -71,16 +70,16 @@ public class StreamingGhostBuster implements Lifecycle {
     scheduler.stop();
   }
 
-  public StremingWeakReference track(ManagedCursorProvider cursorProvider) {
-    return new StremingWeakReference(cursorProvider, new StreamingPhantom(cursorProvider, referenceQueue));
+  public StreamingWeakReference track(ManagedCursorProvider cursorProvider) {
+    return new StreamingWeakReference(cursorProvider, referenceQueue);
   }
 
-  private void collectPhantoms() {
+  private void ghostBust() {
     while (!stopped && !currentThread().isInterrupted()) {
       try {
-        StreamingPhantom phantom = (StreamingPhantom) referenceQueue.remove(POLL_INTERVAL);
-        if (phantom != null) {
-          bustGhost(phantom);
+        StreamingWeakReference ghost = (StreamingWeakReference) referenceQueue.remove(POLL_INTERVAL);
+        if (ghost != null) {
+          bust(ghost);
         }
       } catch (InterruptedException e) {
         if (LOGGER.isDebugEnabled()) {
@@ -90,43 +89,44 @@ public class StreamingGhostBuster implements Lifecycle {
     }
   }
 
-  private void bustGhost(StreamingPhantom phantom) {
+  private void bust(StreamingWeakReference ghost) {
     try {
-      phantom.dispose();
+      ghost.dispose();
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
         LOGGER.warn("Found exception trying to dispose phantom CursorProvider: " + e.getMessage(), e);
       }
     } finally {
-      phantom.clear();
+      ghost.clear();
     }
   }
 
-  private class StremingWeakReference extends WeakReference<ManagedCursorProvider> {
-
-    private final StreamingPhantom phantom;
-
-    public StremingWeakReference(ManagedCursorProvider referent, StreamingPhantom phantom) {
-      super(referent);
-      this.phantom = phantom;
-    }
-
-    public StreamingPhantom getPhantom() {
-      return phantom;
-    }
-  }
-
-  private class StreamingPhantom extends PhantomReference<ManagedCursorProvider> {
+  private class StreamingWeakReference extends WeakReference<ManagedCursorProvider> {
 
     private final CursorProviderJanitor janitor;
+    //TODO: usefulness of this to be confirmed
+    private boolean clear = false;
 
-    public StreamingPhantom(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> q) {
-      super(referent, q);
-      janitor = referent.getJanitor();
+    public StreamingWeakReference(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> referenceQueue) {
+      super(referent, referenceQueue);
+      this.janitor = referent.getJanitor();
     }
 
     public void dispose() {
-      janitor.releaseResources();
+      if (!clear) {
+        janitor.releaseResources();
+      }
+    }
+
+    @Override
+    public ManagedCursorProvider get() {
+      return clear ? null : super.get();
+    }
+
+    @Override
+    public void clear() {
+      super.clear();
+      clear = true;
     }
   }
 }
