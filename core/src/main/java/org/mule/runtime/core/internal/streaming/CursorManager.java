@@ -84,8 +84,7 @@ public class CursorManager {
     private final Map<Integer, WeakReference<ManagedCursorProvider>> providers = new ConcurrentHashMap<>();
 
     private void addProvider(ManagedCursorProvider provider) {
-      ghostBuster.track(provider);
-      providers.put(identityHashCode(provider), new WeakReference<>(provider));
+      providers.put(identityHashCode(provider), ghostBuster.track(provider));
     }
 
     private void dispose() {

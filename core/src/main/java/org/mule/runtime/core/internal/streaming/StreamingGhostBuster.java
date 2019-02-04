@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.streaming;
 
 
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.newSetFromMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,8 +20,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -36,7 +34,6 @@ public class StreamingGhostBuster implements Lifecycle {
   private static final Logger LOGGER = getLogger(StreamingGhostBuster.class);
 
   private final ReferenceQueue<ManagedCursorProvider> referenceQueue = new ReferenceQueue<>();
-  private final Set<StreamingPhantom> phantoms = newSetFromMap(new ConcurrentHashMap<>());
   private volatile boolean stopped = false;
   private Future taskHandle;
 
@@ -74,8 +71,8 @@ public class StreamingGhostBuster implements Lifecycle {
     scheduler.stop();
   }
 
-  public void track(ManagedCursorProvider cursorProvider) {
-    phantoms.add(new StreamingPhantom(cursorProvider, referenceQueue));
+  public StremingWeakReference track(ManagedCursorProvider cursorProvider) {
+    return new StremingWeakReference(cursorProvider, new StreamingPhantom(cursorProvider, referenceQueue));
   }
 
   private void collectPhantoms() {
@@ -91,8 +88,6 @@ public class StreamingGhostBuster implements Lifecycle {
         }
       }
     }
-
-    phantoms.clear();
   }
 
   private void bustGhost(StreamingPhantom phantom) {
@@ -104,7 +99,20 @@ public class StreamingGhostBuster implements Lifecycle {
       }
     } finally {
       phantom.clear();
-      phantoms.remove(phantom);
+    }
+  }
+
+  private class StremingWeakReference extends WeakReference<ManagedCursorProvider> {
+
+    private final StreamingPhantom phantom;
+
+    public StremingWeakReference(ManagedCursorProvider referent, StreamingPhantom phantom) {
+      super(referent);
+      this.phantom = phantom;
+    }
+
+    public StreamingPhantom getPhantom() {
+      return phantom;
     }
   }
 
