@@ -61,6 +61,12 @@ import org.mule.runtime.core.privileged.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -70,11 +76,6 @@ import java.util.function.Function;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(FORK_JOIN_STRATEGIES)
 public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleContextTestCase {
@@ -315,9 +316,12 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 4, true, MAX_VALUE);
 
-    expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
-    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1));
+    expectedException.expect(CompositeRoutingException.class);
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1), throwable -> {
+      CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
+      RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 0, 1);
+      assertThat(routingResult.getFailures().get("0").getCause(), instanceOf(RejectedExecutionException.class));
+    });
   }
 
   @Test

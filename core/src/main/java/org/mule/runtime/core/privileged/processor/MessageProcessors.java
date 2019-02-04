@@ -272,18 +272,13 @@ public class MessageProcessors {
 
 
     return just(quickCopy(child, event))
-        // .doOnNext(e -> System.out.println(" > e1 " + (e.getContext()) + " -> " + processor.toString()))
         .transform(processor)
-        // .doOnNext(e -> System.out.println(" > e2 " + (e.getContext())))
         .doOnNext(completeSuccessIfNeeded(/* child, */true))
         .switchIfEmpty(from(responsePublisher))
         .map(result -> quickCopy(child.getParentContext().get(), result))
-        .doOnError(MessagingException.class,
-                   me -> me.setProcessedEvent(quickCopy(child.getParentContext().get(), me.getEvent())));
-
-
-    // final CoreEvent dsfgs =
-    // quickCopy(quickCopy(child, event), ImmutableMap.of("originalContext_" + processor.toString(), event.getContext()));
+        .onErrorMap(MessagingException.class,
+                    me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
+                        .get(), me.getEvent()), me));
 
     // return just(event)
     // .map(ev -> quickCopy(quickCopy(child, ev), ImmutableMap.of("originalContext_" + processor.toString(), ev.getContext())))
