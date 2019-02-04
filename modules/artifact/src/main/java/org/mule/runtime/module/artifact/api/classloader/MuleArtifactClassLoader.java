@@ -50,9 +50,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
   static final String PATH_SEPARATOR = "/";
   static final String RESOURCE_PREFIX = "resource::";
-  static final String WILDCARD = "*";
+  static final String WILDCARD = "\\*";
 
-  private static final String NO_WILDCARD_NO_SPACES = "([^\\" + WILDCARD + "|\\s]+)";
+  private static final String SPACES = "\\s";
+  private static final String RESOURCE_CAPTURE_START = "([^";
+  private static final String PIPE = "|";
+  private static final String RESOURCE_CAPTURE_END = "]+)";
+  private static final String RESOURCE = RESOURCE_CAPTURE_START + WILDCARD + PIPE + RESOURCE_CAPTURE_END;
+  private static final String NO_WILDCARD_NO_SPACES = RESOURCE_CAPTURE_START + WILDCARD + PIPE + SPACES + RESOURCE_CAPTURE_END;
   private static final String NO_SPACES = "(\\S+)";
 
   static final Pattern GAV_EXTENDED_PATTERN = Pattern.compile(
@@ -68,7 +73,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
                                                                   // type
                                                                   + NO_WILDCARD_NO_SPACES + ":"
                                                                   // resource
-                                                                  + NO_WILDCARD_NO_SPACES);
+                                                                  + RESOURCE);
 
   private static final Pattern MAVEN_ARTIFACT_PATTERN = Pattern.compile(
                                                                         PATH_SEPARATOR

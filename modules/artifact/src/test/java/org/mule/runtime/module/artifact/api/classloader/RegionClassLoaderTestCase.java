@@ -47,8 +47,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -72,9 +75,16 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private static final String ARTIFACT_ID = "testAppId";
   private static final String GROUP_ID = "com.organization";
   private static final String SPECIFIC_ARTIFACT_ID = "test-artifact";
+  private static final String SPECIFIC_ARTIFACT_ID_WITH_SPACES = "test-artifact-with-spaces";
   private static final String ARTIFACT_VERSION = "1.0.0";
   private static final String SPECIFIC_RESOURCE_FORMAT = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID + ":%s:%s:%s:%s";
+  private static final String SPECIFIC_RESOURCE_FORMAT_WITH_SPACES = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID_WITH_SPACES + ":%s:%s:%s:%s";
   private static final String API_RESOURCE_NAME = "test-api.raml";
+  private static final String API_RESOURE_NAME_WITH_SPACES = "raml with spaces.raml";
+  private static final String API_FOLDER_NAME_WITH_SPACES = "folder with spaces";
+  private static final String API_RESOURCE_NAME_WITH_SPACES_ENCODED = API_RESOURE_NAME_WITH_SPACES.replace(" ","%20");
+  private static final String API_FOLDER_NAME_WITH_SPACES_ENCODED = API_FOLDER_NAME_WITH_SPACES.replace(" ","%20");
+
 
   private final URL APP_LOADED_RESOURCE;
   private final URL PLUGIN_LOADED_RESOURCE;
@@ -84,18 +94,25 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
   private final ArtifactDescriptor artifactDescriptor;
+  private final URL API_WITH_SPACES_LOCATION;
+  private final URL API_WITH_SPACES_LOADED_RESOURCE;
+  private final URL API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES;
+
   private TestApplicationClassLoader appClassLoader;
   private TestArtifactClassLoader pluginClassLoader;
 
   @Rule
   public ExpectedException expectedException = none();
 
-  public RegionClassLoaderTestCase() throws MalformedURLException {
+  public RegionClassLoaderTestCase() throws MalformedURLException, UnsupportedEncodingException {
     PARENT_LOADED_RESOURCE = new URL("file:///parent.txt");
     APP_LOADED_RESOURCE = new URL("file:///app.txt");
     PLUGIN_LOADED_RESOURCE = new URL("file:///plugin.txt");
     API_LOCATION = ClassUtils.getResource("com/organization/test-artifact/1.0.0/test-artifact-1.0.0-raml.zip", this.getClass());
+    API_WITH_SPACES_LOCATION = ClassUtils.getResource("com/organization/test-artifact/1.0.0/test-artifact-with-spaces-1.0.0-raml.zip", this.getClass());
     API_LOADED_RESOURCE = new URL("jar:" + API_LOCATION.toString() + "!/" + API_RESOURCE_NAME);
+    API_WITH_SPACES_LOADED_RESOURCE = new URL("jar:" + API_WITH_SPACES_LOCATION.toString() + "!/" + API_RESOURCE_NAME_WITH_SPACES_ENCODED);
+    API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES = new URL("jar:" + API_WITH_SPACES_LOCATION.toString() + "!/" + API_FOLDER_NAME_WITH_SPACES_ENCODED + "/" + API_RESOURCE_NAME_WITH_SPACES_ENCODED);
     artifactDescriptor = new ArtifactDescriptor(APP_NAME);
   }
 
@@ -483,6 +500,18 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void findsResourceWithSpacesFromRamlApi() throws Exception {
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT_WITH_SPACES, ARTIFACT_VERSION, "raml", "zip", API_RESOURE_NAME_WITH_SPACES),
+            SPECIFIC_ARTIFACT_ID_WITH_SPACES,API_WITH_SPACES_LOCATION,API_WITH_SPACES_LOADED_RESOURCE);
+  }
+
+  @Test
+  public void findsResourceFromRamlApiInsideFolderWithSpaces() throws Exception {
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT_WITH_SPACES, ARTIFACT_VERSION, "raml", "zip", API_FOLDER_NAME_WITH_SPACES + "/" + API_RESOURE_NAME_WITH_SPACES),
+            SPECIFIC_ARTIFACT_ID_WITH_SPACES,API_WITH_SPACES_LOCATION,API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES);
+  }
+
+  @Test
   public void findsResourceFromRamlFragment() throws Exception {
     getResourceFromApiArtifact("raml-fragment",
                                format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_VERSION, "raml-fragment", "zip", API_RESOURCE_NAME),
@@ -648,16 +677,20 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   private void getResourceFromApiArtifact(String apiKind, String resource, URL expectedResult) throws Exception {
+    getResourceFromApiArtifact(apiKind,resource,SPECIFIC_ARTIFACT_ID,API_LOCATION,expectedResult);
+  }
+
+  private void getResourceFromApiArtifact(String apiKind, String resource, String artifactId, URL apiLocation,URL expectedResult) throws Exception {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(parentClassLoader);
     ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
         .dependingOn(newHashSet(new BundleDependency.Builder()
-            .setBundleUri(API_LOCATION.toURI())
+            .setBundleUri(apiLocation.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
                 .setGroupId(GROUP_ID)
-                .setArtifactId(SPECIFIC_ARTIFACT_ID)
+                .setArtifactId(artifactId)
                 .setVersion(ARTIFACT_VERSION)
                 .setClassifier(apiKind)
                 .setType("zip")
