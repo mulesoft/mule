@@ -231,7 +231,16 @@
           "methodName": "onChainError",
           "elementKind": "method",
           "justification": "Allow for chaining invocations."
-        }
+        },
+        {
+           "code": "java.field.removedWithConstant",
+           "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_CURSOR_MANAGER",
+           "package": "org.mule.runtime.core.api.config",
+           "classSimpleName": "MuleProperties",
+           "fieldName": "OBJECT_CURSOR_MANAGER",
+           "elementKind": "field",
+           "justification": "The constant value was colliding with another entry and it wasn't used anyway"
+         }
       ]
     }
   },

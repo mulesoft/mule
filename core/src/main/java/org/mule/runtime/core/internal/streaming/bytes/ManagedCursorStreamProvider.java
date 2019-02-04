@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.internal.streaming.CursorContext;
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 
@@ -26,27 +24,24 @@ public class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStr
   /**
    * {@inheritDoc}
    */
-  public ManagedCursorStreamProvider(CursorContext cursorContext, CursorManager cursorManager,
-                                     MutableStreamingStatistics statistics) {
-    super(cursorContext, cursorManager, statistics);
+  public ManagedCursorStreamProvider(CursorProvider<CursorStream> delegate, MutableStreamingStatistics statistics) {
+    super(delegate, statistics);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected CursorStream managedCursor(CursorStream cursor, CursorContext handle) {
+  protected CursorStream managedCursor(CursorStream cursor) {
     return new ManagedCursorDecorator(cursor);
   }
 
   private class ManagedCursorDecorator extends CursorStream {
 
     private final CursorStream delegate;
-    //private final CursorContext cursorContext;
 
     private ManagedCursorDecorator(CursorStream delegate) {
       this.delegate = delegate;
-      //this.cursorContext = cursorContext;
     }
 
     @Override
@@ -55,7 +50,6 @@ public class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStr
         delegate.close();
       } finally {
         ManagedCursorStreamProvider.this.onClose(this);
-        //getCursorManager().onClose(delegate, cursorContext);
       }
     }
 

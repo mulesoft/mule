@@ -7,14 +7,11 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static java.util.Collections.newSetFromMap;
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
 
 /**
  * Base class for a {@link CursorProvider} decorator which makes sure that {@link Cursor cursors}
@@ -26,37 +23,29 @@ import org.slf4j.Logger;
  */
 public abstract class ManagedCursorProvider<T extends Cursor> implements CursorProvider<T> {
 
-  private static final Logger LOGGER = getLogger(ManagedCursorProvider.class);
-
   private final CursorProvider<T> delegate;
-  private final CursorManager cursorManager;
-  private final CursorContext cursorContext; //TODO: Seems no longer necessary
   private final Set<Cursor> cursors = newSetFromMap(new ConcurrentHashMap<>());
   private final MutableStreamingStatistics statistics;
   private final CursorProviderJanitor janitor;
 
-  protected ManagedCursorProvider(CursorContext cursorContext, CursorManager cursorManager,
-                                  MutableStreamingStatistics statistics) {
-    this.delegate = (CursorProvider<T>) cursorContext.getCursorProvider();
-    this.cursorContext = cursorContext;
-    this.cursorManager = cursorManager;
+  protected ManagedCursorProvider(CursorProvider<T> delegate, MutableStreamingStatistics statistics) {
+    this.delegate = delegate;
     this.janitor = new CursorProviderJanitor(delegate, cursors, statistics);
     this.statistics = statistics;
     statistics.incrementOpenProviders();
   }
 
   /**
-   * Gets a cursor from the {@link #delegate} and registers it through {@link CursorManager#onOpen(Cursor, CursorContext)}.
+   * Gets a cursor from the {@link #delegate} and keeps track of it.
    * <p>
-   * The returned cursor will also be managed through the means of {@link #managedCursor(Cursor, CursorContext)}
+   * The returned cursor will also be managed through the means of {@link #managedCursor(Cursor)}
    *
    * @return a new {@link Cursor}
    */
   @Override
   public final T openCursor() {
     T cursor = delegate.openCursor();
-    cursorManager.onOpen(cursor, cursorContext);
-    T managedCursor = managedCursor(cursor, cursorContext);
+    T managedCursor = managedCursor(cursor);
     cursors.add(managedCursor);
 
     statistics.incrementOpenCursors();
@@ -78,10 +67,9 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
    * should be that a new instance will be returned.
    *
    * @param cursor the cursor to manage
-   * @param handle the {@link CursorContext}
    * @return a managed {@link Cursor}
    */
-  protected abstract T managedCursor(T cursor, CursorContext handle);
+  protected abstract T managedCursor(T cursor);
 
   @Override
   public final void releaseResources() {
@@ -100,10 +88,5 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   @Override
   public boolean isClosed() {
     return delegate.isClosed();
-  }
-
-  //TODO: Seems no longer necessary
-  protected CursorManager getCursorManager() {
-    return cursorManager;
   }
 }

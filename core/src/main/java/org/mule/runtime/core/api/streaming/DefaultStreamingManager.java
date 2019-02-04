@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.core.api.streaming;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -27,8 +29,10 @@ import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 import org.mule.runtime.core.internal.streaming.AtomicStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.CursorManager;
-import org.mule.runtime.core.internal.streaming.FunkyCursorManager;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
+import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
+import org.mule.runtime.core.internal.streaming.NullStreamingStatistics;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
@@ -41,7 +45,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 @NoExtend
-public class DefaultStreamingManager implements StreamingManager, Lifecycle {
+public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DefaultStreamingManager.class);
 
@@ -49,11 +53,10 @@ public class DefaultStreamingManager implements StreamingManager, Lifecycle {
   private ByteStreamingManager byteStreamingManager;
   private ObjectStreamingManager objectStreamingManager;
   private CursorManager cursorManager;
-  private AtomicStreamingStatistics statistics;
+  private MutableStreamingStatistics statistics;
   private boolean initialised = false;
 
   private Scheduler allocationScheduler;
-  private Scheduler collectorScheduler;
 
   @Inject
   private MuleContext muleContext;
@@ -61,18 +64,21 @@ public class DefaultStreamingManager implements StreamingManager, Lifecycle {
   @Inject
   private SchedulerService schedulerService;
 
+  @Inject
+  private StreamingGhostBuster ghostBuster;
+
   /**
    * {@inheritDoc}
    */
   @Override
   public void initialise() throws InitialisationException {
     if (!initialised) {
-      statistics = new AtomicStreamingStatistics();
+      statistics = createStatistics();
 
-      allocationScheduler = createAllocationScheduler();
-      collectorScheduler = createCollectorScheduler();
+      allocationScheduler =
+          schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-allocate"));
 
-      cursorManager = new FunkyCursorManager(statistics, collectorScheduler);
+      cursorManager = new CursorManager(statistics, ghostBuster);
       bufferManager = new PoolingByteBufferManager(allocationScheduler);
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
@@ -83,14 +89,9 @@ public class DefaultStreamingManager implements StreamingManager, Lifecycle {
     }
   }
 
-  @Override
-  public void start() throws MuleException {
-    cursorManager.start();
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    cursorManager.stop();
+  private MutableStreamingStatistics createStatistics() {
+    return parseBoolean(getProperty(MULE_ENABLE_STREAMING_STATISTICS)) ? new AtomicStreamingStatistics()
+        : new NullStreamingStatistics();
   }
 
   protected ByteStreamingManager createByteStreamingManager() {
@@ -112,7 +113,6 @@ public class DefaultStreamingManager implements StreamingManager, Lifecycle {
     disposeIfNeeded(cursorManager, LOGGER);
 
     allocationScheduler.stop();
-    collectorScheduler.stop();
 
     initialised = false;
   }
@@ -182,16 +182,5 @@ public class DefaultStreamingManager implements StreamingManager, Lifecycle {
 
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
-  }
-
-  private Scheduler createAllocationScheduler() {
-    return schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-allocate"));
-  }
-
-  private Scheduler createCollectorScheduler() {
-    return schedulerService.customScheduler(SchedulerConfig.config()
-        .withMaxConcurrentTasks(1)
-        .withName("StreamingManager-CursorProviderCollector"));
-
   }
 }

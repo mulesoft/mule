@@ -10,32 +10,50 @@ package org.mule.runtime.core.internal.streaming;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.newSetFromMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
-class StreamingGarbageCollector {
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+
+public class StreamingGhostBuster implements Lifecycle {
 
   private static final long POLL_INTERVAL = SECONDS.toMillis(5);
+  private static final Logger LOGGER = getLogger(StreamingGhostBuster.class);
 
-  private final Scheduler scheduler;
   private final ReferenceQueue<ManagedCursorProvider> referenceQueue = new ReferenceQueue<>();
   private final Set<StreamingPhantom> phantoms = newSetFromMap(new ConcurrentHashMap<>());
   private volatile boolean stopped = false;
   private Future taskHandle;
 
-  public StreamingGarbageCollector(Scheduler scheduler) {
-    this.scheduler = scheduler;
+  @Inject
+  private SchedulerService schedulerService;
+
+  private Scheduler scheduler;
+
+  @Override
+  public void initialise() throws InitialisationException {
+    scheduler = schedulerService.customScheduler(SchedulerConfig.config()
+        .withMaxConcurrentTasks(1)
+        .withName("StreamingManager-CursorProviderCollector"));
   }
 
-  public void start() {
+  @Override
+  public void start() throws MuleException {
     try {
       taskHandle = scheduler.submit(this::collectPhantoms);
     } catch (RejectedExecutionException e) {
@@ -44,66 +62,51 @@ class StreamingGarbageCollector {
     stopped = false;
   }
 
-  public void stop() {
+  @Override
+  public void stop() throws MuleException {
     stopped = true;
     taskHandle.cancel(true);
     taskHandle = null;
   }
 
-  //public WeakReference<ManagedCursorProvider> track(ManagedCursorProvider cursorProvider) {
-  //  return new WeakReference<>(cursorProvider, referenceQueue);
-  //  //return new LocaWeakReference(cursorProvider);
-  //}
+  @Override
+  public void dispose() {
+    scheduler.stop();
+  }
 
   public void track(ManagedCursorProvider cursorProvider) {
     phantoms.add(new StreamingPhantom(cursorProvider, referenceQueue));
-    //return new LocaWeakReference(cursorProvider);
   }
 
   private void collectPhantoms() {
-    int phantomCollected = 0;
-    int collected = 0;
     while (!stopped && !currentThread().isInterrupted()) {
       try {
         StreamingPhantom phantom = (StreamingPhantom) referenceQueue.remove(POLL_INTERVAL);
         if (phantom != null) {
-          try {
-            phantom.dispose();
-            System.out.println("Collected: " + ++collected);
-          } catch (Exception e) {
-            e.printStackTrace();
-          } finally {
-            phantom.clear();
-            phantoms.remove(phantom);
-          }
-        } else {
-          System.out.println("phantom collects: " + ++phantomCollected);
+          bustGhost(phantom);
         }
       } catch (InterruptedException e) {
-        // log
-        break;
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Streaming GC thread was interrupted. Finalizing.");
+        }
       }
     }
 
     phantoms.clear();
   }
 
-  private class LocaWeakReference extends WeakReference<ManagedCursorProvider> {
-
-    public LocaWeakReference(ManagedCursorProvider referent) {
-      super(referent);
-    }
-
-    @Override
-    public boolean enqueue() {
-      ManagedCursorProvider provider = get();
-      if (provider != null) {
-        provider.releaseResources();
+  private void bustGhost(StreamingPhantom phantom) {
+    try {
+      phantom.dispose();
+    } catch (Exception e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Found exception trying to dispose phantom CursorProvider: " + e.getMessage(), e);
       }
-      return super.enqueue();
+    } finally {
+      phantom.clear();
+      phantoms.remove(phantom);
     }
   }
-
 
   private class StreamingPhantom extends PhantomReference<ManagedCursorProvider> {
 
