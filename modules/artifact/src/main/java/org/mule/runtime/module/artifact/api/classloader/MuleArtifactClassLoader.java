@@ -52,7 +52,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   static final String RESOURCE_PREFIX = "resource::";
   static final String WILDCARD = "*";
 
-  private static final String NO_WILDCARD =  "([^\\" + WILDCARD + "]+)";
+  private static final String NO_WILDCARD = "([^\\" + WILDCARD + "]+)";
   private static final String NO_WILDCARD_NO_SPACES = "([^\\" + WILDCARD + "|\\s]+)";
   private static final String NO_SPACES = "(\\S+)";
 

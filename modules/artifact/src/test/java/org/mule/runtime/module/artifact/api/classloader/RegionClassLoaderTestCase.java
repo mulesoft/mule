@@ -78,12 +78,13 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private static final String SPECIFIC_ARTIFACT_ID_WITH_SPACES = "test-artifact-with-spaces";
   private static final String ARTIFACT_VERSION = "1.0.0";
   private static final String SPECIFIC_RESOURCE_FORMAT = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID + ":%s:%s:%s:%s";
-  private static final String SPECIFIC_RESOURCE_FORMAT_WITH_SPACES = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID_WITH_SPACES + ":%s:%s:%s:%s";
+  private static final String SPECIFIC_RESOURCE_FORMAT_WITH_SPACES =
+      "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID_WITH_SPACES + ":%s:%s:%s:%s";
   private static final String API_RESOURCE_NAME = "test-api.raml";
   private static final String API_RESOURE_NAME_WITH_SPACES = "raml with spaces.raml";
   private static final String API_FOLDER_NAME_WITH_SPACES = "folder with spaces";
-  private static final String API_RESOURCE_NAME_WITH_SPACES_ENCODED = API_RESOURE_NAME_WITH_SPACES.replace(" ","%20");
-  private static final String API_FOLDER_NAME_WITH_SPACES_ENCODED = API_FOLDER_NAME_WITH_SPACES.replace(" ","%20");
+  private static final String API_RESOURCE_NAME_WITH_SPACES_ENCODED = API_RESOURE_NAME_WITH_SPACES.replace(" ", "%20");
+  private static final String API_FOLDER_NAME_WITH_SPACES_ENCODED = API_FOLDER_NAME_WITH_SPACES.replace(" ", "%20");
 
 
   private final URL APP_LOADED_RESOURCE;
@@ -109,10 +110,13 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     APP_LOADED_RESOURCE = new URL("file:///app.txt");
     PLUGIN_LOADED_RESOURCE = new URL("file:///plugin.txt");
     API_LOCATION = ClassUtils.getResource("com/organization/test-artifact/1.0.0/test-artifact-1.0.0-raml.zip", this.getClass());
-    API_WITH_SPACES_LOCATION = ClassUtils.getResource("com/organization/test-artifact/1.0.0/test-artifact-with-spaces-1.0.0-raml.zip", this.getClass());
+    API_WITH_SPACES_LOCATION =
+        ClassUtils.getResource("com/organization/test-artifact/1.0.0/test-artifact-with-spaces-1.0.0-raml.zip", this.getClass());
     API_LOADED_RESOURCE = new URL("jar:" + API_LOCATION.toString() + "!/" + API_RESOURCE_NAME);
-    API_WITH_SPACES_LOADED_RESOURCE = new URL("jar:" + API_WITH_SPACES_LOCATION.toString() + "!/" + API_RESOURCE_NAME_WITH_SPACES_ENCODED);
-    API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES = new URL("jar:" + API_WITH_SPACES_LOCATION.toString() + "!/" + API_FOLDER_NAME_WITH_SPACES_ENCODED + "/" + API_RESOURCE_NAME_WITH_SPACES_ENCODED);
+    API_WITH_SPACES_LOADED_RESOURCE =
+        new URL("jar:" + API_WITH_SPACES_LOCATION.toString() + "!/" + API_RESOURCE_NAME_WITH_SPACES_ENCODED);
+    API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES = new URL("jar:" + API_WITH_SPACES_LOCATION.toString() + "!/"
+        + API_FOLDER_NAME_WITH_SPACES_ENCODED + "/" + API_RESOURCE_NAME_WITH_SPACES_ENCODED);
     artifactDescriptor = new ArtifactDescriptor(APP_NAME);
   }
 
@@ -501,14 +505,17 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void findsResourceWithSpacesFromRamlApi() throws Exception {
-    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT_WITH_SPACES, ARTIFACT_VERSION, "raml", "zip", API_RESOURE_NAME_WITH_SPACES),
-            SPECIFIC_ARTIFACT_ID_WITH_SPACES,API_WITH_SPACES_LOCATION,API_WITH_SPACES_LOADED_RESOURCE);
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT_WITH_SPACES, ARTIFACT_VERSION, "raml", "zip",
+                                              API_RESOURE_NAME_WITH_SPACES),
+                               SPECIFIC_ARTIFACT_ID_WITH_SPACES, API_WITH_SPACES_LOCATION, API_WITH_SPACES_LOADED_RESOURCE);
   }
 
   @Test
   public void findsResourceFromRamlApiInsideFolderWithSpaces() throws Exception {
-    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT_WITH_SPACES, ARTIFACT_VERSION, "raml", "zip", API_FOLDER_NAME_WITH_SPACES + "/" + API_RESOURE_NAME_WITH_SPACES),
-            SPECIFIC_ARTIFACT_ID_WITH_SPACES,API_WITH_SPACES_LOCATION,API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES);
+    getResourceFromApiArtifact("raml", format(SPECIFIC_RESOURCE_FORMAT_WITH_SPACES, ARTIFACT_VERSION, "raml", "zip",
+                                              API_FOLDER_NAME_WITH_SPACES + "/" + API_RESOURE_NAME_WITH_SPACES),
+                               SPECIFIC_ARTIFACT_ID_WITH_SPACES, API_WITH_SPACES_LOCATION,
+                               API_WITH_SPACES_LOADED_RESOURCE_WITH_FOLDER_WITH_SPACES);
   }
 
   @Test
@@ -677,10 +684,11 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   private void getResourceFromApiArtifact(String apiKind, String resource, URL expectedResult) throws Exception {
-    getResourceFromApiArtifact(apiKind,resource,SPECIFIC_ARTIFACT_ID,API_LOCATION,expectedResult);
+    getResourceFromApiArtifact(apiKind, resource, SPECIFIC_ARTIFACT_ID, API_LOCATION, expectedResult);
   }
 
-  private void getResourceFromApiArtifact(String apiKind, String resource, String artifactId, URL apiLocation,URL expectedResult) throws Exception {
+  private void getResourceFromApiArtifact(String apiKind, String resource, String artifactId, URL apiLocation, URL expectedResult)
+      throws Exception {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
