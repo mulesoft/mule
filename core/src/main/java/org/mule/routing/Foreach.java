@@ -9,6 +9,7 @@ package org.mule.routing;
 import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.SequentialExpressionSplitter;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -29,11 +30,8 @@ import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NotificationUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -191,7 +189,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             ExpressionConfig expressionConfig = new ExpressionConfig();
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
-            splitter = new ExpressionSplitter(expressionConfig);
+            splitter = new SequentialExpressionSplitter(expressionConfig);
+
             if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
             {
                 xpathCollection = true;
