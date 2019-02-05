@@ -161,8 +161,8 @@ public class MuleProperties {
   public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
   public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
+  public static final String OBJECT_STREAMING_GHOST_BUSTER = "_muleStreamingGhostBuster";
   public static final String OBJECT_REGISTRY = "_muleRegistry";
-  public static final String OBJECT_CURSOR_MANAGER = "_muleStreamingManager";
   public static final String OBJECT_TRANSFORMATION_SERVICE = "_muleTransformationService";
   public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";

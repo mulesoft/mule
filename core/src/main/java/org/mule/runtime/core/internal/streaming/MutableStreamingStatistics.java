@@ -8,47 +8,39 @@ package org.mule.runtime.core.internal.streaming;
 
 import org.mule.runtime.core.api.streaming.StreamingStatistics;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
- * Mutable implementation of {@link StreamingStatistics}
+ * Augmented version of the {@link StreamingStatistics} contract which allows to manipulate
+ * the held values.
  *
- * @since 4.0
+ * @since 4.2.0
  */
-public class MutableStreamingStatistics implements StreamingStatistics {
-
-  private final AtomicInteger openProviders = new AtomicInteger(0);
-  private final AtomicInteger openCursors = new AtomicInteger(0);
-
-  void incrementOpenProviders() {
-    openProviders.incrementAndGet();
-  }
-
-  void decrementOpenProviders() {
-    openProviders.decrementAndGet();
-  }
-
-  void incrementOpenCursors() {
-    openCursors.incrementAndGet();
-  }
-
-  void decrementOpenCursors() {
-    openCursors.decrementAndGet();
-  }
+public interface MutableStreamingStatistics extends StreamingStatistics {
 
   /**
-   * {@inheritDoc}
+   * Increases the number of open providers by one and returns the updated value
+   *
+   * @return the updated value
    */
-  @Override
-  public int getOpenCursorProvidersCount() {
-    return openProviders.get();
-  }
+  int incrementOpenProviders();
 
   /**
-   * {@inheritDoc}
+   * Decreases the number of open providers by one and returns the updated value
+   *
+   * @return the updated value
    */
-  @Override
-  public int getOpenCursorsCount() {
-    return openCursors.get();
-  }
+  int decrementOpenProviders();
+
+  /**
+   * Increases the number of open cursors by one and returns the updated value
+   *
+   * @return the updated value
+   */
+  int incrementOpenCursors();
+
+  /**
+   * Decreases the number of open providers by one and returns the updated value
+   *
+   * @return the updated value
+   */
+  int decrementOpenCursors();
 }

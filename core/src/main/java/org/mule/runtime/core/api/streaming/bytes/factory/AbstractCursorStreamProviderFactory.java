@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.InputStream;
