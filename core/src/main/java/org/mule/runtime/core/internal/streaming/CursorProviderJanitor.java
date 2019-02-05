@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 
@@ -13,35 +14,53 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * Performs cleanup tasks for one particular {@link CursorProvider} passed in the constructor.
+ * <p>
+ * None of the methods in this class fail. Any exceptions are logged only.
+ *
+ * @since 4.2.0
+ */
 public class CursorProviderJanitor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CursorProviderJanitor.class);
+  private static final Logger LOGGER = getLogger(CursorProviderJanitor.class);
 
-  private final CursorProvider delegate;
+  private final CursorProvider provider;
   private final Set<Cursor> cursors;
   private final MutableStreamingStatistics statistics;
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicBoolean released = new AtomicBoolean(false);
 
-  public CursorProviderJanitor(CursorProvider delegate, Set<Cursor> cursors,
-                               MutableStreamingStatistics statistics) {
-    this.delegate = delegate;
+  /**
+   * Creates a new instance
+   *
+   * @param provider   the {@link CursorProvider} which resources are freed
+   * @param cursors    a {@link Set} with the providers open cursors
+   * @param statistics a {@link MutableStreamingStatistics}
+   */
+  public CursorProviderJanitor(CursorProvider provider, Set<Cursor> cursors, MutableStreamingStatistics statistics) {
+    this.provider = provider;
     this.cursors = cursors;
     this.statistics = statistics;
   }
 
+  /**
+   * Closes the underlying {@link CursorProvider}
+   */
   public void close() {
     if (closed.compareAndSet(false, true)) {
       try {
-        delegate.close();
+        provider.close();
       } finally {
         statistics.decrementOpenProviders();
       }
     }
   }
 
+  /**
+   * Releases the resources of the underlying {@link CursorProvider}, including its {@link Cursor cursors}
+   */
   public final void releaseResources() {
     if (!released.compareAndSet(false, true)) {
       return;
@@ -57,10 +76,15 @@ public class CursorProviderJanitor {
     try {
       cursors.forEach(this::releaseCursor);
     } finally {
-      delegate.releaseResources();
+      provider.releaseResources();
     }
   }
 
+  /**
+   * Releases the resources associated to the given {@code cursor}.
+   *
+   * @param cursor a {@link Cursor}
+   */
   public void releaseCursor(Cursor cursor) {
     try {
       cursor.release();

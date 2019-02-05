@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.streaming;
 import static java.lang.System.identityHashCode;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -24,6 +25,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Keeps track of active {@link Cursor cursors} and their {@link CursorProvider providers}
+ *
+ * @since 4.0
+ */
 public class CursorManager {
 
   private final LoadingCache<BaseEventContext, EventStreamingState> registry =
