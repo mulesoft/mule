@@ -137,7 +137,7 @@ class MuleExtensionModelDeclarer {
     declareErrorHandler(extensionDeclarer, typeLoader);
     declareTry(extensionDeclarer, typeLoader);
     declareScatterGather(extensionDeclarer, typeLoader);
-    declareSplitAggregate(extensionDeclarer, typeLoader);
+    declareParallelForEach(extensionDeclarer, typeLoader);
     declareFirstSuccessful(extensionDeclarer);
     declareRoundRobin(extensionDeclarer);
     declareConfiguration(extensionDeclarer, typeLoader);
@@ -593,40 +593,39 @@ class MuleExtensionModelDeclarer {
     // ConstructModel doesn't support it.)
   }
 
-  private void declareSplitAggregate(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    ConstructDeclarer splitAggregate = extensionDeclarer.withConstruct("splitAggregate")
+  private void declareParallelForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer parallelForeach = extensionDeclarer.withConstruct("parallelForeach")
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError);
 
-    splitAggregate.withChain();
+    parallelForeach.withChain();
 
-    splitAggregate.onDefaultParameterGroup()
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(String.class))
-        // TODO MULE-14734 Review collection parameter in splitAggregate
         .withRole(ParameterRole.BEHAVIOUR)
         .withExpressionSupport(REQUIRED)
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
-    splitAggregate.onDefaultParameterGroup()
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
         .defaultingTo(Long.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
-    splitAggregate.onDefaultParameterGroup()
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
         .ofType(typeLoader.load(Integer.class))
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
-    splitAggregate.onDefaultParameterGroup()
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_PARAMETER_NAME)
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
-    splitAggregate.onDefaultParameterGroup()
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(typeLoader.load(String.class))
         .defaultingTo(PAYLOAD)

@@ -403,39 +403,39 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void splitAggregate() {
-    final ConstructModel splitAggregate = coreExtensionModel.getConstructModel("splitAggregate").get();
+  public void parallelForeach() {
+    final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
 
-    NestableElementModel processorsChain = splitAggregate.getNestedComponents().get(0);
+    NestableElementModel processorsChain = parallelForeach.getNestedComponents().get(0);
     assertThat(processorsChain, instanceOf(NestedChainModel.class));
     assertThat(processorsChain.isRequired(), is(true));
 
-    assertThat(splitAggregate.getAllParameterModels(), hasSize(5));
+    assertThat(parallelForeach.getAllParameterModels(), hasSize(5));
 
-    assertThat(splitAggregate.getAllParameterModels().get(0).getName(), is("collection"));
-    assertThat(splitAggregate.getAllParameterModels().get(0).getExpressionSupport(), is(REQUIRED));
-    assertThat(splitAggregate.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
-    assertThat(splitAggregate.getAllParameterModels().get(0).isRequired(), is(false));
+    assertThat(parallelForeach.getAllParameterModels().get(0).getName(), is("collection"));
+    assertThat(parallelForeach.getAllParameterModels().get(0).getExpressionSupport(), is(REQUIRED));
+    assertThat(parallelForeach.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
+    assertThat(parallelForeach.getAllParameterModels().get(0).isRequired(), is(false));
 
-    assertThat(splitAggregate.getAllParameterModels().get(1).getName(), is("timeout"));
-    assertThat(splitAggregate.getAllParameterModels().get(1).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(splitAggregate.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
-    assertThat(splitAggregate.getAllParameterModels().get(1).isRequired(), is(false));
+    assertThat(parallelForeach.getAllParameterModels().get(1).getName(), is("timeout"));
+    assertThat(parallelForeach.getAllParameterModels().get(1).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(parallelForeach.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
+    assertThat(parallelForeach.getAllParameterModels().get(1).isRequired(), is(false));
 
-    assertThat(splitAggregate.getAllParameterModels().get(2).getName(), is("maxConcurrency"));
-    assertThat(splitAggregate.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(splitAggregate.getAllParameterModels().get(2).getType(), instanceOf(DefaultNumberType.class));
-    assertThat(splitAggregate.getAllParameterModels().get(2).isRequired(), is(false));
+    assertThat(parallelForeach.getAllParameterModels().get(2).getName(), is("maxConcurrency"));
+    assertThat(parallelForeach.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(parallelForeach.getAllParameterModels().get(2).getType(), instanceOf(DefaultNumberType.class));
+    assertThat(parallelForeach.getAllParameterModels().get(2).isRequired(), is(false));
 
-    assertThat(splitAggregate.getAllParameterModels().get(3).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(splitAggregate.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(splitAggregate.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
-    assertThat(splitAggregate.getAllParameterModels().get(3).isRequired(), is(false));
+    assertThat(parallelForeach.getAllParameterModels().get(3).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(parallelForeach.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(parallelForeach.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
+    assertThat(parallelForeach.getAllParameterModels().get(3).isRequired(), is(false));
 
-    assertThat(splitAggregate.getAllParameterModels().get(4).getName(), is(TARGET_VALUE_PARAMETER_NAME));
-    assertThat(splitAggregate.getAllParameterModels().get(4).getExpressionSupport(), is(REQUIRED));
-    assertThat(splitAggregate.getAllParameterModels().get(4).getType(), instanceOf(StringType.class));
-    assertThat(splitAggregate.getAllParameterModels().get(4).isRequired(), is(false));
+    assertThat(parallelForeach.getAllParameterModels().get(4).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(parallelForeach.getAllParameterModels().get(4).getExpressionSupport(), is(REQUIRED));
+    assertThat(parallelForeach.getAllParameterModels().get(4).getType(), instanceOf(StringType.class));
+    assertThat(parallelForeach.getAllParameterModels().get(4).isRequired(), is(false));
   }
 
   @Test
