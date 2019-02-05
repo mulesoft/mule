@@ -12,6 +12,28 @@
           "classSimpleName": "MavenConfiguration",
           "elementKind": "interface",
           "justification": "Marked as not implemented interface as clients shouldn't implement this internal interface"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.maven.client.api.model.Authentication",
+          "new": "interface org.mule.maven.client.api.model.Authentication",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "Authentication",
+          "elementKind": "interface",
+          "justification": "Marked as not implemented interface as clients shouldn't implement this internal interface"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.maven.client.api.model.RemoteRepository",
+          "new": "interface org.mule.maven.client.api.model.RemoteRepository",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "RemoteRepository",
+          "elementKind": "interface",
+          "justification": "Marked as not implemented interface as clients shouldn't implement this internal interface"
         }
       ]
     }
