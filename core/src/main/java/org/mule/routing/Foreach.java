@@ -191,7 +191,15 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             ExpressionConfig expressionConfig = new ExpressionConfig();
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
-            splitter = new ExpressionSplitter(expressionConfig);
+            splitter = new ExpressionSplitter(expressionConfig)
+            {
+                @Override
+                protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
+                {
+                    message.setCorrelationId(correlationId + "-" + correlationSequence);
+                }
+            };
+
             if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
             {
                 xpathCollection = true;
