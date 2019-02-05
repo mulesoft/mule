@@ -59,9 +59,7 @@ abstract class AbstractCursorStream extends CursorStream {
    */
   @Override
   public synchronized final void release() {
-    if (!released) {
-      released = true;
-    }
+    released = true;
   }
 
   /**

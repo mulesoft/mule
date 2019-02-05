@@ -16,6 +16,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
+import static org.mule.runtime.api.util.MuleSystemProperties.TESTING_MODE_PROPERTY_NAME;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
@@ -84,7 +86,8 @@ public abstract class AbstractMuleTestCase {
       verbose = true;
     }
 
-    System.setProperty(TESTING_MODE_PROPERTY_NAME, StringUtils.EMPTY);
+    System.setProperty(TESTING_MODE_PROPERTY_NAME, "true");
+    System.setProperty(MULE_ENABLE_STREAMING_STATISTICS, "true");
   }
 
   private static final Logger LOGGER = getLogger(AbstractMuleTestCase.class);

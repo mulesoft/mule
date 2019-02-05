@@ -9,9 +9,8 @@ package org.mule.runtime.core.internal.streaming.object;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.internal.streaming.CursorContext;
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
+import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -26,26 +25,24 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
   /**
    * {@inheritDoc}
    */
-  public ManagedCursorIteratorProvider(CursorContext cursorContext, CursorManager cursorManager) {
-    super(cursorContext, cursorManager);
+  public ManagedCursorIteratorProvider(CursorProvider<CursorIterator> delegate, MutableStreamingStatistics statistics) {
+    super(delegate, statistics);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected CursorIterator managedCursor(CursorIterator cursor, CursorContext handle) {
-    return new ManagedCursorIterator(cursor, handle);
+  protected CursorIterator managedCursor(CursorIterator cursor) {
+    return new ManagedCursorIterator(cursor);
   }
 
   private class ManagedCursorIterator<T> implements CursorIterator<T> {
 
     private final CursorIterator<T> delegate;
-    private final CursorContext cursorContext;
 
-    private ManagedCursorIterator(CursorIterator<T> delegate, CursorContext cursorContext) {
+    private ManagedCursorIterator(CursorIterator<T> delegate) {
       this.delegate = delegate;
-      this.cursorContext = cursorContext;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
       try {
         delegate.close();
       } finally {
-        getCursorManager().onClose(delegate, cursorContext);
+        ManagedCursorIteratorProvider.this.onClose(this);
       }
     }
 
