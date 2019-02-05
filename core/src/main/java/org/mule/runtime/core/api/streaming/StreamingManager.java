@@ -13,7 +13,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
-import org.mule.runtime.core.internal.streaming.CursorContext;
 
 import java.io.InputStream;
 
@@ -47,7 +46,7 @@ public interface StreamingManager {
    *
    * @param provider     the provider to be tracked
    * @param creatorRootEventContext the event context on which the stream was created
-   * @return a {@link CursorContext}
+   * @return a {@link CursorProvider}
    */
   CursorProvider manage(CursorProvider provider, EventContext creatorRootEventContext);
 
@@ -57,7 +56,7 @@ public interface StreamingManager {
    *
    * @param provider the provider to be tracked
    * @param creatorEvent the event that created the provider
-   * @return a {@link CursorContext}
+   * @return a {@link CursorProvider}
    * @deprecated Use {@link #manage(InputStream, EventContext)} instead.
    */
   @Deprecated
