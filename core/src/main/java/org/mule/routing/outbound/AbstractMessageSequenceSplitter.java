@@ -135,18 +135,21 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             }
 
             MuleMessage message = createMessage(payload, originalEvent.getMessage());
+
             correlationSequence++;
+
             if (counterVariableName != null)
             {
                 message.setInvocationProperty(counterVariableName, correlationSequence);
             }
+
             if (enableCorrelation != CorrelationMode.NEVER)
             {
                 boolean correlationSet = message.getCorrelationId() != null;
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-                    || (enableCorrelation == CorrelationMode.ALWAYS))
+                        || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-                    message.setCorrelationId(correlationId);
+                    setMessageCorrelationId(message, correlationId, correlationSequence);
                 }
 
                 // take correlation group size from the message properties, set by
@@ -155,6 +158,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 message.setCorrelationGroupSize(count);
                 message.setCorrelationSequence(correlationSequence);
             }
+
             message.propagateRootId(originalEvent.getMessage());
             MuleEvent resultEvent = processNext(RequestContext.setEvent(new DefaultMuleEvent(message, originalEvent, currentEvent.getSession())));
             if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
@@ -170,7 +174,12 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         return resultEvents;
     }
 
-    private MuleMessage createMessage(Object payload, MuleMessage originalMessage)
+    protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
+    {
+        message.setCorrelationId(correlationId);
+    }
+
+    protected MuleMessage createMessage(Object payload, MuleMessage originalMessage)
     {
         if (payload instanceof MuleMessage)
         {
