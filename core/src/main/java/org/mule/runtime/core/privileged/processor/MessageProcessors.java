@@ -34,15 +34,18 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoSink;
 
 /**
  * Some convenience methods for message processors.
@@ -180,8 +183,7 @@ public class MessageProcessors {
       BaseEventContext childContext = newChildContext(event, empty());
       return just(event)
           .transform(publisher -> from(publisher).flatMap(request -> {
-            return from(internalProcessWithChildContext(request, processor, childContext,
-                                                        childContext.getResponsePublisher()));
+            return from(internalProcessWithChildContext(request, processor, childContext));
           }))
           .block();
     } catch (Throwable e) {
@@ -226,7 +228,7 @@ public class MessageProcessors {
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation) {
     BaseEventContext childContext = newChildContext(event, componentLocation);
-    return internalProcessWithChildContext(event, processor, childContext, childContext.getResponsePublisher());
+    return internalProcessWithChildContext(event, processor, childContext);
   }
 
   /**
@@ -242,7 +244,7 @@ public class MessageProcessors {
 
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              BaseEventContext childContext) {
-    return internalProcessWithChildContext(event, processor, childContext, childContext.getResponsePublisher());
+    return internalProcessWithChildContext(event, processor, childContext);
   }
 
   /**
@@ -262,19 +264,24 @@ public class MessageProcessors {
                                                              Optional<ComponentLocation> componentLocation,
                                                              FlowExceptionHandler exceptionHandler) {
     BaseEventContext childContext = child(((BaseEventContext) event.getContext()), componentLocation, exceptionHandler);
-    return internalProcessWithChildContext(event, processor, childContext, childContext.getResponsePublisher());
+    return internalProcessWithChildContext(event, processor, childContext);
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
-                                                                      BaseEventContext child,
-                                                                      Publisher<CoreEvent> responsePublisher) {
+                                                                      BaseEventContext child) {
     String originalCtxKey = "originalContext_" + processor.toString();
 
 
+    AtomicReference<MonoSink<CoreEvent>> sinkRef = new AtomicReference<>();
+
     return just(quickCopy(child, event))
+        .doOnNext(request -> Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
+            .doOnNext(e -> sinkRef.get().success(e))
+            .doOnError(e -> sinkRef.get().error(e))
+            .toProcessor())
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded(/* child, */true))
-        .switchIfEmpty(from(responsePublisher))
+        .switchIfEmpty(Mono.<CoreEvent>create(sink -> sinkRef.set(sink)).toProcessor())
         .map(result -> quickCopy(child.getParentContext().get(), result))
         .onErrorMap(MessagingException.class,
                     me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
