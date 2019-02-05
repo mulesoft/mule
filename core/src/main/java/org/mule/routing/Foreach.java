@@ -9,7 +9,6 @@ package org.mule.routing;
 import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.SequentialExpressionSplitter;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -189,24 +188,12 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             ExpressionConfig expressionConfig = new ExpressionConfig();
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
-            splitter = new ExpressionSplitter(expressionConfig){
+            splitter = new ExpressionSplitter(expressionConfig)
+            {
                 @Override
-                protected void setCorrelationParameters(MuleMessage message, String correlationId, int count, int correlationSequence)
+                protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
                 {
-                    if (enableCorrelation != CorrelationMode.NEVER)
-                    {
-                        boolean correlationSet = message.getCorrelationId() != null;
-                        if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-                                || (enableCorrelation == CorrelationMode.ALWAYS))
-                        {
-                            message.setCorrelationId(correlationId + "-" + correlationSequence);
-                        }
-                        // take correlation group size from the message properties, set by
-                        // concrete
-                        // message splitter implementations
-                        message.setCorrelationGroupSize(count);
-                        message.setCorrelationSequence(correlationSequence);
-                    }
+                    message.setCorrelationId(correlationId + "-" + correlationSequence);
                 }
             };
 

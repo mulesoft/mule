@@ -147,7 +147,21 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 message.setInvocationProperty(counterVariableName, correlationSequence);
             }
 
-            setCorrelationParameters(message, correlationId, count, correlationSequence);
+            if (enableCorrelation != CorrelationMode.NEVER)
+            {
+                boolean correlationSet = message.getCorrelationId() != null;
+                if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
+                        || (enableCorrelation == CorrelationMode.ALWAYS))
+                {
+                    setMessageCorrelationId(message, correlationId, correlationSequence);
+                }
+
+                // take correlation group size from the message properties, set by
+                // concrete
+                // message splitter implementations
+                message.setCorrelationGroupSize(count);
+                message.setCorrelationSequence(correlationSequence);
+            }
 
             message.propagateRootId(originalEvent.getMessage());
             MuleEvent resultEvent = processNext(RequestContext.setEvent(new DefaultMuleEvent(message, originalEvent, currentEvent.getSession())));
@@ -164,23 +178,9 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         return resultEvents;
     }
 
-    protected void setCorrelationParameters(MuleMessage message, String correlationId, int count, int correlationSequence)
+    protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
     {
-        if (enableCorrelation != CorrelationMode.NEVER)
-        {
-            boolean correlationSet = message.getCorrelationId() != null;
-            if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-                    || (enableCorrelation == CorrelationMode.ALWAYS))
-            {
-                message.setCorrelationId(correlationId);
-            }
-
-            // take correlation group size from the message properties, set by
-            // concrete
-            // message splitter implementations
-            message.setCorrelationGroupSize(count);
-            message.setCorrelationSequence(correlationSequence);
-        }
+        message.setCorrelationId(correlationId);
     }
 
     protected MuleMessage createMessage(Object payload, MuleMessage originalMessage)
