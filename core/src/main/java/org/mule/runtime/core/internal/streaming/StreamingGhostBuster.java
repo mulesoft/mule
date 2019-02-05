@@ -103,6 +103,7 @@ public class StreamingGhostBuster implements Lifecycle {
           bust(ghost);
         }
       } catch (InterruptedException e) {
+        currentThread().interrupt();
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Streaming GC thread was interrupted. Finalizing.");
         }
