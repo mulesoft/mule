@@ -36,7 +36,7 @@ import org.slf4j.Logger;
  * (e.g: an &lt;until-successful&gt; which reads a file many times or a &lt;foreach&gt; that executes many queries which result
  * are never used outside of the scope).
  * <p>
- * Notice that this <b>DOES NOT</b> replaces the cleanup and tracking job that is performed in {@link CursorManager}. That
+ * Notice that this <b>DOES NOT</b> replace the cleanup and tracking job that is performed in {@link CursorManager}. That
  * still remains the main cleanup mechanism as we cannot rely on garbage collection for releasing streaming resources. This is
  * only a mitigation for cases like described above.
  *
