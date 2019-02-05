@@ -189,7 +189,26 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             ExpressionConfig expressionConfig = new ExpressionConfig();
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
-            splitter = new SequentialExpressionSplitter(expressionConfig);
+            splitter = new ExpressionSplitter(expressionConfig){
+                @Override
+                protected void setCorrelationParameters(MuleMessage message, String correlationId, int count, int correlationSequence)
+                {
+                    if (enableCorrelation != CorrelationMode.NEVER)
+                    {
+                        boolean correlationSet = message.getCorrelationId() != null;
+                        if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
+                                || (enableCorrelation == CorrelationMode.ALWAYS))
+                        {
+                            message.setCorrelationId(correlationId + "-" + correlationSequence);
+                        }
+                        // take correlation group size from the message properties, set by
+                        // concrete
+                        // message splitter implementations
+                        message.setCorrelationGroupSize(count);
+                        message.setCorrelationSequence(correlationSequence);
+                    }
+                }
+            };
 
             if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
             {
