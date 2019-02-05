@@ -1944,7 +1944,7 @@
             <xsd:extension base="annotatedType">
                 <xsd:annotation>
                     <xsd:documentation>
-                        An empty holder that can be extended by modules that want to provide security managers. Typically it will contain elements called 'module:type-security-provider', which extend securityProviderType where "module" might be "spring-security" and "type" might de "provider", for example. It can also contain encryption strategies, which should follow a similar scheme and extend encryptionStrategyType.
+                        An empty holder that can be extended by modules that want to provide security managers. Typically it will contain elements called 'module:type-security-provider', which extend securityProviderType where "module" might be "spring-security" and "type" might de "delegate", for example. It can also contain encryption strategies, which should follow a similar scheme and extend encryptionStrategyType.
                     </xsd:documentation>
                 </xsd:annotation>
                 <xsd:attribute name="id" />
