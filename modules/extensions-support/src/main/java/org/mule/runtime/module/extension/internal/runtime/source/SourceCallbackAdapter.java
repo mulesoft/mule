@@ -53,5 +53,8 @@ public interface SourceCallbackAdapter<T, A> extends SourceCallback<T, A> {
    */
   String getOwningExtensionName();
 
+  /**
+   * @return the source's {@link ComponentLocation}
+   */
   ComponentLocation getSourceLocation();
 }

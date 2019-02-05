@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.transaction;
 
 import static java.lang.System.identityHashCode;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
@@ -205,6 +206,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
 
   @Override
   public Optional<ComponentLocation> getComponentLocation() {
-    return Optional.ofNullable(componentLocation);
+    return ofNullable(componentLocation);
   }
 }
