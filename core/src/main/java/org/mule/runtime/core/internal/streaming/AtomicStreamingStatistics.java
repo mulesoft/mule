@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import org.mule.runtime.core.api.streaming.StreamingStatistics;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Mutable implementation of {@link StreamingStatistics}
+ * Implementation of {@link MutableStreamingStatistics} based on {@link AtomicInteger}
  *
- * @since 4.0
+ * @since 4.2.0
  */
 public class AtomicStreamingStatistics implements MutableStreamingStatistics {
 

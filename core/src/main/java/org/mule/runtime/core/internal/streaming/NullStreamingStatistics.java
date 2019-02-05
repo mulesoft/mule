@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+/**
+ * Null implementation of {@link MutableStreamingStatistics}. All methods simply return zero.
+ *
+ * @since 4.2.0
+ */
 public class NullStreamingStatistics implements MutableStreamingStatistics {
 
   @Override
