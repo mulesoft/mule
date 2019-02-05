@@ -66,7 +66,7 @@ public class StreamingGhostBuster implements Lifecycle {
   @Override
   public void start() throws MuleException {
     try {
-      taskHandle = scheduler.submit(this::ghostBust);
+      taskHandle = scheduler.submit(this::bustGhosts);
     } catch (RejectedExecutionException e) {
       throw new MuleRuntimeException(e);
     }
@@ -95,7 +95,7 @@ public class StreamingGhostBuster implements Lifecycle {
     return new StreamingWeakReference(cursorProvider, referenceQueue);
   }
 
-  private void ghostBust() {
+  private void bustGhosts() {
     while (!stopped && !currentThread().isInterrupted()) {
       try {
         StreamingWeakReference ghost = (StreamingWeakReference) referenceQueue.remove(POLL_INTERVAL);
@@ -115,7 +115,7 @@ public class StreamingGhostBuster implements Lifecycle {
       ghost.dispose();
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Found exception trying to dispose phantom CursorProvider: " + e.getMessage(), e);
+        LOGGER.warn("Found exception trying to dispose phantom CursorProvider", e);
       }
     } finally {
       ghost.clear();

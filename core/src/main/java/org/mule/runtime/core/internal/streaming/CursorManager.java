@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.lang.System.identityHashCode;
+import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
@@ -21,7 +21,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -87,15 +87,15 @@ public class CursorManager {
   private class EventStreamingState {
 
     private final AtomicBoolean disposed = new AtomicBoolean(false);
-    private final Map<Integer, WeakReference<ManagedCursorProvider>> providers = new ConcurrentHashMap<>();
+    private final Set<WeakReference<ManagedCursorProvider>> providers = newSetFromMap(new ConcurrentHashMap<>());
 
     private void addProvider(ManagedCursorProvider provider) {
-      providers.put(identityHashCode(provider), ghostBuster.track(provider));
+      providers.add(ghostBuster.track(provider));
     }
 
     private void dispose() {
       if (disposed.compareAndSet(false, true)) {
-        providers.values().forEach(weakReference -> {
+        providers.forEach(weakReference -> {
           ManagedCursorProvider provider = weakReference.get();
           if (provider != null) {
             weakReference.clear();
