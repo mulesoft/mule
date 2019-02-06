@@ -12,6 +12,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
+import java.util.Objects;
+
 public class PojoWithStackableTypes {
 
   @Parameter
@@ -48,5 +50,22 @@ public class PojoWithStackableTypes {
 
   public void setTypedValueString(TypedValue<String> typedValueString) {
     this.typedValueString = typedValueString;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    PojoWithStackableTypes that = (PojoWithStackableTypes) o;
+    return Objects.equals(literalString, that.literalString) &&
+        Objects.equals(parameterResolverString, that.parameterResolverString) &&
+        Objects.equals(typedValueString, that.typedValueString);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(literalString, parameterResolverString, typedValueString);
   }
 }

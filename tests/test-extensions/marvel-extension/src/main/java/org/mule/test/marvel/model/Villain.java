@@ -6,6 +6,8 @@
  */
 package org.mule.test.marvel.model;
 
+import java.util.Objects;
+
 public class Villain {
 
   public static final String KABOOM = "KABOOM!";
@@ -19,5 +21,20 @@ public class Villain {
 
   public boolean isAlive() {
     return alive;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    Villain villain = (Villain) o;
+    return alive == villain.alive;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(alive);
   }
 }

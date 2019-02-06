@@ -11,6 +11,8 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.util.Objects;
+
 public class SimplePojo {
 
   @Parameter
@@ -35,5 +37,21 @@ public class SimplePojo {
 
   public void setPass(String pass) {
     this.pass = pass;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    SimplePojo that = (SimplePojo) o;
+    return Objects.equals(user, that.user) &&
+        Objects.equals(pass, that.pass);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(user, pass);
   }
 }

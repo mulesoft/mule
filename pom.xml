@@ -161,7 +161,7 @@
         <bouncycastleVersion>1.60</bouncycastleVersion>
         <c3p0Version>0.9.5.2-MULE-001</c3p0Version>
         <caffeineVersion>2.6.2</caffeineVersion>
-        <cglibVersion>3.2.6</cglibVersion>
+        <cglibVersion>3.2.10</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
@@ -212,7 +212,7 @@
         <projectReactorExtraVersion>3.1.6.RELEASE</projectReactorExtraVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
-        <saxonVersion>9.7.0-15</saxonVersion>
+        <saxonVersion>9.9.1-1</saxonVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
         <snakeYamlVersion>1.21</snakeYamlVersion>
         <springVersion>5.1.0.RELEASE</springVersion>

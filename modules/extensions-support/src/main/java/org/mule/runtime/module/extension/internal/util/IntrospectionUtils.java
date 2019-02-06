@@ -109,6 +109,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -252,6 +253,26 @@ public final class IntrospectionUtils {
     });
 
     return dataType.get();
+  }
+
+  /**
+   * Based on a {@link ExtensionModel}, determines if this one has been created using the Java AST.
+   * @param model Extension model to introspect
+   * @return a boolean indicating whether the {@link ExtensionModel} was created using the Java AST or using compiled classes
+   */
+  public static boolean isASTMode(ExtensionModel model) {
+    Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+    return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
+  }
+
+  /**
+   * Based on a {@link BaseDeclaration}, determines if this one has been created using the Java AST.
+   * @param model Base Declaration to introspect
+   * @return a boolean indicating whether the {@link BaseDeclaration} was created using the Java AST or using compiled classes
+   */
+  public static boolean isASTMode(BaseDeclaration model) {
+    Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+    return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
   }
 
   public static MetadataType getMethodReturnType(MethodElement method) {
@@ -874,8 +895,8 @@ public final class IntrospectionUtils {
     return methodStream.filter(method -> isPublic(method.getModifiers()));
   }
 
-  private static Stream<ExecutableElement> getMethodsStream(TypeElement typeElement, boolean superClasses,
-                                                            ProcessingEnvironment processingEnvironment) {
+  public static Stream<ExecutableElement> getMethodsStream(TypeElement typeElement, boolean superClasses,
+                                                           ProcessingEnvironment processingEnvironment) {
     Stream<ExecutableElement> methodStream;
 
     if (superClasses) {

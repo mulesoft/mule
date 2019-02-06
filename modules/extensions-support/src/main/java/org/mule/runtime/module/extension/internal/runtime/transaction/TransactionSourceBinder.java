@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -17,6 +19,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
@@ -45,6 +48,7 @@ public class TransactionSourceBinder {
 
   public <T extends TransactionalConnection> Optional<ConnectionHandler<T>> bindToTransaction(TransactionConfig transactionConfig,
                                                                                               ConfigurationInstance configurationInstance,
+                                                                                              ComponentLocation sourceLocation,
                                                                                               ConnectionHandler connectionHandler)
 
       throws ConnectionException, TransactionException {
@@ -54,6 +58,7 @@ public class TransactionSourceBinder {
     }
 
     Transaction tx = transactionConfig.getFactory().beginTransaction(muleContext);
+    ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
     tx.setTimeout(transactionConfig.getTimeout());
 
     ConfigurationInstance configuration = ofNullable(configurationInstance)

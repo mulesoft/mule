@@ -8,6 +8,8 @@ package org.mule.test.heisenberg.extension.model;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.util.Objects;
+
 public class Methylamine {
 
   @Parameter
@@ -30,5 +32,21 @@ public class Methylamine {
 
   public void setStolen(boolean stolen) {
     this.stolen = stolen;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    Methylamine that = (Methylamine) o;
+    return stolen == that.stolen &&
+        Objects.equals(importer, that.importer);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(importer, stolen);
   }
 }
