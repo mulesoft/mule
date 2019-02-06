@@ -91,6 +91,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     private static Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
 
     private final boolean isThreadLoggingEnabled;
+    private final int sinksCount;
 
     public ProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                                    int bufferSize,
@@ -108,6 +109,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
             maxConcurrencyEagerCheck);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
+      this.sinksCount = maxConcurrency < CORES ? maxConcurrency : CORES;
     }
 
     public ProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
@@ -129,12 +131,13 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
-      List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
-      int concurrency = maxConcurrency < CORES ? maxConcurrency : CORES;
+      final int sinkBufferSize = bufferSize / sinksCount;
       reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-      for (int i = 0; i < concurrency; i++) {
+      List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
+
+      for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
-        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferSize / concurrency);
+        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(sinkBufferSize);
         processor.publishOn(scheduler).doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
             .transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
@@ -149,7 +152,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
             currentThread().interrupt();
             throw new MuleRuntimeException(e);
           }
-        }, createOnEventConsumer(), bufferSize);
+        }, createOnEventConsumer(), sinkBufferSize);
         sinks.add(new ProactorSinkWrapper<>(sink));
       }
 
