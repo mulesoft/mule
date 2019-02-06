@@ -84,7 +84,7 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
     });
   }
 
-  private URL[] getClassloaderURLs(ClassLoader classLoader)  {
+  private URL[] getClassloaderURLs(ClassLoader classLoader) {
     if (classLoader instanceof URLClassLoader) {
       return ((URLClassLoader) classLoader).getURLs();
     }
