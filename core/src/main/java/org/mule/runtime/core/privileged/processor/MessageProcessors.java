@@ -44,6 +44,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -271,8 +272,11 @@ public class MessageProcessors {
     AtomicReference<MonoSink<CoreEvent>> errorSwitchSinkSinkRef = new AtomicReference<>();
 
     return Mono.<CoreEvent>create(sink -> {
+      // System.out.println(" >> child.getResponsePublisher()");
       Mono.from(child.getResponsePublisher())
           .doOnSuccess(response -> {
+            // System.out
+            // .println(" >> child.getResponsePublisher() -> onSuccess " + completeParentIfEmpty + ", " + response.getContext());
             if (response == null && completeParentIfEmpty) {
               child.getParentContext().get().success();
               errorSwitchSinkSinkRef.get().success();
@@ -280,7 +284,10 @@ public class MessageProcessors {
               errorSwitchSinkSinkRef.get().success(response);
             }
           })
-          .doOnError(error -> errorSwitchSinkSinkRef.get().error(error))
+          .doOnError(error -> {
+            // System.out.println(" >> child.getResponsePublisher() -> onError " + completeParentIfEmpty + ", " + error);
+            errorSwitchSinkSinkRef.get().error(error);
+          })
           .toProcessor();
 
       sink.success(quickCopy(child, event));
@@ -288,7 +295,10 @@ public class MessageProcessors {
         .toProcessor()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(Mono.<CoreEvent>create(sink -> errorSwitchSinkSinkRef.set(sink)).toProcessor())
+        .switchIfEmpty(Mono.<CoreEvent>create(sink -> {
+          // System.out.println(" >> switchIfEmpty create");
+          errorSwitchSinkSinkRef.set(sink);
+        }).toProcessor())
         .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result))
         .onErrorMap(MessagingException.class,
                     me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
@@ -302,20 +312,39 @@ public class MessageProcessors {
     // String originalCtxKey = "originalContext_" + processor.toString();
 
 
-    AtomicReference<MonoSink<CoreEvent>> errorSwitchSinkSinkRef = new AtomicReference<>();
+    AtomicReference<FluxSink<CoreEvent>> errorSwitchSinkSinkRef = new AtomicReference<>();
+
+    Flux<CoreEvent> lalala = Flux.<CoreEvent>create(sink -> {
+      // System.out.println(" >> mergeWith create");
+      errorSwitchSinkSinkRef.set(sink);
+    })
+        .onErrorMap(MessagingException.class,
+                    me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
+                        .get(), me.getEvent()), me))
+    // .publish()
+    ;
 
     return Flux.from(eventChildCtxPub)
-        .doOnNext(eventChildCtx -> Mono.from(((BaseEventContext) eventChildCtx.getContext()).getResponsePublisher())
-            .doOnSuccess(response -> {
-              if (response == null && completeParentIfEmpty) {
-                ((BaseEventContext) eventChildCtx.getContext()).getParentContext().get().success();
-                errorSwitchSinkSinkRef.get().success();
-              } else {
-                errorSwitchSinkSinkRef.get().success(response);
-              }
-            })
-            .doOnError(error -> errorSwitchSinkSinkRef.get().error(error))
-            .toProcessor())
+        .doOnNext(eventChildCtx -> {
+          // System.out.println(" >> child.getResponsePublisher()");
+          Mono.from(((BaseEventContext) eventChildCtx.getContext()).getResponsePublisher())
+              .doOnSuccess(response -> {
+                // System.out.println(" >> child.getResponsePublisher() -> onSuccess " + completeParentIfEmpty + ", "
+                // + response.getContext());
+                if (response == null && completeParentIfEmpty) {
+                  ((BaseEventContext) eventChildCtx.getContext()).getParentContext().get().success();
+                  errorSwitchSinkSinkRef.get().next(null);
+                } else {
+                  errorSwitchSinkSinkRef.get().next(response);
+                }
+              })
+              .doOnError(error -> {
+                // System.out.println(" >> child.getResponsePublisher() -> onError " + completeParentIfEmpty + ", " + error);
+                errorSwitchSinkSinkRef.get().error(error);
+              })/*
+                 * .toProcessor()
+                 */;
+        })
 
         // return Mono.<CoreEvent>create(sink -> {
         // Mono.from(child.getResponsePublisher())
@@ -329,11 +358,13 @@ public class MessageProcessors {
         // .toProcessor()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .mergeWith(Mono.<CoreEvent>create(sink -> errorSwitchSinkSinkRef.set(sink)).toProcessor())
-        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result))
-        .onErrorMap(MessagingException.class,
-                    me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
-                        .get(), me.getEvent()), me));
+        // .mergeWith(Flux.<CoreEvent>create(sink -> {
+        // System.out.println(" >> mergeWith create");
+        // errorSwitchSinkSinkRef.set(sink);
+        // })/* .toProcessor() */)
+        // .mergeWith(Mono.<CoreEvent>create(sink -> errorSwitchSinkSinkRef.set(sink)).toProcessor())
+        .mergeWith(lalala)
+        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
 
     // return just(event)
     // .map(ev -> quickCopy(quickCopy(child, ev), ImmutableMap.of("originalContext_" + processor.toString(), ev.getContext())))
@@ -407,6 +438,7 @@ public class MessageProcessors {
 
   private static Consumer<CoreEvent> completeSuccessIfNeeded() {
     return result -> {
+      // System.out.println(" >> completeSuccessIfNeeded " + result.getContext());
       final BaseEventContext ctx = (BaseEventContext) result.getContext();
       if (!ctx.isComplete()) {
         ctx.success(result);
