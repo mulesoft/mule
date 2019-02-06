@@ -218,7 +218,7 @@
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
-        <saxonVersion>9.7.0-15</saxonVersion>
+        <saxonVersion>9.9.1-1</saxonVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
         <snakeYamlVersion>1.18</snakeYamlVersion>
         <springVersion>4.3.19.RELEASE</springVersion>
