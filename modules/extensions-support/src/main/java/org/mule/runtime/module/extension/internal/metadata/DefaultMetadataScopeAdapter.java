@@ -10,13 +10,17 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
@@ -64,11 +68,7 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
     Optional<OutputResolver> outputResolverDeclaration = operation.getAnnotation(OutputResolver.class);
     Optional<Pair<MetadataKeyId, MetadataType>> keyId = locateMetadataKeyId(declaration);
 
-    inputResolvers = declaration.getAllParameters().stream()
-        .filter(p -> getAnnotatedElement(p).map(e -> e.isAnnotationPresent(TypeResolver.class)).orElse(false))
-        .filter(p -> !hasCustomStaticType(p))
-        .collect(toMap(p -> p.getName(),
-                       p -> ResolverSupplier.of(getAnnotatedElement(p).get().getAnnotation(TypeResolver.class).value())));
+    inputResolvers = getInputResolvers(declaration);
 
     if (outputResolverDeclaration.isPresent() || !inputResolvers.isEmpty()) {
       outputResolverDeclaration.ifPresent(resolverDeclaration -> {
@@ -89,6 +89,18 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
 
   public DefaultMetadataScopeAdapter(Type extensionElement, WithDeclaringClass source, SourceDeclaration sourceDeclaration) {
     initializeFromClass(extensionElement, source, sourceDeclaration);
+  }
+
+  private Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers(ParameterizedDeclaration<? extends BaseDeclaration> declaration) {
+    return declaration.getAllParameters().stream()
+        .filter(p -> getAnnotatedElement(p).map(e -> e.isAnnotationPresent(TypeResolver.class)).orElse(false))
+        .filter(p -> !hasCustomStaticType(p))
+        .collect(toMap(p -> p.getName(),
+                       p -> ResolverSupplier.of(getAnnotatedElement(p).get().getAnnotation(TypeResolver.class).value())));
+  }
+
+  public DefaultMetadataScopeAdapter(SourceCallbackDeclaration sourceCallbackDeclaration) {
+    inputResolvers = getInputResolvers(sourceCallbackDeclaration);
   }
 
   private void initializeFromClass(Type extensionType, WithDeclaringClass annotatedType, WithOutputDeclaration declaration) {

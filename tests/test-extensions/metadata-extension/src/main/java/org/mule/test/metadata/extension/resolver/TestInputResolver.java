@@ -11,8 +11,11 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 
 public class TestInputResolver implements InputTypeResolver<String> {
+
+  public static String INPUT_RESOLVER_NAME = MetadataComponent.INPUT.name();
 
   @Override
   public String getCategoryName() {

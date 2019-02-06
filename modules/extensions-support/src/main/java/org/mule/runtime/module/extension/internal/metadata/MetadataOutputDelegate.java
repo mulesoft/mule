@@ -15,6 +15,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -22,6 +23,7 @@ import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -37,13 +39,13 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverUtils;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -53,8 +55,8 @@ import java.util.function.Function;
  */
 class MetadataOutputDelegate extends BaseMetadataDelegate {
 
-  MetadataOutputDelegate(ComponentModel componentModel) {
-    super(componentModel);
+  MetadataOutputDelegate(EnrichableModel model) {
+    super(model);
   }
 
   Optional<String> getCategoryName() {
@@ -72,7 +74,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * resolution fails for any reason.
    */
   MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor(MetadataContext context, Object key) {
-    if (!(component instanceof HasOutputModel)) {
+    if (!(model instanceof HasOutputModel)) {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component has not output definition to be described").onComponent());
     }
@@ -80,7 +82,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     MetadataResult<MetadataType> output = getOutputMetadata(context, key);
     MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
 
-    HasOutputModel componentWithOutput = (HasOutputModel) this.component;
+    HasOutputModel componentWithOutput = (HasOutputModel) this.model;
     MetadataResult<TypeMetadataDescriptor> outputDescriptor =
         toMetadataDescriptorResult(componentWithOutput.getOutput().getType(), componentWithOutput.getOutput().hasDynamicType(),
                                    output);
@@ -120,7 +122,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @return a {@link MetadataResult} with the {@link MetadataType} of the component's output
    */
   private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
-    OutputModel output = ((HasOutputModel) component).getOutput();
+    OutputModel output = ((HasOutputModel) model).getOutput();
     if (isVoid(output.getType()) || !output.hasDynamicType()) {
       return success(output.getType());
     }
@@ -149,7 +151,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @return a {@link MetadataResult} with the {@link MetadataType} of the components output {@link Message#getAttributes()}
    */
   private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {
-    OutputModel attributes = ((HasOutputModel) component).getOutputAttributes();
+    OutputModel attributes = ((HasOutputModel) model).getOutputAttributes();
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());
     }
@@ -189,7 +191,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
   private MetadataType adaptToListIfNecessary(MetadataType resolvedType, Object key, MetadataContext metadataContext)
       throws MetadataResolvingException {
 
-    MetadataType componentOutputType = ((HasOutputModel) component).getOutput().getType();
+    MetadataType componentOutputType = ((HasOutputModel) model).getOutput().getType();
     if (!isCollection(componentOutputType) || isVoid(resolvedType) || isNullType(resolvedType)) {
       return resolvedType;
     }
@@ -215,7 +217,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     MessageMetadataTypeBuilder message = new MessageMetadataTypeBuilder().payload(type);
     staticAttributes.ifPresent(message::attributes);
 
-    if (((HasOutputModel) component).getOutputAttributes().hasDynamicType()) {
+    if (((HasOutputModel) model).getOutputAttributes().hasDynamicType()) {
       MetadataResult<MetadataType> attributes = resolveOutputAttributesMetadata(context, key, Objects::nonNull);
       if (!attributes.isSuccess()) {
         throw new MetadataResolvingException("Could not resolve attributes of List<Message> output",

@@ -112,6 +112,14 @@
         </metadata:metadata-source>
     </flow>
 
+    <flow name="sourceMetadataWithCallbackParameters" initialState="stopped">
+        <metadata:metadata-source-with-callback-parameters config-ref="config" type="PERSON" successObject="#['success!']" errorObject="#['error!']">
+            <metadata:response response="#['The processing was succesfull!']" code="200"/>
+            <metadata:error-response response="#['There was an error!']" code="400"/>
+        </metadata:metadata-source-with-callback-parameters>
+        <logger/>
+    </flow>
+
     <flow name="flowWithoutSource">
         <logger/>
     </flow>

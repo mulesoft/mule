@@ -32,7 +32,7 @@ import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
     MetadataInheritedOperationResolversOperations.class, CustomStaticMetadataOperations.class})
 @ConnectionProviders(MetadataConnectionProvider.class)
 @Sources({MetadataSource.class, MetadataSourceWithMultilevel.class, CustomStaticMetadataSource.class,
-    CustomXmlStaticMetadataSource.class})
+    CustomXmlStaticMetadataSource.class, MetadataSourceWithCallbackParameters.class})
 @SubTypeMapping(baseType = Animal.class, subTypes = Bear.class)
 @SubTypeMapping(baseType = Shape.class, subTypes = {Circle.class, Rectangle.class})
 @SubTypeMapping(baseType = AbstractOutputAttributes.class,

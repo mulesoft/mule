@@ -15038,6 +15038,922 @@
             }
           },
           "kind": "source"
+        },
+        {
+          "hasResponse": false,
+          "runsOnPrimaryNodeOnly": false,
+          "successCallback": {
+            "parameterGroupModels": [
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Any",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "classInformation": {
+                          "classname": "java.lang.Object",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "typeAlias": {
+                          "value": "Object"
+                        }
+                      }
+                    },
+                    "hasDynamicType": true,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": false,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 7
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "successObject",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "showInDsl": false,
+                "name": "General",
+                "description": "",
+                "modelProperties": {}
+              },
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Binary",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.io.InputStream",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Closeable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
+                      }
+                    },
+                    "hasDynamicType": true,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": false,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 5
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "response",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": false,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 6
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "code",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
+                "showInDsl": true,
+                "name": "Response",
+                "description": "",
+                "modelProperties": {}
+              }
+            ],
+            "name": "onSuccess",
+            "description": "",
+            "modelProperties": {
+              "typeResolversInformation": {
+                "category": "TestResolvers",
+                "inputResolvers": {
+                  "response": {
+                    "resolverName": "testInputPersonResolver",
+                    "requiresConnection": true,
+                    "requiresConfiguration": true
+                  },
+                  "successObject": {
+                    "resolverName": "testInputCarResolver",
+                    "requiresConnection": true,
+                    "requiresConfiguration": true
+                  }
+                }
+              }
+            }
+          },
+          "errorCallback": {
+            "parameterGroupModels": [
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Any",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "classInformation": {
+                          "classname": "java.lang.Object",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "typeAlias": {
+                          "value": "Object"
+                        }
+                      }
+                    },
+                    "hasDynamicType": true,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": false,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 10
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "errorObject",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "showInDsl": false,
+                "name": "General",
+                "description": "",
+                "modelProperties": {}
+              },
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Binary",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.io.InputStream",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Closeable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
+                      }
+                    },
+                    "hasDynamicType": true,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": false,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 8
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "response",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "isComponentId": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": false,
+                      "allowsReferences": false,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 9
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "code",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
+                "showInDsl": true,
+                "name": "Error Response",
+                "description": "",
+                "modelProperties": {}
+              }
+            ],
+            "name": "onError",
+            "description": "",
+            "modelProperties": {
+              "typeResolversInformation": {
+                "category": "TestResolvers",
+                "inputResolvers": {
+                  "errorObject": {
+                    "resolverName": "INPUT",
+                    "requiresConnection": true,
+                    "requiresConfiguration": true
+                  },
+                  "response": {
+                    "resolverName": "testInputHouseResolver",
+                    "requiresConnection": true,
+                    "requiresConfiguration": true
+                  }
+                }
+              }
+            }
+          },
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Object",
+              "annotations": {
+                "classInformation": {
+                  "classname": "java.util.Map",
+                  "hasDefaultConstructor": false,
+                  "isInterface": true,
+                  "isInstantiable": false,
+                  "isAbstract": true,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": [
+                    "java.lang.String",
+                    "java.lang.Object"
+                  ],
+                  "isMap": true
+                }
+              },
+              "open": {
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "classInformation": {
+                    "classname": "java.lang.Object",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "typeAlias": {
+                    "value": "Object"
+                  }
+                },
+                "fields": []
+              },
+              "fields": []
+            },
+            "hasDynamicType": true,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.tck.message.StringAttributes"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "notifications": [],
+          "nestedComponents": [],
+          "errors": [],
+          "stereotype": {
+            "type": "METADATA_SOURCE_WITH_CALLBACK_PARAMETERS",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "type",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
+                      "order": 1,
+                      "providedByKeyResolver": true
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "METADATA",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "config-ref",
+                  "description": "The name of the configuration to be used to execute this component",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": false,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 11,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "RedeliveryPolicy"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxRedeliveryCount"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "messageDigestAlgorithm"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "MessageIdentifier"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "RedeliveryPolicyMessageIdentifier",
+                            "exclusiveOptionals": {
+                              "exclusiveParameterNames": [
+                                "useSecureHash",
+                                "idExpression"
+                              ],
+                              "isOneRequired": true
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "useSecureHash"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "true"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "idExpression"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "flattened": {},
+                          "description": {
+                            "value": "Defines which strategy is used to identify the messages."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "objectStore"
+                        },
+                        "model": {
+                          "type": "@ref:org.mule.runtime.api.store.ObjectStore"
+                        },
+                        "annotations": {
+                          "stereotype": {
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "value": "The object store where the redelivery counter for each message is going to be stored."
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3,
+                    "tabName": "Redelivery"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "redeliveryPolicy",
+                  "description": "Defines a policy for processing the redelivery of the same message",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-redelivery-policy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "ReconnectionStrategy"
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect-forever"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "MetadataSourceWithCallbackParameters",
+          "description": "",
+          "modelProperties": {
+            "typeResolversInformation": {
+              "category": "MetadataExtensionResolver",
+              "outputResolver": {
+                "resolverName": "TestInputAndOutputWithAttributesResolverWithKeyResolver",
+                "requiresConnection": true,
+                "requiresConfiguration": true
+              },
+              "keysResolver": {
+                "resolverName": "TestInputOutputSourceResolverWithKeyResolver",
+                "requiresConnection": true,
+                "requiresConfiguration": true
+              }
+            },
+            "metadataKeyId": {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
+            }
+          },
+          "kind": "source"
         }
       ],
       "name": "config",

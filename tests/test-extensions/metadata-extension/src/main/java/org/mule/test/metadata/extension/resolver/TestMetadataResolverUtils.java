@@ -40,21 +40,15 @@ public class TestMetadataResolverUtils {
   }
 
   public static MetadataType getMetadata(String key) throws MetadataResolvingException {
-    final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(JAVA).objectType();
+
 
     switch (key) {
       case MetadataConnection.CAR:
-        objectBuilder.addField().key(TIRES).value().numberType();
-        objectBuilder.addField().key(BRAND).value().stringType();
-        break;
+        return getCarMetadata();
       case MetadataConnection.HOUSE:
-        objectBuilder.addField().key(DIRECTION).value().stringType();
-        objectBuilder.addField().key(SIZE).value().numberType();
-        break;
+        return getHouseMetadata();
       case MetadataConnection.PERSON:
-        objectBuilder.addField().key(NAME).value().stringType();
-        objectBuilder.addField().key(AGE).value().numberType();
-        break;
+        return getPersonMetadata();
       case MetadataConnection.NULL:
         return BaseTypeBuilder.create(JAVA).nullType().build();
       case MetadataConnection.VOID:
@@ -62,7 +56,26 @@ public class TestMetadataResolverUtils {
       default:
         throw new MetadataResolvingException("Unknown key " + key, INVALID_METADATA_KEY);
     }
+  }
 
+  public static MetadataType getCarMetadata() {
+    ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(JAVA).objectType();
+    objectBuilder.addField().key(TIRES).value().numberType();
+    objectBuilder.addField().key(BRAND).value().stringType();
+    return objectBuilder.build();
+  }
+
+  public static MetadataType getHouseMetadata() {
+    ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(JAVA).objectType();
+    objectBuilder.addField().key(DIRECTION).value().stringType();
+    objectBuilder.addField().key(SIZE).value().numberType();
+    return objectBuilder.build();
+  }
+
+  public static MetadataType getPersonMetadata() {
+    ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(JAVA).objectType();
+    objectBuilder.addField().key(NAME).value().stringType();
+    objectBuilder.addField().key(AGE).value().numberType();
     return objectBuilder.build();
   }
 
