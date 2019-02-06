@@ -240,7 +240,18 @@
            "fieldName": "OBJECT_CURSOR_MANAGER",
            "elementKind": "field",
            "justification": "The constant value was colliding with another entry and it wasn't used anyway"
-         }
+         },
+         {
+            "code": "java.annotation.added",
+            "old": "interface org.mule.runtime.core.api.transaction.Transaction",
+            "new": "interface org.mule.runtime.core.api.transaction.Transaction",
+            "annotationType": "org.mule.api.annotation.NoImplement",
+            "annotation": "@org.mule.api.annotation.NoImplement",
+            "package": "org.mule.runtime.core.api.transaction",
+            "classSimpleName": "Transaction",
+            "elementKind": "interface",
+            "justification": "This interface is not intended to be implemented."
+          },
       ]
     }
   },
@@ -282,6 +293,17 @@
           "methodName": "onPoliciesChanged",
           "elementKind": "method",
           "justification": "Added for performance, has default implementation"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.transaction.Transaction",
+          "new": "interface org.mule.runtime.core.api.transaction.Transaction",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.core.api.transaction",
+          "classSimpleName": "Transaction",
+          "elementKind": "interface",
+          "justification": "This interface is not intended to be implemented."
         }
       ]
     }
