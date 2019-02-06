@@ -99,8 +99,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       return Scope.super.apply(publisher);
     } else {
-      return from(publisher)
-          .flatMap(event -> processWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
+      return applyWithChildContext(from(publisher), nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
     }
   }
 

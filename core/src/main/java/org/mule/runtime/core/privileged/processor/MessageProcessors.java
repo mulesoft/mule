@@ -314,7 +314,7 @@ public class MessageProcessors {
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,
-                                                                      ReactiveProcessor processor) {
+                                                                    ReactiveProcessor processor) {
     // System.out.println(" >> child " + child);
     // String originalCtxKey = "originalContext_" + processor.toString();
 
@@ -373,7 +373,7 @@ public class MessageProcessors {
    * @return the future result of processing processor.
    */
   public static Publisher<CoreEvent> applyWithChildContext(Publisher<CoreEvent> eventPub, ReactiveProcessor processor,
-                                                             Optional<ComponentLocation> componentLocation) {
+                                                           Optional<ComponentLocation> componentLocation) {
     // BaseEventContext childContext = newChildContext(event, componentLocation);
     // return internalProcessWithChildContext(event, processor, childContext);
     return internalApplyWithChildContext(Flux.from(eventPub).map(event -> {
@@ -395,8 +395,8 @@ public class MessageProcessors {
    * @return the future result of processing processor.
    */
   public static Publisher<CoreEvent> applyWithChildContext(Publisher<CoreEvent> eventPub, ReactiveProcessor processor,
-                                                             Optional<ComponentLocation> componentLocation,
-                                                             FlowExceptionHandler exceptionHandler) {
+                                                           Optional<ComponentLocation> componentLocation,
+                                                           FlowExceptionHandler exceptionHandler) {
     return internalApplyWithChildContext(Flux.from(eventPub).map(event -> {
       return quickCopy(child(((BaseEventContext) event.getContext()), componentLocation, exceptionHandler), event);
     }), processor);
