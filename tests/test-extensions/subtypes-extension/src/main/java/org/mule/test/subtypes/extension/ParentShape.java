@@ -6,6 +6,8 @@
  */
 package org.mule.test.subtypes.extension;
 
+import java.util.Objects;
+
 public class ParentShape {
 
   private Integer area;
@@ -16,5 +18,20 @@ public class ParentShape {
 
   public void setArea(Integer area) {
     this.area = area;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    ParentShape that = (ParentShape) o;
+    return Objects.equals(area, that.area);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(area);
   }
 }

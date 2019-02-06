@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
@@ -76,11 +78,16 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
     @Override
     public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-      Optional<ExtensionTypeDescriptorModelProperty> property = extensionLoadingContext.getExtensionDeclarer().getDeclaration()
-          .getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-
+      BaseDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
       //TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
-      if (property.isPresent() && property.get().getType().getDeclaringClass().isPresent()) {
+      if (!isASTMode(declaration)) {
+        Optional<ExtensionTypeDescriptorModelProperty> property =
+            declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+
+        if (!property.isPresent()) {
+          return;
+        }
+
         extensionType = property.get().getType();
 
         new IdempotentDeclarationWalker() {

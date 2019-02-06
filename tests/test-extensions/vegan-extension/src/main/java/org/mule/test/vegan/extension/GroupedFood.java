@@ -11,6 +11,8 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.util.Objects;
+
 @TypeDsl(allowTopLevelDefinition = true)
 public class GroupedFood {
 
@@ -25,5 +27,20 @@ public class GroupedFood {
 
   public void setFood(FarmedFood food) {
     this.food = food;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    GroupedFood that = (GroupedFood) o;
+    return Objects.equals(food, that.food);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(food);
   }
 }

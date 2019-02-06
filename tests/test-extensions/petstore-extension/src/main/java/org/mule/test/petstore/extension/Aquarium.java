@@ -10,6 +10,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
+import java.util.Objects;
+
 public class Aquarium {
 
   @ParameterGroup(name = "pond")
@@ -27,4 +29,19 @@ public class Aquarium {
     return pond;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    Aquarium aquarium = (Aquarium) o;
+    return Objects.equals(pond, aquarium.pond) &&
+        Objects.equals(ticketPrice, aquarium.ticketPrice);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(pond, ticketPrice);
+  }
 }

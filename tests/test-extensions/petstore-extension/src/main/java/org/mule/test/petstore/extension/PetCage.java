@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class PetCage {
 
@@ -39,4 +40,20 @@ public class PetCage {
     return tls;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    PetCage petCage = (PetCage) o;
+    return Objects.equals(birds, petCage.birds) &&
+        Objects.equals(ammenities, petCage.ammenities) &&
+        Objects.equals(tls, petCage.tls);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(birds, ammenities, tls);
+  }
 }

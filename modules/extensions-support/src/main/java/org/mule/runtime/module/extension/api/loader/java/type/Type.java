@@ -151,4 +151,12 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
    */
   @Override
   Optional<TypeElement> getElement();
+
+  /**
+   * @param name
+   * @param parameterTypes
+   * @return The {@link MethodElement} if present
+   * @since 4.2
+   */
+  Optional<MethodElement> getMethod(String name, Class<?>... parameterTypes);
 }

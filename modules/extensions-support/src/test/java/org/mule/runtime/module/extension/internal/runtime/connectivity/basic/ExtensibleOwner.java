@@ -12,6 +12,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.api.meta.ExpressionSupport;
 
+import java.util.Objects;
+
 @Extensible
 public class ExtensibleOwner {
 
@@ -50,4 +52,27 @@ public class ExtensibleOwner {
   @Optional
   private String optionalFieldExpressionNotSupported;
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    ExtensibleOwner that = (ExtensibleOwner) o;
+    return Objects.equals(requiredFieldDefault, that.requiredFieldDefault) &&
+        Objects.equals(requiredFieldExpressionSupported, that.requiredFieldExpressionSupported) &&
+        Objects.equals(requiredFieldExpressionRequired, that.requiredFieldExpressionRequired) &&
+        Objects.equals(requiredFieldExpressionNotSupported, that.requiredFieldExpressionNotSupported) &&
+        Objects.equals(optionalFieldDefault, that.optionalFieldDefault) &&
+        Objects.equals(optionalFieldExpressionSupported, that.optionalFieldExpressionSupported) &&
+        Objects.equals(optionalFieldExpressionRequired, that.optionalFieldExpressionRequired) &&
+        Objects.equals(optionalFieldExpressionNotSupported, that.optionalFieldExpressionNotSupported);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(requiredFieldDefault, requiredFieldExpressionSupported, requiredFieldExpressionRequired,
+                        requiredFieldExpressionNotSupported, optionalFieldDefault, optionalFieldExpressionSupported,
+                        optionalFieldExpressionRequired, optionalFieldExpressionNotSupported);
+  }
 }

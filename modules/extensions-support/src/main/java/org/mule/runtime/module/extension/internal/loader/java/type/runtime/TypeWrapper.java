@@ -22,6 +22,7 @@ import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.PropertyElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
@@ -30,6 +31,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
@@ -278,5 +280,18 @@ public class TypeWrapper implements Type {
   @Override
   public Optional<TypeElement> getElement() {
     return empty();
+  }
+
+  @Override
+  public Optional<MethodElement> getMethod(String name, Class<?>... objects) {
+    try {
+      Method method = aClass.getMethod(name, objects);
+      if (!method.getDeclaringClass().equals(Object.class)) {
+        return Optional.of(new MethodWrapper(method, typeLoader));
+      }
+      return Optional.empty();
+    } catch (NoSuchMethodException e) {
+      return Optional.empty();
+    }
   }
 }

@@ -74,6 +74,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.ParameterTyp
 import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.SourceCallbacksModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.EqualsAndHashCodeModelValidator;
 
 import java.util.Collection;
 import java.util.List;
@@ -87,6 +88,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
                                                                                          new ConfigurationModelValidator(),
                                                                                          new ConnectionProviderModelValidator(),
+                                                                                         new EqualsAndHashCodeModelValidator(),
                                                                                          new DeprecationModelValidator(),
                                                                                          new InputParametersTypeModelValidator(),
                                                                                          new JavaSubtypesModelValidator(),

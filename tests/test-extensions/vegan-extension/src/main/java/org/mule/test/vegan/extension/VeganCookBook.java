@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Extensible
 public class VeganCookBook {
@@ -48,5 +49,22 @@ public class VeganCookBook {
 
   public String getEditorial() {
     return editorial;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    VeganCookBook that = (VeganCookBook) o;
+    return Objects.equals(recipes, that.recipes) &&
+        Objects.equals(numberOfPages, that.numberOfPages) &&
+        Objects.equals(editorial, that.editorial);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(recipes, numberOfPages, editorial);
   }
 }
