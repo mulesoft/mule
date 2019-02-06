@@ -17,19 +17,23 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import org.junit.Test;
+import sun.misc.Unsafe;
 
 @SmallTest
 public class IOUtilsTestCase extends AbstractMuleTestCase {
@@ -59,12 +63,12 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   public void increaseBufferSizeViaSystemProperty() throws Exception {
     final int newBufferSize = 8 * 1024;
 
-    testWithSystemProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE, Integer.toString(newBufferSize), () -> {
+    testWithSystemProperty(MULE_STREAMING_BUFFER_SIZE, Integer.toString(newBufferSize), () -> {
       InputStream in = new ByteArrayInputStream(new byte[newBufferSize]);
       OutputStream out = mock(OutputStream.class);
 
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();
-      URLClassLoader newClassLoader = new URLClassLoader(((URLClassLoader) contextClassLoader).getURLs(), null);
+      ClassLoader newClassLoader = new URLClassLoader(getClassloaderURLs(contextClassLoader), null);
       Class clazz = loadClass(IOUtils.class.getCanonicalName(), newClassLoader);
 
       try {
@@ -78,6 +82,36 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       // input stream
       verify(out, times(1)).write(any(byte[].class), anyInt(), anyInt());
     });
+  }
+
+  private URL[] getClassloaderURLs(ClassLoader classLoader)  {
+    if (classLoader instanceof URLClassLoader) {
+      return ((URLClassLoader) classLoader).getURLs();
+    }
+
+    if (classLoader.getClass().getName().startsWith("jdk.internal.loader.ClassLoaders$")) {
+      try {
+        Field field = Unsafe.class.getDeclaredField("theUnsafe");
+        field.setAccessible(true);
+        Unsafe unsafe = (Unsafe) field.get(null);
+
+        // jdk.internal.loader.ClassLoaders.AppClassLoader.ucp
+        Field ucpField = classLoader.getClass().getDeclaredField("ucp");
+        long ucpFieldOffset = unsafe.objectFieldOffset(ucpField);
+        Object ucpObject = unsafe.getObject(classLoader, ucpFieldOffset);
+
+        // jdk.internal.loader.URLClassPath.path
+        Field pathField = ucpField.getType().getDeclaredField("path");
+        long pathFieldOffset = unsafe.objectFieldOffset(pathField);
+        List<URL> path = (List<URL>) unsafe.getObject(ucpObject, pathFieldOffset);
+
+        return path.toArray(new URL[path.size()]);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    throw new IllegalArgumentException("Unknown classloader type: " + classLoader);
   }
 
   @Test

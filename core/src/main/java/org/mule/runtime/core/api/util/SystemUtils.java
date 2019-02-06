@@ -73,6 +73,18 @@ public class SystemUtils {
     return JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
   }
 
+  public static boolean isAzulJDK() {
+    return JAVA_VM_VENDOR.toLowerCase().contains("azul");
+  }
+
+  public static boolean isAmazonJDK() {
+    return JAVA_VM_VENDOR.toLowerCase().contains("amazon");
+  }
+
+  public static boolean isOpenJDK() {
+    return JAVA_VM_VENDOR.toLowerCase().contains("openjdk");
+  }
+
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
 
   private static CommandLine parseCommandLine(String args[], String opts[][]) throws MuleException {
