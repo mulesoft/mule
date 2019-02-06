@@ -30,6 +30,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
+import org.mule.runtime.core.internal.rx.MonoSinkRecorder;
+import org.mule.runtime.core.internal.rx.MonoSinkRecorderToReactorSinkAdapter;
+import org.mule.runtime.core.internal.rx.SinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -39,14 +44,11 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
 
 /**
  * Some convenience methods for message processors.
@@ -269,116 +271,88 @@ public class MessageProcessors {
 
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       boolean completeParentIfEmpty, BaseEventContext child) {
-    AtomicReference<MonoSink<CoreEvent>> errorSwitchSinkSinkRef = new AtomicReference<>();
+    // AtomicReference<FluxSink<CoreEvent>> errorSwitchSinkSinkRef = new AtomicReference<>();
+
+    MonoSinkRecorder<CoreEvent> errorSwitchSinkSinkRef = new MonoSinkRecorder<>();
 
     return Mono.<CoreEvent>create(sink -> {
-      // System.out.println(" >> child.getResponsePublisher()");
-      Mono.from(child.getResponsePublisher())
-          .doOnSuccess(response -> {
-            // System.out
-            // .println(" >> child.getResponsePublisher() -> onSuccess " + completeParentIfEmpty + ", " + response.getContext());
-            if (response == null && completeParentIfEmpty) {
-              child.getParentContext().get().success();
-              errorSwitchSinkSinkRef.get().success();
-            } else {
-              errorSwitchSinkSinkRef.get().success(response);
-            }
-          })
-          .doOnError(error -> {
-            // System.out.println(" >> child.getResponsePublisher() -> onError " + completeParentIfEmpty + ", " + error);
-            errorSwitchSinkSinkRef.get().error(error);
-          })
-          .toProcessor();
+      final CoreEvent eventChildCtx = quickCopy(child, event);
+      childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+                                  completeParentIfEmpty);
 
-      sink.success(quickCopy(child, event));
+      // // System.out.println(" >> child.getResponsePublisher()");
+      // Mono.from(child.getResponsePublisher())
+      // .doOnSuccess(response -> {
+      // // System.out
+      // // .println(" >> child.getResponsePublisher() -> onSuccess " + completeParentIfEmpty + ", " + response.getContext());
+      // if (response == null && completeParentIfEmpty) {
+      // child.getParentContext().get().success();
+      // errorSwitchSinkSinkRef.get().success();
+      // } else {
+      // errorSwitchSinkSinkRef.get().success(response);
+      // }
+      // })
+      // .doOnError(MessagingException.class, error -> {
+      // // System.out.println(" >> child.getResponsePublisher() -> onError " + completeParentIfEmpty + ", " + error);
+      // // errorSwitchSinkSinkRef.get().error(error);
+      // errorSwitchSinkSinkRef.get()
+      // .error(new MessagingException(quickCopy(((BaseEventContext) error.getEvent().getContext()).getParentContext()
+      // .get(), error.getEvent()), error));
+      // })
+      // .toProcessor();
+
+      sink.success(eventChildCtx);
     })
         .toProcessor()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(Mono.<CoreEvent>create(sink -> {
-          // System.out.println(" >> switchIfEmpty create");
-          errorSwitchSinkSinkRef.set(sink);
-        }).toProcessor())
+        .switchIfEmpty(Mono.<CoreEvent>create(errorSwitchSinkSinkRef).toProcessor())
         .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result))
-        .onErrorMap(MessagingException.class,
-                    me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
-                        .get(), me.getEvent()), me));
+    // .onErrorMap(MessagingException.class,
+    // me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
+    // .get(), me.getEvent()), me))
+    ;
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,
                                                                     ReactiveProcessor processor,
                                                                     boolean completeParentIfEmpty) {
-    // System.out.println(" >> child " + child);
-    // String originalCtxKey = "originalContext_" + processor.toString();
-
-
-    AtomicReference<FluxSink<CoreEvent>> errorSwitchSinkSinkRef = new AtomicReference<>();
-
-    Flux<CoreEvent> lalala = Flux.<CoreEvent>create(sink -> {
-      // System.out.println(" >> mergeWith create");
-      errorSwitchSinkSinkRef.set(sink);
-    })
-        .onErrorMap(MessagingException.class,
-                    me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
-                        .get(), me.getEvent()), me))
-    // .publish()
-    ;
+    FluxSinkRecorder<CoreEvent> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+    // AtomicReference<FluxSink<CoreEvent>> errorSwitchSinkSinkRef = new AtomicReference<>();
 
     return Flux.from(eventChildCtxPub)
         .doOnNext(eventChildCtx -> {
-          // System.out.println(" >> child.getResponsePublisher()");
-          Mono.from(((BaseEventContext) eventChildCtx.getContext()).getResponsePublisher())
-              .doOnSuccess(response -> {
-                // System.out.println(" >> child.getResponsePublisher() -> onSuccess " + completeParentIfEmpty + ", "
-                // + response.getContext());
-                if (response == null && completeParentIfEmpty) {
-                  ((BaseEventContext) eventChildCtx.getContext()).getParentContext().get().success();
-                  errorSwitchSinkSinkRef.get().next(null);
-                } else {
-                  errorSwitchSinkSinkRef.get().next(response);
-                }
-              })
-              .doOnError(error -> {
-                // System.out.println(" >> child.getResponsePublisher() -> onError " + completeParentIfEmpty + ", " + error);
-                errorSwitchSinkSinkRef.get().error(error);
-              })/*
-                 * .toProcessor()
-                 */;
+          childContextResponseHandler(eventChildCtx, new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+                                      completeParentIfEmpty);
         })
-
-        // return Mono.<CoreEvent>create(sink -> {
-        // Mono.from(child.getResponsePublisher())
-        // .doOnSuccess(response -> errorSwitchSinkSinkRef.get().success(response))
-        // .doOnError(error -> errorSwitchSinkSinkRef.get().error(error))
-        // .toProcessor();
-        //
-        // final CoreEvent childContextEvent = quickCopy(child, event);
-        // sink.success(childContextEvent);
-        // })
-        // .toProcessor()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        // .mergeWith(Flux.<CoreEvent>create(sink -> {
-        // System.out.println(" >> mergeWith create");
-        // errorSwitchSinkSinkRef.set(sink);
-        // })/* .toProcessor() */)
-        // .mergeWith(Mono.<CoreEvent>create(sink -> errorSwitchSinkSinkRef.set(sink)).toProcessor())
-        .mergeWith(lalala)
+        .mergeWith(Flux.<CoreEvent>create(errorSwitchSinkSinkRef))
         .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
+  }
 
-    // return just(event)
-    // .map(ev -> quickCopy(quickCopy(child, ev), ImmutableMap.of("originalContext_" + processor.toString(), ev.getContext())))
-    // .cast(CoreEvent.class)
-    // .transform(processor)
-    // .doOnNext(completeSuccessIfNeeded(true))
-    // .switchIfEmpty(Mono.from(responsePublisher))
-    // .map(result -> quickCopy(((InternalEvent) result).getInternalParameter("originalContext_" + processor.toString()),
-    // result))
-    // .doOnError(MessagingException.class,
-    // me -> me.setProcessedEvent(quickCopy(
-    // ((InternalEvent) me.getEvent())
-    // .getInternalParameter("originalContext_" + processor.toString()),
-    // me.getEvent()))) ;
+  private static void childContextResponseHandler(CoreEvent eventChildCtx,
+                                                  SinkRecorderToReactorSinkAdapter<CoreEvent> errorSwitchSinkSinkRef,
+                                                  boolean completeParentIfEmpty) {
+    // System.out.println(" >> child.getResponsePublisher()");
+    Mono.from(((BaseEventContext) eventChildCtx.getContext()).getResponsePublisher())
+        .doOnSuccess(response -> {
+          // System.out.println(" >> child.getResponsePublisher() -> onSuccess " + completeParentIfEmpty + ", "
+          // + response.getContext());
+          if (response == null && completeParentIfEmpty) {
+            ((BaseEventContext) eventChildCtx.getContext()).getParentContext().get().success();
+            errorSwitchSinkSinkRef.next();
+          } else {
+            errorSwitchSinkSinkRef.next(response);
+          }
+        })
+        .doOnError(MessagingException.class, error -> {
+          // System.out.println(" >> child.getResponsePublisher() -> onError " + completeParentIfEmpty + ", " + error);
+          errorSwitchSinkSinkRef
+              .error(new MessagingException(quickCopy(((BaseEventContext) error.getEvent().getContext()).getParentContext()
+                  .get(), error.getEvent()), error));
+        })
+        .toProcessor();
   }
 
   /**
@@ -392,8 +366,6 @@ public class MessageProcessors {
    */
   public static Publisher<CoreEvent> applyWithChildContext(Publisher<CoreEvent> eventPub, ReactiveProcessor processor,
                                                            Optional<ComponentLocation> componentLocation) {
-    // BaseEventContext childContext = newChildContext(event, componentLocation);
-    // return internalProcessWithChildContext(event, processor, childContext);
     return internalApplyWithChildContext(Flux.from(eventPub)
         .map(event -> quickCopy(child(((BaseEventContext) event.getContext()), componentLocation), event)),
                                          processor, true);

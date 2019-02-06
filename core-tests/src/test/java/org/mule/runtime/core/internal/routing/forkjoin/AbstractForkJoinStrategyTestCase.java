@@ -316,12 +316,9 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 4, true, MAX_VALUE);
 
-    expectedException.expect(CompositeRoutingException.class);
-    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1), throwable -> {
-      CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
-      RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 0, 1);
-      assertThat(routingResult.getFailures().get("0").getCause(), instanceOf(RejectedExecutionException.class));
-    });
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1));
   }
 
   @Test
