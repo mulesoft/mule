@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.anyBoolean;
@@ -23,6 +24,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
@@ -89,6 +91,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(onErrorPropagateHandler.getLocation()));
 
     expectedException.expectCause(sameInstance(mockException));
 
@@ -99,6 +102,28 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
       verify(mockTransaction, times(1)).setRollbackOnly();
       verify(mockTransaction, times(0)).commit();
       verify(mockTransaction, times(1)).rollback();
+    }
+  }
+
+  @Test
+  public void testHandleExceptionWithoutRollback() throws Exception {
+    configureXaTransactionAndSingleResourceTransaction();
+    when(mockException.handled()).thenReturn(false);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
+    when(mockException.getEvent()).thenReturn(muleEvent);
+    ComponentLocation location = mock(ComponentLocation.class);
+    when(location.getRootContainerName()).thenReturn("");
+    when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(location));
+
+    expectedException.expectCause(sameInstance(mockException));
+
+    try {
+      onErrorPropagateHandler.handleException(mockException, muleEvent);
+    } finally {
+      verify(mockException, never()).setHandled(anyBoolean());
+      verify(mockTransaction, times(0)).setRollbackOnly();
+      verify(mockTransaction, times(0)).commit();
+      verify(mockTransaction, times(0)).rollback();
     }
   }
 

@@ -7,19 +7,20 @@
 package org.mule.runtime.core.privileged.transaction;
 
 import static java.lang.System.identityHashCode;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
@@ -30,17 +31,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 /**
  * This base class provides low level features for transactions.
  */
-public abstract class AbstractTransaction implements Transaction {
+public abstract class AbstractTransaction implements TransactionAdapter {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
   protected String id = UUID.getUUID();
 
   protected int timeout;
+  protected ComponentLocation componentLocation;
 
   protected MuleContext muleContext;
   private final NotificationDispatcher notificationFirer;
@@ -194,5 +197,15 @@ public abstract class AbstractTransaction implements Transaction {
   @Override
   public void setTimeout(int timeout) {
     this.timeout = timeout;
+  }
+
+  @Override
+  public void setComponentLocation(ComponentLocation componentLocation) {
+    this.componentLocation = componentLocation;
+  }
+
+  @Override
+  public Optional<ComponentLocation> getComponentLocation() {
+    return ofNullable(componentLocation);
   }
 }

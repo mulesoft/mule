@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -319,5 +320,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   @Override
   public String getOwningExtensionName() {
     return messageSource.getExtensionModel().getName();
+  }
+
+  @Override
+  public ComponentLocation getSourceLocation() {
+    return messageSource.getLocation();
   }
 }

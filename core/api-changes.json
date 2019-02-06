@@ -32,6 +32,52 @@
           "methodName": "map",
           "elementKind": "method",
           "justification": "Utility added, used by internal components"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.privileged.transaction.TransactionAdapter",
+          "package": "org.mule.runtime.core.privileged.transaction",
+          "classSimpleName": "TransactionAdapter",
+          "elementKind": "interface",
+          "justification": "This is not exposed"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.transaction.Transaction",
+          "new": "interface org.mule.runtime.core.api.transaction.Transaction",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.core.api.transaction",
+          "classSimpleName": "Transaction",
+          "elementKind": "interface",
+          "justification": "This must not be implemented"
+        },
+        {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.core.privileged.transaction.AbstractTransaction.componentLocation",
+          "package": "org.muPetStoreRetryPolicyProviderConnectionTestCasele.runtime.core.privileged.transaction",
+          "classSimpleName": "AbstractTransaction",
+          "fieldName": "componentLocation",
+          "elementKind": "field",
+          "justification": "Need to set Component Location (since addition of TransactionAdapter)."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Optional<org.mule.runtime.api.component.location.ComponentLocation> org.mule.runtime.core.privileged.transaction.AbstractTransaction::getComponentLocation()",
+          "package": "org.mule.runtime.core.privileged.transaction",
+          "classSimpleName": "AbstractTransaction",
+          "methodName": "getComponentLocation",
+          "elementKind": "method",
+          "justification": "Need to get Component Location (since addition of TransactionAdapter)."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.transaction.AbstractTransaction::setComponentLocation(org.mule.runtime.api.component.location.ComponentLocation)",
+          "package": "org.mule.runtime.core.privileged.transaction",
+          "classSimpleName": "AbstractTransaction",
+          "methodName": "setComponentLocation",
+          "elementKind": "method",
+          "justification": "Need to set Component Location (since addition of TransactionAdapter)."
         }
       ]
     }

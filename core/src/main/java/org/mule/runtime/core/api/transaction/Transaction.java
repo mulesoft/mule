@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tx.TransactionException;
 
+@NoImplement
 public interface Transaction {
 
   int STATUS_ACTIVE = 0;
@@ -97,4 +99,5 @@ public interface Transaction {
    * @return TX identification.
    */
   String getId();
+
 }

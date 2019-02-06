@@ -10,6 +10,7 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.reactivestreams.Publisher;
 
 /**
@@ -35,11 +37,20 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   protected Function<CoreEvent, CoreEvent> beforeRouting(Exception exception) {
     return event -> {
       event = super.beforeRouting(exception).apply(event);
-      if (!isRedeliveryExhausted(exception)) {
+      if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
         rollback(exception);
       }
       return event;
     };
+  }
+
+  private boolean isOwnedTransaction() {
+    TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+    if (transaction == null || !transaction.getComponentLocation().isPresent()) {
+      return false;
+    }
+    return transaction.getComponentLocation().get().getRootContainerName()
+        .equals(this.getRootContainerLocation().getGlobalName());
   }
 
   @Override
