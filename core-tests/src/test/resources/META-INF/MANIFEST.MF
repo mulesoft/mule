@@ -1,23 +1,23 @@
 Manifest-Version: 1.0
-Archiver-Version: Plexus Archiver
-Created-By: Apache Maven
-Built-By: pablokraan
-Build-Jdk: 1.8.0_40
-Specification-Title: Mule Core
-Specification-Version: 4.2.0-SNAPSHOT
-Specification-Vendor: MuleSoft, Inc.
 Implementation-Title: Mule Core
+Build-Date: 2019-Feb-04 20:04:49
 Implementation-Version: 4.2.0-SNAPSHOT
-Implementation-Vendor-Id: org.mule
-Implementation-Vendor: MuleSoft, Inc.
-Build-Date: 2015-Nov-30 21:08:59
-Build-Revision: a8e27a27
+Built-By: mariano.gonzalez
+Specification-Vendor: MuleSoft, Inc.
+Specification-Title: Mule Core
+Implementation-Vendor-Id: org.mule.runtime
+Supported-Jdks: [1.8.0,12)
 Description: Mule Runtime and Integration Platform
+Recommended-Jdks: [1.8.0_181,9),[11,12)
+Implementation-Vendor: MuleSoft, Inc.
 License: CPAL v1.0 http://www.mulesoft.com/CPAL/
-More-Info: For more information go to http://www.mulesoft.org
-Product-Url: http://www.mulesoft.org
-Recommended-Jdks: [1.8.0_60,1.9)
-Support: Get commercial support: http://www.mulesoft.com/support
-Supported-Jdks: [1.8.0,1.9)
+Product-Url: https://developer.mulesoft.com/
+Build-Revision: 52efcfd9
+More-Info: For more information go to https://developer.mulesoft.com/
+Dev-List-Email: mule-esb@mulesoft.com
 Vendor-Url: http://www.mulesoft.com
-
+Support: Get commercial support: http://www.mulesoft.com/support
+Created-By: Apache Maven 3.6.0
+Build-Jdk: 1.8.0_191
+Specification-Version: 4.2
+Implementation-URL: https://developer.mulesoft.com/mule-core/

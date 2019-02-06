@@ -22,6 +22,7 @@ public class JdkVersionUtils {
 
   public static final String JAVA_VERSION_PROPERTY = "java.version";
 
+
   public static class JdkVersion implements Comparable<JdkVersion> {
 
     private Integer major;
@@ -116,43 +117,57 @@ public class JdkVersionUtils {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
+      if (this == obj) {
         return true;
-      if (obj == null)
+      }
+      if (obj == null) {
         return false;
-      if (!(obj instanceof JdkVersion))
+      }
+      if (!(obj instanceof JdkVersion)) {
         return false;
+      }
       JdkVersion other = (JdkVersion) obj;
       if (major == null) {
-        if (other.major != null)
+        if (other.major != null) {
           return false;
-      } else if (!major.equals(other.major))
+        }
+      } else if (!major.equals(other.major)) {
         return false;
+      }
       if (micro == null) {
-        if (other.micro != null)
+        if (other.micro != null) {
           return false;
-      } else if (!micro.equals(other.micro))
+        }
+      } else if (!micro.equals(other.micro)) {
         return false;
+      }
       if (milestone == null) {
-        if (other.milestone != null)
+        if (other.milestone != null) {
           return false;
-      } else if (!milestone.equals(other.milestone))
+        }
+      } else if (!milestone.equals(other.milestone)) {
         return false;
+      }
       if (minor == null) {
-        if (other.minor != null)
+        if (other.minor != null) {
           return false;
-      } else if (!minor.equals(other.minor))
+        }
+      } else if (!minor.equals(other.minor)) {
         return false;
+      }
       if (update == null) {
-        if (other.update != null)
+        if (other.update != null) {
           return false;
-      } else if (!update.equals(other.update))
+        }
+      } else if (!update.equals(other.update)) {
         return false;
+      }
       return true;
     }
 
 
   }
+
 
   public static class JdkVersionRange extends VersionRange {
 
@@ -179,6 +194,7 @@ public class JdkVersionUtils {
           && (jdkVersion.compareTo(upper) > 0 || (jdkVersion.compareTo(upper) == 0 && !isUpperBoundInclusive()));
     }
   }
+
 
   private static final Logger logger = LoggerFactory.getLogger(JdkVersionUtils.class);
 
@@ -212,7 +228,12 @@ public class JdkVersionUtils {
   }
 
   public static boolean isSupportedJdkVendor() {
-    return SystemUtils.isSunJDK() || SystemUtils.isAppleJDK() || SystemUtils.isIbmJDK();
+    return SystemUtils.isSunJDK() ||
+        SystemUtils.isOpenJDK() ||
+        SystemUtils.isAmazonJDK() ||
+        SystemUtils.isAzulJDK() ||
+        SystemUtils.isAppleJDK() ||
+        SystemUtils.isIbmJDK();
   }
 
   public static String getRecommendedJdks() {
@@ -258,7 +279,7 @@ public class JdkVersionUtils {
 
   /**
    * Validates that the jdk version and vendor are acceptable values (either supported or not invalid).
-   * 
+   *
    * @throws RuntimeException if the jdk vendor or version are invalid (known to not work)
    */
   public static void validateJdk() throws RuntimeException {
