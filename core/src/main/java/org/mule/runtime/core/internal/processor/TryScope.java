@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -100,7 +99,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       return Scope.super.apply(publisher);
     } else {
-      return applyWithChildContext(from(publisher), nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
+      return from(publisher)
+          .flatMap(event -> processWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
+      // return applyWithChildContext(from(publisher), nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
     }
   }
 
