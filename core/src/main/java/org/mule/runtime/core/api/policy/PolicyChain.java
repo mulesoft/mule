@@ -28,6 +28,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -123,11 +124,16 @@ public class PolicyChain extends AbstractComponent
                 .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
             .andThen(notificationHelper.notification(PROCESS_START)))
         // TODO MULE-16370 remove this flatMap
-        .flatMap(event -> from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
-            .doOnError(MessagingException.class, t -> {
-              notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
-              this.onError.ifPresent(onError -> onError.accept(t));
-            }))
+        .flatMap(event -> from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation()),
+                                                       new BaseExceptionHandler() {
+
+                                                         @Override
+                                                         public void onError(Exception exception) {
+                                                           MessagingException t = (MessagingException) exception;
+                                                           notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
+                                                           onError.ifPresent(onError -> onError.accept(t));
+                                                         }
+                                                       })))
         .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
   }
 
