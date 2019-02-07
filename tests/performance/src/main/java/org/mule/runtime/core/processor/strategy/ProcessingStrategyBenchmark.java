@@ -131,96 +131,72 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
   @Benchmark
   @Threads(Threads.MAX)
   public CoreEvent directSink() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      directSink.accept(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> directSink.accept(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(Threads.MAX)
   public CoreEvent emitterSink() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      emitterSink.accept(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> emitterSink.accept(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(Threads.MAX)
   public CoreEvent workQueueSink() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      workQueueSink.accept(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> workQueueSink.accept(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(1)
   public CoreEvent directPipeline() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      directPipeline.next(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> directPipeline.next(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(1)
   public CoreEvent emitterPipeline() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      emitterPipeline.next(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> emitterPipeline.next(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(1)
   public CoreEvent workQueuePipeline() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      workQueuePipeline.next(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> workQueuePipeline.next(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(1)
   public CoreEvent directProcessor() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      directProcessor.next(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> directProcessor.next(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(1)
   public CoreEvent emitterProcessor() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      emitterProcessor.next(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> emitterProcessor.next(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(1)
   public CoreEvent workQueueProcessor() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      workQueueProcessor.next(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> workQueueProcessor.next(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(Threads.MAX)
   public CoreEvent directAllSink() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      directAllSink.accept(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> directAllSink.accept(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(Threads.MAX)
   public CoreEvent emitterAllSink() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      emitterAllSink.accept(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> emitterAllSink.accept(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
   @Threads(Threads.MAX)
   public CoreEvent workQueueAllSink() {
-    return Mono.<CoreEvent>create(resultSink -> {
-      workQueueAllSink.accept(createEvent(flow, resultSink));
-    }).block();
+    return Mono.<CoreEvent>create(resultSink -> workQueueAllSink.accept(createEvent(flow, resultSink))).block();
   }
 }
