@@ -231,20 +231,20 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           return error(e);
         }
 
-        Mono<CoreEvent> mono;
-        if (referencedProcessor instanceof Flow) {
-          mono = Mono.from(processWithChildContext(event, referencedProcessor,
-                                                   ofNullable(FlowRefFactoryBean.this.getLocation()),
-                                                   ((Flow) referencedProcessor).getExceptionListener()));
-        } else {
-          mono = Mono.from(processWithChildContext(event, referencedProcessor,
-                                                   ofNullable(FlowRefFactoryBean.this.getLocation())));
-        }
-        return from(mono.doOnSuccess(result -> {
-          if (result == null) {
-            ((BaseEventContext) event.getContext()).success();
-          }
-        }))
+        return Mono.from(referencedProcessor instanceof Flow
+            ? processWithChildContext(event, referencedProcessor,
+                                      ofNullable(FlowRefFactoryBean.this.getLocation()),
+                                      ((Flow) referencedProcessor).getExceptionListener())
+            : processWithChildContext(event, referencedProcessor,
+                                      ofNullable(FlowRefFactoryBean.this.getLocation())))
+            .doOnSuccess(result -> {
+              if (result == null) {
+                ((BaseEventContext) event.getContext()).success();
+              }
+            })
+            .doOnError(e -> {
+              ((BaseEventContext) event.getContext()).error(e);
+            })
             .map(outputToTarget(event, target, targetValue, expressionManager));
       });
     }

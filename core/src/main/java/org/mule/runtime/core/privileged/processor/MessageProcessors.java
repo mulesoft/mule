@@ -305,13 +305,18 @@ public class MessageProcessors {
     })
         .toProcessor()
         .transform(processor)
+        .onErrorMap(MessagingException.class,
+                    me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
+                        .get(), me.getEvent()), me))
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(Mono.<CoreEvent>create(errorSwitchSinkSinkRef).toProcessor())
-        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result))
-    // .onErrorMap(MessagingException.class,
-    // me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
-    // .get(), me.getEvent()), me))
-    ;
+        .switchIfEmpty(Mono.<CoreEvent>create(errorSwitchSinkSinkRef)
+            // .doOnNext(e -> System.out.println(" >> emptySwitch next"))
+            // .doOnError(e -> System.out.println(" >> emptySwith error"))
+            .toProcessor())
+        .map(result -> {
+          // System.out.println(" >> mapping");
+          return quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result);
+        });
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,
@@ -394,6 +399,7 @@ public class MessageProcessors {
 
   public static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
     return result -> {
+      // System.out.println(" >> completeSuccessIfNeeded " + child + ", " + complete);
       if (complete && !((BaseEventContext) child).isComplete()) {
         ((BaseEventContext) child).success(result);
       }
