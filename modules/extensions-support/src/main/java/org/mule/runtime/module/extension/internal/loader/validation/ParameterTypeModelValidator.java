@@ -11,7 +11,6 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;

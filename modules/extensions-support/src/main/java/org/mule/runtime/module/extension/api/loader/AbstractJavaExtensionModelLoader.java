@@ -58,7 +58,6 @@ import org.mule.runtime.module.extension.internal.loader.validation.ComponentLoc
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.DeprecationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.HasDefaultConstructorModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
@@ -107,7 +106,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new ValueProviderModelValidator(),
                                                                                          new PrivilegedApiValidator(),
                                                                                          new ComponentLocationModelValidator(),
-                                                                                         new HasDefaultConstructorModelValidator(),
                                                                                          new InjectedFieldsModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
