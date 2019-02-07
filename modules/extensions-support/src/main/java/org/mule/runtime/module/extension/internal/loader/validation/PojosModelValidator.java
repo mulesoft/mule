@@ -96,7 +96,7 @@ public class PojosModelValidator implements ExtensionModelValidator {
 
   private void validatePojoHasDefaultConstructor(ParameterizedModel owner, ProblemsReporter problemsReporter) {
     iterateParametersAndValidate(owner, problemsReporter, (parameterizedModel, type, problemReporter) -> {
-      if (TypedValue.class.getName().equals(type.getClassInformation().getClassname())) {
+      if (type.isSameType(TypedValue.class)) {
         type = getFirstGenericType(type).orElse(null);
       }
       if (type != null && type.asMetadataType() instanceof ObjectType) {
