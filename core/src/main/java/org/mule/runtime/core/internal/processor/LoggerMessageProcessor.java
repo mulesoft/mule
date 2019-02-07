@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LoggerMessageProcessor extends AbstractComponent implements Processor, Initialisable, MuleContextAware {
 
+  // TODO - MULE-16446: Logger execution type should be defined according to the appender used
   private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty("mule.logging.blockingCategories", "");
   private static final Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
 
@@ -53,6 +54,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   @Override
   public void initialise() throws InitialisationException {
     initLogger();
+    initProcessingTypeIfPossible();
     expressionManager = muleContext.getExpressionManager();
   }
 
@@ -61,6 +63,14 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
       logger = LoggerFactory.getLogger(category);
     } else {
       logger = LoggerFactory.getLogger(LoggerMessageProcessor.class);
+    }
+  }
+
+  private void initProcessingTypeIfPossible() {
+    if (BLOCKING_CATEGORIES.isEmpty()) {
+      processingType = CPU_LITE;
+    } else if (BLOCKING_CATEGORIES.contains("*")) {
+      processingType = BLOCKING;
     }
   }
 
