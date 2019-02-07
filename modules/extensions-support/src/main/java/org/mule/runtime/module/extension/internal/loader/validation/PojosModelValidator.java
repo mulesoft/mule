@@ -32,7 +32,7 @@ import java.util.Optional;
 import org.apache.commons.collections.CollectionUtils;
 
 /**
- * Validates that POJOs parameter overrides Equals and HashCode
+ * Validates that POJOs are valid for the model
  *
  * @since 4.2
  */
