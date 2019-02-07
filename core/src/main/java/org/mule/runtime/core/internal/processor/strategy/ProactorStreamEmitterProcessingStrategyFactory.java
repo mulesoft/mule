@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -131,14 +131,12 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
       final int sinksCount = maxConcurrency < CORES ? maxConcurrency : CORES;
       final int sinkBufferSize = bufferSize / sinksCount;
-      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(sinkBufferSize);
-        processor.publishOn(scheduler).doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-            .transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
+        processor.transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
         ReactorSink<CoreEvent> sink = new DefaultReactorSink<>(processor.sink(), () -> {
           long start = currentTimeMillis();
@@ -160,7 +158,9 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      return pipeline;
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+      return publisher -> from(publisher).publishOn(scheduler)
+          .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader)).transform(pipeline);
     }
 
     @Override
