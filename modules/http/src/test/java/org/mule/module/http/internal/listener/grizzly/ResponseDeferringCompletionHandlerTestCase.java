@@ -132,6 +132,195 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
         interceptCompletionHandlerSemaphore();
     }
 
+
+    @Test
+    public void testSingleFlushAndCloseGenerateOneDownstreamCompletionEvent() throws IOException, InterruptedException
+    {
+
+        logger.info("Starting responseDeferringCompletionHandler");
+        // the CH start method ends up firing up the orchestrator thread, which is
+        // in charge of calling flush and close CompletionOutputStream methods
+        responseDeferringCompletionHandler.start();
+
+        // some content is written to CompletionOutputStream
+        wailUntilContentWritten();
+
+        // ctx.write called from CompletionOutputStream$flush
+        doAnswer(flushContextWriteMock()).when(ctx).write(anyObject(), any(CompletionHandler.class));
+
+        // release semaphore to let CompletionOutputStream$flush be called by orchestrator
+        logger.info("Releasing 'flush' sync");
+        stepSync.release();
+
+        // Waiting for flush thread to be started
+        flushEnteredWriting.await(5, TimeUnit.SECONDS);
+
+        // ctx.write called from CompletionOutputStream$close
+        // should block in semaphore, and wait in write for flush's callback to execute
+        doAnswer(closeContextWriteMock()).when(ctx).write(anyObject(), any(CompletionHandler.class));
+
+        // release semaphore to let CompletionOutputStream$close be called by orchestrator
+        logger.info("Releasing 'close' sync");
+        stepSync.release();
+
+        waitUntilFlushAndCloseExecuted();
+
+        assertThat(downstreamNotificationsSent, is(1));
+    }
+
+    // Once the write method is called on the OutputHandler, which in this case
+    // is implemented by the TestClass, launch the orchestrator thread, which will
+    // trigger each CompletionOutputHanlder method being tested
+    @Override
+    public void write(MuleEvent event, final OutputStream out) throws IOException
+    {
+        // Save deferred output stream
+        outputStream = out;
+
+        // Orchestrator thread
+        // Should perform the following method calls
+        // 1 - flush
+        // 2 - close
+        new Thread("Orchestrator thread")
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    // To make CompletionOutputStream's buffer not empty
+                    logger.warn("About to write stream contents");
+                    outputStream.write("This is a test string".getBytes());
+                    // polled flag to make test thread run once content has been written
+                    contentWritten.set(true);
+
+                    // wait for signal
+                    logger.warn("Acquiring flush sync");
+                    stepSync.acquire();
+                    // run flush
+                    outputStream.flush();
+
+                    // wait for signal
+                    logger.warn("Acquiring close sync");
+                    stepSync.acquire();
+                    // run close
+                    syncLatch.await(5, TimeUnit.SECONDS);
+                    outputStream.close();
+
+                }
+                catch (InterruptedException | IOException e)
+                {
+                    logger.warn("Exception raised in " + Thread.currentThread().getName() + ": " + e.toString());
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    private Answer<Void> closeContextWriteMock()
+    {
+        return new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                new Thread("close context writer")
+                {
+                    @Override
+                    public void run ()
+                    {
+                        // entering FilterChainContext$write from CompletionOutputStream$close => isDone has been set
+                        // make flush's callback continue after 'sending' semaphore release
+                        completeAndCloseSync.countDown();
+
+                        logger.info("ctx.write called from close");
+
+                        // Entered ctx.write from close. This means done flag is set in DeferringCompletionHandler
+                        responseDeferringCompletionHandler.completed(mockWriteResult);
+
+                        contextWritesCompleted++;
+                    }
+                }.start();
+
+                return null;
+            }
+        };
+    }
+
+    private Answer<Void> flushContextWriteMock()
+    {
+        return new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                new Thread("flush context writer thread")
+                {
+                    @Override
+                    public void run()
+                    {
+                        logger.info("ctx.write called from flush");
+
+                        // sync used to make sure mocked FilterChainContext.write delegates
+                        // to the creation of this thread, before the mock answer is changed to the
+                        // CompletionOutputStream$close one
+                        flushEnteredWriting.countDown();
+
+                        // TODO: Is this sync necessary, it seems not because of the previous one
+                        syncLatch.countDown();
+
+                        // Final context write completion call
+                        responseDeferringCompletionHandler.completed(mockWriteResult);
+
+                        contextWritesCompleted++;
+                    }
+                }.start();
+                return null;
+            }
+        };
+    }
+
+
+    private void waitUntilFlushAndCloseExecuted()
+    {
+        new PollingProber(10000, 1000).check(new Probe()
+        {
+
+            private int expectedWrites = 2;
+
+            @Override
+            public boolean isSatisfied()
+            {
+                return contextWritesCompleted == expectedWrites;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Not all context writes completed. It actually is " + contextWritesCompleted + " while the expected is " + expectedWrites;
+            }
+        });
+    }
+
+    private void wailUntilContentWritten()
+    {
+        new PollingProber(10000, 1000).check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return contentWritten.get();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Timeouted waiting for content to be written";
+            }
+        });
+        logger.warn("Content written");
+    }
+
     private void interceptCompletionHandlerSemaphore() throws NoSuchFieldException, IllegalAccessException
     {
         Field sendingSemaphore = responseDeferringCompletionHandler.getClass().getDeclaredField(RESPONSE_DEFERRING_CH_SEMAPHORE_FIELD);
@@ -175,169 +364,5 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
         when(ctx.getFilterChain()).thenReturn(filterChain);
         when(connection.getTransport()).thenReturn(transport);
         when(transport.getMemoryManager()).thenReturn(memoryManager);
-    }
-
-    @Test
-    public void testSingleFlushAndCloseGenerateOneDownstreamCompletionEvent() throws IOException, InterruptedException
-    {
-
-        logger.warn("Starting responseDeferringCompletionHandler");
-        responseDeferringCompletionHandler.start();
-
-        wailUntilContentWritten();
-
-        // ctx.write called from CompletionOutputStream$flush
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                new Thread("flush context writer thread")
-                {
-                    @Override
-                    public void run()
-                    {
-                        logger.warn(Thread.currentThread().getName() + " !! ctx.write called from flush");
-
-                        flushEnteredWriting.countDown();
-
-                        syncLatch.countDown();
-                        responseDeferringCompletionHandler.completed(mockWriteResult);
-
-                        contextWritesCompleted++;
-                    }
-                }.start();
-                return null;
-            }
-        }).when(ctx).write(anyObject(), any(CompletionHandler.class));
-
-        // class flush on outputstream
-        logger.warn("Releasing 'flush' sync");
-        stepSync.release();
-
-        // Waiting for flush thread to be started
-        flushEnteredWriting.await(5, TimeUnit.SECONDS);
-
-        // ctx.write called from CompletionOutputStream$close
-        // should block in semaphore, and wait in write for flush's callback to execute
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                new Thread("close context writer")
-                {
-                    @Override
-                    public void run ()
-                    {
-                        completeAndCloseSync.countDown();
-
-                        logger.warn(Thread.currentThread().getName() + " !! ctx.write called from close");
-
-                        // Entered ctx.write from close. This means done flag is set in DeferringCompletionHandler
-                        responseDeferringCompletionHandler.completed(mockWriteResult);
-
-                        contextWritesCompleted++;
-                    }
-                }.start();
-
-                return null;
-            }
-        }).when(ctx).write(anyObject(), any(CompletionHandler.class));
-
-        logger.warn("Releasing 'close' sync");
-        stepSync.release();
-
-        waitUntilFlushAndCloseExecuted();
-
-        assertThat(downstreamNotificationsSent, is(1));
-    }
-
-    @Override
-    public void write(MuleEvent event, final OutputStream out) throws IOException
-    {
-
-        // Save deferred output stream
-        outputStream = out;
-
-        // Orchestrator thread
-        // Should perform the following method calls
-        // 1 - flush
-        // 2 - close
-        new Thread("Orchestrator thread")
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    // To make CompletionOutputStream's buffer not empty
-                    logger.warn("About to write stream contents");
-
-                    outputStream.write("This is a test string".getBytes());
-                    contentWritten.set(true);
-
-                    // wait for signal
-                    logger.warn("Acquiring flush sync");
-                    stepSync.acquire();
-                    // run flush
-                    outputStream.flush();
-
-                    // wait for signal
-                    logger.warn("Acquiring close sync");
-                    stepSync.acquire();
-                    // run flush
-                    syncLatch.await(5, TimeUnit.SECONDS);
-                    outputStream.close();
-
-                }
-                catch (InterruptedException | IOException e)
-                {
-                    logger.warn("Exception raised in " + Thread.currentThread().getName() + ": " + e.toString());
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-
-    }
-
-    private void waitUntilFlushAndCloseExecuted()
-    {
-        new PollingProber(10000, 1000).check(new Probe()
-        {
-
-            private int expectedWrites = 2;
-
-            @Override
-            public boolean isSatisfied()
-            {
-                return contextWritesCompleted == expectedWrites;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "Not all context writes completed. It actually is " + contextWritesCompleted + " while the expected is " + expectedWrites;
-            }
-        });
-    }
-
-    private void wailUntilContentWritten()
-    {
-        new PollingProber(10000, 1000).check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return contentWritten.get();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "Timeouted waiting for content to be written";
-            }
-        });
-        logger.warn("Content written");
     }
 }
