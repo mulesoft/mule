@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -31,7 +30,6 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
@@ -139,13 +137,13 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, reactor.core.scheduler.Scheduler eventLoopScheduler,
                                                 Scheduler processorScheduler, CoreEvent event) {
       if (isThreadLoggingEnabled) {
-        final Context ctx = subscriberContext().block();
         return just(event)
-            .flatMap(e -> Mono.just(e).transform(processor)
-                .publishOn(eventLoopScheduler)
-                .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
-                    .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
-                                                                                           e.getContext().getId()))));
+            .flatMap(e -> Mono.subscriberContext()
+                .flatMap(ctx -> Mono.just(e).transform(processor)
+                    .publishOn(eventLoopScheduler)
+                    .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
+                        .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
+                                                                                               e.getContext().getId())))));
       } else {
         return just(event)
             .transform(processor)
