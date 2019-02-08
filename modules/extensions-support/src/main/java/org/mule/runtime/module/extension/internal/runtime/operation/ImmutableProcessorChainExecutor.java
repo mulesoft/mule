@@ -7,14 +7,17 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -25,6 +28,9 @@ import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import reactor.util.context.Context;
 
 /**
  * An implementation of {@link Chain} that wraps a {@link Processor} and allows to execute it
@@ -32,6 +38,8 @@ import java.util.function.Consumer;
  * @since 4.0
  */
 public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcessors {
+
+  public static final String INNER_CHAIN_CTX_MAPPING = "mule.sdk.innerChainContextMapping";
 
   /**
    * Processor that will be executed upon calling process
@@ -113,6 +121,9 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
     }
 
     public void execute() {
+      final Function<Context, Context> innerChainCtxMapping =
+          (Function<Context, Context>) ((InternalEvent) event).getInternalParameter(INNER_CHAIN_CTX_MAPPING);
+
       from(processWithChildContext(event, chain, ofNullable(chain.getLocation())))
           .doOnSuccess(this::handleSuccess)
           .doOnError(error -> {
@@ -122,6 +133,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
               this.handleError(error, event);
             }
           })
+          .subscriberContext(innerChainCtxMapping != null ? innerChainCtxMapping : identity())
           .subscribe();
     }
 
