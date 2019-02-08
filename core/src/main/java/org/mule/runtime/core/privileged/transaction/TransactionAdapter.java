@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * Adapter interface to access {@link Transaction} related functionality that we don't want exposed as part of the public API
  *
- * @since 4.2
+ * @since 4.1.6
  */
 public interface TransactionAdapter extends Transaction {
 

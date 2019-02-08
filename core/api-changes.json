@@ -55,11 +55,11 @@
         {
           "code": "java.field.added",
           "new": "field org.mule.runtime.core.privileged.transaction.AbstractTransaction.componentLocation",
-          "package": "org.muPetStoreRetryPolicyProviderConnectionTestCasele.runtime.core.privileged.transaction",
+          "package": "org.mule.runtime.core.privileged.transaction",
           "classSimpleName": "AbstractTransaction",
           "fieldName": "componentLocation",
           "elementKind": "field",
-          "justification": "Need to set Component Location (since addition of TransactionAdapter)."
+          "justification": "Need to set ComponentLocation for transaction (since addition of TransactionAdapter)"
         },
         {
           "code": "java.method.added",
