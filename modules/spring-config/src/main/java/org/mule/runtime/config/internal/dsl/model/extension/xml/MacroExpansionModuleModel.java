@@ -28,10 +28,10 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
@@ -41,15 +41,11 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -97,6 +93,7 @@ public class MacroExpansionModuleModel {
 
   private final ApplicationModel applicationModel;
   private final ExtensionModel extensionModel;
+  private final DslSyntaxResolver dslSyntaxResolver;
 
   /**
    * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method is executed.
@@ -108,6 +105,8 @@ public class MacroExpansionModuleModel {
   MacroExpansionModuleModel(ApplicationModel applicationModel, ExtensionModel extensionModel) {
     this.applicationModel = applicationModel;
     this.extensionModel = extensionModel;
+    final DslResolvingContext dslResolvingContext = DslResolvingContext.getDefault(Collections.singleton(extensionModel));
+    this.dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
   }
 
   public void expand() {
@@ -676,16 +675,35 @@ public class MacroExpansionModuleModel {
    */
   private Optional<OperationModel> lookForOperation(ComponentIdentifier operationIdentifier, String prefix) {
     Optional<OperationModel> result = empty();
-    final String operationName = operationIdentifier.getName();
     if (operationIdentifier.getNamespace().equals(prefix)) {
-      // As the operation can be inside the extension or the config, it has to be looked up in both elements.
-      final HasOperationModels hasOperationModels =
-          getConfigurationModel()
-              .map(configurationModel -> (HasOperationModels) configurationModel)
-              .orElse(extensionModel);
-      result = hasOperationModels.getOperationModel(operationIdentifier.getName());
+      final String opName = operationIdentifier.getName();
+      final HyphenatedOperationFinder extensionWalker = new HyphenatedOperationFinder(opName);
+      extensionWalker.walk(extensionModel);
+      result = extensionWalker.result;
     }
     return result;
+  }
+
+  /**
+   * Looks an operation within the ExtensionModel by matching it with the hyphenated one that the SDK generates.
+   */
+  private class HyphenatedOperationFinder extends IdempotentExtensionWalker {
+
+    private final String hyphenatedOpName;
+    private Optional<OperationModel> result = Optional.empty();
+
+    private HyphenatedOperationFinder(final String hyphenatedOpName) {
+      this.hyphenatedOpName = hyphenatedOpName;
+    }
+
+    @Override
+    protected void onOperation(OperationModel model) {
+      DslElementSyntax dsl = dslSyntaxResolver.resolve(model);
+      if (dsl.getElementName().equals(hyphenatedOpName)) {
+        result = Optional.of(model);
+        stop();
+      }
+    }
   }
 
   // TODO MULE-9849: until there's no clear way to check against the ComponentModel using the
