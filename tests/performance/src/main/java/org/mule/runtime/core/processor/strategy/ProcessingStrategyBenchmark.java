@@ -123,8 +123,8 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
     return Flux.from(publisher)
         .transform(transformFunction)
         .doOnNext(event -> ((MonoSink<CoreEvent>) (event.getMessage().getPayload().getValue())).success(event))
-        .onErrorContinue((t, event) -> {
-          ((MonoSink<CoreEvent>) (((CoreEvent) event).getMessage().getPayload().getValue())).error(t);
+        .errorStrategyContinue((t, event) -> {
+          ((MonoSink<CoreEvent>) (event.getMessage().getPayload().getValue())).error(t);
         });
   }
 
