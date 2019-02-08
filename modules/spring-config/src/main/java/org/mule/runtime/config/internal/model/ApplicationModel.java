@@ -984,6 +984,12 @@ public class ApplicationModel {
     }
   }
 
+  public void executeOnlyOnMuleRoot(final Consumer<ComponentModel> task) {
+    for (ComponentModel componentModel : muleComponentModels) {
+      task.accept(componentModel);
+    }
+  }
+
 
   public void executeOnEveryRootElement(final Consumer<ComponentModel> task) {
     for (ComponentModel muleComponentModel : muleComponentModels) {

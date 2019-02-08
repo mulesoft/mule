@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider::maskPasswords(java.lang.String, java.lang.String)",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "LocationExecutionContextProvider",
+          "methodName": "maskPasswords",
+          "elementKind": "method",
+          "justification": "Utility added, used by internal components"
+        },
+        {
           "code": "java.method.parameterTypeChanged",
           "old": "parameter java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(===org.mule.runtime.core.api.util.CaseInsensitiveHashMap.InternalCaseInsensitiveHashMap===)",
           "new": "parameter java.util.Map org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K, V>::wrap(===java.util.AbstractMap===)",

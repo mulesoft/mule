@@ -51,23 +51,27 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
     return sourceXml != null ? maskPasswords(sourceXml.toString()) : null;
   }
 
-  protected static String maskPasswords(String xml) {
-    xml = maskUrlPassword(xml, URL_PATTERN);
-    xml = maskUrlPassword(xml, ADDRESS_PATTERN);
+  public static String maskPasswords(String xml, String passwordMask) {
+    xml = maskUrlPassword(xml, URL_PATTERN, passwordMask);
+    xml = maskUrlPassword(xml, ADDRESS_PATTERN, passwordMask);
 
     Matcher matcher = PASSWORD_PATTERN.matcher(xml);
     if (matcher.find() && matcher.groupCount() > 0) {
-      xml = xml.replaceAll(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
+      xml = xml.replaceAll(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(passwordMask));
     }
-    xml = maskUrlPassword(xml, PASSWORD_PATTERN);
+    xml = maskUrlPassword(xml, PASSWORD_PATTERN, passwordMask);
 
     return xml;
   }
 
-  private static String maskUrlPassword(String xml, Pattern pattern) {
+  protected static String maskPasswords(String xml) {
+    return maskPasswords(xml, PASSWORD_MASK);
+  }
+
+  private static String maskUrlPassword(String xml, Pattern pattern, String passwordMask) {
     Matcher matcher = pattern.matcher(xml);
     if (matcher.find() && matcher.groupCount() > 0) {
-      xml = xml.replaceAll(matcher.group(1), PASSWORD_MASK);
+      xml = xml.replaceAll(matcher.group(1), passwordMask);
     }
     return xml;
   }
