@@ -9,16 +9,12 @@ package org.mule.runtime.globalconfig.internal;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Comparator;
-import java.util.Map;
-
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import org.mule.maven.client.api.model.Authentication;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
+import org.mule.maven.client.api.model.RepositoryPolicy;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.api.MuleFoldersUtil;
@@ -26,6 +22,13 @@ import org.mule.runtime.globalconfig.api.exception.RuntimeGlobalConfigException;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Configuration builder for {@link MavenConfiguration} instances.
@@ -91,10 +94,10 @@ public class MavenConfigBuilder {
         Map<String, Object> repositoriesAsMap = repositories.unwrapped();
         repositoriesAsMap.entrySet().stream().sorted(remoteRepositoriesComparator()).forEach((repoEntry) -> {
           String repositoryId = repoEntry.getKey();
-          Map<String, String> repositoryConfig = (Map<String, String>) repoEntry.getValue();
-          String url = repositoryConfig.get("url");
-          String username = repositoryConfig.get("username");
-          String password = repositoryConfig.get("password");
+          Map<String, Object> repositoryConfig = (Map<String, Object>) repoEntry.getValue();
+          String url = (String) repositoryConfig.get("url");
+          String username = (String) repositoryConfig.get("username");
+          String password = (String) repositoryConfig.get("password");
           try {
             RemoteRepository.RemoteRepositoryBuilder remoteRepositoryBuilder = RemoteRepository.newRemoteRepositoryBuilder()
                 .id(repositoryId).url(new URL(url));
@@ -106,6 +109,10 @@ public class MavenConfigBuilder {
               if (password != null) {
                 authenticationBuilder.password(password);
               }
+              getRepositoryPolicy(repositoryConfig, "snapshotPolicy")
+                  .ifPresent(snapshotPolicy -> remoteRepositoryBuilder.snapshotPolicy(snapshotPolicy));
+              getRepositoryPolicy(repositoryConfig, "releasePolicy")
+                  .ifPresent(releasePolicy -> remoteRepositoryBuilder.releasePolicy(releasePolicy));
               remoteRepositoryBuilder.authentication(authenticationBuilder.build());
             }
             mavenConfigurationBuilder.remoteRepository(remoteRepositoryBuilder.build());
@@ -121,6 +128,27 @@ public class MavenConfigBuilder {
       }
       throw new RuntimeGlobalConfigException(e);
     }
+  }
+
+  private static Optional<RepositoryPolicy> getRepositoryPolicy(Map<String, Object> repositoryConfig, String policy) {
+    if (repositoryConfig.containsKey(policy)) {
+      RepositoryPolicy.RepositoryPolicyBuilder repositoryPolicyBuilder = RepositoryPolicy.newRepositoryPolicyBuilder();
+      Map<String, String> snapshotPolicy = (Map<String, String>) repositoryConfig.get(policy);
+      String enabled = snapshotPolicy.getOrDefault("enabled", null);
+      String updatePolicy = snapshotPolicy.getOrDefault("updatePolicy", null);
+      String checksumPolicy = snapshotPolicy.getOrDefault("checksumPolicy", null);
+      if (enabled != null) {
+        repositoryPolicyBuilder.enabled(Boolean.valueOf(enabled));
+      }
+      if (updatePolicy != null) {
+        repositoryPolicyBuilder.updatePolicy(updatePolicy);
+      }
+      if (checksumPolicy != null) {
+        repositoryPolicyBuilder.checksumPolicy(checksumPolicy);
+      }
+      return of(repositoryPolicyBuilder.build());
+    }
+    return empty();
   }
 
   private static File findResource(String resourceLocation) {

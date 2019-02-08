@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.globalconfig;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -29,13 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(RUNTIME_GLOBAL_CONFIGURATION)
 @Story(MAVEN_GLOBAL_CONFIGURATION_STORY)
@@ -62,6 +63,16 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
     assertThat(remoteRepository.getUrl(), is(new URL(MAVEN_CENTRAL_URL)));
     assertThat(remoteRepository.getAuthentication().get().getPassword(), is("password"));
     assertThat(remoteRepository.getAuthentication().get().getUsername(), is("username"));
+
+    assertThat(remoteRepository.getSnapshotPolicy().isPresent(), is(true));
+    assertThat(remoteRepository.getSnapshotPolicy().get().isEnabled(), is(true));
+    assertThat(remoteRepository.getSnapshotPolicy().get().getUpdatePolicy(), equalTo("daily"));
+    assertThat(remoteRepository.getSnapshotPolicy().get().getChecksumPolicy(), equalTo("warn"));
+
+    assertThat(remoteRepository.getReleasePolicy().isPresent(), is(true));
+    assertThat(remoteRepository.getReleasePolicy().get().isEnabled(), is(false));
+    assertThat(remoteRepository.getReleasePolicy().get().getUpdatePolicy(), equalTo("always"));
+    assertThat(remoteRepository.getReleasePolicy().get().getChecksumPolicy(), equalTo("ignore"));
   }
 
   @Description("Loads the configuration from mule-config.json and overrides the maven repository location using a system property")

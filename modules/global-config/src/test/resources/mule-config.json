@@ -5,7 +5,17 @@
         "mavenCentral": {
           "url": "https://repo.maven.apache.org/maven2/",
           "username": "username",
-          "password": "password"
+          "password": "password",
+          "snapshotPolicy": {
+            "enabled": "true",
+            "updatePolicy": "daily",
+            "checksumPolicy": "warn"
+          },
+          "releasePolicy": {
+            "enabled": "false",
+            "updatePolicy": "always",
+            "checksumPolicy": "ignore"
+          }
         }
       }
     }
