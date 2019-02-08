@@ -183,15 +183,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return from(publisher)
         .flatMap(checkedFunction(event -> subscriberContext()
             .flatMap(ctx -> {
-              final CoreEvent eventWithContext;
-              if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
-                eventWithContext = quickCopy(event, singletonMap(INNER_CHAIN_CTX_MAPPING,
-                                                                 (Function<Context, Context>) (innerChainCtx -> innerChainCtx
-                                                                     .put(POLICY_NEXT_OPERATION,
-                                                                          ctx.get(POLICY_NEXT_OPERATION)))));
-              } else {
-                eventWithContext = event;
-              }
+              final CoreEvent eventWithContext = addContextToEvent(event, ctx);
 
               final Optional<ConfigurationInstance> configuration = resolveConfiguration(eventWithContext);
               Map<String, Object> resolutionResult;
@@ -237,6 +229,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 return Mono.from(operationExecutionFunction.execute(resolutionResult, eventWithContext));
               }
             })));
+  }
+
+  private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
+    final CoreEvent eventWithContext;
+    if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
+      return quickCopy(event, singletonMap(INNER_CHAIN_CTX_MAPPING,
+                                           (Function<Context, Context>) (innerChainCtx -> innerChainCtx
+                                               .put(POLICY_NEXT_OPERATION,
+                                                    ctx.get(POLICY_NEXT_OPERATION)))));
+    } else {
+      return event;
+    }
   }
 
   private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {

@@ -122,7 +122,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
 
     public void execute() {
       final Function<Context, Context> innerChainCtxMapping =
-          (Function<Context, Context>) ((InternalEvent) event).getInternalParameter(INNER_CHAIN_CTX_MAPPING);
+          ((InternalEvent) event).getInternalParameter(INNER_CHAIN_CTX_MAPPING);
 
       from(processWithChildContext(event, chain, ofNullable(chain.getLocation())))
           .doOnSuccess(this::handleSuccess)
