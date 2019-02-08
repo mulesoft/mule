@@ -25,6 +25,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.glassfish.grizzly.http.Protocol;
 import org.slf4j.Logger;
@@ -90,24 +91,23 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
     private ResponseDeferringCompletionHandler responseDeferringCompletionHandler;
 
     // synchronizers
-    private Integer downstreamNotificationsSent;
-    private CountDownLatch syncLatch;
-    private CountDownLatch flushEnteredWriting;
+    private AtomicInteger downstreamNotificationsSent;
+    private AtomicInteger contextWritesCompleted;
     private WriteResult mockWriteResult = mock(WriteResult.class);
     private AtomicBoolean contentWritten;
     private CountDownLatch completeAndCloseSync;
+    private CountDownLatch flushEnteredWriting;
 
     private OutputStream outputStream;
 
     private Semaphore stepSync;
 
-    private int contextWritesCompleted;
 
     @Before
     public void setUp() throws Exception
     {
         // downstream notifications counter
-        downstreamNotificationsSent = 0;
+        downstreamNotificationsSent = new AtomicInteger(0);
 
         initializeSynchronizers();
 
@@ -120,7 +120,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
             public Void answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 logger.error("Downstream notification sent");
-                downstreamNotificationsSent++;
+                downstreamNotificationsSent.incrementAndGet();
                 return null;
             }
         }).when(ctx).notifyDownstream(any(FilterChainEvent.class));
@@ -165,7 +165,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
 
         waitUntilFlushAndCloseExecuted();
 
-        assertThat(downstreamNotificationsSent, is(1));
+        assertThat(downstreamNotificationsSent.get(), is(1));
     }
 
     // Once the write method is called on the OutputHandler, which in this case
@@ -204,7 +204,6 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                     logger.warn("Acquiring close sync");
                     stepSync.acquire();
                     // run close
-                    syncLatch.await(5, TimeUnit.SECONDS);
                     outputStream.close();
 
                 }
@@ -238,7 +237,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                         // Entered ctx.write from close. This means done flag is set in DeferringCompletionHandler
                         responseDeferringCompletionHandler.completed(mockWriteResult);
 
-                        contextWritesCompleted++;
+                        contextWritesCompleted.incrementAndGet();
                     }
                 }.start();
 
@@ -266,13 +265,10 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                         // CompletionOutputStream$close one
                         flushEnteredWriting.countDown();
 
-                        // TODO: Is this sync necessary, it seems not because of the previous one
-                        syncLatch.countDown();
-
                         // Final context write completion call
                         responseDeferringCompletionHandler.completed(mockWriteResult);
 
-                        contextWritesCompleted++;
+                        contextWritesCompleted.incrementAndGet();
                     }
                 }.start();
                 return null;
@@ -291,7 +287,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
             @Override
             public boolean isSatisfied()
             {
-                return contextWritesCompleted == expectedWrites;
+                return contextWritesCompleted.get() == expectedWrites;
             }
 
             @Override
@@ -344,12 +340,11 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
 
     private void initializeSynchronizers()
     {
-        syncLatch = new CountDownLatch(1);
         flushEnteredWriting = new CountDownLatch(1);
         stepSync = new Semaphore(0);
         contentWritten = new AtomicBoolean(false);
         completeAndCloseSync = new CountDownLatch(1);
-        contextWritesCompleted = 0;
+        contextWritesCompleted = new AtomicInteger(0);
     }
 
     private void mockHttpRequestAndResponse()
