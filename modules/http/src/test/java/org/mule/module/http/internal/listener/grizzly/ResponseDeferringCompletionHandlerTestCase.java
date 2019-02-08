@@ -49,20 +49,50 @@ import org.slf4j.LoggerFactory;
 public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTestCase implements OutputHandler
 {
 
+    /*
+    ResponseDeferringCompletionHandler semaphore has to be intercepted in the release method call,
+    since the race condition being tested happens in the following situation:
+
+        1 - The contents of the ResponseDeferringCompletionHandler$CompletionOutputStream are flushed.
+        This happens for example, when the CH (completion handler) is owned by a DataWeave transformer,
+        and it finished writing the current transformation, or whenever a write is going to overfill the buffer.
+
+        2 - When the flush method write to the FilterChainContext, it registers the CH as a completed callback.
+
+        3 - The close method is called on ResponseDeferringCompletionHandler$CompletionOutputStream, and it block
+        waiting for the sending semaphore. It also registers a completed callback (B).
+
+        4 - When flush's method completed callback is called (A), it releases the sending semaphore.
+
+        5 - close method continues execution, setting the isDone flag as true.
+
+        6 - flush completed callback (A) continues executing, entering the isDone branch, and calling the doComplete method,
+        which notifies the completion of the request downstream in the FilterChain.
+
+        7 - close's completed callback (B) continues executing, entering yet again the isDone branch, calling doComplete,
+        and notifies an already finished FilterChain. This leads to a NPE when attemping to reuse an already discarded filter
+        chain context.
+    */
+
+    private static final String RESPONSE_DEFERRING_CH_SEMAPHORE_FIELD = "sending";
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    // Grizzly requirements mocking
     private FilterChainContext ctx = mock(FilterChainContext.class);
     private FilterChain filterChain = mock(FilterChain.class);
     private Connection connection = mock(Connection.class);
     private Transport transport = mock(Transport.class);
     private MemoryManager memoryManager = new HeapMemoryManager();
-
     private HttpRequestPacket request = mock(HttpRequestPacket.class);
-    private Integer downstreamNotificationsSent;
     private HttpResponse response;
+
+    // class under test
+    private ResponseDeferringCompletionHandler responseDeferringCompletionHandler;
+
+    // synchronizers
+    private Integer downstreamNotificationsSent;
     private CountDownLatch syncLatch;
     private CountDownLatch flushEnteredWriting;
-    private ResponseDeferringCompletionHandler responseDeferringCompletionHandler;
     private WriteResult mockWriteResult = mock(WriteResult.class);
     private AtomicBoolean contentWritten;
     private CountDownLatch completeAndCloseSync;
@@ -76,16 +106,14 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
     @Before
     public void setUp() throws Exception
     {
+        // downstream notifications counter
         downstreamNotificationsSent = 0;
-        syncLatch = new CountDownLatch(1);
-        flushEnteredWriting = new CountDownLatch(1);
-        stepSync = new Semaphore(0);
-        contentWritten = new AtomicBoolean(false);
-        completeAndCloseSync = new CountDownLatch(1);
-        contextWritesCompleted = 0;
+
+        initializeSynchronizers();
 
         mockHttpRequestAndResponse();
 
+        // whenever a notification is sent downstream in Grizzly's filter chain, count it
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -97,9 +125,16 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
             }
         }).when(ctx).notifyDownstream(any(FilterChainEvent.class));
 
+        // Create new completion handler to be tested
         responseDeferringCompletionHandler = new ResponseDeferringCompletionHandler(ctx, request, response, mock(ResponseStatusCallback.class));
 
-        Field sendingSemaphore = responseDeferringCompletionHandler.getClass().getDeclaredField("sending");
+        // CH sending semaphore release method has to be intercepted, in order to replicate race condition
+        interceptCompletionHandlerSemaphore();
+    }
+
+    private void interceptCompletionHandlerSemaphore() throws NoSuchFieldException, IllegalAccessException
+    {
+        Field sendingSemaphore = responseDeferringCompletionHandler.getClass().getDeclaredField(RESPONSE_DEFERRING_CH_SEMAPHORE_FIELD);
         sendingSemaphore.setAccessible(true);
         sendingSemaphore.set(responseDeferringCompletionHandler, new Semaphore(1) {
             @Override
@@ -116,7 +151,16 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                 }
             }
         });
+    }
 
+    private void initializeSynchronizers()
+    {
+        syncLatch = new CountDownLatch(1);
+        flushEnteredWriting = new CountDownLatch(1);
+        stepSync = new Semaphore(0);
+        contentWritten = new AtomicBoolean(false);
+        completeAndCloseSync = new CountDownLatch(1);
+        contextWritesCompleted = 0;
     }
 
     private void mockHttpRequestAndResponse()
@@ -209,48 +253,6 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
         assertThat(downstreamNotificationsSent, is(1));
     }
 
-    private void waitUntilFlushAndCloseExecuted()
-    {
-        new PollingProber(10000, 1000).check(new Probe()
-        {
-
-            private int expectedWrites = 2;
-
-            @Override
-            public boolean isSatisfied()
-            {
-                return contextWritesCompleted == expectedWrites;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "Not all context writes completed. It actually is " + contextWritesCompleted + " while the expected is " + expectedWrites;
-            }
-        });
-    }
-
-    private void wailUntilContentWritten()
-    {
-        new PollingProber(10000, 1000).check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return contentWritten.get();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "Timeouted waiting for content to be written";
-            }
-        });
-
-        logger.warn("Content written");
-    }
-
-
     @Override
     public void write(MuleEvent event, final OutputStream out) throws IOException
     {
@@ -297,5 +299,45 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
             }
         }.start();
 
+    }
+
+    private void waitUntilFlushAndCloseExecuted()
+    {
+        new PollingProber(10000, 1000).check(new Probe()
+        {
+
+            private int expectedWrites = 2;
+
+            @Override
+            public boolean isSatisfied()
+            {
+                return contextWritesCompleted == expectedWrites;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Not all context writes completed. It actually is " + contextWritesCompleted + " while the expected is " + expectedWrites;
+            }
+        });
+    }
+
+    private void wailUntilContentWritten()
+    {
+        new PollingProber(10000, 1000).check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return contentWritten.get();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Timeouted waiting for content to be written";
+            }
+        });
+        logger.warn("Content written");
     }
 }
