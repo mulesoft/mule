@@ -232,7 +232,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
-    final CoreEvent eventWithContext;
     if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
       return quickCopy(event, singletonMap(INNER_CHAIN_CTX_MAPPING,
                                            (Function<Context, Context>) (innerChainCtx -> innerChainCtx
