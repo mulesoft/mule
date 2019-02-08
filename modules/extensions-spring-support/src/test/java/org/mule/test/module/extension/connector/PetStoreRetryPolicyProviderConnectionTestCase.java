@@ -29,7 +29,6 @@ import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-
 import java.util.Set;
 
 import org.junit.After;
