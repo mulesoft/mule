@@ -7,7 +7,11 @@
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static org.apache.commons.lang3.StringUtils.repeat;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.toXml;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
@@ -17,13 +21,11 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.XMLConstants;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,10 @@ import java.util.stream.Collectors;
  * @since 4.0
  */
 public class MacroExpansionModulesModel {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MacroExpansionModulesModel.class);
+  private static final String FILE_MACRO_EXPANSION_DELIMITER = repeat('*', 80) + lineSeparator();
+  private static final String FILE_MACRO_EXPANSION_SECTION_DELIMITER = repeat('-', 80) + lineSeparator();
 
   private final ApplicationModel applicationModel;
   private final List<ExtensionModel> sortedExtensions;
@@ -61,7 +67,31 @@ public class MacroExpansionModulesModel {
    */
   public void expand() {
     for (ExtensionModel sortedExtension : sortedExtensions) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(String.format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
+                                   sortedExtension.getName(),
+                                   sortedExtension.getXmlDslModel().getPrefix(),
+                                   sortedExtension.getXmlDslModel().getNamespace()));
+      }
       new MacroExpansionModuleModel(applicationModel, sortedExtension).expand();
+    }
+    if (LOGGER.isDebugEnabled()) {
+      //only log the macro expanded app if there are smart connectors in it
+      boolean hasMacroExpansionExtension = sortedExtensions.stream()
+          .anyMatch(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent());
+      if (hasMacroExpansionExtension) {
+        applicationModel.executeOnlyOnMuleRoot(rootComponentModel -> {
+          final StringBuilder buf = new StringBuilder(1024);
+
+          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
+          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
+          buf.append("Filename: ").append(rootComponentModel.getConfigFileName().orElse("<unnamed>"));
+          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
+          buf.append(toXml(rootComponentModel));
+          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
+          LOGGER.debug(buf.toString());
+        });
+      }
     }
   }
 
@@ -86,7 +116,7 @@ public class MacroExpansionModulesModel {
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
         .collect(Collectors.toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
 
-    // we firt check there are at least one extension to macro expand
+    // we first check there are at least one extension to macro expand
     if (!allExtensionsByNamespace.isEmpty()) {
       Set<String> extensionsUsedInApp = new HashSet<>();
       applicationModel.executeOnEveryMuleComponentTree(rootComponentModel -> extensionsUsedInApp
@@ -96,7 +126,7 @@ public class MacroExpansionModulesModel {
         // generation of the DAG and then the topological iterator.
         // it's important to be 100% sure the DAG is not empty, or the TopologicalOrderIterator will fail at start up.
         DirectedGraph<String, DefaultEdge> namespaceDAG = new DirectedMultigraph<>(DefaultEdge.class);
-        extensionsUsedInApp.stream().forEach(namespace -> fillDependencyGraph(namespaceDAG, namespace, allExtensionsByNamespace));
+        extensionsUsedInApp.forEach(namespace -> fillDependencyGraph(namespaceDAG, namespace, allExtensionsByNamespace));
         GraphIterator<String, DefaultEdge> graphIterator = new TopologicalOrderIterator<>(namespaceDAG);
         while (graphIterator.hasNext()) {
           final String namespace = graphIterator.next();
