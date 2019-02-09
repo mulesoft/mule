@@ -307,12 +307,12 @@ public class MessageProcessors {
         // .log()
         .toProcessor()
         .transform(processor)
-        .onErrorMap(MessagingException.class,
-                    me -> {
-                      // System.out.println(" >> onErrorMap");
-                      return new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
-                          .get(), me.getEvent()), me);
-                    })
+        // .onErrorMap(MessagingException.class,
+        // me -> {
+        // // System.out.println(" >> onErrorMap");
+        // return new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
+        // .get(), me.getEvent()), me);
+        // })
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<CoreEvent>create(errorSwitchSinkSinkRef)
             // .doOnNext(e -> System.out.println(" >> emptySwitch next"))
