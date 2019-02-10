@@ -320,6 +320,7 @@ public class MessageProcessors {
             .toProcessor())
         .map(result -> {
           // System.out.println(" >> mapping");
+          // return quickCopy(child.getParentContext().get(), result);
           return quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result);
         });
   }
