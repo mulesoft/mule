@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -67,8 +68,8 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
     }
   }
 
-  private void initProcessingTypeIfPossible() {
-    if (BLOCKING_CATEGORIES.isEmpty()) {
+  protected void initProcessingTypeIfPossible() {
+    if (BLOCKING_CATEGORIES.size() == 1 && BLOCKING_CATEGORIES.contains(EMPTY)) {
       processingType = CPU_LITE;
     } else if (BLOCKING_CATEGORIES.contains(WILDCARD)) {
       processingType = BLOCKING;
