@@ -40,6 +40,9 @@ public class JavaDocReader {
   private static final char OPENING_BRACKET_CHAR = '{';
   private static final char LESS_THAN_CHAR = '<';
   private static final char GREATER_THAN_CHAR = '>';
+  public static final Whitelist WHITELIST = Whitelist.none().addTags("a").addAttributes("a", "href")
+          .addProtocols("a", "href", "http", "https");
+  public static final Whitelist NONE = Whitelist.none();
 
   /**
    * Extracts the JavaDoc of an element and parses it returning a easy to consume {@link JavaDocModel}
@@ -121,14 +124,12 @@ public class JavaDocReader {
    * Removes all HTML from the text and converts anchor to asciidoc valid links. For example: <a href="url">Inner</a> becomes url[Inner].
    */
   private static String removeHTML(String text) {
-    String textWithAnchors = Jsoup.clean(text,
-                                         new Whitelist().none().addTags("a").addAttributes("a", "href")
-                                             .addProtocols("a", "href", "http", "https"));
+    String textWithAnchors = Jsoup.clean(text, WHITELIST);
     Document htmlDoc = Jsoup.parseBodyFragment(textWithAnchors);
     for (org.jsoup.nodes.Element anchor : htmlDoc.select("a")) {
       anchor.html(anchor.attr("href") + "[" + anchor.html() + "]");
     }
-    return Jsoup.clean(htmlDoc.html(), new Whitelist().none());
+    return Jsoup.clean(htmlDoc.html(), NONE);
   }
 
   private static String stripTags(String comment) {
