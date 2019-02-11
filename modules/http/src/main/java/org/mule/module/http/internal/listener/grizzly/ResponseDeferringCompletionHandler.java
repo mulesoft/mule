@@ -88,12 +88,12 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   @Override
   public void completed(WriteResult result)
   {
-    // Allow more data to be sent
-    sending.release();
     if (isDone)
     {
       doComplete();
     }
+    // Allow more data to be sent
+    sending.release();
   }
 
   private void doComplete()
