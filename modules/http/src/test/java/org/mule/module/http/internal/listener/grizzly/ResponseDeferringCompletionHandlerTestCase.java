@@ -71,7 +71,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
         which notifies the completion of the request downstream in the FilterChain.
 
         7 - close's completed callback (B) continues executing, entering yet again the isDone branch, calling doComplete,
-        and notifies an already finished FilterChain. This leads to a NPE when attemping to reuse an already discarded filter
+        and notifies an already finished FilterChain. This leads to a NPE when attempting to reuse an already discarded filter
         chain context.
     */
 
