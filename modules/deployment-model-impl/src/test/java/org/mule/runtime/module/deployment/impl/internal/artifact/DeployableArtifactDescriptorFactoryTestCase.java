@@ -250,7 +250,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
     assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(PROVIDED, false)));
+    assertThat(classLoaderModel.getDependencies(),
+               hasItem(testEmptyPluginDependencyMatcher(PROVIDED, false, true)));
   }
 
   @Test
@@ -282,7 +283,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
     assertThat(classLoaderModel.getDependencies().size(), is(2));
-    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher()));
+    assertThat(classLoaderModel.getDependencies(), hasItem(testEmptyPluginDependencyMatcher(COMPILE, true, false)));
 
     assertThat(classLoaderModel.getUrls().length, is(1));
     assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
@@ -405,10 +406,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   private Matcher<BundleDependency> testEmptyPluginDependencyMatcher() {
-    return testEmptyPluginDependencyMatcher(COMPILE, true);
+    return testEmptyPluginDependencyMatcher(COMPILE, true, true);
   }
 
-  private Matcher<BundleDependency> testEmptyPluginDependencyMatcher(BundleScope scope, boolean hasUri) {
+  private Matcher<BundleDependency> testEmptyPluginDependencyMatcher(BundleScope scope, boolean hasUri, boolean checkVersion) {
     return new BaseMatcher<BundleDependency>() {
 
       @Override
@@ -425,11 +426,12 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         BundleDependency bundleDependency = (BundleDependency) o;
 
         return bundleDependency.getDescriptor().getClassifier().isPresent() &&
+            (bundleDependency.getScope() == null || bundleDependency.getScope().equals(scope)) &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("test-empty-plugin") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&
-            bundleDependency.getDescriptor().getVersion().equals(MULE_PROJECT_VERSION) &&
-            (hasUri ? bundleDependency.getBundleUri() != null : bundleDependency.getBundleUri() == null);
+            (!checkVersion || bundleDependency.getDescriptor().getVersion().equals(MULE_PROJECT_VERSION)) &&
+            (hasUri == (bundleDependency.getBundleUri() != null));
       }
     };
   }
@@ -458,6 +460,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
         BundleDependency bundleDependency = (BundleDependency) o;
         return bundleDependency.getDescriptor().getClassifier().isPresent() &&
+            (bundleDependency.getScope() == null || bundleDependency.getScope().equals(COMPILE)) &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&
