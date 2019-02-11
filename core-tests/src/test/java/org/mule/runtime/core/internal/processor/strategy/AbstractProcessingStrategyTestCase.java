@@ -31,6 +31,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
@@ -47,7 +48,6 @@ import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -59,7 +59,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
@@ -76,7 +75,6 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -121,6 +119,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected static final String CPU_INTENSIVE = "cpuIntensive";
   protected static final String CUSTOM = "custom";
   protected static final String RING_BUFFER = "ringBuffer";
+  protected static final String EXECUTOR = "executor";
   protected static final int STREAM_ITERATIONS = 5000;
 
   protected Supplier<Builder> flowBuilder;
@@ -216,7 +215,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     custom = new RetrySchedulerWrapper(new TestScheduler(4, CUSTOM, true), 5, () -> {
     });
     ringBuffer = new TestScheduler(1, RING_BUFFER, true);
-    asyncExecutor = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(SchedulerService.class).ioScheduler();
+    asyncExecutor = new TestScheduler(CORES, EXECUTOR, false);
 
     flowBuilder = () -> builder("test", muleContext)
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix))
