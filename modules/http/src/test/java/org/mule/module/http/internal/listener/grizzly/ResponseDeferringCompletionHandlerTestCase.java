@@ -214,6 +214,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                 catch (InterruptedException | IOException e)
                 {
                     // fail fast when exception raised in launched threads
+                    Thread.currentThread().interrupt();
                     failLoggingException(e);
                 }
             }
@@ -342,6 +343,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                 catch (InterruptedException e)
                 {
                     // fail fast when exception raised in launched threads
+                    Thread.currentThread().interrupt();
                     failLoggingException(e);
                 }
             }
