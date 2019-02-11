@@ -1,7 +1,10 @@
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.apache.http.HttpHeaders.TRANSFER_ENCODING;
+import static org.glassfish.grizzly.http.Protocol.HTTP_1_1;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
@@ -76,6 +79,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
     */
 
     private static final String RESPONSE_DEFERRING_CH_SEMAPHORE_FIELD = "sending";
+    private static final String TRUE = "true";
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // Grizzly requirements mocking
@@ -137,7 +141,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
     public void testSingleFlushAndCloseGenerateOneDownstreamCompletionEvent() throws IOException, InterruptedException
     {
 
-        logger.info("Starting responseDeferringCompletionHandler");
+        logger.warn("Starting responseDeferringCompletionHandler");
         // the CH start method ends up firing up the orchestrator thread, which is
         // in charge of calling flush and close CompletionOutputStream methods
         responseDeferringCompletionHandler.start();
@@ -149,7 +153,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
         doAnswer(flushContextWriteMock()).when(ctx).write(anyObject(), any(CompletionHandler.class));
 
         // release semaphore to let CompletionOutputStream$flush be called by orchestrator
-        logger.info("Releasing 'flush' sync");
+        logger.warn("Releasing 'flush' sync");
         stepSync.release();
 
         // Waiting for flush thread to be started
@@ -160,7 +164,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
         doAnswer(closeContextWriteMock()).when(ctx).write(anyObject(), any(CompletionHandler.class));
 
         // release semaphore to let CompletionOutputStream$close be called by orchestrator
-        logger.info("Releasing 'close' sync");
+        logger.warn("Releasing 'close' sync");
         stepSync.release();
 
         waitUntilFlushAndCloseExecuted();
@@ -209,11 +213,16 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                 }
                 catch (InterruptedException | IOException e)
                 {
-                    logger.warn("Exception raised in " + Thread.currentThread().getName() + ": " + e.toString());
-                    e.printStackTrace();
+                    // fail fast when exception raised in launched threads
+                    failLoggingException(e);
                 }
             }
         }.start();
+    }
+
+    private void failLoggingException(Exception e)
+    {
+        fail("Exception raised in " + Thread.currentThread().getName() + ": " + e.toString());
     }
 
     private Answer<Void> closeContextWriteMock()
@@ -232,7 +241,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                         // make flush's callback continue after 'sending' semaphore release
                         completeAndCloseSync.countDown();
 
-                        logger.info("ctx.write called from close");
+                        logger.warn("ctx.write called from close");
 
                         // Entered ctx.write from close. This means done flag is set in DeferringCompletionHandler
                         responseDeferringCompletionHandler.completed(mockWriteResult);
@@ -258,7 +267,7 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                     @Override
                     public void run()
                     {
-                        logger.info("ctx.write called from flush");
+                        logger.warn("ctx.write called from flush");
 
                         // sync used to make sure mocked FilterChainContext.write delegates
                         // to the creation of this thread, before the mock answer is changed to the
@@ -332,7 +341,8 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
                 }
                 catch (InterruptedException e)
                 {
-                    e.printStackTrace();
+                    // fail fast when exception raised in launched threads
+                    failLoggingException(e);
                 }
             }
         });
@@ -349,10 +359,10 @@ public class ResponseDeferringCompletionHandlerTestCase extends AbstractMuleTest
 
     private void mockHttpRequestAndResponse()
     {
-        when(request.getProtocol()).thenReturn(Protocol.HTTP_1_1);
+        when(request.getProtocol()).thenReturn(HTTP_1_1);
 
         MultiHashMap responseHeaders = new MultiHashMap();
-        responseHeaders.put("Transfer-Encoding", "true");
+        responseHeaders.put(TRANSFER_ENCODING, TRUE);
         response = new DefaultHttpResponse(new ResponseStatus(), responseHeaders, new OutputHandlerHttpEntity(this));
 
         when(ctx.getConnection()).thenReturn(connection);
