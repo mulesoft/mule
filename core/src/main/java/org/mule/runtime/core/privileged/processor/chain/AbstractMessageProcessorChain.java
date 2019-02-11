@@ -108,8 +108,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private final String name;
   private final List<Processor> processors;
-  private ProcessingStrategy processingStrategy;
-  private List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
+  private final ProcessingStrategy processingStrategy;
+  private final List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
 
   @Inject
   private InterceptorManager processorInterceptorManager;
@@ -194,6 +194,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         // Give priority to failed event from reactor over MessagingException event.
         BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
             : ((MessagingException) throwable).getEvent().getContext());
+
+        System.out.println(" >> AMPCh " + context.toString() + "; " + throwable.toString());
+
         errorNotification(processor).andThen(e -> context.error(e))
             .accept(resolveMessagingException(processor).apply((MessagingException) throwable));
       } else {
@@ -202,6 +205,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
         } else {
           BaseEventContext context = ((BaseEventContext) event.getContext());
+
+          System.out.println(" >> AMPCh " + context.toString() + "; " + throwable.toString());
+
           errorNotification(processor).andThen(e -> context.error(e))
               .accept(resolveException(processor, event, throwable));
         }
@@ -274,7 +280,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
     return lift((scannable, subscriber) -> new CoreSubscriber<CoreEvent>() {
 
-      private Context context = subscriber.currentContext();
+      private final Context context = subscriber.currentContext();
 
       @Override
       public void onNext(CoreEvent event) {

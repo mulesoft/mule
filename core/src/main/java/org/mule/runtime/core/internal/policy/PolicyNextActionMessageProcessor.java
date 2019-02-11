@@ -106,6 +106,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         // ))
 
         .doOnNext(coreEvent -> {
+          System.out.println(" >> PNAMP next ");
           notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
           pushAfterNextFlowStackElement().accept(coreEvent);
           logExecuteNextEvent("After execute-next", coreEvent.getContext(), coreEvent.getMessage(),
@@ -116,6 +117,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   }
 
   private void handleExceptionInNext(MessagingException me) {
+    System.out.println(" >> PNAMP error ");
+
     notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
     pushAfterNextFlowStackElement().accept(me.getEvent());
 
