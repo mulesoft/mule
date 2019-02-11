@@ -10,6 +10,8 @@ import static java.util.Collections.singletonMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -19,6 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.el.BindingContext;
@@ -69,6 +72,12 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     verifyLoggerMessageByLevel("INFO");
     verifyLoggerMessageByLevel("WARN");
     verifyLoggerMessageByLevel("ERROR");
+  }
+
+  @Test
+  public void defaultProcessTypeIsCpuLite() {
+    LoggerMessageProcessor logger = buildLoggerMessageProcessorWithLevel("INFO");
+    assertThat(logger.getProcessingType(), is(CPU_LITE));
   }
 
   // Verifies if the right call to the logger was made depending on the level enabled
@@ -157,6 +166,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     LoggerMessageProcessor loggerMessageProcessor = new LoggerMessageProcessor();
     loggerMessageProcessor.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     loggerMessageProcessor.initLogger();
+    loggerMessageProcessor.initProcessingTypeIfPossible();
     loggerMessageProcessor.logger = buildMockLogger();
     loggerMessageProcessor.setLevel(level);
     return loggerMessageProcessor;
