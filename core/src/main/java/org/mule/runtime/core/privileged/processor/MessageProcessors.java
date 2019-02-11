@@ -40,6 +40,8 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +58,8 @@ import reactor.core.publisher.Mono;
  * Some convenience methods for message processors.
  */
 public class MessageProcessors {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MessageProcessors.class);
 
   private MessageProcessors() {
     // do not instantiate
@@ -280,7 +284,10 @@ public class MessageProcessors {
     // Hooks.onOperatorDebug();
     return Mono.<CoreEvent>create(sink -> {
       final CoreEvent eventChildCtx = quickCopy(child, event);
-      childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+      final MonoSinkRecorderToReactorSinkAdapter<CoreEvent> errorSwitchSinkSinkRef2 =
+          new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
+      System.out.println(" >> ChCtxP begin... " + errorSwitchSinkSinkRef2);
+      childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRef2,
                                   completeParentIfEmpty);
 
       // // System.out.println(" >> child.getResponsePublisher()");
@@ -340,27 +347,22 @@ public class MessageProcessors {
         // .log()
         // .doOnCancel(() -> System.out.println(" >> Cancel top"))
         .doOnNext(eventChildCtx -> {
-          // System.out.println(" >> ChCtx begin...");
-          childContextResponseHandler(eventChildCtx, new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+          final FluxSinkRecorderToReactorSinkAdapter<CoreEvent> errorSwitchSinkSinkRef2 =
+              new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
+          // System.out.println(" >> ChCtxA begin... " + errorSwitchSinkSinkRef2);
+          childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRef2,
                                       completeParentIfEmpty);
         })
         .transform(processor)
-        .doOnComplete(() -> {
-          System.out.println(" >> main chain complete");
-        })
-        .doOnNext(s -> System.out.println(" >> ChCtx middle... "))
         .doOnNext(completeSuccessIfNeeded())
-        // .filter(e -> false)
         .mergeWith(Flux.<CoreEvent>create(errorSwitchSinkSinkRef)
-            // .doOnCancel(() -> System.out.println(" >> Cancel mergee"))
+        // .doOnCancel(() -> System.out.println(" >> Cancel mergee"))
 
-            .doOnNext(e -> System.out.println(" >> emptySwitch next"))
-            .doOnError(e -> System.out.println(" >> emptySwith error"))
-            .doOnComplete(() -> {
-              new Exception(" >> mergee complete").printStackTrace();
-            }))
+        // .doOnNext(e -> System.out.println(" >> emptySwitch next"))
+        // .doOnError(e -> System.out.println(" >> emptySwith error"))
+        )
         .distinct(event -> {
-          ((BaseEventContext) (event.getContext())).onComplete((e, t) -> {
+          (((BaseEventContext) (event.getContext())).getRootContext()).onComplete((e, t) -> {
             if (e != null) {
               seenContextIds.remove(e.getCorrelationId());
             } else {
@@ -370,13 +372,7 @@ public class MessageProcessors {
           return event.getCorrelationId();
         }, () -> seenContextIds)
         .map(result -> {
-          System.out.println(" >> mapping " + System.identityHashCode(result));
           return quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result);
-        })
-        .doOnError(e -> System.out.println(" >> apply error "))
-        .doOnCancel(() -> {
-          // System.out.println(" >> Cancel bottom");
-          // new Exception(" >> Cancel bottom").printStackTrace();
         });
   }
 
@@ -388,8 +384,9 @@ public class MessageProcessors {
         // .name("childContextResponseHandler")
         // .log()
         .doOnSuccess(response -> {
-          System.out.println(" >> child.getResponsePublisher() -> onSuccess " + completeParentIfEmpty + ", "
-              + response.getContext());
+          // System.out.println(" >> child.getResponsePublisher(" + errorSwitchSinkSinkRef + ") -> onSuccess "
+          // + completeParentIfEmpty + ", "
+          // + response.getContext());
           if (response == null && completeParentIfEmpty) {
             ((BaseEventContext) eventChildCtx.getContext()).getParentContext().get().success();
             errorSwitchSinkSinkRef.next();
@@ -397,13 +394,17 @@ public class MessageProcessors {
             errorSwitchSinkSinkRef.next(response);
           }
         })
-        .doOnError(MessagingException.class, error -> {
-          System.out.println(" >> child.getResponsePublisher() -> onError " + completeParentIfEmpty + ", "
-              + error.getEvent().getContext());
+        .onErrorResume(MessagingException.class, error -> {
+          // System.out
+          // .println(" >> child.getResponsePublisher(" + errorSwitchSinkSinkRef + ") -> onError " + completeParentIfEmpty + ", "
+          // + error.getEvent().getContext());
           errorSwitchSinkSinkRef
               .error(new MessagingException(quickCopy(((BaseEventContext) error.getEvent().getContext()).getParentContext()
                   .get(), error.getEvent()), error));
+
+          return Mono.empty();
         })
+        .doOnError(e -> LOGGER.error("Uncaugh exception in childContextResponseHandler", e))
         .toProcessor();
   }
 

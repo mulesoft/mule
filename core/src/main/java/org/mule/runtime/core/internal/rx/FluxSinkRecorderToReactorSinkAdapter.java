@@ -32,12 +32,12 @@ public class FluxSinkRecorderToReactorSinkAdapter<T> implements SinkRecorderToRe
 
   @Override
   public void next(T response) {
-    adaptedFluxSinkRecorder.getFluxSink().next(response);
+    adaptedFluxSinkRecorder.next(response);
   }
 
   @Override
   public void error(MessagingException error) {
-    adaptedFluxSinkRecorder.getFluxSink().error(error);
+    adaptedFluxSinkRecorder.error(error);
   }
 
 }
