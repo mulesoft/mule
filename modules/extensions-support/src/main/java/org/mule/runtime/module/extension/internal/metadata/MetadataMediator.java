@@ -93,9 +93,11 @@ public final class MetadataMediator<T extends ComponentModel> {
     this.keyIdObjectResolver = new MetadataKeyIdObjectResolver(component);
     this.outputDelegate = new MetadataOutputDelegate(componentModel);
     this.inputDelegate = new MetadataInputDelegate(componentModel);
-    if(componentModel instanceof SourceModel){
-      successCallbackInputDelegate = ((SourceModel)componentModel).getSuccessCallback().map(successCallbackModel -> new MetadataInputDelegate(successCallbackModel));
-      errorCallbackInputDelegate = ((SourceModel)componentModel).getErrorCallback().map(errorCallbackModel -> new MetadataInputDelegate(errorCallbackModel));
+    if (componentModel instanceof SourceModel) {
+      successCallbackInputDelegate = ((SourceModel) componentModel).getSuccessCallback()
+          .map(successCallbackModel -> new MetadataInputDelegate(successCallbackModel));
+      errorCallbackInputDelegate = ((SourceModel) componentModel).getErrorCallback()
+          .map(errorCallbackModel -> new MetadataInputDelegate(errorCallbackModel));
     } else {
       successCallbackInputDelegate = empty();
       errorCallbackInputDelegate = empty();
@@ -205,7 +207,8 @@ public final class MetadataMediator<T extends ComponentModel> {
         .map(successCallbackInputDelegate -> successCallbackInputDelegate.getInputMetadataDescriptors(context, keyValue));
     Optional<MetadataResult<InputMetadataDescriptor>> errorCallbackInput = errorCallbackInputDelegate
         .map(errorCallbackInputDelegate -> errorCallbackInputDelegate.getInputMetadataDescriptors(context, keyValue));
-    if (output.isSuccess() && input.isSuccess() && (!successCallbackInput.isPresent() || successCallbackInput.get().isSuccess()) &&
+    if (output.isSuccess() && input.isSuccess() && (!successCallbackInput.isPresent() || successCallbackInput.get().isSuccess())
+        &&
         (errorCallbackInput.isPresent() || errorCallbackInput.get().isSuccess())) {
       MetadataAttributes metadataAttributes = getMetadataAttributes(attributesBuilder, outputDelegate, input.get());
       T model = getTypedModel(input.get(), output.get(), successCallbackInput.map(MetadataResult::get),
