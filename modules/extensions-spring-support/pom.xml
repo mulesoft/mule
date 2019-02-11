@@ -17,6 +17,7 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <jsoup.version>1.11.3</jsoup.version>
     </properties>
 
     <build>
@@ -36,6 +37,13 @@
     </build>
 
     <dependencies>
+
+        <!-- Dependencies for the JavaDocReader-->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>
 
         <!-- Mule Dependencies -->
         <dependency>
