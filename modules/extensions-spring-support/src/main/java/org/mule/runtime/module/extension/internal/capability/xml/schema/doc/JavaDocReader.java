@@ -41,7 +41,7 @@ public class JavaDocReader {
   private static final char LESS_THAN_CHAR = '<';
   private static final char GREATER_THAN_CHAR = '>';
   public static final Whitelist WHITELIST = Whitelist.none().addTags("a").addAttributes("a", "href")
-          .addProtocols("a", "href", "http", "https");
+      .addProtocols("a", "href", "http", "https");
   public static final Whitelist NONE = Whitelist.none();
 
   /**
