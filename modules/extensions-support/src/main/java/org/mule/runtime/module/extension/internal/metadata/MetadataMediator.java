@@ -208,8 +208,7 @@ public final class MetadataMediator<T extends ComponentModel> {
     Optional<MetadataResult<InputMetadataDescriptor>> errorCallbackInput = errorCallbackInputDelegate
         .map(errorCallbackInputDelegate -> errorCallbackInputDelegate.getInputMetadataDescriptors(context, keyValue));
     if (output.isSuccess() && input.isSuccess() && (!successCallbackInput.isPresent() || successCallbackInput.get().isSuccess())
-        &&
-        (errorCallbackInput.isPresent() || errorCallbackInput.get().isSuccess())) {
+        && (!errorCallbackInput.isPresent() || errorCallbackInput.get().isSuccess())) {
       MetadataAttributes metadataAttributes = getMetadataAttributes(attributesBuilder, outputDelegate, input.get());
       T model = getTypedModel(input.get(), output.get(), successCallbackInput.map(MetadataResult::get),
                               errorCallbackInput.map(MetadataResult::get));
