@@ -194,9 +194,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         // Give priority to failed event from reactor over MessagingException event.
         BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
             : ((MessagingException) throwable).getEvent().getContext());
-
-        System.out.println(" >> AMPCh " + context.toString() + "; " + throwable.toString());
-
         errorNotification(processor).andThen(e -> context.error(e))
             .accept(resolveMessagingException(processor).apply((MessagingException) throwable));
       } else {
@@ -205,9 +202,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
         } else {
           BaseEventContext context = ((BaseEventContext) event.getContext());
-
-          System.out.println(" >> AMPCh " + context.toString() + "; " + throwable.toString());
-
           errorNotification(processor).andThen(e -> context.error(e))
               .accept(resolveException(processor, event, throwable));
         }

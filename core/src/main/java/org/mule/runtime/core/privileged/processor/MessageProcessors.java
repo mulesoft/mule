@@ -284,10 +284,7 @@ public class MessageProcessors {
     // Hooks.onOperatorDebug();
     return Mono.<CoreEvent>create(sink -> {
       final CoreEvent eventChildCtx = quickCopy(child, event);
-      final MonoSinkRecorderToReactorSinkAdapter<CoreEvent> errorSwitchSinkSinkRef2 =
-          new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
-      System.out.println(" >> ChCtxP begin... " + errorSwitchSinkSinkRef2);
-      childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRef2,
+      childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
                                   completeParentIfEmpty);
 
       // // System.out.println(" >> child.getResponsePublisher()");

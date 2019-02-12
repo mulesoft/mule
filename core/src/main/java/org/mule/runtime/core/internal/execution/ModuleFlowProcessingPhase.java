@@ -23,6 +23,7 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
@@ -64,7 +65,6 @@ import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import org.reactivestreams.Publisher;
@@ -400,12 +400,8 @@ public class ModuleFlowProcessingPhase
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return Flux.from(publisher)
-          // .compose(p -> applyWithChildContext(p, pub -> template.routeEventAsync(pub),
-          // Optional.empty(), flowConstruct.getExceptionListener()))
-          .flatMap(event -> from(MessageProcessors.processWithChildContext(event,
-                                                                           p -> template.routeEventAsync(p),
-                                                                           Optional.empty(),
-                                                                           flowConstruct.getExceptionListener())));
+          .compose(p -> applyWithChildContext(p, pub -> template.routeEventAsync(pub),
+                                              Optional.empty(), flowConstruct.getExceptionListener()));
     }
 
     @Override
