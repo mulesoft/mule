@@ -21,7 +21,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.*;
+import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
 
 /**
@@ -175,7 +175,7 @@ public class JavaDocReader {
     }
   }
 
-  private static String extractJavadoc(ProcessingEnvironment processingEnv, javax.lang.model.element.Element element) {
+  private static String extractJavadoc(ProcessingEnvironment processingEnv, Element element) {
     String comment = processingEnv.getElementUtils().getDocComment(element);
 
     if (StringUtils.isBlank(comment)) {
