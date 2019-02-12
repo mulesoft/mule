@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.api.functional.Either.left;
-import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
