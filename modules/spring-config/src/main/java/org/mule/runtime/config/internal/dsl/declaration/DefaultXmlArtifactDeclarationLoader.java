@@ -1045,7 +1045,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                                       Map<String, SimpleConfigAttribute> attributes,
                                       ParameterizedElementDeclarer builder) {
     attributes.values().stream()
-        .filter(a -> !a.getName().equals(NAME_ATTRIBUTE_NAME) && !a.getName().equals(CONFIG_ATTRIBUTE_NAME))
+        .filter(a -> !a.getName().equals(CONFIG_ATTRIBUTE_NAME))
         .filter(a -> !a.isValueFromSchema())
         .forEach(a -> {
           Optional<ParameterGroupModel> ownerGroup = model.getParameterGroupModels().stream()
@@ -1058,7 +1058,9 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                                                                            getGroupParameterType(ownerGroup, a.getName())))
                     .getDeclaration());
           } else {
-            builder.withCustomParameter(a.getName(), a.getValue());
+            if (!a.getName().equals(NAME_ATTRIBUTE_NAME)) {
+              builder.withCustomParameter(a.getName(), a.getValue());
+            }
           }
         });
   }
