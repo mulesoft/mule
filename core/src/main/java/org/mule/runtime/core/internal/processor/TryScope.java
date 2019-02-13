@@ -101,7 +101,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     } else {
       return from(publisher)
           .flatMap(event -> processWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
-      // return applyWithChildContext(from(publisher), nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
     }
   }
 

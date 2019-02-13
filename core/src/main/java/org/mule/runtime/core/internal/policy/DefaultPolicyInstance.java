@@ -239,7 +239,6 @@ public class DefaultPolicyInstance extends AbstractComponent
       cpuLiteScheduler = schedulerService.cpuLightScheduler(schedulerBaseConfig.withName(schedulersNamePrefix + "-cpuLite"));
     }
 
-    // @Override
     public void stopSchedulers() {
       if (cpuLiteScheduler != null) {
         cpuLiteScheduler.stop();
