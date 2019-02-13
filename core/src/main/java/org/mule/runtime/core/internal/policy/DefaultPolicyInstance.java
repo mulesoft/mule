@@ -32,7 +32,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -238,14 +237,10 @@ public class DefaultPolicyInstance extends AbstractComponent
       ioScheduler = schedulerService.ioScheduler(schedulerBaseConfig.withName(schedulersNamePrefix));
       cpuIntensiveScheduler = schedulerService.cpuIntensiveScheduler(schedulerBaseConfig.withName(schedulersNamePrefix));
       cpuLiteScheduler = schedulerService.cpuLightScheduler(schedulerBaseConfig.withName(schedulersNamePrefix + "-cpuLite"));
-
-      Latch completionLatch = new Latch();
     }
 
     // @Override
     public void stopSchedulers() {
-      System.out.println("asdgfasdgads");
-
       if (cpuLiteScheduler != null) {
         cpuLiteScheduler.stop();
       }
