@@ -423,6 +423,45 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  public void interceptorMutatesEventAroundAfterFailWithErrorTypeAndMessage() throws Exception {
+    final String FAIL = "Some message";
+    ErrorType errorTypeMock = mock(ErrorType.class);
+    when(errorTypeMock.getIdentifier()).thenReturn("ID");
+    when(errorTypeMock.getNamespace()).thenReturn("NS");
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        event.message(Message.of(TEST_PAYLOAD));
+        return action.fail(errorTypeMock, FAIL);
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorTypeThat(sameInstance(errorTypeMock))));
+    expected.expectCause(instanceOf(InterceptionException.class));
+    expected.expectMessage(FAIL);
+    try {
+      process(flow, eventBuilder(muleContext).message(Message.of("")).build());
+    } finally {
+      if (useMockInterceptor) {
+        InOrder inOrder = inOrder(processor, interceptor);
+
+        inOrder.verify(interceptor).before(any(), mapArgWithEntry("param", ""), any());
+        inOrder.verify(interceptor).around(any(), mapArgWithEntry("param", ""), any(), any());
+        inOrder.verify(processor, never()).process(any());
+        inOrder.verify(interceptor).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)),
+                                          argThat(not(empty())));
+
+        verifyParametersResolvedAndDisposed(times(1));
+      }
+    }
+  }
+
+  @Test
   public void interceptorMutatesEventAroundAfterFailWithCause() throws Exception {
     Throwable cause = new RuntimeException("");
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
