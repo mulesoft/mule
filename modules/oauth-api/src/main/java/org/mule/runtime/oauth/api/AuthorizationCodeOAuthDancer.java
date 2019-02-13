@@ -45,7 +45,7 @@ public interface AuthorizationCodeOAuthDancer {
    * Performs the refresh of the access token.
    *
    * @param resourceOwner The resource owner to get the token for.
-   * @param useQueryParameters If the parameters requested to be sent to refresh the token should be sent as query parameters. If false, they should be sent encoded in the body of the message.
+   * @param useQueryParameters If the parameters needed to refresh the token should be sent as query parameters. If false, they will be sent encoded in the body of the message.
    *
    * @return a completable future that is complete when the token has been refreshed.
    */
