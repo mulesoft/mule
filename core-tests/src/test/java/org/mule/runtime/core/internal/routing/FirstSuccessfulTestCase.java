@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -117,7 +116,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   private static class TestProcessor implements Processor {
 
-    private String rejectIfMatches;
+    private final String rejectIfMatches;
 
     TestProcessor(String rejectIfMatches) {
       this.rejectIfMatches = rejectIfMatches;
@@ -138,7 +137,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = of("No " + rejectIfMatches);
         }
-        CoreEvent muleEvent = eventBuilder(muleContext).message(msg).error(error).build();
+        CoreEvent muleEvent = CoreEvent.builder(event).message(msg).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

@@ -12,10 +12,10 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
-import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Flux.from;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -27,7 +27,9 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -45,8 +47,6 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import reactor.core.publisher.Flux;
-
 /**
  * Policy chain for handling the message processor associated to a policy.
  *
@@ -58,6 +58,9 @@ public class PolicyChain extends AbstractComponent
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private ServerNotificationHandler notificationManager;
 
   private ProcessingStrategy processingStrategy;
 
@@ -77,12 +80,11 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public final void initialise() throws InitialisationException {
-    processorChain = newChain(of(processingStrategy), processors);
+    processorChain = newChain(ofNullable(processingStrategy), processors);
     chainWithMPs = processingStrategy.onPipeline(processorChain);
     initialiseIfNeeded(processorChain, muleContext);
 
-    notificationHelper =
-        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(), this);
+    notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);
   }
 
   public void setProcessingStrategy(ProcessingStrategy processingStrategy) {
@@ -117,18 +119,26 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return Flux.from(publisher)
+    return from(publisher)
         .doOnNext(pushBeforeNextFlowStackElement()
             .andThen(req -> ((BaseEventContext) req.getContext())
                 .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
             .andThen(notificationHelper.notification(PROCESS_START)))
-        // TODO MULE-16370 remove this flatMap
-        .flatMap(event -> from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
-            .doOnError(MessagingException.class, t -> {
-              notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
-              this.onError.ifPresent(onError -> onError.accept(t));
-            }))
+        .compose(eventPub -> applyWithChildContext(eventPub, processorChain, ofNullable(getLocation()),
+                                                   policyChainErrorHandler()))
         .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
+  }
+
+  private BaseExceptionHandler policyChainErrorHandler() {
+    return new BaseExceptionHandler() {
+
+      @Override
+      public void onError(Exception exception) {
+        MessagingException t = (MessagingException) exception;
+        notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
+        onError.ifPresent(onError -> onError.accept(t));
+      }
+    };
   }
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {

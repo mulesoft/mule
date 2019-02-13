@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.internal.rx;
 
+import org.mule.runtime.core.internal.exception.MessagingException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.Flux;
@@ -15,18 +19,55 @@ import reactor.core.publisher.FluxSink;
  * Utility class for using with {@link Flux#create(Consumer)}.
  *
  * @param <T> The type of values in the flux
- * @param <S>
  */
 public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
-  private FluxSink<T> fluxSink;
+  private volatile FluxSink<T> fluxSink;
+
+  // If a fluxSink as not yet been accepted, events are buffered until one is accepted
+  private final List<Runnable> bufferedEvents = new ArrayList<Runnable>();
 
   @Override
   public void accept(FluxSink<T> fluxSink) {
-    this.fluxSink = fluxSink;
+    synchronized (this) {
+      this.fluxSink = fluxSink;
+    }
+    bufferedEvents.forEach(e -> e.run());
   }
 
   public FluxSink<T> getFluxSink() {
     return fluxSink;
+  }
+
+  public void next(T response) {
+    boolean present = true;
+    synchronized (this) {
+      if (fluxSink == null) {
+        present = false;
+        bufferedEvents.add(() -> {
+          fluxSink.next(response);
+        });
+      }
+    }
+
+    if (present) {
+      fluxSink.next(response);
+    }
+  }
+
+  public void error(MessagingException error) {
+    boolean present = true;
+    synchronized (this) {
+      if (fluxSink == null) {
+        present = false;
+        bufferedEvents.add(() -> {
+          fluxSink.error(error);
+        });
+      }
+    }
+
+    if (present) {
+      fluxSink.error(error);
+    }
   }
 }

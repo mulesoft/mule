@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
@@ -31,16 +32,18 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Next-operation message processor implementation.
@@ -56,6 +59,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_STATE_EVENT = "policy.beforeNextEvent";
+  public static final String POLICY_NEXT_EVENT_CTX_IDS = "policy.next.eventCtxIds";
 
   @Inject
   private MuleContext muleContext;
@@ -88,23 +92,14 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return from(publisher)
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
-        .map(event -> (CoreEvent) policyEventConverter.createEvent(saveState((PrivilegedEvent) event),
-                                                                   getOriginalEvent(event)))
+        .map(event -> addEventContextHandledByThisNext(policyEventConverter.createEvent(saveState((PrivilegedEvent) event),
+                                                                                        getOriginalEvent(event))))
         .doOnNext(event -> {
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
         })
-
-        .flatMap(event -> subscriberContext().flatMap(ctx -> Mono.just(event).transform(ctx.get(POLICY_NEXT_OPERATION)))
-            .cast(CoreEvent.class)
-            .doOnError(MessagingException.class, this::handleExceptionInNext))
-
-        // TODO MULE-16371 Replace the flatMap above with this compose. Review how to handle the error from the flow in source
-        // policies (this is covered in test cases).
-        // .compose(eventPub -> subscriberContext().flatMapMany(ctx -> eventPub.transform(ctx.get(POLICY_NEXT_OPERATION))
-        //// .doOnError(MessagingException.class, me -> handleExceptionInNext(me))
-        // ))
-
+        .compose(eventPub -> subscriberContext()
+            .flatMapMany(ctx -> eventPub.transform(ctx.get(POLICY_NEXT_OPERATION)).cast(CoreEvent.class)))
         .doOnNext(coreEvent -> {
           notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
           pushAfterNextFlowStackElement().accept(coreEvent);
@@ -112,16 +107,34 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                               this.muleContext.getConfiguration().getId());
         })
         .map(result -> (CoreEvent) policyEventConverter.createEvent((PrivilegedEvent) result,
-                                                                    loadState((PrivilegedEvent) result)));
+                                                                    loadState((PrivilegedEvent) result)))
+        .onErrorContinue(MessagingException.class, (error, ev) -> {
+          final CoreEvent event = ((MessagingException) error).getEvent();
+
+          if (isEventContextHandledByThisNext(event)) {
+            MessagingException me = (MessagingException) error;
+            notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
+            pushAfterNextFlowStackElement().accept(me.getEvent());
+
+            me.setProcessedEvent(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
+                                                                  loadState((PrivilegedEvent) me.getEvent())));
+
+            ((BaseEventContext) event.getContext()).error(error);
+          }
+        });
   }
 
-  private void handleExceptionInNext(MessagingException me) {
-    notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
-    pushAfterNextFlowStackElement().accept(me.getEvent());
+  private CoreEvent addEventContextHandledByThisNext(CoreEvent event) {
+    final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
 
-    me.setProcessedEvent(policyEventConverter
-        .createEvent((PrivilegedEvent) me.getEvent(),
-                     loadState((PrivilegedEvent) me.getEvent())));
+    return quickCopy(event, singletonMap(POLICY_NEXT_EVENT_CTX_IDS, eventCtxIds == null
+        ? singleton(event.getContext().getId())
+        : ImmutableSet.builder().addAll(eventCtxIds).add(event.getContext().getId()).build()));
+  }
+
+  private boolean isEventContextHandledByThisNext(CoreEvent event) {
+    final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
+    return eventCtxIds != null && eventCtxIds.contains(event.getContext().getId());
   }
 
   private PrivilegedEvent getOriginalEvent(CoreEvent event) {

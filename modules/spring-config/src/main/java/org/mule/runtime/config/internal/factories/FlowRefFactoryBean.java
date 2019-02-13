@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
@@ -37,7 +38,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
@@ -61,7 +64,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> implements ApplicationContextAware {
 
@@ -223,23 +226,34 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher).flatMap(event -> {
-        Processor referencedProcessor;
+        ReactiveProcessor resolvedReferencedProcessor;
         try {
-          referencedProcessor = resolveReferencedProcessor(event);
+          resolvedReferencedProcessor = resolveReferencedProcessor(event);
         } catch (MuleException e) {
           return error(e);
         }
 
-        Flux<CoreEvent> flux;
-        if (referencedProcessor instanceof Flow) {
-          flux = from(processWithChildContext(event, referencedProcessor,
-                                              ofNullable(FlowRefFactoryBean.this.getLocation()),
-                                              ((Flow) referencedProcessor).getExceptionListener()));
-        } else {
-          flux = from(processWithChildContext(event, referencedProcessor,
-                                              ofNullable(FlowRefFactoryBean.this.getLocation())));
-        }
-        return flux.map(outputToTarget(event, target, targetValue, expressionManager));
+        ReactiveProcessor referencedProcessor = p -> Mono.from(p)
+            .transform(resolvedReferencedProcessor)
+            .onErrorMap(MessagingException.class,
+                        me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
+                            .get(), me.getEvent()), me));
+
+        return Mono.from(resolvedReferencedProcessor instanceof Flow
+            ? processWithChildContext(event, referencedProcessor,
+                                      ofNullable(FlowRefFactoryBean.this.getLocation()),
+                                      ((Flow) resolvedReferencedProcessor).getExceptionListener())
+            : processWithChildContext(event, referencedProcessor,
+                                      ofNullable(FlowRefFactoryBean.this.getLocation())))
+            .doOnSuccess(result -> {
+              if (result == null) {
+                ((BaseEventContext) event.getContext()).success();
+              }
+            })
+            .doOnError(e -> {
+              ((BaseEventContext) event.getContext()).error(e);
+            })
+            .map(outputToTarget(event, target, targetValue, expressionManager));
       });
     }
 

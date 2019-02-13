@@ -149,7 +149,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {
-    return event -> lastEventCreated;
+    return event -> CoreEvent.builder(event).message(lastEventCreated.getMessage()).build();
   }
 
   private Processor createFailingEventMessageProcessor() {

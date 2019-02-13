@@ -211,7 +211,10 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   }
 
   private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {
-    return event -> lastEventCreated;
+    return event -> CoreEvent.builder(event)
+        .message(lastEventCreated.getMessage())
+        .variables(lastEventCreated.getVariables())
+        .build();
   }
 
   private Processor createFailingEventMessageProcessor(Exception toThrow) {

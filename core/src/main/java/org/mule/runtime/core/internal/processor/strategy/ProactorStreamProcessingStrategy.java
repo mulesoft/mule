@@ -48,10 +48,9 @@ public abstract class ProactorStreamProcessingStrategy
 
   protected static final int STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
       getInteger(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
-  private static Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
+  private static final Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
 
-  private static long SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
-  private static long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+  private static final long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
 
   private final Supplier<Scheduler> blockingSchedulerSupplier;
   private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;

@@ -274,7 +274,6 @@ public class ModuleFlowProcessingPhase
     } catch (Exception e) {
       return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, e, messagingException));
     }
-    // }
   }
 
   /*
@@ -400,9 +399,8 @@ public class ModuleFlowProcessingPhase
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return Flux.from(publisher)
-          .flatMap(event -> from(processWithChildContext(event,
-                                                         p -> template.routeEventAsync(p),
-                                                         Optional.empty(), flowConstruct.getExceptionListener())));
+          .flatMap(p -> processWithChildContext(p, pub -> template.routeEventAsync(pub),
+                                                Optional.empty(), flowConstruct.getExceptionListener()));
     }
 
     @Override
