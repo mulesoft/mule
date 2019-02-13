@@ -30,6 +30,15 @@ public interface OAuthDancerBuilder<D> {
   OAuthDancerBuilder<D> clientCredentials(String clientId, String clientSecret);
 
   /**
+   * Define where the client credentials will be sent in the OAuth2 Dance.
+   * @param clientCredentialsLocation location of the credentials in an HTTP request.
+   * @return this builder
+   */
+  default OAuthDancerBuilder<D> withClientCredentialsIn(ClientCredentialsLocation clientCredentialsLocation) {
+    return this;
+  }
+
+  /**
    * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
    * access token.
    * 

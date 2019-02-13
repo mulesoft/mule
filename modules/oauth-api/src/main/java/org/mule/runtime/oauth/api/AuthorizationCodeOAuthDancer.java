@@ -42,6 +42,18 @@ public interface AuthorizationCodeOAuthDancer {
   CompletableFuture<Void> refreshToken(String resourceOwner);
 
   /**
+   * Performs the refresh of the access token.
+   *
+   * @param resourceOwner The resource owner to get the token for.
+   * @param useQueryParameters If the parameters requested to be sent to refresh the token should be sent as query parameters. If false, they should be sent encoded in the body of the message.
+   *
+   * @return a completable future that is complete when the token has been refreshed.
+   */
+  default CompletableFuture<Void> refreshToken(String resourceOwner, boolean useQueryParameters) {
+    return refreshToken(resourceOwner);
+  }
+
+  /**
    * Clears the oauth context for a given user.
    *
    * @param resourceOwnerId id of the user.
