@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
 
 /**
  * JavaDoc Reader which encapsulates the logic of parsing JavaDocs.
@@ -35,6 +38,11 @@ public class JavaDocReader {
   private static final char SPACE_CHAR = ' ';
   private static final char CLOSING_BRACKET_CHAR = '}';
   private static final char OPENING_BRACKET_CHAR = '{';
+  private static final char LESS_THAN_CHAR = '<';
+  private static final char GREATER_THAN_CHAR = '>';
+  public static final Whitelist WHITELIST = Whitelist.none().addTags("a").addAttributes("a", "href")
+      .addProtocols("a", "href", "http", "https");
+  public static final Whitelist NONE = Whitelist.none();
 
   /**
    * Extracts the JavaDoc of an element and parses it returning a easy to consume {@link JavaDocModel}
@@ -85,9 +93,8 @@ public class JavaDocReader {
         readingState = UNSUPPORTED;
       }
     }
-
-    return new JavaDocModel(stripTags(body.toString()), params.entrySet().stream()
-        .collect(toMap(Map.Entry::getKey, entry -> stripTags(entry.getValue().toString()))));
+    return new JavaDocModel(clean(body.toString()), params.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, entry -> clean(entry.getValue().toString()))));
   }
 
   private static String parseParameter(String token, Map<String, StringBuilder> params) {
@@ -107,6 +114,22 @@ public class JavaDocReader {
     params.put(currentParamName, paramBuilder);
 
     return currentParamName;
+  }
+
+  private static String clean(String text) {
+    return removeHTML(stripTags(text));
+  }
+
+  /**
+   * Removes all HTML from the text and converts anchor to asciidoc valid links. For example: <a href="url">Inner</a> becomes url[Inner].
+   */
+  private static String removeHTML(String text) {
+    String textWithAnchors = Jsoup.clean(text, WHITELIST);
+    Document htmlDoc = Jsoup.parseBodyFragment(textWithAnchors);
+    for (org.jsoup.nodes.Element anchor : htmlDoc.select("a")) {
+      anchor.html(anchor.attr("href") + "[" + anchor.html() + "]");
+    }
+    return Jsoup.clean(htmlDoc.html(), NONE);
   }
 
   private static String stripTags(String comment) {
@@ -133,8 +156,15 @@ public class JavaDocReader {
           insideTag = false;
           continue;
         }
-
-        builder.append(comment.charAt(i));
+        // We want to allow the use of '<' and '>' inside the {@...} JavaDoc tags, but prevent it from being removed by
+        // the HTML parser, so we replace them by their XML-escaped versions.
+        if (comment.charAt(i) == LESS_THAN_CHAR && insideTag) {
+          builder.append("&lt;");
+        } else if (comment.charAt(i) == GREATER_THAN_CHAR && insideTag) {
+          builder.append("&gt;");
+        } else {
+          builder.append(comment.charAt(i));
+        }
       }
 
       String strippedComments = builder.toString().trim();
