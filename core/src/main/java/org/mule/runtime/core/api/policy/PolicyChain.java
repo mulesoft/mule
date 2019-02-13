@@ -27,6 +27,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
@@ -46,8 +47,6 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import reactor.core.publisher.Flux;
-
 /**
  * Policy chain for handling the message processor associated to a policy.
  *
@@ -59,6 +58,9 @@ public class PolicyChain extends AbstractComponent
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private ServerNotificationHandler notificationManager;
 
   private ProcessingStrategy processingStrategy;
 
@@ -82,8 +84,7 @@ public class PolicyChain extends AbstractComponent
     chainWithMPs = processingStrategy.onPipeline(processorChain);
     initialiseIfNeeded(processorChain, muleContext);
 
-    notificationHelper =
-        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(), this);
+    notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);
   }
 
   public void setProcessingStrategy(ProcessingStrategy processingStrategy) {
@@ -118,32 +119,26 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    // Hooks.onOperatorDebug();
-
-    return Flux.from(publisher)
-        // .log()
+    return from(publisher)
         .doOnNext(pushBeforeNextFlowStackElement()
             .andThen(req -> ((BaseEventContext) req.getContext())
                 .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
             .andThen(notificationHelper.notification(PROCESS_START)))
-        .compose(eventPub -> from(applyWithChildContext(eventPub, processorChain, ofNullable(getLocation()),
-                                                        new BaseExceptionHandler() {
+        .compose(eventPub -> applyWithChildContext(eventPub, processorChain, ofNullable(getLocation()),
+                                                   policyChainErrorHandler()))
+        .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
+  }
 
-                                                          @Override
-                                                          public void onError(Exception exception) {
-                                                            // System.out.println(" >> PCh onError...");
-                                                            MessagingException t =
-                                                                (MessagingException) exception;
-                                                            notificationHelper.fireNotification(t.getEvent(), t,
-                                                                                                PROCESS_END);
-                                                            onError.ifPresent(onError -> onError.accept(t));
-                                                            // System.out.println(" >> PCh onError!");
-                                                          }
-                                                        })))
-        .doOnNext(e -> {
-          // System.out.println(" >> Pch next");
-          notificationHelper.fireNotification(e, null, PROCESS_END);
-        });
+  private BaseExceptionHandler policyChainErrorHandler() {
+    return new BaseExceptionHandler() {
+
+      @Override
+      public void onError(Exception exception) {
+        MessagingException t = (MessagingException) exception;
+        notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
+        onError.ifPresent(onError -> onError.accept(t));
+      }
+    };
   }
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {

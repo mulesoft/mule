@@ -93,27 +93,14 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
         .map(event -> addEventContextHandledByThisNext(policyEventConverter.createEvent(saveState((PrivilegedEvent) event),
-                                                                   getOriginalEvent(event))))
+                                                                                        getOriginalEvent(event))))
         .doOnNext(event -> {
-          System.out.println(" >> next.bef  : " + event.getContext().getId());
-
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
         })
-
-        // .flatMap(event -> subscriberContext().flatMap(ctx -> Mono.just(event).transform(ctx.get(POLICY_NEXT_OPERATION)))
-        // // .doOnError(MessagingException.class, this::handleExceptionInNext)
-        // .cast(CoreEvent.class))
-
-        // TODO MULE-16371 Replace the flatMap above with this compose. Review how to handle the error from the flow in source
-        // policies (this is covered in test cases).
-        .compose(eventPub -> subscriberContext().flatMapMany(ctx -> eventPub.transform(ctx.get(POLICY_NEXT_OPERATION))
-        //        // .doOnError(MessagingException.class, me -> handleExceptionInNext(me))
-        ))
-        .cast(CoreEvent.class)
-
+        .compose(eventPub -> subscriberContext()
+            .flatMapMany(ctx -> eventPub.transform(ctx.get(POLICY_NEXT_OPERATION)).cast(CoreEvent.class)))
         .doOnNext(coreEvent -> {
-          System.out.println(" >> PNAMP next ");
           notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
           pushAfterNextFlowStackElement().accept(coreEvent);
           logExecuteNextEvent("After execute-next", coreEvent.getContext(), coreEvent.getMessage(),
@@ -121,14 +108,18 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         })
         .map(result -> (CoreEvent) policyEventConverter.createEvent((PrivilegedEvent) result,
                                                                     loadState((PrivilegedEvent) result)))
-        .onErrorContinue((er, ev) -> {
-          System.out.println(" >> next.oec 1: "
-              + ((InternalEvent) ((MessagingException) er).getEvent()).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS));
-          System.out.println(" >> next.oec 2: " + ((InternalEvent) ((MessagingException) er).getEvent()).getContext().getId());
+        .onErrorContinue(MessagingException.class, (error, ev) -> {
+          final CoreEvent event = ((MessagingException) error).getEvent();
 
-          if (isEventContextHandledByThisNext(((MessagingException) er).getEvent())) {
-            handleExceptionInNext((MessagingException) er);
-            ((BaseEventContext) ((MessagingException) er).getEvent().getContext()).error(er);
+          if (isEventContextHandledByThisNext(event)) {
+            MessagingException me = (MessagingException) error;
+            notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
+            pushAfterNextFlowStackElement().accept(me.getEvent());
+
+            me.setProcessedEvent(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
+                                                                  loadState((PrivilegedEvent) me.getEvent())));
+
+            ((BaseEventContext) event.getContext()).error(error);
           }
         });
   }
@@ -144,16 +135,6 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private boolean isEventContextHandledByThisNext(CoreEvent event) {
     final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
     return eventCtxIds != null && eventCtxIds.contains(event.getContext().getId());
-  }
-
-  private void handleExceptionInNext(MessagingException me) {
-    System.out.println(" >> PNAMP error ");
-
-    notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
-    pushAfterNextFlowStackElement().accept(me.getEvent());
-
-    me.setProcessedEvent(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
-                                                          loadState((PrivilegedEvent) me.getEvent())));
   }
 
   private PrivilegedEvent getOriginalEvent(CoreEvent event) {
