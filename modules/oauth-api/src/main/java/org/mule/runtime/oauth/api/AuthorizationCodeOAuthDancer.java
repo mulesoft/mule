@@ -48,6 +48,8 @@ public interface AuthorizationCodeOAuthDancer {
    * @param useQueryParameters If the parameters needed to refresh the token should be sent as query parameters. If false, they will be sent encoded in the body of the message.
    *
    * @return a completable future that is complete when the token has been refreshed.
+   *
+   * @since 4.2.0
    */
   default CompletableFuture<Void> refreshToken(String resourceOwner, boolean useQueryParameters) {
     return refreshToken(resourceOwner);

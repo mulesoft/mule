@@ -8,6 +8,8 @@ package org.mule.runtime.oauth.api.builder;
 
 /**
  * Enum to define where to send the client credentials in an OAuth2 Dance.
+ *
+ * @since 4.2.0
  */
 public enum ClientCredentialsLocation {
 

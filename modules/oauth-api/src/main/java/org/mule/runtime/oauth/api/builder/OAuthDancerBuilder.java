@@ -30,9 +30,12 @@ public interface OAuthDancerBuilder<D> {
   OAuthDancerBuilder<D> clientCredentials(String clientId, String clientSecret);
 
   /**
-   * Define where the client credentials will be sent in the OAuth2 Dance.
+   * Define where the client credentials will be sent in the HTTP requests for the OAuth2 Dance.
    * @param clientCredentialsLocation location of the credentials in an HTTP request.
+   *
    * @return this builder
+   *
+   * @since 4.2.0
    */
   default OAuthDancerBuilder<D> withClientCredentialsIn(ClientCredentialsLocation clientCredentialsLocation) {
     return this;
