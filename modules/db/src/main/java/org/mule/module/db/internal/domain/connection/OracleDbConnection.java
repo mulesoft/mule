@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.domain.connection;
 
-import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getOwnerFrom;
-import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getTypeSimpleName;
+import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 
 import java.lang.reflect.Method;
 import java.sql.Array;
@@ -20,8 +20,8 @@ import java.sql.Struct;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getOwnerFrom;
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getTypeSimpleName;
 
 /**
  * Custom {@link DbConnection} for Oracle databases
@@ -35,6 +35,10 @@ public class OracleDbConnection extends DefaultDbConnection
     public static final String QUERY_TYPE_ATTRS = "SELECT ATTR_NO, ATTR_TYPE_NAME FROM ALL_TYPE_ATTRS WHERE TYPE_NAME = ? AND ATTR_TYPE_NAME IN ('CLOB', 'BLOB')";
 
     public static final String QUERY_TYPE_OWNER_CONDITION = " AND OWNER = ?";
+
+    public static final String QUERY_ALL_COLL_TYPES = "SELECT * FROM SYS.ALL_COLL_TYPES where TYPE_NAME = ?";
+
+    private static final String ELEM_TYPE_NAME = "ELEM_TYPE_NAME";
 
     private Method createArrayMethod;
     private boolean initialized;
@@ -58,6 +62,7 @@ public class OracleDbConnection extends DefaultDbConnection
         {
             try
             {
+                resolveLobsForArrays(typeName, elements);
                 return (Array) getCreateArrayOfMethod(delegate).invoke(delegate, typeName, elements);
             }
             catch (Exception e)
@@ -93,6 +98,33 @@ public class OracleDbConnection extends DefaultDbConnection
         return createArrayMethod;
     }
 
+    protected void resolveLobsForArrays(String typeName, Object[] elements) throws SQLException
+    {
+        String nestedTableType = getNestedTableType(typeName);
+
+        if(nestedTableType != null)
+        {
+            typeName = nestedTableType;
+        }
+
+        Map<Integer, String> dataTypes = getDataTypes(typeName);
+
+        if (dataTypes.keySet().isEmpty())
+        {
+            logger.warn("No catalog information was found for the typename '%s'. No lob resolution will be performed", typeName);
+        }
+
+        for (int index : dataTypes.keySet())
+        {
+            String dataTypeName = dataTypes.get(index);
+
+            for(Object element : elements)
+            {
+                doResolveLobIn((Object[]) element, index-1, dataTypeName);
+            }
+        }
+    }
+
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException
     {
@@ -124,7 +156,7 @@ public class OracleDbConnection extends DefaultDbConnection
 
     private Map<Integer, String> getDataTypes(String typeName) throws SQLException
     {
-        Map<Integer, String> dataTypes = new HashMap<Integer, String>();
+        Map<Integer, String> dataTypes = new HashMap<>();
 
         String owner = getOwnerFrom(typeName);
         String type = getTypeSimpleName(typeName);
@@ -148,6 +180,24 @@ public class OracleDbConnection extends DefaultDbConnection
 
             return dataTypes;
         }
+    }
+
+    public String getNestedTableType(String typeName) throws SQLException
+    {
+        String dataType = null;
+
+        try (PreparedStatement ps = this.prepareStatement(QUERY_ALL_COLL_TYPES))
+        {
+            ps.setString(1, typeName);
+
+            ResultSet resultSet = ps.executeQuery();
+
+            while (resultSet.next())
+            {
+                dataType = resultSet.getString(ELEM_TYPE_NAME);
+            }
+        }
+        return dataType;
     }
 
 }

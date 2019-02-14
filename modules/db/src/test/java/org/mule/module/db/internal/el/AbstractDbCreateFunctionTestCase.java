@@ -7,8 +7,9 @@
 
 package org.mule.module.db.internal.el;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.el.ExpressionLanguageContext;
@@ -16,16 +17,24 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.module.db.internal.domain.connection.DefaultDbConnection;
+import org.mule.module.db.internal.domain.connection.DefaultDbConnectionReleaser;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.ATTR_TYPE_NAME_INDEX;
+import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.DATA_TYPE_INDEX;
+import static org.mule.module.db.internal.domain.transaction.TransactionalAction.ALWAYS_JOIN;
 
 public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestCase
 {
@@ -42,7 +51,7 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
     protected final AbstractDbFunction function = createDbFunction(muleContext);
 
     @Test
-    public void validatesNumberOfParameters() throws Exception
+    public void validatesNumberOfParameters()
     {
         Object[] params = new Object[] {DB_CONFIG_NAME, TYPE_NAME};
 
@@ -53,7 +62,7 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
     }
 
     @Test
-    public void validatesFirstParameterIsAString() throws Exception
+    public void validatesFirstParameterIsAString()
     {
         Object[] params = new Object[] {new Object(), TYPE_NAME, new Object[0]};
 
@@ -64,7 +73,7 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
     }
 
     @Test
-    public void validatesSecondParameterIsAString() throws Exception
+    public void validatesSecondParameterIsAString()
     {
         Object[] params = new Object[] {DB_CONFIG_NAME, new Object(), new Object[0]};
 
@@ -75,7 +84,7 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
     }
 
     @Test
-    public void validatesThirdParameterType() throws Exception
+    public void validatesThirdParameterType()
     {
         Object[] params = new Object[] {DB_CONFIG_NAME, TYPE_NAME, new Object()};
 
@@ -100,7 +109,7 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
 
     /**
      * @return the function instance to use on the test.
-     * @param muleContext Mule context corresponding to the artifact where the fcuntion is executed.
+     * @param muleContext Mule context corresponding to the artifact where the function is executed.
      */
     protected abstract AbstractDbFunction createDbFunction(MuleContext muleContext);
 
@@ -130,4 +139,21 @@ public abstract class AbstractDbCreateFunctionTestCase extends AbstractMuleTestC
 
         return dbConnection;
     }
+
+    protected DefaultDbConnection testThroughMetadata(Connection delegate, Object[] structValues, int dataType, String dataTypeName) throws Exception
+    {
+        DatabaseMetaData metadata = mock(DatabaseMetaData.class);
+        ResultSet resultSet = mock(ResultSet.class);
+        when(delegate.getMetaData()).thenReturn(metadata);
+        when(delegate.getCatalog()).thenReturn("catalog");
+        when(resultSet.next()).thenReturn(true).thenReturn(false);
+        when(resultSet.getInt(DATA_TYPE_INDEX)).thenReturn(dataType);
+        when(resultSet.getString(ATTR_TYPE_NAME_INDEX)).thenReturn(dataTypeName);
+        when(metadata.getAttributes("catalog", null, TYPE_NAME, null)).thenReturn(resultSet);
+        DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
+        DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
+        ParamTypeResolverFactory paramTypeResolverFactory = mock(ParamTypeResolverFactory.class);
+        return new DefaultDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory);
+    }
+
 }

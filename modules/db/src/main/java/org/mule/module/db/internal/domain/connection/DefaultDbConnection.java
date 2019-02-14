@@ -7,10 +7,12 @@
 
 package org.mule.module.db.internal.domain.connection;
 
-import static java.lang.String.format;
-import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
-import static org.mule.module.db.internal.domain.type.JdbcTypes.CLOB_DB_TYPE;
-import static org.mule.util.IOUtils.toByteArray;
+import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
+import org.mule.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.sql.Array;
@@ -29,16 +31,17 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
-import org.mule.util.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.String.format;
+import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
+import static org.mule.module.db.internal.domain.type.JdbcTypes.CLOB_DB_TYPE;
+import static org.mule.util.IOUtils.toByteArray;
 
 /**
  * Delegates {@link Connection} behaviour to a delegate
@@ -331,6 +334,14 @@ public class DefaultDbConnection extends AbstractDbConnection
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException
     {
+        try
+        {
+            resolveLobsForArrays(typeName, elements);
+        }
+        catch (SQLException e)
+        {
+            logger.warn("Unable to resolve lobs: {}. Proceeding with original attributes.", e.getMessage());
+        }
         return delegate.createArrayOf(typeName, elements);
     }
 
@@ -393,22 +404,52 @@ public class DefaultDbConnection extends AbstractDbConnection
     @Override
     protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
     {
+        Map<Integer, List> dataTypes = getDataTypes(typeName);
+
+        for(Integer key : dataTypes.keySet())
+        {
+            List dataType = dataTypes.get(key);
+            doResolveLobIn(attributes, key, (int) dataType.get(0), (String) dataType.get(1));
+        }
+    }
+
+    private Map<Integer, List> getDataTypes(String typeName) throws SQLException
+    {
+        Map<Integer, List> dataTypes = new HashMap<>();
+
         try (ResultSet resultSet = this.getMetaData().getAttributes(this.getCatalog(), null, typeName, null))
         {
-
+            List<String> lobTypes = Arrays.asList(BLOB_DB_TYPE.getName(), CLOB_DB_TYPE.getName());
             int index = 0;
             while (resultSet.next())
             {
                 int dataType = resultSet.getInt(DATA_TYPE_INDEX);
                 String dataTypeName = resultSet.getString(ATTR_TYPE_NAME_INDEX);
 
-                doResolveLobIn(attributes, index, dataType, dataTypeName);
+                if(lobTypes.contains(dataTypeName))
+                {
+                    dataTypes.put(index, Arrays.asList(dataType, dataTypeName));
+                }
 
                 index++;
             }
         }
+        return dataTypes;
     }
 
+    protected void resolveLobsForArrays(String typeName, Object[] attributes) throws SQLException
+    {
+        Map<Integer, List> dataTypes = getDataTypes(typeName);
+
+        for(Integer key : dataTypes.keySet())
+        {
+            List dataType = dataTypes.get(key);
+            for(Object attribute : attributes)
+            {
+                doResolveLobIn((Object[]) attribute, key, (int) dataType.get(0), (String) dataType.get(1));
+            }
+        }
+    }
 
     protected void doResolveLobIn(Object[] attributes, int index, int dataType, String dataTypeName) throws SQLException
     {
