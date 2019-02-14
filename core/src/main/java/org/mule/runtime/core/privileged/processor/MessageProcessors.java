@@ -54,8 +54,6 @@ import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ParallelFlux;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * Some convenience methods for message processors.
@@ -365,9 +363,6 @@ public class MessageProcessors {
                                                                     ReactiveProcessor processor,
                                                                     boolean completeParentIfEmpty) {
     FluxSinkRecorder<CoreEvent> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
-    final ParallelFlux<CoreEvent> errorSwithFlux = Flux.<CoreEvent>create(errorSwitchSinkSinkRef)
-        .parallel(Runtime.getRuntime().availableProcessors()).runOn(Schedulers.immediate());
-
     Set<BaseEventContext> seenContexts = Collections.newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
 
     return Flux.from(eventChildCtxPub)
@@ -377,7 +372,7 @@ public class MessageProcessors {
         })
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .mergeWith(errorSwithFlux)
+        .mergeWith(Flux.<CoreEvent>create(errorSwitchSinkSinkRef))
         .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
         .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
   }
