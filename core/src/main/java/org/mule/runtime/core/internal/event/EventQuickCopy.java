@@ -41,9 +41,14 @@ public final class EventQuickCopy {
    * @return new {@link CoreEvent} instance.
    */
   public static CoreEvent quickCopy(EventContext context, CoreEvent event) {
-    return (event instanceof InternalEvent && context instanceof BaseEventContext)
-        ? new EventQuickCopyContextDecorator((BaseEventContext) context, (InternalEvent) event)
-        : CoreEvent.builder(context, event).build();
+    if (event instanceof EventQuickCopyContextDecorator
+        && ((EventQuickCopyContextDecorator) event).getEvent().getContext() == context) {
+      return ((EventQuickCopyContextDecorator) event).getEvent();
+    } else {
+      return (event instanceof InternalEvent && context instanceof BaseEventContext)
+          ? new EventQuickCopyContextDecorator((BaseEventContext) context, (InternalEvent) event)
+          : CoreEvent.builder(context, event).build();
+    }
   }
 
   /**
@@ -58,9 +63,14 @@ public final class EventQuickCopy {
    * @return new {@link PrivilegedEvent} instance.
    */
   public static PrivilegedEvent quickCopy(EventContext context, PrivilegedEvent event) {
-    return (event instanceof InternalEvent && context instanceof BaseEventContext)
-        ? new EventQuickCopyContextDecorator((BaseEventContext) context, (InternalEvent) event)
-        : PrivilegedEvent.builder(context, event).build();
+    if (event instanceof EventQuickCopyContextDecorator
+        && ((EventQuickCopyContextDecorator) event).getEvent().getContext() == context) {
+      return ((EventQuickCopyContextDecorator) event).getEvent();
+    } else {
+      return (event instanceof InternalEvent && context instanceof BaseEventContext)
+          ? new EventQuickCopyContextDecorator((BaseEventContext) context, (InternalEvent) event)
+          : PrivilegedEvent.builder(context, event).build();
+    }
   }
 
   /**

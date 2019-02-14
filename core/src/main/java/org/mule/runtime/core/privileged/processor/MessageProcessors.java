@@ -54,6 +54,8 @@ import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ParallelFlux;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Some convenience methods for message processors.
@@ -167,10 +169,10 @@ public class MessageProcessors {
           .doOnError(completeErrorIfNeeded((event.getContext()), completeContext))
           .block();
     } catch (Throwable e) {
-      MuleException muleException = rxExceptionToMuleException(e);
       if (e.getCause() instanceof InterruptedException) {
         currentThread().interrupt();
       }
+      MuleException muleException = rxExceptionToMuleException(e);
       throw muleException;
     }
   }
@@ -276,6 +278,71 @@ public class MessageProcessors {
     return internalProcessWithChildContext(event, processor, true, childContext);
   }
 
+  /**
+   * Process a {@link Processor} using a child {@link EventContext}. This is useful if it is necessary to perform processing in a
+   * scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @param componentLocation
+   * @return the result of processing processor.
+   * @throws MuleException
+   */
+  public static CoreEvent processWithChildContextBlocking(CoreEvent event, Processor processor,
+                                                          Optional<ComponentLocation> componentLocation)
+      throws MuleException {
+    return internalProcessWithChildContextBlocking(event, processor, true,
+                                                   child(((BaseEventContext) event.getContext()), componentLocation));
+  }
+
+
+  /**
+   * Process a {@link Processor} using a child {@link EventContext}. This is useful if it is necessary to perform processing in a
+   * scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * The {@link FlowExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to handle
+   * any errors that occur.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @param componentLocation
+   * @param exceptionHandler used to handle {@link Exception}'s.
+   * @return the result of processing processor.
+   * @throws MuleException
+   */
+  public static CoreEvent processWithChildContextBlocking(CoreEvent event, Processor processor,
+                                                          Optional<ComponentLocation> componentLocation,
+                                                          FlowExceptionHandler exceptionHandler)
+      throws MuleException {
+    return internalProcessWithChildContextBlocking(event, processor, true,
+                                                   child(((BaseEventContext) event.getContext()), componentLocation,
+                                                         exceptionHandler));
+  }
+
+  private static CoreEvent internalProcessWithChildContextBlocking(CoreEvent event, Processor processor,
+                                                                   boolean completeParentIfEmpty, BaseEventContext child)
+      throws MuleException {
+    final Publisher<CoreEvent> childResponsePublisher = child.getResponsePublisher();
+
+    CoreEvent result;
+    try {
+      result = processor.process(quickCopy(child, event));
+      completeSuccessIfNeeded().accept(result);
+    } catch (Throwable e) {
+      try {
+        result = Mono.from(childResponsePublisher).block();
+      } catch (Throwable t) {
+        if (t.getCause() instanceof InterruptedException) {
+          currentThread().interrupt();
+        }
+        MuleException muleException = rxExceptionToMuleException(t);
+        throw muleException;
+      }
+    }
+
+    return quickCopy(event.getContext(), result);
+  }
+
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       boolean completeParentIfEmpty, BaseEventContext child) {
     MonoSinkRecorder<CoreEvent> errorSwitchSinkSinkRef = new MonoSinkRecorder<>();
@@ -298,6 +365,9 @@ public class MessageProcessors {
                                                                     ReactiveProcessor processor,
                                                                     boolean completeParentIfEmpty) {
     FluxSinkRecorder<CoreEvent> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+    final ParallelFlux<CoreEvent> errorSwithFlux = Flux.<CoreEvent>create(errorSwitchSinkSinkRef)
+        .parallel(Runtime.getRuntime().availableProcessors()).runOn(Schedulers.immediate());
+
     Set<BaseEventContext> seenContexts = Collections.newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
 
     return Flux.from(eventChildCtxPub)
@@ -307,7 +377,7 @@ public class MessageProcessors {
         })
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .mergeWith(Flux.<CoreEvent>create(errorSwitchSinkSinkRef))
+        .mergeWith(errorSwithFlux)
         .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
         .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
   }

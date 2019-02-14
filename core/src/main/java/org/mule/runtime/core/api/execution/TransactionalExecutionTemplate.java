@@ -16,9 +16,9 @@ import org.mule.runtime.core.internal.execution.ExecutionContext;
 import org.mule.runtime.core.internal.execution.ExecutionInterceptor;
 import org.mule.runtime.core.internal.execution.ExternalTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.IsolateCurrentTransactionInterceptor;
-import org.mule.runtime.core.internal.execution.compatibility.ResolvePreviousTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.SuspendXaTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.ValidateTransactionalStateInterceptor;
+import org.mule.runtime.core.internal.execution.compatibility.ResolvePreviousTransactionInterceptor;
 
 /**
  * ExecutionTemplate created should be used on a MessageProcessor that are previously wrapper by
@@ -98,9 +98,9 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    * @param transactionConfig
    * @return
    */
-  public static TransactionalExecutionTemplate createScopeTransactionalExecutionTemplate(MuleContext muleContext,
-                                                                                         TransactionConfig transactionConfig) {
-    return new TransactionalExecutionTemplate(muleContext, transactionConfig, false, false);
+  public static <T> TransactionalExecutionTemplate<T> createScopeTransactionalExecutionTemplate(MuleContext muleContext,
+                                                                                                TransactionConfig transactionConfig) {
+    return new TransactionalExecutionTemplate<>(muleContext, transactionConfig, false, false);
   }
 
   @Override

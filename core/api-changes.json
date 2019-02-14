@@ -233,25 +233,57 @@
           "justification": "Allow for chaining invocations."
         },
         {
-           "code": "java.field.removedWithConstant",
-           "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_CURSOR_MANAGER",
-           "package": "org.mule.runtime.core.api.config",
-           "classSimpleName": "MuleProperties",
-           "fieldName": "OBJECT_CURSOR_MANAGER",
-           "elementKind": "field",
-           "justification": "The constant value was colliding with another entry and it wasn't used anyway"
-         },
-         {
-            "code": "java.annotation.added",
-            "old": "interface org.mule.runtime.core.api.transaction.Transaction",
-            "new": "interface org.mule.runtime.core.api.transaction.Transaction",
-            "annotationType": "org.mule.api.annotation.NoImplement",
-            "annotation": "@org.mule.api.annotation.NoImplement",
-            "package": "org.mule.runtime.core.api.transaction",
-            "classSimpleName": "Transaction",
-            "elementKind": "interface",
-            "justification": "This interface is not intended to be implemented."
-          },
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_CURSOR_MANAGER",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_CURSOR_MANAGER",
+          "elementKind": "field",
+          "justification": "The constant value was colliding with another entry and it wasn't used anyway"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.transaction.Transaction",
+          "new": "interface org.mule.runtime.core.api.transaction.Transaction",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.core.api.transaction",
+          "classSimpleName": "Transaction",
+          "elementKind": "interface",
+          "justification": "This interface is not intended to be implemented."
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method org.mule.runtime.core.api.execution.TransactionalExecutionTemplate org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+          "new": "method <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+          "oldType": "org.mule.runtime.core.api.execution.TransactionalExecutionTemplate",
+          "newType": "org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T extends java.lang.Object>",
+          "package": "org.mule.runtime.core.api.execution",
+          "classSimpleName": "TransactionalExecutionTemplate",
+          "methodName": "createScopeTransactionalExecutionTemplate",
+          "elementKind": "method",
+          "justification": "This doesn't break already compiled stuff"
+        },
+        {
+          "code": "java.generics.elementNowParameterized",
+          "old": "method org.mule.runtime.core.api.execution.TransactionalExecutionTemplate org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+          "new": "method <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+          "package": "org.mule.runtime.core.api.execution",
+          "classSimpleName": "TransactionalExecutionTemplate",
+          "methodName": "createScopeTransactionalExecutionTemplate",
+          "elementKind": "method",
+          "justification": "This doesn't break already compiled stuff"
+        },
+        {
+          "code": "java.generics.formalTypeParameterAdded",
+          "old": "method org.mule.runtime.core.api.execution.TransactionalExecutionTemplate org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+          "new": "method <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+          "package": "org.mule.runtime.core.api.execution",
+          "classSimpleName": "TransactionalExecutionTemplate",
+          "methodName": "createScopeTransactionalExecutionTemplate",
+          "elementKind": "method",
+          "justification": "This doesn't break already compiled stuff"
+        }
       ]
     }
   },
