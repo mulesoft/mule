@@ -54,6 +54,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -301,6 +302,21 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     assertThat(expressionManager.parseLogTemplate("this is #[payload.wsc_fields.operation]", event, TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
                is("this is \"echo\""));
+  }
+
+  @Test
+  @Description("Verifies that JSON content can be used for logging in DW.")
+  public void parseLogJsonWithEscapedStrings() throws MuleException {
+    System.out.println("{\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}");
+
+    CoreEvent event = getEventBuilder().message(Message.builder()
+        .value("{\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}")
+        .mediaType(MediaType.JSON)
+        .build())
+        .build();
+    assertThat(expressionManager.parseLogTemplate("this is #[payload]", event, TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is("this is {\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}"));
   }
 
   @Test
