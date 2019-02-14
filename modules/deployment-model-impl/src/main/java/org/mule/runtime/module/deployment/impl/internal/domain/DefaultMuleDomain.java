@@ -21,6 +21,26 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.deployment.model.api.DeploymentInitException;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.InstallException;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,35 +49,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.deployment.model.api.DeploymentInitException;
-import org.mule.runtime.deployment.model.api.DeploymentStartException;
-import org.mule.runtime.deployment.model.api.DeploymentStopException;
-import org.mule.runtime.deployment.model.api.InstallException;
-import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultMuleDomain implements Domain {
+public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescriptor> implements Domain {
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -66,11 +61,9 @@ public class DefaultMuleDomain implements Domain {
   private final List<ArtifactPlugin> artifactPlugins;
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ClassLoaderRepository classLoaderRepository;
-  private ArtifactClassLoader deploymentClassLoader;
   private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   private MuleContextListener muleContextListener;
-  private ArtifactContext artifactContext;
 
   public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
                            ClassLoaderRepository classLoaderRepository,
@@ -78,7 +71,7 @@ public class DefaultMuleDomain implements Domain {
                            List<ArtifactPlugin> artifactPlugins,
                            ExtensionModelLoaderManager extensionModelLoaderManager,
                            ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
-    this.deploymentClassLoader = deploymentClassLoader;
+    super("domain", "domain", deploymentClassLoader);
     this.classLoaderRepository = classLoaderRepository;
     this.descriptor = descriptor;
     this.serviceRepository = serviceRepository;
@@ -237,94 +230,6 @@ public class DefaultMuleDomain implements Domain {
     } catch (Exception e) {
       throw new DeploymentStartException(createStaticMessage("Failure trying to start domain " + getArtifactName()), e);
     }
-  }
-
-  @Override
-  public void stop() {
-    if (this.artifactContext == null
-        || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
-      return;
-    }
-
-    if (this.artifactContext == null) {
-      // domain never started, maybe due to a previous error
-      if (logger.isInfoEnabled()) {
-        logger.info(format("Stopping domain '%s' with no mule context", descriptor.getName()));
-      }
-
-      return;
-    }
-
-    artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
-
-    withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
-        log(miniSplash(format("Stopping domain '%s'", getArtifactName())));
-      }
-    });
-
-    withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
-      this.artifactContext.getMuleContext().stop();
-      return null;
-    });
-  }
-
-  private void doDispose() {
-    if (artifactContext == null) {
-      if (logger.isInfoEnabled()) {
-        logger.info(format("Domain '%s' never started, nothing to dispose of", descriptor.getName()));
-      }
-      return;
-    }
-
-    try {
-      stop();
-    } catch (DeploymentStopException e) {
-      // catch the stop errors and just log, we're disposing of an domain anyway
-      logger.error("Error stopping domain", e);
-    }
-
-    artifactContext.getMuleContext().dispose();
-    artifactContext = null;
-
-  }
-
-  @Override
-  public void dispose() {
-    withContextClassLoader(null, () -> {
-      log(miniSplash(format("Disposing domain '%s'", getArtifactName())));
-    });
-
-    // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
-    // classloader cleanup
-    try {
-      ClassLoader domainCL = null;
-      if (getArtifactClassLoader() != null) {
-        domainCL = getArtifactClassLoader().getClassLoader();
-      }
-      // if not initialized yet, it can be null
-      if (domainCL != null) {
-        Thread.currentThread().setContextClassLoader(domainCL);
-      }
-
-      doDispose();
-
-      if (domainCL != null) {
-        if (isRegionClassLoaderMember(domainCL)) {
-          ((DisposableClassLoader) domainCL.getParent()).dispose();
-        } else if (domainCL instanceof DisposableClassLoader) {
-          ((DisposableClassLoader) domainCL).dispose();
-        }
-      }
-    } finally {
-      // kill any refs to the old classloader to avoid leaks
-      Thread.currentThread().setContextClassLoader(null);
-      deploymentClassLoader = null;
-    }
-  }
-
-  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
-    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   @Override
