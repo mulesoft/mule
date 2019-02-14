@@ -33,7 +33,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
@@ -49,6 +49,8 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 
@@ -64,7 +66,7 @@ public class DefaultMuleDomain implements Domain {
   private final List<ArtifactPlugin> artifactPlugins;
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ClassLoaderRepository classLoaderRepository;
-  private final ArtifactClassLoader deploymentClassLoader;
+  private ArtifactClassLoader deploymentClassLoader;
   private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   private MuleContextListener muleContextListener;
@@ -239,21 +241,52 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public void stop() {
-    try {
-      withContextClassLoader(null, () -> {
-        if (logger.isInfoEnabled()) {
-          log(miniSplash(format("Stopping domain '%s'", getArtifactName())));
-        }
-      });
-      if (this.artifactContext != null) {
-        withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
-          this.artifactContext.getMuleContext().stop();
-          return null;
-        });
-      }
-    } catch (Exception e) {
-      throw new DeploymentStopException(createStaticMessage("Failure trying to stop domain " + getArtifactName()), e);
+    if (this.artifactContext == null
+        || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
+      return;
     }
+
+    if (this.artifactContext == null) {
+      // domain never started, maybe due to a previous error
+      if (logger.isInfoEnabled()) {
+        logger.info(format("Stopping domain '%s' with no mule context", descriptor.getName()));
+      }
+
+      return;
+    }
+
+    artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
+
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        log(miniSplash(format("Stopping domain '%s'", getArtifactName())));
+      }
+    });
+
+    withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
+      this.artifactContext.getMuleContext().stop();
+      return null;
+    });
+  }
+
+  private void doDispose() {
+    if (artifactContext == null) {
+      if (logger.isInfoEnabled()) {
+        logger.info(format("Domain '%s' never started, nothing to dispose of", descriptor.getName()));
+      }
+      return;
+    }
+
+    try {
+      stop();
+    } catch (DeploymentStopException e) {
+      // catch the stop errors and just log, we're disposing of an domain anyway
+      logger.error("Error stopping domain", e);
+    }
+
+    artifactContext.getMuleContext().dispose();
+    artifactContext = null;
+
   }
 
   @Override
@@ -261,11 +294,37 @@ public class DefaultMuleDomain implements Domain {
     withContextClassLoader(null, () -> {
       log(miniSplash(format("Disposing domain '%s'", getArtifactName())));
     });
-    if (this.artifactContext != null) {
-      withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> this.artifactContext.getMuleContext().dispose());
-    }
 
-    this.deploymentClassLoader.dispose();
+    // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
+    // classloader cleanup
+    try {
+      ClassLoader domainCL = null;
+      if (getArtifactClassLoader() != null) {
+        domainCL = getArtifactClassLoader().getClassLoader();
+      }
+      // if not initialized yet, it can be null
+      if (domainCL != null) {
+        Thread.currentThread().setContextClassLoader(domainCL);
+      }
+
+      doDispose();
+
+      if (domainCL != null) {
+        if (isRegionClassLoaderMember(domainCL)) {
+          ((DisposableClassLoader) domainCL.getParent()).dispose();
+        } else if (domainCL instanceof DisposableClassLoader) {
+          ((DisposableClassLoader) domainCL).dispose();
+        }
+      }
+    } finally {
+      // kill any refs to the old classloader to avoid leaks
+      Thread.currentThread().setContextClassLoader(null);
+      deploymentClassLoader = null;
+    }
+  }
+
+  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
+    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   @Override
@@ -294,16 +353,6 @@ public class DefaultMuleDomain implements Domain {
   @Override
   public ArtifactClassLoader getArtifactClassLoader() {
     return deploymentClassLoader;
-  }
-
-  public void initialise() {
-    try {
-      if (this.artifactContext != null) {
-        this.artifactContext.getMuleContext().initialise();
-      }
-    } catch (InitialisationException e) {
-      throw new DeploymentInitException(createStaticMessage("Failure trying to initialise domain " + getArtifactName()), e);
-    }
   }
 
   @Override
