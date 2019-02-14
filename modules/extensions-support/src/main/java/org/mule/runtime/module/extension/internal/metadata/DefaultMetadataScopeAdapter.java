@@ -91,16 +91,16 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
     initializeFromClass(extensionElement, source, sourceDeclaration);
   }
 
+  public DefaultMetadataScopeAdapter(SourceCallbackDeclaration sourceCallbackDeclaration) {
+    inputResolvers = getInputResolvers(sourceCallbackDeclaration);
+  }
+
   private Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers(ParameterizedDeclaration<? extends BaseDeclaration> declaration) {
     return declaration.getAllParameters().stream()
         .filter(p -> getAnnotatedElement(p).map(e -> e.isAnnotationPresent(TypeResolver.class)).orElse(false))
         .filter(p -> !hasCustomStaticType(p))
         .collect(toMap(p -> p.getName(),
                        p -> ResolverSupplier.of(getAnnotatedElement(p).get().getAnnotation(TypeResolver.class).value())));
-  }
-
-  public DefaultMetadataScopeAdapter(SourceCallbackDeclaration sourceCallbackDeclaration) {
-    inputResolvers = getInputResolvers(sourceCallbackDeclaration);
   }
 
   private void initializeFromClass(Type extensionType, WithDeclaringClass annotatedType, WithOutputDeclaration declaration) {
