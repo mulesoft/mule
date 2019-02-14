@@ -115,7 +115,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     // classloader set as the TCCL.
     final ClassLoader extensionClassLoader = currentThread().getContextClassLoader();
     final ClassLoader appRegionClassLoader = muleContext.getExecutionClassLoader().getParent();
-    ClassLoader classLoader = new CompositeClassLoader(extensionClassLoader, appRegionClassLoader);
+    ClassLoader classLoader = new CompositeClassLoader(appRegionClassLoader, extensionClassLoader);
 
     Class[] proxyInterfaces = getProxyInterfaces(provider);
     enhancer.setInterfaces(proxyInterfaces);
