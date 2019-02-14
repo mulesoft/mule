@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.operation.UninitializedOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
@@ -79,6 +80,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
 
   private final CoreEvent event;
 
+  private final ProcessorCache processorCache;
+
   /**
    * This constructor enables the {@link DefaultExtensionsClient} to be aware of the current execution {@link CoreEvent} and
    * enables to perform the dynamic operation execution with the same event that the SDK operation using the {@link ExtensionsClient}
@@ -95,6 +98,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     this.extensionManager = muleContext.getExtensionManager();
     this.registry = registry;
     this.policyManager = policyManager;
+    this.processorCache = ProcessorCache.getInstance();
   }
 
   /**
@@ -102,6 +106,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
    */
   public DefaultExtensionsClient() {
     this.event = null;
+    this.processorCache = ProcessorCache.getInstance();
   }
 
   /**
@@ -109,11 +114,23 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
    */
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
-    OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-    return just(getEvent()).transform(processor)
+    OperationMessageProcessor operationMessageProcessor =
+        processorCache.getOperationMessageProcessor(extension, operation, parameters);
+    if (operationMessageProcessor == null) {
+      operationMessageProcessor = createProcessor(extension, operation, parameters);
+      String operationMessageProcessorId = processorCache.getOperationMessageProcessorId(extension, operation, parameters);
+      processorCache.putOperationMessageProcessor(operationMessageProcessorId, operationMessageProcessor);
+    }
+
+    UninitializedOperationMessageProcessor uninitializedOperationMessageProcessor =
+        createUninitializedOperationMessageProcessor(extension, operation,
+                                                     parameters,
+                                                     operationMessageProcessor);
+
+    return just(getEvent()).transform(uninitializedOperationMessageProcessor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate(() -> disposeProcessor(processor)).toFuture();
+        .doAfterTerminate(() -> disposeProcessor(uninitializedOperationMessageProcessor)).toFuture();
   }
 
   @Override
@@ -150,6 +167,37 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create Operation Message Processor"), e);
     }
+  }
+
+  private UninitializedOperationMessageProcessor createUninitializedOperationMessageProcessor(String extensionName,
+                                                                                              String operationName,
+                                                                                              OperationParameters parameters,
+                                                                                              OperationMessageProcessor cachedOperationMessageProcessor) {
+
+    ExtensionModel extension = findExtension(extensionName);
+    OperationModel operation = findOperation(extension, operationName);
+    ConfigurationProvider configurationProvider = parameters.getConfigName().map(this::findConfiguration).orElse(null);
+    Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), getEvent());
+
+    try {
+      UninitializedOperationMessageProcessor uninitializedOperationMessageProcessor =
+          new UninitializedOperationMessageProcessor(extension, operation, policyManager, registry,
+                                                     cachedOperationMessageProcessor,
+                                                     resolvedParams, muleContext,
+                                                     getConfigurationProvider(resolvedParams, configurationProvider));
+
+      uninitializedOperationMessageProcessor.start();
+      return uninitializedOperationMessageProcessor;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create Frula Operation Message Processor"), e);
+    }
+  }
+
+  private ConfigurationProvider getConfigurationProvider(Map<String, ?> parameters, ConfigurationProvider configurationProvider) {
+    return parameters.values().stream()
+        .filter(v -> v instanceof ConfigurationProvider)
+        .map(v -> ((ConfigurationProvider) v)).findAny()
+        .orElse(configurationProvider);
   }
 
   private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, CoreEvent event) {

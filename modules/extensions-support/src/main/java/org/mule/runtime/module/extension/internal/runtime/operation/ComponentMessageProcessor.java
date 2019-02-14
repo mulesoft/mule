@@ -542,7 +542,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return createExecutionContext(configuration, getResolutionResult(event, configuration), event, IMMEDIATE_SCHEDULER);
   }
 
-  private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
+  protected Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withConfig(configuration).build()) {
