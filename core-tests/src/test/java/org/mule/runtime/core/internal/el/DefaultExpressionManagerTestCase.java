@@ -43,6 +43,7 @@ import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnor
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -53,6 +54,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -66,6 +68,14 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -75,13 +85,6 @@ import java.util.Optional;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -300,6 +303,21 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     assertThat(expressionManager.parseLogTemplate("this is #[payload.wsc_fields.operation]", event, TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
                is("this is \"echo\""));
+  }
+
+  @Test
+  @Description("Verifies that JSON content can be used for logging in DW.")
+  public void parseLogJsonWithEscapedStrings() throws MuleException {
+    System.out.println("{\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}");
+
+    CoreEvent event = getEventBuilder().message(Message.builder()
+        .value("{\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}")
+        .mediaType(MediaType.JSON)
+        .build())
+        .build();
+    assertThat(expressionManager.parseLogTemplate("this is #[payload]", event, TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is("this is {\"key1\": \"{\\\"key1\\\": \\\"value1\\\"}\"}"));
   }
 
   @Test

@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.core.privileged.util;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,11 +21,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static java.lang.String.format;
 
 /**
  * <code>TemplateParser</code> is a simple string parser that will substitute tokens in a string with values supplied in a Map.
@@ -50,7 +50,7 @@ public final class TemplateParser {
     // Such a complex regex is needed to support nested expressions, otherwise we
     // have to do this manually or using an ANTLR grammar etc.
 
-    //TODO MULE-14603 - Expression Regex fails on detect expression when this have an unbalanced opening bracket
+    // TODO MULE-14603 - Expression Regex fails on detect expression when this have an unbalanced opening bracket
     // Support for 6 levels (5 nested)
     patterns.put(WIGGLY_MULE_TEMPLATE_STYLE,
                  new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE,
@@ -132,13 +132,16 @@ public final class TemplateParser {
         result.append(START_EXPRESSION);
       }
 
-      if (lastIsBackSlash && c != '\'' && c != '"' && c != START_EXPRESSION) {
-        result.append("\\");
+      if (lastIsBackSlash) {
+        if (c != START_EXPRESSION) {
+          result.append("\\");
+        }
+      } else {
+        if (c == '\'') {
+          openSingleQuotes = !openSingleQuotes;
+        }
       }
 
-      if (!lastIsBackSlash && c == '\'') {
-        openSingleQuotes = !openSingleQuotes;
-      }
       if (c == OPEN_EXPRESSION && lastStartedExpression && (!insideExpression || !openSingleQuotes)) {
         int closing = closingBracesPosition(template, currentPosition);
         String enclosingTemplate = template.substring(currentPosition + 1, closing);
