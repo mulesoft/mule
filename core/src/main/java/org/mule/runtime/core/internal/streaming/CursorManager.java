@@ -22,6 +22,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.lang.ref.WeakReference;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -57,7 +58,7 @@ public class CursorManager {
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider     the provider to be tracked
+   * @param provider the provider to be tracked
    * @param ownerContext the root context of the event that created the provider
    * @return a {@link CursorProvider}
    */
@@ -87,7 +88,8 @@ public class CursorManager {
   private class EventStreamingState {
 
     private final AtomicBoolean disposed = new AtomicBoolean(false);
-    private final Set<WeakReference<ManagedCursorProvider>> providers = newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<WeakReference<ManagedCursorProvider>> providers =
+        newSetFromMap(new WeakHashMap<WeakReference<ManagedCursorProvider>, Boolean>());
 
     private void addProvider(ManagedCursorProvider provider) {
       providers.add(ghostBuster.track(provider));
