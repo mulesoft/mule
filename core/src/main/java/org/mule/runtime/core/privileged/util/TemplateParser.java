@@ -121,6 +121,7 @@ public final class TemplateParser {
 
     boolean lastIsBackSlash = false;
     boolean lastStartedExpression = false;
+    boolean inExpression = insideExpression;
     boolean openSingleQuotes = false;
 
     StringBuilder result = new StringBuilder();
@@ -131,9 +132,15 @@ public final class TemplateParser {
       if (lastStartedExpression && c != OPEN_EXPRESSION) {
         result.append(START_EXPRESSION);
       }
+      if (lastStartedExpression && c == OPEN_EXPRESSION) {
+        inExpression = true;
+      }
+      if (inExpression && c == CLOSE_EXPRESSION) {
+        inExpression = false;
+      }
 
       if (lastIsBackSlash) {
-        if (c != START_EXPRESSION) {
+        if ((inExpression ? c != '\'' && c != '"' : true) && c != START_EXPRESSION) {
           result.append("\\");
         }
       } else {
@@ -152,7 +159,7 @@ public final class TemplateParser {
           if (value == null) {
             value = NULL_AS_STRING;
           } else {
-            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, true);
+            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, value.equals(enclosingTemplate));
           }
         }
         result.append(value);
