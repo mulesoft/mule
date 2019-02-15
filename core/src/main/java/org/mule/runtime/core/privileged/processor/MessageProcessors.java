@@ -174,8 +174,7 @@ public class MessageProcessors {
       if (e.getCause() instanceof InterruptedException) {
         currentThread().interrupt();
       }
-      MuleException muleException = rxExceptionToMuleException(e);
-      throw muleException;
+      throw rxExceptionToMuleException(e);
     }
   }
 
@@ -293,7 +292,7 @@ public class MessageProcessors {
   public static CoreEvent processWithChildContextBlocking(CoreEvent event, Processor processor,
                                                           Optional<ComponentLocation> componentLocation)
       throws MuleException {
-    return internalProcessWithChildContextBlocking(event, processor, true,
+    return internalProcessWithChildContextBlocking(event, processor,
                                                    child(((BaseEventContext) event.getContext()), componentLocation));
   }
 
@@ -316,13 +315,12 @@ public class MessageProcessors {
                                                           Optional<ComponentLocation> componentLocation,
                                                           FlowExceptionHandler exceptionHandler)
       throws MuleException {
-    return internalProcessWithChildContextBlocking(event, processor, true,
+    return internalProcessWithChildContextBlocking(event, processor,
                                                    child(((BaseEventContext) event.getContext()), componentLocation,
                                                          exceptionHandler));
   }
 
-  private static CoreEvent internalProcessWithChildContextBlocking(CoreEvent event, Processor processor,
-                                                                   boolean completeParentIfEmpty, BaseEventContext child)
+  private static CoreEvent internalProcessWithChildContextBlocking(CoreEvent event, Processor processor, BaseEventContext child)
       throws MuleException {
     final Publisher<CoreEvent> childResponsePublisher = child.getResponsePublisher();
 
@@ -330,15 +328,14 @@ public class MessageProcessors {
     try {
       result = processor.process(quickCopy(child, event));
       completeSuccessIfNeeded().accept(result);
-    } catch (Throwable e) {
+    } catch (MuleException e) {
       try {
         result = Mono.from(childResponsePublisher).block();
       } catch (Throwable t) {
         if (t.getCause() instanceof InterruptedException) {
           currentThread().interrupt();
         }
-        MuleException muleException = rxExceptionToMuleException(t);
-        throw muleException;
+        throw rxExceptionToMuleException(t);
       }
     }
 
@@ -364,7 +361,7 @@ public class MessageProcessors {
               throw propagateWrappingFatal(me);
             }, response -> response))
             .toProcessor())
-        .map(result -> toParentContext(result));
+        .map(MessageProcessors::toParentContext);
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,
@@ -388,7 +385,7 @@ public class MessageProcessors {
           throw propagateWrappingFatal(me);
         }, response -> response))
         .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
-        .map(result -> toParentContext(result));
+        .map(MessageProcessors::toParentContext);
   }
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,
@@ -397,7 +394,7 @@ public class MessageProcessors {
     Mono.from(((BaseEventContext) eventChildCtx.getContext()).getResponsePublisher())
         .doOnSuccess(response -> {
           if (response == null && completeParentIfEmpty) {
-            ((BaseEventContext) eventChildCtx.getContext()).getParentContext().get().success();
+            getParentContext(eventChildCtx).success();
             errorSwitchSinkSinkRef.next();
           } else {
             if (response == null) {
@@ -416,7 +413,11 @@ public class MessageProcessors {
   }
 
   private static CoreEvent toParentContext(final CoreEvent event) {
-    return quickCopy(((BaseEventContext) event.getContext()).getParentContext().get(), event);
+    return quickCopy(getParentContext(event), event);
+  }
+
+  private static BaseEventContext getParentContext(final CoreEvent event) {
+    return ((BaseEventContext) event.getContext()).getParentContext().orElse(null);
   }
 
   /**
