@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
@@ -184,29 +185,39 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    */
   private BiConsumer<Throwable, Object> getContinueStrategyErrorHandler(Processor processor) {
     return (throwable, object) -> {
-      if (object != null && !(object instanceof CoreEvent)) {
+      throwable = unwrap(throwable);
+
+      if (object == null && !(throwable instanceof MessagingException)) {
         LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
         throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
       }
-      CoreEvent event = (CoreEvent) object;
-      throwable = Exceptions.unwrap(throwable);
-      if (throwable instanceof MessagingException) {
-        // Give priority to failed event from reactor over MessagingException event.
-        BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
-            : ((MessagingException) throwable).getEvent().getContext());
-        errorNotification(processor).andThen(e -> context.error(e))
-            .accept(resolveMessagingException(processor).apply((MessagingException) throwable));
+
+      if (object != null && !(object instanceof CoreEvent) && throwable instanceof MessagingException) {
+        notifyError(processor,
+                    (BaseEventContext) ((MessagingException) throwable).getEvent().getContext(),
+                    resolveMessagingException(processor).apply((MessagingException) throwable));
       } else {
-        if (event == null) {
-          LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
-          throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+        CoreEvent event = (CoreEvent) object;
+        if (throwable instanceof MessagingException) {
+          // Give priority to failed event from reactor over MessagingException event.
+          notifyError(processor,
+                      (BaseEventContext) (event != null
+                          ? event.getContext()
+                          : ((MessagingException) throwable).getEvent().getContext()),
+                      resolveMessagingException(processor).apply((MessagingException) throwable));
         } else {
-          BaseEventContext context = ((BaseEventContext) event.getContext());
-          errorNotification(processor).andThen(e -> context.error(e))
-              .accept(resolveException(processor, event, throwable));
+          notifyError(processor,
+                      ((BaseEventContext) event.getContext()),
+                      resolveException(processor, event, throwable));
         }
       }
     };
+  }
+
+  private void notifyError(Processor processor, BaseEventContext context, final MessagingException resolvedException) {
+    errorNotification(processor)
+        .andThen(context::error)
+        .accept(resolvedException);
   }
 
   private ReactiveProcessor applyInterceptors(List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted,
