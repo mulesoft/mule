@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultMuleApplication  extends AbstractDeployableArtifact<ApplicationDescriptor> implements Application {
+public class DefaultMuleApplication extends AbstractDeployableArtifact<ApplicationDescriptor> implements Application {
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -179,7 +179,9 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
         logger.error(null, getRootCause(e));
       }
 
-      throw new DeploymentStartException(createStaticMessage(format("Error starting %s '%s'", artifactType, descriptor.getName())), e);
+      throw new DeploymentStartException(createStaticMessage(format("Error starting %s '%s'", artifactType,
+                                                                    descriptor.getName())),
+                                         e);
     }
   }
 
@@ -370,6 +372,10 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
   @Override
   public List<ArtifactPlugin> getArtifactPlugins() {
     return artifactPlugins;
+  }
+
+  protected ArtifactClassLoader getDeploymentClassLoader() {
+    return deploymentClassLoader;
   }
 
   @Override
