@@ -185,25 +185,34 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private BiConsumer<Throwable, Object> getContinueStrategyErrorHandler(Processor processor) {
     return (throwable, object) -> {
       if (object != null && !(object instanceof CoreEvent)) {
-        LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
-        throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
-      }
-      CoreEvent event = (CoreEvent) object;
-      throwable = Exceptions.unwrap(throwable);
-      if (throwable instanceof MessagingException) {
-        // Give priority to failed event from reactor over MessagingException event.
-        BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
-            : ((MessagingException) throwable).getEvent().getContext());
-        errorNotification(processor).andThen(e -> context.error(e))
-            .accept(resolveMessagingException(processor).apply((MessagingException) throwable));
-      } else {
-        if (event == null) {
+        throwable = Exceptions.unwrap(throwable);
+
+        if (throwable instanceof MessagingException) {
+          BaseEventContext context = (BaseEventContext) ((MessagingException) throwable).getEvent().getContext();
+          errorNotification(processor).andThen(e -> context.error(e))
+              .accept(resolveMessagingException(processor).apply((MessagingException) throwable));
+        } else {
           LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
           throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
-        } else {
-          BaseEventContext context = ((BaseEventContext) event.getContext());
+        }
+      } else {
+        CoreEvent event = (CoreEvent) object;
+        throwable = Exceptions.unwrap(throwable);
+        if (throwable instanceof MessagingException) {
+          // Give priority to failed event from reactor over MessagingException event.
+          BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
+              : ((MessagingException) throwable).getEvent().getContext());
           errorNotification(processor).andThen(e -> context.error(e))
-              .accept(resolveException(processor, event, throwable));
+              .accept(resolveMessagingException(processor).apply((MessagingException) throwable));
+        } else {
+          if (event == null) {
+            LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
+            throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+          } else {
+            BaseEventContext context = ((BaseEventContext) event.getContext());
+            errorNotification(processor).andThen(e -> context.error(e))
+                .accept(resolveException(processor, event, throwable));
+          }
         }
       }
     };
