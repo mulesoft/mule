@@ -12,12 +12,6 @@ import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -39,6 +33,15 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.wsdl.BindingOperation;
+import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLReader;
+
 public class WSConsumerConfig implements MuleContextAware
 {
 
@@ -54,6 +57,7 @@ public class WSConsumerConfig implements MuleContextAware
     private WSSecurity security;
     private volatile Definition wsdlDefinition;
     private volatile MuleWSDLLocator wsdlLocator;
+    private Map<String, String> operationToBodyCache = new HashMap<>();
 
     @Override
     public void setMuleContext(MuleContext muleContext)
@@ -324,5 +328,28 @@ public class WSConsumerConfig implements MuleContextAware
         }
 
         return wsdlLocator;
+    }
+
+    /**
+     * Returns the cached request body for the given operation if present in the config, or generates a new one otherwise.
+     */
+    public String getRequestBody(Definition wsdlDefinition, BindingOperation bindingOperation) throws WSDLException
+    {
+        synchronized (this)
+        {
+            String body;
+            String operationName = bindingOperation.getName();
+            if (operationToBodyCache.containsKey(operationName))
+            {
+                body = operationToBodyCache.get(operationName);
+            }
+            else
+            {
+                RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition, getWsdlLocator());
+                body = requestBodyGenerator.generateRequestBody(bindingOperation);
+                operationToBodyCache.put(operationName, body);
+            }
+            return body;
+        }
     }
 }
