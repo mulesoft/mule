@@ -74,8 +74,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
       try {
         return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
-      } catch (Throwable t) {
-        throw t;
       } finally {
         transaction.setComponentLocation(lastLocation);
       }
