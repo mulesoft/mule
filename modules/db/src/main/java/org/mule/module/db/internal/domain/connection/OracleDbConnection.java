@@ -36,7 +36,7 @@ public class OracleDbConnection extends DefaultDbConnection
 
     public static final String QUERY_TYPE_OWNER_CONDITION = " AND OWNER = ?";
 
-    public static final String QUERY_ALL_COLL_TYPES = "SELECT * FROM SYS.ALL_COLL_TYPES where TYPE_NAME = ?";
+    public static final String QUERY_ALL_COLL_TYPES = "SELECT * FROM SYS.ALL_COLL_TYPES WHERE TYPE_NAME = ?";
 
     private static final String ELEM_TYPE_NAME = "ELEM_TYPE_NAME";
 
@@ -98,24 +98,27 @@ public class OracleDbConnection extends DefaultDbConnection
         return createArrayMethod;
     }
 
+    @Override
     protected void resolveLobsForArrays(String typeName, Object[] elements) throws SQLException
     {
-        String nestedTableType = getNestedTableType(typeName);
+        String collectionTypeName = getTypeFor(typeName);
 
-        if(nestedTableType != null)
+        if(collectionTypeName != null)
         {
-            typeName = nestedTableType;
+            typeName = collectionTypeName;
         }
 
-        Map<Integer, String> dataTypes = getDataTypes(typeName);
+        Map<Integer, String> dataTypes = getLobFieldsDataTypeInfo(typeName);
 
         if (dataTypes.keySet().isEmpty())
         {
-            logger.warn("No catalog information was found for the typename '%s'. No lob resolution will be performed", typeName);
+            logger.warn("No catalog information was found for the typename {}. No lob resolution will be performed", typeName);
         }
 
-        for (int index : dataTypes.keySet())
+        Integer index;
+        for (Map.Entry entry : dataTypes.entrySet())
         {
+            index = (Integer) entry.getKey();
             String dataTypeName = dataTypes.get(index);
 
             for(Object element : elements)
@@ -134,11 +137,11 @@ public class OracleDbConnection extends DefaultDbConnection
     @Override
     protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
     {
-        Map<Integer, String> dataTypes = getDataTypes(typeName);
+        Map<Integer, String> dataTypes = getLobFieldsDataTypeInfo(typeName);
 
         if (dataTypes.keySet().isEmpty())
         {
-            logger.warn("No catalog information was found for the typename '%s'. No lob resolution will be performed", typeName);
+            logger.warn("No catalog information was found for the typename {}. No lob resolution will be performed", typeName);
         }
 
         for (int index : dataTypes.keySet())
@@ -154,7 +157,7 @@ public class OracleDbConnection extends DefaultDbConnection
         }
     }
 
-    private Map<Integer, String> getDataTypes(String typeName) throws SQLException
+    private Map<Integer, String> getLobFieldsDataTypeInfo(String typeName) throws SQLException
     {
         Map<Integer, String> dataTypes = new HashMap<>();
 
@@ -163,6 +166,7 @@ public class OracleDbConnection extends DefaultDbConnection
 
         String query = QUERY_TYPE_ATTRS + (owner != null ? QUERY_TYPE_OWNER_CONDITION : "");
 
+        ResultSet resultSet = null;
         try (PreparedStatement ps = this.prepareStatement(query))
         {
             ps.setString(1, type);
@@ -171,7 +175,7 @@ public class OracleDbConnection extends DefaultDbConnection
                 ps.setString(2, owner);
             }
 
-            ResultSet resultSet = ps.executeQuery();
+            resultSet = ps.executeQuery();
 
             while (resultSet.next())
             {
@@ -180,21 +184,36 @@ public class OracleDbConnection extends DefaultDbConnection
 
             return dataTypes;
         }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
+        }
     }
 
-    public String getNestedTableType(String typeName) throws SQLException
+    private String getTypeFor(String collectionTypeName) throws SQLException
     {
         String dataType = null;
+        ResultSet resultSet = null;
 
         try (PreparedStatement ps = this.prepareStatement(QUERY_ALL_COLL_TYPES))
         {
-            ps.setString(1, typeName);
+            ps.setString(1, collectionTypeName);
 
-            ResultSet resultSet = ps.executeQuery();
+            resultSet = ps.executeQuery();
 
             while (resultSet.next())
             {
                 dataType = resultSet.getString(ELEM_TYPE_NAME);
+            }
+        }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
             }
         }
         return dataType;
