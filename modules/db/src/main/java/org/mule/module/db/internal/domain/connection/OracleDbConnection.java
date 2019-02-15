@@ -166,7 +166,6 @@ public class OracleDbConnection extends DefaultDbConnection
 
         String query = QUERY_TYPE_ATTRS + (owner != null ? QUERY_TYPE_OWNER_CONDITION : "");
 
-        ResultSet resultSet = null;
         try (PreparedStatement ps = this.prepareStatement(query))
         {
             ps.setString(1, type);
@@ -175,45 +174,32 @@ public class OracleDbConnection extends DefaultDbConnection
                 ps.setString(2, owner);
             }
 
-            resultSet = ps.executeQuery();
-
-            while (resultSet.next())
+            try (ResultSet resultSet = ps.executeQuery())
             {
-                dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resultSet.getString(ATTR_TYPE_NAME_PARAM));
+                while (resultSet.next())
+                {
+                    dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resultSet.getString(ATTR_TYPE_NAME_PARAM));
+                }
             }
 
             return dataTypes;
-        }
-        finally
-        {
-            if (resultSet != null)
-            {
-                resultSet.close();
-            }
         }
     }
 
     private String getTypeFor(String collectionTypeName) throws SQLException
     {
         String dataType = null;
-        ResultSet resultSet = null;
 
         try (PreparedStatement ps = this.prepareStatement(QUERY_ALL_COLL_TYPES))
         {
             ps.setString(1, collectionTypeName);
 
-            resultSet = ps.executeQuery();
-
-            while (resultSet.next())
+            try (ResultSet resultSet = ps.executeQuery())
             {
-                dataType = resultSet.getString(ELEM_TYPE_NAME);
-            }
-        }
-        finally
-        {
-            if (resultSet != null)
-            {
-                resultSet.close();
+                while (resultSet.next())
+                {
+                    dataType = resultSet.getString(ELEM_TYPE_NAME);
+                }
             }
         }
         return dataType;
