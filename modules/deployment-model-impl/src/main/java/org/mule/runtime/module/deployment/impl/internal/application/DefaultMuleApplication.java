@@ -25,9 +25,19 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification.Action;
@@ -43,6 +53,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -53,25 +64,17 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultMuleApplication  extends AbstractDeployableArtifact<ApplicationDescriptor> implements Application {
+public class DefaultMuleApplication implements Application {
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -85,8 +88,10 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
   private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private ApplicationStatus status;
 
+  protected ArtifactClassLoader deploymentClassLoader;
   protected MuleContextListener muleContextListener;
   private NotificationListener<MuleContextNotification> statusListener;
+  private ArtifactContext artifactContext;
   private ApplicationPolicyProvider policyManager;
 
   private NotificationListenerRegistry notificationRegistrer;
@@ -99,7 +104,6 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
                                 ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
-    super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
@@ -107,10 +111,11 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
     this.classLoaderRepository = classLoaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.location = location;
+    this.deploymentClassLoader = deploymentClassLoader;
     this.policyManager = applicationPolicyProvider;
     this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
-    if (this.deploymentClassLoader == null) {
+    if (deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
     }
   }
@@ -125,7 +130,7 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
   @Override
   public void install() {
     withContextClassLoader(null, () -> {
-      log(miniSplash(format("New %s '%s'", shortArtifactType, descriptor.getName())));
+      log(miniSplash(format("New app '%s'", descriptor.getName())));
     });
     // set even though it might be redundant, just in case the app is been redeployed
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
@@ -134,7 +139,7 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
       for (String configFile : this.descriptor.getConfigResources()) {
         URL configFileUrl = getArtifactClassLoader().getClassLoader().getResource(configFile);
         if (configFileUrl == null) {
-          String message = format("Config for %s '%s' not found: %s", shortArtifactType, getArtifactName(), configFile);
+          String message = format("Config for app '%s' not found: %s", getArtifactName(), configFile);
           throw new InstallException(createStaticMessage(message));
         }
       }
@@ -157,7 +162,7 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
   @Override
   public void start() {
     withContextClassLoader(null, () -> {
-      log(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
+      log(miniSplash(format("Starting app '%s'", descriptor.getName())));
     });
     try {
       this.artifactContext.getMuleContext().start();
@@ -179,7 +184,7 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
         logger.error(null, getRootCause(e));
       }
 
-      throw new DeploymentStartException(createStaticMessage(format("Error starting %s '%s'", artifactType, descriptor.getName())), e);
+      throw new DeploymentStartException(createStaticMessage(format("Error starting application '%s'", descriptor.getName())), e);
     }
   }
 
@@ -190,7 +195,7 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
 
   private void doInit(boolean lazy, boolean disableXmlValidations) {
     withContextClassLoader(null, () -> {
-      log(miniSplash(format("Initializing %s '%s'", shortArtifactType, descriptor.getName())));
+      log(miniSplash(format("Initializing app '%s'", descriptor.getName())));
     });
     try {
       ArtifactContextBuilder artifactBuilder =
@@ -324,6 +329,40 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
   }
 
   @Override
+  public void dispose() {
+    // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
+    // classloader cleanup
+    try {
+      ClassLoader appCl = null;
+      if (getArtifactClassLoader() != null) {
+        appCl = getArtifactClassLoader().getClassLoader();
+      }
+      // if not initialized yet, it can be null
+      if (appCl != null) {
+        Thread.currentThread().setContextClassLoader(appCl);
+      }
+
+      doDispose();
+
+      if (appCl != null) {
+        if (isRegionClassLoaderMember(appCl)) {
+          ((DisposableClassLoader) appCl.getParent()).dispose();
+        } else if (appCl instanceof DisposableClassLoader) {
+          ((DisposableClassLoader) appCl).dispose();
+        }
+      }
+    } finally {
+      // kill any refs to the old classloader to avoid leaks
+      Thread.currentThread().setContextClassLoader(null);
+      deploymentClassLoader = null;
+    }
+  }
+
+  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
+    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
+  }
+
+  @Override
   public String getArtifactName() {
     return descriptor.getName();
   }
@@ -344,6 +383,36 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
   @Override
   public ArtifactClassLoader getArtifactClassLoader() {
     return deploymentClassLoader;
+  }
+
+  @Override
+  public void stop() {
+    if (this.artifactContext == null
+        || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
+      return;
+    }
+
+    if (this.artifactContext == null) {
+      withContextClassLoader(null, () -> {
+        // app never started, maybe due to a previous error
+        if (logger.isInfoEnabled()) {
+          logger.info(format("Stopping app '%s' with no mule context", descriptor.getName()));
+        }
+      });
+      status = ApplicationStatus.STOPPED;
+      return;
+    }
+
+    artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
+
+    try {
+      withContextClassLoader(null, () -> {
+        log(miniSplash(format("Stopping app '%s'", descriptor.getName())));
+      });
+      this.artifactContext.getMuleContext().stop();
+    } catch (MuleException e) {
+      throw new DeploymentStopException(createStaticMessage(format("Error stopping application '%s'", descriptor.getName())), e);
+    }
   }
 
   @Override
@@ -375,6 +444,28 @@ public class DefaultMuleApplication  extends AbstractDeployableArtifact<Applicat
   @Override
   public String toString() {
     return format("%s[%s]@%s", getClass().getName(), descriptor.getName(), Integer.toHexString(System.identityHashCode(this)));
+  }
+
+  protected void doDispose() {
+    if (artifactContext == null) {
+      if (logger.isInfoEnabled()) {
+        logger.info(format("App '%s' never started, nothing to dispose of", descriptor.getName()));
+      }
+      return;
+    }
+
+    try {
+      stop();
+    } catch (DeploymentStopException e) {
+      // catch the stop errors and just log, we're disposing of an app anyway
+      logger.error("Error stopping application", e);
+    }
+
+    withContextClassLoader(null, () -> {
+      log(miniSplash(format("Disposing app '%s'", descriptor.getName())));
+    });
+    artifactContext.getMuleContext().dispose();
+    artifactContext = null;
   }
 
 }
