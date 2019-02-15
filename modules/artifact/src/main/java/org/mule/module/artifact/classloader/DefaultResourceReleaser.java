@@ -218,6 +218,37 @@ public class DefaultResourceReleaser implements ResourceReleaser {
         Method checkedShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
         checkedShutdown.invoke(null);
       }
+
+      try {
+        // In new mysql driver versions (at least 8), the executor service is wrapped inside a delegate class
+        // (DelegatedExecutorService) that
+        // exposes only the ExecutorService interface. Extract real ThreadPoolExecutor, which has the single threaded
+        // threadFactory saved, to clean it after disposal
+
+        // Hierarchy leading to real ThreadPoolExecutor
+        // AbandonedConnectionCleanupThread.cleanupThreadExecutorService -> class DelegatedExecutorService.e -> class
+        // ThreadPoolExecutor
+
+        // Note that the field 'cleanupThreadExcecutorService' is mispelled. There's actually a typo in MySql driver
+        // code.
+        Field cleanupExecutorServiceField = classAbandonedConnectionCleanupThread
+            .getDeclaredField("cleanupThreadExcecutorService");
+        cleanupExecutorServiceField.setAccessible(true);
+        ExecutorService delegateCleanupExecutorService =
+            (ExecutorService) cleanupExecutorServiceField.get(classAbandonedConnectionCleanupThread);
+
+        Field realExecutorServiceField = delegateCleanupExecutorService.getClass().getSuperclass().getDeclaredField("e");
+        realExecutorServiceField.setAccessible(true);
+        ThreadPoolExecutor realExecutorService =
+            (ThreadPoolExecutor) realExecutorServiceField.get(delegateCleanupExecutorService);
+
+        realExecutorService.setThreadFactory(Executors.defaultThreadFactory());
+      } catch (NoSuchFieldException e) {
+        logger.warn("Error cleaning threadFactory from AbandonedConnectionCleanupThread executor service");
+        e.printStackTrace();
+      }
+
+
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
