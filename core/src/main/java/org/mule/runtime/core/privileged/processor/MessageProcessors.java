@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
@@ -361,7 +361,7 @@ public class MessageProcessors {
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
             .map(result -> result.reduce(me -> {
-              throw Exceptions.propagateWrappingFatal(me);
+              throw propagateWrappingFatal(me);
             }, response -> response))
             .toProcessor())
         .map(result -> toParentContext(result));
@@ -385,7 +385,7 @@ public class MessageProcessors {
         // cancelled, ignoring the onErrorcontinue of the parent Flux.
         .mergeWith(Flux.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef))
         .map(result -> result.reduce(me -> {
-          throw Exceptions.propagateWrappingFatal(me);
+          throw propagateWrappingFatal(me);
         }, response -> response))
         .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
         .map(result -> toParentContext(result));
