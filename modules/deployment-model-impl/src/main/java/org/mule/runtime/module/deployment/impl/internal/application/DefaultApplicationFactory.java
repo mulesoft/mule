@@ -184,7 +184,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
         if (bundleDependency.getDescriptor().isPlugin()) {
           File pluginZip = new File(bundleDependency.getBundleUri());
           try {
-            pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginZip));
+            pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginZip, bundleDependency.getDescriptor(), descriptor));
           } catch (IOException e) {
             throw new IllegalStateException("Cannot create plugin descriptor: " + pluginZip.getAbsolutePath(), e);
           }

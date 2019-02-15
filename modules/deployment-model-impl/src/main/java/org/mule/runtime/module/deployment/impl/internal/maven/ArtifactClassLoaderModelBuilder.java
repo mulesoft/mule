@@ -26,7 +26,7 @@ import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -66,7 +66,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   protected FileJarExplorer fileJarExplorer = new FileJarExplorer();
 
   protected File artifactFolder;
-  protected DeployableArtifactDescriptor deployableArtifactDescriptor;
+  protected ArtifactDescriptor deployableArtifactDescriptor;
   protected BundleDescriptor artifactBundleDescriptor;
 
   public ArtifactClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor) {
@@ -97,7 +97,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     return this;
   }
 
-  public void setDeployableArtifactDescriptor(DeployableArtifactDescriptor deployableArtifactDescriptor) {
+  public void setDeployableArtifactDescriptor(ArtifactDescriptor deployableArtifactDescriptor) {
     this.deployableArtifactDescriptor = deployableArtifactDescriptor;
   }
 

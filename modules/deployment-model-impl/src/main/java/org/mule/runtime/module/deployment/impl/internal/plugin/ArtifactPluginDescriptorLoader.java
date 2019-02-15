@@ -9,8 +9,9 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,14 +51,15 @@ public class ArtifactPluginDescriptorLoader {
    * Load a {@code ArtifactPluginDescriptor} from an artifact plugin {@link File}.
    *
    * @param pluginFile the artifact plugin bundle file.
+   * @param pluginBundleDescriptor the plugin bundle descriptor resolved from the deployable artifact descriptor.
    * @param deployableArtifactDescriptor container where the plugin has been declared as dependency.
    *
    * @return the plugin {@code ArtifactPluginDescriptor}
    * @throws IOException if there was a problem trying to read the artifact plugin zip file or using the {@code unpackDestination}
    *         location
    */
-  public ArtifactPluginDescriptor load(File pluginFile,
-                                       DeployableArtifactDescriptor deployableArtifactDescriptor)
+  public ArtifactPluginDescriptor load(File pluginFile, BundleDescriptor pluginBundleDescriptor,
+                                       ArtifactDescriptor deployableArtifactDescriptor)
       throws IOException {
     checkArgument(pluginFile != null, "plugin zip cannot be null");
     checkArgument(pluginFile.getName().endsWith("jar"),
@@ -65,7 +67,7 @@ public class ArtifactPluginDescriptorLoader {
                       + pluginFile.getAbsolutePath());
 
     return artifactPluginDescriptorFactory
-        .create(pluginFile, of(new PluginExtendedDeploymentProperties(new Properties(),
+        .create(pluginFile, of(new PluginExtendedDeploymentProperties(new Properties(), pluginBundleDescriptor,
                                                                       deployableArtifactDescriptor)));
   }
 
