@@ -13,14 +13,19 @@ import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -39,6 +44,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
+      Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
 
   @Override
   public void release() {
@@ -188,10 +195,22 @@ public class DefaultResourceReleaser implements ResourceReleaser {
    */
   private void shutdownMySqlAbandonedConnectionCleanupThread() {
 
-    Class<?> classAbandonedConnectionCleanupThread;
+    Class<?> classAbandonedConnectionCleanupThread = null;
     try {
-      classAbandonedConnectionCleanupThread =
-          this.getClass().getClassLoader().loadClass("com.mysql.jdbc.AbandonedConnectionCleanupThread");
+      for (String knownCleanupThreadClassAddress : CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES) {
+        try {
+          classAbandonedConnectionCleanupThread =
+              this.getClass().getClassLoader().loadClass(knownCleanupThreadClassAddress);
+        } catch (ClassNotFoundException e) {
+          logger.warn("No AbandonedConnectionCleanupThread registered with class address " + knownCleanupThreadClassAddress);
+          continue;
+        }
+      }
+      if (classAbandonedConnectionCleanupThread == null) {
+        logger.warn("No AbandonedConnectionCleanupThread class found. Check if thread class is between "
+            + CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES.toString());
+        throw new ClassNotFoundException(CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES.get(0));
+      }
       try {
         Method uncheckedShutdown = classAbandonedConnectionCleanupThread.getMethod("uncheckedShutdown");
         uncheckedShutdown.invoke(null);
