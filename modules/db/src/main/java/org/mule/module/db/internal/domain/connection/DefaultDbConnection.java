@@ -7,6 +7,9 @@
 
 package org.mule.module.db.internal.domain.connection;
 
+import org.mule.module.db.internal.domain.connection.type.resolver.CollectionTypeResolver;
+import org.mule.module.db.internal.domain.connection.type.resolver.StructTypeResolver;
+import org.mule.module.db.internal.domain.connection.type.resolver.TypeResolver;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
@@ -52,7 +55,7 @@ public class DefaultDbConnection extends AbstractDbConnection
 {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static final int UNKNOWN_DATA_TYPE = -1;
+    protected static final int UNKNOWN_DATA_TYPE = -1;
 
     public static final int DATA_TYPE_INDEX = 5;
 
@@ -338,28 +341,14 @@ public class DefaultDbConnection extends AbstractDbConnection
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException
     {
-        try
-        {
-            resolveLobsForArrays(typeName, elements);
-        }
-        catch (SQLException e)
-        {
-            logger.warn("Unable to resolve lobs: {}. Proceeding with original attributes.", e.getMessage());
-        }
+        resolveLobs(typeName, elements, new CollectionTypeResolver(this));
         return delegate.createArrayOf(typeName, elements);
     }
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException
     {
-        try
-        {
-            resolveLobs(typeName, attributes);
-        }
-        catch (SQLException e)
-        {
-            logger.warn("Unable to resolve lobs: {}. Proceeding with original attributes.", e.getMessage());
-        }
+        resolveLobs(typeName, attributes, new StructTypeResolver(this));
         return delegate.createStruct(typeName, attributes);
     }
 
@@ -406,21 +395,27 @@ public class DefaultDbConnection extends AbstractDbConnection
     }
 
     @Override
-    protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
+    protected void resolveLobs(String typeName, Object[] attributes, TypeResolver typeResolver) throws SQLException
     {
-        Map<Integer, ResolvedDbType> dataTypes = getLobFieldsDataTypeInfo(typeName);
-
-        Integer key;
-        for(Entry entry : dataTypes.entrySet())
+        try
         {
-            key = (Integer) entry.getKey();
+            Map<Integer, ResolvedDbType> dataTypes = getLobFieldsDataTypeInfo(typeName);
 
-            ResolvedDbType dataType = dataTypes.get(key);
-            doResolveLobIn(attributes, key, dataType.getId(), dataType.getName());
+            for(Entry entry : dataTypes.entrySet())
+            {
+                Integer key = (Integer) entry.getKey();
+                ResolvedDbType dataType = (ResolvedDbType) entry.getValue();
+
+                typeResolver.resolveLobIn(attributes, key, dataType);
+            }
+        }
+        catch (SQLException e)
+        {
+            logger.warn("Unable to resolve lobs: {}. Proceeding with original attributes.", e.getMessage());
         }
     }
 
-    private Map<Integer, ResolvedDbType> getLobFieldsDataTypeInfo(String typeName) throws SQLException
+    protected Map<Integer, ResolvedDbType> getLobFieldsDataTypeInfo(String typeName) throws SQLException
     {
         Map<Integer, ResolvedDbType> dataTypes = new HashMap<>();
 
@@ -443,23 +438,7 @@ public class DefaultDbConnection extends AbstractDbConnection
         return dataTypes;
     }
 
-    protected void resolveLobsForArrays(String typeName, Object[] attributes) throws SQLException
-    {
-        Map<Integer, ResolvedDbType> dataTypes = getLobFieldsDataTypeInfo(typeName);
-
-        Integer key;
-        for(Entry entry : dataTypes.entrySet())
-        {
-            key = (Integer) entry.getKey();
-            ResolvedDbType resolvedDbType = dataTypes.get(key);
-            for(Object attribute : attributes)
-            {
-                doResolveLobIn((Object[]) attribute, key, resolvedDbType.getId(), resolvedDbType.getName());
-            }
-        }
-    }
-
-    protected void doResolveLobIn(Object[] attributes, int index, int dataType, String dataTypeName) throws SQLException
+    public void doResolveLobIn(Object[] attributes, int index, int dataType, String dataTypeName) throws SQLException
     {
         if (shouldResolveAttributeWithJdbcType(dataType, dataTypeName, BLOB_DB_TYPE))
         {
@@ -483,13 +462,12 @@ public class DefaultDbConnection extends AbstractDbConnection
         }
     }
 
-    protected void doResolveLobIn(Object[] attributes, int index, String dataTypeName) throws SQLException
+    public void doResolveLobIn(Object[] attributes, int index, String dataTypeName) throws SQLException
     {
         doResolveLobIn(attributes, index, UNKNOWN_DATA_TYPE, dataTypeName);
     }
 
-
-    protected Blob createBlob(Object attribute) throws SQLException
+    private Blob createBlob(Object attribute) throws SQLException
     {
         Blob blob = this.createBlob();
         if (attribute instanceof byte[])
@@ -512,7 +490,7 @@ public class DefaultDbConnection extends AbstractDbConnection
         return blob;
     }
 
-    protected Clob createClob(Object attribute) throws SQLException
+    private Clob createClob(Object attribute) throws SQLException
     {
         Clob clob = this.createClob();
         if (attribute instanceof String)

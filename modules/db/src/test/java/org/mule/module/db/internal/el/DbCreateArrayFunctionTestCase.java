@@ -36,8 +36,8 @@ import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.
 import static org.mule.module.db.internal.domain.connection.DefaultDbConnection.DATA_TYPE_INDEX;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_NO_PARAM;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_TYPE_NAME_PARAM;
-import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_ALL_COLL_TYPES;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_TYPE_ATTRS;
+import static org.mule.module.db.internal.domain.connection.type.resolver.CollectionTypeResolver.QUERY_ALL_COLL_TYPES;
 import static org.mule.module.db.internal.domain.transaction.TransactionalAction.ALWAYS_JOIN;
 import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
 import static org.mule.module.db.internal.domain.type.JdbcTypes.CLOB_DB_TYPE;
