@@ -14,6 +14,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Type resolver for array entities
+ *
+ * @since 3.10.0
+ */
 public class CollectionTypeResolver implements TypeResolver
 {
     public static final String QUERY_ALL_COLL_TYPES = "SELECT * FROM SYS.ALL_COLL_TYPES WHERE TYPE_NAME = ?";
@@ -27,16 +32,12 @@ public class CollectionTypeResolver implements TypeResolver
         this.connection = connection;
     }
 
-    public DefaultDbConnection getConnection()
-    {
-        return connection;
-    }
-
+    @Override
     public void resolveLobs(Object[] elements, Integer index, String dataTypeName) throws SQLException
     {
         for(Object element : elements)
         {
-            getConnection().doResolveLobIn((Object[]) element, index, dataTypeName);
+            connection.doResolveLobIn((Object[]) element, index, dataTypeName);
         }
     }
 
@@ -53,11 +54,11 @@ public class CollectionTypeResolver implements TypeResolver
     }
 
     @Override
-    public void resolveLobIn(Object[] attributes, Integer key, ResolvedDbType resolvedDbType) throws SQLException
+    public void resolveLobIn(Object[] attributes, Integer index, ResolvedDbType resolvedDbType) throws SQLException
     {
         for(Object attribute : attributes)
         {
-            getConnection().doResolveLobIn((Object[]) attribute, key, resolvedDbType.getId(), resolvedDbType.getName());
+            connection.doResolveLobIn((Object[]) attribute, index, resolvedDbType.getId(), resolvedDbType.getName());
         }
     }
 
@@ -65,7 +66,7 @@ public class CollectionTypeResolver implements TypeResolver
     {
         String dataType = null;
 
-        try (PreparedStatement ps = getConnection().prepareStatement(QUERY_ALL_COLL_TYPES))
+        try (PreparedStatement ps = connection.prepareStatement(QUERY_ALL_COLL_TYPES))
         {
             ps.setString(1, collectionTypeName);
 

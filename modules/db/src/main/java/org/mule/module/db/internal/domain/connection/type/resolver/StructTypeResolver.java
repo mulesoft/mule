@@ -12,6 +12,11 @@ import org.mule.module.db.internal.domain.type.ResolvedDbType;
 
 import java.sql.SQLException;
 
+/**
+ * Type resolver for struct entities
+ *
+ * @since 3.10.0
+ */
 public class StructTypeResolver implements TypeResolver
 {
     private DefaultDbConnection connection;
@@ -21,15 +26,10 @@ public class StructTypeResolver implements TypeResolver
         this.connection = connection;
     }
 
-    public DefaultDbConnection getConnection()
-    {
-        return connection;
-    }
-
     @Override
     public void resolveLobs(Object[] elements, Integer index, String dataTypeName) throws SQLException
     {
-        getConnection().doResolveLobIn(elements, index, dataTypeName);
+        connection.doResolveLobIn(elements, index, dataTypeName);
     }
 
     @Override
@@ -39,8 +39,8 @@ public class StructTypeResolver implements TypeResolver
     }
 
     @Override
-    public void resolveLobIn(Object[] attributes, Integer key, ResolvedDbType resolvedDbType) throws SQLException
+    public void resolveLobIn(Object[] attributes, Integer index, ResolvedDbType resolvedDbType) throws SQLException
     {
-        getConnection().doResolveLobIn(attributes, key, resolvedDbType.getId(), resolvedDbType.getName());
+        connection.doResolveLobIn(attributes, index, resolvedDbType.getId(), resolvedDbType.getName());
     }
 }
