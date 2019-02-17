@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static java.util.Collections.newSetFromMap;
+import static java.util.Collections.synchronizedSet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
@@ -21,6 +22,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,7 +91,7 @@ public class CursorManager {
 
     private final AtomicBoolean disposed = new AtomicBoolean(false);
     private final Set<WeakReference<ManagedCursorProvider>> providers =
-        newSetFromMap(new WeakHashMap<WeakReference<ManagedCursorProvider>, Boolean>());
+        synchronizedSet(newSetFromMap(new WeakHashMap<WeakReference<ManagedCursorProvider>, Boolean>()));
 
     private void addProvider(ManagedCursorProvider provider) {
       providers.add(ghostBuster.track(provider));
