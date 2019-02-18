@@ -65,7 +65,7 @@ public abstract class AbstractWssCheckTimestampInResponseTestCase extends Functi
     @ClassRule
     public static DynamicPort dynamicPortNoTSInResponseNoTSCheck = new DynamicPort("portNoTSInResponseNoTSCheck");
 
-    protected static final String EXPECTED_ERROR_NO_TIMESTAMP_RESPONSE = "An error was discovered processing the <wsse:Security> header.";
+    protected static final String EXPECTED_ERROR_NO_TIMESTAMP_RESPONSE = "An error was discovered processing the <wsse:Security> header";
 
     public AbstractWssCheckTimestampInResponseTestCase()
     {

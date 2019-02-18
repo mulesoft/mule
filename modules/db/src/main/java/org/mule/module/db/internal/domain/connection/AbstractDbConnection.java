@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.domain.connection;
 
+import org.mule.module.db.internal.domain.connection.type.resolver.TypeResolver;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.domain.type.DbType;
@@ -73,7 +74,7 @@ public abstract class AbstractDbConnection implements DbConnection
      * @param attributes attributes of the struct to populate
      * @throws SQLException raises if a problems occurs on retrieval of the metadata
      */
-    protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
+    protected void resolveLobs(String typeName, Object[] attributes, TypeResolver typeResolver) throws SQLException
     {
         // Do nothing
     }

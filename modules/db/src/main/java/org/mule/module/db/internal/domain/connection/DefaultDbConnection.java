@@ -7,10 +7,16 @@
 
 package org.mule.module.db.internal.domain.connection;
 
-import static java.lang.String.format;
-import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
-import static org.mule.module.db.internal.domain.type.JdbcTypes.CLOB_DB_TYPE;
-import static org.mule.util.IOUtils.toByteArray;
+import org.mule.module.db.internal.domain.connection.type.resolver.CollectionTypeResolver;
+import org.mule.module.db.internal.domain.connection.type.resolver.StructTypeResolver;
+import org.mule.module.db.internal.domain.connection.type.resolver.TypeResolver;
+import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.domain.type.ResolvedDbType;
+import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
+import org.mule.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.sql.Array;
@@ -29,16 +35,18 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
-import org.mule.util.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Map.Entry;
+import static org.mule.module.db.internal.domain.type.JdbcTypes.BLOB_DB_TYPE;
+import static org.mule.module.db.internal.domain.type.JdbcTypes.CLOB_DB_TYPE;
+import static org.mule.util.IOUtils.toByteArray;
 
 /**
  * Delegates {@link Connection} behaviour to a delegate
@@ -47,11 +55,13 @@ public class DefaultDbConnection extends AbstractDbConnection
 {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static final int UNKNOWN_DATA_TYPE = -1;
+    protected static final int UNKNOWN_DATA_TYPE = -1;
 
     public static final int DATA_TYPE_INDEX = 5;
 
     public static final int ATTR_TYPE_NAME_INDEX = 6;
+
+    private static final List<String> LOB_TYPES = asList(BLOB_DB_TYPE.getName(), CLOB_DB_TYPE.getName());
 
     public DefaultDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory)
     {
@@ -331,20 +341,14 @@ public class DefaultDbConnection extends AbstractDbConnection
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException
     {
+        resolveLobs(typeName, elements, new CollectionTypeResolver(this));
         return delegate.createArrayOf(typeName, elements);
     }
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException
     {
-        try
-        {
-            resolveLobs(typeName, attributes);
-        }
-        catch (SQLException e)
-        {
-            logger.warn("Unable to resolve lobs: {}. Proceeding with original attributes.", e.getMessage());
-        }
+        resolveLobs(typeName, attributes, new StructTypeResolver(this));
         return delegate.createStruct(typeName, attributes);
     }
 
@@ -391,26 +395,50 @@ public class DefaultDbConnection extends AbstractDbConnection
     }
 
     @Override
-    protected void resolveLobs(String typeName, Object[] attributes) throws SQLException
+    protected void resolveLobs(String typeName, Object[] attributes, TypeResolver typeResolver) throws SQLException
     {
+        try
+        {
+            Map<Integer, ResolvedDbType> dataTypes = getLobFieldsDataTypeInfo(typeName);
+
+            for(Entry entry : dataTypes.entrySet())
+            {
+                Integer key = (Integer) entry.getKey();
+                ResolvedDbType dataType = (ResolvedDbType) entry.getValue();
+
+                typeResolver.resolveLobIn(attributes, key, dataType);
+            }
+        }
+        catch (SQLException e)
+        {
+            logger.warn("Unable to resolve lobs: {}. Proceeding with original attributes.", e.getMessage());
+        }
+    }
+
+    protected Map<Integer, ResolvedDbType> getLobFieldsDataTypeInfo(String typeName) throws SQLException
+    {
+        Map<Integer, ResolvedDbType> dataTypes = new HashMap<>();
+
         try (ResultSet resultSet = this.getMetaData().getAttributes(this.getCatalog(), null, typeName, null))
         {
-
             int index = 0;
             while (resultSet.next())
             {
                 int dataType = resultSet.getInt(DATA_TYPE_INDEX);
                 String dataTypeName = resultSet.getString(ATTR_TYPE_NAME_INDEX);
 
-                doResolveLobIn(attributes, index, dataType, dataTypeName);
+                if(LOB_TYPES.contains(dataTypeName))
+                {
+                    dataTypes.put(index, new ResolvedDbType(dataType, dataTypeName));
+                }
 
                 index++;
             }
         }
+        return dataTypes;
     }
 
-
-    protected void doResolveLobIn(Object[] attributes, int index, int dataType, String dataTypeName) throws SQLException
+    public void doResolveLobIn(Object[] attributes, int index, int dataType, String dataTypeName) throws SQLException
     {
         if (shouldResolveAttributeWithJdbcType(dataType, dataTypeName, BLOB_DB_TYPE))
         {
@@ -434,13 +462,12 @@ public class DefaultDbConnection extends AbstractDbConnection
         }
     }
 
-    protected void doResolveLobIn(Object[] attributes, int index, String dataTypeName) throws SQLException
+    public void doResolveLobIn(Object[] attributes, int index, String dataTypeName) throws SQLException
     {
         doResolveLobIn(attributes, index, UNKNOWN_DATA_TYPE, dataTypeName);
     }
 
-
-    protected Blob createBlob(Object attribute) throws SQLException
+    private Blob createBlob(Object attribute) throws SQLException
     {
         Blob blob = this.createBlob();
         if (attribute instanceof byte[])
@@ -463,7 +490,7 @@ public class DefaultDbConnection extends AbstractDbConnection
         return blob;
     }
 
-    protected Clob createClob(Object attribute) throws SQLException
+    private Clob createClob(Object attribute) throws SQLException
     {
         Clob clob = this.createClob();
         if (attribute instanceof String)
