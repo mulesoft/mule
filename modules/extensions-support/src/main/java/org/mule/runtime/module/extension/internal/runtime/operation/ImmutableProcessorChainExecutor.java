@@ -15,7 +15,6 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -125,18 +124,15 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
       final Function<Context, Context> innerChainCtxMapping =
           ((InternalEvent) event).getInternalParameter(INNER_CHAIN_CTX_MAPPING);
 
-      from(processWithChildContext(event, chain, ofNullable(chain.getLocation()), new BaseExceptionHandler() {
-
-        @Override
-        protected void onError(Exception error) {
-          if (error instanceof MessagingException) {
-            handleError(error, ((MessagingException) error).getEvent());
-          } else {
-            handleError(error, event);
-          }
-        }
-      }))
+      from(processWithChildContext(event, chain, ofNullable(chain.getLocation())))
           .doOnSuccess(this::handleSuccess)
+          .doOnError(error -> {
+            if (error instanceof MessagingException) {
+              this.handleError(error, ((MessagingException) error).getEvent());
+            } else {
+              this.handleError(error, event);
+            }
+          })
           .subscriberContext(innerChainCtxMapping != null ? innerChainCtxMapping : identity())
           .subscribe();
     }
