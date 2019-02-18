@@ -8,7 +8,6 @@
 package org.mule.module.ws.consumer;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -29,7 +28,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
-import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
@@ -52,8 +50,6 @@ import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.attachment.AttachmentImpl;
@@ -383,8 +379,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         try
         {
-            RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition, config.getWsdlLocator());
-            this.requestBody = requestBodyGenerator.generateRequestBody(bindingOperation);
+            this.requestBody = config.getRequestBody(wsdlDefinition, bindingOperation);
         }
         catch (WSDLException e)
         {
