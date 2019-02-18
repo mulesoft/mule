@@ -49,7 +49,12 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescriptor> implements Domain {
+
+  protected static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleDomain.class);
 
   private final DomainDescriptor descriptor;
   private final ServiceRepository serviceRepository;
@@ -119,7 +124,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   @Override
   public void install() {
     withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
+      if (LOGGER.isInfoEnabled()) {
         log(miniSplash(format("New domain '%s'", getArtifactName())));
       }
     });
@@ -154,7 +159,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
 
   public void doInit(boolean lazy, boolean disableXmlValidations) throws DeploymentInitException {
     withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
+      if (LOGGER.isInfoEnabled()) {
         log(miniSplash(format("Initializing domain '%s'", getArtifactName())));
       }
     });
@@ -186,7 +191,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
       artifactContext = artifactBuilder.build();
     } catch (Exception e) {
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
-      logger.error(e.getMessage(), getRootCause(e));
+      LOGGER.error(e.getMessage(), getRootCause(e));
       throw new DeploymentInitException(createStaticMessage(getRootCauseMessage(e)), e);
     }
   }
@@ -211,7 +216,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
         try {
           this.artifactContext.getMuleContext().start();
         } catch (MuleException e) {
-          logger.error(null, getRootCause(e));
+          LOGGER.error(null, getRootCause(e));
           throw new DeploymentStartException(createStaticMessage(getRootCauseMessage(e)), e);
         }
       }

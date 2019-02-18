@@ -68,7 +68,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DefaultMuleApplication extends AbstractDeployableArtifact<ApplicationDescriptor> implements Application {
+
+  protected static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleApplication.class);
 
   protected final ApplicationDescriptor descriptor;
   private final DomainRepository domainRepository;
@@ -169,9 +174,9 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
       if (e instanceof MuleException) {
-        logger.error(((MuleException) e).getDetailedMessage());
+        LOGGER.error(((MuleException) e).getDetailedMessage());
       } else {
-        logger.error(null, getRootCause(e));
+        LOGGER.error(null, getRootCause(e));
       }
 
       throw new DeploymentStartException(createStaticMessage(format("Error starting %s '%s'", artifactType,
@@ -219,7 +224,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       setStatusToFailed();
 
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
-      logger.error(e.getMessage(), getRootCause(e));
+      LOGGER.error(e.getMessage(), getRootCause(e));
       throw new DeploymentInitException(createStaticMessage(getRootCauseMessage(e)), e);
     }
   }
