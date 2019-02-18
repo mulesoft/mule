@@ -18,8 +18,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -58,6 +60,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   private final ClassLoader domainClassloader = mock(ClassLoader.class);
   private final ArtifactContext artifactContext = mock(ArtifactContext.class);
   private final MuleContext muleContext = mock(MuleContext.class);
+  private final LifecycleManager lifecycleManager = mock(LifecycleManager.class);
   private ClassLoader classloaderUsedInDispose;
   private Domain domain;
 
@@ -71,6 +74,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
     when(domainDescriptor.getDataFolderName()).thenReturn("dataFolderName");
     when(artifactContextBuilder.build()).thenReturn(artifactContext);
     when(artifactContext.getMuleContext()).thenReturn(muleContext);
+    when(muleContext.getLifecycleManager()).thenReturn(lifecycleManager);
+
+    when(lifecycleManager.isDirectTransition(Stoppable.PHASE_NAME)).thenReturn(true);
+
     domain.init();
     when(artifactClassLoader.getClassLoader()).thenReturn(domainClassloader);
   }

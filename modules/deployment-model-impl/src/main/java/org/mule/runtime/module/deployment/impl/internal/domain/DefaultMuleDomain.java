@@ -49,12 +49,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescriptor> implements Domain {
-
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final DomainDescriptor descriptor;
   private final ServiceRepository serviceRepository;

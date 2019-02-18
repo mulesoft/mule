@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDescriptor> implements DeployableArtifact<D> {
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   protected final String shortArtifactType;
   protected final String artifactType;
@@ -75,6 +76,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
     // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
     // classloader cleanup
+    ClassLoader originalClassLoader = currentThread().getContextClassLoader();
     try {
       ClassLoader artifactCL = null;
       if (getArtifactClassLoader() != null) {
@@ -82,7 +84,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       }
       // if not initialized yet, it can be null
       if (artifactCL != null) {
-        Thread.currentThread().setContextClassLoader(artifactCL);
+        currentThread().setContextClassLoader(artifactCL);
       }
 
       doDispose();
@@ -96,7 +98,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       }
     } finally {
       // kill any refs to the old classloader to avoid leaks
-      Thread.currentThread().setContextClassLoader(null);
+      currentThread().setContextClassLoader(originalClassLoader);
       deploymentClassLoader = null;
     }
   }

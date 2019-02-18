@@ -68,12 +68,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DefaultMuleApplication extends AbstractDeployableArtifact<ApplicationDescriptor> implements Application {
-
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
   protected final ApplicationDescriptor descriptor;
   private final DomainRepository domainRepository;
