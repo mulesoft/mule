@@ -46,15 +46,10 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
   public final void stop() {
     if (this.artifactContext == null
         || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
-      return;
-    }
-
-    if (this.artifactContext == null) {
       // domain never started, maybe due to a previous error
       if (logger.isInfoEnabled()) {
         logger.info(format("Stopping %s '%s' with no mule context", shortArtifactType, getArtifactName()));
       }
-
       return;
     }
 
