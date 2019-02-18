@@ -17,6 +17,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -43,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import reactor.core.publisher.Mono;
-
 
 public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
@@ -108,8 +108,29 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   }
 
   @Test
-  public void expressionErrorInResolutionResult() throws MuleException {
-    final ExpressionRuntimeException thrown = new ExpressionRuntimeException(createStaticMessage("Expected"));
+  public void muleRuntimeExceptionInResolutionResult() throws MuleException {
+    final Exception thrown = new ExpressionRuntimeException(createStaticMessage("Expected"));
+
+    when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
+
+    expected.expect(sameInstance(thrown));
+    Mono.from(processor.apply(Mono.just(testEvent()))).block();
+  }
+
+  @Test
+  public void muleExceptionInResolutionResult() throws MuleException {
+    final Exception thrown = new DefaultMuleException(createStaticMessage("Expected"));
+
+    when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
+
+    // the cause is wrapped in a reactor exception
+    expected.expectCause(sameInstance(thrown));
+    Mono.from(processor.apply(Mono.just(testEvent()))).block();
+  }
+
+  @Test
+  public void runtimeExceptionInResolutionResult() throws MuleException {
+    final Exception thrown = new NullPointerException("Expected");
 
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
 
