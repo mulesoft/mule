@@ -194,31 +194,22 @@ public class DefaultResourceReleaser implements ResourceReleaser {
    * Workaround for http://bugs.mysql.com/bug.php?id=65909
    */
   private void shutdownMySqlAbandonedConnectionCleanupThread() {
-
     try {
       Class<?> cleanupThreadsClass = findMySqlDriverClass();
-
       if (cleanupThreadsClass == null) {
         logger.warn("No AbandonedConnectionCleanupThread class found. Check if thread class is between "
             + CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES.toString());
         throw new ClassNotFoundException(CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES.get(0));
       }
-
       shutdownMySqlConnectionCleanupThreads(cleanupThreadsClass);
-
       try {
-
         // The cleanup threads are fired from a single-thread ThreadPoolExecutor, which is created inside a
         // lambda, which wraps the thread pool into a finalizable wrapper. This leads to retention in the
         // artifact classloaders when several redeployments are performed.
         cleanMySqlCleanupThreadsThreadFactory(cleanupThreadsClass);
-
       } catch (NoSuchFieldException e) {
         logger.warn("Error cleaning threadFactory from AbandonedConnectionCleanupThread executor service");
-        e.printStackTrace();
       }
-
-
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
@@ -238,10 +229,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     // In new mysql driver versions (at least 8), the executor service is wrapped inside a delegate class
     // (DelegatedExecutorService) that exposes only the ExecutorService interface. In order to clean the threadPoolExecutor
     // classloader reference, it has to be extracted manually though reflection from each delegate/wrapper class.
-
     // Hierarchy leading to real ThreadPoolExecutor is: AbandonedConnectionCleanupThread.cleanupThreadExecutorService ->
-    // class DelegatedExecutorService.e -> class ThreadPoolExecutor
-
+    // class DelegatedExecutorService.e -> class ThreadPoolExecutor.
     // Note that the field 'cleanupThreadExcecutorService' is mispelled. There's actually a typo in MySql driver code.
     Field cleanupExecutorServiceField = cleanupThreadsClass
         .getDeclaredField("cleanupThreadExcecutorService");
@@ -259,6 +248,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
 
   /**
    * Sends a shutdown message to MySql's connection cleanup thread class.
+   * 
    * @param classAbandonedConnectionCleanupThread
    * @throws IllegalAccessException
    * @throws InvocationTargetException
@@ -276,8 +266,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * Tries to find the MySql driver AbandonedConnectionCleanupThread class, with the known
-   * class addresses.
+   * Tries to find the MySql driver AbandonedConnectionCleanupThread class, with the known class addresses.
+   * 
    * @return The MySql driver AbandonedConnectionCleanupThread class object, if found.
    */
   private Class<?> findMySqlDriverClass() {
