@@ -7,6 +7,7 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -29,7 +30,6 @@ import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class WSConsumerTestCase extends AbstractMuleContextTestCase
@@ -109,8 +109,8 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
         wsConsumer2.initialise();
         wsConsumer3.initialise();
 
-        verify(spyConfig, times(1)).createRequestBody(Mockito.any(Definition.class), Mockito.any(BindingOperation.class));
-        verify(spyConfig, times(2)).getRequestBodyFromCache(Mockito.any(String.class));
+        verify(spyConfig, times(1)).createRequestBody(any(Definition.class), any(BindingOperation.class));
+        verify(spyConfig, times(2)).getRequestBodyFromCache(any(String.class));
     }
 
     @Test
@@ -120,12 +120,12 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
 
         WSConsumerConfig spyConfig = spy(new WSConsumerConfig());
 
-        /* create three consumers with an operation */
+        // create three consumers with an operation
         WSConsumer echoWSConsumer1 = createConsumer(spyConfig, echoOperation);
         WSConsumer echoWSConsumer2 = createConsumer(spyConfig, echoOperation);
         WSConsumer echoWSConsumer3 = createConsumer(spyConfig, echoOperation);
 
-        /* create more consumers with another operation */
+        // create more consumers with another operation
         WSConsumer withHeadersConsumer1 = createConsumer(spyConfig, echoWithHeadersOperation);
         WSConsumer withHeadersConsumer2 = createConsumer(spyConfig, echoWithHeadersOperation);
         WSConsumer withHeadersConsumer3 = createConsumer(spyConfig, echoWithHeadersOperation);
@@ -140,8 +140,8 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
         withHeadersConsumer3.initialise();
         withHeadersConsumer4.initialise();
 
-        verify(spyConfig, times(2)).createRequestBody(Mockito.any(Definition.class), Mockito.any(BindingOperation.class));
-        verify(spyConfig, times(5)).getRequestBodyFromCache(Mockito.any(String.class));
+        verify(spyConfig, times(2)).createRequestBody(any(Definition.class), any(BindingOperation.class));
+        verify(spyConfig, times(5)).getRequestBodyFromCache(any(String.class));
     }
 
     private WSConsumer createConsumer()
