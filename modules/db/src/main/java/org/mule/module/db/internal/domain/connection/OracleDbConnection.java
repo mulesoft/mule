@@ -38,7 +38,7 @@ public class OracleDbConnection extends DefaultDbConnection
 
     public static final String QUERY_TYPE_ATTRS = "SELECT ATTR_NO, ATTR_TYPE_NAME FROM ALL_TYPE_ATTRS WHERE TYPE_NAME = ? AND ATTR_TYPE_NAME IN ('CLOB', 'BLOB')";
 
-    public static final String QUERY_TYPE_OWNER_CONDITION = " AND OWNER = ?";
+    public static final String QUERY_OWNER_CONDITION = " AND OWNER = ?";
 
     private Method createArrayMethod;
     private boolean initialized;
@@ -136,7 +136,7 @@ public class OracleDbConnection extends DefaultDbConnection
         String owner = getOwnerFrom(typeName);
         String type = getTypeSimpleName(typeName);
 
-        String query = QUERY_TYPE_ATTRS + (owner != null ? QUERY_TYPE_OWNER_CONDITION : "");
+        String query = QUERY_TYPE_ATTRS + (owner != null ? QUERY_OWNER_CONDITION : "");
 
         try (PreparedStatement ps = this.prepareStatement(query))
         {

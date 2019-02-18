@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_NO_PARAM;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.ATTR_TYPE_NAME_PARAM;
 import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_TYPE_ATTRS;
-import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_TYPE_OWNER_CONDITION;
+import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_OWNER_CONDITION;
 import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getOwnerFrom;
 import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getTypeSimpleName;
 import static org.mule.module.db.internal.domain.transaction.TransactionalAction.ALWAYS_JOIN;
@@ -170,7 +170,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         }
         else
         {
-            when(delegate.prepareStatement(QUERY_TYPE_ATTRS + QUERY_TYPE_OWNER_CONDITION)).thenReturn(preparedStatement);
+            when(delegate.prepareStatement(QUERY_TYPE_ATTRS + QUERY_OWNER_CONDITION)).thenReturn(preparedStatement);
         }
 
         when(resultSet.next()).thenReturn(true).thenReturn(false);

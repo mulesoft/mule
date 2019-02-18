@@ -14,6 +14,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static org.mule.module.db.internal.domain.connection.OracleDbConnection.QUERY_OWNER_CONDITION;
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getOwnerFrom;
+import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getTypeSimpleName;
+
 /**
  * Type resolver for array entities
  *
@@ -66,9 +70,23 @@ public class CollectionTypeResolver implements TypeResolver
     {
         String dataType = null;
 
-        try (PreparedStatement ps = connection.prepareStatement(QUERY_ALL_COLL_TYPES))
+        String owner = getOwnerFrom(collectionTypeName);
+        String typeName = getTypeSimpleName(collectionTypeName);
+        String query = QUERY_ALL_COLL_TYPES;
+
+        if(owner != null)
         {
-            ps.setString(1, collectionTypeName);
+            query = query + QUERY_OWNER_CONDITION;
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(query))
+        {
+            ps.setString(1, typeName);
+
+            if(owner != null)
+            {
+                ps.setString(2, owner);
+            }
 
             try (ResultSet resultSet = ps.executeQuery())
             {
