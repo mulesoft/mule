@@ -189,8 +189,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               Map<String, Object> resolutionResult;
               try {
                 resolutionResult = getResolutionResult(eventWithContext, configuration);
-              } catch (Exception e) {
-                return Mono.error(new MessagingException(event, e, this));
+              } catch (MuleException e) {
+                return error(new MessagingException(event, e, this));
               }
 
               OperationExecutionFunction operationExecutionFunction;
