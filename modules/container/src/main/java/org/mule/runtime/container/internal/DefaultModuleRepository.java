@@ -48,7 +48,7 @@ public class DefaultModuleRepository implements ModuleRepository {
           modules = discoverModules();
 
           if (logger.isDebugEnabled()) {
-            logger.debug("Found {} modules: ", modules.size(), modules.stream().map(m -> m.getName()).collect(toList()));
+            logger.debug("Found {} modules: {}", modules.size(), modules.stream().map(m -> m.getName()).collect(toList()));
           }
         }
       }
