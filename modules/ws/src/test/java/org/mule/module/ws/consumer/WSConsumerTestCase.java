@@ -8,6 +8,8 @@ package org.mule.module.ws.consumer;
 
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 import org.mule.api.MuleException;
@@ -22,7 +24,12 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConnector;
 
+import javax.wsdl.BindingOperation;
+import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
+
 import org.junit.Test;
+import org.mockito.Mockito;
 
 @SmallTest
 public class WSConsumerTestCase extends AbstractMuleContextTestCase
@@ -88,10 +95,62 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
         verify((Disposable) endpointFactory.getCreatedEndpoint()).dispose();
     }
 
+    @Test
+    public void onlyTheFirstWSConsumerCreatesANewRequestBodyForTheSameOperation() throws InitialisationException, WSDLException {
+        String echoOperation = "echo";
+
+        WSConsumerConfig spyConfig = spy(new WSConsumerConfig());
+
+        WSConsumer wsConsumer1 = createConsumer(spyConfig, echoOperation);
+        WSConsumer wsConsumer2 = createConsumer(spyConfig, echoOperation);
+        WSConsumer wsConsumer3 = createConsumer(spyConfig, echoOperation);
+
+        wsConsumer1.initialise();
+        wsConsumer2.initialise();
+        wsConsumer3.initialise();
+
+        verify(spyConfig, times(1)).createRequestBody(Mockito.any(Definition.class), Mockito.any(BindingOperation.class));
+        verify(spyConfig, times(2)).getRequestBodyFromCache(Mockito.any(String.class));
+    }
+
+    @Test
+    public void onlyTheFirstWSConsumerCreatesANewRequestBodyPerOperation() throws InitialisationException, WSDLException {
+        String echoOperation = "echo";
+        String echoWithHeadersOperation = "echoWithHeaders";
+
+        WSConsumerConfig spyConfig = spy(new WSConsumerConfig());
+
+        /* create three consumers with an operation */
+        WSConsumer echoWSConsumer1 = createConsumer(spyConfig, echoOperation);
+        WSConsumer echoWSConsumer2 = createConsumer(spyConfig, echoOperation);
+        WSConsumer echoWSConsumer3 = createConsumer(spyConfig, echoOperation);
+
+        /* create more consumers with another operation */
+        WSConsumer withHeadersConsumer1 = createConsumer(spyConfig, echoWithHeadersOperation);
+        WSConsumer withHeadersConsumer2 = createConsumer(spyConfig, echoWithHeadersOperation);
+        WSConsumer withHeadersConsumer3 = createConsumer(spyConfig, echoWithHeadersOperation);
+        WSConsumer withHeadersConsumer4 = createConsumer(spyConfig, echoWithHeadersOperation);
+
+        echoWSConsumer1.initialise();
+        echoWSConsumer2.initialise();
+        echoWSConsumer3.initialise();
+
+        withHeadersConsumer1.initialise();
+        withHeadersConsumer2.initialise();
+        withHeadersConsumer3.initialise();
+        withHeadersConsumer4.initialise();
+
+        verify(spyConfig, times(2)).createRequestBody(Mockito.any(Definition.class), Mockito.any(BindingOperation.class));
+        verify(spyConfig, times(5)).getRequestBodyFromCache(Mockito.any(String.class));
+    }
+
     private WSConsumer createConsumer()
     {
-        WSConsumerConfig wsConsumerConfig = new WSConsumerConfig();
+        return createConsumer(new WSConsumerConfig(), "echo");
+    }
 
+    private WSConsumer createConsumer(WSConsumerConfig wsConsumerConfig, String operation)
+    {
         wsConsumerConfig.setWsdlLocation("Test.wsdl");
         wsConsumerConfig.setServiceAddress("http://localhost/test");
         wsConsumerConfig.setService("TestService");
@@ -99,7 +158,7 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
         wsConsumerConfig.setMuleContext(muleContext);
 
         WSConsumer wsConsumer = new WSConsumer();
-        wsConsumer.setOperation("echo");
+        wsConsumer.setOperation(operation);
         wsConsumer.setConfig(wsConsumerConfig);
         wsConsumer.setMuleContext(muleContext);
 

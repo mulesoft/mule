@@ -341,15 +341,25 @@ public class WSConsumerConfig implements MuleContextAware
             String operationName = bindingOperation.getName();
             if (operationToBodyCache.containsKey(operationName))
             {
-                body = operationToBodyCache.get(operationName);
+                body = getRequestBodyFromCache(operationName);
             }
             else
             {
-                RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition, getWsdlLocator());
-                body = requestBodyGenerator.generateRequestBody(bindingOperation);
+                body = createRequestBody(wsdlDefinition, bindingOperation);
                 operationToBodyCache.put(operationName, body);
             }
             return body;
         }
+    }
+
+    String createRequestBody(Definition wsdlDefinition, BindingOperation bindingOperation) throws WSDLException
+    {
+        RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition, getWsdlLocator());
+        return requestBodyGenerator.generateRequestBody(bindingOperation);
+    }
+
+    String getRequestBodyFromCache(String operationName)
+    {
+        return operationToBodyCache.get(operationName);
     }
 }
