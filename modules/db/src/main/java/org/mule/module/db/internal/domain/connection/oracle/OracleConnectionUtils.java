@@ -28,7 +28,7 @@ public class OracleConnectionUtils
     {
         if (typeName.indexOf(".") == -1)
         {
-            return null;
+            return typeName;
         }
         else
         {
