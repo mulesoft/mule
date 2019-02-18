@@ -1644,6 +1644,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     public boolean mustRecycleReceivers()
     {
-        return false;
+        return true;
     }
 }
