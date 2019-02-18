@@ -96,6 +96,15 @@
           "fieldName": "OBJECT_CURSOR_MANAGER",
           "elementKind": "field",
           "justification": "The constant value was colliding with another entry and it wasn't used anyway"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_STREAMING_GHOST_BUSTER",
+          "elementKind": "field",
+          "justification": "Needed to avoid leak on foreach"
         }
       ]
     }
