@@ -6,16 +6,22 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getHouseMetadata;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 
-public class TestInputResolver implements InputTypeResolver<String> {
+public class TestMetadataInputHouseResolver implements InputTypeResolver<String> {
 
-  public static String INPUT_RESOLVER_NAME = MetadataComponent.INPUT.name();
+  public static String TEST_INPUT_HOUSE_RESOLVER = "testInputHouseResolver";
+
+  @Override
+  public String getResolverName() {
+    return TEST_INPUT_HOUSE_RESOLVER;
+  }
 
   @Override
   public String getCategoryName() {
@@ -25,6 +31,6 @@ public class TestInputResolver implements InputTypeResolver<String> {
   @Override
   public MetadataType getInputMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
-    return TestMetadataResolverUtils.getMetadata(key);
+    return getHouseMetadata();
   }
 }

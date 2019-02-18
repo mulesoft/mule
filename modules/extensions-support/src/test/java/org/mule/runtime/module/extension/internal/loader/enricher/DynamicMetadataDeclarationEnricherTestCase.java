@@ -23,8 +23,12 @@ import static org.mule.runtime.module.extension.internal.loader.enricher.Enriche
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestInputResolver.INPUT_RESOLVER_NAME;
 import static org.mule.test.metadata.extension.resolver.TestInputResolverWithKeyResolver.TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputResolverWithoutKeyResolver.TEST_INPUT_RESOLVER_WITHOUT_KEY_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestMetadataInputCarResolver.TEST_INPUT_CAR_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestMetadataInputHouseResolver.TEST_INPUT_HOUSE_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestMetadataInputPersonResolver.TEST_INPUT_PERSON_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.TEST_MULTI_LEVEL_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver.METADATA_EXTENSION_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver.TEST_OUTPUT_ANY_TYPE_RESOLVER;
@@ -35,12 +39,13 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.ResolverInformation;
@@ -161,6 +166,22 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   }
 
   @Test
+  public void declareDynamicInputTypesInSource() {
+
+    List<SourceDeclaration> messageSources = declaration.getConfigurations().get(0).getMessageSources();
+    SourceDeclaration sourceDeclaration = getDeclaration(messageSources, "MetadataSourceWithCallbackParameters");
+
+    SourceCallbackDeclaration successSourceCallback = sourceDeclaration.getSuccessCallback().get();
+    assertParamResolverInfo(successSourceCallback, "response", of(TEST_INPUT_PERSON_RESOLVER));
+    assertParamResolverInfo(successSourceCallback, "successObject", of(TEST_INPUT_CAR_RESOLVER));
+
+    SourceCallbackDeclaration errorSourceCallback = sourceDeclaration.getErrorCallback().get();
+
+    assertParamResolverInfo(errorSourceCallback, "response", of(TEST_INPUT_HOUSE_RESOLVER));
+    assertParamResolverInfo(errorSourceCallback, "errorObject", of(INPUT_RESOLVER_NAME));
+  }
+
+  @Test
   public void declaresTypeResolverInformationForDynamicResolver() throws Exception {
     List<OperationDeclaration> operations = declaration.getConfigurations().get(0).getOperations();
 
@@ -254,29 +275,29 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     assertThat(output.hasDynamicType(), is(isDynamic));
   }
 
-  private void assertParamResolverInfo(ComponentDeclaration declaration, String param, Optional<String> expectedName) {
+  private void assertParamResolverInfo(BaseDeclaration declaration, String param, Optional<String> expectedName) {
     assertResolverInfo(declaration, info -> info.getParameterResolver(param), "ParameterResolver", expectedName);
   }
 
-  private void assertOutputResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
+  private void assertOutputResolverInfo(BaseDeclaration declaration, Optional<String> expectedName) {
     assertResolverInfo(declaration, info -> info.getOutputResolver(), "OutputResolver", expectedName);
   }
 
-  private void assertAttributesResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
+  private void assertAttributesResolverInfo(BaseDeclaration declaration, Optional<String> expectedName) {
     assertResolverInfo(declaration, info -> info.getAttributesResolver(), "AttributesResolver", expectedName);
   }
 
-  private void assertKeysResolverInfo(ComponentDeclaration declaration, Optional<String> expectedName) {
+  private void assertKeysResolverInfo(BaseDeclaration declaration, Optional<String> expectedName) {
     assertResolverInfo(declaration, info -> info.getKeysResolver(), "KeysResolver", expectedName);
   }
 
-  private void assertCategoryInfo(ComponentDeclaration declaration, String expectedName) {
+  private void assertCategoryInfo(BaseDeclaration declaration, String expectedName) {
     TypeResolversInformationModelProperty info = getResolversInfo(declaration);
     assertThat("Name miss match for the resolvers category: ",
                info.getCategoryName(), is(equalTo(expectedName)));
   }
 
-  private TypeResolversInformationModelProperty getResolversInfo(ComponentDeclaration declaration) {
+  private TypeResolversInformationModelProperty getResolversInfo(BaseDeclaration declaration) {
     Optional<TypeResolversInformationModelProperty> info = declaration
         .getModelProperty(TypeResolversInformationModelProperty.class);
 
@@ -287,7 +308,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     return info.get();
   }
 
-  private void assertResolverInfo(ComponentDeclaration declaration,
+  private void assertResolverInfo(BaseDeclaration declaration,
                                   Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> resolverSupplier,
                                   String kind, Optional<String> expectedName) {
     TypeResolversInformationModelProperty info = getResolversInfo(declaration);

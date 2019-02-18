@@ -19,7 +19,9 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -44,8 +46,8 @@ import java.util.Optional;
  */
 class MetadataInputDelegate extends BaseMetadataDelegate {
 
-  MetadataInputDelegate(ComponentModel componentModel) {
-    super(componentModel);
+  MetadataInputDelegate(EnrichableModel model) {
+    super(model);
   }
 
   /**
@@ -58,7 +60,14 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   MetadataResult<InputMetadataDescriptor> getInputMetadataDescriptors(MetadataContext context, Object key) {
     InputMetadataDescriptor.InputMetadataDescriptorBuilder input = InputMetadataDescriptor.builder();
     List<MetadataResult<ParameterMetadataDescriptor>> results = new LinkedList<>();
-    for (ParameterModel parameter : component.getAllParameterModels()) {
+    if (!(model instanceof ParameterizedModel)) {
+      return failure(MetadataFailure.Builder.newFailure()
+          .withMessage("The given component has not parameter definitions to be described").onComponent());
+    }
+    for (ParameterModel parameter : ((ParameterizedModel) model).getParameterGroupModels()
+        .stream()
+        .flatMap(parameterGroupModel -> parameterGroupModel.getParameterModels().stream())
+        .collect(toList())) {
       MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
       input.withParameter(parameter.getName(), result.get());
       results.add(result);

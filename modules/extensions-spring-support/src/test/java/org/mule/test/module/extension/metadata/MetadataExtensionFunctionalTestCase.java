@@ -20,12 +20,15 @@ import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
-import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getMetadata;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getCarMetadata;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getHouseMetadata;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getPersonMetadata;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.DSL_RESOLUTION;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -58,7 +61,6 @@ import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 
@@ -97,6 +99,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
   protected static final String SOURCE_METADATA = "sourceMetadata";
   protected static final String SOURCE_METADATA_WITH_MULTILEVEL = "sourceMetadataWithMultilevel";
+  protected static final String SOURCE_METADATA_WITH_CALLBACK_PARAMETERS = "sourceMetadataWithCallbackParameters";
   protected static final String SHOULD_INHERIT_EXTENSION_RESOLVERS = "shouldInheritExtensionResolvers";
   protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
   protected static final String SIMPLE_MULTILEVEL_KEY_RESOLVER = "simpleMultiLevelKeyResolver";
@@ -119,6 +122,10 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String CONTINENT = "continent";
   protected static final String COUNTRY = "country";
   protected static final String CITY = "city";
+
+  protected static final String SUCCESS_OBJECT_PARAMETER_NAME = "successObject";
+  protected static final String ERROR_OBJECT_PARAMETER_NAME = "errorObject";
+  protected static final String RESPONSE_PARAMETER_NAME = "response";
 
   protected final static MetadataKey PERSON_METADATA_KEY = newKey(PERSON).build();
   protected static final MetadataKey CAR_KEY = newKey(CAR).build();
@@ -144,6 +151,9 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   }
 
   protected MetadataType personType;
+  protected MetadataType houseType;
+  protected MetadataType carType;
+
   protected Location location;
   protected CoreEvent event;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -167,7 +177,9 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   @Before
   public void setup() throws Exception {
     event = CoreEvent.builder(testEvent()).message(of("")).build();
-    personType = getMetadata(PERSON_METADATA_KEY.getId());
+    personType = getPersonMetadata();
+    houseType = getHouseMetadata();
+    carType = getCarMetadata();
   }
 
   @Override
