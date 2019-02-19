@@ -26,8 +26,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * MySql's resource cleaner test.
- * The mysql-driver-v5/8.jar files where created to mock the cleanup thread package in both versions.
+ * MySql's resource cleaner test. The mysql-driver-v5/8.jar files where created to mock the cleanup thread package in both
+ * versions.
  */
 @RunWith(Parameterized.class)
 public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
@@ -73,9 +73,9 @@ public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
 
   @Parameterized.Parameters(name = "Testing classname {0}")
   public static Object[][] data() throws NoSuchFieldException, IllegalAccessException {
-    return new Object[][]{
-            {"com.mysql.jdbc.AbandonedConnectionCleanupThread", "mysql/mysql-driver-v5.jar"},
-            {"com.mysql.cj.jdbc.AbandonedConnectionCleanupThread", "mysql/mysql-driver-v8.jar"}
+    return new Object[][] {
+        {"com.mysql.jdbc.AbandonedConnectionCleanupThread", "mysql/mysql-driver-v5.jar"},
+        {"com.mysql.cj.jdbc.AbandonedConnectionCleanupThread", "mysql/mysql-driver-v8.jar"}
     };
   }
 
@@ -83,8 +83,8 @@ public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
   public void testMySqlDriverCleanupThreadClassIsFound() throws ClassNotFoundException {
     MuleArtifactClassLoader artifactClassLoader =
         (new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                    new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
-                                    Thread.currentThread().getContextClassLoader(), testLookupPolicy));
+                                     new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
+                                     Thread.currentThread().getContextClassLoader(), testLookupPolicy));
 
     artifactClassLoader.setResourceReleaserClassLocation(MYSQL_RESOURCE_RELEASER_CLASS_LOCATION);
     artifactClassLoader.dispose();
