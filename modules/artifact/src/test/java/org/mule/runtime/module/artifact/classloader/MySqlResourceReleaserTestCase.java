@@ -8,10 +8,7 @@ package org.mule.runtime.module.artifact.classloader;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -27,7 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.stubbing.Answer;
 
 @RunWith(Parameterized.class)
 public class MySqlResourceReleaserTestCase extends AbstractMuleTestCase {
@@ -75,24 +71,16 @@ public class MySqlResourceReleaserTestCase extends AbstractMuleTestCase {
   public static Object[][] data() throws NoSuchFieldException, IllegalAccessException {
     return new Object[][]{
             {"com.mysql.jdbc.AbandonedConnectionCleanupThread", "mysql/mysql-driver-v5.jar"},
-            {"com.mysql.cj.jdbc.AbandonedConnectionCleanupThread", "mysql/mysql-driver-v5.jar"}
+            {"com.mysql.cj.jdbc.AbandonedConnectionCleanupThread", "mysql/mysql-driver-v8.jar"}
     };
   }
 
   @Test
   public void testMySqlDriverCleanupThreadClassIsFound() throws ClassNotFoundException {
     MuleArtifactClassLoader artifactClassLoader =
-        spy(new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
+        (new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
                                     new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
                                     Thread.currentThread().getContextClassLoader(), testLookupPolicy));
-    doAnswer((Answer) invocationOnMock -> {
-      String classBeingLoaded = invocationOnMock.getArgument(0);
-        if (classBeingLoaded.equals(classnameBeingTested) || classBeingLoaded.equals(MYSQL_RESOURCE_RELEASER_CLASS_LOCATION)) {
-            return invocationOnMock.callRealMethod();
-        } else {
-          return null;
-        }
-    }).when(artifactClassLoader).loadClass(anyString());
 
     artifactClassLoader.setResourceReleaserClassLocation(MYSQL_RESOURCE_RELEASER_CLASS_LOCATION);
     artifactClassLoader.dispose();
