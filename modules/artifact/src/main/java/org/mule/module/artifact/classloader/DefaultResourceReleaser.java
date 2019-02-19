@@ -18,10 +18,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -40,6 +44,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
+      Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
 
   @Override
   public void release() {
@@ -204,18 +210,13 @@ public class DefaultResourceReleaser implements ResourceReleaser {
    * Workaround for http://bugs.mysql.com/bug.php?id=65909
    */
   private void shutdownMySqlAbandonedConnectionCleanupThread() {
-
-    Class<?> classAbandonedConnectionCleanupThread;
     try {
-      classAbandonedConnectionCleanupThread =
-          this.getClass().getClassLoader().loadClass("com.mysql.jdbc.AbandonedConnectionCleanupThread");
-      try {
-        Method uncheckedShutdown = classAbandonedConnectionCleanupThread.getMethod("uncheckedShutdown");
-        uncheckedShutdown.invoke(null);
-      } catch (NoSuchMethodException e) {
-        Method checkedShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
-        checkedShutdown.invoke(null);
-      }
+      Class<?> cleanupThreadsClass = findMySqlDriverClass();
+      shutdownMySqlConnectionCleanupThreads(cleanupThreadsClass);
+      // The cleanup threads are fired from a single-thread ThreadPoolExecutor, which is created inside a
+      // lambda, which wraps the thread pool into a finalizable wrapper. This leads to retention in the
+      // artifact classloaders when several redeployments are performed.
+      cleanMySqlCleanupThreadsThreadFactory(cleanupThreadsClass);
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
@@ -223,7 +224,75 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   *  Shutdowns the AWS IdleConnectionReaper Thread if one is present, since it will cause a leak if not closed correctly.
+   * Cleans a reference existing from the cleanupThread's class to a lambda-created-threadPoolExecutor, which retains a reference
+   * to the DB connector artifact classLoader.
+   * 
+   * @param cleanupThreadsClass The AbandonedConnectionCleanupThread class object
+   */
+  private void cleanMySqlCleanupThreadsThreadFactory(Class<?> cleanupThreadsClass) {
+    // In new mysql driver versions (at least 8), the executor service is wrapped inside a delegate class
+    // (DelegatedExecutorService) that exposes only the ExecutorService interface. In order to clean the threadPoolExecutor
+    // classloader reference, it has to be extracted manually though reflection from each delegate/wrapper class.
+    // Hierarchy leading to real ThreadPoolExecutor is: AbandonedConnectionCleanupThread.cleanupThreadExecutorService ->
+    // class DelegatedExecutorService.e -> class ThreadPoolExecutor.
+    // Note that the field 'cleanupThreadExcecutorService' is mispelled. There's actually a typo in MySql driver code.
+    try {
+      Field cleanupExecutorServiceField = cleanupThreadsClass
+          .getDeclaredField("cleanupThreadExcecutorService");
+      cleanupExecutorServiceField.setAccessible(true);
+      ExecutorService delegateCleanupExecutorService =
+          (ExecutorService) cleanupExecutorServiceField.get(cleanupThreadsClass);
+
+      Field realExecutorServiceField = delegateCleanupExecutorService.getClass().getSuperclass().getDeclaredField("e");
+      realExecutorServiceField.setAccessible(true);
+      ThreadPoolExecutor realExecutorService =
+          (ThreadPoolExecutor) realExecutorServiceField.get(delegateCleanupExecutorService);
+
+      // Set cleanup thread executor service thread factory to one whose classloader is the system one
+      realExecutorService.setThreadFactory(Executors.defaultThreadFactory());
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      logger.warn("Error cleaning threadFactory from AbandonedConnectionCleanupThread executor service", e);
+    }
+  }
+
+  /**
+   * Sends a shutdown message to MySql's connection cleanup thread class.
+   * 
+   * @param classAbandonedConnectionCleanupThread
+   * @throws IllegalAccessException
+   * @throws InvocationTargetException
+   * @throws NoSuchMethodException
+   */
+  private void shutdownMySqlConnectionCleanupThreads(Class<?> classAbandonedConnectionCleanupThread)
+      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    try {
+      Method uncheckedShutdown = classAbandonedConnectionCleanupThread.getMethod("uncheckedShutdown");
+      uncheckedShutdown.invoke(null);
+    } catch (NoSuchMethodException e) {
+      Method checkedShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
+      checkedShutdown.invoke(null);
+    }
+  }
+
+  /**
+   * Tries to find the MySql driver AbandonedConnectionCleanupThread class, with the known class addresses.
+   * 
+   * @return The MySql driver AbandonedConnectionCleanupThread class object, if found.
+   */
+  private Class<?> findMySqlDriverClass() throws ClassNotFoundException {
+    Class<?> foundClass = null;
+    for (String knownCleanupThreadClassAddress : CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES) {
+      try {
+        return this.getClass().getClassLoader().loadClass(knownCleanupThreadClassAddress);
+      } catch (ClassNotFoundException e) {
+        logger.warn("No AbandonedConnectionCleanupThread registered with class address " + knownCleanupThreadClassAddress);
+      }
+    }
+    throw new ClassNotFoundException("No MySql's AbandonedConnectionCleanupThread class was found");
+  }
+
+  /**
+   * Shutdowns the AWS IdleConnectionReaper Thread if one is present, since it will cause a leak if not closed correctly.
    */
   private void shutdownAwsIdleConnectionReaperThread() {
 
