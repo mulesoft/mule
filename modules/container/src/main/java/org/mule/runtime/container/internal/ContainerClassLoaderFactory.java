@@ -26,8 +26,6 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,6 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Creates the classLoader for the Mule container.
@@ -87,7 +87,8 @@ public class ContainerClassLoaderFactory {
    */
   public static final Set<String> BOOT_PACKAGES =
       ImmutableSet.of(// MULE-10194 Mechanism to add custom boot packages to be exported by the container
-                      "com.yourkit");
+                      "com.yourkit",
+                      "javax.activation");
 
   private final ModuleRepository moduleRepository;
 
