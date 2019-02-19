@@ -25,8 +25,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+/**
+ * MySql's resource cleaner test.
+ * The mysql-driver-v5/8.jar files where created to mock the cleanup thread package in both versions.
+ */
 @RunWith(Parameterized.class)
-public class MySqlResourceReleaserTestCase extends AbstractMuleTestCase {
+public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
 
   private static final String MYSQL_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/runtime/module/artifact/classloader/MySqlTestResourceReleaser.class";
@@ -39,7 +43,7 @@ public class MySqlResourceReleaserTestCase extends AbstractMuleTestCase {
   private ClassLoaderLookupPolicy testLookupPolicy;
 
   // Parameterized
-  public MySqlResourceReleaserTestCase(String cleanupThreadClassname, String jarName) {
+  public MySqlDriverLookupTestCase(String cleanupThreadClassname, String jarName) {
     classnameBeingTested = cleanupThreadClassname;
     mySqlDriverJarname = jarName;
 

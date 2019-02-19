@@ -22,7 +22,7 @@ public class MySqlTestResourceReleaser extends DefaultResourceReleaser {
       findMySqlDriverClassMethod.setAccessible(true);
       Class<?> foundClass = (Class<?>) findMySqlDriverClassMethod.invoke(this);
 
-      MySqlResourceReleaserTestCase.foundClassname = foundClass.getCanonicalName();
+      MySqlDriverLookupTestCase.foundClassname = foundClass.getCanonicalName();
     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
       e.printStackTrace();
     }
