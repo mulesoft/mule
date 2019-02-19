@@ -94,6 +94,8 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -181,59 +183,61 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
+        .flatMap(event -> subscriberContext()
+            .map(ctx -> addContextToEvent(event, ctx)))
         .flatMap(checkedFunction(event -> {
           final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
           final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
-          final PrecalculatedExecutionContextAdapter<T> precalculatedEvent = getPrecalculatedContext(event);
+          final PrecalculatedExecutionContextAdapter<T> precalculatedContext = getPrecalculatedContext(event);
+          final Scheduler currentScheduler = ((InternalEvent) event).getInternalParameter(PROCESSOR_SCHEDULER_CONTEXT_KEY);
 
-          return subscriberContext()
-              .flatMap(ctx -> {
-                final CoreEvent eventWithContext = addContextToEvent(event, ctx);
+          OperationExecutionFunction operationExecutionFunction;
 
-                OperationExecutionFunction operationExecutionFunction;
-                final Scheduler currentScheduler =
-                    ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
+          if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
+              && precalculatedContext != null) {
+            ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
-                if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) eventWithContext)
-                    && precalculatedEvent != null) {
-                  ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(eventWithContext);
+            operationExecutionFunction = (parameters, operationEvent) -> {
+              operationContext.setCurrentScheduler(currentScheduler != null ? currentScheduler : IMMEDIATE_SCHEDULER);
+              return doProcessWithErrorMapping(operationEvent, operationContext);
+            };
+          } else {
+            operationExecutionFunction = (parameters, operationEvent) -> {
+              ExecutionContextAdapter<T> operationContext;
+              try {
+                operationContext = createExecutionContext(configuration, parameters, operationEvent,
+                                                          currentScheduler != null ? currentScheduler : IMMEDIATE_SCHEDULER);
+              } catch (MuleException e) {
+                return error(e);
+              }
+              return doProcessWithErrorMapping(operationEvent, operationContext);
+            };
+          }
 
-                  operationExecutionFunction = (parameters, operationEvent) -> {
-                    operationContext.setCurrentScheduler(currentScheduler);
-                    return doProcessWithErrorMapping(operationEvent, operationContext);
-                  };
-                } else {
-                  operationExecutionFunction = (parameters, operationEvent) -> {
-                    ExecutionContextAdapter<T> operationContext;
-                    try {
-                      operationContext = createExecutionContext(configuration, parameters, operationEvent, currentScheduler);
-                    } catch (MuleException e) {
-                      return error(e);
-                    }
-                    return doProcessWithErrorMapping(operationEvent, operationContext);
-                  };
-                }
-
-                if (getLocation() != null) {
-                  ((DefaultFlowCallStack) eventWithContext.getFlowCallStack())
-                      .setCurrentProcessorPath(resolvedProcessorRepresentation);
-                  return Mono.from(policyManager
-                      .createOperationPolicy(this, eventWithContext, () -> resolutionResult)
-                      .process(eventWithContext, operationExecutionFunction, () -> resolutionResult, getLocation()));
-                } else {
-                  // If this operation has no component location then it is internal. Don't apply policies on internal operations.
-                  return Mono.from(operationExecutionFunction.execute(resolutionResult, eventWithContext));
-                }
-              });
+          if (getLocation() != null) {
+            ((DefaultFlowCallStack) event.getFlowCallStack())
+                .setCurrentProcessorPath(resolvedProcessorRepresentation);
+            return Mono.from(policyManager
+                .createOperationPolicy(this, event, () -> resolutionResult)
+                .process(event, operationExecutionFunction, () -> resolutionResult, getLocation()));
+          } else {
+            // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+            return Mono.from(operationExecutionFunction.execute(resolutionResult, event));
+          }
         }));
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
+    final Optional<Scheduler> currentScheduler = ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY);
+
     if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
-      return quickCopy(event, singletonMap(INNER_CHAIN_CTX_MAPPING,
-                                           (Function<Context, Context>) (innerChainCtx -> innerChainCtx
-                                               .put(POLICY_NEXT_OPERATION,
-                                                    ctx.get(POLICY_NEXT_OPERATION)))));
+      return quickCopy(event, ImmutableMap.<String, Object>builder()
+          .put(INNER_CHAIN_CTX_MAPPING, (Function<Context, Context>) (innerChainCtx -> innerChainCtx.put(POLICY_NEXT_OPERATION,
+                                                                                                         ctx.get(POLICY_NEXT_OPERATION))))
+          .put(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER))
+          .build());
+    } else if (currentScheduler.isPresent()) {
+      return quickCopy(event, singletonMap(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.get()));
     } else {
       return event;
     }
