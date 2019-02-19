@@ -26,7 +26,7 @@ public class CursorProviderJanitor {
 
   private static final Logger LOGGER = getLogger(CursorProviderJanitor.class);
 
-  private final CursorProvider provider;
+  CursorProvider provider;
   private final Set<Cursor> cursors;
   private final MutableStreamingStatistics statistics;
   private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -76,6 +76,8 @@ public class CursorProviderJanitor {
       cursors.forEach(this::releaseCursor);
     } finally {
       provider.releaseResources();
+      cursors.clear();
+      provider = null;
     }
   }
 
