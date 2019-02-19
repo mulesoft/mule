@@ -181,54 +181,51 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .flatMap(checkedFunction(event -> subscriberContext()
-            .flatMap(ctx -> {
-              final CoreEvent eventWithContext = addContextToEvent(event, ctx);
+        .flatMap(checkedFunction(event -> {
+          final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
+          final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+          final PrecalculatedExecutionContextAdapter<T> precalculatedEvent = getPrecalculatedContext(event);
 
-              final Optional<ConfigurationInstance> configuration = resolveConfiguration(eventWithContext);
-              Map<String, Object> resolutionResult;
-              try {
-                resolutionResult = getResolutionResult(eventWithContext, configuration);
-              } catch (Exception e) {
-                return Mono.error(new MessagingException(event, e, this));
-              }
+          return subscriberContext()
+              .flatMap(ctx -> {
+                final CoreEvent eventWithContext = addContextToEvent(event, ctx);
 
-              OperationExecutionFunction operationExecutionFunction;
-              final Scheduler currentScheduler =
-                  ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
+                OperationExecutionFunction operationExecutionFunction;
+                final Scheduler currentScheduler =
+                    ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
 
-              final PrecalculatedExecutionContextAdapter<T> precalculatedEvent = getPrecalculatedContext(eventWithContext);
-              if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) eventWithContext)
-                  && precalculatedEvent != null) {
-                ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(eventWithContext);
+                if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) eventWithContext)
+                    && precalculatedEvent != null) {
+                  ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(eventWithContext);
 
-                operationExecutionFunction = (parameters, operationEvent) -> {
-                  operationContext.setCurrentScheduler(currentScheduler);
-                  return doProcessWithErrorMapping(operationEvent, operationContext);
-                };
-              } else {
-                operationExecutionFunction = (parameters, operationEvent) -> {
-                  ExecutionContextAdapter<T> operationContext;
-                  try {
-                    operationContext = createExecutionContext(configuration, parameters, operationEvent, currentScheduler);
-                  } catch (MuleException e) {
-                    return error(e);
-                  }
-                  return doProcessWithErrorMapping(operationEvent, operationContext);
-                };
-              }
+                  operationExecutionFunction = (parameters, operationEvent) -> {
+                    operationContext.setCurrentScheduler(currentScheduler);
+                    return doProcessWithErrorMapping(operationEvent, operationContext);
+                  };
+                } else {
+                  operationExecutionFunction = (parameters, operationEvent) -> {
+                    ExecutionContextAdapter<T> operationContext;
+                    try {
+                      operationContext = createExecutionContext(configuration, parameters, operationEvent, currentScheduler);
+                    } catch (MuleException e) {
+                      return error(e);
+                    }
+                    return doProcessWithErrorMapping(operationEvent, operationContext);
+                  };
+                }
 
-              if (getLocation() != null) {
-                ((DefaultFlowCallStack) eventWithContext.getFlowCallStack())
-                    .setCurrentProcessorPath(resolvedProcessorRepresentation);
-                return Mono.from(policyManager
-                    .createOperationPolicy(this, eventWithContext, () -> resolutionResult)
-                    .process(eventWithContext, operationExecutionFunction, () -> resolutionResult, getLocation()));
-              } else {
-                // If this operation has no component location then it is internal. Don't apply policies on internal operations.
-                return Mono.from(operationExecutionFunction.execute(resolutionResult, eventWithContext));
-              }
-            })));
+                if (getLocation() != null) {
+                  ((DefaultFlowCallStack) eventWithContext.getFlowCallStack())
+                      .setCurrentProcessorPath(resolvedProcessorRepresentation);
+                  return Mono.from(policyManager
+                      .createOperationPolicy(this, eventWithContext, () -> resolutionResult)
+                      .process(eventWithContext, operationExecutionFunction, () -> resolutionResult, getLocation()));
+                } else {
+                  // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+                  return Mono.from(operationExecutionFunction.execute(resolutionResult, eventWithContext));
+                }
+              });
+        }));
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {

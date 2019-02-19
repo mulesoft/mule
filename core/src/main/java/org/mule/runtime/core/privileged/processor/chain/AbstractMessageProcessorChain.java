@@ -40,7 +40,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -166,7 +165,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    */
   private BiFunction<Throwable, Object, Throwable> getLocalOperatorErrorHook(Processor processor) {
     return (throwable, event) -> {
-      throwable = Exceptions.unwrap(throwable);
+      throwable = unwrap(throwable);
       if (event instanceof CoreEvent) {
         if (throwable instanceof MessagingException) {
           return resolveMessagingException(processor).apply((MessagingException) throwable);
