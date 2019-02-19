@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
@@ -37,7 +38,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
@@ -158,7 +158,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    */
   private BiFunction<Throwable, Object, Throwable> getLocalOperatorErrorHook(Processor processor) {
     return (throwable, event) -> {
-      throwable = Exceptions.unwrap(throwable);
+      throwable = unwrap(throwable);
       if (event instanceof CoreEvent) {
         if (throwable instanceof MessagingException) {
           return resolveMessagingException(processor).apply((MessagingException) throwable);
@@ -177,7 +177,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    */
   private BiConsumer<Throwable, CoreEvent> getContinueStrategyErrorHandler(Processor processor) {
     return (throwable, event) -> {
-      throwable = Exceptions.unwrap(throwable);
+      throwable = unwrap(throwable);
       if (throwable instanceof MessagingException) {
         // Give priority to failed event from reactor over MessagingException event.
         BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()

@@ -181,22 +181,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .flatMap(checkedFunction(event -> {
+          final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
+          final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+          final PrecalculatedExecutionContextAdapter<T> precalculatedEvent = getPrecalculatedContext(event);
+
           return subscriberContext().flatMap(ctx -> {
             final CoreEvent eventWithContext = addContextToEvent(event, ctx);
-
-            Optional<ConfigurationInstance> configuration = resolveConfiguration(eventWithContext);
-            Map<String, Object> resolutionResult;
-            try {
-              resolutionResult = getResolutionResult(eventWithContext, configuration);
-            } catch (Exception e) {
-              return Mono.error(new MessagingException(event, e, this));
-            }
 
             OperationExecutionFunction operationExecutionFunction;
             final Scheduler currentScheduler =
                 ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
 
-            final PrecalculatedExecutionContextAdapter<T> precalculatedEvent = getPrecalculatedContext(eventWithContext);
             if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) eventWithContext)
                 && precalculatedEvent != null) {
               ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(eventWithContext);
