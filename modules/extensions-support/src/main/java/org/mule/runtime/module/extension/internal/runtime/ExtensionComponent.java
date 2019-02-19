@@ -130,7 +130,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   protected ConnectionManagerAdapter connectionManager;
 
-  @Inject
   protected StreamingManager streamingManager;
 
   @Inject
@@ -145,7 +144,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   protected ReflectionCache reflectionCache;
 
-  @Inject
   private MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
 
   protected MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
@@ -549,5 +547,15 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public List<ValueProviderModel> getModels(String providerName) {
     return getValueProviderModels(componentModel.getAllParameterModels());
+  }
+
+  @Inject
+  public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory) {
+    this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
+  }
+
+  @Inject
+  public void setStreamingManager(StreamingManager streamingManager) {
+    this.streamingManager = streamingManager;
   }
 }
