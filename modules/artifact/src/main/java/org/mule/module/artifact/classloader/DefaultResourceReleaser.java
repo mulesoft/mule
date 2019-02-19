@@ -263,8 +263,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
    * 
    * @return The MySql driver AbandonedConnectionCleanupThread class object, if found.
    */
-  private Class<?> findMySqlDriverClass() throws ClassNotFoundException
-  {
+  private Class<?> findMySqlDriverClass() throws ClassNotFoundException {
     Class<?> foundClass = null;
     for (String knownCleanupThreadClassAddress : CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES) {
       try {
