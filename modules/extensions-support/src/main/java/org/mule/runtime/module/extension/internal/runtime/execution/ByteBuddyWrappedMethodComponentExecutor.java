@@ -37,6 +37,8 @@ import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -51,10 +53,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.dynamic.DynamicType.Builder.MethodDefinition.ParameterDefinition.Annotatable;
@@ -70,7 +69,6 @@ import net.bytebuddy.implementation.bytecode.member.FieldAccess;
 import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
-import net.bytebuddy.jar.asm.MethodVisitor;
 
 /**
  * Executes a task associated to a {@link ExecutionContext} by invoking a given {@link Method} from a dynamically generated class.
@@ -170,44 +168,38 @@ public class ByteBuddyWrappedMethodComponentExecutor<M extends ComponentModel>
 
       @Override
       public ByteCodeAppender appender(Target implementationTarget) {
-        return new ByteCodeAppender() {
+        return (methodVisitor, instrumentationContext, instrumentedMethod) -> {
+      List<StackManipulation> stackManipulationItems = new ArrayList<>();
 
-          @Override
-          public Size apply(MethodVisitor methodVisitor,
-                            Context instrumentationContext,
-                            MethodDescription instrumentedMethod) {
-            List<StackManipulation> stackManipulationItems = new ArrayList<>();
+      stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
+      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Object.class)
+        .getDeclaredMethods()
+        .filter(isConstructor().and(takesArguments(0)))
+        .getOnly()));
+      stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
+      stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
+      stackManipulationItems.add(FieldAccess.forField(implementationTarget
+        .getInstrumentedType()
+        .getDeclaredFields()
+        .filter(named("componentInstance")).getOnly())
+        .write());
 
-            stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-            stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Object.class)
-                .getDeclaredMethods()
-                .filter(isConstructor().and(takesArguments(0)))
-                .getOnly()));
-            stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-            stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
-            stackManipulationItems.add(FieldAccess.forField(implementationTarget
-                .getInstrumentedType()
-                .getDeclaredFields()
-                .filter(named("componentInstance")).getOnly())
-                .write());
+      for (int i = 0; i < method.getParameterTypes().length; ++i) {
+       stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
+       stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(i + 2));
+       stackManipulationItems.add(FieldAccess.forField(implementationTarget
+         .getInstrumentedType()
+         .getDeclaredFields()
+         .filter(named(method.getParameters()[i].getName() + "Resolver")).getOnly())
+         .write());
+      }
 
-            for (int i = 0; i < method.getParameterTypes().length; ++i) {
-              stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-              stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(i + 2));
-              stackManipulationItems.add(FieldAccess.forField(implementationTarget
-                  .getInstrumentedType()
-                  .getDeclaredFields()
-                  .filter(named(method.getParameters()[i].getName() + "Resolver")).getOnly())
-                  .write());
-            }
+      stackManipulationItems.add(MethodReturn.VOID);
 
-            stackManipulationItems.add(MethodReturn.VOID);
-
-            StackManipulation.Size size = new StackManipulation.Compound(stackManipulationItems)
-                .apply(methodVisitor, instrumentationContext);
-            return new Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
-          }
-        };
+      StackManipulation.Size size = new StackManipulation.Compound(stackManipulationItems)
+        .apply(methodVisitor, instrumentationContext);
+      return new Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
+     };
       }
     })
         .defineMethod("execute", Object.class, PUBLIC)
@@ -222,144 +214,138 @@ public class ByteBuddyWrappedMethodComponentExecutor<M extends ComponentModel>
 
           @Override
           public ByteCodeAppender appender(Target implementationTarget) {
-            return new ByteCodeAppender() {
+            return (methodVisitor, instrumentationContext, instrumentedMethod) -> {
+        List<StackManipulation> stackManipulationItems = new ArrayList<>();
 
-              @Override
-              public Size apply(MethodVisitor methodVisitor,
-                                Context instrumentationContext,
-                                MethodDescription instrumentedMethod) {
-                List<StackManipulation> stackManipulationItems = new ArrayList<>();
+        stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
+        stackManipulationItems.add(FieldAccess.forField(implementationTarget
+          .getInstrumentedType()
+          .getDeclaredFields()
+          .filter(named("componentInstance")).getOnly())
+          .read());
 
-                stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-                stackManipulationItems.add(FieldAccess.forField(implementationTarget
-                    .getInstrumentedType()
-                    .getDeclaredFields()
-                    .filter(named("componentInstance")).getOnly())
-                    .read());
+        for (int i = 0; i < method.getParameterTypes().length; ++i) {
+         stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
+         stackManipulationItems.add(FieldAccess.forField(implementationTarget
+           .getInstrumentedType()
+           .getDeclaredFields()
+           .filter(named(method.getParameters()[i].getName() + "Resolver")).getOnly())
+           .read());
+         stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(ArgumentResolver.class)
+           .getDeclaredMethods()
+           .filter(named("resolve"))
+           .getOnly()));
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Supplier.class)
+           .getDeclaredMethods()
+           .filter(named("get"))
+           .getOnly()));
+         final TypeDescription.ForLoadedType paramType =
+           new TypeDescription.ForLoadedType(method.getParameterTypes()[i]);
 
-                for (int i = 0; i < method.getParameterTypes().length; ++i) {
-                  stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-                  stackManipulationItems.add(FieldAccess.forField(implementationTarget
-                      .getInstrumentedType()
-                      .getDeclaredFields()
-                      .filter(named(method.getParameters()[i].getName() + "Resolver")).getOnly())
-                      .read());
-                  stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(ArgumentResolver.class)
-                      .getDeclaredMethods()
-                      .filter(named("resolve"))
-                      .getOnly()));
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Supplier.class)
-                      .getDeclaredMethods()
-                      .filter(named("get"))
-                      .getOnly()));
-                  final TypeDescription.ForLoadedType paramType =
-                      new TypeDescription.ForLoadedType(method.getParameterTypes()[i]);
+         if (paramType.isPrimitive()) {
+          stackManipulationItems.add(TypeCasting.to(paramType.asBoxed()));
 
-                  if (paramType.isPrimitive()) {
-                    stackManipulationItems.add(TypeCasting.to(paramType.asBoxed()));
+          if (int.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Integer.class)
+             .getDeclaredMethods()
+             .filter(named("intValue"))
+             .getOnly()));
+          } else if (long.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Long.class)
+             .getDeclaredMethods()
+             .filter(named("longValue"))
+             .getOnly()));
+          } else if (short.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Short.class)
+             .getDeclaredMethods()
+             .filter(named("shortValue"))
+             .getOnly()));
+          } else if (double.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Double.class)
+             .getDeclaredMethods()
+             .filter(named("doubleValue"))
+             .getOnly()));
+          } else if (float.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Float.class)
+             .getDeclaredMethods()
+             .filter(named("floatValue"))
+             .getOnly()));
+          } else if (boolean.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Boolean.class)
+             .getDeclaredMethods()
+             .filter(named("booleanValue"))
+             .getOnly()));
+          } else if (char.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Character.class)
+             .getDeclaredMethods()
+             .filter(named("charValue"))
+             .getOnly()));
+          } else if (byte.class.equals(method.getParameterTypes()[i])) {
+           stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Byte.class)
+             .getDeclaredMethods()
+             .filter(named("byteValue"))
+             .getOnly()));
+          }
+         } else {
+          stackManipulationItems.add(TypeCasting.to(paramType));
+         }
+        }
 
-                    if (int.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Integer.class)
-                          .getDeclaredMethods()
-                          .filter(named("intValue"))
-                          .getOnly()));
-                    } else if (long.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Long.class)
-                          .getDeclaredMethods()
-                          .filter(named("longValue"))
-                          .getOnly()));
-                    } else if (short.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Short.class)
-                          .getDeclaredMethods()
-                          .filter(named("shortValue"))
-                          .getOnly()));
-                    } else if (double.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Double.class)
-                          .getDeclaredMethods()
-                          .filter(named("doubleValue"))
-                          .getOnly()));
-                    } else if (float.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Float.class)
-                          .getDeclaredMethods()
-                          .filter(named("floatValue"))
-                          .getOnly()));
-                    } else if (boolean.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Boolean.class)
-                          .getDeclaredMethods()
-                          .filter(named("booleanValue"))
-                          .getOnly()));
-                    } else if (char.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Character.class)
-                          .getDeclaredMethods()
-                          .filter(named("charValue"))
-                          .getOnly()));
-                    } else if (byte.class.equals(method.getParameterTypes()[i])) {
-                      stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Byte.class)
-                          .getDeclaredMethods()
-                          .filter(named("byteValue"))
-                          .getOnly()));
-                    }
-                  } else {
-                    stackManipulationItems.add(TypeCasting.to(paramType));
-                  }
-                }
+        stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(method.getDeclaringClass())
+          .getDeclaredMethods()
+          .filter(named(method.getName()))
+          .getOnly()));
 
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(method.getDeclaringClass())
-                    .getDeclaredMethods()
-                    .filter(named(method.getName()))
-                    .getOnly()));
+        if (Void.TYPE.equals(method.getReturnType())) {
+         stackManipulationItems.add(NullConstant.INSTANCE);
+        } else if (int.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Integer.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, int.class)))
+           .getOnly()));
+        } else if (long.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Long.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, long.class)))
+           .getOnly()));
+        } else if (short.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Short.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, short.class)))
+           .getOnly()));
+        } else if (double.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Double.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, double.class)))
+           .getOnly()));
+        } else if (float.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Float.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, float.class)))
+           .getOnly()));
+        } else if (boolean.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Boolean.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, boolean.class)))
+           .getOnly()));
+        } else if (char.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Character.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, char.class)))
+           .getOnly()));
+        } else if (byte.class.equals(method.getReturnType())) {
+         stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Byte.class)
+           .getDeclaredMethods()
+           .filter(named("valueOf").and(takesArgument(0, byte.class)))
+           .getOnly()));
+        }
+        stackManipulationItems.add(MethodReturn.of(new TypeDescription.ForLoadedType(Object.class)));
 
-                if (Void.TYPE.equals(method.getReturnType())) {
-                  stackManipulationItems.add(NullConstant.INSTANCE);
-                } else if (int.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Integer.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, int.class)))
-                      .getOnly()));
-                } else if (long.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Long.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, long.class)))
-                      .getOnly()));
-                } else if (short.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Short.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, short.class)))
-                      .getOnly()));
-                } else if (double.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Double.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, double.class)))
-                      .getOnly()));
-                } else if (float.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Float.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, float.class)))
-                      .getOnly()));
-                } else if (boolean.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Boolean.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, boolean.class)))
-                      .getOnly()));
-                } else if (char.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Character.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, char.class)))
-                      .getOnly()));
-                } else if (byte.class.equals(method.getReturnType())) {
-                  stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Byte.class)
-                      .getDeclaredMethods()
-                      .filter(named("valueOf").and(takesArgument(0, byte.class)))
-                      .getOnly()));
-                }
-                stackManipulationItems.add(MethodReturn.of(new TypeDescription.ForLoadedType(Object.class)));
-
-                StackManipulation.Size size = new StackManipulation.Compound(stackManipulationItems)
-                    .apply(methodVisitor, instrumentationContext);
-                return new Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
-              }
-            };
+        StackManipulation.Size size = new StackManipulation.Compound(stackManipulationItems)
+          .apply(methodVisitor, instrumentationContext);
+        return new Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
+       };
           }
         }).make();
 
@@ -376,7 +362,7 @@ public class ByteBuddyWrappedMethodComponentExecutor<M extends ComponentModel>
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    System.out.println(file.getAbsolutePath());
+    // System.out.println(file.getAbsolutePath());
 
     final Class<? extends Object> loadedWrapperClass = byteBuddyMadeWrapper
         .load(new CompositeClassLoader(ByteBuddyWrappedMethodComponentExecutor.class.getClassLoader(),

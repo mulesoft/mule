@@ -54,11 +54,11 @@
     </build>
 
     <dependencies>
-<dependency>
-  <groupId>net.bytebuddy</groupId>
-  <artifactId>byte-buddy</artifactId>
-  <version>1.8.0</version>
-</dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.10.7</version>
+        </dependency>
         <!-- Mule Container dependencies -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
