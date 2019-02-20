@@ -19,6 +19,33 @@
           "methodName": "getTransitiveDependencies",
           "elementKind": "method",
           "justification": "Added new method to implementation as well"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::getBundleDescriptorAttributes(org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor, java.util.Optional<java.util.Properties>)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "AbstractArtifactDescriptorFactory",
+          "methodName": "getBundleDescriptorAttributes",
+          "elementKind": "method",
+          "justification": "Added new method to implementation as well"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder::setBaseVersion(java.lang.String)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "Builder",
+          "methodName": "setBaseVersion",
+          "elementKind": "method",
+          "justification": "Added new method to implementation as well"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor::getBaseVersion()",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "BundleDescriptor",
+          "methodName": "getBaseVersion",
+          "elementKind": "method",
+          "justification": "Added new method to implementation as well"
         }
       ]
     }

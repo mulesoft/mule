@@ -8,7 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.ExtendedClassLoaderModelAttributes;
 
 import java.util.Map;
@@ -22,25 +22,25 @@ import java.util.Map;
  */
 public class PluginExtendedClassLoaderModelAttributes extends ExtendedClassLoaderModelAttributes {
 
-  private DeployableArtifactDescriptor deployableArtifactDescriptor;
+  private ArtifactDescriptor deployableArtifactDescriptor;
 
   /**
    * Creates an instance of this extended attributes for the given descriptor.
    *
    * @param originalAttributes the original {@link Map} of attributes. No null.
-   * @param deployableArtifactDescriptor {@link DeployableArtifactDescriptor} which declares the plugin dependency. Not null.
+   * @param deployableArtifactDescriptor {@link ArtifactDescriptor} which declares the plugin dependency. Not null.
    */
   public PluginExtendedClassLoaderModelAttributes(Map originalAttributes,
-                                                  DeployableArtifactDescriptor deployableArtifactDescriptor) {
+                                                  ArtifactDescriptor deployableArtifactDescriptor) {
     super(originalAttributes);
     checkNotNull(deployableArtifactDescriptor, "deployableArtifactDescriptor cannot be null");
     this.deployableArtifactDescriptor = deployableArtifactDescriptor;
   }
 
   /**
-   * @return the {@link DeployableArtifactDescriptor} which declares the dependency to the plugin.
+   * @return the {@link ArtifactDescriptor} which declares the dependency to the plugin.
    */
-  public DeployableArtifactDescriptor getDeployableArtifactDescriptor() {
+  public ArtifactDescriptor getDeployableArtifactDescriptor() {
     return deployableArtifactDescriptor;
   }
 }

@@ -11,7 +11,6 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
-
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -21,13 +20,14 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,15 +82,16 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
   private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(T descriptor)
       throws IOException {
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
-    for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
-      if (bundleDependency.getDescriptor().isPlugin()) {
-        if (bundleDependency.getBundleUri() == null) {
+    for (BundleDependency bundlePluginDependency : descriptor.getClassLoaderModel().getDependencies()) {
+      if (bundlePluginDependency.getDescriptor().isPlugin()) {
+        if (bundlePluginDependency.getBundleUri() == null) {
           LOGGER
               .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
-                           bundleDependency.getDescriptor()));
+                           bundlePluginDependency.getDescriptor()));
         } else {
-          File pluginFile = new File(bundleDependency.getBundleUri());
-          pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginFile, descriptor));
+          File pluginFile = new File(bundlePluginDependency.getBundleUri());
+          pluginDescriptors
+              .add(artifactPluginDescriptorLoader.load(pluginFile, bundlePluginDependency.getDescriptor(), descriptor));
         }
       }
     }

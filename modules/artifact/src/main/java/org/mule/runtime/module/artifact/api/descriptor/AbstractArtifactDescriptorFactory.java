@@ -106,7 +106,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
       descriptor.setRootFolder(artifactLocation);
     }
 
-    BundleDescriptor bundleDescriptor = getBundleDescriptor(artifactLocation, artifactModel);
+    BundleDescriptor bundleDescriptor = getBundleDescriptor(artifactLocation, artifactModel, deploymentProperties);
     descriptor.setBundleDescriptor(bundleDescriptor);
     descriptor.setMinMuleVersion(new MuleVersion(artifactModel.getMinMuleVersion()));
     descriptor.setRequiredProduct(artifactModel.getRequiredProduct());
@@ -206,7 +206,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
         .put(BundleDescriptor.class.getName(), bundleDescriptor).build();
   }
 
-  private BundleDescriptor getBundleDescriptor(File appFolder, M artifactModel) {
+  private BundleDescriptor getBundleDescriptor(File appFolder, M artifactModel, Optional<Properties> deploymentProperties) {
     BundleDescriptorLoader bundleDescriptorLoader;
     try {
       bundleDescriptorLoader =
@@ -218,10 +218,17 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     }
 
     try {
-      return bundleDescriptorLoader.load(appFolder, artifactModel.getBundleDescriptorLoader().getAttributes(), getArtifactType());
+      return bundleDescriptorLoader
+          .load(appFolder, getBundleDescriptorAttributes(artifactModel.getBundleDescriptorLoader(), deploymentProperties),
+                getArtifactType());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }
+  }
+
+  protected Map<String, Object> getBundleDescriptorAttributes(MuleArtifactLoaderDescriptor bundleDescriptorLoader,
+                                                              Optional<Properties> deploymentPropertiesOptional) {
+    return bundleDescriptorLoader.getAttributes();
   }
 
   private M deserializeArtifactModel(String jsonString) throws IOException {

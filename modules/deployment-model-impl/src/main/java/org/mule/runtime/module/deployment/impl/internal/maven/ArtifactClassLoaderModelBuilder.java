@@ -24,6 +24,15 @@ import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -39,16 +48,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 /**
  * ClassLoaderModelBuilder that adds the concept of Shared Library for the configured dependencies.
@@ -67,7 +66,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   protected FileJarExplorer fileJarExplorer = new FileJarExplorer();
 
   protected File artifactFolder;
-  protected DeployableArtifactDescriptor deployableArtifactDescriptor;
+  protected ArtifactDescriptor deployableArtifactDescriptor;
   protected BundleDescriptor artifactBundleDescriptor;
 
   public ArtifactClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor) {
@@ -98,7 +97,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     return this;
   }
 
-  public void setDeployableArtifactDescriptor(DeployableArtifactDescriptor deployableArtifactDescriptor) {
+  public void setDeployableArtifactDescriptor(ArtifactDescriptor deployableArtifactDescriptor) {
     this.deployableArtifactDescriptor = deployableArtifactDescriptor;
   }
 
