@@ -6,12 +6,16 @@
  */
 package org.mule.util.store;
 
+import static java.io.File.separator;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+import static org.mule.util.store.PartitionedPersistentObjectStore.OBJECT_STORE_DIR;
+
 import org.mule.api.MuleContext;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
@@ -22,6 +26,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +50,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         numberOfPartitions = 3;
         when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(".");
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
-        os = new PartitionedPersistentObjectStore<>(mockMuleContext);
+        os = new TestPartitionedPersistentObjectStore(mockMuleContext);
         File objectStorePersistDir = new File(PartitionedPersistentObjectStore.OBJECT_STORE_DIR);
         if (objectStorePersistDir.exists())
         {
@@ -91,23 +96,25 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         openPartitions();
         assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
     }
-    
+
     @Test
-    public void clear() throws ObjectStoreException {
+    public void clear() throws ObjectStoreException
+    {
         this.openPartitions();
         storeInPartitions(OBJECT_KEY, OBJECT_BASE_VALUE);
         assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
-        
+
         this.clearPartitions();
         this.assertNotPresentInAnyPartition(OBJECT_KEY);
-        
+
         // assert is reusable
         this.storeInPartitions(OBJECT_KEY, OBJECT_BASE_VALUE);
         this.assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
     }
 
     @Test
-    public void clearDoesntBreakPartition() throws ObjectStoreException {
+    public void clearDoesntBreakPartition() throws ObjectStoreException
+    {
         String partitionName = "custom";
         String key = "key";
         String value = "value";
@@ -121,6 +128,27 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     }
 
     @Test
+    public void disposePartitionRemovesPartitionDirectory() throws ObjectStoreException
+    {
+        String partitionName = "custom";
+        String key = "key";
+        String value = "value";     
+        File partitionDirectory = getPartitionDirectory(partitionName);
+        os.open(partitionName);
+        os.store(key, value, partitionName);
+        assertThat(partitionDirectory.exists(), equalTo(true));
+        os.disposePartition(partitionName);
+        assertThat(partitionDirectory.exists(), equalTo(false));
+    }
+
+    private File getPartitionDirectory(String partitionName)
+    {
+        String workingDirectory = mockMuleContext.getConfiguration().getWorkingDirectory();
+        String path = workingDirectory + separator + OBJECT_STORE_DIR + separator + partitionName;
+        return new File(path);
+    }
+
+    @Test
     public void allowsAnyPartitionName() throws Exception
     {
         os.open("asdfsadfsa#$%@#$@#$@$%$#&8******ASDFWER??!?!");
@@ -130,7 +158,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     public void muleContextAwareValueGetsDeserialized() throws Exception
     {
         os.open();
-        os.store("key",new DeserializableValue(mockMuleContext));
+        os.store("key", new DeserializableValue(mockMuleContext));
         DeserializableValue value = (DeserializableValue) os.retrieve("key");
         assertNotNull(value.getMuleContext());
     }
@@ -143,7 +171,15 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         }
         os.close();
     }
-    
+
+    private void disposePartitions() throws ObjectStoreException
+    {
+        for (int i = 0; i < numberOfPartitions; i++)
+        {
+            os.disposePartition(getPartitionName(i));
+        }
+    }
+
     private void clearPartitions() throws ObjectStoreException
     {
         for (int i = 0; i < numberOfPartitions; i++)
@@ -156,11 +192,11 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     private void assertAllPartitionsAreEmpty() throws ObjectStoreException
     {
         assertThat(os.contains(OBJECT_KEY), is(false));
-        assertThat(os.allKeys().size(),is(0));
+        assertThat(os.allKeys().size(), is(0));
         for (int i = 0; i < numberOfPartitions; i++)
         {
-            assertThat(os.contains(OBJECT_KEY,getPartitionName(i)), is(false));
-            assertThat(os.allKeys(getPartitionName(i)).size(),is(0));
+            assertThat(os.contains(OBJECT_KEY, getPartitionName(i)), is(false));
+            assertThat(os.allKeys(getPartitionName(i)).size(), is(0));
         }
     }
 
@@ -178,10 +214,10 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         assertThat((String) os.retrieve(key), is(value));
         for (int i = 0; i < numberOfPartitions; i++)
         {
-            assertThat((String) os.retrieve(key,getPartitionName(i)), is(value + i));
+            assertThat((String) os.retrieve(key, getPartitionName(i)), is(value + i));
         }
     }
-    
+
     private void assertNotPresentInAnyPartition(String key) throws ObjectStoreException
     {
         Assert.assertFalse(os.contains(key));
@@ -193,7 +229,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
 
     private void storeInPartitions(String key, String value) throws ObjectStoreException
     {
-        os.store(key,value);
+        os.store(key, value);
         for (int i = 0; i < numberOfPartitions; i++)
         {
             os.store(key, value + i, getPartitionName(i));
@@ -228,8 +264,23 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
             this.muleContext = muleContext;
         }
 
-        public MuleContext getMuleContext() {
+        public MuleContext getMuleContext()
+        {
             return muleContext;
+        }
+    }
+    
+    private static class TestPartitionedPersistentObjectStore extends PartitionedPersistentObjectStore<Serializable>
+    {
+        public TestPartitionedPersistentObjectStore(MuleContext mockMuleContext)
+        {
+            super(mockMuleContext);
+        }
+
+        @Override
+        protected String getPartitionDirectoryName(String partitionName)
+        {
+            return partitionName;
         }
     }
 
