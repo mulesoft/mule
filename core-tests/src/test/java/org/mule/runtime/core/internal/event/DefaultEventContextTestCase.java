@@ -22,6 +22,7 @@ import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
 import static reactor.core.publisher.Mono.from;
@@ -53,8 +54,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import reactor.core.publisher.Mono;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -256,6 +260,30 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     }, "A hard reference is being mantained to the child event."));
 
     parent.success(eventParent);
+  }
+
+  @Test
+  @Issue("MULE-15257")
+  public void parentResponseConsumerCalledWithChildContext() throws MuleException {
+    AtomicBoolean parentResponse = new AtomicBoolean();
+    AtomicBoolean childResponse = new AtomicBoolean();
+
+    parent.onResponse((e, t) -> parentResponse.set(true));
+
+    child = addChild(parent);
+
+    Mono.from(child.getResponsePublisher())
+        .doOnNext(e -> childResponse.set(true))
+        .subscribe();
+
+    child.success(getEventBuilder().message(Message.of(TEST_PAYLOAD)).build());
+
+    probe(() -> childResponse.get());
+    probe(() -> !parentResponse.get());
+
+    parent.success(getEventBuilder().message(Message.of(TEST_PAYLOAD)).build());
+
+    probe(() -> parentResponse.get());
   }
 
   @Test
