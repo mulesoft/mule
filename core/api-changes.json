@@ -283,6 +283,17 @@
           "methodName": "createScopeTransactionalExecutionTemplate",
           "elementKind": "method",
           "justification": "This doesn't break already compiled stuff"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K extends java.lang.Object, V extends java.lang.Object>",
+          "new": "class org.mule.runtime.core.api.util.CaseInsensitiveHashMap<K extends java.lang.Object, V extends java.lang.Object>",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "CaseInsensitiveHashMap",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
         }
       ]
     }
