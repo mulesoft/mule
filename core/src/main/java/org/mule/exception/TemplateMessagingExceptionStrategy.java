@@ -6,12 +6,16 @@
  */
 package org.mule.exception;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.api.config.MuleProperties.DISABLE_ERROR_COUNT_ON_ERROR_NOTIFICATION_DISABLED;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
@@ -34,6 +38,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     private MessageProcessor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
     private String when;
     private boolean handleException;
+    private boolean disableErrorCountOnErrorNotificationsDisabled = getBoolean(DISABLE_ERROR_COUNT_ON_ERROR_NOTIFICATION_DISABLED);
 
     final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
@@ -162,10 +167,15 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     private void processStatistics(MuleEvent event)
     {
         FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
-        if (statistics != null && statistics.isEnabled())
+        if (statistics != null && statistics.isEnabled() && mustCountErrorInStatistics())
         {
             statistics.incExecutionError();
         }
+    }
+
+    private boolean mustCountErrorInStatistics()
+    {
+        return enableNotifications || !disableErrorCountOnErrorNotificationsDisabled;
     }
 
     protected MuleEvent route(MuleEvent event, Exception t)
