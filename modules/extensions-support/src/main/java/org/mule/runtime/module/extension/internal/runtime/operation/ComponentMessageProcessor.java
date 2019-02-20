@@ -238,14 +238,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
         if (ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)) {
           innerChainCtx = innerChainCtx.put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS,
-                  ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
+                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
         }
         return innerChainCtx;
       };
       return quickCopy(event, ImmutableMap.<String, Object>builder()
-              .put(INNER_CHAIN_CTX_MAPPING, context)
-              .put(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER))
-              .build());
+          .put(INNER_CHAIN_CTX_MAPPING, context)
+          .put(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER))
+          .build());
 
     } else if (currentScheduler.isPresent()) {
       return quickCopy(event, singletonMap(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.get()));
