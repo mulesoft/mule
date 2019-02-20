@@ -74,7 +74,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private volatile byte state = STATE_READY;
   private volatile Either<Throwable, CoreEvent> result;
 
-  private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(() -> new ResponsePublisher());
+  private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
 
   protected FlowCallStack flowCallStack = new DefaultFlowCallStack();
 
@@ -133,13 +133,13 @@ abstract class AbstractEventContext implements BaseEventContext {
   public final void success() {
     if (isResponseDone()) {
       if (debugLogEnabled) {
-        LOGGER.debug(this + " empty response was already completed, ignoring.");
+        LOGGER.debug("{} empty response was already completed, ignoring.", this.toString());
       }
       return;
     }
 
     if (debugLogEnabled) {
-      LOGGER.debug(this + " response completed with no result.");
+      LOGGER.debug("{} response completed with no result.", this.toString());
     }
     responseDone(right(null));
   }
@@ -151,13 +151,13 @@ abstract class AbstractEventContext implements BaseEventContext {
   public final void success(CoreEvent event) {
     if (isResponseDone()) {
       if (debugLogEnabled) {
-        LOGGER.debug(this + " response was already completed, ignoring.");
+        LOGGER.debug("{} response was already completed, ignoring.", this.toString());
       }
       return;
     }
 
     if (debugLogEnabled) {
-      LOGGER.debug(this + " response completed with result.");
+      LOGGER.debug("{} response completed with result.", this.toString());
     }
     responseDone(right(event));
   }
@@ -169,18 +169,18 @@ abstract class AbstractEventContext implements BaseEventContext {
   public final Publisher<Void> error(Throwable throwable) {
     if (isResponseDone()) {
       if (debugLogEnabled) {
-        LOGGER.debug(this + " error response was already completed, ignoring.");
+        LOGGER.debug("{} error response was already completed, ignoring.", this.toString());
       }
       return empty();
     }
 
     if (debugLogEnabled) {
-      LOGGER.debug(this + " responseDone completed with error.");
+      LOGGER.debug("{} responseDone completed with error.", this.toString());
     }
 
     if (throwable instanceof MessagingException) {
       if (debugLogEnabled) {
-        LOGGER.debug(this + " handling messaging exception.");
+        LOGGER.debug("{} handling messaging exception.", this.toString());
       }
       return just((MessagingException) throwable)
           .flatMapMany(exceptionHandler)
@@ -220,7 +220,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     synchronized (this) {
       if (state == STATE_RESPONSE && allChildrenComplete) {
         if (debugLogEnabled) {
-          LOGGER.debug(this + " completed.");
+          LOGGER.debug("{} completed.", this.toString());
         }
         this.state = STATE_COMPLETE;
 
@@ -241,7 +241,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   protected synchronized void tryTerminate() {
     if (this.state == STATE_COMPLETE && (externalCompletion == null || externalCompletion.isDone())) {
       if (debugLogEnabled) {
-        LOGGER.debug(this + " terminated.");
+        LOGGER.debug("{} terminated.", this.toString());
       }
       this.state = STATE_TERMINATED;
 
