@@ -78,13 +78,18 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
 
   private void createPartition(String partitionName) throws ObjectStoreException {
     PersistentObjectStorePartition persistentObjectStorePartition =
-        new PersistentObjectStorePartition(muleContext, partitionName, getNewPartitionDirectory());
+        new PersistentObjectStorePartition(muleContext, partitionName, getNewPartitionDirectory(partitionName));
     persistentObjectStorePartition.open();
     partitionsByName.put(partitionName, persistentObjectStorePartition);
   }
 
-  private File getNewPartitionDirectory() {
-    return new File(storeDirectory, UUID.getUUID());
+  private File getNewPartitionDirectory(String partitionName) {
+    return new File(storeDirectory, getPartitionDirectoryName(partitionName));
+  }
+
+  protected String getPartitionDirectoryName(String partitionName) {
+    // By default an UUID is used.
+    return UUID.getUUID();
   }
 
   @Override
@@ -203,7 +208,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
 
   @Override
   public void disposePartition(String partitionName) throws ObjectStoreException {
-    clear(partitionName);
+    this.getPartitionObjectStore(partitionName).close();
   }
 
   @Override

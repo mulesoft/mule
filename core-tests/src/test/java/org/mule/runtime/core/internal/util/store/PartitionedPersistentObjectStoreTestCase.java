@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static java.io.File.separator;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore.OBJECT_STORE_DIR;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
@@ -47,7 +50,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     numberOfPartitions = 3;
     when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(".");
     when(mockMuleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
-    os = new PartitionedPersistentObjectStore<>(mockMuleContext);
+    os = new TestPartitionedPersistentObjectStore(mockMuleContext);
     File objectStorePersistDir = new File(PartitionedPersistentObjectStore.OBJECT_STORE_DIR);
     if (objectStorePersistDir.exists()) {
       FileUtils.deleteDirectory(objectStorePersistDir);
@@ -118,6 +121,25 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     newOS.open(partitionName);
     Serializable retrieve = newOS.retrieve(key, partitionName);
     assertThat(retrieve, is(value));
+  }
+
+  @Test
+  public void disposePartitionRemovesPartitionDirectory() throws ObjectStoreException {
+    String partitionName = "custom";
+    String key = "key";
+    String value = "value";
+    File partitionDirectory = getPartitionDirectory(partitionName);
+    os.open(partitionName);
+    os.store(key, value, partitionName);
+    assertThat(partitionDirectory.exists(), equalTo(true));
+    os.disposePartition(partitionName);
+    assertThat(partitionDirectory.exists(), equalTo(false));
+  }
+
+  private File getPartitionDirectory(String partitionName) {
+    String workingDirectory = mockMuleContext.getConfiguration().getWorkingDirectory();
+    String path = workingDirectory + separator + OBJECT_STORE_DIR + separator + partitionName;
+    return new File(path);
   }
 
   @Test
@@ -209,6 +231,18 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
 
     public MuleContext getMuleContext() {
       return muleContext;
+    }
+  }
+
+  private static class TestPartitionedPersistentObjectStore extends PartitionedPersistentObjectStore<Serializable> {
+
+    public TestPartitionedPersistentObjectStore(MuleContext mockMuleContext) {
+      super(mockMuleContext);
+    }
+
+    @Override
+    protected String getPartitionDirectoryName(String partitionName) {
+      return partitionName;
     }
   }
 
