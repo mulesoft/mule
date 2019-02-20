@@ -95,9 +95,15 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
         .flatMap(event -> subscriberContext()
-            .flatMap(ctx -> Mono.just(addEventContextHandledByThisNext(policyEventConverter
-                .createEvent(saveState((PrivilegedEvent) event), getOriginalEvent(event),
-                             ctx.getOrDefault(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS, false))))))
+            .flatMap(ctx -> Mono.just(addEventContextHandledByThisNext(
+                                                                       ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                                                                           ? policyEventConverter
+                                                                               .createEvent(saveState((PrivilegedEvent) event),
+                                                                                            getOriginalEvent(event),
+                                                                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
+                                                                           : policyEventConverter
+                                                                               .createEvent(saveState((PrivilegedEvent) event),
+                                                                                            getOriginalEvent(event))))))
         .doOnNext(event -> {
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
