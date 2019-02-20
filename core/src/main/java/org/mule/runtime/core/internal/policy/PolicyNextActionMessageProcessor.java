@@ -16,6 +16,7 @@ import static org.mule.runtime.core.internal.policy.SourcePolicyProcessor.POLICY
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -39,6 +40,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
+import reactor.core.publisher.Mono;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -60,6 +62,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_STATE_EVENT = "policy.beforeNextEvent";
   public static final String POLICY_NEXT_EVENT_CTX_IDS = "policy.next.eventCtxIds";
+  public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
 
   @Inject
   private MuleContext muleContext;
@@ -92,8 +95,10 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return from(publisher)
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
-        .map(event -> addEventContextHandledByThisNext(policyEventConverter.createEvent(saveState((PrivilegedEvent) event),
-                                                                                        getOriginalEvent(event))))
+        .flatMap(event -> subscriberContext()
+            .flatMap(ctx -> Mono.just(addEventContextHandledByThisNext(policyEventConverter
+                .createEvent(saveState((PrivilegedEvent) event), getOriginalEvent(event),
+                             ctx.getOrDefault(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS, true))))))
         .doOnNext(event -> {
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
