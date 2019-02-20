@@ -102,6 +102,24 @@ public class ArtifactPluginDescriptorFactory
   }
 
   @Override
+  protected Map<String, Object> getBundleDescriptorAttributes(MuleArtifactLoaderDescriptor bundleDescriptorLoader,
+                                                              Optional<Properties> deploymentPropertiesOptional) {
+    Map<String, Object> attributes =
+        super.getBundleDescriptorAttributes(bundleDescriptorLoader, deploymentPropertiesOptional);
+
+    if (deploymentPropertiesOptional.isPresent()) {
+      Properties deploymentProperties = deploymentPropertiesOptional.get();
+      if (deploymentProperties instanceof PluginExtendedDeploymentProperties) {
+        PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
+            (PluginExtendedDeploymentProperties) deploymentProperties;
+        return new PluginExtendedBundleDescriptorAttributes(attributes,
+                                                            pluginExtendedDeploymentProperties.getPluginBundleDescriptor());
+      }
+    }
+    return attributes;
+  }
+
+  @Override
   protected ArtifactType getArtifactType() {
     return PLUGIN;
   }
