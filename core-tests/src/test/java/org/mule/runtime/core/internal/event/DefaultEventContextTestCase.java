@@ -26,6 +26,8 @@ import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.scheduler.Schedulers.single;
+
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
@@ -43,6 +45,16 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.reactivestreams.Publisher;
+
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
@@ -50,6 +62,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -60,15 +73,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 /**
  * TODO MULE-14000 Create hamcrest matchers to assert EventContext state
@@ -83,21 +88,21 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private Supplier<DefaultEventContext> context;
-  private Function<CompletableFuture<Void>, BaseEventContext> contextWithCompletion;
-  private Function<ComponentLocation, BaseEventContext> contextWithComponentLocation;
+  private final Supplier<DefaultEventContext> context;
+  private final Function<CompletableFuture<Void>, BaseEventContext> contextWithCompletion;
+  private final Function<ComponentLocation, BaseEventContext> contextWithComponentLocation;
 
   private BaseEventContext parent;
   private BaseEventContext child;
 
-  private AtomicReference<CoreEvent> parentResultValue = new AtomicReference<>();
-  private AtomicReference<Throwable> parentErrorValue = new AtomicReference<>();
-  private AtomicBoolean parentCompletion = new AtomicBoolean();
-  private AtomicBoolean parentTerminated = new AtomicBoolean();
+  private final AtomicReference<CoreEvent> parentResultValue = new AtomicReference<>();
+  private final AtomicReference<Throwable> parentErrorValue = new AtomicReference<>();
+  private final AtomicBoolean parentCompletion = new AtomicBoolean();
+  private final AtomicBoolean parentTerminated = new AtomicBoolean();
 
-  private AtomicReference<CoreEvent> childResultValue = new AtomicReference<>();
-  private AtomicReference<Throwable> childErrorValue = new AtomicReference<>();
-  private AtomicBoolean childCompletion = new AtomicBoolean();
+  private final AtomicReference<CoreEvent> childResultValue = new AtomicReference<>();
+  private final AtomicReference<Throwable> childErrorValue = new AtomicReference<>();
+  private final AtomicBoolean childCompletion = new AtomicBoolean();
 
 
   public DefaultEventContextTestCase(Supplier<DefaultEventContext> context,
@@ -260,6 +265,23 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     }, "A hard reference is being mantained to the child event."));
 
     parent.success(eventParent);
+  }
+
+  @Test
+  public void multipleResponsePublisherSubscriptions() throws MuleException {
+    CoreEvent event = getEventBuilder().message(Message.of(TEST_PAYLOAD)).build();
+
+    AtomicInteger responseCounter = new AtomicInteger();
+
+    // Call getResponsePublisher twice to receive the response in 2 different places
+    Flux.from(parent.getResponsePublisher())
+        .mergeWith(parent.getResponsePublisher())
+        .subscribeOn(single())
+        .subscribe(e -> responseCounter.incrementAndGet());
+
+    parent.success(event);
+
+    probe(() -> responseCounter.get() == 2);
   }
 
   @Test

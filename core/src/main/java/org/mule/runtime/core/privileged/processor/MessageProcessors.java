@@ -391,25 +391,23 @@ public class MessageProcessors {
   private static void childContextResponseHandler(CoreEvent eventChildCtx,
                                                   SinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef,
                                                   boolean completeParentIfEmpty) {
-    Mono.from(((BaseEventContext) eventChildCtx.getContext()).getResponsePublisher())
-        .doOnSuccess(response -> {
-          if (response == null && completeParentIfEmpty) {
-            getParentContext(eventChildCtx).success();
-            errorSwitchSinkSinkRef.next();
-          } else {
-            if (response == null) {
-              errorSwitchSinkSinkRef.next();
-            } else {
-              errorSwitchSinkSinkRef.next(right(MessagingException.class, response));
-            }
-          }
-        })
-        .onErrorResume(MessagingException.class, error -> {
-          errorSwitchSinkSinkRef.next(left(new MessagingException(toParentContext(error.getEvent()), error), CoreEvent.class));
-          return Mono.empty();
-        })
-        .doOnError(e -> LOGGER.error("Uncaugh exception in childContextResponseHandler", e))
-        .toProcessor();
+    ((BaseEventContext) eventChildCtx.getContext()).onResponse((response, throwable) -> {
+      try {
+        if (throwable != null) {
+          final MessagingException error = (MessagingException) throwable;
+          errorSwitchSinkSinkRef.next(left(new MessagingException(toParentContext(error.getEvent()), error)));
+        } else if (response == null && completeParentIfEmpty) {
+          getParentContext(eventChildCtx).success();
+          errorSwitchSinkSinkRef.next();
+        } else if (response == null) {
+          errorSwitchSinkSinkRef.next();
+        } else {
+          errorSwitchSinkSinkRef.next(right(response));
+        }
+      } catch (Exception e) {
+        LOGGER.error("Uncaught exception in childContextResponseHandler", e);
+      }
+    });
   }
 
   private static CoreEvent toParentContext(final CoreEvent event) {
