@@ -133,13 +133,13 @@ abstract class AbstractEventContext implements BaseEventContext {
   public final void success() {
     if (isResponseDone()) {
       if (debugLogEnabled) {
-        LOGGER.debug("{} empty response was already completed, ignoring.", this.toString());
+        LOGGER.debug("{} empty response was already completed, ignoring.", this);
       }
       return;
     }
 
     if (debugLogEnabled) {
-      LOGGER.debug("{} response completed with no result.", this.toString());
+      LOGGER.debug("{} response completed with no result.", this);
     }
     responseDone(right(null));
   }
@@ -151,13 +151,13 @@ abstract class AbstractEventContext implements BaseEventContext {
   public final void success(CoreEvent event) {
     if (isResponseDone()) {
       if (debugLogEnabled) {
-        LOGGER.debug("{} response was already completed, ignoring.", this.toString());
+        LOGGER.debug("{} response was already completed, ignoring.", this);
       }
       return;
     }
 
     if (debugLogEnabled) {
-      LOGGER.debug("{} response completed with result.", this.toString());
+      LOGGER.debug("{} response completed with result.", this);
     }
     responseDone(right(event));
   }
@@ -169,18 +169,18 @@ abstract class AbstractEventContext implements BaseEventContext {
   public final Publisher<Void> error(Throwable throwable) {
     if (isResponseDone()) {
       if (debugLogEnabled) {
-        LOGGER.debug("{} error response was already completed, ignoring.", this.toString());
+        LOGGER.debug("{} error response was already completed, ignoring.", this);
       }
       return empty();
     }
 
     if (debugLogEnabled) {
-      LOGGER.debug("{} responseDone completed with error.", this.toString());
+      LOGGER.debug("{} responseDone completed with error.", this);
     }
 
     if (throwable instanceof MessagingException) {
       if (debugLogEnabled) {
-        LOGGER.debug("{} handling messaging exception.", this.toString());
+        LOGGER.debug("{} handling messaging exception.", this);
       }
       return just((MessagingException) throwable)
           .flatMapMany(exceptionHandler)
@@ -220,7 +220,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     synchronized (this) {
       if (state == STATE_RESPONSE && allChildrenComplete) {
         if (debugLogEnabled) {
-          LOGGER.debug("{} completed.", this.toString());
+          LOGGER.debug("{} completed.", this);
         }
         this.state = STATE_COMPLETE;
 
@@ -241,7 +241,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   protected synchronized void tryTerminate() {
     if (this.state == STATE_COMPLETE && (externalCompletion == null || externalCompletion.isDone())) {
       if (debugLogEnabled) {
-        LOGGER.debug("{} terminated.", this.toString());
+        LOGGER.debug("{} terminated.", this);
       }
       this.state = STATE_TERMINATED;
 
@@ -277,7 +277,7 @@ abstract class AbstractEventContext implements BaseEventContext {
       consumer.accept(result.getRight(), result.getLeft());
     } catch (Throwable t) {
       LOGGER.error(format("The event consumer %s, of EventContext %s failed with exception:",
-                          consumer.toString(), this.toString()),
+                          consumer, this),
                    t);
     }
   }
