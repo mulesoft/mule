@@ -107,6 +107,20 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public void close() throws ObjectStoreException
     {
+        synchronized (realKeyToUUIDIndex)
+        {
+            try
+            {
+                cleanDirectory(this.partitionDirectory);
+                partitionDirectory.delete();
+            }
+            catch (IOException e)
+            {
+                throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not close object store partition"), e);
+            }
+
+            realKeyToUUIDIndex.clear();
+        }
     }
 
     @Override
