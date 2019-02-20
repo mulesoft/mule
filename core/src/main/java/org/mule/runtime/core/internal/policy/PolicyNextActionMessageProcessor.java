@@ -97,7 +97,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .flatMap(event -> subscriberContext()
             .flatMap(ctx -> Mono.just(addEventContextHandledByThisNext(policyEventConverter
                 .createEvent(saveState((PrivilegedEvent) event), getOriginalEvent(event),
-                             ctx.getOrDefault(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS, true))))))
+                             ctx.getOrDefault(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS, false))))))
         .doOnNext(event -> {
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
