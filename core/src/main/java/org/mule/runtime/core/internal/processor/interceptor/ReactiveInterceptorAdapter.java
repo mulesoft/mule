@@ -19,6 +19,7 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -39,14 +40,14 @@ import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -231,7 +232,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
           builder.addInternalParameter(INTERCEPTION_COMPONENT, component);
         });
         return builder.build();
-      } catch (ExpressionRuntimeException e) {
+      } catch (ExpressionRuntimeException | IllegalArgumentException e) {
         // Some operation parameter threw an expression exception.
         // Continue with the interception as it it were not an operation so that the call to `before` is guaranteed.
         return super.setInternalParamsForNotParamResolver(component, resolvedParameters, event, builder);
