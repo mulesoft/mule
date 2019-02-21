@@ -14,16 +14,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.ZipUtils.compress;
 import static org.mule.util.FileUtils.unzip;
+import org.mule.api.MuleRuntimeException;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 public class FileUtilsTestCase extends AbstractMuleTestCase
@@ -387,6 +392,60 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         unzip(compressedFile, toDir);
 
         assertThat(new File(new File(toDir, "folder"), resourceName).exists(), is(true));
+    }
+
+    @Test
+    public void fileIsOpenWhenUsingAFileOutputStream() throws IOException
+    {
+        File file = FileUtils.newFile(TEST_FILE);
+        assertThat(FileUtils.isFileOpen(file), is(false));
+
+        FileOutputStream outputStream = new FileOutputStream(file);
+        assertThat(FileUtils.isFileOpen(file), is(true));
+
+        outputStream.close();
+        assertThat(FileUtils.isFileOpen(file), is(false));
+    }
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    private boolean originalFailIfDeleteOpenFile;
+
+    @Before
+    public void before()
+    {
+        originalFailIfDeleteOpenFile = DefaultMuleConfiguration.shouldFailIfDeleteOpenFile();
+    }
+
+    @After
+    public void after()
+    {
+        DefaultMuleConfiguration.failIfDeleteOpenFile = originalFailIfDeleteOpenFile;
+    }
+
+    @Test
+    public void openFilesCannotBeDeletedIfTheProperFlagIsSet() throws IOException
+    {
+        DefaultMuleConfiguration.failIfDeleteOpenFile = true;
+
+        File file = FileUtils.newFile(TEST_FILE);
+        thrown.expect(MuleRuntimeException.class);
+        thrown.expectMessage("Attempting to delete an open file: " + file);
+
+        assertThat(FileUtils.isFileOpen(file), is(false));
+
+        try (FileOutputStream outputStream = new FileOutputStream(file))
+        {
+            assertThat(FileUtils.isFileOpen(file), is(true));
+            FileUtils.deleteFile(file);
+        }
+        finally
+        {
+            // it is now closed because the output stream is AutoCloseable
+            assertThat(FileUtils.isFileOpen(file), is(false));
+            assertThat(FileUtils.deleteFile(file), is(true));
+        }
     }
 
     private File createTestFile(String filePath) throws IOException

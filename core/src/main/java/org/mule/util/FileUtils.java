@@ -7,6 +7,8 @@
 package org.mule.util;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
@@ -50,6 +52,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 {
     private static final Log logger = LogFactory.getLog(FileUtils.class);
     public static String DEFAULT_ENCODING = "UTF-8";
+    private static Boolean _isOSWindows = null;
     
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException
     {
@@ -1028,8 +1031,42 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
     }
 
+    private static boolean isOSWindows()
+    {
+        if (_isOSWindows == null)
+        {
+            String osName = System.getProperty("os.name", "<None>");
+            _isOSWindows = osName.startsWith("Windows");
+        }
+
+        return _isOSWindows;
+    }
+
+    private static boolean shouldLogWarningIfDeleteOpenFile()
+    {
+        return logger.isWarnEnabled() && isOSWindows();
+    }
+
     public static boolean deleteFile(File file)
     {
+        boolean shouldFailIfOpen = DefaultMuleConfiguration.shouldFailIfDeleteOpenFile();
+
+        if (shouldFailIfOpen)
+        {
+            if (isFileOpen(file))
+            {
+                Message message = MessageFactory.createStaticMessage("Attempting to delete an open file: " + file);
+                throw new MuleRuntimeException(message);
+            }
+        }
+        else if (shouldLogWarningIfDeleteOpenFile())
+        {
+            if (isFileOpen(file))
+            {
+                logger.warn("Attempting to delete an open file: " + file);
+            }
+        }
+
         return file.delete();
     }
 
