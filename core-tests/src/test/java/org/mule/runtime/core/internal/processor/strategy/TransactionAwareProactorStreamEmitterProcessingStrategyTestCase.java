@@ -13,19 +13,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory.TransactionAwareProactorStreamEmitterProcessingStrategy;
+import org.mule.tck.testmodels.mule.TestTransaction;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
@@ -38,10 +38,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareProactorStreamEmitterProcessingStrategy(() -> blocking,
-                                                                       XS_BUFFER_SIZE,
+    return new TransactionAwareProactorStreamEmitterProcessingStrategy(XS_BUFFER_SIZE,
                                                                        2,
-                                                                       DEFAULT_WAIT_STRATEGY,
                                                                        () -> cpuLight,
                                                                        () -> blocking,
                                                                        () -> cpuIntensive,

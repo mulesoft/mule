@@ -37,11 +37,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareProactorStreamEmitterProcessingStrategy(getRingBufferSchedulerSupplier(muleContext,
-                                                                                                      schedulersNamePrefix),
-                                                                       getBufferSize(),
+    return new TransactionAwareProactorStreamEmitterProcessingStrategy(getBufferSize(),
                                                                        getSubscriberCount(),
-                                                                       getWaitStrategy(),
                                                                        () -> muleContext.getSchedulerService()
                                                                            .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
                                                                                .withName(schedulersNamePrefix + "."
@@ -68,10 +65,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
   static class TransactionAwareProactorStreamEmitterProcessingStrategy extends ProactorStreamEmitterProcessingStrategy {
 
-    TransactionAwareProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                            int bufferSize,
+    TransactionAwareProactorStreamEmitterProcessingStrategy(int bufferSize,
                                                             int subscriberCount,
-                                                            String waitStrategy,
                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
@@ -79,22 +74,20 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                             boolean isMaxConcurrencyEagerCheck, boolean isThreadLoggingEnabled)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+      super(bufferSize, subscriberCount, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
             isMaxConcurrencyEagerCheck, isThreadLoggingEnabled);
     }
 
-    TransactionAwareProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                            int bufferSize,
+    TransactionAwareProactorStreamEmitterProcessingStrategy(int bufferSize,
                                                             int subscriberCount,
-                                                            String waitStrategy,
                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                             int maxConcurrency, boolean isMaxConcurrencyEagerCheck)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+      super(bufferSize, subscriberCount, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency,
             isMaxConcurrencyEagerCheck, false);
     }

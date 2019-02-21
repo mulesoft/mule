@@ -35,13 +35,10 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,7 +57,9 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.apache.commons.io.input.NullInputStream;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,10 +92,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix,
                                                         int maxConcurrency) {
-    return new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                       XS_BUFFER_SIZE,
+    return new ProactorStreamEmitterProcessingStrategy(XS_BUFFER_SIZE,
                                                        2,
-                                                       DEFAULT_WAIT_STRATEGY,
                                                        () -> cpuLight,
                                                        () -> blocking,
                                                        () -> cpuIntensive,
@@ -251,10 +248,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
 
     flow = flowBuilder.get().processors(blockingProcessor)
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     1,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLight,
                                                                                                     () -> rejectingSchedulerSpy,
                                                                                                     () -> cpuIntensive,
@@ -280,10 +275,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(cpuIntensiveSchedulerSpy));
 
     flow = flowBuilder.get().processors(cpuIntensiveProcessor)
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     1,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> rejectingSchedulerSpy,
@@ -307,10 +300,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     1,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
@@ -328,10 +319,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("If max concurrency is 2, only 2 threads are used for CPU_LITE processors and further requests blocks.")
   public void singleCpuLightConcurrentMaxConcurrency2() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     2,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
@@ -349,10 +338,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     2,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
@@ -370,10 +357,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("If max concurrency is 2, only 2 threads are used for BLOCKING processors and further requests blocks.")
   public void singleBlockingConcurrentMaxConcurrency2() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    DEFAULT_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
                                                                                                     2,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
@@ -419,10 +404,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("When concurrency < parallelism IO threads are still used for blocking processors to avoid cpuLight thread starvation.")
   public void concurrencyLessThanParallelism() throws Exception {
     flow = flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    XS_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(XS_BUFFER_SIZE,
                                                                                                     1,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLight,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,
@@ -668,7 +651,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final Scheduler cpuLightBusy = new TestScheduler(2, CPU_LIGHT, true) {
 
-      private AtomicInteger countdown = new AtomicInteger(0);
+      private final AtomicInteger countdown = new AtomicInteger(0);
 
       private void countAndThrow() {
         int v = countdown.getAndIncrement();
@@ -693,10 +676,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     triggerableMessageSource = new TriggerableMessageSource(FAIL);
 
     flow = flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(() -> ringBuffer,
-                                                                                                    XS_BUFFER_SIZE,
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(XS_BUFFER_SIZE,
                                                                                                     1,
-                                                                                                    DEFAULT_WAIT_STRATEGY,
                                                                                                     () -> cpuLightBusy,
                                                                                                     () -> blocking,
                                                                                                     () -> cpuIntensive,

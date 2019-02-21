@@ -9,18 +9,19 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory.WorkQueueStreamProcessingStrategy;
 
 import java.util.function.Supplier;
 
@@ -34,7 +35,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProcessingStrategyFactory {
+public class ReactorStreamProcessingStrategyFactory extends AbstractStreamWorkQueueProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
@@ -66,18 +67,29 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
     return ReactorStreamProcessingStrategy.class;
   }
 
-  static class ReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable {
+  static class ReactorStreamProcessingStrategy extends AbstractReactorStreamProcessingStrategy implements Startable, Stoppable {
 
-    private final Supplier<Scheduler> cpuLightSchedulerSupplier;
-    protected Scheduler cpuLightScheduler;
-    private final int parallelism;
+    private final WorkQueueStreamProcessingStrategy workQueueStreamProcessingStrategy;
 
     ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
                                     String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier, int parallelism,
                                     int maxConcurrency, boolean maxConcurrencyEagerCheck) {
-      super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency, maxConcurrencyEagerCheck);
-      this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
-      this.parallelism = parallelism;
+      super(subscribers, cpuLightSchedulerSupplier, parallelism,
+            maxConcurrency, maxConcurrencyEagerCheck);
+      this.workQueueStreamProcessingStrategy = new WorkQueueStreamProcessingStrategy(ringBufferSchedulerSupplier,
+                                                                                     bufferSize,
+                                                                                     subscribers,
+                                                                                     waitStrategy,
+                                                                                     // This scheduler is not actually used by the
+                                                                                     // sink that is built
+                                                                                     cpuLightSchedulerSupplier,
+                                                                                     maxConcurrency,
+                                                                                     maxConcurrencyEagerCheck);
+    }
+
+    @Override
+    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
+      return workQueueStreamProcessingStrategy.createSink(flowConstruct, pipeline);
     }
 
     @Override
@@ -85,7 +97,7 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
       reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       if (maxConcurrency > subscribers) {
         return publisher -> from(publisher)
-            .parallel(parallelism)
+            .parallel(getParallelism())
             .runOn(scheduler)
             .composeGroup(super.onPipeline(pipeline));
       } else {
@@ -93,40 +105,6 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
       }
     }
 
-    @Override
-    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      reactor.core.scheduler.Scheduler cpuLightScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-      if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher)
-            .transform(processor)
-            .publishOn(cpuLightScheduler)
-            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-      } else {
-        return publisher -> from(publisher)
-            .transform(processor)
-            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-      }
-    }
-
-    protected int getParallelism() {
-      return parallelism;
-    }
-
-    @Override
-    public void start() throws MuleException {
-      this.cpuLightScheduler = cpuLightSchedulerSupplier.get();
-    }
-
-    @Override
-    public void stop() throws MuleException {
-      if (cpuLightScheduler != null) {
-        cpuLightScheduler.stop();
-      }
-    }
-
-    protected Scheduler getCpuLightScheduler() {
-      return cpuLightScheduler;
-    }
   }
 
 }
