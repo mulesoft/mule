@@ -32,7 +32,7 @@ import java.util.Optional;
 import org.apache.commons.collections.CollectionUtils;
 
 /**
- * Validates that POJOs are valid for the model
+ * Validates that POJOs have a default constructor, and implements methods equals and hashCode
  *
  * @since 4.2
  */
@@ -59,52 +59,43 @@ public class PojosModelValidator implements ExtensionModelValidator {
 
       @Override
       protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-        validatePojoHasDefaultConstructor(owner, problemsReporter);
+        Optional<ExtensionParameterDescriptorModelProperty> modelProperty =
+            model.getModelProperty(ExtensionParameterDescriptorModelProperty.class);
+        if (modelProperty.isPresent()) {
+          Type type = modelProperty.get().getExtensionParameter().getType();
+          if (type.isSameType(TypedValue.class)) {
+            type = getFirstGenericType(type).orElse(null);
+          }
+          if (type != null && type.asMetadataType() instanceof ObjectType) {
+            ClassInformationAnnotation classInformationAnnotation = type.getClassInformation();
+            if (!classInformationAnnotation.isAbstract() && !classInformationAnnotation.isInterface()
+                && !classInformationAnnotation.hasDefaultConstructor()) {
+              problemsReporter
+                  .addError(new Problem(model, format("Type '%s' does not have a default constructor", type.getName())));
+            }
+          }
+        }
       }
     }.walk(extensionModel);
   }
 
-  private void iterateParametersAndValidate(ParameterizedModel model, ProblemsReporter problemsReporter,
-                                            TypeValidator<ParameterizedModel, Type, ProblemsReporter> validator) {
+  private void validateOverridesEqualsAndHashCode(ParameterizedModel model, ProblemsReporter reporter) {
     model.getAllParameterModels().forEach(parameterModel -> {
-
       Optional<ExtensionParameterDescriptorModelProperty> modelProperty =
           parameterModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class);
       if (modelProperty.isPresent()) {
         Type type = modelProperty.get().getExtensionParameter().getType();
-        validator.validateType(model, type, problemsReporter);
-      }
-    });
-  }
-
-  private void validateOverridesEqualsAndHashCode(ParameterizedModel model, ProblemsReporter reporter) {
-    iterateParametersAndValidate(model, reporter, (parameterizedModel, type, problemReporter) -> {
-      ClassInformationAnnotation classInformationAnnotation = type.getClassInformation();
-      if (!classInformationAnnotation.isInterface() && !classInformationAnnotation.isAbstract()
-          && type.asMetadataType() instanceof ObjectType) {
-        Optional<MethodElement> equals = type.getMethod("equals", Object.class);
-        Optional<MethodElement> hashCode = type.getMethod("hashCode");
-        if (!equals.isPresent() || !hashCode.isPresent()) {
-          reporter
-              .addError(new Problem(model,
-                                    format("Type '%s' must override equals and hashCode",
-                                           type.getName())));
-        }
-      }
-    });
-  }
-
-  private void validatePojoHasDefaultConstructor(ParameterizedModel owner, ProblemsReporter problemsReporter) {
-    iterateParametersAndValidate(owner, problemsReporter, (parameterizedModel, type, problemReporter) -> {
-      if (type.isSameType(TypedValue.class)) {
-        type = getFirstGenericType(type).orElse(null);
-      }
-      if (type != null && type.asMetadataType() instanceof ObjectType) {
         ClassInformationAnnotation classInformationAnnotation = type.getClassInformation();
-        if (!classInformationAnnotation.isAbstract() && !classInformationAnnotation.isInterface()
-            && !classInformationAnnotation.hasDefaultConstructor()) {
-          problemsReporter
-              .addError(new Problem(parameterizedModel, format("Type '%s' does not have a default constructor", type.getName())));
+        if (!classInformationAnnotation.isInterface() && !classInformationAnnotation.isAbstract()
+            && type.asMetadataType() instanceof ObjectType) {
+          Optional<MethodElement> equals = type.getMethod("equals", Object.class);
+          Optional<MethodElement> hashCode = type.getMethod("hashCode");
+          if (!equals.isPresent() || !hashCode.isPresent()) {
+            reporter
+                .addError(new Problem(model,
+                                      format("Type '%s' must override equals and hashCode",
+                                             type.getName())));
+          }
         }
       }
     });
@@ -113,11 +104,5 @@ public class PojosModelValidator implements ExtensionModelValidator {
   private Optional<Type> getFirstGenericType(Type typeWithGenerics) {
     return !CollectionUtils.isEmpty(typeWithGenerics.getGenerics())
         ? Optional.ofNullable(typeWithGenerics.getGenerics().get(0).getConcreteType()) : Optional.empty();
-  }
-
-  @FunctionalInterface
-  private interface TypeValidator<M, T, PR> {
-
-    void validateType(M model, T type, PR problemsReporter);
   }
 }
