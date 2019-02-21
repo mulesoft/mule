@@ -12,9 +12,7 @@ import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
@@ -143,7 +141,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
 
       InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
       if (beforeExecutionResult.isOk()) {
-        result = from(withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context)));
+        result = from(executor.execute(context));
         executedInterceptors.addAll(interceptors);
       } else {
         result = error(beforeExecutionResult.getThrowable());
