@@ -81,7 +81,7 @@ public class PerAppCopyNativeLibraryFinder extends PerAppNativeLibraryFinder
         {
             for (String library : list)
             {
-                new File(perAppNativeLibs, library).delete();
+                FileUtils.deleteFile(new File(perAppNativeLibs, library));
             }
         }
     }

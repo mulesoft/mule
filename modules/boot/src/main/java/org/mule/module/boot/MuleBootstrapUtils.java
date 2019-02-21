@@ -6,6 +6,8 @@
  */
 package org.mule.module.boot;
 
+import org.mule.util.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -234,11 +236,11 @@ public final class MuleBootstrapUtils
                     }
                     if (isRenamed)
                     {
-                        srcFile.delete();
+                        FileUtils.deleteFile(srcFile);
                     }
                     else
                     {
-                        destFile.delete();
+                        FileUtils.deleteFile(destFile);
                     }
                 }
             }

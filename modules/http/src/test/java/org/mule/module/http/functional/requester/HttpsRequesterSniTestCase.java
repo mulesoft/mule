@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.security.tls.TlsConfiguration;
@@ -18,6 +17,7 @@ import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.ClassUtils;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +75,7 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
     @AfterClass
     public static void removeTlsPropertiesFile()
     {
-        getTlsPropertiesFile().delete();
+        FileUtils.deleteFile(getTlsPropertiesFile());
     }
 
     private static File getTlsPropertiesFile()

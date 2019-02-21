@@ -280,14 +280,14 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 }
                 else
                 {
-                    if (!files[i].delete())
+                    if (!deleteFile(files[i]))
                     {
                         return false;
                     }
                 }
             }
         }
-        return dir.delete();
+        return deleteFile(dir);
     }
 
     /**
@@ -669,11 +669,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                         logger.debug("File renamed: " + isRenamed);
                         if (isRenamed)
                         {
-                            srcFile.delete();
+                            deleteFile(srcFile);
                         }
                         else
                         {
-                            destFile.delete();
+                            deleteFile(destFile);
                         }
                     }
                     else
@@ -777,7 +777,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
                 srcChannel.close();
                 dstChannel.close();
-                success = sourceFile.delete();
+                success = deleteFile(sourceFile);
             }
             catch (IOException ioex)
             {
@@ -994,6 +994,43 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
 
         return timeStamp;
+    }
+
+    public static boolean isFileOpen(File file)
+    {
+        String osName = System.getProperty("os.name", "<None>");
+        if (osName.startsWith("Windows"))
+        {
+            // try to rename to the same name will fail on Windows
+            String fileName = file.getName();
+            File sameFileName = new File(fileName);
+            return !file.renameTo(sameFileName);
+        }
+        else
+        {
+            String filePath = file.getAbsolutePath();
+            File nullFile = new File("/dev/null");
+
+            // use lsof utility
+            ProcessBuilder builder = new ProcessBuilder("lsof", "-c", "java", "-a", "-T", "--", filePath).redirectError(nullFile).redirectOutput(nullFile);
+
+            try
+            {
+                Process process = builder.start();
+                int exitValue = process.waitFor();
+                return exitValue == 0;
+            }
+            catch (InterruptedException | IOException e)
+            {
+                // ignore the exceptions
+            }
+            return false;
+        }
+    }
+
+    public static boolean deleteFile(File file)
+    {
+        return file.delete();
     }
 
     public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive)

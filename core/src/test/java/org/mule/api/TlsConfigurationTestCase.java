@@ -26,6 +26,7 @@ import static org.mule.util.ClassUtils.getClassPathRoot;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.util.FileUtils;
 import org.mule.util.SecurityUtils;
 
 import java.io.File;
@@ -136,7 +137,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            configFile.delete();
+            FileUtils.deleteFile(configFile);
         }
     }
 
@@ -158,7 +159,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            configFile.delete();
+            FileUtils.deleteFile(configFile);
         }
     }
 
@@ -205,7 +206,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            configFile.delete();
+            FileUtils.deleteFile(configFile);
         }
     }
 
@@ -231,7 +232,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            configFile.delete();
+            FileUtils.deleteFile(configFile);
         }
     }
 
@@ -252,7 +253,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         finally
         {
             System.setProperty(MULE_SECURITY_SYSTEM_PROPERTY, previousSecurityModel);
-            file.delete();
+            FileUtils.deleteFile(file);
         }
     }
 

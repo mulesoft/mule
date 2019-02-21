@@ -94,7 +94,7 @@ public final class JarUtils
             combinedEntries.putAll(entries);
             File tmpJarFile = File.createTempFile(jarFile.getName(), null);
             createJarFileEntries(tmpJarFile, combinedEntries);
-            jarFile.delete();
+            FileUtils.deleteFile(jarFile);
             FileUtils.renameFile(tmpJarFile, jarFile);
         }
     }

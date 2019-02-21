@@ -6,6 +6,10 @@
  */
 package org.mule.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -14,11 +18,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test suite for jar utilities.
@@ -51,7 +50,7 @@ public class JarUtilsTestCase extends AbstractMuleTestCase
             jarEntries.put("META-INF/byte", jarEntryBytes);
             
             jarFile = File.createTempFile("test", ".jar");
-            assertTrue(jarFile.delete());
+            assertTrue(FileUtils.deleteFile(jarFile));
             
             JarUtils.createJarFileEntries(jarFile, jarEntries);
             
@@ -104,11 +103,11 @@ public class JarUtilsTestCase extends AbstractMuleTestCase
         {
             if (jarFile != null)
             {
-                jarFile.delete();
+                FileUtils.deleteFile(jarFile);
             }
             if (jarEntryFile != null)
             {
-                jarEntryFile.delete();
+                FileUtils.deleteFile(jarEntryFile);
             }
         }
     }

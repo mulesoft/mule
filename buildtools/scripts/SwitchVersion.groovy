@@ -174,5 +174,5 @@ def replaceFile(originalFile, newFile)
 
     originalFile.renameTo(backupFile)
     newFile.renameTo(originalFile)
-    backupFile.delete()
+    FileUtils.deleteFile(backupFile)
 }

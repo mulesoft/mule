@@ -136,7 +136,7 @@ public class ArtifactArchiveInstaller
             FileUtils.deleteDirectory(tmpDir);
             // remove a marker, harmless, but a tidy artifact dir is always better :)
             File marker = getArtifactAnchorFile(artifactName);
-            marker.delete();
+            FileUtils.deleteFile(marker);
             Introspector.flushCaches();
         }
         catch (Throwable t)

@@ -880,7 +880,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                 throw new IOException("Failed to set readonly-folder: " + parent + " to writeable");
             }
 
-            if (!parent.delete())
+            if (!FileUtils.deleteFile(parent))
             {
                 throw new IOException("Failed to delete folder: " + parent);
             }

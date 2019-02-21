@@ -87,7 +87,7 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
     private void createTempDirectory() throws Exception
     {
         tmpDir = File.createTempFile("mule-file-test-", "-dir");
-        tmpDir.delete();
+        FileUtils.deleteFile(tmpDir);
         tmpDir.mkdir();
     }
 

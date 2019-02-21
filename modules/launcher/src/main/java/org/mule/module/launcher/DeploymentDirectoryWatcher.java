@@ -12,7 +12,6 @@ import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.Artifact;
@@ -23,7 +22,10 @@ import org.mule.module.launcher.util.ElementRemovedEvent;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.ArrayUtils;
 import org.mule.util.CollectionUtils;
+import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
+
+import com.google.common.base.Optional;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -41,7 +43,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.google.common.base.Optional;
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
@@ -513,7 +514,7 @@ public class DeploymentDirectoryWatcher implements Runnable
         for (String anchor : anchors)
         {
             // ignore result
-            new File(directory, anchor).delete();
+            FileUtils.deleteFile(new File(directory, anchor));
         }
     }
 

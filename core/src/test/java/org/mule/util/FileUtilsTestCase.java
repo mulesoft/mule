@@ -74,10 +74,10 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             assertNotNull(file);
             assertTrue(file.exists());
             assertTrue(file.canRead());
-            file.delete();
+            FileUtils.deleteFile(file);
 
             file = FileUtils.newFile(TEST_FILE);
-            file.delete();
+            FileUtils.deleteFile(file);
 
             File dir = FileUtils.openDirectory("src");
             assertNotNull(dir);
@@ -90,14 +90,14 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             assertTrue(dir.exists());
             assertTrue(dir.canRead());
             assertTrue(dir.isDirectory());
-            dir.delete();
+            FileUtils.deleteFile(dir);
 
         }
         finally
         {
             if (file != null)
             {
-                file.delete();
+                FileUtils.deleteFile(file);
             }
         }
     }
@@ -330,10 +330,10 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             File sourceFile = createTestFile("source");
             File destFile = createTestFile("dest");
 
-            assertTrue(destFile.delete());
+            assertTrue(FileUtils.deleteFile(destFile));
             assertTrue(FileUtils.renameFile(sourceFile, destFile));
             assertTrue(destFile.exists());
-            assertTrue(destFile.delete());
+            assertTrue(FileUtils.deleteFile(destFile));
         }
         catch (Exception e)
         {
@@ -352,8 +352,8 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
 
             assertTrue(FileUtils.renameFile(sourceFile, destFile));
             assertTrue(destFile.exists());
-            assertTrue(destFile.delete());
-            assertTrue(dir.delete());
+            assertTrue(FileUtils.deleteFile(destFile));
+            assertTrue(FileUtils.deleteFile(dir));
         }
         catch (Exception e)
         {
@@ -397,7 +397,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     private File createTestDir(String dirPath) throws IOException
     {
         File file = createTestFile(dirPath);
-        file.delete();
+        FileUtils.deleteFile(file);
         file.mkdir();
         return file;
     }

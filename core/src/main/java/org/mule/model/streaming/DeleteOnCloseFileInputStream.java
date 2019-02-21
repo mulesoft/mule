@@ -6,6 +6,8 @@
  */
 package org.mule.model.streaming;
 
+import org.mule.util.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,7 +42,7 @@ public class DeleteOnCloseFileInputStream extends FileInputStream
         {
             if (file != null)
             {
-                file.delete();
+                FileUtils.deleteFile(file);
                 file = null;
             }
         }

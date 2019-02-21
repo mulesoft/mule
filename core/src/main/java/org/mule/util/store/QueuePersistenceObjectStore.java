@@ -350,7 +350,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     {
         if (file.exists())
         {
-            if (!file.delete())
+            if (!FileUtils.deleteFile(file))
             {
                 Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath()
                                                                    + " failed");

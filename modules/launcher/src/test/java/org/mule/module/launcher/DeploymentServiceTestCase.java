@@ -3606,7 +3606,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private boolean removeAppAnchorFile(String appName)
     {
         File anchorFile = getArtifactAnchorFile(appName, appsDir);
-        return anchorFile.delete();
+        return FileUtils.deleteFile(anchorFile);
     }
 
     /**
@@ -3618,7 +3618,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private boolean removeDomainAnchorFile(String domainName)
     {
         File anchorFile = getArtifactAnchorFile(domainName, domainsDir);
-        return anchorFile.delete();
+        return FileUtils.deleteFile(anchorFile);
     }
 
     private void assertApplicationAnchorFileExists(String applicationName)

@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assume.assumeThat;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 
@@ -33,7 +34,7 @@ public class PerAppCopyNativeLibraryFinderTestCase extends AbstractNativeLibrary
     @Test
     public void createsTempFolder() throws Exception
     {
-        tempFolder.getRoot().delete();
+        FileUtils.deleteFile(tempFolder.getRoot());
 
         new PerAppCopyNativeLibraryFinder(libFolder.getRoot(), tempFolder.getRoot());
 

@@ -178,7 +178,7 @@ def move(File sourceFile, File destFile)
 
 def delete(File file)
 {
-    if (file.delete() == false)
+    if (FileUtils.deleteFile(file) == false)
     {
         throw new IOException("deleting " + file.canonicalFile + " failed")
     }

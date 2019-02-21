@@ -62,7 +62,7 @@ public class JettyHttpsCustomTlsConfigTestCase extends FunctionalTestCase
     @AfterClass
     public static void removeTlsPropertiesFile()
     {
-        getTlsPropertiesFile().delete();
+        FileUtils.deleteFile(getTlsPropertiesFile());
     }
 
     private static File getTlsPropertiesFile()

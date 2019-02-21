@@ -12,7 +12,6 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
 import static org.mule.util.FileUtils.cleanDirectory;
 import static org.mule.util.FileUtils.newFile;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.serialization.ObjectSerializer;
@@ -25,6 +24,7 @@ import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.util.FileUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -483,7 +483,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
     {
         if (file.exists())
         {
-            if (!file.delete())
+            if (!FileUtils.deleteFile(file))
             {
                 Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath()
                                                                    + " failed");

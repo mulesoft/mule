@@ -6,6 +6,12 @@
  */
 package org.mule.module.reboot;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import org.mule.util.FileUtils;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,11 +23,6 @@ import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class MuleContainerBootstrapUtilsTestCase
 {
@@ -107,8 +108,8 @@ public class MuleContainerBootstrapUtilsTestCase
         MuleContainerBootstrapUtils.renameFile(source, dest);
         assertTrue(dest.exists());
         assertFalse(source.exists());
-        source.delete();
-        dest.delete();
+        FileUtils.deleteFile(source);
+        FileUtils.deleteFile(dest);
     }
 
     /**
@@ -124,8 +125,8 @@ public class MuleContainerBootstrapUtilsTestCase
         MuleContainerBootstrapUtils.renameFileHard(source, dest);
         assertTrue(dest.exists());
         assertFalse(source.exists());
-        source.delete();
-        dest.delete();
+        FileUtils.deleteFile(source);
+        FileUtils.deleteFile(dest);
     }
 
     /**
