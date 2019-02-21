@@ -315,9 +315,17 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
         extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(false));
 
-    assertThat(configurationModel.getOperationModels().size(), is(1));
+    assertThat(configurationModel.getOperationModels().size(), is(2));
 
     Optional<OperationModel> operationModelOptional = configurationModel.getOperationModel("operation-with-doc");
+    assertOperationWithDocumentationElementsEverywhere(extensionModel, operationModelOptional);
+
+    Optional<OperationModel> anotherOperationModelOptional = configurationModel.getOperationModel("anotherOperationWithDoc");
+    assertOperationWithDocumentationElementsEverywhere(extensionModel, anotherOperationModelOptional);
+  }
+
+  private void assertOperationWithDocumentationElementsEverywhere(final ExtensionModel extensionModel,
+                                                                  final Optional<OperationModel> operationModelOptional) {
     assertThat(operationModelOptional.isPresent(), is(true));
     final OperationModel operationModel = operationModelOptional.get();
     assertThat(operationModel.getDescription(), is("Documentation for the operation"));

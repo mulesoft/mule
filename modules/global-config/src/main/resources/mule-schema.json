@@ -22,6 +22,34 @@
               "password": {
                 "description": "Password to access the repository",
                 "type": "string"
+              },
+              "snapshotPolicy": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "string"
+                  },
+                  "updatePolicy": {
+                    "type": "string"
+                  },
+                  "checksumPolicy": {
+                    "type": "string"
+                  }
+                }
+              },
+              "releasePolicy": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "string"
+                  },
+                  "updatePolicy": {
+                    "type": "string"
+                  },
+                  "checksumPolicy": {
+                    "type": "string"
+                  }
+                }
               }
             },
             "required" : ["url"]

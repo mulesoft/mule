@@ -27,6 +27,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateE
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedBundleDescriptorAttributes;
 
 import java.io.File;
 import java.util.Map;
@@ -74,6 +75,9 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
           .build();
     } else {
+      if (attributes instanceof PluginExtendedBundleDescriptorAttributes) {
+        return ((PluginExtendedBundleDescriptorAttributes) attributes).getPluginBundleDescriptor();
+      }
       return getBundleDescriptor(artifactFile, artifactType);
     }
   }

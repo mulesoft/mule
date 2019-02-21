@@ -39,6 +39,8 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
 
   public static final String PROCESSOR_SCHEDULER_CONTEXT_KEY = "mule.nb.processorScheduler";
 
+  protected static final long SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     return new DirectSink(pipeline, createOnEventConsumer(), SMALL_BUFFER_SIZE);

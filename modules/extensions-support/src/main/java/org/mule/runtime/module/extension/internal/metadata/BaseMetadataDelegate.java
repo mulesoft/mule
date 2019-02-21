@@ -8,8 +8,9 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
+
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -26,12 +27,12 @@ abstract class BaseMetadataDelegate {
 
   final static String NULL_TYPE_ERROR = "NullType is not a valid type for this element";
 
-  protected final ComponentModel component;
+  protected final EnrichableModel model;
   final MetadataResolverFactory resolverFactory;
 
-  BaseMetadataDelegate(ComponentModel component) {
-    this.component = component;
-    this.resolverFactory = getMetadataResolverFactory(component);
+  BaseMetadataDelegate(EnrichableModel model) {
+    this.model = model;
+    this.resolverFactory = getMetadataResolverFactory(model);
   }
 
   boolean isMetadataResolvedCorrectly(MetadataType dynamicType, boolean allowsNullType) {

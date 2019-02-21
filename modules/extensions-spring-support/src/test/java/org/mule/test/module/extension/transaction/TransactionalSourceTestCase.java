@@ -9,6 +9,7 @@ package org.mule.test.module.extension.transaction;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;

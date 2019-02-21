@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.functional.Either.right;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -29,10 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -60,6 +59,7 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private static final int MAX_DEPTH = getInteger(BaseEventContext.class.getName() + ".maxDepth", 25);
 
+  private final boolean debugLogEnabled = LOGGER.isDebugEnabled();
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
@@ -74,7 +74,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private volatile byte state = STATE_READY;
   private volatile Either<Throwable, CoreEvent> result;
 
-  private final Set<ResponsePublisher> responsePublishers = new HashSet<>();
+  private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
 
   protected FlowCallStack flowCallStack = new DefaultFlowCallStack();
 
@@ -106,7 +106,7 @@ abstract class AbstractEventContext implements BaseEventContext {
 
       messageBuilder.append("Too many child contexts nested." + lineSeparator());
 
-      if (LOGGER.isDebugEnabled()) {
+      if (debugLogEnabled) {
         messageBuilder.append("  > " + this.toString() + lineSeparator());
         Optional<BaseEventContext> current = getParentContext();
         while (current.isPresent()) {
@@ -132,14 +132,14 @@ abstract class AbstractEventContext implements BaseEventContext {
   @Override
   public final void success() {
     if (isResponseDone()) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " empty response was already completed, ignoring.");
+      if (debugLogEnabled) {
+        LOGGER.debug("{} empty response was already completed, ignoring.", this);
       }
       return;
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(this + " response completed with no result.");
+    if (debugLogEnabled) {
+      LOGGER.debug("{} response completed with no result.", this);
     }
     responseDone(right(null));
   }
@@ -150,14 +150,14 @@ abstract class AbstractEventContext implements BaseEventContext {
   @Override
   public final void success(CoreEvent event) {
     if (isResponseDone()) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " response was already completed, ignoring.");
+      if (debugLogEnabled) {
+        LOGGER.debug("{} response was already completed, ignoring.", this);
       }
       return;
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(this + " response completed with result.");
+    if (debugLogEnabled) {
+      LOGGER.debug("{} response completed with result.", this);
     }
     responseDone(right(event));
   }
@@ -168,19 +168,19 @@ abstract class AbstractEventContext implements BaseEventContext {
   @Override
   public final Publisher<Void> error(Throwable throwable) {
     if (isResponseDone()) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " error response was already completed, ignoring.");
+      if (debugLogEnabled) {
+        LOGGER.debug("{} error response was already completed, ignoring.", this);
       }
       return empty();
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(this + " responseDone completed with error.");
+    if (debugLogEnabled) {
+      LOGGER.debug("{} responseDone completed with error.", this);
     }
 
     if (throwable instanceof MessagingException) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " handling messaging exception.");
+      if (debugLogEnabled) {
+        LOGGER.debug("{} handling messaging exception.", this);
       }
       return just((MessagingException) throwable)
           .flatMapMany(exceptionHandler)
@@ -197,9 +197,8 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private synchronized void responseDone(Either<Throwable, CoreEvent> result) {
     this.result = result;
-    for (ResponsePublisher rp : responsePublishers) {
-      rp.result = result;
-    }
+    responsePublisher.ifComputed(rp -> rp.result = result);
+
     state = STATE_RESPONSE;
     for (BiConsumer<CoreEvent, Throwable> onResponseConsumer : onResponseConsumerList) {
       signalConsumerSilently(onResponseConsumer);
@@ -220,8 +219,8 @@ abstract class AbstractEventContext implements BaseEventContext {
 
     synchronized (this) {
       if (state == STATE_RESPONSE && allChildrenComplete) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(this + " completed.");
+        if (debugLogEnabled) {
+          LOGGER.debug("{} completed.", this);
         }
         this.state = STATE_COMPLETE;
 
@@ -241,8 +240,8 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   protected synchronized void tryTerminate() {
     if (this.state == STATE_COMPLETE && (externalCompletion == null || externalCompletion.isDone())) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " terminated.");
+      if (debugLogEnabled) {
+        LOGGER.debug("{} terminated.", this);
       }
       this.state = STATE_TERMINATED;
 
@@ -269,7 +268,7 @@ abstract class AbstractEventContext implements BaseEventContext {
       });
 
       result = null;
-      responsePublishers.clear();
+      responsePublisher = null;
     }
   }
 
@@ -278,7 +277,7 @@ abstract class AbstractEventContext implements BaseEventContext {
       consumer.accept(result.getRight(), result.getLeft());
     } catch (Throwable t) {
       LOGGER.error(format("The event consumer %s, of EventContext %s failed with exception:",
-                          consumer.toString(), this.toString()),
+                          consumer, this),
                    t);
     }
   }
@@ -341,9 +340,7 @@ abstract class AbstractEventContext implements BaseEventContext {
       throw new IllegalStateException("getResponsePublisher() cannot be called after eventContext termination.");
     }
 
-    final ResponsePublisher responsePublisher = new ResponsePublisher();
-    responsePublishers.add(responsePublisher);
-    return Mono.create(responsePublisher);
+    return Mono.create(responsePublisher.get());
   }
 
   public void forEachChild(Consumer<BaseEventContext> childConsumer) {

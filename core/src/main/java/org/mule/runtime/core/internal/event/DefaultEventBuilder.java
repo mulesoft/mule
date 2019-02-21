@@ -71,7 +71,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
   private boolean varsModified = false;
-  private final Map<String, TypedValue<?>> flowVariables = new HashMap<>();
+  private final CaseInsensitiveHashMap<String, TypedValue<?>> flowVariables = new CaseInsensitiveHashMap<>();
   private final CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
   private final Map<String, Object> internalParameters = new HashMap<>(4);
   private Error error;
@@ -321,7 +321,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
     // Use this constructor from the builder
-    private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
+    private InternalEventImplementation(BaseEventContext context, Message message,
+                                        CaseInsensitiveHashMap<String, TypedValue<?>> variables,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
                                         Error error,
@@ -330,9 +331,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.session = session;
       this.securityContext = securityContext;
       this.message = message;
-      this.variables = (variables instanceof CaseInsensitiveHashMap
-          ? (CaseInsensitiveHashMap) variables
-          : new CaseInsensitiveHashMap<String, TypedValue<?>>(variables)).toImmutableCaseInsensitiveMap();
+      this.variables = variables.toImmutableCaseInsensitiveMap();
       this.internalParameters = internalParameters;
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);

@@ -39,6 +39,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -64,10 +65,6 @@ import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,7 +73,10 @@ import org.mockito.MockSettings;
 import org.mockito.stubbing.Answer;
 import org.reactivestreams.Publisher;
 import org.springframework.context.ApplicationContext;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
+
+import javax.inject.Inject;
 
 @SmallTest
 public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
@@ -299,8 +299,11 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private Answer<?> successAnswer() {
     return invocation -> {
-      Mono<CoreEvent> mono = from(invocation.getArgument(0));
-      return mono.doOnNext(event -> ((BaseEventContext) event.getContext()).success(result)).map(event -> result);
+      return from(invocation.getArgument(0))
+          .cast(CoreEvent.class)
+          .doOnNext(event -> ((BaseEventContext) event.getContext())
+              .success(CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build()))
+          .map(event -> CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build());
     };
   }
 

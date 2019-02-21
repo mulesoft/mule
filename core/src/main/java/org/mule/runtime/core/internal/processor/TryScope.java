@@ -17,10 +17,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -38,8 +38,8 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,18 +68,14 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     ExecutionTemplate<CoreEvent> executionTemplate =
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
+      TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+      ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
+      transaction.setComponentLocation(getLocation());
+
       try {
-        TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
-        ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
-        transaction.setComponentLocation(getLocation());
-        CoreEvent e = processToApply(event,
-                                     p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
-                                                                                             ofNullable(getLocation()),
-                                                                                             messagingExceptionHandler)));
+        return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
+      } finally {
         transaction.setComponentLocation(lastLocation);
-        return e;
-      } catch (Exception e) {
-        throw e;
       }
     };
 
@@ -100,7 +96,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       return Scope.super.apply(publisher);
     } else {
       return from(publisher)
-          .flatMap(event -> processWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
+          .transform(event -> applyWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
     }
   }
 

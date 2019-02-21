@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -36,8 +37,10 @@ import org.slf4j.LoggerFactory;
  */
 public class LoggerMessageProcessor extends AbstractComponent implements Processor, Initialisable, MuleContextAware {
 
+  // TODO - MULE-16446: Logger execution type should be defined according to the appender used
   private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty("mule.logging.blockingCategories", "");
   private static final Set<String> BLOCKING_CATEGORIES = new HashSet<>(asList(BLOCKING_CATEGORIES_PROPERTY.split(",")));
+  private static final String WILDCARD = "*";
 
   protected transient Logger logger;
 
@@ -53,6 +56,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   @Override
   public void initialise() throws InitialisationException {
     initLogger();
+    initProcessingTypeIfPossible();
     expressionManager = muleContext.getExpressionManager();
   }
 
@@ -61,6 +65,14 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
       logger = LoggerFactory.getLogger(category);
     } else {
       logger = LoggerFactory.getLogger(LoggerMessageProcessor.class);
+    }
+  }
+
+  protected void initProcessingTypeIfPossible() {
+    if (BLOCKING_CATEGORIES.size() == 1 && BLOCKING_CATEGORIES.contains(EMPTY)) {
+      processingType = CPU_LITE;
+    } else if (BLOCKING_CATEGORIES.contains(WILDCARD)) {
+      processingType = BLOCKING;
     }
   }
 

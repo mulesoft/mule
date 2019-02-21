@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -18,22 +19,26 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor.INNER_CHAIN_CTX_MAPPING;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.subscriberContext;
 
@@ -90,12 +95,15 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import reactor.core.publisher.Mono;
@@ -176,29 +184,30 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
+        .flatMap(event -> subscriberContext()
+            .map(ctx -> addContextToEvent(event, ctx)))
         .flatMap(checkedFunction(event -> {
-          Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
-
-          Context ctx = subscriberContext().block();
+          final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
+          final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+          final PrecalculatedExecutionContextAdapter<T> precalculatedContext = getPrecalculatedContext(event);
+          final Scheduler currentScheduler = ((InternalEvent) event).getInternalParameter(PROCESSOR_SCHEDULER_CONTEXT_KEY);
 
           OperationExecutionFunction operationExecutionFunction;
-          final Scheduler currentScheduler =
-              ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
 
-          final PrecalculatedExecutionContextAdapter<T> precalculatedEvent = getPrecalculatedContext(event);
           if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
-              && precalculatedEvent != null) {
+              && precalculatedContext != null) {
             ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
             operationExecutionFunction = (parameters, operationEvent) -> {
-              operationContext.setCurrentScheduler(currentScheduler);
+              operationContext.setCurrentScheduler(currentScheduler != null ? currentScheduler : IMMEDIATE_SCHEDULER);
               return doProcessWithErrorMapping(operationEvent, operationContext);
             };
           } else {
             operationExecutionFunction = (parameters, operationEvent) -> {
               ExecutionContextAdapter<T> operationContext;
               try {
-                operationContext = createExecutionContext(configuration, parameters, operationEvent, currentScheduler);
+                operationContext = createExecutionContext(configuration, parameters, operationEvent,
+                                                          currentScheduler != null ? currentScheduler : IMMEDIATE_SCHEDULER);
               } catch (MuleException e) {
                 return error(e);
               }
@@ -206,18 +215,43 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             };
           }
 
-          final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
-
           if (getLocation() != null) {
-            ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolvedProcessorRepresentation);
-            return policyManager
+            ((DefaultFlowCallStack) event.getFlowCallStack())
+                .setCurrentProcessorPath(resolvedProcessorRepresentation);
+            return Mono.from(policyManager
                 .createOperationPolicy(this, event, () -> resolutionResult)
-                .process(event, operationExecutionFunction, () -> resolutionResult, getLocation());
+                .process(event, operationExecutionFunction, () -> resolutionResult, getLocation()));
           } else {
             // If this operation has no component location then it is internal. Don't apply policies on internal operations.
-            return operationExecutionFunction.execute(resolutionResult, event);
+            return Mono.from(operationExecutionFunction.execute(resolutionResult, event));
           }
         }));
+  }
+
+  private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
+    final Optional<Scheduler> currentScheduler = ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY);
+
+    if (ctx.hasKey(POLICY_NEXT_OPERATION) || ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)) {
+      Function<Context, Context> context = innerChainCtx -> {
+        if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
+          innerChainCtx = innerChainCtx.put(POLICY_NEXT_OPERATION, ctx.get(POLICY_NEXT_OPERATION));
+        }
+        if (ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)) {
+          innerChainCtx = innerChainCtx.put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS,
+                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
+        }
+        return innerChainCtx;
+      };
+      return quickCopy(event, ImmutableMap.<String, Object>builder()
+          .put(INNER_CHAIN_CTX_MAPPING, context)
+          .put(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER))
+          .build());
+
+    } else if (currentScheduler.isPresent()) {
+      return quickCopy(event, singletonMap(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.get()));
+    } else {
+      return event;
+    }
   }
 
   private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {

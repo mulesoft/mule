@@ -121,9 +121,9 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
                                    null, null, appLocation, null, null, null);
     application.install();
-    assertThat(application.deploymentClassLoader, is(notNullValue()));
+    assertThat(application.getDeploymentClassLoader(), is(notNullValue()));
     application.dispose();
-    assertThat(application.deploymentClassLoader, is(nullValue()));
+    assertThat(application.getDeploymentClassLoader(), is(nullValue()));
   }
 
   @Test

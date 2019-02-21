@@ -28,7 +28,6 @@ import static reactor.util.concurrent.WaitStrategy.phasedOffLiteLock;
 import static reactor.util.concurrent.WaitStrategy.sleeping;
 import static reactor.util.concurrent.WaitStrategy.yielding;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -187,17 +186,24 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
                       flowConstruct.getName(), shutdownTimeout);
           processor.forceShutdown();
         }
-        try {
-          if (!completionLatch.await(max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
-            LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
-                        shutdownTimeout);
-          }
-        } catch (InterruptedException e) {
-          currentThread().interrupt();
-          throw new MuleRuntimeException(e);
-        }
-
+        awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch, start);
       }, createOnEventConsumer(), bufferSize);
+    }
+
+    protected void awaitSubscribersCompletion(FlowConstruct flowConstruct, final long shutdownTimeout,
+                                              CountDownLatch completionLatch, long startMillis) {
+      try {
+        if (!completionLatch.await(max(startMillis - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
+          LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
+                      shutdownTimeout);
+        }
+      } catch (InterruptedException e) {
+        LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
+                    flowConstruct.getName(),
+                    shutdownTimeout);
+        currentThread().interrupt();
+        return;
+      }
     }
 
 

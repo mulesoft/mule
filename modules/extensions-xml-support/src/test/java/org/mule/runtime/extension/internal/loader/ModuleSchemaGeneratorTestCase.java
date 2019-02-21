@@ -75,6 +75,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
         add("module-properties-types");
         add("module-single-op-with-property");
         add("module-single-operation");
+        add("module-single-operation-camelized");
       }
     };
 

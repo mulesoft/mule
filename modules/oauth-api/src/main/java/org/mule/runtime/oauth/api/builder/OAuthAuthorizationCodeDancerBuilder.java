@@ -29,8 +29,11 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
    * @param encodeClientCredentialsInBody If @{code true}, the client id and client secret will be sent in the request body.
    *        Otherwise, they will be sent as basic authentication.
    *
+   * @deprecated since 4.2.0. Use {@link OAuthAuthorizationCodeDancerBuilder#withClientCredentialsIn(ClientCredentialsLocation)} instead.
+   *
    * @return this builder
    */
+  @Deprecated
   default OAuthAuthorizationCodeDancerBuilder encodeClientCredentialsInBody(boolean encodeClientCredentialsInBody) {
     return this;
   }

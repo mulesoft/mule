@@ -7,13 +7,12 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.util.stream.Collectors.toSet;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DependencyConverter {
 
@@ -43,8 +42,8 @@ public class DependencyConverter {
     org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder builder =
         new org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder().setGroupId(descriptor.getGroupId())
             .setArtifactId(descriptor.getArtifactId())
-            // Use baseVersion as it will refer to the unresolved meta version (case of SNAPSHOTS instead of timestamp versions)
-            .setVersion(descriptor.getBaseVersion())
+            .setVersion(descriptor.getVersion())
+            .setBaseVersion(descriptor.getBaseVersion())
             .setType(descriptor.getType());
     descriptor.getClassifier().ifPresent(builder::setClassifier);
     return builder.build();

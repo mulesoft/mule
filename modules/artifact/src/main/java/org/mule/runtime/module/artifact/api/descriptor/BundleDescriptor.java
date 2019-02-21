@@ -23,6 +23,7 @@ public final class BundleDescriptor {
   private String groupId;
   private String artifactId;
   private String version;
+  private String baseVersion;
   private String type = "jar";
   private Optional<String> classifier = empty();
   private volatile String artifactFileName;
@@ -35,6 +36,10 @@ public final class BundleDescriptor {
 
   public String getArtifactId() {
     return this.artifactId;
+  }
+
+  public String getBaseVersion() {
+    return baseVersion;
   }
 
   public String getVersion() {
@@ -94,6 +99,7 @@ public final class BundleDescriptor {
     return "BundleDescriptor{" +
         "groupId='" + groupId + '\'' +
         ", artifactId='" + artifactId + '\'' +
+        ", baseVersion='" + baseVersion + '\'' +
         ", version='" + version + '\'' +
         ", type='" + type + '\'' +
         ", classifier=" + classifier +
@@ -132,6 +138,7 @@ public final class BundleDescriptor {
 
     private static final String ARTIFACT_ID = "artifact id";
     private static final String VERSION = "version";
+    private static final String BASE_VERSION = "base version";
     private static final String GROUP_ID = "group id";
     private static final String TYPE = "type";
     private static final String CLASSIFIER = "classifier";
@@ -168,6 +175,18 @@ public final class BundleDescriptor {
     public BundleDescriptor.Builder setVersion(String version) {
       validateIsNotEmpty(version, VERSION);
       bundleDependency.version = version;
+      return this;
+    }
+
+    /**
+     * This is the base version of the bundle.
+     *
+     * @param baseVersion the base version of the bundle. Cannot be null or empty.
+     * @return the builder
+     */
+    public BundleDescriptor.Builder setBaseVersion(String baseVersion) {
+      validateIsNotEmpty(baseVersion, BASE_VERSION);
+      bundleDependency.baseVersion = baseVersion;
       return this;
     }
 
