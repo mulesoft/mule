@@ -86,7 +86,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
 
         final AbstractPartitionedObjectStore<Serializable> objectStore = muleContext.getRegistry()
             .lookupObject("objectStore");
-        objectStore.disposePartition("DEFAULT_PARTITION");
+        objectStore.clear("DEFAULT_PARTITION");
     }
 
     @Test
