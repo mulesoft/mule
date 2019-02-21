@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
@@ -56,10 +57,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ProactorStreamEmitterProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
-                                                       getBufferSize(),
+    return new ProactorStreamEmitterProcessingStrategy(getBufferSize(),
                                                        getSubscriberCount(),
-                                                       getWaitStrategy(),
                                                        getCpuLightSchedulerSupplier(muleContext, schedulersNamePrefix),
                                                        () -> muleContext.getSchedulerService()
                                                            .ioScheduler(muleContext.getSchedulerBaseConfig()
@@ -87,12 +86,11 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     private static Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
 
+    private final int bufferSize;
     private final boolean isThreadLoggingEnabled;
 
-    public ProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                   int bufferSize,
+    public ProactorStreamEmitterProcessingStrategy(int bufferSize,
                                                    int subscriberCount,
-                                                   String waitStrategy,
                                                    Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                    Supplier<Scheduler> blockingSchedulerSupplier,
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
@@ -101,16 +99,15 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    boolean isThreadLoggingEnabled)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+      super(subscriberCount, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
             maxConcurrencyEagerCheck);
+      this.bufferSize = requireNonNull(bufferSize);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
 
-    public ProactorStreamEmitterProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                   int bufferSize,
+    public ProactorStreamEmitterProcessingStrategy(int bufferSize,
                                                    int subscriberCount,
-                                                   String waitStrategy,
                                                    Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                    Supplier<Scheduler> blockingSchedulerSupplier,
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
@@ -118,7 +115,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    int maxConcurrency, boolean maxConcurrencyEagerCheck)
 
     {
-      this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+      this(bufferSize, subscriberCount, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
            maxConcurrencyEagerCheck, false);
     }

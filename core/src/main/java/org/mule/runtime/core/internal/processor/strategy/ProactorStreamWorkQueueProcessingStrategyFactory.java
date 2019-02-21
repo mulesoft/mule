@@ -11,17 +11,22 @@ import static java.lang.Math.min;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
+import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory.WorkQueueStreamProcessingStrategy;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -92,6 +97,7 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
 
   static class ProactorStreamWorkQueueProcessingStrategy extends ProactorStreamProcessingStrategy {
 
+    private final WorkQueueStreamProcessingStrategy workQueueStreamProcessingStrategy;
     private final boolean isThreadLoggingEnabled;
 
     public ProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
@@ -106,9 +112,24 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
                                                      boolean isThreadLoggingEnabled)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
+      super(subscriberCount, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
             maxConcurrencyEagerCheck);
+      this.workQueueStreamProcessingStrategy = new WorkQueueStreamProcessingStrategy(ringBufferSchedulerSupplier,
+                                                                                     bufferSize,
+                                                                                     subscriberCount,
+                                                                                     waitStrategy,
+                                                                                     blockingSchedulerSupplier,
+                                                                                     maxConcurrency,
+                                                                                     maxConcurrencyEagerCheck,
+                                                                                     isThreadLoggingEnabled) {
+
+        @Override
+        protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, Disposable disposable, Consumer<CoreEvent> onEventConsumer,
+                                               int bufferSize) {
+          return new ProactorSinkWrapper<E>(super.buildSink(fluxSink, disposable, onEventConsumer, bufferSize));
+        }
+      };
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
 
@@ -126,6 +147,24 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
            maxConcurrencyEagerCheck, false);
+    }
+
+    @Override
+    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
+      return workQueueStreamProcessingStrategy.createSink(flowConstruct, function);
+    }
+
+    @Override
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+      if (maxConcurrency > subscribers) {
+        return publisher -> from(publisher)
+            .parallel(getParallelism())
+            .runOn(scheduler)
+            .composeGroup(super.onPipeline(pipeline));
+      } else {
+        return super.onPipeline(pipeline);
+      }
     }
 
     @Override
@@ -153,9 +192,15 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     }
 
     @Override
-    protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, Disposable disposable, Consumer<CoreEvent> onEventConsumer,
-                                           int bufferSize) {
-      return new ProactorSinkWrapper<E>(super.buildSink(fluxSink, disposable, onEventConsumer, bufferSize));
+    public void start() throws MuleException {
+      super.start();
+      workQueueStreamProcessingStrategy.start();
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      workQueueStreamProcessingStrategy.stop();
+      super.stop();
     }
   }
 }

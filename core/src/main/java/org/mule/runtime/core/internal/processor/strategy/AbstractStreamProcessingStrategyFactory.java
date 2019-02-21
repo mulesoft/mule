@@ -11,49 +11,26 @@ import static java.lang.Integer.getInteger;
 import static java.lang.Long.max;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
-import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
-import static java.time.Duration.ofMillis;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.LITE_BLOCKING;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.valueOf;
 import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 import static reactor.util.concurrent.Queues.isPowerOfTwo;
-import static reactor.util.concurrent.WaitStrategy.blocking;
-import static reactor.util.concurrent.WaitStrategy.busySpin;
-import static reactor.util.concurrent.WaitStrategy.liteBlocking;
-import static reactor.util.concurrent.WaitStrategy.parking;
-import static reactor.util.concurrent.WaitStrategy.phasedOffLiteLock;
-import static reactor.util.concurrent.WaitStrategy.sleeping;
-import static reactor.util.concurrent.WaitStrategy.yielding;
 
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.WorkQueueProcessor;
 
 /**
- * Abstract {@link ProcessingStrategyFactory} to be used by implementations that de-multiplex incoming messages using a
- * ring-buffer which can then be subscribed to n times.
+ * Abstract {@link ProcessingStrategyFactory} to be used by implementations that de-multiplex incoming messages.
  * <p>
  * Processing strategies created with this factory are not suitable for transactional flows and will fail if used with an active
- * transaction.
+ * transaction by default.
  *
  * @since 4.0
  */
@@ -70,12 +47,8 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   // required to achieve absolute minimum latency for the scenarios where this is important.
   protected static final int DEFAULT_SUBSCRIBER_COUNT =
       getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", Integer.max(1, (CORES / 2)));
-  protected static final String DEFAULT_WAIT_STRATEGY =
-      getProperty(SYSTEM_PROPERTY_PREFIX + "DEFAULT_WAIT_STRATEGY", LITE_BLOCKING.name());
-  protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
   private int bufferSize = DEFAULT_BUFFER_SIZE;
   private int subscriberCount = DEFAULT_SUBSCRIBER_COUNT;
-  private String waitStrategy = DEFAULT_WAIT_STRATEGY;
 
   /**
    * Configure the size of the ring-buffer size used to buffer and de-multiplexes events from multiple source threads. This value
@@ -102,15 +75,6 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
     this.subscriberCount = subscriberCount;
   }
 
-  /**
-   * Configure the wait strategy used to wait for new events on ring-buffer.
-   *
-   * @param waitStrategy
-   */
-  public void setWaitStrategy(String waitStrategy) {
-    this.waitStrategy = waitStrategy;
-  }
-
   protected int getBufferSize() {
     return bufferSize;
   }
@@ -119,20 +83,9 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
     return subscriberCount;
   }
 
-  protected String getWaitStrategy() {
-    return waitStrategy;
-  }
-
   @Override
   public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return AbstractStreamProcessingStrategy.class;
-  }
-
-  protected Supplier<Scheduler> getRingBufferSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
-    return () -> muleContext.getSchedulerService()
-        .customScheduler(muleContext.getSchedulerBaseConfig()
-            .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-            .withMaxConcurrentTasks(getSubscriberCount()).withWaitAllowed(true));
   }
 
   /**
@@ -145,49 +98,16 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
    */
   abstract static class AbstractStreamProcessingStrategy extends AbstractProcessingStrategy {
 
-    final protected Supplier<Scheduler> ringBufferSchedulerSupplier;
-    final protected int bufferSize;
     final protected int subscribers;
-    final protected WaitStrategy waitStrategy;
     final protected int maxConcurrency;
     final protected boolean maxConcurrencyEagerCheck;
     final protected ClassLoader executionClassloader;
 
-    protected AbstractStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
-                                               String waitStrategy, int maxConcurrency, boolean maxConcurrencyEagerCheck) {
+    protected AbstractStreamProcessingStrategy(int subscribers, int maxConcurrency, boolean maxConcurrencyEagerCheck) {
       this.subscribers = requireNonNull(subscribers);
-      this.waitStrategy = valueOf(waitStrategy);
-      this.bufferSize = requireNonNull(bufferSize);
-      this.ringBufferSchedulerSupplier = requireNonNull(ringBufferSchedulerSupplier);
       this.maxConcurrency = requireNonNull(maxConcurrency);
       this.maxConcurrencyEagerCheck = maxConcurrency < MAX_VALUE && maxConcurrencyEagerCheck;
       this.executionClassloader = currentThread().getContextClassLoader();
-    }
-
-    @Override
-    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
-      final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
-      WorkQueueProcessor<EventWrapper> processor =
-          WorkQueueProcessor.<EventWrapper>builder().executor(ringBufferSchedulerSupplier.get()).bufferSize(bufferSize)
-              .waitStrategy(waitStrategy.getReactorWaitStrategy()).build();
-      int subscriberCount = maxConcurrency < subscribers ? maxConcurrency : subscribers;
-      CountDownLatch completionLatch = new CountDownLatch(subscriberCount);
-      for (int i = 0; i < subscriberCount; i++) {
-        processor
-            .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-            .map(ew -> ew.getWrappedEvent())
-            .transform(function)
-            .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
-      }
-      return buildSink(processor.sink(), () -> {
-        long start = currentTimeMillis();
-        if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
-          LOGGER.warn("WorkQueueProcessor of ProcessingStrategy for flow '{}' not shutDown in {} ms. Forcing shutdown...",
-                      flowConstruct.getName(), shutdownTimeout);
-          processor.forceShutdown();
-        }
-        awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch, start);
-      }, createOnEventConsumer(), bufferSize);
     }
 
     protected void awaitSubscribersCompletion(FlowConstruct flowConstruct, final long shutdownTimeout,
@@ -199,64 +119,8 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
         }
       } catch (InterruptedException e) {
         LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
-                    flowConstruct.getName(),
-                    shutdownTimeout);
+                    flowConstruct.getName());
         currentThread().interrupt();
-        return;
-      }
-    }
-
-
-    protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
-                                           Consumer<CoreEvent> onEventConsumer, int bufferSize) {
-      return new DefaultReactorSink(fluxSink, disposable, onEventConsumer, bufferSize) {
-
-        @Override
-        public EventWrapper intoSink(CoreEvent event) {
-          return new EventWrapper(event);
-        }
-      };
-    }
-
-    protected enum WaitStrategy {
-      BLOCKING(blocking()),
-
-      LITE_BLOCKING(liteBlocking()),
-
-      SLEEPING(sleeping()),
-
-      BUSY_SPIN(busySpin()),
-
-      YIELDING(yielding()),
-
-      PARKING(parking()),
-
-      PHASED(phasedOffLiteLock(200, 100, MILLISECONDS));
-
-      private reactor.util.concurrent.WaitStrategy reactorWaitStrategy;
-
-      WaitStrategy(reactor.util.concurrent.WaitStrategy reactorWaitStrategy) {
-        this.reactorWaitStrategy = reactorWaitStrategy;
-      }
-
-      reactor.util.concurrent.WaitStrategy getReactorWaitStrategy() {
-        return reactorWaitStrategy;
-      }
-    }
-
-    private static final class EventWrapper {
-
-      CoreEvent wrappedEvent;
-
-      public EventWrapper(CoreEvent event) {
-        this.wrappedEvent = event;
-        ((BaseEventContext) (wrappedEvent.getContext())).getRootContext().onTerminated((e, t) -> {
-          wrappedEvent = null;
-        });
-      }
-
-      public CoreEvent getWrappedEvent() {
-        return wrappedEvent;
       }
     }
 

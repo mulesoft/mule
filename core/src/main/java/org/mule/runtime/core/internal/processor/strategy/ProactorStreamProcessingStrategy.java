@@ -43,8 +43,7 @@ import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 import reactor.retry.BackoffDelay;
 
-public abstract class ProactorStreamProcessingStrategy
-    extends ReactorStreamProcessingStrategyFactory.ReactorStreamProcessingStrategy {
+public abstract class ProactorStreamProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
 
   protected static final int STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
       getInteger(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
@@ -59,10 +58,7 @@ public abstract class ProactorStreamProcessingStrategy
 
   private final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
 
-  public ProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                          int bufferSize,
-                                          int subscriberCount,
-                                          String waitStrategy,
+  public ProactorStreamProcessingStrategy(int subscriberCount,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
                                           Supplier<Scheduler> blockingSchedulerSupplier,
                                           Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
@@ -71,8 +67,7 @@ public abstract class ProactorStreamProcessingStrategy
                                           boolean maxConcurrencyEagerCheck)
 
   {
-    super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parallelism,
-          maxConcurrency, maxConcurrencyEagerCheck);
+    super(subscriberCount, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
     this.blockingSchedulerSupplier = blockingSchedulerSupplier;
     this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
   }
@@ -80,10 +75,14 @@ public abstract class ProactorStreamProcessingStrategy
   @Override
   public void start() throws MuleException {
     super.start();
-    this.cpuLightScheduler =
-        new RetrySchedulerWrapper(cpuLightScheduler, SCHEDULER_BUSY_RETRY_INTERVAL_MS, () -> lastRetryTimestamp.set(nanoTime()));
     this.blockingScheduler = blockingSchedulerSupplier.get();
     this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
+  }
+
+  @Override
+  protected Scheduler createCpuLightScheduler(Supplier<Scheduler> cpuLightSchedulerSupplier) {
+    return new RetrySchedulerWrapper(super.createCpuLightScheduler(cpuLightSchedulerSupplier), SCHEDULER_BUSY_RETRY_INTERVAL_MS,
+                                     () -> lastRetryTimestamp.set(nanoTime()));
   }
 
   @Override
