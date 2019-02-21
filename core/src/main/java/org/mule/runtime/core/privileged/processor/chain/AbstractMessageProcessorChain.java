@@ -287,11 +287,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .doOnNext(preNotification(processor))
         .transform(next)
         // If the processor returns a CursorProvider, then have the StreamingManager manage it
-        .map(updateEventForStreaming(streamingManager).compose(result -> {
-          postNotification(processor).accept(result);
-          setCurrentEvent((PrivilegedEvent) result);
-          return result;
-        })));
+        .map(updateEventForStreaming(streamingManager)
+            .compose(result -> {
+              postNotification(processor).accept(result);
+              setCurrentEvent((PrivilegedEvent) result);
+              return result;
+            })));
 
     return interceptors;
   }

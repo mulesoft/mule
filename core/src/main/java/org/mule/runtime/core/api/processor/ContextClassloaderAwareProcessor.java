@@ -11,7 +11,8 @@ import org.mule.api.annotation.NoImplement;
 /**
  * Marker interface for {@link Processor} implementations that either:
  * <ul>
- * <li>Do not require to have the threadContextClassLoader set to the {@link ClassLoader} of its application.</li>
+ * <li>Do not require to have the threadContextClassLoader set to the {@link ClassLoader} of its application before being
+ * invoked.</li>
  * <li>Internally fetch and set the threadContextClassLoader of the application themselves.</li>
  * </ul>
  *
