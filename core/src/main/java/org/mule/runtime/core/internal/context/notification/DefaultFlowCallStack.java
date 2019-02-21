@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
-
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -28,9 +24,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   private static final long serialVersionUID = -8683711977929802819L;
 
-  private static final Logger LOGGER = getLogger(DefaultFlowCallStack.class);
-
-  private Stack<FlowStackElement> innerStack = new Stack<>();
+  private final Stack<FlowStackElement> innerStack = new Stack<>();
 
   /**
    * Adds an element to the top of this stack
@@ -38,9 +32,6 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * @param flowStackElement the element to add
    */
   public void push(FlowStackElement flowStackElement) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("push ({}): {}", identityHashCode(this), flowStackElement.toString());
-    }
     innerStack.push(flowStackElement);
   }
 
@@ -52,11 +43,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    */
   public void setCurrentProcessorPath(String processorPath) {
     if (!innerStack.empty()) {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("setCurrentProcessorPath({}): {}", identityHashCode(this), processorPath);
-      }
-      FlowStackElement topElement = innerStack.pop();
-      innerStack.push(new FlowStackElement(topElement.getFlowName(), processorPath));
+      innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
     }
   }
 
@@ -67,11 +54,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * @throws EmptyStackException if this stack is empty.
    */
   public FlowStackElement pop() {
-    FlowStackElement element = innerStack.pop();
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("pop({}): {}", identityHashCode(this), element.toString());
-    }
-    return element;
+    return innerStack.pop();
   }
 
   @Override
