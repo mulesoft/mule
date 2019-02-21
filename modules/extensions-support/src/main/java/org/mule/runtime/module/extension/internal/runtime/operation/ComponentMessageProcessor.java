@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
@@ -230,12 +231,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
     final Optional<Scheduler> currentScheduler = ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY);
 
-    if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
+    if (ctx.hasKey(POLICY_NEXT_OPERATION) || ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)) {
+      Function<Context, Context> context = innerChainCtx -> {
+        if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
+          innerChainCtx = innerChainCtx.put(POLICY_NEXT_OPERATION, ctx.get(POLICY_NEXT_OPERATION));
+        }
+        if (ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)) {
+          innerChainCtx = innerChainCtx.put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS,
+                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
+        }
+        return innerChainCtx;
+      };
       return quickCopy(event, ImmutableMap.<String, Object>builder()
-          .put(INNER_CHAIN_CTX_MAPPING, (Function<Context, Context>) (innerChainCtx -> innerChainCtx.put(POLICY_NEXT_OPERATION,
-                                                                                                         ctx.get(POLICY_NEXT_OPERATION))))
+          .put(INNER_CHAIN_CTX_MAPPING, context)
           .put(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER))
           .build());
+
     } else if (currentScheduler.isPresent()) {
       return quickCopy(event, singletonMap(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.get()));
     } else {
