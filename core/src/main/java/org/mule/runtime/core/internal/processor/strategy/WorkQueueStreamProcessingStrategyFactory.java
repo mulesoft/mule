@@ -128,7 +128,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamWork
       for (int i = 0; i < subscriberCount; i++) {
         processor
             .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-            .map(ew -> ew.getWrappedEvent())
+            .map(EventWrapper::getWrappedEvent)
             .transform(function)
             .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
       }
@@ -206,9 +206,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamWork
 
     public EventWrapper(CoreEvent event) {
       this.wrappedEvent = event;
-      ((BaseEventContext) (wrappedEvent.getContext())).getRootContext().onTerminated((e, t) -> {
-        wrappedEvent = null;
-      });
+      ((BaseEventContext) (wrappedEvent.getContext())).getRootContext().onTerminated((e, t) -> wrappedEvent = null);
     }
 
     public CoreEvent getWrappedEvent() {

@@ -29,7 +29,7 @@ public abstract class AbstractStreamWorkQueueProcessingStrategyFactory extends A
   protected static final String DEFAULT_WAIT_STRATEGY =
       getProperty(SYSTEM_PROPERTY_PREFIX + "DEFAULT_WAIT_STRATEGY", LITE_BLOCKING.name());
 
-  protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
+  protected static final String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
 
   private String waitStrategy = DEFAULT_WAIT_STRATEGY;
 

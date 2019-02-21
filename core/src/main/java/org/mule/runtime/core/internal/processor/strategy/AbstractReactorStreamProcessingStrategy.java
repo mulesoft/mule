@@ -35,11 +35,11 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
 
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    reactor.core.scheduler.Scheduler cpuLightScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+    reactor.core.scheduler.Scheduler cpuLiteScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
     if (processor.getProcessingType() == CPU_LITE_ASYNC) {
       return publisher -> from(publisher)
           .transform(processor)
-          .publishOn(cpuLightScheduler)
+          .publishOn(cpuLiteScheduler)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
     } else {
       return publisher -> from(publisher)
