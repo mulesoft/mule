@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -37,7 +36,8 @@ public class DefaultResolverSetBasedObjectBuilder<T> extends ResolverSetBasedObj
   @Override
   protected T instantiateObject() {
     try {
-      return withContextClassLoader(prototypeClass.getClassLoader(), () -> createInstance(prototypeClass));
+      // return withContextClassLoader(prototypeClass.getClassLoader(), () -> createInstance(prototypeClass));
+      return createInstance(prototypeClass);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of " + prototypeClass), e);
     }

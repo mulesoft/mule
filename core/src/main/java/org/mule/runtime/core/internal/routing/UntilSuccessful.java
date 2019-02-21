@@ -22,6 +22,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
+import org.mule.runtime.core.api.processor.ContextClassloaderAwareProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
@@ -45,7 +46,7 @@ import reactor.core.publisher.Mono;
  * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
  * exception has been raised and, optionally, if the response matches an expression.
  */
-public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
+public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope, ContextClassloaderAwareProcessor {
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";

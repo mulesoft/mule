@@ -51,7 +51,7 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @NoExtend
-public class PolicyChain extends AbstractComponent    implements Lifecycle, ContextClassloaderAwareProcessor {
+public class PolicyChain extends AbstractComponent implements Lifecycle, ContextClassloaderAwareProcessor {
 
   @Inject
   private MuleContext muleContext;

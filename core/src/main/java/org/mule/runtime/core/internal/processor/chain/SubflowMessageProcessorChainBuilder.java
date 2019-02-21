@@ -20,6 +20,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.ContextClassloaderAwareProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -89,9 +90,9 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   /**
    * Generates message processor identifiers specific for subflows.
    */
-  static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
+  static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain implements ContextClassloaderAwareProcessor {
 
-    private String subFlowName;
+    private final String subFlowName;
 
     SubFlowMessageProcessorChain(String name, Processor head, List<Processor> processors,
                                  List<Processor> processorsForLifecycle) {
