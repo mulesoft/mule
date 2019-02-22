@@ -6,9 +6,11 @@
  */
 package org.mule;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 
@@ -20,6 +22,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -168,6 +171,13 @@ public class EventBenchmark extends AbstractBenchmark {
       builder.addInboundProperty("newKey", "val").addOutboundProperty("newKey", "val").build();
     }
     return eventBuilder.message(builder.build()).build();
+  }
+
+  @Benchmark
+  public CoreEvent quickCopyInternalParameters() {
+    return InternalEvent.builder(quickCopy(quickCopy(event, singletonMap("k1", "v1")), singletonMap("k2", "v2")))
+        .addInternalParameter("k3", "v3")
+        .build();
   }
 
   private CoreEvent createMuleEvent(Message message, int numProperties) {
