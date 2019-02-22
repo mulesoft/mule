@@ -234,7 +234,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
           builder.internalParameters(interceptionEventParams);
         });
         return builder.build();
-      } catch (ExpressionRuntimeException e) {
+      } catch (ExpressionRuntimeException | IllegalArgumentException e) {
         // Some operation parameter threw an expression exception.
         // Continue with the interception as it it were not an operation so that the call to `before` is guaranteed.
         return super.setInternalParamsForNotParamResolver(component, resolvedParameters, event, builder);
