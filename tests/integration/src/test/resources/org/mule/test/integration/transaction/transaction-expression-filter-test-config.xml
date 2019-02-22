@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+     <flow name="expression-false-in-transaction-flow">
+          <vm:inbound-endpoint path="transaction-filter-all"/>
+          <transactional action="ALWAYS_BEGIN">
+               <expression-filter expression="#[false]"/>
+          </transactional>
+          <vm:outbound-endpoint path="transaction-filter-all-reply"/>
+     </flow>
+
+     <flow name="expression-true-in-transaction-flow">
+          <vm:inbound-endpoint path="transaction-filter-nothing"/>
+          <transactional action="ALWAYS_BEGIN">
+               <expression-filter expression="#[true]"/>
+          </transactional>
+          <vm:outbound-endpoint path="transaction-filter-nothing-reply"/>
+     </flow>
+</mule>
