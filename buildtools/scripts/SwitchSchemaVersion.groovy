@@ -6,6 +6,8 @@
 
 import org.codehaus.groovy.ant.FileScanner
 
+import static org.mule.util.FileUtils.deleteFile
+
 def cliBuilder = new CliBuilder()
 cliBuilder.f(longOpt: "from", args: 1, "switch from version (e.g. 2.2)")
 cliBuilder.h(longOpt: "help", "show usage info")
@@ -178,7 +180,7 @@ def move(File sourceFile, File destFile)
 
 def delete(File file)
 {
-    if (FileUtils.deleteFile(file) == false)
+    if (deleteFile(file) == false)
     {
         throw new IOException("deleting " + file.canonicalFile + " failed")
     }
