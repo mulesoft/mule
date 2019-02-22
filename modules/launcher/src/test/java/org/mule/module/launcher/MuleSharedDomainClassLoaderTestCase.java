@@ -9,9 +9,7 @@ package org.mule.module.launcher;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.config.MuleProperties;
-import org.mule.module.reboot.MuleContainerBootstrap;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;

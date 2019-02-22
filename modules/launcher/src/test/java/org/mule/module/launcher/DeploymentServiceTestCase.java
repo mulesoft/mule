@@ -36,6 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
@@ -3391,7 +3392,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private boolean removeAppAnchorFile(String appName)
     {
         File anchorFile = getArtifactAnchorFile(appName, appsDir);
-        return anchorFile.delete();
+        return deleteFile(anchorFile);
     }
 
     /**
@@ -3403,7 +3404,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private boolean removeDomainAnchorFile(String domainName)
     {
         File anchorFile = getArtifactAnchorFile(domainName, domainsDir);
-        return anchorFile.delete();
+        return deleteFile(anchorFile);
     }
 
     private void assertApplicationAnchorFileExists(String applicationName)

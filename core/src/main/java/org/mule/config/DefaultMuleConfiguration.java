@@ -75,6 +75,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     public static boolean flowTrace = false;
 
+    /**
+     * If true, an exception will be thrown when mule attempts to delete an already open file.
+     */
+    public static boolean failIfDeleteOpenFile = false;
 
     /**
      * A comma-separated list of internal packages/classes which are removed from sanitized stacktraces.
@@ -370,6 +374,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             flowTrace = false;
         }
 
+        p = System.getProperty(MuleProperties.MULE_FAIL_IF_DELETE_OPEN_FILE);
+        if (p != null)
+        {
+            failIfDeleteOpenFile = BooleanUtils.toBoolean(p);
+        }
+        else
+        {
+            failIfDeleteOpenFile = false;
+        }
+
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
         if (p != null)
         {
@@ -395,6 +409,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public static boolean isFlowTrace()
     {
         return flowTrace || logger.isDebugEnabled();
+    }
+
+    public static boolean shouldFailIfDeleteOpenFile()
+    {
+        return failIfDeleteOpenFile;
     }
 
     protected void validateEncoding() throws FatalException

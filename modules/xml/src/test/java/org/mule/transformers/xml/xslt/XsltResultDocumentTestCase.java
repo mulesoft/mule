@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.util.FileUtils.deleteFile;
 import static org.mule.api.config.MuleProperties.MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION;
 
 import org.mule.api.MuleEvent;
@@ -19,10 +20,9 @@ import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.UUID;
 
-import net.sf.saxon.Controller;
-
 import java.io.File;
 
+import net.sf.saxon.Controller;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -53,7 +53,7 @@ public abstract class XsltResultDocumentTestCase extends FunctionalTestCase
 
         executeFlowAndValidateOutput(cities, outputFile);
         executeFlowAndValidateOutput(cities, outputFile);
-        
+
         verifyControllerReset();
     }
 
@@ -61,7 +61,7 @@ public abstract class XsltResultDocumentTestCase extends FunctionalTestCase
     {
         String resetControllerAfterEachTransformationProperty = System.getProperty(MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION, "false");
         boolean resetControllerAfterEachTransformation = Boolean.parseBoolean(resetControllerAfterEachTransformationProperty);
-        
+
         if (resetControllerAfterEachTransformation)
         {
             Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
@@ -74,12 +74,12 @@ public abstract class XsltResultDocumentTestCase extends FunctionalTestCase
                 assertThat(controller.getInitialContextItem(), is(not(nullValue())));
             }
         }
-        
+
     }
 
     private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception
     {
-        outputFile.delete();
+        deleteFile(outputFile);
         runFlow(FLOW_NAME, createEventWithPayloadAndSessionProperty(payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()));
         assertThat(FileUtils.readFileToString(outputFile), is(EXPECTED_OUTPUT));
     }

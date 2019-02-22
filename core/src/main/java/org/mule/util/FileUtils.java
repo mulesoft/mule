@@ -6,8 +6,10 @@
  */
 package org.mule.util;
 
+import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
+import static org.mule.config.DefaultMuleConfiguration.shouldFailIfDeleteOpenFile;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -50,7 +52,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 {
     private static final Log logger = LogFactory.getLog(FileUtils.class);
     public static String DEFAULT_ENCODING = "UTF-8";
-    
+
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException
     {
         if (destination.exists() && !destination.canWrite())
@@ -280,14 +282,14 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 }
                 else
                 {
-                    if (!files[i].delete())
+                    if (!deleteFile(files[i]))
                     {
                         return false;
                     }
                 }
             }
         }
-        return dir.delete();
+        return deleteFile(dir);
     }
 
     /**
@@ -369,7 +371,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName),
+                    createStaticMessage("Unable to create a canonical file for " + pathName),
                     e);
         }
     }
@@ -393,7 +395,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + uri),
+                    createStaticMessage("Unable to create a canonical file for " + uri),
                     e);
         }
     }
@@ -417,7 +419,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
+                    createStaticMessage("Unable to create a canonical file for parent: "
                             + parent + " and child: " + child),
                     e);
         }
@@ -442,7 +444,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
+                    createStaticMessage("Unable to create a canonical file for parent: "
                             + parent + " and child: " + child),
                     e);
         }
@@ -669,11 +671,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                         logger.debug("File renamed: " + isRenamed);
                         if (isRenamed)
                         {
-                            srcFile.delete();
+                            deleteFile(srcFile);
                         }
                         else
                         {
-                            destFile.delete();
+                            deleteFile(destFile);
                         }
                     }
                     else
@@ -777,7 +779,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
                 srcChannel.close();
                 dstChannel.close();
-                success = sourceFile.delete();
+                success = deleteFile(sourceFile);
             }
             catch (IOException ioex)
             {
@@ -994,6 +996,64 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
 
         return timeStamp;
+    }
+
+    public static boolean isFileOpen(File file)
+    {
+        if (IS_OS_WINDOWS)
+        {
+            // try to rename to the same name will fail on Windows
+            String fileName = file.getName();
+            File sameFileName = new File(fileName);
+            return !file.renameTo(sameFileName);
+        }
+        else
+        {
+            String filePath = file.getAbsolutePath();
+            File nullFile = new File("/dev/null");
+
+            // use lsof utility
+            ProcessBuilder builder = new ProcessBuilder("lsof", "-c", "java", "-a", "-T", "--", filePath).redirectError(nullFile).redirectOutput(nullFile);
+
+            try
+            {
+                Process process = builder.start();
+                int exitValue = process.waitFor();
+                return exitValue == 0;
+            }
+            catch (InterruptedException | IOException e)
+            {
+                // ignore the exceptions
+            }
+            return false;
+        }
+    }
+
+    private static boolean shouldLogWarningIfDeleteOpenFile()
+    {
+        return logger.isWarnEnabled() && IS_OS_WINDOWS;
+    }
+
+    public static boolean deleteFile(File file)
+    {
+        boolean shouldFailIfOpen = shouldFailIfDeleteOpenFile();
+
+        if (shouldFailIfOpen)
+        {
+            if (isFileOpen(file))
+            {
+                throw new MuleRuntimeException(createStaticMessage("Attempting to delete an open file: " + file));
+            }
+        }
+        else if (shouldLogWarningIfDeleteOpenFile())
+        {
+            if (isFileOpen(file))
+            {
+                logger.warn("Attempting to delete an open file: " + file);
+            }
+        }
+
+        return file.delete();
     }
 
     public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive)
