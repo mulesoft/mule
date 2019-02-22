@@ -9,7 +9,6 @@ package org.mule.util;
 import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
@@ -1043,8 +1042,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             if (isFileOpen(file))
             {
-                Message message = MessageFactory.createStaticMessage("Attempting to delete an open file: " + file);
-                throw new MuleRuntimeException(message);
+                throw new MuleRuntimeException(MessageFactory.createStaticMessage("Attempting to delete an open file: " + file));
             }
         }
         else if (shouldLogWarningIfDeleteOpenFile())
