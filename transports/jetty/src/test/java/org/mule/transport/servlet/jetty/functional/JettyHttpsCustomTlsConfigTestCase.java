@@ -9,6 +9,7 @@ package org.mule.transport.servlet.jetty.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -62,7 +63,7 @@ public class JettyHttpsCustomTlsConfigTestCase extends FunctionalTestCase
     @AfterClass
     public static void removeTlsPropertiesFile()
     {
-        getTlsPropertiesFile().delete();
+        deleteFile(getTlsPropertiesFile());
     }
 
     private static File getTlsPropertiesFile()

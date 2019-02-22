@@ -7,6 +7,7 @@
 
 package org.mule.module.launcher.nativelib;
 
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -81,7 +82,7 @@ public class PerAppCopyNativeLibraryFinder extends PerAppNativeLibraryFinder
         {
             for (String library : list)
             {
-                new File(perAppNativeLibs, library).delete();
+                deleteFile(new File(perAppNativeLibs, library));
             }
         }
     }
