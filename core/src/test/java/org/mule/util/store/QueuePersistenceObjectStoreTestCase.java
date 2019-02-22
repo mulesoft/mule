@@ -16,6 +16,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.config.DefaultMuleConfiguration.failIfDeleteOpenFile;
+import static org.mule.config.DefaultMuleConfiguration.shouldFailIfDeleteOpenFile;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -54,12 +56,21 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
 
     private File persistenceFolder;
     private MuleContext mockMuleContext;
+    private boolean originalFailIfDeleteOpenFile;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         initMockMuleContext();
+        originalFailIfDeleteOpenFile = shouldFailIfDeleteOpenFile();
+        failIfDeleteOpenFile = true;
+    }
+
+    @Override
+    protected void doTearDown()
+    {
+        failIfDeleteOpenFile = originalFailIfDeleteOpenFile;
     }
 
     private void initMockMuleContext() throws IOException
