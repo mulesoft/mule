@@ -6,6 +6,7 @@
  */
 package org.mule.util;
 
+import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.Message;
@@ -52,8 +53,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 {
     private static final Log logger = LogFactory.getLog(FileUtils.class);
     public static String DEFAULT_ENCODING = "UTF-8";
-    private static Boolean _isOSWindows = null;
-    
+
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException
     {
         if (destination.exists() && !destination.canWrite())
@@ -1001,8 +1001,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     public static boolean isFileOpen(File file)
     {
-        String osName = System.getProperty("os.name", "<None>");
-        if (osName.startsWith("Windows"))
+        if (IS_OS_WINDOWS)
         {
             // try to rename to the same name will fail on Windows
             String fileName = file.getName();
@@ -1031,20 +1030,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
     }
 
-    private static boolean isOSWindows()
-    {
-        if (_isOSWindows == null)
-        {
-            String osName = System.getProperty("os.name", "<None>");
-            _isOSWindows = osName.startsWith("Windows");
-        }
-
-        return _isOSWindows;
-    }
-
     private static boolean shouldLogWarningIfDeleteOpenFile()
     {
-        return logger.isWarnEnabled() && isOSWindows();
+        return logger.isWarnEnabled() && IS_OS_WINDOWS;
     }
 
     public static boolean deleteFile(File file)
