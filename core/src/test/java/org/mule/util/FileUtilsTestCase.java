@@ -412,7 +412,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     }
 
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public ExpectedException expected = ExpectedException.none();
 
     private boolean originalFailIfDeleteOpenFile;
 
@@ -434,8 +434,8 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         failIfDeleteOpenFile = true;
 
         File file = newFile(TEST_FILE);
-        thrown.expect(MuleRuntimeException.class);
-        thrown.expectMessage("Attempting to delete an open file: " + file);
+        expected.expect(MuleRuntimeException.class);
+        expected.expectMessage("Attempting to delete an open file: " + file);
 
         assertThat(isFileOpen(file), is(false));
 
