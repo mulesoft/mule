@@ -19,8 +19,8 @@ public final class FlowStackElement implements Serializable {
 
   private static final long serialVersionUID = -851491195125245390L;
 
-  private String flowName;
-  private String processorPath;
+  private final String flowName;
+  private final String processorPath;
 
   public FlowStackElement(String flowName, String processorPath) {
     this.flowName = flowName;

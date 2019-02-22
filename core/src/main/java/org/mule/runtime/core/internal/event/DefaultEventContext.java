@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -183,6 +184,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     if (DefaultMuleConfiguration.isFlowTrace() && flow != null && flow.getMuleContext() != null) {
       eventContextMaintain(flow.getMuleContext().getEventContextService());
     }
+    this.flowCallStack = new DefaultFlowCallStack();
   }
 
   /**
@@ -205,6 +207,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.location = location;
     this.processingTime = null;
     this.correlationId = correlationId;
+    this.flowCallStack = new DefaultFlowCallStack();
   }
 
   private void eventContextMaintain(EventContextService eventContextService) {
