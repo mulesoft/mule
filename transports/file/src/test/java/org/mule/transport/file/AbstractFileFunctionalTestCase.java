@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.util.FileUtils.deleteFile;
 
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -87,7 +88,7 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
     private void createTempDirectory() throws Exception
     {
         tmpDir = File.createTempFile("mule-file-test-", "-dir");
-        FileUtils.deleteFile(tmpDir);
+        deleteFile(tmpDir);
         tmpDir.mkdir();
     }
 

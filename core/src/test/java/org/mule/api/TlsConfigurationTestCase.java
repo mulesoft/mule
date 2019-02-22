@@ -23,10 +23,10 @@ import static org.mule.api.security.tls.TlsConfiguration.DEFAULT_SSL_TYPE;
 import static org.mule.api.security.tls.TlsConfiguration.JSSE_NAMESPACE;
 import static org.mule.api.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 import static org.mule.util.ClassUtils.getClassPathRoot;
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.FileUtils;
 import org.mule.util.SecurityUtils;
 
 import java.io.File;
@@ -137,7 +137,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            FileUtils.deleteFile(configFile);
+            deleteFile(configFile);
         }
     }
 
@@ -159,7 +159,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            FileUtils.deleteFile(configFile);
+            deleteFile(configFile);
         }
     }
 
@@ -206,7 +206,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            FileUtils.deleteFile(configFile);
+            deleteFile(configFile);
         }
     }
 
@@ -232,7 +232,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            FileUtils.deleteFile(configFile);
+            deleteFile(configFile);
         }
     }
 
@@ -253,7 +253,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         finally
         {
             System.setProperty(MULE_SECURITY_SYSTEM_PROPERTY, previousSecurityModel);
-            FileUtils.deleteFile(file);
+            deleteFile(file);
         }
     }
 

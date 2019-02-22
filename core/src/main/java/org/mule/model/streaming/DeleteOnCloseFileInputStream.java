@@ -6,7 +6,7 @@
  */
 package org.mule.model.streaming;
 
-import org.mule.util.FileUtils;
+import static org.mule.util.FileUtils.deleteFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +42,7 @@ public class DeleteOnCloseFileInputStream extends FileInputStream
         {
             if (file != null)
             {
-                FileUtils.deleteFile(file);
+                deleteFile(file);
                 file = null;
             }
         }

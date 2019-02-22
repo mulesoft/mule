@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.ZipUtils.compress;
+import static org.mule.util.FileUtils.deleteFile;
 import static org.mule.util.FileUtils.unzip;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.DefaultMuleConfiguration;
@@ -79,10 +80,10 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             assertNotNull(file);
             assertTrue(file.exists());
             assertTrue(file.canRead());
-            FileUtils.deleteFile(file);
+            deleteFile(file);
 
             file = FileUtils.newFile(TEST_FILE);
-            FileUtils.deleteFile(file);
+            deleteFile(file);
 
             File dir = FileUtils.openDirectory("src");
             assertNotNull(dir);
@@ -95,14 +96,14 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             assertTrue(dir.exists());
             assertTrue(dir.canRead());
             assertTrue(dir.isDirectory());
-            FileUtils.deleteFile(dir);
+            deleteFile(dir);
 
         }
         finally
         {
             if (file != null)
             {
-                FileUtils.deleteFile(file);
+                deleteFile(file);
             }
         }
     }
@@ -335,10 +336,10 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             File sourceFile = createTestFile("source");
             File destFile = createTestFile("dest");
 
-            assertTrue(FileUtils.deleteFile(destFile));
+            assertTrue(deleteFile(destFile));
             assertTrue(FileUtils.renameFile(sourceFile, destFile));
             assertTrue(destFile.exists());
-            assertTrue(FileUtils.deleteFile(destFile));
+            assertTrue(deleteFile(destFile));
         }
         catch (Exception e)
         {
@@ -357,8 +358,8 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
 
             assertTrue(FileUtils.renameFile(sourceFile, destFile));
             assertTrue(destFile.exists());
-            assertTrue(FileUtils.deleteFile(destFile));
-            assertTrue(FileUtils.deleteFile(dir));
+            assertTrue(deleteFile(destFile));
+            assertTrue(deleteFile(dir));
         }
         catch (Exception e)
         {
@@ -438,13 +439,13 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         try (FileOutputStream outputStream = new FileOutputStream(file))
         {
             assertThat(FileUtils.isFileOpen(file), is(true));
-            FileUtils.deleteFile(file);
+            deleteFile(file);
         }
         finally
         {
             // it is now closed because the output stream is AutoCloseable
             assertThat(FileUtils.isFileOpen(file), is(false));
-            assertThat(FileUtils.deleteFile(file), is(true));
+            assertThat(deleteFile(file), is(true));
         }
     }
 
@@ -456,7 +457,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     private File createTestDir(String dirPath) throws IOException
     {
         File file = createTestFile(dirPath);
-        FileUtils.deleteFile(file);
+        deleteFile(file);
         file.mkdir();
         return file;
     }

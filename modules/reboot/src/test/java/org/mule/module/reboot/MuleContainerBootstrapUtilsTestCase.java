@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.util.FileUtils;
+import static org.mule.util.FileUtils.deleteFile;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -108,8 +108,8 @@ public class MuleContainerBootstrapUtilsTestCase
         MuleContainerBootstrapUtils.renameFile(source, dest);
         assertTrue(dest.exists());
         assertFalse(source.exists());
-        FileUtils.deleteFile(source);
-        FileUtils.deleteFile(dest);
+        deleteFile(source);
+        deleteFile(dest);
     }
 
     /**
@@ -125,8 +125,8 @@ public class MuleContainerBootstrapUtilsTestCase
         MuleContainerBootstrapUtils.renameFileHard(source, dest);
         assertTrue(dest.exists());
         assertFalse(source.exists());
-        FileUtils.deleteFile(source);
-        FileUtils.deleteFile(dest);
+        deleteFile(source);
+        deleteFile(dest);
     }
 
     /**
