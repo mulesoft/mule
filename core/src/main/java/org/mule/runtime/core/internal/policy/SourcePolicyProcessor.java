@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Collections.singletonMap;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_STATE_EVENT;
@@ -76,8 +74,9 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .cast(PrivilegedEvent.class)
-        .map(sourceEvent -> PrivilegedEvent
-            .builder(quickCopy(sourceEvent, singletonMap(POLICY_SOURCE_ORIGINAL_EVENT, sourceEvent)))
+        .map(sourceEvent -> InternalEvent
+            .builder(sourceEvent)
+            .addInternalParameter(POLICY_SOURCE_ORIGINAL_EVENT, sourceEvent)
             .clearVariables().build())
         .cast(CoreEvent.class)
         .transform(policy.getPolicyChain().onChainError(t -> {
