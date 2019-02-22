@@ -6,21 +6,19 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-     <vm:connector name="default"/>
-
      <flow name="expression-false-in-transaction-flow">
-          <vm:inbound-endpoint path="transaction-filter-all" connector-ref="default"/>
+          <vm:inbound-endpoint path="transaction-filter-all"/>
           <transactional action="ALWAYS_BEGIN">
                <expression-filter expression="#[false]"/>
           </transactional>
-          <vm:outbound-endpoint path="transaction-filter-all-reply" connector-ref="default"/>
+          <vm:outbound-endpoint path="transaction-filter-all-reply"/>
      </flow>
 
      <flow name="expression-true-in-transaction-flow">
-          <vm:inbound-endpoint path="transaction-filter-nothing" connector-ref="default"/>
+          <vm:inbound-endpoint path="transaction-filter-nothing"/>
           <transactional action="ALWAYS_BEGIN">
                <expression-filter expression="#[true]"/>
           </transactional>
-          <vm:outbound-endpoint path="transaction-filter-nothing-reply" connector-ref="default"/>
+          <vm:outbound-endpoint path="transaction-filter-nothing-reply"/>
      </flow>
 </mule>
