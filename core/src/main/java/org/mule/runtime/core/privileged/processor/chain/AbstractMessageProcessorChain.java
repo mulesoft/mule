@@ -250,7 +250,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           });
 
       if (processor instanceof ContextClassloaderAwareProcessor) {
-        return baseFlux.transform(next);
+        return baseFlux.log().transform(next);
       } else {
         return baseFlux.transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_CONSUMER)
             .andThen(next)

@@ -40,13 +40,17 @@ public final class Operators {
    */
   public static BiConsumer<CoreEvent, SynchronousSink<CoreEvent>> nullSafeMap(Function<CoreEvent, CoreEvent> mapper) {
     return (event, sink) -> {
-      if (event != null) {
-        CoreEvent result = mapper.apply(event);
-        if (result != null) {
-          sink.next(result);
-        } else {
-          ((BaseEventContext) event.getContext()).success();
+      try {
+        if (event != null) {
+          CoreEvent result = mapper.apply(event);
+          if (result != null) {
+            sink.next(result);
+          } else {
+            ((BaseEventContext) event.getContext()).success();
+          }
         }
+      } catch (Exception e) {
+        sink.error(e);
       }
     };
   }
