@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.util.FileUtils.deleteFile;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -880,7 +881,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                 throw new IOException("Failed to set readonly-folder: " + parent + " to writeable");
             }
 
-            if (!parent.delete())
+            if (!deleteFile(parent))
             {
                 throw new IOException("Failed to delete folder: " + parent);
             }

@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -52,7 +53,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
     @AfterClass
     public static void removeTlsPropertiesFile()
     {
-        getTlsPropertiesFile().delete();
+        deleteFile(getTlsPropertiesFile());
     }
 
     private static File getTlsPropertiesFile()

@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -17,10 +18,9 @@ import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.UUID;
 
-import net.sf.saxon.Controller;
-
 import java.io.File;
 
+import net.sf.saxon.Controller;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -83,7 +83,7 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
 
     private void executeFlowAndValidateOutput(String payload, File outputFile, String flow) throws Exception
     {
-        outputFile.delete();
+        deleteFile(outputFile);
         runFlow(flow, createEventWithPayloadAndSessionProperty(payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()));
         assertThat(FileUtils.readFileToString(outputFile), is(EXPECTED_OUTPUT));
     }

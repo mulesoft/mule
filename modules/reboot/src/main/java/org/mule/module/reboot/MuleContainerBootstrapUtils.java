@@ -6,6 +6,7 @@
  */
 package org.mule.module.reboot;
 
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.MuleServer;
 
 import java.io.File;
@@ -224,11 +225,11 @@ public final class MuleContainerBootstrapUtils
                     }
                     if (isRenamed)
                     {
-                        srcFile.delete();
+                        deleteFile(srcFile);
                     }
                     else
                     {
-                        destFile.delete();
+                        deleteFile(destFile);
                     }
                 }
             }
