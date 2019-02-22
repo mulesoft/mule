@@ -7,9 +7,9 @@
 package org.mule.util;
 
 import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
+import static org.mule.config.DefaultMuleConfiguration.shouldFailIfDeleteOpenFile;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -371,7 +371,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName),
+                    createStaticMessage("Unable to create a canonical file for " + pathName),
                     e);
         }
     }
@@ -395,7 +395,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + uri),
+                    createStaticMessage("Unable to create a canonical file for " + uri),
                     e);
         }
     }
@@ -419,7 +419,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
+                    createStaticMessage("Unable to create a canonical file for parent: "
                             + parent + " and child: " + child),
                     e);
         }
@@ -444,7 +444,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
+                    createStaticMessage("Unable to create a canonical file for parent: "
                             + parent + " and child: " + child),
                     e);
         }
@@ -1036,13 +1036,13 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     public static boolean deleteFile(File file)
     {
-        boolean shouldFailIfOpen = DefaultMuleConfiguration.shouldFailIfDeleteOpenFile();
+        boolean shouldFailIfOpen = shouldFailIfDeleteOpenFile();
 
         if (shouldFailIfOpen)
         {
             if (isFileOpen(file))
             {
-                throw new MuleRuntimeException(MessageFactory.createStaticMessage("Attempting to delete an open file: " + file));
+                throw new MuleRuntimeException(createStaticMessage("Attempting to delete an open file: " + file));
             }
         }
         else if (shouldLogWarningIfDeleteOpenFile())

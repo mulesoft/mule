@@ -12,11 +12,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.config.DefaultMuleConfiguration.failIfDeleteOpenFile;
+import static org.mule.config.DefaultMuleConfiguration.shouldFailIfDeleteOpenFile;
 import static org.mule.tck.ZipUtils.compress;
 import static org.mule.util.FileUtils.deleteFile;
+import static org.mule.util.FileUtils.isFileOpen;
+import static org.mule.util.FileUtils.newFile;
 import static org.mule.util.FileUtils.unzip;
 import org.mule.api.MuleRuntimeException;
-import org.mule.config.DefaultMuleConfiguration;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -62,13 +65,13 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
 
             file = FileUtils.stringToFile(TEST_FILE, " and this is appended content", true);
 
-            String content = FileUtils.readFileToString(FileUtils.newFile(TEST_FILE), (String) null);
+            String content = FileUtils.readFileToString(newFile(TEST_FILE), (String) null);
 
             assertNotNull(content);
             assertTrue(content.indexOf("this is a test file") > -1);
             assertTrue(content.indexOf(" and this is appended content") > -1);
 
-            file = FileUtils.newFile(TEST_FILE);
+            file = newFile(TEST_FILE);
             assertNotNull(file);
             assertTrue(file.exists());
 
@@ -82,7 +85,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             assertTrue(file.canRead());
             deleteFile(file);
 
-            file = FileUtils.newFile(TEST_FILE);
+            file = newFile(TEST_FILE);
             deleteFile(file);
 
             File dir = FileUtils.openDirectory("src");
@@ -145,14 +148,14 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractResource() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-1";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             assertTrue("Failed to create output dirs.", outputDir.mkdirs());
         }
         String res = "META-INF/MANIFEST.MF";
         FileUtils.extractResources(res, getClass(), outputDir, true);
-        File result = FileUtils.newFile(testDir, res);
+        File result = newFile(testDir, res);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -165,14 +168,14 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractResources() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-2";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
         }
         String res = "META-INF/";
         FileUtils.extractResources(res, getClass(), outputDir, true);
-        File result = FileUtils.newFile(testDir, res);
+        File result = newFile(testDir, res);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -184,14 +187,14 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractFileResource() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-3";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
         }
         String res = "org/mule/util/FileUtils.class";
         FileUtils.extractResources(res, FileUtils.class, outputDir, true);
-        File result = FileUtils.newFile(testDir, res);
+        File result = newFile(testDir, res);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -204,14 +207,14 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractFileResources() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-4";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
         }
         String res = "org/mule/util/";
         FileUtils.extractResources(res, FileUtils.class, outputDir, true);
-        File result = FileUtils.newFile(testDir, res);
+        File result = newFile(testDir, res);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -223,7 +226,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractResourceWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-5";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
@@ -231,7 +234,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         String fileName = "MANIFEST.MF";
         String res = "META-INF/" + fileName;
         FileUtils.extractResources(res, getClass(), outputDir, false);
-        File result = FileUtils.newFile(testDir, fileName);
+        File result = newFile(testDir, fileName);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -244,7 +247,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractResourcesWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-6";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
@@ -252,7 +255,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         String fileName = "util/FileUtilsTestCase.class";
         String res = "org/mule/";
         FileUtils.extractResources(res, FileUtilsTestCase.class, outputDir, false);
-        File result = FileUtils.newFile(testDir, fileName);
+        File result = newFile(testDir, fileName);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -265,7 +268,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractFileResourceWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-7";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
@@ -273,7 +276,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         String fileName = "FileUtils.class";
         String res = "org/mule/util/" + fileName;
         FileUtils.extractResources(res, FileUtils.class, outputDir, false);
-        File result = FileUtils.newFile(testDir, fileName);
+        File result = newFile(testDir, fileName);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -286,7 +289,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testExtractFileResourcesWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-8";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
@@ -294,7 +297,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         String fileName = "util/FileUtilsTestCase.class";
         String res = "org/mule/";
         FileUtils.extractResources(res, FileUtilsTestCase.class, outputDir, false);
-        File result = FileUtils.newFile(testDir, fileName);
+        File result = newFile(testDir, fileName);
         assertNotNull(result);
         assertTrue(result.exists());
         assertTrue(result.canRead());
@@ -307,18 +310,18 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     public void testDeleteTreeWithIgnoredDirectories() throws Exception
     {
         final String testDir = TEST_DIRECTORY + File.separator + "Test-deleting";
-        File outputDir = FileUtils.newFile(testDir);
+        File outputDir = newFile(testDir);
         if (!outputDir.exists())
         {
             outputDir.mkdirs();
         }
 
-        File toBeDeleted1 = FileUtils.newFile(outputDir, "toBeDeleted1/");
+        File toBeDeleted1 = newFile(outputDir, "toBeDeleted1/");
         toBeDeleted1.mkdirs();
-        File toBeDeleted2 = FileUtils.newFile(outputDir, "toBeDeleted2/");
+        File toBeDeleted2 = newFile(outputDir, "toBeDeleted2/");
         toBeDeleted2.mkdirs();
 
-        File keepMeIntact = FileUtils.newFile(outputDir, "keepMeIntact/");
+        File keepMeIntact = newFile(outputDir, "keepMeIntact/");
         keepMeIntact.mkdirs();
 
         FileUtils.deleteTree(outputDir, new String[] {"keepMeIntact"});
@@ -372,7 +375,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     {
         URL resourceAsUrl = IOUtils.getResourceAsUrl("testFolder.zip", getClass());
         File zipFile = new File(resourceAsUrl.getFile());
-        File outputDir = FileUtils.newFile(TEST_DIRECTORY);
+        File outputDir = newFile(TEST_DIRECTORY);
 
         for (int i = 0; i < 2; i++)
         {
@@ -398,14 +401,14 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void fileIsOpenWhenUsingAFileOutputStream() throws IOException
     {
-        File file = FileUtils.newFile(TEST_FILE);
-        assertThat(FileUtils.isFileOpen(file), is(false));
+        File file = newFile(TEST_FILE);
+        assertThat(isFileOpen(file), is(false));
 
         FileOutputStream outputStream = new FileOutputStream(file);
-        assertThat(FileUtils.isFileOpen(file), is(true));
+        assertThat(isFileOpen(file), is(true));
 
         outputStream.close();
-        assertThat(FileUtils.isFileOpen(file), is(false));
+        assertThat(isFileOpen(file), is(false));
     }
 
     @Rule
@@ -416,35 +419,35 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        originalFailIfDeleteOpenFile = DefaultMuleConfiguration.shouldFailIfDeleteOpenFile();
+        originalFailIfDeleteOpenFile = shouldFailIfDeleteOpenFile();
     }
 
     @After
     public void after()
     {
-        DefaultMuleConfiguration.failIfDeleteOpenFile = originalFailIfDeleteOpenFile;
+        failIfDeleteOpenFile = originalFailIfDeleteOpenFile;
     }
 
     @Test
     public void openFilesCannotBeDeletedIfTheProperFlagIsSet() throws IOException
     {
-        DefaultMuleConfiguration.failIfDeleteOpenFile = true;
+        failIfDeleteOpenFile = true;
 
-        File file = FileUtils.newFile(TEST_FILE);
+        File file = newFile(TEST_FILE);
         thrown.expect(MuleRuntimeException.class);
         thrown.expectMessage("Attempting to delete an open file: " + file);
 
-        assertThat(FileUtils.isFileOpen(file), is(false));
+        assertThat(isFileOpen(file), is(false));
 
         try (FileOutputStream outputStream = new FileOutputStream(file))
         {
-            assertThat(FileUtils.isFileOpen(file), is(true));
+            assertThat(isFileOpen(file), is(true));
             deleteFile(file);
         }
         finally
         {
             // it is now closed because the output stream is AutoCloseable
-            assertThat(FileUtils.isFileOpen(file), is(false));
+            assertThat(isFileOpen(file), is(false));
             assertThat(deleteFile(file), is(true));
         }
     }
