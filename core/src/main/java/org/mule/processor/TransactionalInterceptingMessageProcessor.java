@@ -62,7 +62,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
             try
             {
                 MuleEvent result = executionTemplate.execute(processingCallback);
-                if(VoidMuleEvent.getInstance() == result)
+                if(result == null || VoidMuleEvent.getInstance() == result)
                 {
                     return result;
                 }
