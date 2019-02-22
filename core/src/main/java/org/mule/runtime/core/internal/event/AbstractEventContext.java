@@ -21,7 +21,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -76,7 +75,7 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
 
-  protected FlowCallStack flowCallStack = new DefaultFlowCallStack();
+  protected FlowCallStack flowCallStack;
 
   public AbstractEventContext() {
     this(NULL_EXCEPTION_HANDLER, 0, Optional.empty());
