@@ -32,7 +32,6 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.api.processor.ContextClassloaderAwareProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -52,7 +51,7 @@ import java.util.List;
  * If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.runtime.core.api.processor.Processor} is invoked directly.
  */
-public class TryScope extends AbstractMessageProcessorOwner implements Scope, ContextClassloaderAwareProcessor {
+public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TryScope.class);
 
