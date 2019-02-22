@@ -8,7 +8,7 @@
 
      <vm:connector name="default"/>
 
-     <flow name="expression-in-transaction-flow">
+     <flow name="expression-false-in-transaction-flow">
           <vm:inbound-endpoint path="transaction-filter-all" connector-ref="default"/>
           <transactional action="ALWAYS_BEGIN">
                <expression-filter expression="#[false]"/>
@@ -16,4 +16,11 @@
           <vm:outbound-endpoint path="transaction-filter-all-reply" connector-ref="default"/>
      </flow>
 
+     <flow name="expression-true-in-transaction-flow">
+          <vm:inbound-endpoint path="transaction-filter-nothing" connector-ref="default"/>
+          <transactional action="ALWAYS_BEGIN">
+               <expression-filter expression="#[true]"/>
+          </transactional>
+          <vm:outbound-endpoint path="transaction-filter-nothing-reply" connector-ref="default"/>
+     </flow>
 </mule>

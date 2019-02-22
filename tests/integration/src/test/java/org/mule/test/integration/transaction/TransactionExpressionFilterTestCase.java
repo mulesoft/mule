@@ -6,26 +6,19 @@
  */
 package org.mule.test.integration.transaction;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.Is.is;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
 public class TransactionExpressionFilterTestCase extends FunctionalTestCase
 {
-
-    protected static final int TIMEOUT = 5000;
-
     @Override
     protected String getConfigFile()
     {
@@ -33,21 +26,22 @@ public class TransactionExpressionFilterTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void transactionWithNestedExpressionFilterStopsFlowAndReturnsNull()
+    public void transactionWithNestedExpressionFalseFilterStopsFlowAndReturnsNull() throws Exception
     {
-        List<Integer> payload = Arrays.asList(1, 2, 3);
-
         MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(payload, mock(Map.class) , muleContext);
-        try
-        {
-            client.dispatch("vm://transaction-filter-all", message);
-            MuleMessage reply = client.request("vm://transaction-filter-all-reply", TIMEOUT);
-            assertNull(reply);
-        }
-        catch (Exception e)
-        {
-            fail(String.format("Exception was thrown on executing transaction with nested expression filter: %s", e.toString()));
-        }
+        client.dispatch("vm://transaction-filter-all", "ok", null);
+
+        MuleMessage reply = client.request("vm://transaction-filter-all-reply", RECEIVE_TIMEOUT);
+        assertThat(reply, nullValue());
+    }
+
+    @Test
+    public void transactionWithNestedExpressionFilterTrueReturnsPayload() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://transaction-filter-nothing", "ok", null);
+
+        MuleMessage reply = client.request("vm://transaction-filter-nothing-reply", RECEIVE_TIMEOUT);
+        assertThat(reply.getPayload().toString(), is(equalTo("ok")));
     }
 }
