@@ -26,7 +26,7 @@ public class TransactionExpressionFilterTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void transactionWithNestedExpressionFalseFilterStopsFlowAndReturnsNull() throws Exception
+    public void transactionWithNestedExpressionFilterEvaluatesFalseStopsFlowAndReturnsNull() throws Exception
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://transaction-filter-all", "ok", null);
@@ -36,7 +36,7 @@ public class TransactionExpressionFilterTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void transactionWithNestedExpressionFilterTrueReturnsPayload() throws Exception
+    public void transactionWithNestedExpressionFilterEvaluatesTrueReturnsPayload() throws Exception
     {
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://transaction-filter-nothing", "ok", null);
