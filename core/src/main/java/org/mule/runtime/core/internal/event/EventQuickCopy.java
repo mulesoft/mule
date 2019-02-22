@@ -83,9 +83,20 @@ public final class EventQuickCopy {
    * @return new {@link CoreEvent} instance.
    */
   public static InternalEvent quickCopy(CoreEvent event, Map<String, Object> internalParameters) {
-    return (event instanceof InternalEvent)
-        ? new EventQuickCopyInternalParametersDecorator((InternalEvent) event, internalParameters)
-        : InternalEvent.builder(event).internalParameters(internalParameters).build();
+    if (event instanceof EventQuickCopyInternalParametersDecorator) {
+      final EventQuickCopyInternalParametersDecorator quickCopy = (EventQuickCopyInternalParametersDecorator) event;
+
+      final Map<String, Object> resolvedParams =
+          new HashMap<>(2 * (quickCopy.internalParameters.size() + internalParameters.size()));
+      resolvedParams.putAll(quickCopy.internalParameters);
+      resolvedParams.putAll(internalParameters);
+
+      return quickCopy(quickCopy.getEvent(), resolvedParams);
+    } else {
+      return (event instanceof InternalEvent)
+          ? new EventQuickCopyInternalParametersDecorator((InternalEvent) event, internalParameters)
+          : InternalEvent.builder(event).internalParameters(internalParameters).build();
+    }
   }
 
   private static class EventQuickCopyContextDecorator extends BaseEventDecorator {
@@ -132,7 +143,9 @@ public final class EventQuickCopy {
         return internalParameters;
       }
 
-      final Map<String, Object> resolvedParams = new HashMap<>(getEvent().getInternalParameters());
+      final Map<String, Object> resolvedParams =
+          new HashMap<>(2 * (getEvent().getInternalParameters().size() + internalParameters.size()));
+      resolvedParams.putAll(getEvent().getInternalParameters());
       resolvedParams.putAll(internalParameters);
       return resolvedParams;
     }

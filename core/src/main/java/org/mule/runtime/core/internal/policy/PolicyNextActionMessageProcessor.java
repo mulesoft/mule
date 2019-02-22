@@ -7,15 +7,14 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.OperationPolicyProcessor.POLICY_OPERATION_ORIGINAL_EVENT;
 import static org.mule.runtime.core.internal.policy.SourcePolicyProcessor.POLICY_SOURCE_ORIGINAL_EVENT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -32,6 +31,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
@@ -39,7 +39,6 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
-import reactor.core.publisher.Mono;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -95,15 +94,14 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
         .flatMap(event -> subscriberContext()
-            .flatMap(ctx -> Mono.just(addEventContextHandledByThisNext(
-                                                                       ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
-                                                                           ? policyEventConverter
-                                                                               .createEvent(saveState((PrivilegedEvent) event),
-                                                                                            getOriginalEvent(event),
-                                                                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
-                                                                           : policyEventConverter
-                                                                               .createEvent(saveState((PrivilegedEvent) event),
-                                                                                            getOriginalEvent(event))))))
+            .flatMap(ctx -> just(ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                ? policyEventConverter.createEvent((PrivilegedEvent) event,
+                                                   getOriginalEvent(event),
+                                                   builder -> saveState(builder, event),
+                                                   (boolean) ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
+                : policyEventConverter.createEvent((PrivilegedEvent) event,
+                                                   getOriginalEvent(event),
+                                                   builder -> saveState(builder, event)))))
         .doOnNext(event -> {
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
@@ -134,12 +132,14 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         });
   }
 
-  private CoreEvent addEventContextHandledByThisNext(CoreEvent event) {
+  private Builder saveState(PrivilegedEvent.Builder builder, CoreEvent event) {
     final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
 
-    return quickCopy(event, singletonMap(POLICY_NEXT_EVENT_CTX_IDS, eventCtxIds == null
-        ? singleton(event.getContext().getId())
-        : ImmutableSet.builder().addAll(eventCtxIds).add(event.getContext().getId()).build()));
+    return ((InternalEvent.Builder) builder)
+        .addInternalParameter(POLICY_STATE_EVENT, event)
+        .addInternalParameter(POLICY_NEXT_EVENT_CTX_IDS, eventCtxIds == null
+            ? singleton(event.getContext().getId())
+            : ImmutableSet.builder().addAll(eventCtxIds).add(event.getContext().getId()).build());
   }
 
   private boolean isEventContextHandledByThisNext(CoreEvent event) {
@@ -155,10 +155,6 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     } else {
       return ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_ORIGINAL_EVENT);
     }
-  }
-
-  private PrivilegedEvent saveState(PrivilegedEvent event) {
-    return quickCopy(event, singletonMap(POLICY_STATE_EVENT, event));
   }
 
   private PrivilegedEvent loadState(PrivilegedEvent event) {

@@ -161,14 +161,13 @@ public class CompositeOperationPolicy
     return Flux.from(eventPub)
         .transform(defaultOperationPolicy)
         .map(policyResponse -> {
-
           if (policy.getPolicyChain().isPropagateMessageTransformations()) {
             return quickCopy(policyResponse, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, policyResponse));
+          } else {
+            final InternalEvent nextOperationResponse =
+                ((InternalEvent) policyResponse).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
+            return nextOperationResponse != null ? nextOperationResponse : policyResponse;
           }
-
-          final InternalEvent nextOperationResponse =
-              ((InternalEvent) policyResponse).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
-          return nextOperationResponse != null ? nextOperationResponse : policyResponse;
         })
         .cast(CoreEvent.class);
   }
