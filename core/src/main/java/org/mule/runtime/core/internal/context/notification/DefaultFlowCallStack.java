@@ -11,10 +11,11 @@ import static java.lang.System.lineSeparator;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EmptyStackException;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting information
@@ -24,7 +25,15 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   private static final long serialVersionUID = -8683711977929802819L;
 
-  private final Stack<FlowStackElement> innerStack = new Stack<>();
+  private final Deque<FlowStackElement> innerStack;
+
+  public DefaultFlowCallStack() {
+    this.innerStack = new ArrayDeque<>(4);
+  }
+
+  private DefaultFlowCallStack(final Deque<FlowStackElement> innerStack) {
+    this.innerStack = new ArrayDeque<>(innerStack);
+  }
 
   /**
    * Adds an element to the top of this stack
@@ -42,7 +51,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * @throws EmptyStackException if this stack is empty.
    */
   public void setCurrentProcessorPath(String processorPath) {
-    if (!innerStack.empty()) {
+    if (!innerStack.isEmpty()) {
       innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
     }
   }
@@ -59,29 +68,22 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   @Override
   public List<FlowStackElement> getElements() {
-    List<FlowStackElement> elementsCloned = new ArrayList<>();
-    for (int i = innerStack.size() - 1; i >= 0; --i) {
-      elementsCloned.add(innerStack.get(i));
-    }
-    return elementsCloned;
+    return new ArrayList<>(innerStack);
   }
 
   @Override
   public DefaultFlowCallStack clone() {
-    DefaultFlowCallStack cloned = new DefaultFlowCallStack();
-    for (int i = 0; i < innerStack.size(); ++i) {
-      cloned.innerStack.push(innerStack.get(i));
-    }
-
-    return cloned;
+    return new DefaultFlowCallStack(innerStack);
   }
 
   @Override
   public String toString() {
     StringBuilder stackString = new StringBuilder();
-    for (int i = innerStack.size() - 1; i >= 0; --i) {
-      stackString.append("at ").append(innerStack.get(i).toString());
-      if (i != 0) {
+
+    int i = 0;
+    for (FlowStackElement flowStackElement : innerStack) {
+      stackString.append("at ").append(flowStackElement.toString());
+      if (++i != innerStack.size()) {
         stackString.append(lineSeparator());
       }
     }

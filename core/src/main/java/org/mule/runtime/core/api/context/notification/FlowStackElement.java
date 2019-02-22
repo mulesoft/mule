@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.context.notification;
 
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 
 import java.io.Serializable;
 
@@ -19,14 +20,14 @@ public final class FlowStackElement implements Serializable {
 
   private static final long serialVersionUID = 192333659386101806L;
 
-  private String flowName;
-  private String processorPath;
-  private Long creationTime;
+  private final String flowName;
+  private final String processorPath;
+  private final Long creationTime;
 
   public FlowStackElement(String flowName, String processorPath) {
     this.flowName = flowName;
     this.processorPath = processorPath;
-    this.creationTime = System.currentTimeMillis();
+    this.creationTime = currentTimeMillis();
   }
 
   /**
@@ -54,7 +55,7 @@ public final class FlowStackElement implements Serializable {
    * @return the milliseconds elapsed between its creation and now.
    */
   public Long getElapsedTime() {
-    return System.currentTimeMillis() - creationTime;
+    return currentTimeMillis() - creationTime;
   }
 
   @Override
