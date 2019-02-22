@@ -28,20 +28,21 @@ public class TransactionExpressionFilterTestCase extends FunctionalTestCase
     @Test
     public void transactionWithNestedExpressionFilterEvaluatesFalseStopsFlowAndReturnsNull() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://transaction-filter-all", TEST_MESSAGE, null);
-
-        MuleMessage reply = client.request("vm://transaction-filter-all-reply", RECEIVE_TIMEOUT);
+        MuleMessage reply = sendTestMessageVmQueueEndpoint("transaction-filter-all", "transaction-filter-all-reply");
         assertThat(reply, nullValue());
     }
 
     @Test
     public void transactionWithNestedExpressionFilterEvaluatesTrueReturnsPayload() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://transaction-filter-nothing", TEST_MESSAGE, null);
-
-        MuleMessage reply = client.request("vm://transaction-filter-nothing-reply", RECEIVE_TIMEOUT);
+        MuleMessage reply = sendTestMessageVmQueueEndpoint("transaction-filter-nothing", "transaction-filter-nothing-reply");
         assertThat(reply.getPayload().toString(), is(equalTo(TEST_MESSAGE)));
+    }
+
+    public MuleMessage sendTestMessageVmQueueEndpoint(String inQueue, String outQueue) throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://" + inQueue, TEST_MESSAGE, null);
+        return client.request("vm://" + outQueue, RECEIVE_TIMEOUT);
     }
 }
