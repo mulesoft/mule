@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.internal.runtime.execution.Refle
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
+import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -22,7 +23,6 @@ import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProvid
 
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import javax.inject.Inject;
 
@@ -49,18 +49,23 @@ public final class PagedReflectiveOperationExecutorFactory<T, M extends Componen
                                                    createDelegate(implementationClass, parameters), pagingProviderTransformer);
   }
 
-  private class PagingProviderResultTransformer implements BiFunction<Object, ExecutionContext<M>, Object> {
+  private class PagingProviderResultTransformer implements CheckedBiFunction<Object, ExecutionContext<M>, Object> {
 
     @Inject
     private ExtensionConnectionSupplier connectionSupplier;
 
     @Override
-    public Object apply(Object result, ExecutionContext<M> executionContext) {
+    public Object applyChecked(Object result, ExecutionContext<M> executionContext) throws Throwable {
       PagingProviderProducer pagingProviderProducer =
           new PagingProviderProducer<>((PagingProvider) result, executionContext.getConfiguration().get(),
                                        (ExecutionContextAdapter) executionContext, connectionSupplier);
       ListConsumer<?> consumer = new ListConsumer(pagingProviderProducer);
-      consumer.loadNextPage();
+      try {
+        consumer.loadNextPage();
+      } catch (Throwable e) {
+        throw pagingProviderProducer.getCause(e);
+      }
+
       return new ConsumerStreamingIterator<>(consumer);
     }
   }

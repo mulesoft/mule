@@ -25,4 +25,8 @@
         </foreach>
     </flow>
 
+    <flow name="fail-paged-error-handler">
+        <petstore:fail-paged-operation-with-error-handler errorAction="#[vars.errorAction default 'NONE']" config-ref="petstore-valid"/>
+    </flow>
+
 </mule>

@@ -8,20 +8,17 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -29,7 +26,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Extension
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -90,12 +86,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       executionContext.setVariable(CONNECTION_PARAM, connectionSupplier.getHandler());
       return function.apply(connectionSupplier.getConnection());
     } catch (Throwable e) {
-      Optional<ModuleException> moduleException = extractOfType(e, ModuleException.class);
-      if (moduleException.isPresent()) {
-        throw moduleException.get();
-      } else {
-        throw new MuleRuntimeException(createStaticMessage(PAGE_ERROR), e);
-      }
+      throw new PagingProviderRuntimeException(createStaticMessage(PAGE_ERROR), e);
     } finally {
       if (connectionSupplier != null) {
         connectionSupplier.close();
@@ -113,7 +104,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
       delegate.close(connectionSupplier.getConnection());
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
+      throw new PagingProviderRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
       if (connectionSupplier != null) {
         connectionSupplier.close();
@@ -172,7 +163,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     private ConnectionHandler connectionHandler;
 
     @Override
-    public ConnectionSupplier getConnectionSupplier() throws MuleException {
+    public ConnectionSupplier getConnectionSupplier() {
       return stickyConnection.get();
     }
 
@@ -253,6 +244,30 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     @Override
     public void invalidate() {
       connectionHandler.invalidate();
+    }
+  }
+
+  /**
+   * Private exception indicating than an error occurred using the Paging Provider Producer
+   */
+  private static class PagingProviderRuntimeException extends MuleRuntimeException {
+
+    PagingProviderRuntimeException(I18nMessage message, Throwable cause) {
+      super(message, cause);
+    }
+  }
+
+  /**
+   * Utility method to obtain the failure cause when an exception is thrown using the {@link PagingProviderProducer}
+   *
+   * @param t Throwable to handle
+   * @return The correct failure cause
+   */
+  public Throwable getCause(Throwable t) {
+    if (t instanceof PagingProviderRuntimeException) {
+      return t.getCause();
+    } else {
+      return t;
     }
   }
 }
