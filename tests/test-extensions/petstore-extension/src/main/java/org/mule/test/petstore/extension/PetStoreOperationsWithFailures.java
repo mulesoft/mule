@@ -10,13 +10,17 @@ package org.mule.test.petstore.extension;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.test.petstore.extension.error.ErrorAction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +65,7 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
                                                                         defaultValue = "false") boolean stickyConnections,
                                                                     @org.mule.runtime.extension.api.annotation.param.Optional(
                                                                         defaultValue = "true") boolean throwConnectivity) {
-    return new PagingProvider<PetStoreClient, Integer>() {
+    return new AbstractPetStorePagingProvider(stickyConnections) {
 
       private int index = 0;
       private List<Integer> returnValue = Collections.singletonList(1);
@@ -79,21 +83,76 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
         index++;
         return returnValue;
       }
+    };
+  }
+
+  @Throws(PetStoreCustomErrorProvider.class)
+  @OnException(PetStoreErrorHandler.class)
+  public PagingProvider<PetStoreClient, Integer> failPagedOperationWithErrorHandler(ErrorAction errorAction) {
+    return new AbstractPetStorePagingProvider(false) {
 
       @Override
-      public Optional<Integer> getTotalResults(PetStoreClient petStoreClient) {
-        return Optional.empty();
-      }
-
-      @Override
-      public void close(PetStoreClient petStoreClient) throws MuleException {
-
-      }
-
-      @Override
-      public boolean useStickyConnections() {
-        return stickyConnections;
+      public List<Integer> getPage(PetStoreClient petStoreClient) {
+        throw new PetStoreException(errorAction);
       }
     };
+  }
+
+  private abstract class AbstractPetStorePagingProvider implements PagingProvider<PetStoreClient, Integer> {
+
+    private boolean useStickyConnections;
+
+    public AbstractPetStorePagingProvider(boolean useStickyConnections) {
+      this.useStickyConnections = useStickyConnections;
+    }
+
+    @Override
+    public Optional<Integer> getTotalResults(PetStoreClient petStoreClient) {
+      return Optional.empty();
+    }
+
+    @Override
+    public void close(PetStoreClient petStoreClient) throws MuleException {
+
+    }
+
+    @Override
+    public boolean useStickyConnections() {
+      return useStickyConnections;
+    }
+
+  }
+
+  public static class PetStoreErrorHandler extends ExceptionHandler {
+
+    @Override
+    public Exception enrichException(Exception e) {
+      if (e instanceof PetStoreException) {
+        return ((PetStoreException) e).getException();
+      } else {
+        return e;
+      }
+    }
+  }
+
+  private static class PetStoreException extends RuntimeException {
+
+
+    private ErrorAction errorAction;
+
+    private PetStoreException(ErrorAction errorAction) {
+      this.errorAction = errorAction;
+    }
+
+    public Exception getException() {
+      switch (errorAction) {
+        case CONNECTIVITY:
+          return new ConnectionException(this);
+        case RUNTIME:
+          return new RuntimeException(this);
+        default:
+          return new ModuleException(PET_ERROR, this);
+      }
+    }
   }
 }

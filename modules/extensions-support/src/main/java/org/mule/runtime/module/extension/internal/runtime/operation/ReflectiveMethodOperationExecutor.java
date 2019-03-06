@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -58,7 +59,7 @@ public class ReflectiveMethodOperationExecutor<M extends ComponentModel>
   }
 
   public ReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance,
-                                           BiFunction<Object, ExecutionContext<M>, Object> resultTransformer) {
+                                           CheckedBiFunction<Object, ExecutionContext<M>, Object> resultTransformer) {
     this.executor =
         new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
     this.resultTransformer = resultTransformer;

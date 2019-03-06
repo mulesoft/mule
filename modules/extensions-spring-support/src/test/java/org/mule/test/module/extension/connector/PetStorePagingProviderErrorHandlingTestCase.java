@@ -10,7 +10,9 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVIT
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 
+import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.petstore.extension.error.ErrorAction;
 
 import org.junit.Test;
 
@@ -32,5 +34,20 @@ public class PetStorePagingProviderErrorHandlingTestCase extends AbstractExtensi
     flowRunner("fail-paged")
         .withVariable("throwConnectivity", false)
         .runExpectingException(errorType(PET_ERROR));
+  }
+
+  @Test
+  public void errorHandlerThrowsModuleException() throws Exception {
+    flowRunner("fail-paged-error-handler")
+        .withVariable("throwConnectivity", false)
+        .runExpectingException(errorType(PET_ERROR));
+  }
+
+  @Test
+  public void errorHandlerThrowsConnectivity() throws Exception {
+    flowRunner("fail-paged-error-handler")
+        .withVariable("throwConnectivity", false)
+        .withVariable("errorAction", ErrorAction.CONNECTIVITY)
+        .runExpectingException(errorType(MuleErrors.CONNECTIVITY));
   }
 }
