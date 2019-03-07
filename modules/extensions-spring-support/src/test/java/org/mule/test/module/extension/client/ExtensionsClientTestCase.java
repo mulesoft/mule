@@ -185,6 +185,24 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   }
 
   @Test
+  @Description("Executes a simple operation with an expression as parameter using the client and checks the output")
+  public void executeTwice() throws Throwable {
+    OperationParameters params = builder().configName(HEISENBERG_CONFIG)
+      .addParameter("victim", "#[mel:'Juani']")
+      .addParameter("goodbyeMessage", "ADIOS")
+      .build();
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);
+    assertThat(result.getOutput(), is("ADIOS, Juani"));
+
+    OperationParameters params2 = builder().configName(HEISENBERG_CONFIG)
+      .addParameter("victim", "#[mel:'Juani']")
+      .addParameter("goodbyeMessage", "ADIOS")
+      .build();
+    Result<String, Object> result2 = doExecute(HEISENBERG_EXT_NAME, "kill", params2);
+    assertThat(result2.getOutput(), is("ADIOS, Juani"));
+  }
+
+  @Test
   @Description("Executes an operation that fails using the client and checks the throwed exception")
   public void executeFailureNonBlockingOperation() throws Throwable {
     exception.expect(MuleException.class);

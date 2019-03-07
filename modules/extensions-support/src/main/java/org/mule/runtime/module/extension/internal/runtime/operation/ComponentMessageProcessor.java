@@ -139,21 +139,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   protected final ExtensionModel extensionModel;
+
   protected final ResolverSet resolverSet;
+
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
-
   private final ReflectionCache reflectionCache;
 
   protected ExecutionMediator executionMediator;
+
   protected ComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   protected PolicyManager policyManager;
-
   private String resolvedProcessorRepresentation;
-  private boolean initialised = false;
 
+  private boolean initialised = false;
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
                                    ConfigurationProvider configurationProvider,
@@ -173,6 +174,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.reflectionCache = reflectionCache;
+  }
+
+  protected ResolverSet getResolverSet() {
+    return resolverSet;
   }
 
   @Override
