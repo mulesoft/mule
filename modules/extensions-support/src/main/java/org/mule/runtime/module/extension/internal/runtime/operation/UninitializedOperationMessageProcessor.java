@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -28,6 +32,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.internal.dsl.DslConstants;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -39,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -46,9 +52,13 @@ import javax.xml.namespace.QName;
 
 import com.google.common.collect.ImmutableMap;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 public class UninitializedOperationMessageProcessor extends OperationMessageProcessor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(UninitializedOperationMessageProcessor.class.getName());
 
   private OperationMessageProcessor operationMessageProcessorDelegate;
   private Map<String, ValueResolver> resolvedParameters;
@@ -148,23 +158,23 @@ public class UninitializedOperationMessageProcessor extends OperationMessageProc
 
   @Override
   protected Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
-      throws MuleException {
+    throws MuleException {
 
     ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(event).build();
-    Object config = resolverSet.resolve(valueResolvingContext).asMap().get("config-ref");
+    Object config = resolverSet.resolve(valueResolvingContext).asMap().get(CONFIG_ATTRIBUTE_NAME);
 
     Map resolvedParametersMap = resolvedParameters.entrySet().stream()
-        .filter(e -> e.getKey().equals("config-ref"))
-        .collect(Collectors.toMap(key -> key, value -> {
+        .filter(e -> e.getKey().equals(CONFIG_ATTRIBUTE_NAME))
+        .collect(toMap(identity(), value -> {
           try {
             return value.getValue().resolve(valueResolvingContext);
           } catch (MuleException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not resolve value [" + value.getKey() + "] value: " + e.getMessage(), e);
+            return null;
           }
-          return null;
         }));
 
-    return (Map) ImmutableMap.builder().putAll(resolvedParametersMap).put("config-ref", config).build();
+    return ImmutableMap.<String, Object>builder().put(CONFIG_ATTRIBUTE_NAME, config).putAll(resolvedParametersMap).build();
   }
 
   @Override
