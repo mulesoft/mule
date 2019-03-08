@@ -17,11 +17,15 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -148,7 +152,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
       Map<String, ValueResolver> params = parameters.get().entrySet().stream()
           .collect(toMap(e -> e.getKey(), e -> {
             ExpressionValueResolver resolver =
-                new ExpressionValueResolver(DEFAULT_EXPRESSION_PREFIX + "vars." + e.getKey() + DEFAULT_EXPRESSION_POSTFIX);
+                new ExpressionValueResolver(DEFAULT_EXPRESSION_PREFIX + "vars.INTERNAL_EXTENSIONS_PARAMETER_" + e.getKey() + DEFAULT_EXPRESSION_POSTFIX);
             try {
               initialiseIfNeeded(resolver, true, muleContext);
             } catch (InitialisationException ex) {
@@ -165,7 +169,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     char separator = '&';
     StringBuilder keyBuilder = new StringBuilder(256);
     keyBuilder.append(extension).append(separator).append(operation).append(separator).append(parameters.getConfigName());
-    for (String key : parameters.get().keySet()) {
+    List<String> keyList = parameters.get().keySet().stream().collect(Collectors.toList());
+    Collections.sort(keyList, Comparator.naturalOrder());
+    for (String key : keyList) {
       keyBuilder.append(separator).append(key);
     }
     return keyBuilder.toString();
@@ -188,7 +194,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
       ValueResolver valueResolver = operationParameters.get(key);
       try {
         Object value = valueResolver.resolve(ValueResolvingContext.from(event));
-        childEventBuilder.addVariable(key, value, DataType.fromObject(value));
+        childEventBuilder.addVariable("INTERNAL_EXTENSIONS_PARAMETER_" + key, value, DataType.fromObject(value));
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
       }
