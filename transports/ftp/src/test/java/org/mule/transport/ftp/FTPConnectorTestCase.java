@@ -15,7 +15,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.transport.ftp.FtpConnector.FILES_TO_READ;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -26,7 +25,6 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.nameable.AbstractInboundEndpointNameableConnectorTestCase;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,9 +33,6 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.pool.ObjectPool;
 import org.junit.Test;
-import org.mockito.Mockito;
-
-import sun.net.ftp.FtpClient;
 
 /**
  * Test configuration of FTP connector. It's all done in code, no configuration files
@@ -229,7 +224,6 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
         // no validate call for simplicity
         connector.setValidateConnections(false);
 
-        connector.setConnectionFactoryClass(testFactory.getClass().getName());
         return connector;
     }
     
