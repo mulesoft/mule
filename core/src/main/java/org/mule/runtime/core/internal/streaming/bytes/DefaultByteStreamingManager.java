@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
+import org.mule.runtime.core.internal.streaming.StreamingStrategy;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
@@ -19,7 +20,7 @@ import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
  *
  * @since 4.0
  */
-public class DefaultByteStreamingManager implements ByteStreamingManager {
+public class DefaultByteStreamingManager implements ByteStreamingManager, ByteStreamingStrategyManager {
 
   private final ByteBufferManager bufferManager;
   protected final StreamingManager streamingManager;
@@ -55,5 +56,18 @@ public class DefaultByteStreamingManager implements ByteStreamingManager {
 
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
+  }
+
+  @Override
+  public CursorStreamProviderFactory getDefaultCursorProviderFactory(StreamingStrategy streamingStrategy) {
+    switch (streamingStrategy) {
+      case IN_MEMORY:
+        return getInMemoryCursorProviderFactory(InMemoryCursorStreamConfig.getDefault());
+      case NON_REPEATABLE:
+        return getNullCursorProviderFactory();
+      case FILE_STORE:
+      default:
+        throw new IllegalArgumentException("The streaming strategy chosen is not available for this ByteStreamingStrategyManager");
+    }
   }
 }

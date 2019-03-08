@@ -9,13 +9,16 @@ package org.mule.test.marvel.drstrange;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -28,10 +31,13 @@ import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
+import org.mule.test.marvel.model.Relic;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +46,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 public class DrStrangeOperations {
+
+  private static int HUGH_SIZE = InMemoryCursorStreamConfig.getDefault().getMaxBufferSize().toBytes() + 1;
 
   @Inject
   private ConfigurationComponentLocator locator;
@@ -65,6 +73,98 @@ public class DrStrangeOperations {
     } catch (Exception e) {
       throw new CustomErrorException(e, CUSTOM_ERROR);
     }
+  }
+
+  public PagingProvider<MysticConnection, Relic> getRelics(StreamingHelper streamingHelper) {
+    return new PagingProvider<MysticConnection, Relic>() {
+
+      private int currentPage = 1;
+      private final int PAGES = 4;
+
+      @Override
+      public List<Relic> getPage(MysticConnection connection) {
+        if (currentPage == PAGES) {
+          return emptyList();
+        }
+        currentPage++;
+        return new ArrayList<Relic>() {
+
+          {
+            add(getResolvedRelic("cloak"));
+            add(getResolvedRelic("boots"));
+            add(getResolvedRelic("staff"));
+          }
+        };
+      }
+
+      private Relic getResolvedRelic(String description) {
+        return new Relic(streamingHelper.resolveCursorProvider(new ByteArrayInputStream(description.getBytes())));
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MysticConnection connection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close(MysticConnection connection) throws MuleException {
+        // Do nothing.
+      }
+    };
+  }
+
+  public PagingProvider<MysticConnection, Relic> getHugeRelic(StreamingHelper streamingHelper) {
+    return new PagingProvider<MysticConnection, Relic>() {
+
+      private boolean pageRetrieved = false;
+
+      @Override
+      public List<Relic> getPage(MysticConnection connection) {
+        if (pageRetrieved == true) {
+          return emptyList();
+        }
+        pageRetrieved = true;
+        return new ArrayList<Relic>() {
+
+          {
+            add(getResolvedRelic(HUGH_SIZE));
+          }
+        };
+      }
+
+      private Relic getResolvedRelic(int descriptionSize) {
+        InputStream inputStream = new InputStream() {
+
+          private int bytesRead = 0;
+          private final int CONTENT = 140;
+
+          @Override
+          public int read() throws IOException {
+            if (bytesRead < descriptionSize) {
+              bytesRead++;
+              return CONTENT;
+            }
+            return -1;
+          }
+        };
+        return new Relic(streamingHelper.resolveCursorProvider(inputStream));
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MysticConnection connection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close(MysticConnection connection) throws MuleException {
+        // Do nothing.
+      }
+    };
+  }
+
+  @MediaType(ANY)
+  public Object getStreamingHelper(StreamingHelper streamingHelper) {
+    return streamingHelper;
   }
 
   @MediaType(TEXT_PLAIN)

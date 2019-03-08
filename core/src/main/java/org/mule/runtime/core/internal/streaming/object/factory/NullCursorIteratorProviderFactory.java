@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
+import static org.mule.runtime.core.internal.streaming.StreamingStrategy.NON_REPEATABLE;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.streaming.StreamingStrategy;
 
 import java.util.Iterator;
 
-public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorProviderFactory {
+public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorProviderFactory implements HasStreamingStrategy {
 
   public NullCursorIteratorProviderFactory(StreamingManager streamingManager) {
     super(streamingManager);
@@ -20,5 +23,10 @@ public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorPro
   @Override
   protected Object resolve(Iterator iterator, EventContext eventContext) {
     return iterator;
+  }
+
+  @Override
+  public StreamingStrategy getStreamingStrategy() {
+    return NON_REPEATABLE;
   }
 }

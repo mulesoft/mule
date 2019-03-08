@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
+import static org.mule.runtime.core.internal.streaming.StreamingStrategy.IN_MEMORY;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.internal.streaming.StreamingStrategy;
 import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
 
 import java.util.Iterator;
 
-public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIteratorProviderFactory {
+public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIteratorProviderFactory implements HasStreamingStrategy {
 
   private final InMemoryCursorIteratorConfig config;
 
@@ -37,5 +40,10 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
   @Override
   protected Object resolve(Iterator iterator, EventContext eventContext) {
     return new InMemoryCursorIteratorProvider(iterator, config);
+  }
+
+  @Override
+  public StreamingStrategy getStreamingStrategy() {
+    return IN_MEMORY;
   }
 }

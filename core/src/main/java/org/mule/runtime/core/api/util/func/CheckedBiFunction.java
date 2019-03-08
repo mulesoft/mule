@@ -24,3 +24,4 @@ public interface CheckedBiFunction<T, U, R> extends BiFunction<T, U, R> {
 
   R applyChecked(T t, U u) throws Throwable;
 }
+

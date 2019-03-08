@@ -14,6 +14,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingStrategyManager;
+import org.mule.runtime.core.internal.streaming.object.factory.HasStreamingStrategy;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
@@ -96,9 +98,16 @@ public class DefaultStreamingHelper implements StreamingHelper {
   }
 
   private Object resolveCursorStreamProvider(InputStream value) {
-    CursorProviderFactory factory = cursorProviderFactory.accepts(value)
-        ? cursorProviderFactory
-        : streamingManager.forBytes().getDefaultCursorProviderFactory();
+    CursorProviderFactory factory;
+    if (cursorProviderFactory.accepts(value)) {
+      factory = cursorProviderFactory;
+    } else if (streamingManager.forBytes() instanceof ByteStreamingStrategyManager
+        && cursorProviderFactory instanceof HasStreamingStrategy) {
+      factory = ((ByteStreamingStrategyManager) streamingManager.forBytes())
+          .getDefaultCursorProviderFactory(((HasStreamingStrategy) cursorProviderFactory).getStreamingStrategy());
+    } else {
+      factory = streamingManager.forBytes().getDefaultCursorProviderFactory();
+    }
 
     return factory.of(((BaseEventContext) event.getContext()).getRootContext(), value);
   }
