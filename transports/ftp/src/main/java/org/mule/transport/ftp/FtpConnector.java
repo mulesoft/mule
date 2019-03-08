@@ -711,45 +711,57 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
     protected FTPClient createFtpClient(ImmutableEndpoint endpoint) throws Exception
     {
         EndpointURI uri = endpoint.getEndpointURI();
-        FTPClient client = this.getFtp(endpoint);
-        client.setDataTimeout(endpoint.getResponseTimeout());
-
-        this.enterActiveOrPassiveMode(client, endpoint);
-        this.setupFileType(client, endpoint);
-
-        String path = uri.getPath();
-
-        // only change directory if one was configured
-        if (StringUtils.isBlank(path))
+        FTPClient client = null;
+        try
         {
-            return client;
-        }
+            client = this.getFtp(endpoint);
+            client.setDataTimeout(endpoint.getResponseTimeout());
 
-        // MULE-2400: if the path begins with '~' we must strip the first '/' to make things
-        // work with FTPClient
-        if ((path.length() >= 2) && (path.charAt(1) == '~'))
-        {
-            path = path.substring(1);
-        }
+            this.enterActiveOrPassiveMode(client, endpoint);
+            this.setupFileType(client, endpoint);
 
-        //Checking if it is a file or a directory
-        boolean isFile = this.isFile(endpoint, client);
-        if (!isFile && !client.changeWorkingDirectory(path))
-        {
-            throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
-                    path, client.getReplyCode()));
-        }
-        else if (isFile)
-        {
-            // Changing the working directory to the parent folder, it should be better if
-            // the ftpClient API would provide a way to retrieve the parent folder
-            FTPFile[] listFiles = client.listFiles(path);
-            // Files could have been consumed, e.g. by an external FTP Client
-            if (listFiles.length == 1)
+            String path = uri.getPath();
+
+            // only change directory if one was configured
+            if (StringUtils.isBlank(path))
             {
-                String directory = path.replaceAll(listFiles[0].getName(), "");
-                client.changeWorkingDirectory(directory);
+                return client;
             }
+
+            // MULE-2400: if the path begins with '~' we must strip the first '/' to make things
+            // work with FTPClient
+            if ((path.length() >= 2) && (path.charAt(1) == '~'))
+            {
+                path = path.substring(1);
+            }
+
+            // Checking if it is a file or a directory
+            boolean isFile = this.isFile(endpoint, client);
+            if (!isFile && !client.changeWorkingDirectory(path))
+            {
+                throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
+                        path, client.getReplyCode()));
+            }
+            else if (isFile)
+            {
+                // Changing the working directory to the parent folder, it should be better if
+                // the ftpClient API would provide a way to retrieve the parent folder
+                FTPFile[] listFiles = client.listFiles(path);
+                // Files could have been consumed, e.g. by an external FTP Client
+                if (listFiles.length == 1)
+                {
+                    String directory = path.replaceAll(listFiles[0].getName(), "");
+                    client.changeWorkingDirectory(directory);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            if (client != null)
+            {
+                releaseFtp(endpoint, client);
+            }
+            throw e;
         }
 
         return client;
