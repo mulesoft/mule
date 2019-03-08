@@ -75,7 +75,7 @@ public class PolicyEventConverter {
                                      Consumer<PrivilegedEvent.Builder> eventConfigurer, boolean keepMessage) {
     PrivilegedEvent.Builder eventBuilder = PrivilegedEvent
         .builder(event)
-        .variables(originalEvent.getVariables());
+        .variablesTyped(originalEvent.getVariables());
 
     if (!keepMessage) {
       eventBuilder.message(originalEvent.getMessage());

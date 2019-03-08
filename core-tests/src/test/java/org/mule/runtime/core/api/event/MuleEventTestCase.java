@@ -17,7 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.api.security.SecurityContext;
@@ -42,6 +44,9 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import io.qameta.allure.Description;
 
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
@@ -179,6 +184,43 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertEquals("bar", event.getVariables().get("foo").getValue());
 
     assertEquals("bar2", copy.getVariables().get("foo").getValue());
+  }
+
+  @Test
+  @Description("Test that a perfromance optimization to avoid recreating the variables map is applied")
+  public void varsOverridenFromAnotherEvent() throws MuleException {
+    CoreEvent baseEventWithVars = getEventBuilder()
+        .message(of("whatever"))
+        .addVariable("foo", "bar")
+        .build();
+    CoreEvent baseEventNoVars = getEventBuilder()
+        .message(of("whatever"))
+        .build();
+
+    final Map<String, TypedValue<?>> baseEventVars = baseEventWithVars.getVariables();
+
+    final PrivilegedEvent newEvent = PrivilegedEvent.builder(baseEventNoVars).variablesTyped(baseEventVars).build();
+
+    assertThat(newEvent.getVariables(), sameInstance(baseEventVars));
+  }
+
+  @Test
+  @Description("Test that a perfromance optimization to avoid recreating the variables map is applied")
+  public void varsOverridenFromAnotherEventNotEmpty() throws MuleException {
+    CoreEvent baseEventWithVars = getEventBuilder()
+        .message(of("whatever"))
+        .addVariable("foo", "bar")
+        .build();
+    CoreEvent baseEventWithOtherVars = getEventBuilder()
+        .message(of("whatever"))
+        .addVariable("baz", "qux")
+        .build();
+
+    final Map<String, TypedValue<?>> baseEventVars = baseEventWithVars.getVariables();
+
+    final PrivilegedEvent newEvent = PrivilegedEvent.builder(baseEventWithOtherVars).variablesTyped(baseEventVars).build();
+
+    assertThat(newEvent.getVariables(), sameInstance(baseEventVars));
   }
 
   @Test
