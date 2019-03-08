@@ -17,18 +17,6 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -59,6 +47,17 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 import reactor.core.publisher.Mono;
 
 
@@ -152,7 +151,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
       Map<String, ValueResolver> params = parameters.get().entrySet().stream()
           .collect(toMap(e -> e.getKey(), e -> {
             ExpressionValueResolver resolver =
-                new ExpressionValueResolver(DEFAULT_EXPRESSION_PREFIX + "vars.INTERNAL_EXTENSIONS_PARAMETER_" + e.getKey() + DEFAULT_EXPRESSION_POSTFIX);
+                new ExpressionValueResolver(DEFAULT_EXPRESSION_PREFIX + "vars." + e.getKey() + DEFAULT_EXPRESSION_POSTFIX);
             try {
               initialiseIfNeeded(resolver, true, muleContext);
             } catch (InitialisationException ex) {
@@ -194,7 +193,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
       ValueResolver valueResolver = operationParameters.get(key);
       try {
         Object value = valueResolver.resolve(ValueResolvingContext.from(event));
-        childEventBuilder.addVariable("INTERNAL_EXTENSIONS_PARAMETER_" + key, value, DataType.fromObject(value));
+        childEventBuilder.addVariable(key, value, DataType.fromObject(value));
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
       }
