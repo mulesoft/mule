@@ -7,11 +7,23 @@
 package org.mule.runtime.module.extension.internal.runtime.client;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import javax.inject.Inject;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,6 +33,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -39,14 +52,10 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import javax.inject.Inject;
+import reactor.core.publisher.Mono;
 
 
 /**
@@ -80,6 +89,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
 
   private final CoreEvent event;
 
+  private static Map<String, OperationMessageProcessor> processorMap = new HashMap<>();
+
   /**
    * This constructor enables the {@link DefaultExtensionsClient} to be aware of the current execution {@link CoreEvent} and
    * enables to perform the dynamic operation execution with the same event that the SDK operation using the {@link ExtensionsClient}
@@ -110,34 +121,91 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
    */
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
-    OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-    return just(getEvent()).transform(processor)
+    OperationMessageProcessor processor = getOrCreateOperationMessageProcessor(extension, operation, parameters);
+    return just(buildChildEvent(event, parameters)).transform(processor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate(() -> disposeProcessor(processor)).toFuture();
+        .doAfterTerminate(() -> disposeProcessor(processor))
+        .toFuture();
   }
 
   @Override
   public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
       throws MuleException {
-    OperationMessageProcessor processor = createProcessor(extension, operation, params);
+    OperationMessageProcessor processor = getOrCreateOperationMessageProcessor(extension, operation, params);
     try {
-      CoreEvent process = processor.process(getEvent());
+      CoreEvent process = processor.process(buildChildEvent(getEvent(), params));
       return Result.<T, A>builder(process.getMessage()).build();
     } finally {
       disposeProcessor(processor);
     }
   }
 
+  private OperationMessageProcessor getOrCreateOperationMessageProcessor(String extension, String operation,
+                                                                         OperationParameters parameters) {
+    String key = buildKey(extension, operation, parameters);
+    if (!processorMap.containsKey(key)) {
+      Map<String, ValueResolver> params = parameters.get().entrySet().stream()
+          .collect(toMap(e -> e.getKey(), e -> {
+            ExpressionValueResolver resolver =
+                new ExpressionValueResolver(DEFAULT_EXPRESSION_PREFIX + "vars." + e.getKey() + DEFAULT_EXPRESSION_POSTFIX);
+            try {
+              initialiseIfNeeded(resolver, true, muleContext);
+            } catch (InitialisationException ex) {
+              throw new MuleRuntimeException(ex);
+            }
+            return resolver;
+          }));
+      processorMap.put(key, createProcessor(extension, operation, parameters.getConfigName(), params));
+    }
+    return processorMap.get(key);
+  }
+
+  private String buildKey(String extension, String operation, OperationParameters parameters) {
+    char separator = '&';
+    StringBuilder keyBuilder = new StringBuilder(256);
+    keyBuilder.append(extension).append(separator).append(operation).append(separator).append(parameters.getConfigName());
+    for (String key : parameters.get().keySet()) {
+      keyBuilder.append(separator).append(key);
+    }
+    return keyBuilder.toString();
+  }
+
+  private Mono<CoreEvent> process(OperationMessageProcessor omp, OperationParameters parameters) {
+    if (event != null) {
+      return from(processWithChildContext(buildChildEvent(event, parameters), omp, Optional.empty()));
+    }
+    return from(omp.apply(just(buildChildEvent(getInitialiserEvent(muleContext), parameters))));
+  }
+
+  private CoreEvent buildChildEvent(CoreEvent event, OperationParameters parameters) {
+    if(event == null){
+      return getInitialiserEvent();
+    }
+    CoreEvent.Builder childEventBuilder = CoreEvent.builder(event);
+    Map<String, ValueResolver> operationParameters = resolveParameters(parameters.get(), event);
+    for (String key : operationParameters.keySet()) {
+      ValueResolver valueResolver = operationParameters.get(key);
+      try {
+        Object value = valueResolver.resolve(ValueResolvingContext.from(event));
+        childEventBuilder.addVariable(key, value, DataType.fromObject(value));
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
+    return childEventBuilder.build();
+  }
+
   /**
    * Creates a new {@link OperationMessageProcessor} for the required operation and parses all the parameters passed by the client
    * user.
    */
-  private OperationMessageProcessor createProcessor(String extensionName, String operationName, OperationParameters parameters) {
+  private OperationMessageProcessor createProcessor(String extensionName, String operationName, Optional<String> configName,
+                                                    Map<String, ValueResolver> parameters) {
     ExtensionModel extension = findExtension(extensionName);
     OperationModel operation = findOperation(extension, operationName);
-    ConfigurationProvider config = parameters.getConfigName().map(this::findConfiguration).orElse(null);
-    Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), getEvent());
+    ConfigurationProvider config = configName.map(this::findConfiguration).orElse(null);
+    Map<String, ValueResolver> resolvedParams = parameters;
     try {
       OperationMessageProcessor processor =
           new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
@@ -156,29 +224,31 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, CoreEvent event) {
     LinkedHashMap<String, ValueResolver> values = new LinkedHashMap<>();
     parameters.forEach((name, value) -> {
+      ValueResolver valueResolver;
       if (value instanceof ComplexParameter) {
         ComplexParameter complex = (ComplexParameter) value;
         DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType(), reflectionCache);
-        resolveParameters(complex.getParameters(), event).forEach((propertyName, valueResolver) -> {
-          try {
-            initialiseIfNeeded(valueResolver, true, muleContext);
-            builder.addPropertyResolver(propertyName, valueResolver);
-          } catch (InitialisationException e) {
-            throw new MuleRuntimeException(e);
-          }
+        resolveParameters(complex.getParameters(), event).forEach((propertyName, resolver) -> {
+          builder.addPropertyResolver(propertyName, resolver);
         });
         try {
-          values.put(name, new StaticValueResolver<>(builder.build(from(event))));
+          valueResolver = new StaticValueResolver<>(builder.build(ValueResolvingContext.from(event)));
         } catch (MuleException e) {
           throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", name)), e);
         }
       } else {
         if (value instanceof String && parser.isContainsTemplate((String) value)) {
-          values.put(name, new ExpressionValueResolver((String) value));
+          valueResolver = new ExpressionValueResolver((String) value);
         } else {
-          values.put(name, new StaticValueResolver<>(value));
+          valueResolver = new StaticValueResolver(value);
         }
       }
+      try {
+        initialiseIfNeeded(valueResolver, true, muleContext);
+      } catch (InitialisationException e) {
+        throw new MuleRuntimeException(e);
+      }
+      values.put(name, valueResolver);
     });
     return values;
   }
