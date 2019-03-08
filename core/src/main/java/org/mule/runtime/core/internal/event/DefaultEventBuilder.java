@@ -277,9 +277,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      final Message message = requireNonNull(messageFactory.apply(context));
-      // initVariables();
-      return new InternalEventImplementation(context, message,
+      return new InternalEventImplementation(context, requireNonNull(messageFactory.apply(context)),
                                              varsModified ? flowVariables : originalVars,
                                              internalParameters, session, securityContext, itemSequenceInfo, error,
                                              legacyCorrelationId,
