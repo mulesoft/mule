@@ -31,6 +31,7 @@ import org.mule.util.UUID;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,17 +63,10 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     private String backupFolder = null;
     // A lock to protect concurrent access to the folder.
     private final Object folderLock = new Object();
+    private final Object connectionLock = new Object();
 
 
     private boolean connectionEstablished = false;
-
-    // Overriding method to prevent start() call in case the connection is performed with an asynchronous
-    // retry policy. For an example, see MULE-15769
-    @Override
-    public boolean isStarting()
-    {
-        return super.isStarting() || !isConnectionEstablished();
-    }
 
     public RetrieveMessageReceiver(Connector connector,
                                    FlowConstruct flowConstruct,
@@ -101,32 +95,34 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             @Override
             public void doWork(RetryContext context) throws Exception
             {
-                logger.info("Attemping to establish connection with message retrieval server");
-                SessionDetails session = RetrieveMessageReceiver.this.castConnector().getSessionDetails(endpoint);
-
-                Store store = session.newStore();
-                store.connect();
-                RetrieveMessageReceiver.this.folder = store.getFolder(castConnector().getMailboxFolder());
-                if (castConnector().getMoveToFolder() != null)
+                synchronized (connectionLock)
                 {
-                    RetrieveMessageReceiver.this.moveToFolder = store.getFolder(castConnector().getMoveToFolder());
-                    RetrieveMessageReceiver.this.moveToFolder.open(READ_WRITE);
-                }
+                    logger.info("Attemping to establish connection with message retrieval server");
+                    SessionDetails session = RetrieveMessageReceiver.this.castConnector().getSessionDetails(endpoint);
 
-                // set default value if empty/null
-                if (StringUtils.isEmpty(backupFolder))
-                {
-                    RetrieveMessageReceiver.this.backupFolder = getEndpoint().getMuleContext().getConfiguration().getWorkingDirectory()
-                                                                + "/mail/" + folder.getName();
-                }
+                    Store store = session.newStore();
+                    store.connect();
+                    RetrieveMessageReceiver.this.folder = store.getFolder(castConnector().getMailboxFolder());
+                    if (castConnector().getMoveToFolder() != null)
+                    {
+                        RetrieveMessageReceiver.this.moveToFolder = store.getFolder(castConnector().getMoveToFolder());
+                        RetrieveMessageReceiver.this.moveToFolder.open(READ_WRITE);
+                    }
 
-                if (RetrieveMessageReceiver.this.backupFolder != null && !RetrieveMessageReceiver.this.backupFolder.endsWith(File.separator))
-                {
-                    RetrieveMessageReceiver.this.backupFolder += File.separator;
-                }
+                    // set default value if empty/null
+                    if (StringUtils.isEmpty(backupFolder))
+                    {
+                        RetrieveMessageReceiver.this.backupFolder = getEndpoint().getMuleContext().getConfiguration().getWorkingDirectory()
+                                + "/mail/" + folder.getName();
+                    }
 
-                // Once all connection has been established, reply isStarting with true
-                RetrieveMessageReceiver.this.connectionEstablished = true;
+                    if (RetrieveMessageReceiver.this.backupFolder != null && !RetrieveMessageReceiver.this.backupFolder.endsWith(File.separator))
+                    {
+                        RetrieveMessageReceiver.this.backupFolder += File.separator;
+                    }
+
+                    RetrieveMessageReceiver.this.connectionEstablished = true;
+                }
             }
 
             @Override
@@ -166,11 +162,50 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     protected void doStart() throws MuleException
     {
-        super.doStart();
-        synchronized (folderLock)
+        try
         {
-            folder.addMessageCountListener(this);
+            getConnector().getRetryPolicyTemplate().execute(new RetryCallback()
+            {
+                @Override
+                public void doWork(RetryContext retryContext) throws MuleException
+                {
+                    synchronized (connectionLock)
+                    {
+                        if (RetrieveMessageReceiver.this.connectionEstablished)
+                        {
+                            RetrieveMessageReceiver.super.doStart();
+                            synchronized (folderLock)
+                            {
+                                folder.addMessageCountListener(RetrieveMessageReceiver.this);
+                            }
+                        }
+                        else
+                        {
+                            throw new NotYetConnectedException();
+                        }
+                    }
+                }
+
+                @Override
+                public String getWorkDescription() {
+                    return "Trying to start the retrieve message retriever";
+                }
+
+                @Override
+                public Object getWorkOwner() {
+                    return RetrieveMessageReceiver.this;
+                }
+            }, getWorkManager());
         }
+        catch (MuleException me)
+        {
+            throw me;
+        }
+        catch (Exception e)
+        {
+            // Ignore other exceptions
+        }
+
     }
 
     public void messagesAdded(MessageCountEvent event) 
@@ -526,10 +561,5 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             }
         }
         return message;
-    }
-
-    public boolean isConnectionEstablished()
-    {
-        return connectionEstablished;
     }
 }
