@@ -200,6 +200,7 @@ public class MuleProperties
     public static final String MULE_DEFAULT_PROCESSING_STRATEGY = SYSTEM_PROPERTY_PREFIX + "default.processing.strategy";
     public static final String MULE_HANDLE_COPY_OF_EVENT_IN_MESSAGE_PROCESSOR_NOTIFICATION = SYSTEM_PROPERTY_PREFIX + "handle.copy.event.for.notification";
     public static final String MULE_FLOW_TRACE = SYSTEM_PROPERTY_PREFIX + "flowTrace";
+    public static final String MULE_FAIL_IF_DELETE_OPEN_FILE = SYSTEM_PROPERTY_PREFIX + "failIfDeleteOpenFile";
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
 
     public static final String MULE_JMS_REDELIVERY_DELAY = SYSTEM_PROPERTY_PREFIX + "jms.redeliveryDelay";

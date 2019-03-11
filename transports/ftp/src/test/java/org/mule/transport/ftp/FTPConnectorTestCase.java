@@ -9,10 +9,12 @@ package org.mule.transport.ftp;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.transport.ftp.FtpConnector.FILES_TO_READ;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -23,7 +25,6 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.nameable.AbstractInboundEndpointNameableConnectorTestCase;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,6 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.pool.ObjectPool;
 import org.junit.Test;
-import sun.net.ftp.FtpClient;
 
 /**
  * Test configuration of FTP connector. It's all done in code, no configuration files
@@ -45,6 +45,8 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
     static final String TEST_ENDPOINT_URI = "ftp://foo:bar@example.com";
     static final String VALID_MESSAGE = "This is a valid FTP message";
     static final String RESOURCE_PATH = "somePath";
+    
+    protected static FTPClient client = mock(FTPClient.class);
 
     @Override
     public Connector createConnector() throws Exception
@@ -104,22 +106,16 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
     @Test
     public void testCustomFtpConnectionFactory() throws Exception
     {
-        final String testObject = "custom object";
-
         final ImmutableEndpoint endpoint = muleContext.getEndpointFactory()
             .getOutboundEndpoint("ftp://test:test@example.com");
-        final EndpointURI endpointURI = endpoint.getEndpointURI();
+        FtpConnector connector = createFtpConnector(endpoint);
 
-        FtpConnectionFactory testFactory = new TestFtpConnectionFactory(endpointURI);
-        FtpConnector connector = (FtpConnector)getConnector();
-
-        connector.setConnectionFactoryClass(testFactory.getClass().getName());
         // no validate call for simplicity
         connector.setValidateConnections(false);
 
         ObjectPool pool = connector.getFtpPool(endpoint);
         Object obj = pool.borrowObject();
-        assertEquals("Custom FTP connection factory has been ignored.", testObject, obj);
+        assertEquals("Custom FTP connection factory has been ignored.", client, obj);
     }
 
     @Test
@@ -192,7 +188,45 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
 
         return connector;
     }
+    
+    @Test
+    public void testClientReleaseOnExceptionDuringCreation() throws Exception
+    {
+        final ImmutableEndpoint endpoint = muleContext.getEndpointFactory()
+                                                      .getOutboundEndpoint("ftp://test:test@example.com");
+        FtpConnector connector = createFtpConnector(endpoint);
 
+
+        // This is done so that an exception is raised after client creation
+        doThrow(Exception.class).when(client).setDataTimeout(anyInt());
+        
+        try
+        {
+            connector.createFtpClient(endpoint);
+        }
+        catch (Exception e)
+        {
+
+        }
+        
+        verify(client).disconnect();
+
+    }
+
+    private FtpConnector createFtpConnector(final ImmutableEndpoint endpoint)
+    {
+        final EndpointURI endpointURI = endpoint.getEndpointURI();
+
+        FtpConnectionFactory testFactory = new TestFtpConnectionFactory(endpointURI);
+        FtpConnector connector = (FtpConnector) getConnector();
+
+        connector.setConnectionFactoryClass(testFactory.getClass().getName());
+        // no validate call for simplicity
+        connector.setValidateConnections(false);
+
+        return connector;
+    }
+    
     public static final class TestFtpConnectionFactory extends FtpConnectionFactory {
 
         public TestFtpConnectionFactory(EndpointURI uri)
@@ -203,13 +237,20 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
         @Override
         public Object makeObject() throws Exception
         {
-            return "custom object";
+            return client;
         }
 
         @Override
         public void activateObject(final Object obj) throws Exception
         {
             // empty no-op, do not call super
+        }
+        
+        @Override
+        public void passivateObject(Object obj) throws Exception
+        {
+            // For testing purposes, on passivate implies a disconnection
+            ((FTPClient) obj).disconnect();
         }
 
     }

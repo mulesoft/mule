@@ -7,6 +7,7 @@
 package org.mule.module.launcher;
 
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.util.FileUtils.deleteFile;
 import static org.mule.util.FileUtils.deleteTree;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
@@ -136,7 +137,7 @@ public class ArtifactArchiveInstaller
             FileUtils.deleteDirectory(tmpDir);
             // remove a marker, harmless, but a tidy artifact dir is always better :)
             File marker = getArtifactAnchorFile(artifactName);
-            marker.delete();
+            deleteFile(marker);
             Introspector.flushCaches();
         }
         catch (Throwable t)

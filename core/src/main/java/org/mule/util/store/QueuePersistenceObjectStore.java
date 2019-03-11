@@ -6,6 +6,7 @@
  */
 package org.mule.util.store;
 
+import static org.mule.util.FileUtils.deleteFile;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
@@ -269,9 +270,8 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
 
     protected void serialize(T value, File outputFile) throws ObjectStoreException
     {
-        try
+        try (FileOutputStream out = new FileOutputStream(outputFile))
         {
-            FileOutputStream out = new FileOutputStream(outputFile);
             out.write(muleContext.getObjectSerializer().serialize(value));
             out.flush();
         }
@@ -350,7 +350,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     {
         if (file.exists())
         {
-            if (!file.delete())
+            if (!deleteFile(file))
             {
                 Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath()
                                                                    + " failed");

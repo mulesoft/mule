@@ -8,6 +8,8 @@
 
 import java.util.regex.Pattern
 
+import static org.mule.util.FileUtils.deleteFile
+
 def cliBuilder = new CliBuilder()
 cliBuilder.f(longOpt: "from", args: 1, required: true, "switch from version (e.g. 2.0)")
 cliBuilder.h(longOpt: "help", "show usage info")
@@ -174,5 +176,5 @@ def replaceFile(originalFile, newFile)
 
     originalFile.renameTo(backupFile)
     newFile.renameTo(originalFile)
-    backupFile.delete()
+    deleteFile(backupFile)
 }

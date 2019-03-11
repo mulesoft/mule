@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import static org.mule.util.FileUtils.deleteFile;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -94,7 +96,7 @@ public final class JarUtils
             combinedEntries.putAll(entries);
             File tmpJarFile = File.createTempFile(jarFile.getName(), null);
             createJarFileEntries(tmpJarFile, combinedEntries);
-            jarFile.delete();
+            deleteFile(jarFile);
             FileUtils.renameFile(tmpJarFile, jarFile);
         }
     }
