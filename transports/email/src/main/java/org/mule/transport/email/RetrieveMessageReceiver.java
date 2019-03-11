@@ -18,6 +18,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.Connector;
@@ -63,6 +64,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     private String backupFolder = null;
     // A lock to protect concurrent access to the folder.
     private final Object folderLock = new Object();
+    // Lock to prevent connect and start from being executed simultaneously.
     private final Object connectionLock = new Object();
 
 
@@ -164,6 +166,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     {
         try
         {
+            // The start operation must be done only if the connection is already established, so we schedule it using the same
+            // retry policy in order to wait the connection
             getConnector().getRetryPolicyTemplate().execute(new RetryCallback()
             {
                 @Override
@@ -197,15 +201,10 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 }
             }, getWorkManager());
         }
-        catch (MuleException me)
-        {
-            throw me;
-        }
         catch (Exception e)
         {
-            // Ignore other exceptions
+            throw new LifecycleException(e, this);
         }
-
     }
 
     public void messagesAdded(MessageCountEvent event) 
