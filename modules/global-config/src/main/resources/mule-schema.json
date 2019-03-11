@@ -75,6 +75,9 @@
         },
         "offLineMode" : {
           "description" : "Flag to control whether the repository system operates in offline mode and avoids/refuses any access to remote repositories"
+        },
+        "forcePolicyUpdateNever": {
+          "description": "Flag to control whether  the repository system operates with an UPDATE_POLICY_NEVER for SNAPSHOTS. By default it is set to false. This is the equivalent to {@code -nsu} option for Maven CLI"
         }
       }
     }
