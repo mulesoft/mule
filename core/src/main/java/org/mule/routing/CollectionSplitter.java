@@ -30,9 +30,4 @@ public class CollectionSplitter extends AbstractMessageSequenceSplitter
         return this.strategy.split(event);
     }
 
-    @Override
-    protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
-    {
-        message.setCorrelationId(correlationId);
-    }
 }
