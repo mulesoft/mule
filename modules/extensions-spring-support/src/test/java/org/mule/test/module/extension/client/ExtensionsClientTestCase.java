@@ -6,12 +6,15 @@
  */
 package org.mule.test.module.extension.client;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSION_CLIENT_CACHE_DISABLED;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
@@ -31,18 +34,16 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 import org.mule.test.vegan.extension.VeganPolicy;
 
+import java.util.Collection;
+import java.util.List;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Collection;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
 
 @Feature("EXTENSIONS_CLIENT")
 public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigTestCase {
@@ -224,6 +225,10 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Checks that an operation disposes the resources after terminated")
   public void disposeAfterExecution() throws Throwable {
+    if(usingCachedStrategy()){
+      return;
+    }
+
     executeSimpleOperation();
     assertThat(HeisenbergOperations.disposed, is(true));
   }
@@ -233,5 +238,9 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   public void disposeOnFailureOperation() throws Throwable {
     executeFailureOperation();
     assertThat(HeisenbergOperations.disposed, is(true));
+  }
+
+  private boolean usingCachedStrategy(){
+    return !parseBoolean(getProperty(MULE_EXTENSION_CLIENT_CACHE_DISABLED));
   }
 }

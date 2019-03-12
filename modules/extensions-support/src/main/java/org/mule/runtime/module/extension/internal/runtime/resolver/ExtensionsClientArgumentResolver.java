@@ -7,7 +7,11 @@
 
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -35,7 +39,14 @@ public class ExtensionsClientArgumentResolver implements ArgumentResolver<Extens
   public Supplier<ExtensionsClient> resolve(ExecutionContext executionContext) {
     return () -> {
       ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
-      return new DefaultExtensionsClient(cxt.getMuleContext(), cxt.getEvent(), registry, policyManager);
+      DefaultExtensionsClient extensionClient =
+          new DefaultExtensionsClient(cxt.getMuleContext(), cxt.getEvent(), registry, policyManager);
+      try {
+        extensionClient.initialise();
+      } catch (InitialisationException e) {
+        throw new MuleRuntimeException(createStaticMessage("Failed to initialise Extension Client"), e);
+      }
+      return extensionClient;
     };
   }
 }
