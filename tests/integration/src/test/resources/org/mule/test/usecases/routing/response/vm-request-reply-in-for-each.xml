@@ -48,6 +48,16 @@
         <flow-ref name="request-reply-flow"/>
     </flow>
 
+    <flow name="forEachSplitAggregateNoExpressionCaseFlow">
+        <vm:inbound-endpoint path="foreach-no-expression-spag" connector-ref="default"/>
+        <foreach>
+            <logger level="ERROR" message="#[payload]"/>
+            <collection-splitter />
+            <collection-aggregator />
+            <vm:outbound-endpoint path="test-foreach-no-expression-spag-reply" connector-ref="default"/>
+        </foreach>
+    </flow>
+
     <flow name="request-reply" processingStrategy="synchronous">
         <vm:inbound-endpoint path="request" connector-ref="default"/>
         <test:component appendString="-processed"/>

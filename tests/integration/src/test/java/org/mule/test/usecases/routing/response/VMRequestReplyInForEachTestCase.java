@@ -62,6 +62,17 @@ public class VMRequestReplyInForEachTestCase extends RequestReplyInForEachTestCa
         }
     }
 
+    @Test
+    public void testRequestReplyWithNestedForEachWithSplitAggregateAndNoCollectionExpression() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = new DefaultMuleMessage(collectionValues, mock(Map.class) , muleContext);
+        client.dispatch("vm://foreach-no-expression-spag", message);
+        for(List<String> sublist: collectionValues)
+        {
+            assertResultCollection(client, sublist, "", "test-foreach-no-expression-spag-reply");
+        }
+    }
 
     private void assertResultCollection(MuleClient client, List<String> payload, String suffix, String queueName) throws Exception
     {

@@ -297,5 +297,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             return super.splitMessageIntoSequence(event);
         }
 
+        @Override
+        protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
+        {
+            message.setCorrelationId(correlationId + "-" + correlationSequence);
+        }
+
     }
 }
