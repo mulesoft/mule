@@ -7,6 +7,7 @@
 package org.mule.routing;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.util.collection.EventToMessageSequenceSplittingStrategy;
 import org.mule.util.collection.SplittingStrategy;
@@ -27,5 +28,11 @@ public class CollectionSplitter extends AbstractMessageSequenceSplitter
     protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event)
     {
         return this.strategy.split(event);
+    }
+
+    @Override
+    protected void setMessageCorrelationId(MuleMessage message, String correlationId, int correlationSequence)
+    {
+        message.setCorrelationId(correlationId);
     }
 }
