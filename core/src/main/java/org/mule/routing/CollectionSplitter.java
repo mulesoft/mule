@@ -7,7 +7,6 @@
 package org.mule.routing;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.util.collection.EventToMessageSequenceSplittingStrategy;
 import org.mule.util.collection.SplittingStrategy;
@@ -29,5 +28,4 @@ public class CollectionSplitter extends AbstractMessageSequenceSplitter
     {
         return this.strategy.split(event);
     }
-
 }
