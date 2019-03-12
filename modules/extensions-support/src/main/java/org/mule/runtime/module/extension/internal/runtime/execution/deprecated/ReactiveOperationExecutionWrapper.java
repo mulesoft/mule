@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.execution;
+package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -58,7 +59,7 @@ public final class ReactiveOperationExecutionWrapper<M extends ComponentModel>
   public Publisher<Object> execute(ExecutionContext<M> executionContext) {
     ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
     return Mono.create(sink -> {
-      ReactorCompletionCallback callback = new ReactorCompletionCallback(sink);
+      MonoCompletionCallback callback = new MonoCompletionCallback(sink);
       context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, callback);
 
       try {

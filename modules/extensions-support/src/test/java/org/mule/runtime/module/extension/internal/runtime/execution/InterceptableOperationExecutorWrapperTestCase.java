@@ -7,14 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.mockito.Mockito.verify;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 
@@ -25,7 +25,10 @@ public class InterceptableOperationExecutorWrapperTestCase
     extends AbstractInterceptableContractTestCase<InterceptableOperationExecutorWrapper> {
 
   @Mock(extraInterfaces = Lifecycle.class)
-  private ComponentExecutor executor;
+  private CompletableComponentExecutor executor;
+
+  @Mock
+  private ExecutorCallback callback;
 
   @Mock
   private ExecutionContext<OperationModel> executionContext;
@@ -37,8 +40,8 @@ public class InterceptableOperationExecutorWrapperTestCase
 
   @Test
   public void execute() throws Exception {
-    interceptable.execute(executionContext);
-    verify(executor).execute(executionContext);
+    interceptable.execute(executionContext, callback);
+    verify(executor).execute(executionContext, callback);
   }
 
   @Test

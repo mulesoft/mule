@@ -20,8 +20,6 @@ import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
-import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 
 import com.google.common.base.Defaults;
 
@@ -29,7 +27,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ReflectiveMethodOperationExecutor}.
+ * An implementation of {@link FunctionExecutorFactory} which produces instances of {@link ReflectiveExpressionFunctionExecutor}.
  *
  * @param <T> the type of the class in which the implementing method is declared
  * @since 3.7.0

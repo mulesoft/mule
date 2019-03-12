@@ -36,6 +36,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -57,6 +58,7 @@ import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
@@ -65,6 +67,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
@@ -74,7 +77,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Intercept
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
+import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
@@ -112,7 +117,7 @@ public class MuleExtensionUtils {
    * Returns {@code true} if any of the items in {@code resolvers} return true for the {@link ValueResolver#isDynamic()} method
    *
    * @param resolvers a {@link Iterable} with instances of {@link ValueResolver}
-   * @param <T> the generic type of the {@link ValueResolver} items
+   * @param <T>       the generic type of the {@link ValueResolver} items
    * @return {@code true} if at least one {@link ValueResolver} is dynamic, {@code false} otherwise
    */
   public static <T extends Object> boolean hasAnyDynamic(Iterable<ValueResolver<T>> resolvers) {
@@ -151,7 +156,7 @@ public class MuleExtensionUtils {
    * {@link ConfigurationModel#getConnectionProviders()} level and finally the ones at
    * {@link ExtensionModel#getConnectionProviders()}
    *
-   * @param extensionModel the {@link ExtensionModel} which owns the {@code configurationModel}
+   * @param extensionModel     the {@link ExtensionModel} which owns the {@code configurationModel}
    * @param configurationModel a {@link ConfigurationModel}
    * @return a {@link List}. Might be empty but will never be {@code null}
    */
@@ -199,7 +204,7 @@ public class MuleExtensionUtils {
   /**
    * Adds the given {@code interceptorFactory} to the {@code declaration} as the last interceptor in the list
    *
-   * @param declaration a {@link BaseDeclaration}
+   * @param declaration        a {@link BaseDeclaration}
    * @param interceptorFactory a {@link InterceptorFactory}
    */
   public static void addInterceptorFactory(BaseDeclaration declaration, InterceptorFactory interceptorFactory) {
@@ -209,9 +214,9 @@ public class MuleExtensionUtils {
   /**
    * Adds the given {@code interceptorFactory} to the {@code declaration} at the given {@code position}
    *
-   * @param declaration a {@link BaseDeclaration}
+   * @param declaration        a {@link BaseDeclaration}
    * @param interceptorFactory a {@link InterceptorFactory}
-   * @param position a valid list index
+   * @param position           a valid list index
    */
   public static void addInterceptorFactory(BaseDeclaration declaration, InterceptorFactory interceptorFactory, int position) {
     getOrCreateInterceptorModelProperty(declaration).addInterceptorFactory(interceptorFactory, position);
@@ -257,8 +262,8 @@ public class MuleExtensionUtils {
    * Executes the given {@code callable} using the {@link ClassLoader} associated to the {@code extensionModel}
    *
    * @param extensionModel a {@link ExtensionModel}
-   * @param callable a {@link Callable}
-   * @param <T> the generic type of the {@code callable}'s return type
+   * @param callable       a {@link Callable}
+   * @param <T>            the generic type of the {@code callable}'s return type
    * @return the value returned by the {@code callable}
    * @throws Exception if the {@code callable} fails to execute
    */
@@ -359,6 +364,55 @@ public class MuleExtensionUtils {
   }
 
   /**
+   * Tests the given {@code operationModel} for a {@link ComponentExecutorModelProperty} and if present it returns the enclosed
+   * {@link ComponentExecutorFactory}. If no such property is found, then a {@link IllegalOperationModelDefinitionException} is
+   * thrown.
+   *
+   * @param operationModel an {@link OperationModel}
+   * @return a {@link ComponentExecutorFactory}
+   * @throws IllegalOperationModelDefinitionException if the operation is not properly enriched
+   * @deprecated since 4.2. Use {@link #getOperationExecutorFactory(ComponentModel)} instead
+   */
+  @Deprecated
+  public static <T extends ComponentModel> ComponentExecutorFactory<T> getLegacyOperationExecutorFactory(T operationModel) {
+    ComponentExecutorFactory executorFactory =
+        fromModelProperty(operationModel,
+                          ComponentExecutorModelProperty.class,
+                          ComponentExecutorModelProperty::getExecutorFactory,
+                          () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
+                                                                                    operationModel.getName(),
+                                                                                    ComponentExecutorFactory.class
+                                                                                        .getSimpleName())));
+
+    return new ReactiveOperationExecutorFactoryWrapper(executorFactory, createInterceptors(operationModel));
+  }
+
+  public static <T extends ComponentModel> CompletableComponentExecutorFactory<T> getOperationExecutorFactory(T operationModel) {
+    if (operationModel.getModelProperty(ComponentExecutorModelProperty.class).isPresent()) {
+      return new ComponentExecutorCompletableAdapterFactory<>(getLegacyOperationExecutorFactory(operationModel));
+    }
+
+    CompletableComponentExecutorFactory executorFactory =
+        fromModelProperty(operationModel,
+                          CompletableComponentExecutorModelProperty.class,
+                          CompletableComponentExecutorModelProperty::getExecutorFactory,
+                          () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
+                                                                                    operationModel.getName(),
+                                                                                    CompletableComponentExecutorModelProperty.class
+                                                                                        .getSimpleName())));
+
+    return new CompletableOperationExecutorFactoryWrapper<>(executorFactory, createInterceptors(operationModel));
+  }
+
+  public static boolean isNonBlocking(ComponentModel model) {
+    if (model instanceof OperationModel) {
+      return !((OperationModel) model).isBlocking();
+    }
+
+    return model instanceof ConstructModel;
+  }
+
+  /**
    * Tests the given {@code model} for a {@link MetadataResolverFactoryModelProperty} and if present it returns the contained
    * {@link MetadataResolverFactory}. If no such property is found, then a {@link NullMetadataResolverFactory} is returned
    *
@@ -371,27 +425,7 @@ public class MuleExtensionUtils {
         .orElse(new NullMetadataResolverFactory());
   }
 
-  /**
-   * Tests the given {@code operationModel} for a {@link ComponentExecutorModelProperty} and if present it returns the enclosed
-   * {@link ComponentExecutorFactory}. If no such property is found, then a {@link IllegalOperationModelDefinitionException} is
-   * thrown.
-   *
-   * @param operationModel an {@link OperationModel}
-   * @return a {@link ComponentExecutorFactory}
-   * @throws IllegalOperationModelDefinitionException if the operation is not properly enriched
-   */
-  public static <T extends ComponentModel> ComponentExecutorFactory<T> getOperationExecutorFactory(T operationModel) {
-    ComponentExecutorFactory executorFactory =
-        fromModelProperty(operationModel,
-                          ComponentExecutorModelProperty.class,
-                          ComponentExecutorModelProperty::getExecutorFactory,
-                          () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
-                                                                                    operationModel.getName(),
-                                                                                    ComponentExecutorFactory.class
-                                                                                        .getSimpleName())));
 
-    return new OperationExecutorFactoryWrapper(executorFactory, createInterceptors(operationModel));
-  }
 
   /**
    * Tests the given {@code sourceModel} for a {@link SourceFactoryModelProperty} and if present it returns the enclosed
@@ -493,8 +527,9 @@ public class MuleExtensionUtils {
 
   /**
    * TODO MULE-14603 - This should not exist after MULE-14603 is fixed
-   *
+   * <p>
    * Indicates if the given value is considered as an expression
+   *
    * @param value Value to check
    * @return a boolean indicating if the value is an expression or not.
    */

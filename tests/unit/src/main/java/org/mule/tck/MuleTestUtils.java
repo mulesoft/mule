@@ -8,18 +8,21 @@ package org.mule.tck;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -33,13 +36,14 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
-
-import org.mockito.Mockito;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.mockito.Mockito;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -108,9 +112,9 @@ public final class MuleTestUtils {
    * Executes callback with a given system property set and replaces the system property with it's original value once done.
    * Useful for asserting behaviour that is dependent on the presence of a system property.
    *
-   * @param propertyName Name of system property to set
+   * @param propertyName  Name of system property to set
    * @param propertyValue Value of system property
-   * @param callback Callback implementing the the test code and assertions to be run with system property set.
+   * @param callback      Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
   public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback)
@@ -138,7 +142,7 @@ public final class MuleTestUtils {
    * Useful for asserting behaviour that is dependent on the presence of a system property.
    *
    * @param properties {@link Map} of property name and property value to be set.
-   * @param callback Callback implementing the the test code and assertions to be run with system property set.
+   * @param callback   Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
   public static void testWithSystemProperties(Map<String, String> properties, TestCallback callback)
@@ -178,6 +182,7 @@ public final class MuleTestUtils {
       });
     }
   }
+
 
   public interface TestCallback {
 
@@ -237,5 +242,31 @@ public final class MuleTestUtils {
     } catch (Exception e) {
       throw new IllegalStateException("Cannot obtain processors from the object");
     }
+  }
+
+  public static <M extends ComponentModel> CompletableComponentExecutor<M> mockComponentExecutor(Object returnValue) {
+    return stubComponentExecutor(mock(CompletableComponentExecutor.class, withSettings().lenient()), returnValue);
+  }
+
+  public static <M extends ComponentModel> CompletableComponentExecutor<M> stubComponentExecutor(CompletableComponentExecutor<M> executor,
+                                                                                                 Object returnValue) {
+    doAnswer(invocation -> {
+      CompletableComponentExecutor.ExecutorCallback callback = invocation.getArgument(1);
+      callback.complete(returnValue);
+      return null;
+    }).when(executor).execute(any(), any());
+
+    return executor;
+  }
+
+  public static <M extends ComponentModel> CompletableComponentExecutor<M> stubFailingComponentExecutor(CompletableComponentExecutor<M> executor,
+                                                                                                        Throwable t) {
+    doAnswer(invocation -> {
+      CompletableComponentExecutor.ExecutorCallback callback = invocation.getArgument(1);
+      callback.error(t);
+      return null;
+    }).when(executor).execute(any(), any());
+
+    return executor;
   }
 }

@@ -101,6 +101,10 @@ public class Exceptions {
     return (t, u) -> checkedBiFunction.apply(t, u);
   }
 
+  public static <T, U> BiConsumer<T, U> checkedBiConsumer(CheckedBiConsumer<T, U> checkedBiConsumer) {
+    return checkedBiConsumer::accept;
+  }
+
   /**
    * Adapt a {@link CheckedPredicate} to a {@link Predicate} propagating any exceptions thrown by the {@link CheckedPredicate}
    * using {@link reactor.core.Exceptions#propagate(Throwable)}. Useful when using existing methods which throw checked exceptions

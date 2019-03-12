@@ -15,9 +15,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -33,7 +30,8 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -41,18 +39,17 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import reactor.core.publisher.Mono;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ExecutionMediator}.
@@ -68,11 +65,11 @@ import reactor.core.publisher.Mono;
  * In case of operation failure, it will execute the {@link Interceptor#onError(ExecutionContext, Throwable)} method of all the
  * available interceptors. If the operation fails with {@link ConnectionException}, then a retry might be attempted depending on
  * the configured {@link RetryPolicyTemplate}. Notice that if a retry is attempted, the entire cycle of interception (before,
- * onSuccess/onError, after) will be fired again.
+ * onSuccess/interceptError, after) will be fired again.
  *
  * @since 4.0
  */
-public final class DefaultExecutionMediator<T extends ComponentModel> implements ExecutionMediator<T> {
+public final class DefaultExecutionMediator<M extends ComponentModel, T, A> implements ExecutionMediator<M> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
 
@@ -91,7 +88,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
-                                  T operationModel,
+                                  M operationModel,
                                   ConnectionManagerAdapter connectionManager,
                                   ErrorTypeRepository typeRepository,
                                   ValueTransformer... valueTransformers) {
@@ -101,83 +98,186 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
   }
 
-
   /**
    * Executes the operation per the specification in this classes' javadoc
    *
-   * @param executor an {@link ComponentExecutor}
-   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param executor an {@link CompletableComponentExecutor}
+   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
   @Override
-  public Publisher<Object> execute(ComponentExecutor<T> executor, ExecutionContextAdapter<T> context) {
-    final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
-    stats.ifPresent(s -> s.addInflightOperation());
+  public void execute(CompletableComponentExecutor<M> executor,
+                      ExecutionContextAdapter<M> context,
+                      ExecutorCallback callback) {
+
+    final MutableConfigurationStats stats = getMutableConfigurationStats(context);
+    if (stats != null) {
+      stats.addInflightOperation();
+    }
 
     try {
-      return (Mono<Object>) getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context)
-          .execute(() -> executeWithInterceptors(executor, context, collectInterceptors(context, executor), stats));
+      getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context).execute(() -> {
+        executeWithInterceptors(executor, context, collectInterceptors(context, executor), stats, callback);
+        return null;
+      });
     } catch (Exception e) {
-      return error(e);
+      callback.error(e);
     } catch (Throwable t) {
-      return error(wrapFatal(t));
+      callback.error(wrapFatal(t));
     }
   }
 
-  private Mono<Object> executeWithInterceptors(ComponentExecutor<T> executor,
-                                               ExecutionContextAdapter<T> context,
-                                               final List<Interceptor> interceptors,
-                                               Optional<MutableConfigurationStats> stats) {
-    // This was originally changed for MULE-16004 but then reverted. With that change, the error handling in
-    // AbstractMessageProcessorChain#getContinueStrategyErrorHandler is executing before the mapping of the error is done, which
-    // causes the exception to be wrongly handled. In the near future, the porcessor/mediator chain should be replaced by its own
-    // flux, and then the error handling at the flow level should not interfere.
+  private class FutureExecutionCallbackDecorator implements ExecutorCallback {
 
-    List<Interceptor> executedInterceptors = new ArrayList<>(interceptors.size());
-    // If the operation is retried, then the interceptors need to be executed again,
-    // so we wrap the mono which executes the operation into another which sets up
-    // the context and is the one configured with the retry logic
-    return Mono.create(sink -> {
-      Mono<Object> result;
+    private final CompletableFuture<Object> future;
+    private final Reference<Object> valueReference = new Reference<>();
 
-      InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
-      if (beforeExecutionResult.isOk()) {
-        result = from(withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context)));
-        executedInterceptors.addAll(interceptors);
-      } else {
-        result = error(beforeExecutionResult.getThrowable());
-        executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
+    private FutureExecutionCallbackDecorator(CompletableFuture<Object> future) {
+      this.future = future;
+    }
+
+    @Override
+    public void complete(Object value) {
+      valueReference.set(value);
+      future.complete(value);
+    }
+
+    @Override
+    public void error(Throwable e) {
+      future.completeExceptionally(e);
+    }
+  }
+
+  private void executeWithoutRetry(Consumer<ExecutorCallback> executeCommand,
+                                   BiConsumer<ExecutorCallback, Object> onSuccess,
+                                   BiConsumer<ExecutorCallback, Throwable> onError,
+                                   ExecutorCallback callback) {
+
+    ExecutorCallback hack = new ExecutorCallback() {
+
+      @Override
+      public void complete(Object value) {
+        onSuccess.accept(callback, value);
       }
 
-      result.map(value -> transform(context, value))
-          .doOnSuccess(value -> {
-            onSuccess(context, value, interceptors);
-            stats.ifPresent(s -> s.discountInflightOperation());
-            sink.success(value);
-          }).onErrorMap(t -> mapError(context, interceptors, t))
-          .subscribe(v -> {
-          }, sink::error);
-    })
-        .doOnSuccessOrError((value, e) -> {
+      @Override
+      public void error(Throwable e) {
+        onError.accept(callback, e);
+      }
+    };
+
+    executeCommand.accept(hack);
+  }
+
+  private void executeWithRetry(ExecutionContextAdapter<M> context,
+                                RetryPolicyTemplate retryPolicy,
+                                List<Interceptor> executedInterceptors,
+                                Consumer<ExecutorCallback> executeCommand,
+                                BiConsumer<ExecutorCallback, Object> onSuccess,
+                                BiConsumer<ExecutorCallback, Throwable> onError,
+                                ExecutorCallback callback) {
+
+    retryPolicy.applyPolicy(() -> {
+      CompletableFuture<Object> future = new CompletableFuture<>();
+      executeCommand.accept(new FutureExecutionCallbackDecorator(future));
+      return future;
+    },
+                            e -> extractConnectionException(e).isPresent(),
+                            e -> {
+                              interceptError(context, e, executedInterceptors);
+                              after(context, null, executedInterceptors);
+                            },
+                            e -> {
+                            },
+                            identity(),
+                            context.getCurrentScheduler())
+        .whenComplete((v, e) -> {
+          if (e != null) {
+            onError.accept(callback, e);
+          } else {
+            onSuccess.accept(callback, v);
+          }
+        });
+  }
+
+  private void executeWithInterceptors(CompletableComponentExecutor<M> executor,
+                                       ExecutionContextAdapter<M> context,
+                                       final List<Interceptor> interceptors,
+                                       MutableConfigurationStats stats,
+                                       ExecutorCallback executorCallback) {
+
+    List<Interceptor> executedInterceptors = new ArrayList<>(interceptors.size());
+
+    Consumer<ExecutorCallback> executeCommand = callback -> {
+      // If the operation is retried, then the interceptors need to be executed again,
+      executedInterceptors.clear();
+      InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
+      if (beforeExecutionResult.isOk()) {
+        executedInterceptors.addAll(interceptors);
+        withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context, callback));
+      } else {
+        executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
+        callback.error(beforeExecutionResult.getThrowable());
+      }
+    };
+
+    BiConsumer<ExecutorCallback, Object> onSuccess = (callback, value) -> {
+      // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
+      // Race conditions appear otherwise, specially in connection pooling scenarios.
+      try {
+        value = transform(context, value);
+        onSuccess(context, value, executedInterceptors);
+        after(context, value, executedInterceptors);
+        callback.complete(value);
+      } catch (Throwable t) {
+        try {
+          t = handleError(t, context, executedInterceptors);
+        } finally {
           try {
             after(context, value, executedInterceptors);
           } finally {
-            executedInterceptors.clear();
+            callback.error(t);
           }
-        })
-        .transform(pub -> from(getRetryPolicyTemplate(context)
-            .applyPolicy(pub,
-                         e -> extractConnectionException(e).isPresent(),
-                         e -> stats.ifPresent(s -> s.discountInflightOperation()),
-                         identity(),
-                         context.getCurrentScheduler())));
+        }
+      } finally {
+        if (stats != null) {
+          stats.discountInflightOperation();
+        }
+      }
+    };
+
+    BiConsumer<ExecutorCallback, Throwable> onError = (callback, t) -> {
+      t = handleError(t, context, executedInterceptors);
+      try {
+        after(context, null, executedInterceptors);
+      } finally {
+        try {
+          callback.error(t);
+        } finally {
+          if (stats != null) {
+            stats.discountInflightOperation();
+          }
+        }
+      }
+    };
+
+    RetryPolicyTemplate retryPolicy = getRetryPolicyTemplate(context);
+    if (retryPolicy.isEnabled()) {
+      executeWithRetry(context, retryPolicy, executedInterceptors, executeCommand, onSuccess, onError, executorCallback);
+    } else {
+      executeWithoutRetry(executeCommand, onSuccess, onError, executorCallback);
+    }
   }
 
-  private Throwable mapError(ExecutionContextAdapter context, List<Interceptor> interceptors, Throwable e) {
+  private Throwable handleError(Throwable e, ExecutionContextAdapter context, List<Interceptor> interceptors) {
+    return mapError(e, context, interceptors);
+  }
+
+  private Throwable mapError(Throwable e, ExecutionContextAdapter context, List<Interceptor> interceptors) {
     e = exceptionEnricherManager.process(e);
     e = moduleExceptionHandler.processException(e);
-    e = onError(context, e, interceptors);
+    e = interceptError(context, e, interceptors);
 
     return e;
   }
@@ -192,7 +292,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
 
   InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
 
-    List<Interceptor> interceptorList = new ArrayList<>();
+    List<Interceptor> interceptorList = new ArrayList<>(interceptors.size());
 
     try {
       for (Interceptor interceptor : interceptors) {
@@ -212,7 +312,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
                                     interceptor));
   }
 
-  private Throwable onError(ExecutionContext executionContext, Throwable e, List<Interceptor> interceptors) {
+  private Throwable interceptError(ExecutionContext executionContext, Throwable e, List<Interceptor> interceptors) {
     Reference<Throwable> exceptionHolder = new Reference<>(e);
 
     intercept(interceptors, interceptor -> {
@@ -221,7 +321,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         exceptionHolder.set(decoratedException);
       }
     }, interceptor -> format(
-                             "Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned",
+                             "Interceptor %s threw exception executing 'interceptError' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned",
                              interceptor));
 
     return exceptionHolder.get();
@@ -261,7 +361,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
   }
 
-  private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<T> context) {
+  private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<M> context) {
     // If there is a template, try to wrap it using the ReconnectionConfig
     Optional<RetryPolicyTemplate> customTemplate = context.getRetryPolicyTemplate()
         .map(delegate -> context.getConfiguration()
@@ -276,14 +376,13 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         .orElse(fallbackRetryPolicyTemplate));
   }
 
-  private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<T> context) {
+  private MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<M> context) {
     return context.getConfiguration()
-        .map(ConfigurationInstance::getStatistics)
-        .filter(s -> s instanceof MutableConfigurationStats)
-        .map(s -> (MutableConfigurationStats) s);
+        .map(c -> (MutableConfigurationStats) c.getStatistics())
+        .orElse(null);
   }
 
-  private List<Interceptor> collectInterceptors(ExecutionContextAdapter<T> context, ComponentExecutor<T> executor) {
+  private List<Interceptor> collectInterceptors(ExecutionContextAdapter<M> context, CompletableComponentExecutor<M> executor) {
     return collectInterceptors(context.getConfiguration(),
                                context instanceof PrecalculatedExecutionContextAdapter
                                    ? ((PrecalculatedExecutionContextAdapter) context).getOperationExecutor()
@@ -291,7 +390,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   }
 
   List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
-                                        ComponentExecutor executor) {
+                                        CompletableComponentExecutor executor) {
     List<Interceptor> accumulator = new LinkedList<>();
     configurationInstance.ifPresent(config -> collectInterceptors(accumulator, config));
     collectInterceptors(accumulator, executor);

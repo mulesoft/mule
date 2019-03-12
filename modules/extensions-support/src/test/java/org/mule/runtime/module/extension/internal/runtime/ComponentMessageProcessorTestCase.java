@@ -16,7 +16,6 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -28,7 +27,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -42,7 +41,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Mono;
 
 public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCase {
@@ -68,8 +66,8 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("mock").build());
 
     componentModel = mock(ComponentModel.class, withSettings().extraInterfaces(EnrichableModel.class));
-    when(((EnrichableModel) componentModel).getModelProperty(ComponentExecutorModelProperty.class))
-        .thenReturn(of(new ComponentExecutorModelProperty((cp, params) -> ctx -> Mono.just(response))));
+    when((componentModel).getModelProperty(CompletableComponentExecutorModelProperty.class))
+        .thenReturn(of(new CompletableComponentExecutorModelProperty((cp, p) -> (ctx, callback) -> callback.complete(response))));
     resolverSet = mock(ResolverSet.class);
 
     extensionManager = mock(ExtensionManager.class);

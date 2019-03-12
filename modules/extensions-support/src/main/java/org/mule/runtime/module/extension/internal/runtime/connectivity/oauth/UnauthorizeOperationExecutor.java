@@ -10,32 +10,29 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 /**
- * Synthetic {@link ComponentExecutor} which invalidates a given user's OAuth context.
+ * Synthetic {@link CompletableComponentExecutor} which invalidates a given user's OAuth context.
  *
  * @since 4.0
  */
-public class UnauthorizeOperationExecutor implements ComponentExecutor<ComponentModel> {
+public class UnauthorizeOperationExecutor implements CompletableComponentExecutor<ComponentModel> {
 
   @Inject
   private ExtensionsOAuthManager oauthManager;
 
   @Override
-  public Publisher<Object> execute(ExecutionContext<ComponentModel> executionContext) {
+  public void execute(ExecutionContext<ComponentModel> executionContext, ExecutorCallback callback) {
     ConfigurationInstance config = executionContext.getConfiguration().get();
     String ownerId = executionContext.hasParameter(RESOURCE_OWNER_ID_PARAMETER_NAME)
         ? executionContext.getParameter(RESOURCE_OWNER_ID_PARAMETER_NAME)
         : DEFAULT_RESOURCE_OWNER_ID;
     oauthManager.invalidate(config.getName(), ownerId);
 
-    return Mono.empty();
+    callback.complete(null);
   }
 }

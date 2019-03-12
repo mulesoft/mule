@@ -434,7 +434,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashedMap();
     ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getName()).thenReturn(PARAMETER_NAME);
-    when(parameterModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
     mockParameters(sourceModel, parameterModel);
     inputResolvers.put(PARAMETER_NAME, ResolverSupplier.of(SimpleInputResolver.class));

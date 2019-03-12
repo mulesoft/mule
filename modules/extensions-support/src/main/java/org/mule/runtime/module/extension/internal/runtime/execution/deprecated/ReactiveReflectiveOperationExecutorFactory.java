@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.execution;
+package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNonBlocking;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
@@ -25,19 +25,20 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * An implementation of {@link CompletableComponentExecutorFactory} which produces instances of
- * {@link ReflectiveMethodOperationExecutor}.
+ * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ReactiveReflectiveMethodOperationExecutor}.
  *
  * @param <T> the type of the class in which the implementing method is declared
- * @since 4.2
+ * @since 3.7.0
+ * @deprecated since 4.2
  */
-public final class ReflectiveOperationExecutorFactory<T, M extends ComponentModel> implements
-    CompletableComponentExecutorFactory<M> {
+@Deprecated
+public final class ReactiveReflectiveOperationExecutorFactory<T, M extends ComponentModel>
+    implements ComponentExecutorFactory<M> {
 
   private final Class<T> implementationClass;
   private final Method operationMethod;
 
-  public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
+  public ReactiveReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
     checkArgument(implementationClass != null, "implementationClass cannot be null");
     checkArgument(operationMethod != null, "operationMethod cannot be null");
 
@@ -46,7 +47,7 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
   }
 
   @Override
-  public CompletableComponentExecutor<M> createExecutor(M operationModel, Map<String, Object> parameters) {
+  public ComponentExecutor<M> createExecutor(M operationModel, Map<String, Object> parameters) {
     DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(implementationClass, new ReflectionCache());
     parameters.forEach((k, v) -> objectBuilder.addPropertyResolver(k, new StaticValueResolver<>(v)));
     Object delegate;
@@ -63,10 +64,6 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
       }
     }
 
-    if (isNonBlocking(operationModel)) {
-      return new NonBlockingReflectiveMethodOperationExecutor<>(operationModel, operationMethod, delegate);
-    }
-
-    return new ReflectiveMethodOperationExecutor<>(operationModel, operationMethod, delegate);
+    return new ReactiveReflectiveMethodOperationExecutor(operationModel, operationMethod, delegate);
   }
 }

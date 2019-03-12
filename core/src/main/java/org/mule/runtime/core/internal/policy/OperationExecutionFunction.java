@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import java.util.Map;
-
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import org.reactivestreams.Publisher;
+import java.util.Map;
+
+import reactor.core.publisher.MonoSink;
 
 /**
  * Function for executing an operation.
@@ -27,6 +27,6 @@ public interface OperationExecutionFunction {
    * @param operationEvent the event to use for executing the operation.
    * @return an {@link CoreEvent} as result of the operation execution.
    */
-  Publisher<CoreEvent> execute(Map<String, Object> parameters, CoreEvent operationEvent);
+  void execute(Map<String, Object> parameters, CoreEvent operationEvent, MonoSink<CoreEvent> sink);
 
 }

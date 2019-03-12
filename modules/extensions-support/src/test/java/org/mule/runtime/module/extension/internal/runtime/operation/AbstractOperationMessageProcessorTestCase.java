@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -29,6 +30,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -39,8 +41,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -89,8 +89,9 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
@@ -103,6 +104,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.util.Collections;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -110,9 +113,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Collections;
-import java.util.Optional;
+import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
@@ -138,10 +139,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected ConnectionManagerAdapter connectionManagerAdapter;
 
   @Mock(lenient = true)
-  protected ComponentExecutorFactory operationExecutorFactory;
+  protected CompletableComponentExecutorFactory operationExecutorFactory;
 
   @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class}, lenient = true)
-  protected ComponentExecutor operationExecutor;
+  protected CompletableComponentExecutor operationExecutor;
+
+  @Mock(lenient = true)
+  protected ExecutorCallback executorCallback;
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected ResolverSet resolverSet;
@@ -288,17 +292,18 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationModel.getModelProperty(InterceptorsModelProperty.class)).thenReturn(empty());
 
     when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
-    when(operationExecutor.execute(any())).thenReturn(just(""));
+
+    stubComponentExecutor(operationExecutor, "");
 
     when(extensionManager.getExtensions()).thenReturn(Collections.singleton(extensionModel));
 
     when(cacheIdGeneratorFactory.create(any(), any())).thenReturn(cacheIdGenerator);
-    when(cacheIdGenerator.getIdForComponentMetadata(any()))
-        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
-    when(cacheIdGenerator.getIdForGlobalMetadata(any()))
-        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
-    when(cacheIdGenerator.getIdForMetadataKeys(any()))
-        .then(invocation -> Optional.of(new MetadataCacheId(UUID.getUUID(), null)));
+
+    Answer<Object> cacheIdAnswer = invocation -> of(new MetadataCacheId(UUID.getUUID(), null));
+
+    when(cacheIdGenerator.getIdForComponentMetadata(any())).then(cacheIdAnswer);
+    when(cacheIdGenerator.getIdForGlobalMetadata(any())).then(cacheIdAnswer);
+    when(cacheIdGenerator.getIdForMetadataKeys(any())).then(cacheIdAnswer);
 
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
                                                                          cacheIdGeneratorFactory);
@@ -353,11 +358,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenAnswer(invocationOnMock -> {
       if (mockOperationPolicy == null) {
         mockOperationPolicy = mock(OperationPolicy.class);
-        when(mockOperationPolicy.process(any(), any(), any(), any()))
-            .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) operationPolicyInvocationMock
-                .getArguments()[1])
-                    .execute(((OperationParametersProcessor) invocationOnMock.getArguments()[2]).getOperationParameters(),
-                             (CoreEvent) invocationOnMock.getArguments()[1]));
+        doAnswer(invocation -> {
+          ((OperationExecutionFunction) invocation.getArgument(1))
+              .execute(((OperationParametersProcessor) invocationOnMock.getArgument(2)).getOperationParameters(),
+                       invocationOnMock.getArgument(1),
+                       invocation.getArgument(4));
+          return null;
+        }).when(mockOperationPolicy).process(any(), any(), any(), any(), any());
       }
       return mockOperationPolicy;
     });

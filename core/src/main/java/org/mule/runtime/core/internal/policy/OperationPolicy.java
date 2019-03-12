@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.MonoSink;
 
 public interface OperationPolicy {
 
@@ -22,7 +22,10 @@ public interface OperationPolicy {
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
-                               OperationParametersProcessor parametersProcessor, ComponentLocation componentLocation);
+  void process(CoreEvent operationEvent,
+               OperationExecutionFunction operationExecutionFunction,
+               OperationParametersProcessor parametersProcessor,
+               ComponentLocation componentLocation,
+               MonoSink<CoreEvent> sink);
 
 }

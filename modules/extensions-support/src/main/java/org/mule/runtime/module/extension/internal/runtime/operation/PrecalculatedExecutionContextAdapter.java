@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -16,24 +15,22 @@ import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.AbstractExecutionContextAdapterDecorator;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends AbstractExecutionContextAdapterDecorator<T> {
+class PrecalculatedExecutionContextAdapter<M extends ComponentModel> extends AbstractExecutionContextAdapterDecorator<M> {
 
   private Optional<ConfigurationInstance> configuration;
-  private ComponentExecutor<T> operation;
+  private CompletableComponentExecutor<M> operation;
 
-  PrecalculatedExecutionContextAdapter(ExecutionContextAdapter<T> decorated, ComponentExecutor<T> operation) {
+  PrecalculatedExecutionContextAdapter(ExecutionContextAdapter<M> decorated, CompletableComponentExecutor<M> operation) {
     super(decorated);
 
     configuration = decorated.getConfiguration().map(config -> {
@@ -55,16 +52,17 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
     return configuration;
   }
 
-  public ComponentExecutor getOperationExecutor() {
+  public CompletableComponentExecutor getOperationExecutor() {
     return operation;
   }
 
-  private static class ComponentExecutorDecorator<M extends ComponentModel> implements ComponentExecutor<M>, Interceptable {
+  private static class ComponentExecutorDecorator<M extends ComponentModel>
+      implements CompletableComponentExecutor<M>, Interceptable {
 
-    private ComponentExecutor decorated;
+    private CompletableComponentExecutor decorated;
     private List<Interceptor> operationExecutorInterceptors;
 
-    public ComponentExecutorDecorator(ComponentExecutor<M> decorated) {
+    public ComponentExecutorDecorator(CompletableComponentExecutor<M> decorated) {
       this.decorated = decorated;
 
       if (decorated instanceof Interceptable) {
@@ -77,8 +75,8 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
     }
 
     @Override
-    public Publisher<Object> execute(ExecutionContext<M> executionContext) {
-      return decorated.execute(executionContext);
+    public void execute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
+      decorated.execute(executionContext, callback);
     }
 
     @Override
@@ -87,6 +85,7 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
     }
 
   }
+
 
   private static class DefaultExecutionContextConfigurationDecorator implements ExecutionContextConfigurationDecorator {
 
@@ -138,6 +137,7 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
       return decorated;
     }
   }
+
 
   private static class InterceptorDecorator<M extends ComponentModel> implements Interceptor<M> {
 

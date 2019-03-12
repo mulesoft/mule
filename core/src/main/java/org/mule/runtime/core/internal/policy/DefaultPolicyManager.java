@@ -10,7 +10,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -54,8 +53,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPolicyManager.class);
 
   private static final OperationPolicy NO_POLICY_OPERATION =
-      (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation) -> operationExecutionFunction
-          .execute(opParamProcessor.getOperationParameters(), operationEvent);
+      (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, sink) -> operationExecutionFunction
+          .execute(opParamProcessor.getOperationParameters(), operationEvent, sink);
 
   private MuleContext muleContext;
 

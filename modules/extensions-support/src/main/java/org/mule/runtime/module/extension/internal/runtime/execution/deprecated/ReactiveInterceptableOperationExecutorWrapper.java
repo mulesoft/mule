@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.execution;
+package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -15,38 +15,42 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * Decorates an {@link CompletableComponentExecutor} adding the behavior defined in {@link AbstractInterceptable}.
+ * Decorates an {@link ComponentExecutor} adding the behavior defined in {@link AbstractInterceptable}.
  * <p>
  * Dependency injection and lifecycle phases will also be propagated to the {@link #delegate}
  *
- * @since 4.2
+ * @since 4.0
+ * @deprecated since 4.2
  */
-public final class InterceptableOperationExecutorWrapper<M extends ComponentModel> extends AbstractInterceptable
-    implements CompletableComponentExecutor<M>, OperationArgumentResolverFactory<M> {
+@Deprecated
+public final class ReactiveInterceptableOperationExecutorWrapper<M extends ComponentModel> extends AbstractInterceptable
+    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M> {
 
-  private static final Logger LOGGER = getLogger(InterceptableOperationExecutorWrapper.class);
+  private static final Logger LOGGER = getLogger(ReactiveInterceptableOperationExecutorWrapper.class);
 
-  private final CompletableComponentExecutor<M> delegate;
+  private final ComponentExecutor delegate;
 
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link CompletableComponentExecutor} to be decorated
+   * @param delegate the {@link ComponentExecutor} to be decorated
    * @param interceptors the {@link Interceptor interceptors} that should apply to the {@code delegate}
    */
-  public InterceptableOperationExecutorWrapper(CompletableComponentExecutor<M> delegate, List<Interceptor> interceptors) {
+  public ReactiveInterceptableOperationExecutorWrapper(ComponentExecutor<M> delegate, List<Interceptor> interceptors) {
     super(interceptors);
     this.delegate = delegate;
   }
@@ -55,8 +59,8 @@ public final class InterceptableOperationExecutorWrapper<M extends ComponentMode
    * Directly delegates into {@link #delegate} {@inheritDoc}
    */
   @Override
-  public void execute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
-    delegate.execute(executionContext, callback);
+  public Publisher<Object> execute(ExecutionContext<M> executionContext) {
+    return delegate.execute(executionContext);
   }
 
   /**
