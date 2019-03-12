@@ -203,6 +203,19 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
     });
   }
 
+  @Description("Loads the forcePolicyUpdateNever flag from system properties")
+  @Test
+  public void loadForcePolicyUpdateNever() throws Exception {
+    Map<String, String> properties = new HashMap<>();
+    properties.put("muleRuntimeConfig.maven.forcePolicyUpdateNever", "true");
+
+    testWithSystemProperties(properties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      assertThat(mavenConfig.getForcePolicyUpdateNever(), is(true));
+    });
+  }
+
   @Description("Loads the configuration from mule-config.json and defines the maven local repository location wrongly")
   @Test
   public void wrongLocalRepositoryLocationConfig() throws Exception {
