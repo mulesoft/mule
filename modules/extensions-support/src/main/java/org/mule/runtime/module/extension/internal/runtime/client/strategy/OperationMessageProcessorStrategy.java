@@ -64,17 +64,17 @@ public abstract class OperationMessageProcessorStrategy {
   public abstract void disposeProcessor(OperationMessageProcessor operationMessageProcessor);
 
   protected OperationMessageProcessor createProcessor(String extensionName, String operationName, Optional<String> configName,
-                                                    Map<String, ValueResolver> parameters) {
+                                                      Map<String, ValueResolver> parameters) {
     ExtensionModel extension = findExtension(extensionName);
     OperationModel operation = findOperation(extension, operationName);
     ConfigurationProvider config = configName.map(this::findConfiguration).orElse(null);
     Map<String, ValueResolver> resolvedParams = parameters;
     try {
       OperationMessageProcessor processor =
-              new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
-                      .setConfigurationProvider(config)
-                      .setParameters(resolvedParams)
-                      .build();
+          new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
+              .setConfigurationProvider(config)
+              .setParameters(resolvedParams)
+              .build();
 
       initialiseIfNeeded(processor, muleContext);
       processor.start();

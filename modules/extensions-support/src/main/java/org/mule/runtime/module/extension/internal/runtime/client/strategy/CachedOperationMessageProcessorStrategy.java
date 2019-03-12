@@ -121,7 +121,7 @@ public class CachedOperationMessageProcessorStrategy extends OperationMessagePro
       @Override
       public void onNotification(MuleContextNotification notification) {
         if (notification.getMuleContext().getId().equals(muleContext.getId())
-            && notification.getAction().equals(CONTEXT_DISPOSED_NOTIFICATION)) {
+            && notification.getAction().getIdentifier().equals(CONTEXT_DISPOSED_NOTIFICATION)) {
           Cache<String, OperationMessageProcessor> cacheToInvalidate =
               operationMessageProcessorsCaches.remove(muleContext.getId());
           cacheToInvalidate.invalidateAll();

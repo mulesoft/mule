@@ -47,7 +47,8 @@ public class NonCachedOperationMessageProcessorStrategy extends OperationMessage
   @Override
   public OperationMessageProcessor getOperationMessageProcessor(String extensionName, String operationName,
                                                                 OperationParameters parameters) {
-    return createProcessor(extensionName, operationName, parameters.getConfigName(), resolveParameters(parameters.get(), getEvent(parameters)));
+    return createProcessor(extensionName, operationName, parameters.getConfigName(),
+                           resolveParameters(parameters.get(), getEvent(parameters)));
   }
 
   private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, CoreEvent event) {
