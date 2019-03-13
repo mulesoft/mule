@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition.NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithStereotypesDeclaration;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
