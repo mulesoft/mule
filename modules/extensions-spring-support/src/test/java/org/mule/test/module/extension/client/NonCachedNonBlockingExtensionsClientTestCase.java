@@ -7,15 +7,15 @@
 package org.mule.test.module.extension.client;
 
 import static java.lang.System.setProperty;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSION_CLIENT_CACHE_DISABLED;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_DISABLED;
 
 import org.junit.BeforeClass;
 
 public class NonCachedNonBlockingExtensionsClientTestCase extends NonBlockingExtensionsClientTestCase {
 
   @BeforeClass
-  public static void setDisableExtensionsClientCacheSystemProperty() throws Exception{
-    setProperty(MULE_EXTENSION_CLIENT_CACHE_DISABLED, "true");
+  public static void setDisableExtensionsClientCacheSystemProperty() throws Exception {
+    setProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED, "true");
   }
 
 }

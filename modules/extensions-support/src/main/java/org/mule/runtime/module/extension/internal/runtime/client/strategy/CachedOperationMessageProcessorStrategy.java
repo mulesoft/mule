@@ -13,14 +13,11 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -29,11 +26,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.client.OperationParameters;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -46,7 +41,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -149,7 +143,8 @@ public class CachedOperationMessageProcessorStrategy extends OperationMessagePro
   private String buildKey(String extension, String operation, OperationParameters parameters) {
     char separator = '&';
     StringBuilder keyBuilder = new StringBuilder(256);
-    keyBuilder.append(extension).append(separator).append(operation).append(separator).append(parameters.getConfigName());
+    keyBuilder.append(extension).append(separator).append(operation).append(separator)
+        .append(parameters.getConfigName().orElse(""));
     List<String> keyList = parameters.get().keySet().stream().collect(Collectors.toList());
     Collections.sort(keyList, Comparator.naturalOrder());
     for (String key : keyList) {

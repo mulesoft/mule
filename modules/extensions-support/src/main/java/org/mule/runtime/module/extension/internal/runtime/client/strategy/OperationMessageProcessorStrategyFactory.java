@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.client.strategy;
 
 import static java.lang.Boolean.parseBoolean;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSION_CLIENT_CACHE_DISABLED;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_DISABLED;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,7 +21,7 @@ public class OperationMessageProcessorStrategyFactory {
   public static OperationMessageProcessorStrategy create(ExtensionManager extensionManager, Registry registry,
                                                          MuleContext muleContext, PolicyManager policyManager,
                                                          ReflectionCache reflectionCache, CoreEvent event) {
-    return parseBoolean(System.getProperty(MULE_EXTENSION_CLIENT_CACHE_DISABLED))
+    return parseBoolean(System.getProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED))
         ? new NonCachedOperationMessageProcessorStrategy(extensionManager, registry, muleContext, policyManager, reflectionCache,
                                                          event)
         : new CachedOperationMessageProcessorStrategy(extensionManager, registry, muleContext, policyManager, reflectionCache,

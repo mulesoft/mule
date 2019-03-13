@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSION_CLIENT_CACHE_DISABLED;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.artifact.Registry;

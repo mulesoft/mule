@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSION_CLIENT_CACHE_DISABLED;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_DISABLED;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
@@ -150,10 +150,10 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Executes an operation that has a parameter group using the client and checks the output")
   public void executeOperationWithParameterGroupUsingOptional() throws Throwable {
     OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-            .addParameter("greeting", "jeje")
-            .addParameter("age", 23)
-            .addParameter("knownAddresses", emptyList())
-            .build();
+        .addParameter("greeting", "jeje")
+        .addParameter("age", 23)
+        .addParameter("knownAddresses", emptyList())
+        .build();
     Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);
     assertThat(result.getOutput(), is(ANOTHER_ALIAS_OUTPUT));
   }
@@ -261,7 +261,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   public void disposeAfterExecution() throws Throwable {
     executeSimpleOperation();
 
-    if(usingCachedStrategy()){
+    if (usingCachedStrategy()) {
       muleContext.dispose();
     }
 
@@ -275,7 +275,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     assertThat(HeisenbergOperations.disposed, is(true));
   }
 
-  private boolean usingCachedStrategy(){
-    return !parseBoolean(getProperty(MULE_EXTENSION_CLIENT_CACHE_DISABLED));
+  private boolean usingCachedStrategy() {
+    return !parseBoolean(getProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED));
   }
 }
