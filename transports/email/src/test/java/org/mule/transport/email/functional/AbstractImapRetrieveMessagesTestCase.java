@@ -43,7 +43,7 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
 
     private static final int UNREAD_MESSAGES = 10;
     private static final int READ_MESSAGES_LESS_THAN_BATCH_SIZE = 4;
-    private static final int READ_MESSAGES_GREATER_THAN_BATCH_SIZE = 8;
+    protected static final int READ_MESSAGES_GREATER_THAN_BATCH_SIZE = 8;
     protected static final Collection<Object[]> READ_MESSAGES_PARAMETERS = Arrays.asList(new Object[][] {
             {READ_MESSAGES_LESS_THAN_BATCH_SIZE}, {READ_MESSAGES_GREATER_THAN_BATCH_SIZE}});
 
