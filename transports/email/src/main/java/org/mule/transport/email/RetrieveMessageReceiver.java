@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.mail.Address;
 import javax.mail.Flags;
@@ -68,7 +69,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     private final Object connectionLock = new Object();
 
 
-    private boolean connectionEstablished = false;
+    private AtomicBoolean connectionEstablished = new AtomicBoolean(false);
 
     public RetrieveMessageReceiver(Connector connector,
                                    FlowConstruct flowConstruct,
@@ -123,7 +124,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         RetrieveMessageReceiver.this.backupFolder += File.separator;
                     }
 
-                    RetrieveMessageReceiver.this.connectionEstablished = true;
+                    RetrieveMessageReceiver.this.connectionEstablished.set(true);
                 }
             }
 
@@ -175,7 +176,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 {
                     synchronized (connectionLock)
                     {
-                        if (RetrieveMessageReceiver.this.connectionEstablished)
+                        if (RetrieveMessageReceiver.this.connectionEstablished.get())
                         {
                             RetrieveMessageReceiver.super.doStart();
                             synchronized (folderLock)
