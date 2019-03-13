@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:imap="http://www.mulesoft.org/schema/mule/imap"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd">
+
+<imap:connector name="imapConnector" checkFrequency="60000" validateConnections="true">
+    <reconnect-forever frequency="300000" blocking="false" />
+</imap:connector>
+
+<flow name="retrieveEmails">
+    <imap:inbound-endpoint user="bob" password="password" host="localhost" port="${port1}"
+                           connector-ref="imapConnector"/>
+    <custom-processor class="org.mule.transport.email.functional.AbstractImapRetrieveMessagesTestCase$StoreEmailsProcessor"/>
+</flow>
+
+</mule>
