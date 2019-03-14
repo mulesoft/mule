@@ -6,7 +6,7 @@
  */
 package org.mule.test.module.extension.client;
 
-import static java.util.Arrays.asList;
+import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -14,16 +14,13 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLI
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.util.Collection;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 @Feature("EXTENSIONS_CLIENT")
-public class ExtensionsClientFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
+public abstract class AbstractExtensionsClientFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static String MESSAGE_TO_ECHO = "Echo this message!";
   private static String ANOTHER_MESSAGE_TO_ECHO = "Echo this another message!";
@@ -39,22 +36,16 @@ public class ExtensionsClientFunctionalTestCase extends AbstractExtensionFunctio
   private static String MESSAGELESS_ECHO = " echoed by Heisenberg";
   private static int NUMBER_OF_CALLS = 1000;
 
-  private String cachedStrategy;
-  private boolean usesNonCachedStrategy;
-
-  @Parameterized.Parameters(name = "{0}")
-  public static Collection<Object[]> data() {
-    return asList(new Object[][] {{"Non Cached Strategy", true}, {"Cached Strategy", false}});
-  }
-
   @Override
   protected String getConfigFile() {
     return "extensions-client-config.xml";
   }
 
+  protected abstract boolean isCacheDisabled();
+
   @Before
   public void setUpStrategy() {
-    System.setProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED, String.valueOf(usesNonCachedStrategy));
+    System.setProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED, valueOf(isCacheDisabled()));
   }
 
   @Test
