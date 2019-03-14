@@ -9,25 +9,20 @@ package org.mule.runtime.module.extension.internal.runtime.client.strategy;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.client.OperationParameters;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -36,19 +31,46 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class NonCachedOperationMessageProcessorStrategy extends OperationMessageProcessorStrategy {
+/**
+ * {@link OperationMessageProcessorStrategy} that creates a new {@link OperationMessageProcessor} for each execution.
+ * 
+ * @since 4.1.6
+ */
+public class NonCachedOperationMessageProcessorStrategy extends AbstractOperationMessageProcessorStrategy {
 
+  /**
+   * Creates a new instance
+   */
   public NonCachedOperationMessageProcessorStrategy(ExtensionManager extensionManager, Registry registry, MuleContext muleContext,
                                                     PolicyManager policyManager, ReflectionCache reflectionCache,
                                                     CoreEvent event) {
     super(extensionManager, registry, muleContext, policyManager, reflectionCache, event);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public OperationMessageProcessor getOperationMessageProcessor(String extensionName, String operationName,
                                                                 OperationParameters parameters) {
     return createProcessor(extensionName, operationName, parameters.getConfigName(),
                            resolveParameters(parameters.get(), getEvent(parameters)));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CoreEvent getEvent(OperationParameters parameters) {
+    return getBaseEvent();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void disposeProcessor(OperationMessageProcessor operationMessageProcessor) {
+    doDisposeProcessor(operationMessageProcessor);
   }
 
   private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, CoreEvent event) {
@@ -79,16 +101,5 @@ public class NonCachedOperationMessageProcessorStrategy extends OperationMessage
       }
     });
     return values;
-  }
-
-
-  @Override
-  public CoreEvent getEvent(OperationParameters parameters) {
-    return getBaseEvent();
-  }
-
-  @Override
-  public void disposeProcessor(OperationMessageProcessor operationMessageProcessor) {
-    doDisposeProcessor(operationMessageProcessor);
   }
 }

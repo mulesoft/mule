@@ -47,7 +47,13 @@ import java.util.stream.Collectors;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-public class CachedOperationMessageProcessorStrategy extends OperationMessageProcessorStrategy {
+/**
+ * {@link OperationMessageProcessorStrategy} that reuses instances of {@link OperationMessageProcessor} for executions when
+ * possible.
+ *
+ * @since 4.1.6
+ */
+public class CachedOperationMessageProcessorStrategy extends AbstractOperationMessageProcessorStrategy {
 
   private static Map<String, Cache<String, OperationMessageProcessor>> operationMessageProcessorsCaches = new HashMap<>();
 
@@ -56,11 +62,17 @@ public class CachedOperationMessageProcessorStrategy extends OperationMessagePro
   private static int CACHE_ENTRY_EXPIRE_AFTER_ACCESS_IN_MINUTES = 10;
   private static String INTERNAL_VARIABLE_PREFIX = "INTERNAL_VARIABLE_";
 
+  /**
+   * Creates a new instance
+   */
   public CachedOperationMessageProcessorStrategy(ExtensionManager extensionManager, Registry registry, MuleContext muleContext,
                                                  PolicyManager policyManager, ReflectionCache reflectionCache, CoreEvent event) {
     super(extensionManager, registry, muleContext, policyManager, reflectionCache, event);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public OperationMessageProcessor getOperationMessageProcessor(String extensionName, String operationName,
                                                                 OperationParameters parameters) {
@@ -88,11 +100,17 @@ public class CachedOperationMessageProcessorStrategy extends OperationMessagePro
     });
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public CoreEvent getEvent(OperationParameters parameters) {
     return event == null ? buildChildEvent(getBaseEvent(), parameters) : buildChildEvent(event, parameters);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void disposeProcessor(OperationMessageProcessor operationMessageProcessor) {
     // The processors does not need to be disposed here since we may reuse it later

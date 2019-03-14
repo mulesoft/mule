@@ -16,8 +16,17 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+/**
+ * Class that provides a {@link OperationMessageProcessorStrategy} according to the value of the system property
+ * MULE_EXTENSIONS_CLIENT_CACHE_DISABLED defined in {@link org.mule.runtime.api.util.MuleSystemProperties}
+ *
+ * @since 4.1.6
+ */
 public class OperationMessageProcessorStrategyFactory {
 
+  /**
+   * This method return the suitable {@link OperationMessageProcessorStrategy}
+   */
   public static OperationMessageProcessorStrategy create(ExtensionManager extensionManager, Registry registry,
                                                          MuleContext muleContext, PolicyManager policyManager,
                                                          ReflectionCache reflectionCache, CoreEvent event) {

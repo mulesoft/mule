@@ -107,6 +107,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
         .toFuture();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
       throws MuleException {
