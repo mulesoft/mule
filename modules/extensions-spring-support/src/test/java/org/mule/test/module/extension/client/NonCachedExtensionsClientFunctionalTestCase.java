@@ -9,7 +9,7 @@ package org.mule.test.module.extension.client;
 public class NonCachedExtensionsClientFunctionalTestCase extends AbstractExtensionsClientFunctionalTestCase {
 
   public boolean isCacheDisabled() {
-    return false;
+    return true;
   }
 
 }
