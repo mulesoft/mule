@@ -20,6 +20,7 @@ import static reactor.core.publisher.Mono.justOrEmpty;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -54,7 +55,7 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public final class SoapOperationExecutor implements ComponentExecutor<OperationModel> {
+public final class SoapOperationExecutor implements ComponentExecutor<OperationModel>, Initialisable {
 
   @Inject
   private MuleExpressionLanguage expressionExecutor;
@@ -84,8 +85,7 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
       SoapClient soapClient = connection.getSoapClient(serviceId);
       SoapResponse response = connection.getExtensionsClientDispatcher(() -> extensionsClientArgumentResolver
           .resolve(context)
-          .get()
-      )
+          .get())
           .map(d -> soapClient.consume(request, d))
           .orElseGet(() -> soapClient.consume(request));
       return justOrEmpty(response.getAsResult(streamingHelperArgumentResolver.resolve(context).get()));
