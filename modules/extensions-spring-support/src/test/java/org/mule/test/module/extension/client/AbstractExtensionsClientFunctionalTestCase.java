@@ -6,17 +6,14 @@
  */
 package org.mule.test.module.extension.client;
 
-import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_DISABLED;
 
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import org.junit.Before;
 import org.junit.Test;
 
 @Feature("EXTENSIONS_CLIENT")
@@ -39,13 +36,6 @@ public abstract class AbstractExtensionsClientFunctionalTestCase extends Abstrac
   @Override
   protected String getConfigFile() {
     return "extensions-client-config.xml";
-  }
-
-  protected abstract boolean isCacheDisabled();
-
-  @Before
-  public void setUpStrategy() {
-    System.setProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED, valueOf(isCacheDisabled()));
   }
 
   @Test

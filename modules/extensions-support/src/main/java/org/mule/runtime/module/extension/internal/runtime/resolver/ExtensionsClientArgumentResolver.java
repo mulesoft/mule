@@ -9,14 +9,13 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.client.DefaultExtensionsClient;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategyFactory;
 
 import java.util.function.Supplier;
 
@@ -27,12 +26,10 @@ import java.util.function.Supplier;
  */
 public class ExtensionsClientArgumentResolver implements ArgumentResolver<ExtensionsClient> {
 
-  private final Registry registry;
-  private final PolicyManager policyManager;
+  private final OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory;
 
-  public ExtensionsClientArgumentResolver(Registry registry, PolicyManager policyManager) {
-    this.registry = registry;
-    this.policyManager = policyManager;
+  public ExtensionsClientArgumentResolver(OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory) {
+    this.operationMessageProcessorStrategyFactory = operationMessageProcessorStrategyFactory;
   }
 
   @Override
@@ -40,7 +37,7 @@ public class ExtensionsClientArgumentResolver implements ArgumentResolver<Extens
     return () -> {
       ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
       DefaultExtensionsClient extensionClient =
-          new DefaultExtensionsClient(cxt.getMuleContext(), cxt.getEvent(), registry, policyManager);
+          new DefaultExtensionsClient(cxt.getEvent(), operationMessageProcessorStrategyFactory);
       try {
         extensionClient.initialise();
       } catch (InitialisationException e) {

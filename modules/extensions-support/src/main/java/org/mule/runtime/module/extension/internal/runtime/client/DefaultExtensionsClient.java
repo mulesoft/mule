@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -16,15 +15,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.rx.Exceptions;
-import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategy;
 import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -43,22 +39,8 @@ import javax.inject.Inject;
  */
 public final class DefaultExtensionsClient implements ExtensionsClient, Initialisable {
 
-  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
-
   @Inject
-  private MuleContext muleContext;
-
-  @Inject
-  private Registry registry;
-
-  @Inject
-  private PolicyManager policyManager;
-
-  @Inject
-  private ExtensionManager extensionManager;
-
-  @Inject
-  private ReflectionCache reflectionCache;
+  private OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory;
 
   private final CoreEvent event;
 
@@ -69,17 +51,13 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
    * enables to perform the dynamic operation execution with the same event that the SDK operation using the
    * {@link ExtensionsClient} receives.
    *
-   * @param muleContext    the current context.
-   * @param event          the current execution event.
-   * @param registry       the application registry.
-   * @param policyManager the configured application policy manager.
+   * @param event the current execution event.
+   * @param operationMessageProcessorStrategyFactory the factory used to get the appropriate operation message processor strategy
    */
-  public DefaultExtensionsClient(MuleContext muleContext, CoreEvent event, Registry registry, PolicyManager policyManager) {
-    this.muleContext = muleContext;
+  public DefaultExtensionsClient(CoreEvent event,
+                                 OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory) {
     this.event = event;
-    this.extensionManager = muleContext.getExtensionManager();
-    this.registry = registry;
-    this.policyManager = policyManager;
+    this.operationMessageProcessorStrategyFactory = operationMessageProcessorStrategyFactory;
   }
 
   /**
@@ -121,7 +99,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Override
   public void initialise() throws InitialisationException {
-    this.operationMessageProcessorStrategy = OperationMessageProcessorStrategyFactory
-        .create(extensionManager, registry, muleContext, policyManager, reflectionCache, event);
+    this.operationMessageProcessorStrategy = operationMessageProcessorStrategyFactory.create(event);
   }
 }

@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_DISABLED;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
@@ -276,6 +276,6 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   }
 
   private boolean usingCachedStrategy() {
-    return !parseBoolean(getProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED));
+    return !parseBoolean(getProperty(MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED));
   }
 }

@@ -6,10 +6,15 @@
  */
 package org.mule.test.module.extension.client;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED;
+
+import org.junit.BeforeClass;
+
 public class CachedExtensionsClientFunctionalTestCase extends AbstractExtensionsClientFunctionalTestCase {
 
-  public boolean isCacheDisabled() {
-    return false;
+  @BeforeClass
+  public static void setUpStrategy() {
+    System.setProperty(MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED, "false");
   }
 
 }

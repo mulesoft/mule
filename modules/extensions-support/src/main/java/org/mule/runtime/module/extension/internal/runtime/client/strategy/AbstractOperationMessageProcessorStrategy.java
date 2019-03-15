@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.strategy;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -13,6 +14,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
@@ -24,11 +26,17 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.internal.client.ComplexParameter;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -113,16 +121,36 @@ public abstract class AbstractOperationMessageProcessorStrategy implements Opera
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No Extension [" + extensionName + "] Found")));
   }
 
-  protected void doDisposeProcessor(OperationMessageProcessor processor) {
-    if (processor == null) {
-      return;
-    }
-    try {
-      processor.stop();
-      processor.dispose();
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Error while disposing the executing operation"), e);
-    }
+  protected Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, CoreEvent event) {
+    LinkedHashMap<String, ValueResolver> values = new LinkedHashMap<>();
+    parameters.forEach((name, value) -> {
+      ValueResolver valueResolver;
+      if (value instanceof ComplexParameter) {
+        ComplexParameter complex = (ComplexParameter) value;
+        DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType(), reflectionCache);
+        resolveParameters(complex.getParameters(), event).forEach((propertyName, resolver) -> {
+          builder.addPropertyResolver(propertyName, resolver);
+        });
+        try {
+          valueResolver = new StaticValueResolver<>(builder.build(ValueResolvingContext.from(event)));
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", name)), e);
+        }
+      } else {
+        if (value instanceof String && parser.isContainsTemplate((String) value)) {
+          valueResolver = new ExpressionValueResolver((String) value);
+        } else {
+          valueResolver = new StaticValueResolver(value);
+        }
+      }
+      try {
+        initialiseIfNeeded(valueResolver, true, muleContext);
+      } catch (InitialisationException e) {
+        throw new MuleRuntimeException(e);
+      }
+      values.put(name, valueResolver);
+    });
+    return values;
   }
 
   protected CoreEvent getBaseEvent() {
