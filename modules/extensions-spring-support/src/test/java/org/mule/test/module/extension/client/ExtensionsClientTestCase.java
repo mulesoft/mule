@@ -275,12 +275,6 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     assertThat(HeisenbergOperations.disposed, is(true));
   }
 
-  @Test
-  @Description("Using dynamic configurations, config parameters are resolved each time.")
-  public void executeTwiceWithDynamicConfiguration() throws Throwable {
-
-  }
-
   private boolean usingCachedStrategy() {
     return !parseBoolean(getProperty(MULE_EXTENSIONS_CLIENT_CACHE_DISABLED));
   }
