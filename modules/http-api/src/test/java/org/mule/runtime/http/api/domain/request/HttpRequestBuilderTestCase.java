@@ -124,4 +124,12 @@ public class HttpRequestBuilderTestCase {
     builder.removeHeader(name);
     assertThat(builder.build().getHeaderNames(), empty());
   }
+
+  @Test
+  public void headerCheck() {
+    HttpRequest request = builder.uri(URI_VALUE).addHeader(name, value).build();
+
+    assertThat(request.containsHeader(name), is(true));
+    assertThat(request.containsHeader("wat"), is(false));
+  }
 }

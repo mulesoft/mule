@@ -15,19 +15,17 @@ import static org.hamcrest.Matchers.isEmptyString;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.RESPONSE_BUILDER;
-
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
-
-import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(HTTP_SERVICE)
 @Story(RESPONSE_BUILDER)
@@ -88,6 +86,14 @@ public class HttpResponseBuilderTestCase {
     builder.removeHeader(header);
     assertThat(builder.build().getHeaderNames(), empty());
 
+  }
+
+  @Test
+  public void headerCheck() {
+    HttpResponse response = builder.addHeader(header, value).build();
+
+    assertThat(response.containsHeader(header), is(true));
+    assertThat(response.containsHeader("wat"), is(false));
   }
 
 }

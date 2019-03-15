@@ -36,18 +36,11 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
 
   protected HttpMessageBuilder(HttpMessage httpMessage) {
     entity(httpMessage.getEntity());
-    initHeaders();
-    headers(httpMessage);
+    headers(httpMessage.getHeaders());
   }
 
   protected void initHeaders() {
     headers = new CaseInsensitiveMultiMap();
-  }
-
-  private void headers(HttpMessage httpMessage) {
-    for (String headerName : httpMessage.getHeaderNames()) {
-      headers.put(headerName, httpMessage.getHeaderValues(headerName));
-    }
   }
 
   /**
@@ -65,7 +58,11 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B headers(MultiMap<String, String> headersMap) {
-    this.headers.putAll(headersMap);
+    if (headersMap instanceof CaseInsensitiveMultiMap && headers.isEmpty() && headersMap.isMutable()) {
+      this.headers = headersMap;
+    } else {
+      this.headers.putAll(headersMap);
+    }
     return (B) this;
   }
 
