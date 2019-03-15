@@ -65,7 +65,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -92,6 +91,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -131,6 +131,7 @@ class MuleExtensionModelDeclarer {
     declareExportedTypes(typeLoader, extensionDeclarer);
 
     // constructs
+    declareObject(extensionDeclarer, typeLoader);
     declareFlow(extensionDeclarer, typeLoader);
     declareSubflow(extensionDeclarer);
     declareChoice(extensionDeclarer, typeLoader);
@@ -163,6 +164,35 @@ class MuleExtensionModelDeclarer {
     declareErrors(extensionDeclarer);
 
     return extensionDeclarer;
+  }
+
+  private void declareObject(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer object = extensionDeclarer.withConstruct("object")
+        .allowingTopLevelDefinition()
+        .describedAs("Element to declare a java object. Objects declared globally can be referenced from other parts of the " +
+            "configuration or recovered programmatically through org.mule.runtime.api.artifact.Registry.");
+
+    object.onDefaultParameterGroup()
+        .withOptionalParameter("name")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("Name to use to reference this object.");
+
+    object.onDefaultParameterGroup()
+        .withOptionalParameter("ref")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("@Deprecated since 4.0. Only meant to be used for backward compatibility. " +
+            "Reference to another object defined in the mule configuration or any other provider of objects.");
+
+    object.onDefaultParameterGroup()
+        .withOptionalParameter("class")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("Creates an instance of the class provided as argument.");
+
+    object.onDefaultParameterGroup()
+        .withExclusiveOptionals(ImmutableSet.of("ref", "class"), true);
   }
 
   private void declareExportedTypes(ClassTypeLoader typeLoader, ExtensionDeclarer extensionDeclarer) {
