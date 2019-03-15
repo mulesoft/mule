@@ -384,12 +384,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   public static void dispose() {
-      try {
-        muleContext.dispose();
-      } catch (IllegalStateException e) {
-        // Ignore
-        LOGGER.warn(e + " : " + e.getMessage());
-      }
+    try {
+      muleContext.dispose();
+    } catch (IllegalStateException e) {
+      // Ignore
+      LOGGER.warn(e + " : " + e.getMessage());
+    }
   }
 
   private static List<SchedulerView> schedulersOnInit;
