@@ -35,7 +35,6 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
 import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -49,7 +48,6 @@ import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -59,6 +57,7 @@ import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
@@ -132,7 +131,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(14));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(15));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -226,6 +225,40 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModels.get(2).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(paramModels.get(2).getType(), instanceOf(StringType.class));
     assertThat(paramModels.get(2).isRequired(), is(false));
+  }
+
+  @Test
+  public void object() {
+    final ConstructModel object = coreExtensionModel.getConstructModel("object").get();
+
+    assertThat(object.allowsTopLevelDeclaration(), is(true));
+
+    final List<ParameterModel> paramModels = object.getAllParameterModels();
+    assertThat(paramModels, hasSize(3));
+
+    ParameterModel name = paramModels.get(0);
+    assertThat(name.getName(), is("name"));
+    assertThat(name.isRequired(), is(false));
+    assertThat(name.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(name.getType(), instanceOf(DefaultStringType.class));
+
+    ParameterModel ref = paramModels.get(1);
+    assertThat(ref.getName(), is("ref"));
+    assertThat(ref.isRequired(), is(false));
+    assertThat(ref.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(ref.getType(), instanceOf(DefaultStringType.class));
+
+    ParameterModel clazz = paramModels.get(2);
+    assertThat(clazz.getName(), is("class"));
+    assertThat(clazz.isRequired(), is(false));
+    assertThat(clazz.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(clazz.getType(), instanceOf(DefaultStringType.class));
+
+    List<ExclusiveParametersModel> exclusiveParametersModels =
+        object.getParameterGroupModels().get(0).getExclusiveParametersModels();
+    ExclusiveParametersModel exclusiveParameterModel = exclusiveParametersModels.get(0);
+    assertThat(exclusiveParameterModel.getExclusiveParameterNames(), contains("ref", "class"));
+    assertThat(exclusiveParameterModel.isOneRequired(), is(true));
   }
 
   @Test
