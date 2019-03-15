@@ -26,8 +26,6 @@ import org.mule.runtime.module.extension.internal.runtime.client.strategy.Operat
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -64,18 +62,16 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private final CoreEvent event;
 
-  private static Map<String, OperationMessageProcessor> processorMap = new HashMap<>();
-
   private OperationMessageProcessorStrategy operationMessageProcessorStrategy;
 
   /**
    * This constructor enables the {@link DefaultExtensionsClient} to be aware of the current execution {@link CoreEvent} and
-   * enables to perform the dynamic operation execution with the same event that the SDK operation using the {@link ExtensionsClient}
-   * receives.
+   * enables to perform the dynamic operation execution with the same event that the SDK operation using the
+   * {@link ExtensionsClient} receives.
    *
-   * @param muleContext   the current context.
-   * @param event         the current execution event.
-   * @param registry      the application registry.
+   * @param muleContext    the current context.
+   * @param event          the current execution event.
+   * @param registry       the application registry.
    * @param policyManager the configured application policy manager.
    */
   public DefaultExtensionsClient(MuleContext muleContext, CoreEvent event, Registry registry, PolicyManager policyManager) {
