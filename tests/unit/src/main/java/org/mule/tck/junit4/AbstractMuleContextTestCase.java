@@ -363,12 +363,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static void disposeContext() throws MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
-        try {
-          muleContext.dispose();
-        } catch (IllegalStateException e) {
-          // Ignore
-          LOGGER.warn(e + " : " + e.getMessage());
-        }
+        disposeOnlyMuleContext();
 
         verifyAndStopSchedulers();
 
@@ -385,6 +380,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     } finally {
       muleContext = null;
       clearLoggingConfig();
+    }
+  }
+
+  public static void disposeOnlyMuleContext() {
+    try {
+      muleContext.dispose();
+    } catch (IllegalStateException e) {
+      // Ignore
+      LOGGER.warn(e + " : " + e.getMessage());
     }
   }
 
