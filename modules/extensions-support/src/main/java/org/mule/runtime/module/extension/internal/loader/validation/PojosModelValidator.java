@@ -15,8 +15,11 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -26,12 +29,14 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 
 import java.util.Optional;
 
+import org.apache.commons.collections.CollectionUtils;
+
 /**
- * Validates that POJOs parameter overrides Equals and HashCode
+ * Validates that POJOs have a default constructor, and implements methods equals and hashCode
  *
  * @since 4.2
  */
-public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator {
+public class PojosModelValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
@@ -51,9 +56,28 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
       protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
         validateOverridesEqualsAndHashCode(model, problemsReporter);
       }
+
+      @Override
+      protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
+        Optional<ExtensionParameterDescriptorModelProperty> modelProperty =
+            model.getModelProperty(ExtensionParameterDescriptorModelProperty.class);
+        if (modelProperty.isPresent()) {
+          Type type = modelProperty.get().getExtensionParameter().getType();
+          if (type.isSameType(TypedValue.class)) {
+            type = getFirstGenericType(type).orElse(null);
+          }
+          if (type != null && type.asMetadataType() instanceof ObjectType) {
+            ClassInformationAnnotation classInformationAnnotation = type.getClassInformation();
+            if (!classInformationAnnotation.isAbstract() && !classInformationAnnotation.isInterface()
+                && !classInformationAnnotation.hasDefaultConstructor()) {
+              problemsReporter
+                  .addError(new Problem(model, format("Type '%s' does not have a default constructor", type.getName())));
+            }
+          }
+        }
+      }
     }.walk(extensionModel);
   }
-
 
   private void validateOverridesEqualsAndHashCode(ParameterizedModel model, ProblemsReporter reporter) {
     model.getAllParameterModels().forEach(parameterModel -> {
@@ -75,5 +99,10 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
         }
       }
     });
+  }
+
+  private Optional<Type> getFirstGenericType(Type typeWithGenerics) {
+    return !CollectionUtils.isEmpty(typeWithGenerics.getGenerics())
+        ? Optional.ofNullable(typeWithGenerics.getGenerics().get(0).getConcreteType()) : Optional.empty();
   }
 }

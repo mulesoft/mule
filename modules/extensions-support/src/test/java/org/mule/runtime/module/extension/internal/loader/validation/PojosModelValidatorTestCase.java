@@ -35,12 +35,12 @@ import org.junit.rules.ExpectedException;
 
 
 @SmallTest
-public class EqualsAndHashCodeModelValidatorTestCase extends AbstractMuleTestCase {
+public class PojosModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ExtensionModelValidator validator = new EqualsAndHashCodeModelValidator();
+  private ExtensionModelValidator validator = new PojosModelValidator();
 
   @Test
   public void pojoConfigurationMustOverrideEqualsAndHashCode() {
@@ -61,6 +61,14 @@ public class EqualsAndHashCodeModelValidatorTestCase extends AbstractMuleTestCas
     validate(ValidTestConnector.class);
   }
 
+  @Test
+  public void pojoConfigurationMustHaveDefaultConstructor() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException.expectMessage("Type 'InvalidPojoRequiresDefaultConstructor' does not have a default constructor");
+    validate(InvalidConfigParameterTestConnector.class);
+  }
+
+
   private void validate(Class<?> connectorClass) {
     ExtensionsTestUtils.validate(connectorClass, validator, new HashMap() {
 
@@ -75,7 +83,7 @@ public class EqualsAndHashCodeModelValidatorTestCase extends AbstractMuleTestCas
     private String id;
   }
 
-  private static class PojoImplementsEqualsAndHashCode {
+  public static class PojoImplementsEqualsAndHashCode {
 
     private String id;
 
@@ -115,7 +123,7 @@ public class EqualsAndHashCodeModelValidatorTestCase extends AbstractMuleTestCas
     }
   }
 
-  private static class Dog extends Animal {
+  public static class Dog extends Animal {
 
   }
 
@@ -238,5 +246,50 @@ public class EqualsAndHashCodeModelValidatorTestCase extends AbstractMuleTestCas
 
   }
 
+
+  public static class InvalidPojoRequiresDefaultConstructor {
+
+    @Parameter
+    private String bar;
+
+    @Parameter
+    private String id;
+
+    public InvalidPojoRequiresDefaultConstructor(String bar, String id) {
+      this.bar = bar;
+      this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (o == null || getClass() != o.getClass())
+        return false;
+      InvalidPojoRequiresDefaultConstructor that = (InvalidPojoRequiresDefaultConstructor) o;
+      return Objects.equals(bar, that.bar) &&
+          Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(bar, id);
+    }
+  }
+
+  @Configuration(name = "config3")
+  @Operations(ValidTestOperations.class)
+  public static class InvalidTestConfigPojoWithoutDefaultConstructor implements Config {
+
+    @Parameter
+    private InvalidPojoRequiresDefaultConstructor pojo;
+  }
+
+  @Extension(name = "validatorTest")
+  @Configurations({InvalidTestConfigPojoWithoutDefaultConstructor.class})
+  @ConnectionProviders({TestConnectionProvider.class})
+  public static class InvalidConfigParameterTestConnector {
+
+  }
 
 }
