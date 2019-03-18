@@ -7,12 +7,15 @@
 
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.core.internal.policy.PolicyManager;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.client.DefaultExtensionsClient;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 
 import java.util.function.Supplier;
 
@@ -23,19 +26,24 @@ import java.util.function.Supplier;
  */
 public class ExtensionsClientArgumentResolver implements ArgumentResolver<ExtensionsClient> {
 
-  private final Registry registry;
-  private final PolicyManager policyManager;
+  private final ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
 
-  public ExtensionsClientArgumentResolver(Registry registry, PolicyManager policyManager) {
-    this.registry = registry;
-    this.policyManager = policyManager;
+  public ExtensionsClientArgumentResolver(ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory) {
+    this.extensionsClientProcessorsStrategyFactory = extensionsClientProcessorsStrategyFactory;
   }
 
   @Override
   public Supplier<ExtensionsClient> resolve(ExecutionContext executionContext) {
     return () -> {
       ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
-      return new DefaultExtensionsClient(cxt.getMuleContext(), cxt.getEvent(), registry, policyManager);
+      DefaultExtensionsClient extensionClient =
+          new DefaultExtensionsClient(cxt.getEvent(), extensionsClientProcessorsStrategyFactory);
+      try {
+        extensionClient.initialise();
+      } catch (InitialisationException e) {
+        throw new MuleRuntimeException(createStaticMessage("Failed to initialise Extension Client"), e);
+      }
+      return extensionClient;
     };
   }
 }
