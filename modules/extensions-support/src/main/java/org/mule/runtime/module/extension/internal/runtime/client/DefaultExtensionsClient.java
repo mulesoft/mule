@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategy;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategy;
 import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 
@@ -44,7 +44,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   private final CoreEvent event;
 
-  private OperationMessageProcessorStrategy operationMessageProcessorStrategy;
+  private ExtensionsClientProcessorsStrategy extensionsClientProcessorsStrategy;
 
   /**
    * This constructor enables the {@link DefaultExtensionsClient} to be aware of the current execution {@link CoreEvent} and
@@ -73,11 +73,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
     OperationMessageProcessor processor =
-        operationMessageProcessorStrategy.getOperationMessageProcessor(extension, operation, parameters);
-    return just(operationMessageProcessorStrategy.getEvent(parameters)).transform(processor)
+        extensionsClientProcessorsStrategy.getOperationMessageProcessor(extension, operation, parameters);
+    return just(extensionsClientProcessorsStrategy.getEvent(parameters)).transform(processor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate(() -> operationMessageProcessorStrategy.disposeProcessor(processor))
+        .doAfterTerminate(() -> extensionsClientProcessorsStrategy.disposeProcessor(processor))
         .toFuture();
   }
 
@@ -88,17 +88,17 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
       throws MuleException {
     OperationMessageProcessor processor =
-        operationMessageProcessorStrategy.getOperationMessageProcessor(extension, operation, params);
+        extensionsClientProcessorsStrategy.getOperationMessageProcessor(extension, operation, params);
     try {
-      CoreEvent process = processor.process(operationMessageProcessorStrategy.getEvent(params));
+      CoreEvent process = processor.process(extensionsClientProcessorsStrategy.getEvent(params));
       return Result.<T, A>builder(process.getMessage()).build();
     } finally {
-      operationMessageProcessorStrategy.disposeProcessor(processor);
+      extensionsClientProcessorsStrategy.disposeProcessor(processor);
     }
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    this.operationMessageProcessorStrategy = operationMessageProcessorStrategyFactory.create(event);
+    this.extensionsClientProcessorsStrategy = operationMessageProcessorStrategyFactory.create(event);
   }
 }

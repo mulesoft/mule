@@ -16,18 +16,19 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
- * {@link OperationMessageProcessorStrategy} that creates a new {@link OperationMessageProcessor} for each execution.
+ * {@link ExtensionsClientProcessorsStrategy} that creates a new {@link OperationMessageProcessor} for each execution.
  * 
  * @since 4.1.6
  */
-public class NonCachedOperationMessageProcessorStrategy extends AbstractOperationMessageProcessorStrategy {
+public class NonCachedExtensionsClientProcessorsStrategy extends AbstractExtensionsClientProcessorsStrategy {
 
   /**
    * Creates a new instance
    */
-  public NonCachedOperationMessageProcessorStrategy(ExtensionManager extensionManager, Registry registry, MuleContext muleContext,
-                                                    PolicyManager policyManager, ReflectionCache reflectionCache,
-                                                    CoreEvent event) {
+  public NonCachedExtensionsClientProcessorsStrategy(ExtensionManager extensionManager, Registry registry,
+                                                     MuleContext muleContext,
+                                                     PolicyManager policyManager, ReflectionCache reflectionCache,
+                                                     CoreEvent event) {
     super(extensionManager, registry, muleContext, policyManager, reflectionCache, event);
   }
 

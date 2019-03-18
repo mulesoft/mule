@@ -36,12 +36,12 @@ import java.util.stream.Collectors;
 import com.github.benmanes.caffeine.cache.Cache;
 
 /**
- * {@link OperationMessageProcessorStrategy} that reuses instances of {@link OperationMessageProcessor} for executions when
+ * {@link ExtensionsClientProcessorsStrategy} that reuses instances of {@link OperationMessageProcessor} for executions when
  * possible.
  *
  * @since 4.1.6
  */
-public class CachedOperationMessageProcessorStrategy extends AbstractOperationMessageProcessorStrategy {
+public class CachedExtensionsClientProcessorsStrategy extends AbstractExtensionsClientProcessorsStrategy {
 
   private static String INTERNAL_VARIABLE_PREFIX = "INTERNAL_VARIABLE_";
 
@@ -50,9 +50,9 @@ public class CachedOperationMessageProcessorStrategy extends AbstractOperationMe
   /**
    * Creates a new instance
    */
-  public CachedOperationMessageProcessorStrategy(ExtensionManager extensionManager, Registry registry, MuleContext muleContext,
-                                                 PolicyManager policyManager, ReflectionCache reflectionCache, CoreEvent event,
-                                                 Cache<String, OperationMessageProcessor> operationMessageProcessorCache) {
+  public CachedExtensionsClientProcessorsStrategy(ExtensionManager extensionManager, Registry registry, MuleContext muleContext,
+                                                  PolicyManager policyManager, ReflectionCache reflectionCache, CoreEvent event,
+                                                  Cache<String, OperationMessageProcessor> operationMessageProcessorCache) {
     super(extensionManager, registry, muleContext, policyManager, reflectionCache, event);
     this.operationMessageProcessorCache = operationMessageProcessorCache;
   }

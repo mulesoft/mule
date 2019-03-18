@@ -17,7 +17,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
  * @since 4.1.6
  */
 @NoImplement
-public interface OperationMessageProcessorStrategy {
+public interface ExtensionsClientProcessorsStrategy {
 
   /**
    * Returns the appropiate {@link OperationMessageProcessor} to be used for executing the operation.

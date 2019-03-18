@@ -28,7 +28,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import javax.inject.Inject;
 
 /**
- * Class that provides a {@link OperationMessageProcessorStrategy} according to the value of the system property
+ * Class that provides a {@link ExtensionsClientProcessorsStrategy} according to the value of the system property
  * MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED defined in {@link org.mule.runtime.api.util.MuleSystemProperties}
  *
  * @since 4.1.6
@@ -61,14 +61,14 @@ public class OperationMessageProcessorStrategyFactory implements Initialisable, 
   }
 
   /**
-   * This method return the suitable {@link OperationMessageProcessorStrategy}
+   * This method return the suitable {@link ExtensionsClientProcessorsStrategy}
    */
-  public OperationMessageProcessorStrategy create(CoreEvent event) {
+  public ExtensionsClientProcessorsStrategy create(CoreEvent event) {
     return usesCachedStrategy
-        ? new CachedOperationMessageProcessorStrategy(extensionManager, registry, muleContext, policyManager, reflectionCache,
-                                                      event, operationMessageProcessorCache)
-        : new NonCachedOperationMessageProcessorStrategy(extensionManager, registry, muleContext, policyManager, reflectionCache,
-                                                         event);
+        ? new CachedExtensionsClientProcessorsStrategy(extensionManager, registry, muleContext, policyManager, reflectionCache,
+                                                       event, operationMessageProcessorCache)
+        : new NonCachedExtensionsClientProcessorsStrategy(extensionManager, registry, muleContext, policyManager, reflectionCache,
+                                                          event);
   }
 
   @Override

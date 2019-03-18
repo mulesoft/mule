@@ -41,28 +41,28 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Abstract base class that hold useful logic to implement a {@link OperationMessageProcessorStrategy}
+ * Abstract base class that hold useful logic to implement a {@link ExtensionsClientProcessorsStrategy}
  *
  * @since 4.1.6
  */
-public abstract class AbstractOperationMessageProcessorStrategy implements OperationMessageProcessorStrategy {
+public abstract class AbstractExtensionsClientProcessorsStrategy implements ExtensionsClientProcessorsStrategy {
 
   protected final TemplateParser parser = TemplateParser.createMuleStyleParser();
 
-  protected ExtensionManager extensionManager;
-  protected Registry registry;
-  protected MuleContext muleContext;
-  protected ReflectionCache reflectionCache;
-  protected PolicyManager policyManager;
-  protected CoreEvent event;
+  protected final ExtensionManager extensionManager;
+  protected final Registry registry;
+  protected final MuleContext muleContext;
+  protected final ReflectionCache reflectionCache;
+  protected final PolicyManager policyManager;
+  protected final CoreEvent event;
 
 
   /**
    * Creates a new instance
    */
-  public AbstractOperationMessageProcessorStrategy(ExtensionManager extensionManager, Registry registry, MuleContext muleContext,
-                                                   PolicyManager policyManager, ReflectionCache reflectionCache,
-                                                   CoreEvent event) {
+  public AbstractExtensionsClientProcessorsStrategy(ExtensionManager extensionManager, Registry registry, MuleContext muleContext,
+                                                    PolicyManager policyManager, ReflectionCache reflectionCache,
+                                                    CoreEvent event) {
     this.extensionManager = extensionManager;
     this.registry = registry;
     this.muleContext = muleContext;
