@@ -9,6 +9,7 @@ package org.mule.test.petstore.extension;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -30,7 +31,6 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -54,10 +54,16 @@ public class PetStoreOperations {
   public static boolean shouldFailWithConnectionException;
   public static AtomicInteger operationExecutionCounter = new AtomicInteger(0);
 
+
   @MediaType(ANY)
   public void scopeWithMuleStereotype(@AllowedStereotypes(ValidatorStereotype.class) Chain validators,
                                       CompletionCallback<String, String> completionCallback) {
     completionCallback.success((Result.<String, String>builder().output("Ok").attributes("Attributes").build()));
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String echoWithSignature(String message) {
+    return message + " echoed by Petstore";
   }
 
   public List<String> getPets(@Connection PetStoreClient client,
