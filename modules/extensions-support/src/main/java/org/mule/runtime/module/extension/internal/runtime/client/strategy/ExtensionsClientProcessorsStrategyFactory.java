@@ -33,7 +33,7 @@ import javax.inject.Inject;
  *
  * @since 4.1.6
  */
-public class OperationMessageProcessorStrategyFactory implements Initialisable, Disposable {
+public class ExtensionsClientProcessorsStrategyFactory implements Initialisable, Disposable {
 
   private static int MAX_CACHE_SIZE = 100;
   private static int CACHE_ENTRY_EXPIRE_AFTER_ACCESS_IN_MINUTES = 10;
@@ -56,7 +56,7 @@ public class OperationMessageProcessorStrategyFactory implements Initialisable, 
   @Inject
   private ReflectionCache reflectionCache;
 
-  public OperationMessageProcessorStrategyFactory() {
+  public ExtensionsClientProcessorsStrategyFactory() {
 
   }
 

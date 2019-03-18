@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.client.DefaultExtensionsClient;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategyFactory;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 
 import java.util.function.Supplier;
 
@@ -26,10 +26,10 @@ import java.util.function.Supplier;
  */
 public class ExtensionsClientArgumentResolver implements ArgumentResolver<ExtensionsClient> {
 
-  private final OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory;
+  private final ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
 
-  public ExtensionsClientArgumentResolver(OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory) {
-    this.operationMessageProcessorStrategyFactory = operationMessageProcessorStrategyFactory;
+  public ExtensionsClientArgumentResolver(ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory) {
+    this.extensionsClientProcessorsStrategyFactory = extensionsClientProcessorsStrategyFactory;
   }
 
   @Override
@@ -37,7 +37,7 @@ public class ExtensionsClientArgumentResolver implements ArgumentResolver<Extens
     return () -> {
       ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
       DefaultExtensionsClient extensionClient =
-          new DefaultExtensionsClient(cxt.getEvent(), operationMessageProcessorStrategyFactory);
+          new DefaultExtensionsClient(cxt.getEvent(), extensionsClientProcessorsStrategyFactory);
       try {
         extensionClient.initialise();
       } catch (InitialisationException e) {

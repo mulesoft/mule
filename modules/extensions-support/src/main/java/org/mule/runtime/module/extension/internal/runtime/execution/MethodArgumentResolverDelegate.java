@@ -46,7 +46,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategyFactory;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.BackPressureContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
@@ -97,7 +97,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private ReflectionCache reflectionCache;
 
   @Inject
-  private OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory;
+  private ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
 
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
@@ -191,7 +191,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (CompletionCallback.class.equals(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (ExtensionsClient.class.equals(parameterType)) {
-        argumentResolver = new ExtensionsClientArgumentResolver(operationMessageProcessorStrategyFactory);
+        argumentResolver = new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory);
       } else if (RouterCompletionCallback.class.equals(parameterType)) {
         argumentResolver = ROUTER_CALLBACK_ARGUMENT_RESOLVER;
       } else if (VoidCompletionCallback.class.equals(parameterType)) {

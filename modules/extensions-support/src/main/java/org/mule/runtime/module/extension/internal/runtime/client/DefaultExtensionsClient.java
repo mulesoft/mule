@@ -19,7 +19,7 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategy;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategyFactory;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 
 import java.util.concurrent.CompletableFuture;
@@ -40,7 +40,7 @@ import javax.inject.Inject;
 public final class DefaultExtensionsClient implements ExtensionsClient, Initialisable {
 
   @Inject
-  private OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory;
+  private ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
 
   private final CoreEvent event;
 
@@ -52,12 +52,12 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
    * {@link ExtensionsClient} receives.
    *
    * @param event the current execution event.
-   * @param operationMessageProcessorStrategyFactory the factory used to get the appropriate operation message processor strategy
+   * @param extensionsClientProcessorsStrategyFactory the factory used to get the appropriate operation message processor strategy
    */
   public DefaultExtensionsClient(CoreEvent event,
-                                 OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory) {
+                                 ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory) {
     this.event = event;
-    this.operationMessageProcessorStrategyFactory = operationMessageProcessorStrategyFactory;
+    this.extensionsClientProcessorsStrategyFactory = extensionsClientProcessorsStrategyFactory;
   }
 
   /**
@@ -99,6 +99,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Override
   public void initialise() throws InitialisationException {
-    this.extensionsClientProcessorsStrategy = operationMessageProcessorStrategyFactory.create(event);
+    this.extensionsClientProcessorsStrategy = extensionsClientProcessorsStrategyFactory.create(event);
   }
 }

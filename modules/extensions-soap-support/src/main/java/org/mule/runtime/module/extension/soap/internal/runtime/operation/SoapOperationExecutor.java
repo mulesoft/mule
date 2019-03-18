@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
-import org.mule.runtime.module.extension.internal.runtime.client.strategy.OperationMessageProcessorStrategyFactory;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExtensionsClientArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
@@ -64,7 +64,7 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
   private TransformationService transformationService;
 
   @Inject
-  private OperationMessageProcessorStrategyFactory operationMessageProcessorStrategyFactory;
+  private ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
 
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
   private final StreamingHelperArgumentResolver streamingHelperArgumentResolver = new StreamingHelperArgumentResolver();
@@ -99,7 +99,7 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
   }
 
   public void initialise() {
-    this.extensionsClientArgumentResolver = new ExtensionsClientArgumentResolver(operationMessageProcessorStrategyFactory);
+    this.extensionsClientArgumentResolver = new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory);
   }
 
   /**
