@@ -6,44 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client;
 
-import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.rx.Exceptions;
-import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.internal.client.ComplexParameter;
-import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategy;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -59,43 +37,27 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public final class DefaultExtensionsClient implements ExtensionsClient {
-
-  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
+public final class DefaultExtensionsClient implements ExtensionsClient, Initialisable {
 
   @Inject
-  private MuleContext muleContext;
-
-  @Inject
-  private Registry registry;
-
-  @Inject
-  private PolicyManager policyManager;
-
-  @Inject
-  private ExtensionManager extensionManager;
-
-  @Inject
-  private ReflectionCache reflectionCache;
+  private ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
 
   private final CoreEvent event;
 
+  private ExtensionsClientProcessorsStrategy extensionsClientProcessorsStrategy;
+
   /**
    * This constructor enables the {@link DefaultExtensionsClient} to be aware of the current execution {@link CoreEvent} and
-   * enables to perform the dynamic operation execution with the same event that the SDK operation using the {@link ExtensionsClient}
-   * receives.
+   * enables to perform the dynamic operation execution with the same event that the SDK operation using the
+   * {@link ExtensionsClient} receives.
    *
-   * @param muleContext   the current context.
-   * @param event         the current execution event.
-   * @param registry      the application registry.
-   * @param policyManager the configured application policy manager.
+   * @param event the current execution event.
+   * @param extensionsClientProcessorsStrategyFactory the factory used to get the appropriate operation message processor strategy
    */
-  public DefaultExtensionsClient(MuleContext muleContext, CoreEvent event, Registry registry, PolicyManager policyManager) {
-    this.muleContext = muleContext;
+  public DefaultExtensionsClient(CoreEvent event,
+                                 ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory) {
     this.event = event;
-    this.extensionManager = muleContext.getExtensionManager();
-    this.registry = registry;
-    this.policyManager = policyManager;
+    this.extensionsClientProcessorsStrategyFactory = extensionsClientProcessorsStrategyFactory;
   }
 
   /**
@@ -110,118 +72,33 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
    */
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
-    OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-    return just(getEvent()).transform(processor)
+    OperationMessageProcessor processor =
+        extensionsClientProcessorsStrategy.getOperationMessageProcessor(extension, operation, parameters);
+    return just(extensionsClientProcessorsStrategy.getEvent(parameters)).transform(processor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate(() -> disposeProcessor(processor)).toFuture();
-  }
-
-  @Override
-  public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
-      throws MuleException {
-    OperationMessageProcessor processor = createProcessor(extension, operation, params);
-    try {
-      CoreEvent process = processor.process(getEvent());
-      return Result.<T, A>builder(process.getMessage()).build();
-    } finally {
-      disposeProcessor(processor);
-    }
+        .doAfterTerminate(() -> extensionsClientProcessorsStrategy.disposeProcessor(processor))
+        .toFuture();
   }
 
   /**
-   * Creates a new {@link OperationMessageProcessor} for the required operation and parses all the parameters passed by the client
-   * user.
+   * {@inheritDoc}
    */
-  private OperationMessageProcessor createProcessor(String extensionName, String operationName, OperationParameters parameters) {
-    ExtensionModel extension = findExtension(extensionName);
-    OperationModel operation = findOperation(extension, operationName);
-    ConfigurationProvider config = parameters.getConfigName().map(this::findConfiguration).orElse(null);
-    Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), getEvent());
+  @Override
+  public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
+      throws MuleException {
+    OperationMessageProcessor processor =
+        extensionsClientProcessorsStrategy.getOperationMessageProcessor(extension, operation, params);
     try {
-      OperationMessageProcessor processor =
-          new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
-              .setConfigurationProvider(config)
-              .setParameters(resolvedParams)
-              .build();
-
-      initialiseIfNeeded(processor, muleContext);
-      processor.start();
-      return processor;
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create Operation Message Processor"), e);
+      CoreEvent process = processor.process(extensionsClientProcessorsStrategy.getEvent(params));
+      return Result.<T, A>builder(process.getMessage()).build();
+    } finally {
+      extensionsClientProcessorsStrategy.disposeProcessor(processor);
     }
   }
 
-  private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, CoreEvent event) {
-    LinkedHashMap<String, ValueResolver> values = new LinkedHashMap<>();
-    parameters.forEach((name, value) -> {
-      if (value instanceof ComplexParameter) {
-        ComplexParameter complex = (ComplexParameter) value;
-        DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType(), reflectionCache);
-        resolveParameters(complex.getParameters(), event).forEach((propertyName, valueResolver) -> {
-          try {
-            initialiseIfNeeded(valueResolver, true, muleContext);
-            builder.addPropertyResolver(propertyName, valueResolver);
-          } catch (InitialisationException e) {
-            throw new MuleRuntimeException(e);
-          }
-        });
-        try {
-          values.put(name, new StaticValueResolver<>(builder.build(from(event))));
-        } catch (MuleException e) {
-          throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", name)), e);
-        }
-      } else {
-        if (value instanceof String && parser.isContainsTemplate((String) value)) {
-          values.put(name, new ExpressionValueResolver((String) value));
-        } else {
-          values.put(name, new StaticValueResolver<>(value));
-        }
-      }
-    });
-    return values;
-  }
-
-  private OperationModel findOperation(ExtensionModel extensionModel, String operationName) {
-    Reference<OperationModel> operation = new Reference<>();
-    ExtensionWalker walker = new IdempotentExtensionWalker() {
-
-      @Override
-      protected void onOperation(OperationModel operationModel) {
-        if (operationName.equals(operationModel.getName())) {
-          operation.set(operationModel);
-          stop();
-        }
-      }
-    };
-    walker.walk(extensionModel);
-    if (operation.get() == null) {
-      throw new MuleRuntimeException(createStaticMessage("No Operation [" + operationName + "] Found"));
-    }
-    return operation.get();
-  }
-
-  private ConfigurationProvider findConfiguration(String configName) {
-    return extensionManager.getConfigurationProvider(configName)
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No configuration [" + configName + "] found")));
-  }
-
-  private ExtensionModel findExtension(String extensionName) {
-    return extensionManager.getExtension(extensionName)
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No Extension [" + extensionName + "] Found")));
-  }
-
-  private void disposeProcessor(OperationMessageProcessor processor) {
-    try {
-      processor.stop();
-      processor.dispose();
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Error while disposing the executing operation"), e);
-    }
-  }
-
-  private CoreEvent getEvent() {
-    return event == null ? getInitialiserEvent() : event;
+  @Override
+  public void initialise() throws InitialisationException {
+    this.extensionsClientProcessorsStrategy = extensionsClientProcessorsStrategyFactory.create(event);
   }
 }
