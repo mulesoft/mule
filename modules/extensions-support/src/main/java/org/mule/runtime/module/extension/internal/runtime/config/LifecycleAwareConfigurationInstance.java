@@ -200,7 +200,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
         if (lock != null) {
           final boolean lockAcquired = lock.tryLock();
           if (lockAcquired) {
-            LOGGER.info("Doing testConnectivity() for config " + getName());
+            LOGGER.debug("Doing testConnectivity() for config '{}'", getName());
             try {
               ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
               if (result.isValid()) {
@@ -213,7 +213,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
                 } else {
                   if (LOGGER.isInfoEnabled()) {
                     LOGGER
-                        .info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: ",
+                        .info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: %s",
                                      getName(), result.getMessage()),
                               result.getException());
                   }
@@ -223,7 +223,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
               lock.unlock();
             }
           } else {
-            LOGGER.warn("There is a testConnectivity() already running for config " + getName());
+            LOGGER.warn("There is a testConnectivity() already running for config '{}'", getName());
           }
         }
       }
