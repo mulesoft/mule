@@ -344,7 +344,7 @@ public class MessageProcessors {
 
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       boolean completeParentIfEmpty, BaseEventContext child) {
-    MonoSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new MonoSinkRecorder<>();
+    MonoSinkRecorder<CoreEvent> errorSwitchSinkSinkRef = new MonoSinkRecorder<>();
 
     return Mono.<CoreEvent>create(sink -> {
       final CoreEvent eventChildCtx = quickCopy(child, event);
@@ -356,19 +356,15 @@ public class MessageProcessors {
         .toProcessor()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
-            .map(result -> result.reduce(me -> {
-              throw propagateWrappingFatal(me);
-            }, response -> response))
-            .toProcessor())
-        .map(MessageProcessors::toParentContext);
+        .switchIfEmpty(Mono.<CoreEvent>create(errorSwitchSinkSinkRef).toProcessor())
+        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,
                                                                     ReactiveProcessor processor,
                                                                     boolean completeParentIfEmpty) {
-    FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
-    Set<BaseEventContext> seenContexts = Collections.newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
+    FluxSinkRecorder<CoreEvent> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+    Set<BaseEventContext> seenContexts = Collections.newSetFromMap(new WeakHashMap<>());
 
     return Flux.from(eventChildCtxPub)
         .doOnNext(eventChildCtx -> {
@@ -377,32 +373,26 @@ public class MessageProcessors {
         })
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .map(event -> right(MessagingException.class, event))
-        // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux, it will be
-        // cancelled, ignoring the onErrorcontinue of the parent Flux.
-        .mergeWith(Flux.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef))
-        .map(result -> result.reduce(me -> {
-          throw propagateWrappingFatal(me);
-        }, response -> response))
+        .mergeWith(Flux.create(errorSwitchSinkSinkRef))
         .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
-        .map(MessageProcessors::toParentContext);
+        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
   }
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,
-                                                  SinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef,
+                                                  SinkRecorderToReactorSinkAdapter<CoreEvent> errorSwitchSinkSinkRef,
                                                   boolean completeParentIfEmpty) {
     ((BaseEventContext) eventChildCtx.getContext()).onResponse((response, throwable) -> {
       try {
         if (throwable != null) {
           final MessagingException error = (MessagingException) throwable;
-          errorSwitchSinkSinkRef.next(left(new MessagingException(toParentContext(error.getEvent()), error)));
+          errorSwitchSinkSinkRef.error(new MessagingException(toParentContext(error.getEvent()), error));
         } else if (response == null && completeParentIfEmpty) {
           getParentContext(eventChildCtx).success();
           errorSwitchSinkSinkRef.next();
         } else if (response == null) {
           errorSwitchSinkSinkRef.next();
         } else {
-          errorSwitchSinkSinkRef.next(right(response));
+          errorSwitchSinkSinkRef.next(response);
         }
       } catch (Exception e) {
         LOGGER.error("Uncaught exception in childContextResponseHandler", e);
