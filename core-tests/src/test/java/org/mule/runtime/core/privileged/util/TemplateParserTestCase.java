@@ -360,7 +360,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   @Test
   public void muleParserWithValueWithSharps() {
     TemplateParser tp = createMuleStyleParser();
-      final String expression = "#[hello mule]";
+    final String expression = "#[hello mule]";
     String expectedResult = "sarasa # sarasa2";
     assertTrue(tp.isValid(expression));
 
