@@ -24,6 +24,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -58,7 +60,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
-  public static final String POLICY_STATE_EVENT = "policy.beforeNextEvent";
+  public static final String POLICY_VARS = "policy.vars.%s";
   public static final String POLICY_NEXT_EVENT_CTX_IDS = "policy.next.eventCtxIds";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
 
@@ -93,29 +95,31 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return from(publisher)
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
-        .flatMap(event -> subscriberContext()
-            .flatMap(ctx -> just(ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
-                ? policyEventConverter.createEvent((PrivilegedEvent) event,
-                                                   getOriginalEvent(event),
-                                                   builder -> saveState(builder, event),
-                                                   (boolean) ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
-                : policyEventConverter.createEvent((PrivilegedEvent) event,
-                                                   getOriginalEvent(event),
-                                                   builder -> saveState(builder, event)))))
         .doOnNext(event -> {
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
         })
         .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> eventPub.transform(ctx.get(POLICY_NEXT_OPERATION)).cast(CoreEvent.class)))
+            .flatMapMany(ctx -> eventPub
+                .flatMap(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                    ? just(policyEventConverter.createEvent((PrivilegedEvent) event,
+                                                            getOriginalEvent(event),
+                                                            builder -> saveState(builder, event),
+                                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)))
+                    : just(policyEventConverter.createEvent((PrivilegedEvent) event,
+                                                            getOriginalEvent(event),
+                                                            builder -> saveState(builder, event))))
+                .cast(CoreEvent.class)
+                .transform(ctx.get(POLICY_NEXT_OPERATION))
+                .cast(CoreEvent.class)))
         .doOnNext(coreEvent -> {
           notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
           pushAfterNextFlowStackElement().accept(coreEvent);
           logExecuteNextEvent("After execute-next", coreEvent.getContext(), coreEvent.getMessage(),
                               this.muleContext.getConfiguration().getId());
         })
-        .map(result -> (CoreEvent) policyEventConverter.createEvent((PrivilegedEvent) result,
-                                                                    loadState((PrivilegedEvent) result)))
+        .map(result -> (CoreEvent) policyEventConverter.restoreVariables((PrivilegedEvent) result,
+                                                                         loadVars((PrivilegedEvent) result)))
         .onErrorContinue(MessagingException.class, (error, ev) -> {
           final CoreEvent event = ((MessagingException) error).getEvent();
 
@@ -124,8 +128,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
             notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
             pushAfterNextFlowStackElement().accept(me.getEvent());
 
-            me.setProcessedEvent(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
-                                                                  loadState((PrivilegedEvent) me.getEvent())));
+            me.setProcessedEvent(policyEventConverter.restoreVariables((PrivilegedEvent) me.getEvent(),
+                                                                       loadVars((PrivilegedEvent) me.getEvent())));
 
             ((BaseEventContext) event.getContext()).error(error);
           }
@@ -136,10 +140,14 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
 
     return ((InternalEvent.Builder) builder)
-        .addInternalParameter(POLICY_STATE_EVENT, event)
+        .addInternalParameter(policyVarsInternalParameterName(), event.getVariables())
         .addInternalParameter(POLICY_NEXT_EVENT_CTX_IDS, eventCtxIds == null
             ? singleton(event.getContext().getId())
             : ImmutableSet.builder().addAll(eventCtxIds).add(event.getContext().getId()).build());
+  }
+
+  private String policyVarsInternalParameterName() {
+    return String.format(POLICY_VARS, muleContext.getConfiguration().getId());
   }
 
   private boolean isEventContextHandledByThisNext(CoreEvent event) {
@@ -157,8 +165,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     }
   }
 
-  private PrivilegedEvent loadState(PrivilegedEvent event) {
-    return ((InternalEvent) event).getInternalParameter(POLICY_STATE_EVENT);
+  private Map<String, TypedValue<?>> loadVars(PrivilegedEvent event) {
+    return ((InternalEvent) event).getInternalParameter(policyVarsInternalParameterName());
   }
 
   @Override

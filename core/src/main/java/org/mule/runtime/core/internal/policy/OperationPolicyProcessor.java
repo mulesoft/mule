@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static org.mule.runtime.core.internal.policy.CompositeOperationPolicy.POLICY_OPERATION_NEXT_OPERATION_RESPONSE;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
-import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_STATE_EVENT;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_VARS;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -24,6 +26,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -69,11 +72,12 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
     return from(publisher)
         .cast(InternalEvent.class)
         .map(operationEvent -> {
-          PrivilegedEvent latestPolicyState = operationEvent.getInternalParameter(POLICY_STATE_EVENT);
-          if (latestPolicyState != null) {
-            return policyEventConverter.createEvent(operationEvent, latestPolicyState,
-                                                    builder -> ((InternalEvent.Builder) builder)
-                                                        .addInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT, operationEvent));
+          Map<String, TypedValue<?>> policyVars = operationEvent.getInternalParameter(policyVarsInternalParameterName());
+          if (policyVars != null) {
+            return policyEventConverter.restoreVariables(operationEvent, policyVars,
+                                                         builder -> ((InternalEvent.Builder) builder)
+                                                             .addInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT,
+                                                                                   operationEvent));
           } else {
             return InternalEvent.builder(operationEvent)
                 .clearVariables()
@@ -93,15 +97,43 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
         .cast(CoreEvent.class);
   }
 
+  private String policyVarsInternalParameterName() {
+    return String.format(POLICY_VARS, policy.getPolicyId());
+  }
+
   private void manageError(MessagingException messagingException) {
-    messagingException.setProcessedEvent(mapAfterOperationPolicyEvent((PrivilegedEvent) messagingException.getEvent()));
+    messagingException.setProcessedEvent(mapAfterError((PrivilegedEvent) messagingException.getEvent()));
+  }
+
+  private PrivilegedEvent mapAfterError(PrivilegedEvent policyChainResult) {
+    return policyEventConverter.createEvent(policyChainResult, getOriginalEvent(policyChainResult),
+                                            builder -> ((InternalEvent.Builder) builder)
+                                                .addInternalParameter(policyVarsInternalParameterName(),
+                                                                      policyChainResult.getVariables())
+                                                .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE,
+                                                                      policyChainResult));
+
   }
 
   private PrivilegedEvent mapAfterOperationPolicyEvent(PrivilegedEvent policyChainResult) {
-    return policyEventConverter.createEvent(policyChainResult,
-                                            getOriginalEvent(policyChainResult),
-                                            builder -> ((InternalEvent.Builder) builder).addInternalParameter(POLICY_STATE_EVENT,
-                                                                                                              policyChainResult));
+    if (policy.getPolicyChain().isPropagateMessageTransformations()) {
+      return policyEventConverter.createEvent(policyChainResult, getOriginalEvent(policyChainResult),
+                                              builder -> ((InternalEvent.Builder) builder)
+                                                  .addInternalParameter(policyVarsInternalParameterName(),
+                                                                        policyChainResult.getVariables())
+                                                  .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE,
+                                                                        policyChainResult));
+    } else {
+      final InternalEvent nextOperationResponse =
+          ((InternalEvent) policyChainResult).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
+
+      return nextOperationResponse != null ? InternalEvent.builder(policyChainResult)
+          .message(nextOperationResponse.getMessage())
+          .variables(nextOperationResponse.getVariables())
+          .addInternalParameter(policyVarsInternalParameterName(), policyChainResult.getVariables())
+          .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, nextOperationResponse)
+          .build() : policyChainResult;
+    }
   }
 
   private PrivilegedEvent getOriginalEvent(CoreEvent event) {
