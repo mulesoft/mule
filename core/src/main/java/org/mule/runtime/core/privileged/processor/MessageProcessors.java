@@ -375,7 +375,7 @@ public class MessageProcessors {
         .doOnNext(completeSuccessIfNeeded())
         .mergeWith(Flux.create(errorSwitchSinkSinkRef))
         .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
-        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
+        .map(MessageProcessors::toParentContext);
   }
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,
