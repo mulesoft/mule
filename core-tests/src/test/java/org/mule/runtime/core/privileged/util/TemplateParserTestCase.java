@@ -358,6 +358,28 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void muleParserWithValueWithSharps() {
+    TemplateParser tp = createMuleStyleParser();
+      final String expression = "#[hello mule]";
+    String expectedResult = "sarasa # sarasa2";
+    assertTrue(tp.isValid(expression));
+
+    String result = tp.parse(null, expression, token -> "sarasa # sarasa2");
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithValueWithScapedSharps() {
+    TemplateParser tp = createMuleStyleParser();
+    final String expression = "#[hello mule]";
+    String expectedResult = "sarasa \\# sarasa2";
+    assertTrue(tp.isValid(expression));
+
+    String result = tp.parse(null, expression, token -> "sarasa \\\\# sarasa2");
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
   public void muleParserWithExpresionInsideWithoutSharp() {
     TemplateParser tp = createMuleStyleParser();
     final String expression = "#[hello [mule]]";
