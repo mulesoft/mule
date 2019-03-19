@@ -66,7 +66,8 @@
       "requiredClassName": "org.heisenberg.HeisenbergJNI",
       "type": "NATIVE",
       "suggestedCoordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
-      "optional": false
+      "optional": false,
+      "allowDeclarationAsAdditionalDependency": true
     }
   ],
   "importedTypes": [
@@ -1652,7 +1653,8 @@
           "requiredClassName": "org.heisenberg.HeisenbergJNI",
           "type": "NATIVE",
           "suggestedCoordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
-          "optional": false
+          "optional": false,
+          "allowDeclarationAsAdditionalDependency": true
         }
       ],
       "operations": [
@@ -9345,7 +9347,8 @@
               "regexMatcher": "heisenberg.so",
               "requiredClassName": "org.heisenberg.HeisenbergJNI",
               "type": "NATIVE",
-              "optional": false
+              "optional": false,
+              "allowDeclarationAsAdditionalDependency": true
             }
           ],
           "supportsConnectivityTesting": true,
@@ -9724,7 +9727,8 @@
               "regexMatcher": "heisenberg.so",
               "requiredClassName": "org.heisenberg.HeisenbergJNI",
               "type": "NATIVE",
-              "optional": false
+              "optional": false,
+              "allowDeclarationAsAdditionalDependency": true
             }
           ],
           "supportsConnectivityTesting": true,
@@ -28051,7 +28055,8 @@
           "regexMatcher": "heisenberg.so",
           "requiredClassName": "org.heisenberg.HeisenbergJNI",
           "type": "NATIVE",
-          "optional": false
+          "optional": false,
+          "allowDeclarationAsAdditionalDependency": true
         }
       ],
       "supportsConnectivityTesting": true,
@@ -28430,7 +28435,8 @@
           "regexMatcher": "heisenberg.so",
           "requiredClassName": "org.heisenberg.HeisenbergJNI",
           "type": "NATIVE",
-          "optional": false
+          "optional": false,
+          "allowDeclarationAsAdditionalDependency": true
         }
       ],
       "supportsConnectivityTesting": true,
