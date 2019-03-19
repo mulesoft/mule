@@ -184,7 +184,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public Builder clearVariables() {
-    if (!this.flowVariables.isEmpty()) {
+    if (!this.flowVariables.isEmpty() || !this.originalVars.isEmpty()) {
       this.varsModified = true;
       this.modified = true;
       this.flowVariables.clear();

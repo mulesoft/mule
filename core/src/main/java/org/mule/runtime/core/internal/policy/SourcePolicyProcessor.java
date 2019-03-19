@@ -8,10 +8,11 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
-import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_STATE_EVENT;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_VARS;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -23,6 +24,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
 
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -82,10 +84,11 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
         .transform(policy.getPolicyChain().onChainError(t -> {
           MessagingException me = (MessagingException) t;
 
+          String policyVarsInternalParameterName = policyVarsInternalParameterName();
           for (Entry<String, ?> entry : ((InternalEvent) me.getEvent()).getInternalParameters().entrySet()) {
-            if (POLICY_STATE_EVENT.equals(entry.getKey())) {
-              me.setProcessedEvent(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
-                                                                    (PrivilegedEvent) entry.getValue()));
+            if (policyVarsInternalParameterName.equals(entry.getKey())) {
+              me.setProcessedEvent(policyEventConverter.restoreVariables((PrivilegedEvent) me.getEvent(),
+                                                                         (Map<String, TypedValue<?>>) entry.getValue()));
               break;
             }
           }
@@ -94,6 +97,10 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
             .put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS, policy.getPolicyChain().isPropagateMessageTransformations()))
         .cast(PrivilegedEvent.class)
         .map(event -> policyEventConverter.createEvent(event, getOriginalEvent(event)));
+  }
+
+  private String policyVarsInternalParameterName() {
+    return String.format(POLICY_VARS, policy.getPolicyId());
   }
 
   private PrivilegedEvent getOriginalEvent(CoreEvent event) {

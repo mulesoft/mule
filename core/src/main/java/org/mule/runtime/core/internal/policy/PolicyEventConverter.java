@@ -7,11 +7,16 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Consumer;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * Helper class that creates an {@link CoreEvent} maintaining variables from different scopes.
@@ -80,6 +85,25 @@ public class PolicyEventConverter {
     if (!keepMessage) {
       eventBuilder.message(originalEvent.getMessage());
     }
+
+    eventConfigurer.accept(eventBuilder);
+
+    return eventBuilder.build();
+  }
+
+  public PrivilegedEvent restoreVariables(PrivilegedEvent event, Map<String, TypedValue<?>> variables) {
+    PrivilegedEvent.Builder eventBuilder = PrivilegedEvent
+        .builder(event)
+        .variablesTyped(variables != null ? variables : emptyMap());
+
+    return eventBuilder.build();
+  }
+
+  public PrivilegedEvent restoreVariables(PrivilegedEvent event, Map<String, TypedValue<?>> variables,
+                                          Consumer<PrivilegedEvent.Builder> eventConfigurer) {
+    PrivilegedEvent.Builder eventBuilder = PrivilegedEvent
+        .builder(event)
+        .variablesTyped(variables != null ? variables : emptyMap());
 
     eventConfigurer.accept(eventBuilder);
 
