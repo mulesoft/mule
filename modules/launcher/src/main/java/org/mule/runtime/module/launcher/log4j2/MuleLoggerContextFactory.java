@@ -12,7 +12,7 @@ import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelect
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator;
 import org.mule.runtime.module.artifact.api.classloader.LocalResourceLocator;
@@ -78,7 +78,7 @@ public class MuleLoggerContextFactory {
   private URI getArtifactLoggingConfig(ArtifactClassLoader muleCL) {
     URI appLogConfig;
     try {
-      ApplicationDescriptor appDescriptor = muleCL.getArtifactDescriptor();
+      DeployableArtifactDescriptor appDescriptor = muleCL.getArtifactDescriptor();
 
       if (appDescriptor.getLogConfigFile() == null) {
         appLogConfig = getLogConfig(muleCL);
