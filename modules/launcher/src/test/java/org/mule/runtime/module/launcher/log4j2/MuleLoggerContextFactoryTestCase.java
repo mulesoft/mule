@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -40,12 +41,14 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private RegionClassLoader classLoader;
   private ApplicationDescriptor artifactDescriptor;
+  private DomainDescriptor artifactDescriptorDomain;
 
   @Before
   public void before() throws Exception {
     when(classLoader.getArtifactId()).thenReturn(getClass().getName());
     when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
     artifactDescriptor = mock(ApplicationDescriptor.class);
+    artifactDescriptorDomain = mock(DomainDescriptor.class);
     when(classLoader.getArtifactDescriptor()).thenReturn(artifactDescriptor);
   }
 
@@ -69,6 +72,18 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
 
     final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
     assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
+  }
+
+  @Test
+  public void externalConfDomain() throws IOException, URISyntaxException {
+    when(classLoader.getArtifactDescriptor()).thenReturn(artifactDescriptorDomain);
+
+    File customLogConfig = new File(getResource("log4j2-test-custom.xml", getClass()).toURI());
+    assertThat(customLogConfig.exists(), is(true));
+    when(artifactDescriptorDomain.getLogConfigFile()).thenReturn(customLogConfig);
+    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
+    assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
   }
 
   protected MuleLoggerContextFactory mockLoggerContextFactory() throws IOException {
