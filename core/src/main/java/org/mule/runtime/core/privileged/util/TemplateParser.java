@@ -205,7 +205,7 @@ public final class TemplateParser {
     if (original.contains("#")) {
       return processed;
     }
-    return processed.replaceAll("(^|[^\\\\])" + START_EXPRESSION, "\\\\" + START_EXPRESSION);
+    return processed.replaceAll("(^|[^\\\\])" + START_EXPRESSION, "$1\\\\" + START_EXPRESSION);
   }
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
