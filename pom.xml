@@ -172,7 +172,7 @@
         <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
-        <commonsIoVersion>2.4</commonsIoVersion>
+        <commonsIoVersion>2.6</commonsIoVersion>
         <commonsTextVersion>1.1</commonsTextVersion>
         <commonsLangVersion>3.6</commonsLangVersion>
         <commonsNetVersion>3.5</commonsNetVersion>
