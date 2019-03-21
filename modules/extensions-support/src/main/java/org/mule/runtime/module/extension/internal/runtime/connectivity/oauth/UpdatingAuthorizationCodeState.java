@@ -23,14 +23,12 @@ import java.util.function.Consumer;
 public class UpdatingAuthorizationCodeState implements AuthorizationCodeState {
 
   private AuthorizationCodeState delegate;
-  private final Consumer<ResourceOwnerOAuthContext> onUpdate;
 
   public UpdatingAuthorizationCodeState(OAuthConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
     delegate = toAuthorizationCodeState(config, initialContext);
-    this.onUpdate = onUpdate;
     dancer.addListener(new AuthorizationCodeListener() {
 
       @Override
