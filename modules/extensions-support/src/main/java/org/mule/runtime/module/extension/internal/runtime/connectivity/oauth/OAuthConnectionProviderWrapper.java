@@ -68,15 +68,21 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
 
   private void updateAuthState() {
     final ConnectionProvider<C> delegate = getDelegate();
-    authCodeStateSetter.set(delegate, new UpdatingAuthorizationCodeState(oauthConfig, dancer, getContext(), context -> {
-      Map<String, Object> responseParameters = context.getTokenResponseParameters();
-      callbackValues.keySet().forEach(field -> {
-        String key = field.getName();
-        if (responseParameters.containsKey(key)) {
-          new FieldSetter<>(field).set(delegate, responseParameters.get(key));
-        }
-      });
+    ResourceOwnerOAuthContext context = getContext();
+    authCodeStateSetter.set(delegate, new UpdatingAuthorizationCodeState(oauthConfig, dancer, context, updatedContext -> {
+      updateOAuthParameters(delegate, updatedContext);
     }));
+    updateOAuthParameters(delegate, context);
+  }
+
+  private void updateOAuthParameters(ConnectionProvider<C> delegate, ResourceOwnerOAuthContext context) {
+    Map<String, Object> responseParameters = context.getTokenResponseParameters();
+    callbackValues.keySet().forEach(field -> {
+      String key = field.getName();
+      if (responseParameters.containsKey(key)) {
+        new FieldSetter<>(field).set(delegate, responseParameters.get(key));
+      }
+    });
   }
 
   public String getResourceOwnerId() {

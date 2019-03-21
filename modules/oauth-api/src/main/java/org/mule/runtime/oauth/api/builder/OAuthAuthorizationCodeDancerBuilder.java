@@ -147,7 +147,7 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
    * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder beforeDanceCallback(
-      Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> callback);
+                                                          Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> callback);
 
   /**
    * Allows custom code to be run after doing the request to the provided {@code tokenUrl} and processing its results.
@@ -158,7 +158,7 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
    * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder afterDanceCallback(
-      BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> callback);
+                                                         BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> callback);
 
 
   /**
