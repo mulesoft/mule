@@ -7,15 +7,16 @@
 package org.mule;
 
 import static java.util.Arrays.asList;
-
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Setup;
-
 import java.util.List;
 import java.util.Map.Entry;
+
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Setup;
 
 public class MultiMapBenchmark extends AbstractBenchmark {
 
@@ -30,6 +31,7 @@ public class MultiMapBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
+  @OutputTimeUnit(NANOSECONDS)
   public MultiMap<String, String> iteration() {
     MultiMap<String, String> targetMap = new MultiMap<>();
 
@@ -39,11 +41,13 @@ public class MultiMapBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
+  @OutputTimeUnit(NANOSECONDS)
   public List<Entry<String, String>> entryList() {
     return multiMap.entryList();
   }
 
   @Benchmark
+  @OutputTimeUnit(NANOSECONDS)
   public MultiMap<String, String> copyWithKeySet() {
     MultiMap<String, String> targetMap = new MultiMap<>();
 
@@ -55,6 +59,7 @@ public class MultiMapBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
+  @OutputTimeUnit(NANOSECONDS)
   public MultiMap<String, String> copyWithEntryList() {
     MultiMap<String, String> targetMap = new MultiMap<>();
 
@@ -66,11 +71,13 @@ public class MultiMapBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
+  @OutputTimeUnit(NANOSECONDS)
   public CaseInsensitiveMultiMap copy() {
     return new CaseInsensitiveMultiMap(multiMap);
   }
 
   @Benchmark
+  @OutputTimeUnit(NANOSECONDS)
   public CaseInsensitiveMultiMap putAll() {
     CaseInsensitiveMultiMap mm = new CaseInsensitiveMultiMap();
     mm.putAll(multiMap);
