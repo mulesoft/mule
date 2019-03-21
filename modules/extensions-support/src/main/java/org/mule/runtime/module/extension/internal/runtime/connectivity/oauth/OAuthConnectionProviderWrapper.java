@@ -69,9 +69,9 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
   private void updateAuthState() {
     final ConnectionProvider<C> delegate = getDelegate();
     ResourceOwnerOAuthContext context = getContext();
-    authCodeStateSetter.set(delegate, new UpdatingAuthorizationCodeState(oauthConfig, dancer, context, updatedContext ->
-        updateOAuthParameters(delegate, updatedContext)
-    ));
+    authCodeStateSetter
+        .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig, dancer, context,
+                                                          updatedContext -> updateOAuthParameters(delegate, updatedContext)));
     updateOAuthParameters(delegate, context);
   }
 
@@ -96,11 +96,11 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
 
     if (stateFields.size() != 1) {
       throw new IllegalConnectionProviderModelDefinitionException(
-          format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
-                     + "one (and only one) field of type %s. %d were found",
-                 delegate.getClass().getName(),
-                 AuthorizationCodeState.class.getName(),
-                 stateFields.size()));
+                                                                  format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
+                                                                      + "one (and only one) field of type %s. %d were found",
+                                                                         delegate.getClass().getName(),
+                                                                         AuthorizationCodeState.class.getName(),
+                                                                         stateFields.size()));
     }
 
     return new FieldSetter<>(stateFields.get(0));
@@ -109,7 +109,7 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
   private ResourceOwnerOAuthContext getContext() {
     return oauthManager.getOAuthContext(oauthConfig)
         .orElseThrow(() -> new IllegalArgumentException("OAuth authorization dance not yet performed for resourceOwnerId "
-                                                            + oauthConfig.getAuthCodeConfig().getResourceOwnerId()));
+            + oauthConfig.getAuthCodeConfig().getResourceOwnerId()));
   }
 
   @Override

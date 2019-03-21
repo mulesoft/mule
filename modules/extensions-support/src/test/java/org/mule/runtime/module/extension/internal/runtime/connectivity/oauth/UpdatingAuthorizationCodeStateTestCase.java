@@ -60,7 +60,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
                                   new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
                                   emptyMap(),
                                   emptyMap());
-    
+
     when(initialContext.getAccessToken()).thenReturn(ACCESS_TOKEN);
     when(initialContext.getRefreshToken()).thenReturn(REFRESH_TOKEN);
 
