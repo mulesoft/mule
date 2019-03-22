@@ -1,7 +1,57 @@
 {
+  "4.1.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method java.util.concurrent.CompletableFuture<java.lang.Void> org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer::refreshToken(java.lang.String, boolean)",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "methodName": "refreshToken",
+          "elementKind": "method",
+          "justification": "New feature fixes bug"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.oauth.api.builder.AuthorizationCodeListener",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "AuthorizationCodeListener",
+          "elementKind": "interface",
+          "justification": "New feature fixes bug"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer::addListener(org.mule.runtime.oauth.api.builder.AuthorizationCodeListener)",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "methodName": "addListener",
+          "elementKind": "method",
+          "justification": "New feature fixes bug"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer::removeListener(org.mule.runtime.oauth.api.builder.AuthorizationCodeListener)",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "methodName": "removeListener",
+          "elementKind": "method",
+          "justification": "New feature fixes bug"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::addListener(org.mule.runtime.oauth.api.builder.AuthorizationCodeListener)",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "methodName": "addListener",
+          "elementKind": "method",
+          "justification": "New feature fixes bug"
+        }
+      ]
+    }
+  },
   "4.1.4": {
-  	"revapi": {
-  	  "ignore" : [
+    "revapi": {
+      "ignore": [
         {
           "code": "java.method.defaultMethodAddedToInterface",
           "new": "method org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
@@ -11,8 +61,8 @@
           "elementKind": "method",
           "justification": "Needed to fix an issue in the OAuth module. (MULE-15539)"
         }
-  	  ]
-  	}
+      ]
+    }
   },
   "4.1.1": {
     "revapi": {

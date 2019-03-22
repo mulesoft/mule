@@ -8,6 +8,7 @@ package org.mule.runtime.oauth.api;
 
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
@@ -42,6 +43,20 @@ public interface AuthorizationCodeOAuthDancer {
   CompletableFuture<Void> refreshToken(String resourceOwner);
 
   /**
+   * Performs the refresh of the access token.
+   *
+   * @param resourceOwner The resource owner to get the token for.
+   * @param useQueryParameters If the parameters needed to refresh the token should be sent as query parameters. If false, they will be sent encoded in the body of the message.
+   *
+   * @return a completable future that is complete when the token has been refreshed.
+   *
+   * @since 4.2.0
+   */
+  default CompletableFuture<Void> refreshToken(String resourceOwner, boolean useQueryParameters) {
+    return refreshToken(resourceOwner);
+  }
+
+  /**
    * Clears the oauth context for a given user.
    *
    * @param resourceOwnerId id of the user.
@@ -64,5 +79,23 @@ public interface AuthorizationCodeOAuthDancer {
    * @param responseCallback the callback where the response with the redirection to the login/authorization page will be sent
    */
   void handleLocalAuthorizationRequest(HttpRequest request, HttpResponseReadyCallback responseCallback);
+
+  /**
+   * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
+   *
+   * @param listener the {@link AuthorizationCodeListener} to be added
+   * @throws IllegalArgumentException if the {@code listener} is {@code null}
+   * @since 4.2.0
+   */
+  void addListener(AuthorizationCodeListener listener);
+
+  /**
+   * Removes the {@code listener}. Nothing happens if it wasn't part of {@code this} dancer.
+   *
+   * @param listener the {@link AuthorizationCodeListener} to be removed
+   * @throws IllegalArgumentException if the {@code listener} is {@code null}
+   * @since 4.2.0
+   */
+  void removeListener(AuthorizationCodeListener listener);
 
 }
