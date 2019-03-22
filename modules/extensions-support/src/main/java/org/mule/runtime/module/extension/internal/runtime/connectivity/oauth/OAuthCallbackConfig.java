@@ -16,7 +16,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class OAuthCallbackConfig {
+public class OAuthCallbackConfig {
 
   private final String listenerConfig;
   private final String callbackPath;

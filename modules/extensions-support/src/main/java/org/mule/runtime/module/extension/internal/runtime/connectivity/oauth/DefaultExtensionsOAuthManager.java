@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -24,7 +26,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
@@ -57,11 +58,13 @@ import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
+import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -129,9 +132,15 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
    * {@inheritDoc}
    */
   @Override
-  public void register(OAuthConfig config) throws MuleException {
-    dancers.computeIfAbsent(config.getOwnerConfigName(),
-                            (CheckedFunction<String, AuthorizationCodeOAuthDancer>) k -> createDancer(config));
+  public AuthorizationCodeOAuthDancer register(OAuthConfig config) throws MuleException {
+    return register(config, emptyList());
+  }
+
+  @Override
+  public AuthorizationCodeOAuthDancer register(OAuthConfig config, List<AuthorizationCodeListener> listeners) {
+    return dancers.computeIfAbsent(config.getOwnerConfigName(),
+                                   (CheckedFunction<String, AuthorizationCodeOAuthDancer>) k -> createDancer(config, listeners));
+
   }
 
   /**
@@ -178,7 +187,6 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
 
     try {
       dancer.refreshToken(resourceOwnerId).get();
-      connectionProvider.updateAuthState();
     } catch (Exception e) {
       throw new MuleRuntimeException(
                                      createStaticMessage(format("Could not refresh token for resourceOwnerId '%s' using config '%s'",
@@ -207,7 +215,10 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     return of(contextForResourceOwner);
   }
 
-  private AuthorizationCodeOAuthDancer createDancer(OAuthConfig config) throws MuleException {
+  private AuthorizationCodeOAuthDancer createDancer(OAuthConfig config, List<AuthorizationCodeListener> listeners)
+      throws MuleException {
+    checkArgument(listeners != null, "listeners cannot be null");
+
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
         oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> lockFactory.createLock(lockId),
                                                                    new LazyObjectStoreToMapAdapter(
@@ -257,6 +268,8 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     Pair<Optional<Flow>, Optional<Flow>> listenerFlows = getListenerFlows(config);
     listenerFlows.getFirst().ifPresent(flow -> dancerBuilder.beforeDanceCallback(beforeCallback(config, flow)));
     listenerFlows.getSecond().ifPresent(flow -> dancerBuilder.afterDanceCallback(afterCallback(config, flow)));
+
+    listeners.forEach(dancerBuilder::addListener);
 
     AuthorizationCodeOAuthDancer dancer = dancerBuilder.build();
 

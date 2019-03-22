@@ -7,15 +7,14 @@
 package org.mule;
 
 import static java.util.Arrays.asList;
-
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Setup;
-
 import java.util.List;
 import java.util.Map.Entry;
+
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Setup;
 
 public class MultiMapBenchmark extends AbstractBenchmark {
 

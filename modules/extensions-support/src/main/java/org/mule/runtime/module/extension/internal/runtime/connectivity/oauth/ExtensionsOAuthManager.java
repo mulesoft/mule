@@ -7,8 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
+import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -26,7 +29,9 @@ public interface ExtensionsOAuthManager {
    *
    * @param config an {@link OAuthConfig}
    */
-  void register(OAuthConfig config) throws MuleException;
+  AuthorizationCodeOAuthDancer register(OAuthConfig config) throws MuleException;
+
+  AuthorizationCodeOAuthDancer register(OAuthConfig config, List<AuthorizationCodeListener> listeners);
 
   /**
    * Invalidates the OAuth information of a particular resourceOwnerId
