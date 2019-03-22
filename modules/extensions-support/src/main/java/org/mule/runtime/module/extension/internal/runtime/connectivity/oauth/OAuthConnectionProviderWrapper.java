@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -19,10 +18,11 @@ import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
+import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
+import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
@@ -45,6 +45,8 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
   private final FieldSetter<ConnectionProvider<C>, AuthorizationCodeState> authCodeStateSetter;
   private final RunOnce dance;
 
+  private AuthorizationCodeOAuthDancer dancer;
+
   public OAuthConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                         OAuthConfig oauthConfig,
                                         Map<Field, String> callbackValues,
@@ -64,12 +66,16 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
     return super.connect();
   }
 
-  public void updateAuthState() {
-    ResourceOwnerOAuthContext context = getContext();
-
+  private void updateAuthState() {
     final ConnectionProvider<C> delegate = getDelegate();
-    authCodeStateSetter.set(delegate, toAuthorizationCodeState(oauthConfig, context));
+    ResourceOwnerOAuthContext context = getContext();
+    authCodeStateSetter
+        .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig, dancer, context,
+                                                          updatedContext -> updateOAuthParameters(delegate, updatedContext)));
+    updateOAuthParameters(delegate, context);
+  }
 
+  private void updateOAuthParameters(ConnectionProvider<C> delegate, ResourceOwnerOAuthContext context) {
     Map<String, Object> responseParameters = context.getTokenResponseParameters();
     callbackValues.keySet().forEach(field -> {
       String key = field.getName();
@@ -108,7 +114,7 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
 
   @Override
   public void start() throws MuleException {
-    oauthManager.register(oauthConfig);
+    dancer = oauthManager.register(oauthConfig);
     super.start();
   }
 }
