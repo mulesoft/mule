@@ -28,6 +28,17 @@
           "methodName": "addListener",
           "elementKind": "method",
           "justification": "New feature fixes bug"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.OAuthService",
+          "new": "interface org.mule.runtime.oauth.api.OAuthService",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "OAuthService",
+          "elementKind": "interface",
+          "justification": "All services APIs should be annotated with NoImplement."
         }
       ]
     }
@@ -43,6 +54,17 @@
           "methodName": "encodeClientCredentialsInBody",
           "elementKind": "method",
           "justification": "Needed to fix an issue in the OAuth module. (MULE-15539)"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.OAuthService",
+          "new": "interface org.mule.runtime.oauth.api.OAuthService",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "OAuthService",
+          "elementKind": "interface",
+          "justification": "All services APIs should be annotated with NoImplement."
         }
       ]
     }
@@ -82,6 +104,17 @@
           "classSimpleName": "TokenUrlResponseException",
           "elementKind": "class",
           "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.OAuthService",
+          "new": "interface org.mule.runtime.oauth.api.OAuthService",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "OAuthService",
+          "elementKind": "interface",
+          "justification": "All services APIs should be annotated with NoImplement."
         }
       ]
     }
