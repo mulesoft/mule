@@ -11,7 +11,7 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
-                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
 
     <xsd:element name="missing" type="abstractBeanType"/>
     <xsd:element name="named" type="dynamicNamedType"/>
