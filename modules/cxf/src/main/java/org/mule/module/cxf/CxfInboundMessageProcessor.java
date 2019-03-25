@@ -6,45 +6,16 @@
  */
 package org.mule.module.cxf;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getBasePath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
 import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
 import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_CLIENT_SSL_SESSION;
 import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
 import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_CLIENT_SSL_SESSION;
-
-import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.endpoint.EndpointNotFoundException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.NonBlockingReplyToHandler;
-import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.ReplyToHandler;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.module.cxf.support.DelegatingOutputStream;
-import org.mule.module.cxf.transport.MuleUniversalDestination;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.internal.listener.properties.SSLSessionProperties;
-import org.mule.module.xml.stax.StaxSource;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
-import org.mule.transport.http.HttpConnector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -57,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import javax.net.ssl.SSLSession;
 import javax.xml.stream.XMLStreamReader;
@@ -84,6 +56,34 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.wsdl.http.AddressType;
+import org.mule.DefaultMuleEvent;
+import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.OptimizedRequestContext;
+import org.mule.VoidMuleEvent;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.NonBlockingSupported;
+import org.mule.api.endpoint.EndpointNotFoundException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.NonBlockingReplyToHandler;
+import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.ReplyToHandler;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.message.DefaultExceptionPayload;
+import org.mule.module.cxf.support.DelegatingOutputStream;
+import org.mule.module.cxf.transport.MuleUniversalDestination;
+import org.mule.module.http.internal.listener.properties.SSLSessionProperties;
+import org.mule.module.xml.stax.StaxSource;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpConnector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -269,6 +269,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                         {
                             // CXF execution chain was suspended, so we need to resume it.
                             // The MuleInvoker component will be recalled, by using the CxfConstants.NON_BLOCKING_RESPONSE flag we force using the received response event instead of re-invoke the flow
+                            CountDownLatch countDownLatch = (CountDownLatch) exchange.get(CxfConstants.NON_BLOCKING_LATCH);
+                            countDownLatch.await(1000, SECONDS);
                             exchange.put(CxfConstants.MULE_EVENT, responseEvent);
                             exchange.put(CxfConstants.NON_BLOCKING_RESPONSE, true);
                             exchange.getInMessage().getInterceptorChain().resume();
@@ -287,6 +289,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                             returnMessage.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
                             responseEvent.setMessage(returnMessage);
                             processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
+                        }
+                        finally
+                        {
+                            exchange.put(CxfConstants.NON_BLOCKING_LATCH, new CountDownLatch(1));
                         }
                     }
 
@@ -444,6 +450,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             {
                 throw e;
             }
+            
+            CountDownLatch nonBlockingLatch = (CountDownLatch) exchange.get(CxfConstants.NON_BLOCKING_LATCH);
+            nonBlockingLatch.countDown();
         }
         finally
         {
