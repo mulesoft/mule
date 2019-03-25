@@ -19,10 +19,12 @@ import org.mule.config.ExceptionHelper;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
+import org.mule.util.concurrent.Latch;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.script.ScriptException;
 import javax.xml.stream.XMLStreamReader;
@@ -57,6 +59,9 @@ public class MuleInvoker implements Invoker
     {
         // this is the original request. Keep it to copy all the message properties from it
         final MuleEvent event = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+        
+        exchange.put(CxfConstants.NON_BLOCKING_LATCH, new CountDownLatch(1));
+        
         MuleEvent responseEvent = null;
 
         if (PropertyUtils.isTrue(exchange.remove(CxfConstants.NON_BLOCKING_RESPONSE)))
