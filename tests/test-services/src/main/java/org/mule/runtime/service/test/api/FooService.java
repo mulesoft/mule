@@ -7,11 +7,13 @@
 
 package org.mule.runtime.service.test.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.Service;
 
 /**
  * Service API used for testing purposes.
  */
+@NoImplement
 public interface FooService extends Service {
 
   /**

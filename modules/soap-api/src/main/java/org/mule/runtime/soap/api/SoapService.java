@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.soap.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.soap.api.client.SoapClient;
 import org.mule.runtime.soap.api.client.SoapClientFactory;
@@ -16,6 +17,7 @@ import org.mule.runtime.soap.api.client.SoapClientFactory;
  *
  * @since 4.0
  */
+@NoImplement
 public interface SoapService extends Service {
 
   /**

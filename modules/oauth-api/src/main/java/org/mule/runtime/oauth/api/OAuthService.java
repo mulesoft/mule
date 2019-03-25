@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.oauth.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.Service;
@@ -24,6 +25,7 @@ import java.util.concurrent.locks.Lock;
  *
  * @since 4.0
  */
+@NoImplement
 public interface OAuthService extends Service {
 
   /**
