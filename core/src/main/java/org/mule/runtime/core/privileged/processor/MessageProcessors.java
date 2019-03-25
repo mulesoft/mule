@@ -356,8 +356,15 @@ public class MessageProcessors {
         .toProcessor()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(Mono.<CoreEvent>create(errorSwitchSinkSinkRef).toProcessor())
-        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result));
+        .switchIfEmpty(Mono.create(errorSwitchSinkSinkRef).toProcessor())
+        .map(result -> quickCopy((((BaseEventContext) result.getContext()).getParentContext().get()), result))
+        .doOnError(MessagingException.class,
+                   me -> me.setProcessedEvent(quickCopy(child.getParentContext().get(), me.getEvent())))
+        .doOnSuccess(result -> {
+          if (result == null && completeParentIfEmpty) {
+            child.getParentContext().get().success();
+          }
+        });
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,
