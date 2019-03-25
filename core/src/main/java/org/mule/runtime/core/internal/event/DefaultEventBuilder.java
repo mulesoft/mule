@@ -327,13 +327,13 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final boolean notificationsEnabled;
 
     private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
-    private final Map<String, ?> internalParameters;
 
     private final String legacyCorrelationId;
     private final Error error;
 
     private final ItemSequenceInfo itemSequenceInfo;
 
+    private transient final Map<String, ?> internalParameters;
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
