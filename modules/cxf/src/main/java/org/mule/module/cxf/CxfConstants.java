@@ -42,5 +42,7 @@ public class CxfConstants
     public static final String UNWRAP_MULE_EXCEPTIONS = "unwrapMuleExceptions";
 
     public static final String WSDL_LOCATION = "WSDL_LOCATION";
+    
+    public static final String NON_BLOCKING_LATCH = "NON_BLOCKING_LATCH";
 
 }
