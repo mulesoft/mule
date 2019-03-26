@@ -119,7 +119,7 @@ public class DrStrangeOperations {
 
       @Override
       public List<Relic> getPage(MysticConnection connection) {
-        if (pageRetrieved == true) {
+        if (pageRetrieved) {
           return emptyList();
         }
         pageRetrieved = true;
