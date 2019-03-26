@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
+import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -127,6 +127,10 @@ public class PolicyChain extends AbstractComponent
         .compose(eventPub -> applyWithChildContext(eventPub, processorChain, ofNullable(getLocation()),
                                                    policyChainErrorHandler()))
         .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
+  }
+
+  public PolicyNotificationHelper getNotificationHelper() {
+    return notificationHelper;
   }
 
   private BaseExceptionHandler policyChainErrorHandler() {

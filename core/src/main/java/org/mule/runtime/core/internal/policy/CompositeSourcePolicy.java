@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
+import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_VARS;
 import static org.mule.runtime.core.internal.util.MessagingExceptionResolver.INFO_LAST_HANDLER_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -17,9 +19,11 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -27,6 +31,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -34,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -60,10 +67,10 @@ public class CompositeSourcePolicy
 
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
   private final ReactiveProcessor flowExecutionProcessor;
+  private PolicyEventConverter policyEventConverter = new PolicyEventConverter();
 
   /**
    * Creates a new source policies composed by several {@link Policy} that will be chain together.
-   *
    * @param parameterizedPolicies the list of policies to use in this composite policy.
    * @param flowExecutionProcessor the operation that executes the flow
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
@@ -123,7 +130,7 @@ public class CompositeSourcePolicy
                         && ((Component) me.getInfo().get(INFO_LAST_HANDLER_KEY)).getLocation().getParts().get(0)
                             .getPartIdentifier()
                             .filter(isPolicy()).isPresent())) {
-                  me = mapErrorInInnerExecution(me);
+                  //                  me = mapErrorInInnerExecution(me);
                 }
 
                 Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result =
@@ -165,8 +172,10 @@ public class CompositeSourcePolicy
    * {@link MessagingException} to signal that the failure was through the the flow exception and not the policy logic.
    */
   @Override
-  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
-    return from(eventPub)
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, PolicyNotificationHelper notificationHelper,
+                                                    String policyId) {
+
+    Publisher<CoreEvent> asd = from(eventPub)
         .transform(flowExecutionProcessor)
         .map(flowExecutionResponse -> {
           Map<String, Object> originalResponseParameters = commonPolicy
@@ -185,10 +194,57 @@ public class CompositeSourcePolicy
               .build();
         })
         .cast(CoreEvent.class)
-        .onErrorMap(MessagingException.class, this::mapErrorInInnerExecution);
+        .onErrorContinue(MessagingException.class, (error, v) -> {
+          final CoreEvent event = ((MessagingException) error).getEvent();
+
+          if (isEventContextHandledByThisNext(event)) {
+            MessagingException me = (MessagingException) error;
+            mapErrorInInnerExecution(me);
+            notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
+            //                pushAfterNextFlowStackElement().accept(me.getEvent());
+
+
+            me.setProcessedEvent(policyEventConverter.restoreVariables((PrivilegedEvent) me.getEvent(),
+                                                                       loadVars((PrivilegedEvent) me.getEvent(), policyId)));
+
+            ((BaseEventContext) event.getContext()).error(error);
+          }
+        });
+
+    //        .onErrorResume(new Function<Throwable, Publisher<? extends CoreEvent>>() {
+    //
+    //          @Override
+    //          public Publisher<? extends CoreEvent> apply(Throwable e) {
+    //            return null;
+    //          }
+    //        })
+    //        .onErrorMap(messagingException -> mapErrorInInnerExecution((MessagingException) messagingException));
+    //        .onErrorContinue(new BiConsumer<Throwable, Object>() {
+    //
+    //          @Override
+    //          public void accept(Throwable throwable, Object o) {
+    //            LOGGER.error("" + throwable);
+    //          }
+    //        });
+
+    return asd;
+    //    return MessageProcessors.applyWithChildContext(asd);
   }
 
-  private MessagingException mapErrorInInnerExecution(MessagingException messagingException) {
+  private Map<String, TypedValue<?>> loadVars(PrivilegedEvent event, String lastPolicyId) {
+    return ((InternalEvent) event).getInternalParameter(policyVarsInternalParameterName(lastPolicyId));
+  }
+
+  private String policyVarsInternalParameterName(String lastPolicyId) {
+    return String.format(POLICY_VARS, lastPolicyId);
+  }
+
+  private boolean isEventContextHandledByThisNext(CoreEvent event) {
+    final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
+    return eventCtxIds != null && eventCtxIds.contains(event.getContext().getId());
+  }
+
+  private void mapErrorInInnerExecution(MessagingException messagingException) {
     Map<String, Object> originalFailureResponseParameters = commonPolicy
         .getResponseParamsProcessor(messagingException.getEvent())
         .getFailedExecutionResponseParametersFunction()
@@ -199,18 +255,12 @@ public class CompositeSourcePolicy
             .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
         .orElse(messagingException.getEvent().getMessage());
 
-    MessagingException flowExecutionException =
-        new FlowExecutionException(InternalEvent.builder(messagingException.getEvent())
-            .message(message)
-            .addInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS, originalFailureResponseParameters)
-            .build(),
-                                   messagingException.getCause(),
-                                   messagingException.getFailingComponent());
-    if (messagingException.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
-      flowExecutionException.addInfo(INFO_ALREADY_LOGGED_KEY,
-                                     messagingException.getInfo().get(INFO_ALREADY_LOGGED_KEY));
-    }
-    return flowExecutionException;
+    InternalEvent newEvent = InternalEvent.builder(messagingException.getEvent())
+        .message(message)
+        .addInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS, originalFailureResponseParameters)
+        .build();
+
+    messagingException.setProcessedEvent(newEvent);
   }
 
   /**

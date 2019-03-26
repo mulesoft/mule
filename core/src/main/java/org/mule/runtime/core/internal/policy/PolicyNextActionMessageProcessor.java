@@ -13,6 +13,7 @@ import static org.mule.runtime.core.internal.policy.OperationPolicyProcessor.POL
 import static org.mule.runtime.core.internal.policy.SourcePolicyProcessor.POLICY_SOURCE_ORIGINAL_EVENT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -28,6 +29,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -96,7 +98,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), muleContext.getConfiguration().getId()))
         .doOnNext(event -> {
-          popBeforeNextFlowFlowStackElement().accept(event);
+          //          popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
         })
         .compose(eventPub -> subscriberContext()
@@ -120,7 +122,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         })
         .map(result -> (CoreEvent) policyEventConverter.restoreVariables((PrivilegedEvent) result,
                                                                          loadVars((PrivilegedEvent) result)))
-        .onErrorContinue(MessagingException.class, (error, ev) -> {
+        .onErrorContinue(MessagingException.class, (error, v) -> {
           final CoreEvent event = ((MessagingException) error).getEvent();
 
           if (isEventContextHandledByThisNext(event)) {

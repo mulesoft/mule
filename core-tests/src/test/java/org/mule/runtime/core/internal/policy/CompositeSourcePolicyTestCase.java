@@ -32,6 +32,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -228,7 +229,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   }
 
   @Test
-  public void nextProcessorExecutionFailurePropagates() throws Exception {
+  public void nextProcessorExecutionFailurePropagates() {
     RuntimeException policyException = new RuntimeException("policy failure");
     final Component policyComponent = mock(Component.class);
     when(policyComponent.getLocation()).thenReturn(fromSingleComponent("some:component"));
@@ -236,7 +237,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     when(flowExecutionProcessor.apply(any()))
         .thenAnswer(invocation -> {
-          Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) invocation.getArgument(0));
+          Flux<CoreEvent> baseFlux = Flux.from(invocation.getArgument(0));
           if (processChangeThread) {
             baseFlux = baseFlux.publishOn(Schedulers.single());
           }
@@ -289,9 +290,10 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     }
 
     @Override
-    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
+    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, PolicyNotificationHelper notificationHelper,
+                                                      String policyId) {
       nextOperation.incrementAndGet();
-      return super.applyNextOperation(eventPub);
+      return super.applyNextOperation(eventPub, notificationHelper, policyId);
     }
 
     @Override
