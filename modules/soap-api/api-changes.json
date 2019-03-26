@@ -1,4 +1,21 @@
 {
+  "4.2.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.soap.api.SoapService",
+          "new": "interface org.mule.runtime.soap.api.SoapService",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.soap.api",
+          "classSimpleName": "SoapService",
+          "elementKind": "interface",
+          "justification": "All services APIs should be annotated with NoImplement."
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
