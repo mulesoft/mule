@@ -28,7 +28,13 @@
           "methodName": "addListener",
           "elementKind": "method",
           "justification": "New feature fixes bug"
-        },
+        }
+      ]
+    }
+  },
+  "4.2.0": {
+    "revapi": {
+      "ignore": [
         {
           "code": "java.annotation.added",
           "old": "interface org.mule.runtime.oauth.api.OAuthService",
