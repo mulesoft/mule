@@ -58,6 +58,9 @@ public class DefaultByteStreamingManager implements ByteStreamingManager, ByteSt
     return bufferManager;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public CursorStreamProviderFactory getDefaultCursorProviderFactory(StreamingStrategy streamingStrategy) {
     switch (streamingStrategy) {

@@ -42,6 +42,9 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
     return new InMemoryCursorIteratorProvider(iterator, config);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public StreamingStrategy getStreamingStrategy() {
     return IN_MEMORY;

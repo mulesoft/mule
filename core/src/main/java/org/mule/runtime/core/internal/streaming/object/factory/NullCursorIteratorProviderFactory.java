@@ -25,6 +25,9 @@ public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorPro
     return iterator;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public StreamingStrategy getStreamingStrategy() {
     return NON_REPEATABLE;

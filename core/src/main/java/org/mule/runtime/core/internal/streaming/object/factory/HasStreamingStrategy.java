@@ -9,9 +9,19 @@ package org.mule.runtime.core.internal.streaming.object.factory;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.internal.streaming.StreamingStrategy;
 
+/**
+ * This interface is used to flag that the implementing class is involved in some sort of streaming and to provide the
+ * {@link StreamingStrategy} that it uses.
+ *
+ * @since 4.2
+ */
 @NoImplement
 public interface HasStreamingStrategy {
 
-  public StreamingStrategy getStreamingStrategy();
+  /**
+   * 
+   * @return the {@link StreamingStrategy} associated with the implementing class.
+   */
+  StreamingStrategy getStreamingStrategy();
 
 }

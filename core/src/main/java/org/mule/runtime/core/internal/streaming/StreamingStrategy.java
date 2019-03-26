@@ -6,6 +6,19 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+/**
+ * Declares the kind of Streaming Strategies supported.
+ *
+ * There are three strategies:
+ *
+ * <ul>
+ * <li><b>IN_MEMORY</b>: Repeatable streaming strategy that stores read information in memory for future reads.</li>
+ * <li><b>NON_REPEATABLE</b>: Non repeatable streaming strategy.</li>
+ * <li><b>FILE_STORE</b>: Repeatable streaming strategy that persists the read information for future reads.</li>
+ * </ul>
+ *
+ * @since 4.2
+ */
 public enum StreamingStrategy {
   IN_MEMORY, NON_REPEATABLE, FILE_STORE
 }
