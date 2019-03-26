@@ -1,0 +1,5 @@
+http\://www.springframework.org/schema/beans/spring-beans-current.xsd=org/springframework/beans/factory/xml/spring-beans-3.2.xsd
+http\://www.springframework.org/schema/beans/spring-beans-3.0.xsd=org/springframework/beans/factory/xml/spring-beans-3.0.xsd
+http\://www.springframework.org/schema/context/spring-context-current.xsd=org/springframework/context/config/spring-context-3.2.xsd
+http\://www.springframework.org/schema/security/spring-security-current.xsd=org/springframework/security/config/spring-security-3.1.xsd
+http\://www.springframework.org/schema/util/spring-util-current.xsd=org/springframework/beans/factory/xml/spring-util-3.2.xsd
