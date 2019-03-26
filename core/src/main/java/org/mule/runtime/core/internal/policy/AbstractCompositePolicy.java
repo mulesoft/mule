@@ -13,6 +13,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
@@ -66,7 +67,12 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
     for (Policy policy : parameterizedPolicies) {
       interceptors.add(next -> eventPub -> from(applyPolicy(policy, next, eventPub)));
     }
-    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub));
+
+    Policy lastPolicy = parameterizedPolicies.get(parameterizedPolicies.size() - 1);
+    PolicyNotificationHelper notificationHelper = lastPolicy.getPolicyChain().getNotificationHelper();
+
+    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub, notificationHelper,
+                                                                                        lastPolicy.getPolicyId()));
     // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
     reverse(interceptors);
     for (Function<ReactiveProcessor, ReactiveProcessor> interceptor : interceptors) {
@@ -93,10 +99,12 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
    * Template method for executing the final processor of the chain.
    *
    * @param eventPub the event to use for executing the next operation.
+   * @param policyId
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub);
+  protected abstract Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub,
+                                                             PolicyNotificationHelper notificationHelper, String policyId);
 
   /**
    * Template method for executing a policy.

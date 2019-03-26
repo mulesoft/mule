@@ -19,6 +19,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -126,15 +127,16 @@ public class CompositeOperationPolicy
    * not a modified version from another policy.
    *
    * @param eventPub the event to execute the operation.
+   * @param policyId
    */
   @Override
-  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, PolicyNotificationHelper notificationHelper,
+                                                    String policyId) {
     return Flux.from(eventPub)
         .flatMap(event -> {
-          Map<String, Object> parametersMap = new HashMap<>();
           OperationParametersProcessor parametersProcessor =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
-          parametersMap.putAll(parametersProcessor.getOperationParameters());
+          Map<String, Object> parametersMap = new HashMap<>(parametersProcessor.getOperationParameters());
 
           if (getParametersTransformer().isPresent()) {
             parametersMap.putAll(getParametersTransformer().get().fromMessageToParameters(event.getMessage()));

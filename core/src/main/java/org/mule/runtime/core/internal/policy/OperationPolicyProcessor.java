@@ -13,6 +13,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
@@ -116,24 +117,44 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
   }
 
   private PrivilegedEvent mapAfterOperationPolicyEvent(PrivilegedEvent policyChainResult) {
-    if (policy.getPolicyChain().isPropagateMessageTransformations()) {
-      return policyEventConverter.createEvent(policyChainResult, getOriginalEvent(policyChainResult),
-                                              builder -> ((InternalEvent.Builder) builder)
-                                                  .addInternalParameter(policyVarsInternalParameterName(),
-                                                                        policyChainResult.getVariables())
-                                                  .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE,
-                                                                        policyChainResult));
-    } else {
-      final InternalEvent nextOperationResponse =
-          ((InternalEvent) policyChainResult).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
+    //    if (policy.getPolicyChain().isPropagateMessageTransformations()) {
+    //      return policyEventConverter.createEvent(policyChainResult, getOriginalEvent(policyChainResult),
+    //                                              builder -> ((InternalEvent.Builder) builder)
+    //                                                  .addInternalParameter(policyVarsInternalParameterName(),
+    //                                                                        policyChainResult.getVariables())
+    //                                                  .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE,
+    //                                                                        policyChainResult));
+    //    } else {
 
-      return nextOperationResponse != null ? InternalEvent.builder(policyChainResult)
-          .message(nextOperationResponse.getMessage())
+    final InternalEvent nextOperationResponse =
+        ((InternalEvent) policyChainResult).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
+
+    if (nextOperationResponse == null) {
+
+      final InternalEvent variablesProvider =
+          ((InternalEvent) policyChainResult).getInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT);
+
+      return InternalEvent.builder(policyChainResult)
+          .variables(variablesProvider.getVariables())
+          .addInternalParameter(policyVarsInternalParameterName(), policyChainResult.getVariables())
+          .build();
+
+    } else {
+
+
+      CoreEvent next = policy.getPolicyChain().isPropagateMessageTransformations() ? policyChainResult : nextOperationResponse;
+
+      // If execute-next returned a value, those variables should always be used
+      next = CoreEvent.builder(next).variables(nextOperationResponse.getVariables()).build();
+
+      return InternalEvent.builder(policyChainResult)
+          .message(next.getMessage())
           .variables(nextOperationResponse.getVariables())
           .addInternalParameter(policyVarsInternalParameterName(), policyChainResult.getVariables())
-          .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, nextOperationResponse)
-          .build() : policyChainResult;
+          .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, next)
+          .build();
     }
+    //    }
   }
 
   private PrivilegedEvent getOriginalEvent(CoreEvent event) {

@@ -34,6 +34,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -240,9 +241,10 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     }
 
     @Override
-    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
+    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, PolicyNotificationHelper notificationHelper,
+                                                      String policyId) {
       nextOperation.incrementAndGet();
-      return super.applyNextOperation(eventPub);
+      return super.applyNextOperation(eventPub, null, null);
     }
 
     @Override
