@@ -9,7 +9,6 @@ package org.mule.test.marvel.drstrange;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
@@ -160,11 +159,6 @@ public class DrStrangeOperations {
         // Do nothing.
       }
     };
-  }
-
-  @MediaType(ANY)
-  public Object getStreamingHelper(StreamingHelper streamingHelper) {
-    return streamingHelper;
   }
 
   @MediaType(TEXT_PLAIN)
