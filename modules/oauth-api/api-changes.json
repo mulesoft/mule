@@ -28,17 +28,6 @@
           "methodName": "addListener",
           "elementKind": "method",
           "justification": "New feature fixes bug"
-        },
-        {
-          "code": "java.annotation.added",
-          "old": "interface org.mule.runtime.oauth.api.OAuthService",
-          "new": "interface org.mule.runtime.oauth.api.OAuthService",
-          "annotationType": "org.mule.api.annotation.NoImplement",
-          "annotation": "@org.mule.api.annotation.NoImplement",
-          "package": "org.mule.runtime.oauth.api",
-          "classSimpleName": "OAuthService",
-          "elementKind": "interface",
-          "justification": "All services APIs should be annotated with NoImplement."
         }
       ]
     }
