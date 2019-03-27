@@ -160,7 +160,7 @@
         <apacheHttpClientVersion>4.5.3</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.60</bouncycastleVersion>
-        <c3p0Version>0.9.5.2-MULE-001</c3p0Version>
+        <c3p0Version>0.9.5.4</c3p0Version>
         <caffeineVersion>2.6.2</caffeineVersion>
         <cglibVersion>3.2.6</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
@@ -1270,7 +1270,7 @@
             </dependency>
 
             <dependency>
-                <groupId>org.mule.mchange</groupId>
+                <groupId>com.mchange</groupId>
                 <artifactId>c3p0</artifactId>
                 <version>${c3p0Version}</version>
             </dependency>
