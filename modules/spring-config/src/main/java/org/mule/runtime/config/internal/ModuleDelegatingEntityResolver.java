@@ -136,6 +136,8 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
         String message = "Internal runtime mule-test.xsd can't be used in real applications";
         throw new MuleRuntimeException(createStaticMessage(message));
       }
+    } else if (systemId.contains("spring")) {
+      systemId = systemId.replace("-current.xsd", ".xsd");
     }
 
     return systemId;
