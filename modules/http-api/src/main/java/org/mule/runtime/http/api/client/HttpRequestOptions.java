@@ -52,16 +52,6 @@ public interface HttpRequestOptions {
   Optional<HttpAuthentication> getAuthentication();
 
   /**
-   * @return whether or not to stream responses, if overriding the global configuration
-   */
-  Optional<Boolean> isStreamResponse();
-
-  /**
-   * @return if streaming, the size of buffer to use, in bytes
-   */
-  Optional<Integer> getResponseBufferSize();
-
-  /**
    * @return the {@link ProxyConfig} to use, if any.
    */
   Optional<ProxyConfig> getProxyConfig();
