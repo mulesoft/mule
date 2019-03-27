@@ -1,46 +1,4 @@
 {
-  "4.3.0": {
-    "revapi": {
-      "ignore": [
-        {
-          "code": "java.method.removed",
-          "old": "method java.util.Optional<java.lang.Integer> org.mule.runtime.http.api.client.HttpRequestOptions::getResponseBufferSize()",
-          "package": "org.mule.runtime.http.api.client",
-          "classSimpleName": "HttpRequestOptions",
-          "methodName": "getResponseBufferSize",
-          "elementKind": "method",
-          "justification": "This methods were added in 4.2.0, after my cherry-pick it would be like nothing happened."
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method java.util.Optional<java.lang.Boolean> org.mule.runtime.http.api.client.HttpRequestOptions::isStreamResponse()",
-          "package": "org.mule.runtime.http.api.client",
-          "classSimpleName": "HttpRequestOptions",
-          "methodName": "isStreamResponse",
-          "elementKind": "method",
-          "justification": "This methods were added in 4.2.0, after my cherry-pick it would be like nothing happened."
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method org.mule.runtime.http.api.client.HttpRequestOptionsBuilder org.mule.runtime.http.api.client.HttpRequestOptionsBuilder::responseBufferSize(int)",
-          "package": "org.mule.runtime.http.api.client",
-          "classSimpleName": "HttpRequestOptionsBuilder",
-          "methodName": "responseBufferSize",
-          "elementKind": "method",
-          "justification": "This methods were added in 4.2.0, after my cherry-pick it would be like nothing happened."
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method org.mule.runtime.http.api.client.HttpRequestOptionsBuilder org.mule.runtime.http.api.client.HttpRequestOptionsBuilder::streamResponse(boolean)",
-          "package": "org.mule.runtime.http.api.client",
-          "classSimpleName": "HttpRequestOptionsBuilder",
-          "methodName": "streamResponse",
-          "elementKind": "method",
-          "justification": "This methods were added in 4.2.0, after my cherry-pick it would be like nothing happened."
-        }
-      ]
-    }
-  },
   "4.2.0": {
     "revapi": {
       "ignore": [
