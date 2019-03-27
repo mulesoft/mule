@@ -14,6 +14,7 @@ import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
+import org.mule.api.annotation.NoImplement;
 
 /**
  * Allows for creation of OAuth dancer implementations for the supported grant types:
@@ -24,6 +25,7 @@ import java.util.concurrent.locks.Lock;
  *
  * @since 4.0
  */
+@NoImplement
 public interface OAuthService extends Service {
 
   /**
