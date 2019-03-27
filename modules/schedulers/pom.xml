@@ -18,7 +18,7 @@
          </dependency>
          <!-- Explicitly adding C3P0 dependency to replace quartz's excluded C3P0 version-->
          <dependency>
-             <groupId>org.mule.mchange</groupId>
+             <groupId>com.mchange</groupId>
              <artifactId>c3p0</artifactId>
          </dependency>
          <dependency>
