@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.event;
 
 
-import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
@@ -56,8 +55,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,6 +65,7 @@ import java.util.function.Function;
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
+  private static final int INTERNAL_PARAMETERS_INITIAL_CAPACITY = 4;
 
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
@@ -88,7 +86,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.context = messageContext;
     this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
-    this.internalParameters = new HashMap<>(4);
+    this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
   }
 
   public DefaultEventBuilder(InternalEvent event) {
@@ -338,6 +336,19 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
+    //Needed for deserialization with kryo
+    private InternalEventImplementation() {
+      this.context = null;
+      this.session = null;
+      this.securityContext = null;
+      this.notificationsEnabled = false;
+      this.variables = null;
+      this.legacyCorrelationId = null;
+      this.error = null;
+      this.itemSequenceInfo = null;
+      this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
+    }
+
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message,
                                         CaseInsensitiveHashMap<String, TypedValue<?>> variables,
@@ -361,7 +372,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
       is.defaultReadObject();
-      this.internalParameters = new HashMap<>();
+      this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
     }
 
     @Override
