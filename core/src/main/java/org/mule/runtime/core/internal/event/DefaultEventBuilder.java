@@ -333,7 +333,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final Error error;
 
     private final ItemSequenceInfo itemSequenceInfo;
-    
+
     private transient Map<String, ?> internalParameters;
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
