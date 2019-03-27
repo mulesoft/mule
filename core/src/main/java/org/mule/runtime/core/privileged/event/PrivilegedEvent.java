@@ -120,7 +120,7 @@ public interface PrivilegedEvent extends CoreEvent {
 
   /**
    * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
-   * this event was received.
+   * this event was received.?
    *
    * @param outputType The requested output type.
    * @param muleContext the Mule node.
