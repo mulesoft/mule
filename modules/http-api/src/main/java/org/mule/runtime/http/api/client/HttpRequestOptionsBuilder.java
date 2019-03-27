@@ -21,9 +21,7 @@ public final class HttpRequestOptionsBuilder {
   private int responseTimeout = 30000;
   private boolean followsRedirect = true;
   private HttpAuthentication authentication;
-  private Boolean streamResponse;
   private ProxyConfig proxyConfig;
-  private Integer responseBufferSize;
 
   HttpRequestOptionsBuilder() {}
 
@@ -31,8 +29,6 @@ public final class HttpRequestOptionsBuilder {
     this.responseTimeout = options.getResponseTimeout();
     this.followsRedirect = options.isFollowsRedirect();
     this.authentication = options.getAuthentication().orElse(null);
-    this.streamResponse = options.isStreamResponse().orElse(null);
-    this.responseBufferSize = options.getResponseBufferSize().orElse(null);
     this.proxyConfig = options.getProxyConfig().orElse(null);
   }
 
@@ -51,24 +47,13 @@ public final class HttpRequestOptionsBuilder {
     return this;
   }
 
-  public HttpRequestOptionsBuilder streamResponse(boolean streamResponse) {
-    this.streamResponse = streamResponse;
-    return this;
-  }
-
-  public HttpRequestOptionsBuilder responseBufferSize(int responseBufferSize) {
-    this.responseBufferSize = responseBufferSize;
-    return this;
-  }
-
   public HttpRequestOptionsBuilder proxyConfig(ProxyConfig proxyConfig) {
     this.proxyConfig = proxyConfig;
     return this;
   }
 
   public HttpRequestOptions build() {
-    return new DefaultHttpRequestOptions(responseTimeout, followsRedirect, authentication, streamResponse, responseBufferSize,
-                                         proxyConfig);
+    return new DefaultHttpRequestOptions(responseTimeout, followsRedirect, authentication, proxyConfig);
   }
 
 }
