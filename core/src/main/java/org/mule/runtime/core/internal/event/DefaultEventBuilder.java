@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.event;
 
 
-import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
@@ -55,8 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +65,7 @@ import java.util.function.Function;
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
+  private static final int INTERNAL_PARAMETERS_INITIAL_CAPACITY = 4;
 
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
@@ -87,7 +86,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.context = messageContext;
     this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
-    this.internalParameters = new HashMap<>(4);
+    this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
   }
 
   public DefaultEventBuilder(InternalEvent event) {
@@ -327,15 +326,28 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final boolean notificationsEnabled;
 
     private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
-    private final Map<String, ?> internalParameters;
 
     private final String legacyCorrelationId;
     private final Error error;
 
     private final ItemSequenceInfo itemSequenceInfo;
 
+    private transient Map<String, ?> internalParameters;
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
+
+    //Needed for deserialization with kryo
+    private InternalEventImplementation() {
+      this.context = null;
+      this.session = null;
+      this.securityContext = null;
+      this.notificationsEnabled = false;
+      this.variables = null;
+      this.legacyCorrelationId = null;
+      this.error = null;
+      this.itemSequenceInfo = null;
+      this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
+    }
 
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message,
@@ -356,6 +368,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.legacyCorrelationId = legacyCorrelationId;
 
       this.notificationsEnabled = notificationsEnabled;
+    }
+
+    private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
+      is.defaultReadObject();
+      this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
     }
 
     @Override
@@ -474,23 +491,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Object getReplyToDestination() {
       return null;
-    }
-
-    // //////////////////////////
-    // Serialization methods
-    // //////////////////////////
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-      // TODO MULE-10013 remove this logic from here
-      out.defaultWriteObject();
-      for (Map.Entry<String, TypedValue<?>> entry : variables.entrySet()) {
-        Object value = entry.getValue();
-        if (value != null && !(value instanceof Serializable)) {
-          String message = format("Unable to serialize the flow variable %s, which is of type %s ", entry.getKey(), value);
-          logger.error(message);
-          throw new IOException(message);
-        }
-      }
     }
 
     private void setMessage(Message message) {
