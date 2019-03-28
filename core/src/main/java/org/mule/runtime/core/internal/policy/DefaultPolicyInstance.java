@@ -22,10 +22,10 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
-
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -52,13 +52,12 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.retry.BackoffDelay;
 
 @NoExtend
@@ -171,6 +170,7 @@ public class DefaultPolicyInstance extends AbstractComponent
   public void dispose() {
     disposeIfNeeded(operationPolicyChain, LOGGER);
     disposeIfNeeded(sourcePolicyChain, LOGGER);
+    disposeIfNeeded(processingStrategy, LOGGER);
     lifecycleStateManager.fireDisposePhase((phaseNam, object) -> {
     });
   }
@@ -212,7 +212,7 @@ public class DefaultPolicyInstance extends AbstractComponent
    * component) in its own scheduler, based on the 'heaviest' {@link ProcessingType} of its processors.
    */
   private static final class PolicyProcessingStrategy extends AbstractProcessingStrategy
-      implements ProcessingStrategy, Startable {
+      implements ProcessingStrategy, Startable, Disposable {
 
     private static final Logger LOGGER = getLogger(PolicyProcessingStrategy.class);
 
@@ -316,5 +316,9 @@ public class DefaultPolicyInstance extends AbstractComponent
               .withBackoffScheduler(fromExecutorService(cpuLiteScheduler)));
     }
 
+    @Override
+    public void dispose() {
+      stopSchedulers();
+    }
   }
 }
