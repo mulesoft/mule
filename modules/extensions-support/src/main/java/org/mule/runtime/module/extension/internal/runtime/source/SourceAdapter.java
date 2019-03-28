@@ -310,7 +310,7 @@ public class SourceAdapter implements Lifecycle {
 
     private void commit() {
       try {
-        context.getTransactionHandle().commit();
+        context.getTransactionHandle().resolve();
       } catch (TransactionException e) {
         LOGGER.error(format("Failed to commit transaction for message source at '%s': %s",
                             component.getLocation().toString(),
