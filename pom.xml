@@ -152,7 +152,7 @@
         <asyncHttpClientVersion>1.14-MULE-006</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.60</bouncycastleVersion>
-        <c3p0Version>0.9.5.2-MULE-001</c3p0Version>
+        <c3p0Version>0.9.5.4</c3p0Version>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
@@ -1451,7 +1451,7 @@
             </dependency>
 
             <dependency>
-                <groupId>org.mule.mchange</groupId>
+                <groupId>com.mchange</groupId>
                 <artifactId>c3p0</artifactId>
                 <version>${c3p0Version}</version>
             </dependency>
