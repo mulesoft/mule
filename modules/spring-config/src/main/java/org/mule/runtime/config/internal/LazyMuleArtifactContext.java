@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
+import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
@@ -203,9 +204,19 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private void applyLifecycle(List<String> createdComponentModels, boolean applyStartPhase) {
     muleContext.withLifecycleLock(() -> {
+      ComponentConfigurationLifecycleObjectSorter componentConfigurationLifecycleObjectSorter =
+          new ComponentConfigurationLifecycleObjectSorter(newBeanDependencyResolver());
+      Map<Object, String> componentNames = new HashMap<>();
+
+      createdComponentModels.forEach(componentName -> {
+        Optional<Object> objectOptional = getRegistry().lookupByName(componentName);
+        objectOptional.ifPresent(object -> {
+          componentConfigurationLifecycleObjectSorter.addObject(componentName, object);
+          componentNames.put(object, componentName);
+        });
+      });
       if (muleContext.isInitialised()) {
-        for (String createdComponentModelName : createdComponentModels) {
-          Object object = getRegistry().lookupByName(createdComponentModelName).get();
+        for (Object object : componentConfigurationLifecycleObjectSorter.getSortedObjects()) {
           try {
             applyLifecycleMessageProcessorChainBuilder(object,
                                                        messageProcessorChain -> initialiseIfNeeded(messageProcessorChain,
@@ -214,7 +225,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                                                                          try {
                                                                                                            muleContext
                                                                                                                .getRegistry()
-                                                                                                               .registerObject(messageProcessorChainInstancesKey(createdComponentModelName),
+                                                                                                               .registerObject(messageProcessorChainInstancesKey(componentNames
+                                                                                                                   .get(object)),
                                                                                                                                messageProcessorChain
                                                                                                                                    .getMessageProcessors());
                                                                                                          } catch (RegistrationException e) {
@@ -228,11 +240,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         }
       }
       if (applyStartPhase && muleContext.isStarted()) {
-        for (String createdComponentModelName : createdComponentModels) {
-          Object object = getRegistry().lookupByName(createdComponentModelName).get();
+        for (Object object : componentConfigurationLifecycleObjectSorter.getSortedObjects()) {
           try {
             if (object instanceof MessageProcessorChainBuilder) {
-              startIfNeeded(muleContext.getRegistry().get(messageProcessorChainInstancesKey(createdComponentModelName)));
+              startIfNeeded(muleContext.getRegistry().get(messageProcessorChainInstancesKey(componentNames.get(object))));
             }
             muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
           } catch (MuleException e) {
@@ -241,6 +252,40 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         }
       }
     });
+  }
+
+  private BeanDependencyResolver newBeanDependencyResolver() {
+    return beanName -> getDependencyResolver().resolveComponentDependencies(beanName).stream()
+        .map(componentName -> getRegistry().lookupByName(componentName).orElse(null))
+        .filter(component -> component != null)
+        .collect(toList());
+  }
+
+  class ComponentConfigurationLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
+
+    private final BeanDependencyResolver beanDependencyResolver;
+
+    public ComponentConfigurationLifecycleObjectSorter(BeanDependencyResolver beanDependencyResolver) {
+      // Only Object.class type is defined as a single bucket as we just need to sort the configuration components (DSL)
+      super(new Class[] {Object.class});
+      this.beanDependencyResolver = beanDependencyResolver;
+    }
+
+    /**
+     * Implementation that handles duplicates. A->B->C, so if we add B, C will be added but later A will be added and its
+     * dependencies were already added before.
+     */
+    @Override
+    protected int doAddObject(String name, Object object, List<Object> bucket) {
+      if (bucket.contains(object)) {
+        return 0;
+      }
+      List<Object> dependencies = beanDependencyResolver.resolveBeanDependencies(name)
+          .stream().filter(dependency -> !bucket.contains(dependency)).collect(toList());
+      bucket.addAll(dependencies);
+      bucket.add(object);
+      return dependencies.size() + 1;
+    }
   }
 
   private Optional<MessageProcessorChain> applyLifecycleMessageProcessorChainBuilder(Object object,

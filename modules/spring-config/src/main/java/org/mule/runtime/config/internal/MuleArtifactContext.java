@@ -143,7 +143,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader;
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
   private final DefaultRegistry serviceDiscoverer;
-  private final ConfigurationDependencyResolver dependencyResolver;
+  private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DefaultResourceLocator resourceLocator;
   protected ApplicationModel applicationModel;
   protected MuleContextWithRegistry muleContext;
@@ -230,7 +230,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     createApplicationModel();
     validateAllConfigElementHaveParsers();
 
-    this.dependencyResolver = new ConfigurationDependencyResolver(applicationModel, componentBuildingDefinitionRegistry);
+    this.configurationDependencyResolver =
+        new ConfigurationDependencyResolver(applicationModel, componentBuildingDefinitionRegistry);
   }
 
 
@@ -439,7 +440,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = new HashSet<>();
     Set<String> alwaysEnabledGeneratedTopLevelComponentsName = new HashSet<>();
 
-    dependencyResolver.resolveAlwaysEnabledComponents()
+    configurationDependencyResolver.resolveAlwaysEnabledComponents()
         .forEach(dependencyNode -> {
           if (dependencyNode.isTopLevel()) {
             alwaysEnabledTopLevelComponents.add(dependencyNode.getComponentName());
@@ -526,7 +527,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * @return a resolver for dependencies between configuration objects
    */
   public ConfigurationDependencyResolver getDependencyResolver() {
-    return dependencyResolver;
+    return configurationDependencyResolver;
   }
 
   @Override
