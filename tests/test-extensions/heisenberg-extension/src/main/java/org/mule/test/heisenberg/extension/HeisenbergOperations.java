@@ -9,6 +9,7 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -27,6 +28,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -45,6 +47,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
+import org.mule.runtime.extension.api.client.DefaultOperationParameters;
 import org.mule.runtime.extension.api.client.DefaultOperationParametersBuilder;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
@@ -274,6 +277,36 @@ public class HeisenbergOperations implements Disposable {
 
     return enemies;
   }
+
+  @MediaType(TEXT_PLAIN)
+  public String echoStaticMessage(@Expression(NOT_SUPPORTED) String message) {
+    return message;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String echoWithSignature(@Optional String message) {
+    return (message == null ? "" : message) + " echoed by Heisenberg";
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String executeForeingOrders(String extensionName, String operationName, @Optional String configName,
+                                     ExtensionsClient extensionsClient, Map<String, Object> operationParameters)
+      throws MuleException {
+    Object output =
+        extensionsClient.execute(extensionName, operationName, createOperationParameters(configName, operationParameters))
+            .getOutput();
+    return output instanceof TypedValue ? (String) ((TypedValue) output).getValue() : (String) output;
+  }
+
+  private OperationParameters createOperationParameters(String configName, Map<String, Object> operationParameters) {
+    DefaultOperationParametersBuilder builder = DefaultOperationParameters.builder();
+    if (configName != null) {
+      builder.configName(configName);
+    }
+    operationParameters.forEach((key, value) -> builder.addParameter(key, value));
+    return builder.build();
+  }
+
 
   @Deprecated(message = "The usage of this operation must be replaced by the knock operation.", since = "1.5.0",
       toRemoveIn = "2.0.0")
