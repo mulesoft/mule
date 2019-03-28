@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.nullValue;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -42,6 +43,9 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
   private PolicyProvider policyProvider;
+
+  @Inject
+  private SchedulerService schedulerService;
 
   @Override
   protected String getConfigFile() {
@@ -82,6 +86,15 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
     List<Policy> operationParameterizedPolicies = testPolicyProvider.findOperationParameterizedPolicies(null);
     assertThat(operationParameterizedPolicies.size(), equalTo(1));
+  }
+
+  @Test
+  public void policyDisposalStopsSchedulers() {
+    // Once the application is started with it's corresponding test policy. Test whether the policy-specific schedulers, generated
+    // in the PolicyProcessingStrategy, are stopped once the whole application is
+    // disposed.
+    muleContext.dispose();
+    assertThat(schedulerService.getSchedulers().size(), is(0));
   }
 
   private static class TestPolicyProvider implements PolicyProvider, Startable {
