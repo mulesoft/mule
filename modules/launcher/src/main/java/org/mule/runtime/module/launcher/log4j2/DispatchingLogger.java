@@ -757,32 +757,38 @@ abstract class DispatchingLogger extends Logger {
   }
 
   @Override
-  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4) {
     getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4);
   }
 
   @Override
-  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5) {
     getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5);
   }
 
   @Override
-  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6) {
     getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6);
   }
 
   @Override
-  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6, Object p7) {
     getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
   }
 
   @Override
-  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7, Object p8) {
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6, Object p7, Object p8) {
     getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
   }
 
   @Override
-  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7, Object p8, Object p9) {
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6, Object p7, Object p8, Object p9) {
     getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
   }
 
