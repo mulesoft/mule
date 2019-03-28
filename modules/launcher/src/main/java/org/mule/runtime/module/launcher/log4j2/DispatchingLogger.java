@@ -24,6 +24,8 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
 import org.apache.logging.log4j.spi.ExtendedLogger;
+import org.apache.logging.log4j.util.MessageSupplier;
+import org.apache.logging.log4j.util.Supplier;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -712,6 +714,82 @@ abstract class DispatchingLogger extends Logger {
   @Override
   public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Throwable t) {
     getLogger().logIfEnabled(fqcn, level, marker, message, t);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, MessageSupplier msgSupplier, Throwable t) {
+    getLogger().logIfEnabled(fqcn, level, marker, msgSupplier, t);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, CharSequence message, Throwable t) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, t);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, Supplier<?> msgSupplier, Throwable t) {
+    getLogger().logIfEnabled(fqcn, level, marker, msgSupplier, t);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2) {
+    super.logIfEnabled(fqcn, level, marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6, Object p7) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6, Object p7, Object p8) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3,
+                           Object p4, Object p5, Object p6, Object p7, Object p8, Object p9) {
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
   }
 
   @Override
