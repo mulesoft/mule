@@ -27,11 +27,10 @@ import java.util.function.Function;
  * Abstract implementation that performs the chaining of a set of policies and the {@link Processor} being intercepted.
  *
  * @param <ParametersTransformer> the type of the function parameters transformer.
- * @param <ParametersProcessor> the type of the parameters processor that provides access to the initial value of the parameters.
  *
  * @since 4.0
  */
-public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
+public abstract class AbstractCompositePolicy<ParametersTransformer> {
 
   private final List<Policy> parameterizedPolicies;
   private final Optional<ParametersTransformer> parametersTransformer;
@@ -51,22 +50,15 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
     this.executionProcessor = getPolicyProcessor();
   }
 
-  /**
-   * When this policy is processed, it will use the {@link CompositeOperationPolicy.NextOperationCall} which will keep track of
-   * the different policies to be applied and the current index of the policy under execution.
-   * <p>
-   * The first time, the first policy in the {@code parameterizedPolicies} will be executed, it will receive as it next operation
-   * the same instance of {@link CompositeOperationPolicy.NextOperationCall}, and since
-   * {@link CompositeOperationPolicy.NextOperationCall} keeps track of the policy executed, it will execute the following policy
-   * in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation
-   * execution.
-   */
-  private final ReactiveProcessor getPolicyProcessor() {
+  private ReactiveProcessor getPolicyProcessor() {
     List<Function<ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
     for (Policy policy : parameterizedPolicies) {
       interceptors.add(next -> eventPub -> from(applyPolicy(policy, next, eventPub)));
     }
-    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub));
+
+    Policy lastPolicy = parameterizedPolicies.get(parameterizedPolicies.size() - 1);
+
+    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub, lastPolicy));
     // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
     reverse(interceptors);
     for (Function<ReactiveProcessor, ReactiveProcessor> interceptor : interceptors) {
@@ -93,10 +85,11 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, Subject> {
    * Template method for executing the final processor of the chain.
    *
    * @param eventPub the event to use for executing the next operation.
+   * @param lastPolicy the last policy that was executed before executing the flow or operation
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub);
+  protected abstract Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy);
 
   /**
    * Template method for executing a policy.

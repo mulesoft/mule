@@ -129,6 +129,10 @@ public class PolicyChain extends AbstractComponent
         .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
   }
 
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
+
   private BaseExceptionHandler policyChainErrorHandler() {
     return new BaseExceptionHandler() {
 

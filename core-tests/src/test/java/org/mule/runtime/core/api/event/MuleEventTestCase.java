@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.event;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -28,6 +29,7 @@ import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
@@ -205,7 +207,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  @Description("Test that a perfromance optimization to avoid recreating the variables map is applied")
+  @Description("Test that a performance optimization to avoid recreating the variables map is applied")
   public void varsOverridenFromAnotherEventNotEmpty() throws MuleException {
     CoreEvent baseEventWithVars = getEventBuilder()
         .message(of("whatever"))
@@ -221,6 +223,18 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     final PrivilegedEvent newEvent = PrivilegedEvent.builder(baseEventWithOtherVars).variablesTyped(baseEventVars).build();
 
     assertThat(newEvent.getVariables(), sameInstance(baseEventVars));
+  }
+
+  @Test
+  public void varsCleared() throws MuleException {
+    CoreEvent baseEventWithVars = getEventBuilder()
+        .message(of("whatever"))
+        .addVariable("foo", "bar")
+        .build();
+
+    final CoreEvent newEvent = CoreEvent.builder(baseEventWithVars).clearVariables().build();
+
+    assertThat(newEvent.getVariables().isEmpty(), is(true));
   }
 
   @Test

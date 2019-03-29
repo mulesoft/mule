@@ -50,7 +50,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
-          Flux.<CoreEvent>create(sinkRef)
+          Flux.create(sinkRef)
               .transform(flowExecutionProcessor)
               .map(flowExecutionResult -> {
                 MessageSourceResponseParametersProcessor parametersProcessor =

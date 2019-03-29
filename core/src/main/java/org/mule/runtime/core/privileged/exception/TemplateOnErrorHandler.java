@@ -20,7 +20,6 @@ import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
-import static org.mule.runtime.core.internal.util.MessagingExceptionResolver.INFO_LAST_HANDLER_KEY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
@@ -105,7 +104,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
             } else {
               if (messagingEx.getEvent() != result) {
                 messagingEx.setProcessedEvent(result);
-                messagingEx.getInfo().put(INFO_LAST_HANDLER_KEY, this);
               }
               sink.error(exception);
             }
