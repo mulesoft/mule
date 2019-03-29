@@ -93,6 +93,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
+  private BeanDependencyResolver registryBeanDependencyResolver =
+      beanName -> getDependencyResolver().resolveComponentDependencies(beanName).stream()
+          .map(componentName -> getRegistry().lookupByName(componentName).orElse(null))
+          .filter(component -> component != null)
+          .collect(toList());
+
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
@@ -205,10 +211,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private void applyLifecycle(List<String> createdComponentModels, boolean applyStartPhase) {
     muleContext.withLifecycleLock(() -> {
       ComponentConfigurationLifecycleObjectSorter componentConfigurationLifecycleObjectSorter =
-          new ComponentConfigurationLifecycleObjectSorter(newBeanDependencyResolver());
+          new ComponentConfigurationLifecycleObjectSorter(registryBeanDependencyResolver);
       Map<Object, String> componentNames = new HashMap<>();
 
       createdComponentModels.forEach(componentName -> {
+
         Optional<Object> objectOptional = getRegistry().lookupByName(componentName);
         objectOptional.ifPresent(object -> {
           componentConfigurationLifecycleObjectSorter.addObject(componentName, object);
@@ -252,13 +259,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         }
       }
     });
-  }
-
-  private BeanDependencyResolver newBeanDependencyResolver() {
-    return beanName -> getDependencyResolver().resolveComponentDependencies(beanName).stream()
-        .map(componentName -> getRegistry().lookupByName(componentName).orElse(null))
-        .filter(component -> component != null)
-        .collect(toList());
   }
 
   class ComponentConfigurationLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
