@@ -51,11 +51,6 @@ import java.util.Optional;
  */
 public class MessagingExceptionResolver {
 
-  /**
-   * Indicates the last handler of the error where the event was modified.
-   */
-  public static final String INFO_LAST_HANDLER_KEY = "Last Handler Element";
-
   private final Component component;
 
   public MessagingExceptionResolver(Component component) {
@@ -182,10 +177,6 @@ public class MessagingExceptionResolver {
     MessagingException updated =
         me instanceof FlowExecutionException ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)
             : new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
-
-    if (me.getInfo().containsKey(INFO_LAST_HANDLER_KEY)) {
-      updated.getInfo().put(INFO_LAST_HANDLER_KEY, me.getInfo().get(INFO_LAST_HANDLER_KEY));
-    }
 
     return enrich(updated, failingProcessor, processor, errorEvent, exceptionContextProviders);
   }

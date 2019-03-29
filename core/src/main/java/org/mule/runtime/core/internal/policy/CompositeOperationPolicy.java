@@ -50,10 +50,10 @@ import reactor.core.publisher.MonoSink;
  * @since 4.0
  */
 public class CompositeOperationPolicy
-    extends AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationExecutionFunction>
+    extends AbstractCompositePolicy<OperationPolicyParametersTransformer>
     implements OperationPolicy, Disposable {
 
-  private static final String POLICY_OPERATION_NEXT_OPERATION_RESPONSE = "policy.operation.nextOperationResponse";
+  public static final String POLICY_OPERATION_NEXT_OPERATION_RESPONSE = "policy.operation.nextOperationResponse";
   public static final String POLICY_OPERATION_PARAMETERS_PROCESSOR = "policy.operation.parametersProcessor";
   public static final String POLICY_OPERATION_OPERATION_EXEC_FUNCTION = "policy.operation.operationExecutionFunction";
   private static final String POLICY_OPERATION_CHILD_CTX = "policy.operation.childContext";
@@ -97,7 +97,7 @@ public class CompositeOperationPolicy
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<CoreEvent> policyFlux =
-          Flux.<CoreEvent>create(sinkRef)
+          Flux.create(sinkRef)
               .transform(getExecutionProcessor())
               .doOnNext(result -> {
                 final BaseEventContext childContext = getStoredChildContext(result);
@@ -128,13 +128,12 @@ public class CompositeOperationPolicy
    * @param eventPub the event to execute the operation.
    */
   @Override
-  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     return Flux.from(eventPub)
         .flatMap(event -> {
-          Map<String, Object> parametersMap = new HashMap<>();
           OperationParametersProcessor parametersProcessor =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
-          parametersMap.putAll(parametersProcessor.getOperationParameters());
+          Map<String, Object> parametersMap = new HashMap<>(parametersProcessor.getOperationParameters());
 
           if (getParametersTransformer().isPresent()) {
             parametersMap.putAll(getParametersTransformer().get().fromMessageToParameters(event.getMessage()));
@@ -158,24 +157,13 @@ public class CompositeOperationPolicy
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
     ReactiveProcessor defaultOperationPolicy = operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
-    return Flux.from(eventPub)
-        .transform(defaultOperationPolicy)
-        .map(policyResponse -> {
-          if (policy.getPolicyChain().isPropagateMessageTransformations()) {
-            return quickCopy(policyResponse, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, policyResponse));
-          } else {
-            final InternalEvent nextOperationResponse =
-                ((InternalEvent) policyResponse).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
-            return nextOperationResponse != null ? nextOperationResponse : policyResponse;
-          }
-        })
-        .cast(CoreEvent.class);
+    return Flux.from(eventPub).transform(defaultOperationPolicy);
   }
 
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                       OperationParametersProcessor parametersProcessor, ComponentLocation operationLocation) {
-    return Mono.<CoreEvent>create(callerSink -> {
+    return Mono.create(callerSink -> {
       FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
       policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
                                               operationExecutionFunction,

@@ -38,16 +38,15 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -240,9 +239,9 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     }
 
     @Override
-    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
+    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy policy) {
       nextOperation.incrementAndGet();
-      return super.applyNextOperation(eventPub);
+      return super.applyNextOperation(eventPub, policy);
     }
 
     @Override
