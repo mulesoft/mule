@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.policy;
+package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
@@ -57,7 +57,7 @@ public class PolicyNotificationHelper {
 
   private PolicyNotification createNotification(CoreEvent event, Exception e, int action) {
     EnrichedNotificationInfo info = EnrichedNotificationInfo.createInfo(event, e, component);
-    return new PolicyNotification(policyId, info, action, null);
+    return new PolicyNotification(policyId, info, action, component.getLocation());
   }
 
 }

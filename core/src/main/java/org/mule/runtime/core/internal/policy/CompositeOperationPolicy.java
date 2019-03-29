@@ -19,7 +19,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
-import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -51,7 +50,7 @@ import reactor.core.publisher.MonoSink;
  * @since 4.0
  */
 public class CompositeOperationPolicy
-    extends AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationExecutionFunction>
+    extends AbstractCompositePolicy<OperationPolicyParametersTransformer>
     implements OperationPolicy, Disposable {
 
   public static final String POLICY_OPERATION_NEXT_OPERATION_RESPONSE = "policy.operation.nextOperationResponse";
@@ -98,7 +97,7 @@ public class CompositeOperationPolicy
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<CoreEvent> policyFlux =
-          Flux.<CoreEvent>create(sinkRef)
+          Flux.create(sinkRef)
               .transform(getExecutionProcessor())
               .doOnNext(result -> {
                 final BaseEventContext childContext = getStoredChildContext(result);
@@ -127,11 +126,9 @@ public class CompositeOperationPolicy
    * not a modified version from another policy.
    *
    * @param eventPub the event to execute the operation.
-   * @param policyId
    */
   @Override
-  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, PolicyNotificationHelper notificationHelper,
-                                                    String policyId) {
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     return Flux.from(eventPub)
         .flatMap(event -> {
           OperationParametersProcessor parametersProcessor =
@@ -166,7 +163,7 @@ public class CompositeOperationPolicy
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                       OperationParametersProcessor parametersProcessor, ComponentLocation operationLocation) {
-    return Mono.<CoreEvent>create(callerSink -> {
+    return Mono.create(callerSink -> {
       FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
       policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
                                               operationExecutionFunction,

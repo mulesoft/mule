@@ -82,18 +82,6 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   protected abstract ReactiveProcessor getProcessor();
 
   @Test
-  public void variablesAddedInNextProcessorNotPropagated() {
-    CoreEvent initialEventWithVars = CoreEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
-    CoreEvent modifiedVarsEvent = CoreEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
-    mockFlowReturningEvent(modifiedVarsEvent);
-    when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> Flux.<CoreEvent>from(invocation.getArgument(0)));
-
-    CoreEvent resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
-
-    assertEquals(resultEvent.getVariables().keySet(), initialEventWithVars.getVariables().keySet());
-  }
-
-  @Test
   public void messageModifiedByNextProcessorIsPropagated() {
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     mockFlowReturningEvent(modifiedMessageEvent);

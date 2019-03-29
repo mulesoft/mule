@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Collections.singleton;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
-import static org.mule.runtime.core.internal.policy.OperationPolicyProcessor.POLICY_OPERATION_ORIGINAL_EVENT;
-import static org.mule.runtime.core.internal.policy.SourcePolicyProcessor.POLICY_SOURCE_ORIGINAL_EVENT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -25,29 +21,19 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.message.InternalEvent.Builder;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableSet;
-
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * Next-operation message processor implementation.
@@ -62,7 +48,6 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
-  public static final String POLICY_VARS = "policy.vars.%s";
   public static final String POLICY_NEXT_EVENT_CTX_IDS = "policy.next.eventCtxIds";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
 
@@ -70,12 +55,48 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private MuleContext muleContext;
 
   private PolicyNotificationHelper notificationHelper;
-
-  private final PolicyEventConverter policyEventConverter = new PolicyEventConverter();
+  private PolicyEventMapper policyEventMapper;
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.policyEventMapper = new PolicyEventMapper(getPolicyId());
+    this.notificationHelper =
+        new PolicyNotificationHelper(muleContext.getNotificationManager(), getPolicyId(), this);
+  }
+
+  @Override
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    return from(publisher)
+        .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
+                                                   coreEvent.getMessage(), getPolicyId()))
+        .doOnNext(event -> {
+          popBeforeNextFlowFlowStackElement().accept(event);
+          notificationHelper.notification(BEFORE_NEXT).accept(event);
+        })
+        .compose(eventPub -> subscriberContext()
+            .flatMapMany(ctx -> eventPub
+                .flatMap(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                    ? just(policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)))
+                    : just(policyEventMapper.onOperationPolicyNext(event)))
+                .transform(ctx.get(POLICY_NEXT_OPERATION))
+                .cast(CoreEvent.class)))
+        .doOnNext(coreEvent -> {
+          notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
+          pushAfterNextFlowStackElement().accept(coreEvent);
+          logExecuteNextEvent("After execute-next", coreEvent.getContext(), coreEvent.getMessage(),
+                              getPolicyId());
+        })
+        .map(result -> policyEventMapper.fromPolicyNext(result))
+        .onErrorContinue(MessagingException.class, (error, v) -> {
+          new OnExecuteNextErrorConsumer(event -> policyEventMapper.fromPolicyNext(event), notificationHelper, getLocation())
+              .accept(error);
+
+        });
   }
 
   private Consumer<CoreEvent> pushAfterNextFlowStackElement() {
@@ -92,89 +113,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
   }
 
-  @Override
-  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
-        .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
-                                                   coreEvent.getMessage(), muleContext.getConfiguration().getId()))
-        .doOnNext(event -> {
-          //          popBeforeNextFlowFlowStackElement().accept(event);
-          notificationHelper.notification(BEFORE_NEXT).accept(event);
-        })
-        .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> eventPub
-                .flatMap(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
-                    ? just(policyEventConverter.createEvent((PrivilegedEvent) event,
-                                                            getOriginalEvent(event),
-                                                            builder -> saveState(builder, event),
-                                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)))
-                    : just(policyEventConverter.createEvent((PrivilegedEvent) event,
-                                                            getOriginalEvent(event),
-                                                            builder -> saveState(builder, event))))
-                .cast(CoreEvent.class)
-                .transform(ctx.get(POLICY_NEXT_OPERATION))
-                .cast(CoreEvent.class)))
-        .doOnNext(coreEvent -> {
-          notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
-          pushAfterNextFlowStackElement().accept(coreEvent);
-          logExecuteNextEvent("After execute-next", coreEvent.getContext(), coreEvent.getMessage(),
-                              this.muleContext.getConfiguration().getId());
-        })
-        .map(result -> (CoreEvent) policyEventConverter.restoreVariables((PrivilegedEvent) result,
-                                                                         loadVars((PrivilegedEvent) result)))
-        .onErrorContinue(MessagingException.class, (error, v) -> {
-          final CoreEvent event = ((MessagingException) error).getEvent();
-
-          if (isEventContextHandledByThisNext(event)) {
-            MessagingException me = (MessagingException) error;
-            notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
-            pushAfterNextFlowStackElement().accept(me.getEvent());
-
-            me.setProcessedEvent(policyEventConverter.restoreVariables((PrivilegedEvent) me.getEvent(),
-                                                                       loadVars((PrivilegedEvent) me.getEvent())));
-
-            ((BaseEventContext) event.getContext()).error(error);
-          }
-        });
-  }
-
-  private Builder saveState(PrivilegedEvent.Builder builder, CoreEvent event) {
-    final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
-
-    return ((InternalEvent.Builder) builder)
-        .addInternalParameter(policyVarsInternalParameterName(), event.getVariables())
-        .addInternalParameter(POLICY_NEXT_EVENT_CTX_IDS, eventCtxIds == null
-            ? singleton(event.getContext().getId())
-            : ImmutableSet.builder().addAll(eventCtxIds).add(event.getContext().getId()).build());
-  }
-
-  private String policyVarsInternalParameterName() {
-    return String.format(POLICY_VARS, muleContext.getConfiguration().getId());
-  }
-
-  private boolean isEventContextHandledByThisNext(CoreEvent event) {
-    final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
-    return eventCtxIds != null && eventCtxIds.contains(event.getContext().getId());
-  }
-
-  private PrivilegedEvent getOriginalEvent(CoreEvent event) {
-    final PrivilegedEvent operationOriginalEvent =
-        ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT);
-    if (operationOriginalEvent != null) {
-      return operationOriginalEvent;
-    } else {
-      return ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_ORIGINAL_EVENT);
-    }
-  }
-
-  private Map<String, TypedValue<?>> loadVars(PrivilegedEvent event) {
-    return ((InternalEvent) event).getInternalParameter(policyVarsInternalParameterName());
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    notificationHelper =
-        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(), this);
+  private String getPolicyId() {
+    return muleContext.getConfiguration().getId();
   }
 
   private void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {

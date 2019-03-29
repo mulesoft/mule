@@ -20,7 +20,6 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
@@ -32,23 +31,21 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
-import org.mule.runtime.core.api.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -229,33 +226,6 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   }
 
   @Test
-  public void nextProcessorExecutionFailurePropagates() {
-    RuntimeException policyException = new RuntimeException("policy failure");
-    final Component policyComponent = mock(Component.class);
-    when(policyComponent.getLocation()).thenReturn(fromSingleComponent("some:component"));
-    reset(flowExecutionProcessor);
-
-    when(flowExecutionProcessor.apply(any()))
-        .thenAnswer(invocation -> {
-          Flux<CoreEvent> baseFlux = Flux.from(invocation.getArgument(0));
-          if (processChangeThread) {
-            baseFlux = baseFlux.publishOn(Schedulers.single());
-          }
-          return baseFlux.flatMap(event -> error(new MessagingException(event, policyException)));
-        });
-    compositeSourcePolicy =
-        new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
-                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
-
-    Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
-        from(compositeSourcePolicy.process(initialEvent, sourceParametersProcessor)).block();
-    assertThat(sourcePolicyResult.isLeft(), is(true));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause(), is(policyException));
-    verify(sourcePolicyParametersTransformer).fromFailureResponseParametersToMessage(any());
-    verify(sourcePolicyParametersTransformer, never()).fromSuccessResponseParametersToMessage(any());
-  }
-
-  @Test
   public void reactorPipelinesReused() {
     InvocationsRecordingCompositeSourcePolicy.reset();
     final InvocationsRecordingCompositeSourcePolicy sourcePolicy =
@@ -290,10 +260,9 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     }
 
     @Override
-    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, PolicyNotificationHelper notificationHelper,
-                                                      String policyId) {
+    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy policy) {
       nextOperation.incrementAndGet();
-      return super.applyNextOperation(eventPub, notificationHelper, policyId);
+      return super.applyNextOperation(eventPub, policy);
     }
 
     @Override
