@@ -22,8 +22,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Consumer executed when a chain triggered by an execute-next processor finishes with an error. That chain can be a flow, a
- * single operation or other policies.
+ * Consumer executed when a chain triggered by a policy's execute-next processor finishes with an error. That chain can be a flow,
+ * a single operation or other policies.
  */
 public class OnExecuteNextErrorConsumer implements Consumer<Throwable> {
 
@@ -44,13 +44,15 @@ public class OnExecuteNextErrorConsumer implements Consumer<Throwable> {
     MessagingException me = (MessagingException) error;
 
     if (isEventContextHandledByThisNext(me.getEvent())) {
-      notificationHelper.fireNotification(me.getEvent(), me, AFTER_NEXT);
+      CoreEvent newEvent = prepareEvent.apply(me.getEvent());
 
-      pushAfterNextFlowStackElement().accept(me.getEvent());
+      me.setProcessedEvent(newEvent);
 
-      me.setProcessedEvent(prepareEvent.apply(me.getEvent()));
+      notificationHelper.fireNotification(newEvent, me, AFTER_NEXT);
 
-      ((BaseEventContext) me.getEvent().getContext()).error(error);
+      pushAfterNextFlowStackElement().accept(newEvent);
+
+      ((BaseEventContext) newEvent.getContext()).error(error);
     }
   }
 
