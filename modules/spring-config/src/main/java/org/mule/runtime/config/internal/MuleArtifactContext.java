@@ -511,9 +511,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     createdComponentModels.sort(Comparator.comparing(beanName -> {
       if (objectProviderNames.contains(beanName)) {
         return 1;
-      } else if (alwaysEnabledTopLevelComponents.contains(beanName)) {
-        return 2;
       } else if (alwaysEnabledGeneratedTopLevelComponentsName.contains(beanName)) {
+        return 2;
+      } else if (alwaysEnabledTopLevelComponents.contains(beanName)) {
         return 3;
       } else {
         return 4;
