@@ -32,5 +32,5 @@ public interface ResponseStatusCallback {
    * @param throwable exception thrown while sending the response
    * @since 4.1.6
    */
-  default void responseSendError(Throwable throwable) {}
+  default void onErrorSendingResponse(Throwable throwable) {}
 }
