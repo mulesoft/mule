@@ -12,9 +12,6 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 
-import java.io.IOException;
-import java.util.function.Consumer;
-
 /**
  * {@link ManagedCursorProvider} implementation for {@link CursorIteratorProvider} instances
  *
@@ -34,74 +31,7 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
    */
   @Override
   protected CursorIterator managedCursor(CursorIterator cursor) {
-    return new ManagedCursorIterator(cursor);
+    return new ManagedCursorIterator(cursor, getJanitor());
   }
 
-  private class ManagedCursorIterator<T> implements CursorIterator<T> {
-
-    private final CursorIterator<T> delegate;
-
-    private ManagedCursorIterator(CursorIterator<T> delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public void close() throws IOException {
-      try {
-        delegate.close();
-      } finally {
-        ManagedCursorIteratorProvider.this.onClose(this);
-      }
-    }
-
-    @Override
-    public boolean hasNext() {
-      return delegate.hasNext();
-    }
-
-    @Override
-    public T next() {
-      return delegate.next();
-    }
-
-    @Override
-    public void remove() {
-      delegate.remove();
-    }
-
-    @Override
-    public void forEachRemaining(Consumer<? super T> action) {
-      delegate.forEachRemaining(action);
-    }
-
-    @Override
-    public long getPosition() {
-      return delegate.getPosition();
-    }
-
-    @Override
-    public void seek(long position) throws IOException {
-      delegate.seek(position);
-    }
-
-    @Override
-    public void release() {
-      delegate.release();
-    }
-
-    @Override
-    public boolean isReleased() {
-      return delegate.isReleased();
-    }
-
-    @Override
-    public CursorProvider getProvider() {
-      return delegate.getProvider();
-    }
-
-    @Override
-    public int getSize() {
-      return delegate.getSize();
-    }
-  }
 }

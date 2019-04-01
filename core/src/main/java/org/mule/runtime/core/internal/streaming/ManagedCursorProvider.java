@@ -54,7 +54,6 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
 
   public final void onClose(Cursor cursor) {
     if (cursors.remove(cursor)) {
-      janitor.releaseCursor(cursor);
       if (isClosed() && cursors.isEmpty()) {
         releaseResources();
       }
