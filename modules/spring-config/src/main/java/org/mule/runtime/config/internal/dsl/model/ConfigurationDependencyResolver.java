@@ -23,7 +23,6 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
-import org.mule.runtime.config.internal.BeanDependencyResolver;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -39,7 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class ConfigurationDependencyResolver implements BeanDependencyResolver {
+public class ConfigurationDependencyResolver {
 
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
@@ -217,11 +216,6 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
   public ApplicationModel getApplicationModel() {
     return applicationModel;
-  }
-
-  @Override
-  public List<Object> resolveBeanDependencies(String beanName) {
-    return null;
   }
 
   public List<ComponentModel> findRequiredComponentModels(Predicate<ComponentModel> predicate) {

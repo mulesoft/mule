@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.BeansException;
@@ -54,7 +55,7 @@ public class TrackingPostProcessor implements BeanPostProcessor {
     tracking = false;
   }
 
-  public void intersection(List<String> beanNames) {
+  public void intersection(Collection<String> beanNames) {
     trackingList.removeIf(name -> !beanNames.contains(name));
   }
 
