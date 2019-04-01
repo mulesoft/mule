@@ -12,6 +12,11 @@ import org.mule.runtime.core.internal.streaming.CursorProviderJanitor;
 
 import java.io.IOException;
 
+/**
+ * A decorator which allows performing management tasks over a {@link CursorStream}
+ *
+ * @since 4.1.6
+ */
 class ManagedCursorDecorator extends CursorStream {
 
   private final CursorStream delegate;

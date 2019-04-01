@@ -89,10 +89,8 @@ public class CursorProviderJanitor {
   public void releaseCursor(Cursor cursor) {
     try {
       cursor.release();
-      if (cursors.remove(cursor)) {
-        if (provider.isClosed() && cursors.isEmpty()) {
-          releaseResources();
-        }
+      if (cursors.remove(cursor) && provider.isClosed() && cursors.isEmpty()) {
+        releaseResources();
       }
     } catch (Exception e) {
       LOGGER.warn("Exception was found trying to release cursor resources. Execution will continue", e);

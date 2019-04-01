@@ -7,12 +7,18 @@
 package org.mule.runtime.core.internal.streaming.object;
 
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.internal.streaming.CursorProviderJanitor;
 
 import java.io.IOException;
 import java.util.function.Consumer;
 
+/**
+ * A decorator which allows performing management tasks over a {@link CursorStream}
+ *
+ * @since 4.1.6
+ */
 class ManagedCursorIterator<T> implements CursorIterator<T> {
 
   private final CursorIterator<T> delegate;
