@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.io.IOUtils.lineIterator;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
@@ -16,7 +18,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.internal.util.SecurityUtils;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
@@ -32,6 +33,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.LineIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,10 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   public void doBody() {
 
     try (InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("banner.txt")) {
-      doBody(IOUtils.toString(resourceAsStream));
+      LineIterator lineIterator = lineIterator(resourceAsStream, defaultCharset());
+      while (lineIterator.hasNext()) {
+        doBody(lineIterator.nextLine());
+      }
     } catch (IOException e) {
       LOGGER.warn("Could not create banner");
     }
