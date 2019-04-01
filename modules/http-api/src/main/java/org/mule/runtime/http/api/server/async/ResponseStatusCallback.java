@@ -25,4 +25,12 @@ public interface ResponseStatusCallback {
    */
   void responseSendSuccessfully();
 
+  /**
+   * Method to process an error without sending a response, since the error that occurred cannot be recovered from. Implementors
+   * should override this particularly when dealing with SDK asynchronous sources that require a completion callback notification.
+   *
+   * @param throwable exception thrown while sending the response
+   * @since 4.1.6
+   */
+  default void onErrorSendingResponse(Throwable throwable) {}
 }
