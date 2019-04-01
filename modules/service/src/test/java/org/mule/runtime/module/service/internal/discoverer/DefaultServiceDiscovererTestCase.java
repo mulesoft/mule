@@ -61,23 +61,22 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void schedulerServiceIsPushedBack() throws ServiceResolutionError
-  {
+  public void schedulerServiceIsPushedBack() throws ServiceResolutionError {
 
     Service mockSchedulerService = new MockService("Scheduler service");
 
     List<Service> mockedServices = asList(
-                                                 new MockService("AwesomeService1"),
-                                                 new MockService("AwesomeService2"),
-                                                 mockSchedulerService,
-                                                 new MockService("AwesomeService3"));
+                                          new MockService("AwesomeService1"),
+                                          new MockService("AwesomeService2"),
+                                          mockSchedulerService,
+                                          new MockService("AwesomeService3"));
 
     when(serviceResolver.resolveServices(anyList())).thenReturn(mockedServices);
 
     List<Service> discoveredServices = serviceDiscoverer.discoverServices();
 
     // Assert scheduler service was pushed back
-    assertThat(discoveredServices.get(discoveredServices.size()-1), is(mockSchedulerService));
+    assertThat(discoveredServices.get(discoveredServices.size() - 1), is(mockSchedulerService));
 
     // Assert all remaining services weren't removed
     assertThat(discoveredServices.containsAll(mockedServices), is(true));
