@@ -61,7 +61,16 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
     }
   }
 
-  protected void moveSchedulerServiceToEnd(List<Service> discoveredServices) throws ServiceResolutionError {
+  /**
+   * Moves discovered 'Scheduler Service' to the end of the list, if present. Since the service manager
+   * {@link org.mule.runtime.module.service.internal.manager.MuleServiceManager} stops all resolved services in the list order,
+   * and the underlying order in which the provider obtains them is unreliable, the scheduler service has to be stopped last. This
+   * prevents any scheduler from being force-shutdown when the service is being disposed, and lets the borrower do a prior clean
+   * shutdown.
+   *
+   * @param discoveredServices raw services discovered
+   */
+  protected void moveSchedulerServiceToEnd(List<Service> discoveredServices) {
     // Find index of schedulerService
     OptionalInt indexOfSchedulerService = range(0, discoveredServices.size())
         .filter(index -> discoveredServices.get(index).getName().equals(SCHEDULER_SERVICE_ARTIFACT_NAME))
