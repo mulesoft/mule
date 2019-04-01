@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -206,11 +207,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     muleContext.withLifecycleLock(() -> {
       // Sorter in order to initialize and start the components according to they dependencies
       ComponentConfigurationLifecycleObjectSorter componentConfigurationLifecycleObjectSorter =
-          new ComponentConfigurationLifecycleObjectSorter(beanName -> getDependencyResolver()
-              .resolveComponentDependencies(beanName).stream()
-              .map(componentName -> components.get(componentName))
-              .filter(component -> component != null)
-              .collect(toList()));
+          new ComponentConfigurationLifecycleObjectSorter(getBeanDependencyResolver(getDependencyResolver(), components));
       // A Map to access the componentName by the bean instance
       Map<Object, String> componentNames = new HashMap<>();
       components.entrySet().forEach(entry -> {
@@ -258,6 +255,15 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     });
   }
 
+  private static BeanDependencyResolver getBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
+                                                                  Map<String, Object> components) {
+    return beanName -> configurationDependencyResolver
+        .resolveComponentDependencies(beanName).stream()
+        .map(componentName -> components.get(componentName))
+        .filter(Objects::nonNull)
+        .collect(toList());
+  }
+
   class ComponentConfigurationLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
 
     private final BeanDependencyResolver beanDependencyResolver;
@@ -269,8 +275,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
 
     /**
-     * Implementation that handles duplicates. A->B->C, so if we add B, C will be added but later A will be added and its
-     * dependencies were already added before.
+     * Implementation that handles duplicates.
+     * Whenever a new object is added, then all its dependencies are added as well.
+     * So if one of those dependencies wants to be added again, it's ignored.
      */
     @Override
     protected int doAddObject(String name, Object object, List<Object> bucket) {
