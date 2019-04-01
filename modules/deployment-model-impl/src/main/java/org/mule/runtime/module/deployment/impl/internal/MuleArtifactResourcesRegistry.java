@@ -10,7 +10,6 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
-
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
@@ -61,7 +60,6 @@ import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFacto
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.service.internal.discoverer.OrderingServiceDiscovererWrapper;
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
 import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
 
@@ -164,12 +162,12 @@ public class MuleArtifactResourcesRegistry {
                                             pluginClassLoadersFactory);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
     serviceManager =
-        ServiceManager.create(new OrderingServiceDiscovererWrapper(new DefaultServiceDiscoverer(
-                                                                                                new FileSystemServiceProviderDiscoverer(containerClassLoader,
-                                                                                                                                        trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
-                                                                                                                                        descriptorLoaderRepository,
-                                                                                                                                        artifactDescriptorValidatorBuilder),
-                                                                                                new ReflectionServiceResolver(new ServiceRegistry()))));
+        ServiceManager.create(new DefaultServiceDiscoverer(
+                                                           new FileSystemServiceProviderDiscoverer(containerClassLoader,
+                                                                                                   trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
+                                                                                                   descriptorLoaderRepository,
+                                                                                                   artifactDescriptorValidatorBuilder),
+                                                           new ReflectionServiceResolver(new ServiceRegistry())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
     ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider =
         getRuntimeComponentBuildingDefinitionProvider();
