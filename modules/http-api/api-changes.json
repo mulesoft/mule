@@ -1,4 +1,19 @@
 {
+  "4.1.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.http.api.server.async.ResponseStatusCallback::onErrorSendingResponse(java.lang.Throwable)",
+          "package": "org.mule.runtime.http.api.server.async",
+          "classSimpleName": "ResponseStatusCallback",
+          "methodName": "onErrorSendingResponse",
+          "elementKind": "method",
+          "justification": "This fixes a critical bug."
+        }
+      ]
+    }
+  },
   "4.1.5": {
     "revapi": {
       "ignore": [
