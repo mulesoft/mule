@@ -7,8 +7,10 @@
 
 package org.mule.runtime.module.service.internal.discoverer;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.service.Service;
@@ -56,5 +58,49 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
     when(serviceResolver.resolveServices(serviceProviders)).thenThrow(new RuntimeException(new ServiceResolutionError("Error")));
 
     serviceDiscoverer.discoverServices();
+  }
+
+  @Test
+  public void schedulerServiceIsPushedBack() throws ServiceResolutionError
+  {
+
+    Service mockSchedulerService = new MockService("Scheduler service");
+
+    List<Service> mockedServices = asList(
+                                                 new MockService("AwesomeService1"),
+                                                 new MockService("AwesomeService2"),
+                                                 mockSchedulerService,
+                                                 new MockService("AwesomeService3"));
+
+    when(serviceResolver.resolveServices(anyList())).thenReturn(mockedServices);
+
+    List<Service> discoveredServices = serviceDiscoverer.discoverServices();
+
+    // Assert scheduler service was pushed back
+    assertThat(discoveredServices.get(discoveredServices.size()-1), is(mockSchedulerService));
+
+    // Assert all remaining services weren't removed
+    assertThat(discoveredServices.containsAll(mockedServices), is(true));
+  }
+
+
+  private class MockService implements Service {
+
+    private String name;
+
+    public MockService(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public String getName() {
+      return name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj instanceof MockService &&
+          ((MockService) obj).getName().equals(name);
+    }
   }
 }

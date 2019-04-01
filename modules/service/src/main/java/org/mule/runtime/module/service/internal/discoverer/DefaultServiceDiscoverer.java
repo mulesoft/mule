@@ -8,15 +8,18 @@
 package org.mule.runtime.module.service.internal.discoverer;
 
 
+import static java.util.Collections.swap;
+import static java.util.stream.IntStream.range;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
+import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 /**
  * Default implementation of {@link ServiceDiscoverer}
@@ -25,6 +28,7 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
 
   private final ServiceResolver serviceResolver;
   private final ServiceProviderDiscoverer serviceProviderDiscoverer;
+  private static final String SCHEDULER_SERVICE_ARTIFACT_NAME = "Scheduler service";
 
   public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer) {
     this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ServiceRegistry()));
@@ -47,11 +51,23 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   public List<Service> discoverServices() throws ServiceResolutionError {
     try {
       final List<ServiceAssembly> assemblies = serviceProviderDiscoverer.discover();
-      return serviceResolver.resolveServices(assemblies);
+      List<Service> resolvedServices = serviceResolver.resolveServices(assemblies);
+      moveSchedulerServiceToEnd(resolvedServices);
+      return resolvedServices;
     } catch (ServiceResolutionError e) {
       throw e;
     } catch (Exception e) {
       throw new ServiceResolutionError(e.getMessage(), e);
+    }
+  }
+
+  protected void moveSchedulerServiceToEnd(List<Service> discoveredServices) throws ServiceResolutionError {
+    // Find index of schedulerService
+    OptionalInt indexOfSchedulerService = range(0, discoveredServices.size())
+        .filter(index -> discoveredServices.get(index).getName().equals(SCHEDULER_SERVICE_ARTIFACT_NAME))
+        .findFirst();
+    if (indexOfSchedulerService.isPresent()) {
+      swap(discoveredServices, indexOfSchedulerService.getAsInt(), discoveredServices.size() - 1);
     }
   }
 }
