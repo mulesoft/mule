@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
 import static java.util.stream.Collectors.toMap;
@@ -26,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -44,7 +44,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   public void doBody() {
 
     try (InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("banner.txt")) {
-      LineIterator lineIterator = lineIterator(resourceAsStream, Charset.defaultCharset());
+      LineIterator lineIterator = lineIterator(resourceAsStream, defaultCharset());
       while (lineIterator.hasNext()) {
         doBody(lineIterator.nextLine());
       }
