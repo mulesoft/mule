@@ -15,7 +15,8 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validateWithoutWarnings;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -149,7 +150,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException.expectMessage("'source' has a String type output but doesn't specify a default mime type.");
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
     when(sourceOutputModel.getType()).thenReturn(toMetadataType(String.class));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -158,7 +159,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException.expectMessage("Source 'source' has a InputStream type output but doesn't specify a default mime type.");
     mockExtensionTypeDescriptorModelProperty(TestStreamSource.class);
     when(sourceOutputModel.getType()).thenReturn(toMetadataType(InputStream.class));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -167,7 +168,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException.expectMessage("Operation 'operation' has a String type output but doesn't specify a default mime type.");
     mockExtensionOperationDescriptorModelProperty("returnsString");
     when(operationOutputModel.getType()).thenReturn(toMetadataType(String.class));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -177,7 +178,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
         .expectMessage("Operation 'operation' has a InputStream type output but doesn't specify a default mime type.");
     mockExtensionOperationDescriptorModelProperty("returnsStream");
     when(operationOutputModel.getType()).thenReturn(toMetadataType(InputStream.class));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -190,7 +191,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationOutputModel.getType()).thenReturn(operationOutputType);
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -203,7 +204,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(sourceOutputModel.getType()).thenReturn(sourceOutputType);
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -216,7 +217,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
     when(operationOutputType.getMetadataFormat()).thenReturn(new MetadataFormat("java", "java", "application/java"));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -229,7 +230,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
     when(sourceOutputType.getMetadataFormat()).thenReturn(new MetadataFormat("java", "java", "application/java"));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -241,7 +242,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
     when(operationOutputType.getMetadataFormat()).thenReturn(new MetadataFormat("Xml", "xml", "application/xml"));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -253,7 +254,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
     when(sourceOutputType.getMetadataFormat()).thenReturn(new MetadataFormat("Xml", "xml", "application/xml"));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -264,7 +265,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationOutputModel.getType()).thenReturn(operationOutputType);
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
@@ -275,14 +276,14 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(sourceOutputModel.getType()).thenReturn(sourceOutputType);
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   @Test
   public void sourceAndOperationReturnsAnObject() throws Exception {
     mockMediaTypeAnnotation(operationModel, "*/*", false);
     mockMediaTypeAnnotation(sourceModel, "*/*", false);
-    validate(extensionModel, validator);
+    validateWithoutWarnings(extensionModel, validator);
   }
 
   public class TestMethods {

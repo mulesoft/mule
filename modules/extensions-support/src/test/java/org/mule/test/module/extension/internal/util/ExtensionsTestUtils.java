@@ -29,6 +29,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.TypeBuilder;
@@ -86,15 +87,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.core.streaming.SimpleByteBufferManager;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.HashMap;
 
+import com.google.common.collect.ImmutableList;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
@@ -132,6 +132,20 @@ public final class ExtensionsTestUtils {
     }
 
     return problemsReporter;
+  }
+
+  public static ProblemsReporter validateWithoutWarnings(ExtensionModel model, ExtensionModelValidator validator) {
+    ProblemsReporter problemsReporter = validate(model, validator);
+    if (problemsReporter.hasWarnings()) {
+      throw new IllegalModelDefinitionException(problemsReporter.toString());
+    }
+
+    return problemsReporter;
+  }
+
+  public static ProblemsReporter validateWithoutWarnings(Class<?> clazz, ExtensionModelValidator validator,
+                                                         Map<String, Object> params) {
+    return validateWithoutWarnings(loadExtension(clazz, params), validator);
   }
 
   public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType) {
@@ -249,7 +263,7 @@ public final class ExtensionsTestUtils {
    * Receives to {@link String} representation of two XML files and verify that they are semantically equivalent
    *
    * @param expected the reference content
-   * @param actual   the actual content
+   * @param actual the actual content
    * @throws Exception if comparison fails
    */
   public static void compareXML(String expected, String actual) throws Exception {

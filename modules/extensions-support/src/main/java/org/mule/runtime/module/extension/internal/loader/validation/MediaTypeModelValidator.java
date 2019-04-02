@@ -88,7 +88,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
                      capitalize(componentType), model.getName(),
                      outputMetadataType instanceof StringType ? "String" : "InputStream",
                      org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
-          problemsReporter.addError(new Problem(model, message));
+          problemsReporter.addWarning(new Problem(model, message));
         } else if (staticResolverClashesWithMediaTypeAnnotationValue(model, outputMetadataType)) {
           String componentType = NameUtils.getComponentModelTypeName(model);
           String message =
@@ -99,7 +99,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
                       "and keep letting the user configure the outputMimeType parameter.",
                           capitalize(componentType), model.getName(), MediaType.class.getSimpleName(),
                           org.mule.metadata.api.model.MetadataFormat.class.getName(), MediaType.class.getSimpleName());
-          problemsReporter.addError(new Problem(model, message));
+          problemsReporter.addWarning(new Problem(model, message));
         } else if (mediaTypeAnnotationIsMissingValue(model, outputMetadataType)) {
           String componentType = NameUtils.getComponentModelTypeName(model);
           String message =
@@ -108,7 +108,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
                      capitalize(componentType), model.getName(),
                      outputMetadataType instanceof StringType ? "String" : "InputStream",
                      org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
-          problemsReporter.addError(new Problem(model, message));
+          problemsReporter.addWarning(new Problem(model, message));
         }
       }
 
