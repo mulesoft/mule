@@ -29,6 +29,11 @@ public abstract class BaseMessageWithHeaders implements MessageWithHeaders {
   }
 
   @Override
+  public boolean containsHeader(String headerName) {
+    return headers.containsKey(headerName);
+  }
+
+  @Override
   public String getHeaderValue(String headerName) {
     return headers.get(headerName);
   }
