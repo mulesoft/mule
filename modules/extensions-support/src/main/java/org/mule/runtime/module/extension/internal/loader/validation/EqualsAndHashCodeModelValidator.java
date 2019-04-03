@@ -68,9 +68,9 @@ public class EqualsAndHashCodeModelValidator implements ExtensionModelValidator 
           Optional<MethodElement> hashCode = type.getMethod("hashCode");
           if (!equals.isPresent() || !hashCode.isPresent()) {
             reporter
-                .addError(new Problem(model,
-                                      format("Type '%s' must override equals and hashCode",
-                                             type.getName())));
+                .addWarning(new Problem(model,
+                                        format("Type '%s' must override equals and hashCode",
+                                               type.getName())));
           }
         }
       }

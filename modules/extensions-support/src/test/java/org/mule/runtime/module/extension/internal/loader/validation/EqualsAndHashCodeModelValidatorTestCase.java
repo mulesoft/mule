@@ -62,7 +62,7 @@ public class EqualsAndHashCodeModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   private void validate(Class<?> connectorClass) {
-    ExtensionsTestUtils.validate(connectorClass, validator, new HashMap() {
+    ExtensionsTestUtils.validateWithoutWarnings(connectorClass, validator, new HashMap() {
 
       {
         put("COMPILATION_MODE", true);
