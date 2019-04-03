@@ -1,4 +1,20 @@
 {
+  "4.3.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.http.api.domain.OptimizedCaseInsensitiveMapWrapper<T extends java.lang.Object>",
+          "new": "class org.mule.runtime.http.api.domain.OptimizedCaseInsensitiveMapWrapper<T extends java.lang.Object>",
+          "superClass": "java.util.AbstractMap<java.lang.String, T extends java.lang.Object>",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "OptimizedCaseInsensitiveMapWrapper",
+          "elementKind": "class",
+          "justification": "This was a bad implementation, will remove this after cherry-pick."
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [

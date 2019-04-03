@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 @NoExtend
 public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements DataTypeAware {
 
-  private static final long serialVersionUID = 7281170170522463160L;
+  private static final long serialVersionUID = -3754163327838153655L;
 
   protected final boolean optimized;
 
@@ -70,10 +70,6 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
       this.paramsMap = unmodifiableMap(paramsMap);
     }
 
-    @Override
-    public boolean isMutable() {
-      return false;
-    }
   }
 
   @Override

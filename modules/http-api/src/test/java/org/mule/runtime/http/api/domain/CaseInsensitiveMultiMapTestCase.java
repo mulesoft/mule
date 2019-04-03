@@ -8,6 +8,7 @@
 package org.mule.runtime.http.api.domain;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -87,9 +88,25 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
   }
 
   @Test
-  public void mutability() {
-    assertThat(multiMap.isMutable(), is(true));
-    assertThat(multiMap.toImmutableMultiMap().isMutable(), is(false));
+  public void emptyEquality() {
+    MultiMap<Object, Object> otherMultiMap = new MultiMap<>();
+
+    assertThat(multiMap, is(equalTo(otherMultiMap)));
+    assertThat(otherMultiMap, is(equalTo(multiMap)));
+  }
+
+  @Test
+  public void complexEquality() {
+    MultiMap<Object, Object> otherMultiMap = new MultiMap<>();
+    otherMultiMap.put("hello", "there");
+    multiMap.put("hello", "there");
+    otherMultiMap.put("hello", "stranger");
+    multiMap.put("HellO", "stranger");
+    otherMultiMap.put("bye", "dude");
+    multiMap.put("BYE", "dude");
+
+    assertThat(otherMultiMap, is(equalTo(multiMap)));
+    assertThat(multiMap, is(equalTo(otherMultiMap)));
   }
 
 }
