@@ -9,9 +9,6 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.functional.Either.left;
-import static org.mule.runtime.core.api.functional.Either.right;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
@@ -29,7 +26,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -231,6 +227,9 @@ public class MessageProcessors {
   /**
    * Process a {@link ReactiveProcessor} using a child {@link BaseEventContext}. This is useful if it is necessary to perform
    * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
+   * since the returned publisher already configures its error handling.
    *
    * @param event the event to process.
    * @param processor the processor to process.
@@ -245,6 +244,9 @@ public class MessageProcessors {
 
   /**
    * Creates a new {@link BaseEventContext} which is child of the one in the given {@code event}
+   * <p>
+   * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
+   * since the returned publisher already configures its error handling.
    *
    * @param event the parent event
    * @param componentLocation the location of the component creating the child context
@@ -265,6 +267,9 @@ public class MessageProcessors {
    * <p>
    * The {@link FlowExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to handle
    * any errors that occur.
+   * <p>
+   * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
+   * since the returned publisher already configures its error handling.
    *
    * @param event the event to process.
    * @param processor the processor to process.
