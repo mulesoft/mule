@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.exception.ExceptionUtils.hasCause;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SERVICE_KEY;
@@ -28,6 +29,8 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -72,6 +75,7 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
@@ -91,6 +95,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private List<BeanHolder> beansCreated = new ArrayList<>();
 
   private Optional<ComponentModelInitializer> parentComponentModelInitializer;
+
+  private ConfigurationDependencyResolver dependencyResolver;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -123,6 +129,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     enableMuleObjects();
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
+
+    dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel, componentBuildingDefinitionRegistry);
+
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
                                                                      new LazyConnectivityTestingService(this, () -> getRegistry()
@@ -318,8 +327,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   public Optional<ComponentModelInitializerAdapter> getParentComponentModelInitializerAdapter(
                                                                                               boolean applyStartPhase) {
     return parentComponentModelInitializer
-        .map(componentModelInitializer -> componentModelPredicate1 -> componentModelInitializer
-            .initializeComponents(componentModelPredicate1, applyStartPhase));
+        .map(componentModelInitializer -> componentModelPredicate -> componentModelInitializer
+            .initializeComponents(componentModelPredicate, applyStartPhase));
   }
 
   private Map<String, Object> createComponents(Optional<Predicate> predicateOptional, Optional<Location> locationOptional,
@@ -330,12 +339,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
       // First unregister any already initialized/started component
       unregisterBeans(beansCreated);
+      // Clean up resources...
       beansCreated.clear();
+      objectProviders.clear();
+      resetMuleSecurityManager();
 
       applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
 
-      ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
-                                                                                               componentBuildingDefinitionRegistry);
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(dependencyResolver);
       Reference<ApplicationModel> minimalApplicationModel = new Reference<>();
@@ -344,17 +354,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       locationOptional
           .ifPresent(location -> minimalApplicationModel.set(minimalApplicationModelGenerator.getMinimalModel(location)));
 
-      try {
-        // Always unregister first the default security manager from Mule.
-        muleContext.getRegistry().unregisterObject(OBJECT_SECURITY_MANAGER);
-        // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to
-        // retrieve it (through MuleContext and registry) while creating it. See
-        // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
-        muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
-      } catch (RegistrationException e) {
-        throw new IllegalStateException("Couldn't register a new instance of Mule security manager in the registry", e);
-      }
-      objectProviders.clear();
 
       if (parentComponentModelInitializerAdapter.isPresent()) {
         List<String> missingComponentNames = dependencyResolver.getMissingDependencies().stream()
@@ -404,6 +403,32 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     });
 
     return createdObjects.get();
+  }
+
+  private void resetMuleSecurityManager() {
+    boolean registerMuleSecurityManager = false;
+    // Always unregister first the default security manager from Mule.
+    try {
+      muleContext.getRegistry().unregisterObject(OBJECT_SECURITY_MANAGER);
+      registerMuleSecurityManager = true;
+    } catch (RegistrationException e) {
+      // NoSuchBeanDefinitionException can be ignored
+      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
+        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Error while unregistering Mule security manager"),
+                                       e);
+      }
+    }
+    if (registerMuleSecurityManager) {
+      try {
+        // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to
+        // retrieve it (through MuleContext and registry) while creating it. See
+        // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
+        muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(I18nMessageFactory
+            .createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"), e);
+      }
+    }
   }
 
   @Override
