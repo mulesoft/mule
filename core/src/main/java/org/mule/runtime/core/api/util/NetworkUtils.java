@@ -10,13 +10,12 @@ import java.net.InetSocketAddress;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import javafx.util.Pair;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class NetworkUtils {
 
-  private static final Map<Pair<String, Class>, InetAddress> addressPerHost = new ConcurrentHashMap<>();
+  private static final Map<String, InetAddress> addressPerHost = new ConcurrentHashMap<>();
   private static InetAddress localHost;
 
   private NetworkUtils() {
@@ -62,7 +61,7 @@ public final class NetworkUtils {
     InetAddress ip = addressPerHost.get(host);
     if (ip == null) {
       ip = new InetSocketAddress(0).getAddress();
-      addressPerHost.put(new Pair(ip.getClass(), host), ip);
+      addressPerHost.put(host, ip);
     }
     return ip;
   }
