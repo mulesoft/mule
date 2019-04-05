@@ -21,6 +21,7 @@ import org.mule.runtime.module.service.api.manager.ServiceManager;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ import org.slf4j.LoggerFactory;
 public class MuleServiceManager implements ServiceManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleServiceManager.class);
+  private static final String SCHEDULER_SERVICE_ARTIFACT_ID = "Scheduler service";
+  private static final String HTTP_SERVICE_ARTIFACT_PREFIX = "HTTP";
 
   private final ServiceDiscoverer serviceDiscoverer;
   private List<Service> services = new ArrayList<>();
@@ -67,14 +70,34 @@ public class MuleServiceManager implements ServiceManager {
     }
   }
 
+  /**
+   * Stop all discovered services. In the case of 'HTTP' and 'Scheduler' service, if present, they should be stopped last and in
+   * that order.
+   *
+   * @throws MuleException
+   */
   @Override
   public void stop() throws MuleException {
+    LinkedList<Service> servicesWithSpecialStoppingOrder = new LinkedList<>();
     for (Service service : services) {
-      try {
-        stopIfNeeded(service);
-      } catch (Exception e) {
-        LOGGER.warn(format("Failed to stop service '%s': %s", service.getName(), e.getMessage()), e);
+      if (service.getName().equals(SCHEDULER_SERVICE_ARTIFACT_ID)) {
+        servicesWithSpecialStoppingOrder.addLast(service);
+      } else if (service.getName().contains(HTTP_SERVICE_ARTIFACT_PREFIX)) {
+        servicesWithSpecialStoppingOrder.addFirst(service);
+      } else {
+        doStopService(service);
       }
+    }
+    for (Service service : servicesWithSpecialStoppingOrder) {
+      doStopService(service);
+    }
+  }
+
+  protected void doStopService(Service service) {
+    try {
+      stopIfNeeded(service);
+    } catch (Exception e) {
+      LOGGER.warn(format("Failed to stop service '%s': %s", service.getName(), e.getMessage()), e);
     }
   }
 
