@@ -39,4 +39,9 @@ public class NullTransactionHandle implements TransactionHandle {
   public void rollback() throws TransactionException {
     // no - op
   }
+
+  @Override
+  public void resolve() throws TransactionException {
+    // no - op
+  }
 }

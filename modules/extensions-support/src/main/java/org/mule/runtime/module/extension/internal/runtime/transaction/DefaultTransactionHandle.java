@@ -49,4 +49,12 @@ public class DefaultTransactionHandle implements TransactionHandle {
       transaction.rollback();
     }
   }
+
+  @Override
+  public void resolve() throws TransactionException {
+    Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+    if (transaction != null) {
+      TransactionCoordination.getInstance().resolveTransaction();
+    }
+  }
 }
