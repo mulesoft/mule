@@ -411,7 +411,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     try {
       muleContext.getRegistry().unregisterObject(OBJECT_SECURITY_MANAGER);
       registerMuleSecurityManager = true;
-    } catch (RegistrationException e) {
+    } catch (Exception e) {
       // NoSuchBeanDefinitionException can be ignored
       if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
         throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Error while unregistering Mule security manager"),
