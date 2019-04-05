@@ -87,8 +87,12 @@ public class MuleServiceManager implements ServiceManager {
         doStopService(service);
       }
     }
-    if(httpService != null) doStopService(httpService);
-    if(schedulerService != null) doStopService(schedulerService);
+    if (httpService != null) {
+      doStopService(httpService);
+    }
+    if (schedulerService != null) {
+      doStopService(schedulerService);
+    }
   }
 
   protected void doStopService(Service service) {
