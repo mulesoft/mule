@@ -6,17 +6,21 @@
  */
 package org.mule.module.http.internal.request;
 
+import static java.lang.String.format;
+import static java.util.regex.Matcher.quoteReplacement;
+import static java.util.regex.Pattern.compile;
 import org.mule.api.MuleEvent;
 import org.mule.module.http.internal.HttpMessageBuilder;
 import org.mule.module.http.internal.HttpParamType;
 import org.mule.module.http.internal.ParameterMap;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 {
 
-    public ParameterMap getQueryParams(MuleEvent event)
+    ParameterMap getQueryParams(MuleEvent event)
     {
         return resolveParams(event, HttpParamType.QUERY_PARAM);
     }
@@ -26,7 +30,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder
         return resolveParams(event, HttpParamType.HEADER);
     }
 
-    public String replaceUriParams(String path, MuleEvent event)
+    String replaceUriParams(String path, MuleEvent event)
     {
         ParameterMap uriParamMap = resolveParams(event, HttpParamType.URI_PARAM);
 
@@ -39,10 +43,14 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 
             if (uriParamValue == null)
             {
-                throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
+                throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
             }
 
-            path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
+            String value = quoteReplacement(uriParamValue);
+
+            Pattern pattern = compile("\\{" + uriParamName + "}");
+
+            path = pattern.matcher(path).replaceAll(value);
         }
         return path;
     }
