@@ -179,7 +179,7 @@
         <commonsPool2Version>2.5.0</commonsPool2Version>
         <commonsMath3Version>3.6.1</commonsMath3Version>
         <derbyVersion>10.13.1.1</derbyVersion>
-        <dom4jVersion>1.6.1</dom4jVersion>
+        <dom4jVersion>2.1.1</dom4jVersion>
         <eaioUuidVersion>3.4.2-MULE-001</eaioUuidVersion>
         <fastUtilVersion>8.1.1</fastUtilVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
@@ -1038,35 +1038,35 @@
                 <version>${jdomVersion}</version>
             </dependency>
             <dependency>
-                <groupId>dom4j</groupId>
+                <groupId>org.dom4j</groupId>
                 <artifactId>dom4j</artifactId>
                 <version>${dom4jVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jaxen</groupId>
-                        <artifactId>jaxen</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>relaxngDatatype</groupId>
-                        <artifactId>relaxngDatatype</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>isorelax</groupId>
-                        <artifactId>isorelax</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>saxpath</groupId>
-                        <artifactId>saxpath</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>msv</groupId>
-                        <artifactId>msv</artifactId>
-                    </exclusion>
-                </exclusions>
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>xml-apis</groupId>-->
+<!--                        <artifactId>xml-apis</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>jaxen</groupId>-->
+<!--                        <artifactId>jaxen</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>relaxngDatatype</groupId>-->
+<!--                        <artifactId>relaxngDatatype</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>isorelax</groupId>-->
+<!--                        <artifactId>isorelax</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>saxpath</groupId>-->
+<!--                        <artifactId>saxpath</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>msv</groupId>-->
+<!--                        <artifactId>msv</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
             </dependency>
 
             <dependency>
