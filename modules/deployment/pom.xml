@@ -53,6 +53,11 @@
         <dependency>
             <!--for the extensions configuration builder-->
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-extensions-api</artifactId>
+        </dependency>
+        <dependency>
+            <!--for the extensions configuration builder-->
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>
