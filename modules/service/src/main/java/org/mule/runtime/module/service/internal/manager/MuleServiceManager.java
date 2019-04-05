@@ -9,6 +9,7 @@ package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.*;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -21,8 +22,8 @@ import org.mule.runtime.module.service.api.manager.ServiceManager;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,19 +79,18 @@ public class MuleServiceManager implements ServiceManager {
    */
   @Override
   public void stop() throws MuleException {
-    LinkedList<Service> servicesWithSpecialStoppingOrder = new LinkedList<>();
+    Optional<Service> schedulerService = empty(), httpService = empty();
     for (Service service : services) {
       if (service.getName().equals(SCHEDULER_SERVICE_ARTIFACT_ID)) {
-        servicesWithSpecialStoppingOrder.addLast(service);
+        schedulerService = Optional.of(service);
       } else if (service.getName().contains(HTTP_SERVICE_ARTIFACT_PREFIX)) {
-        servicesWithSpecialStoppingOrder.addFirst(service);
+        httpService = Optional.of(service);
       } else {
         doStopService(service);
       }
     }
-    for (Service service : servicesWithSpecialStoppingOrder) {
-      doStopService(service);
-    }
+    httpService.ifPresent(this::doStopService);
+    schedulerService.ifPresent(this::doStopService);
   }
 
   protected void doStopService(Service service) {
