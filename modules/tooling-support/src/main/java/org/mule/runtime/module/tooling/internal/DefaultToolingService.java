@@ -271,6 +271,7 @@ public class DefaultToolingService implements ToolingService {
     } else {
       properties = new Properties();
     }
+    // System Property for user allow to force enable logs, but internal property is meant to disable logs if it is true
     properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY,
                            String.valueOf(!valueOf(getProperty(MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY, "false"))));
     properties.setProperty(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH, getToolingWorkingDir().getAbsolutePath());
