@@ -9,7 +9,6 @@ package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
-import static java.util.Optional.*;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -23,7 +22,6 @@ import org.mule.runtime.module.service.api.manager.ServiceManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,18 +77,18 @@ public class MuleServiceManager implements ServiceManager {
    */
   @Override
   public void stop() throws MuleException {
-    Optional<Service> schedulerService = empty(), httpService = empty();
+    Service schedulerService = null, httpService = null;
     for (Service service : services) {
       if (service.getName().equals(SCHEDULER_SERVICE_ARTIFACT_ID)) {
-        schedulerService = Optional.of(service);
+        schedulerService = service;
       } else if (service.getName().contains(HTTP_SERVICE_ARTIFACT_PREFIX)) {
-        httpService = Optional.of(service);
+        httpService = service;
       } else {
         doStopService(service);
       }
     }
-    httpService.ifPresent(this::doStopService);
-    schedulerService.ifPresent(this::doStopService);
+    if(httpService != null) doStopService(httpService);
+    if(schedulerService != null) doStopService(schedulerService);
   }
 
   protected void doStopService(Service service) {
