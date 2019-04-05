@@ -1041,32 +1041,6 @@
                 <groupId>org.dom4j</groupId>
                 <artifactId>dom4j</artifactId>
                 <version>${dom4jVersion}</version>
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>xml-apis</groupId>-->
-<!--                        <artifactId>xml-apis</artifactId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>jaxen</groupId>-->
-<!--                        <artifactId>jaxen</artifactId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>relaxngDatatype</groupId>-->
-<!--                        <artifactId>relaxngDatatype</artifactId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>isorelax</groupId>-->
-<!--                        <artifactId>isorelax</artifactId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>saxpath</groupId>-->
-<!--                        <artifactId>saxpath</artifactId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>msv</groupId>-->
-<!--                        <artifactId>msv</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
             </dependency>
 
             <dependency>
