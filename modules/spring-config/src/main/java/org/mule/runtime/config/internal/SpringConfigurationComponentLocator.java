@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.ClassUtils.memoize;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -69,12 +68,10 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
   }
 
   /**
-   * Removes a component from the locator
-   *
-   * @param location the location of the component to be removed
+   * Removes the components from the locator
    */
-  public void removeComponent(Location location) {
-    this.componentsMap.remove(location.toString());
+  public void removeComponents() {
+    this.componentsMap.clear();
   }
 
   /**
