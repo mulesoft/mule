@@ -23,6 +23,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.transformer.types.TypedValue;
+import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
@@ -423,7 +424,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
                                      boolean nonBooleanReturnsTrue,
                                      String expression)
     {
-        if (result == null)
+        if (result == null || NullPayload.getInstance().equals(result))
         {
             return nullReturnsTrue;
         }

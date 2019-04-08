@@ -10,12 +10,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transport.NullPayload;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -363,6 +363,40 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertFalse(filter.accept(new DefaultMuleMessage("false", muleContext)));
         assertFalse(filter.accept(new DefaultMuleMessage("FALSE", muleContext)));
         assertFalse(filter.accept(new DefaultMuleMessage("faLSe", muleContext)));
+    }
+
+    @Test
+    public void testNullPayload()
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload:");
+        filter.setMuleContext(muleContext);
+
+        filter.setNullReturnsTrue(false);
+
+        assertFalse(filter.accept(new DefaultMuleMessage(NullPayload.getInstance(), muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage(null, muleContext)));
+
+        filter.setNullReturnsTrue(true);
+
+        assertTrue(filter.accept(new DefaultMuleMessage(NullPayload.getInstance(), muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage(null, muleContext)));
+    }
+
+    @Test
+    public void testNullPayloadEL()
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload");
+        filter.setMuleContext(muleContext);
+
+        filter.setNullReturnsTrue(false);
+
+        assertFalse(filter.accept(new DefaultMuleMessage(NullPayload.getInstance(), muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage(null, muleContext)));
+
+        filter.setNullReturnsTrue(true);
+
+        assertTrue(filter.accept(new DefaultMuleMessage(NullPayload.getInstance(), muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage(null, muleContext)));
     }
 
     @Test
