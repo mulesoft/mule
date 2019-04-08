@@ -671,6 +671,11 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     URL result = regionClassLoader.findResource(resource);
 
     assertThat(result, is(expectedResult));
+
+    if (expectedResult != null) {
+      // useCaches should be false
+      assertThat(result.openConnection().getUseCaches(), is(false));
+    }
   }
 
   public static class TestApplicationClassLoader extends TestArtifactClassLoader {

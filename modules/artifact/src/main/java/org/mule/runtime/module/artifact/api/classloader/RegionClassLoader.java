@@ -18,6 +18,14 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.CompoundEnumeration;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -290,7 +298,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                       return descriptorMapping.get(descriptor);
                     } else {
                       try {
-                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()});
+                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()}, getSystemClassLoader(),
+                                                  new NonCachingURLStreamHandlerFactory());
                       } catch (MalformedURLException e) {
                         throw new MuleRuntimeException(e);
                       }
