@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -111,7 +112,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
         processor.transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
         ReactorSink<CoreEvent> sink =
-            new DefaultReactorSink<>(processor.sink(),
+            new DefaultReactorSink<>(processor.sink(BUFFER),
                                      () -> awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
                                                                       +currentTimeMillis()),
                                      createOnEventConsumer(), sinkBufferSize);

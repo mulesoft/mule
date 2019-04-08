@@ -18,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.LITE_BLOCKING;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.valueOf;
+import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 import static reactor.util.concurrent.Queues.isPowerOfTwo;
 import static reactor.util.concurrent.WaitStrategy.blocking;
@@ -179,7 +180,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
             .transform(function)
             .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
       }
-      return buildSink(processor.sink(), () -> {
+      return buildSink(processor.sink(BUFFER), () -> {
         long start = currentTimeMillis();
         if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
           LOGGER.warn("WorkQueueProcessor of ProcessingStrategy for flow '{}' not shutDown in {} ms. Forcing shutdown...",
