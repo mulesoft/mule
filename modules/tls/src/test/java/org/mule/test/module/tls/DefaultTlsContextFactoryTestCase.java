@@ -8,6 +8,7 @@ package org.mule.test.module.tls;
 
 import static java.util.Collections.emptyMap;
 import static javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm;
+import static org.apache.commons.lang3.SystemUtils.IS_JAVA_1_8;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -16,15 +17,25 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -34,12 +45,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
@@ -176,14 +181,29 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void defaultIncludesTls12Ciphers() throws Exception {
+    assumeThat(IS_JAVA_1_8, is(true));
+
+    defaultIncludesDEfaultTlsVersionCiphers("TLSv1.2");
+  }
+
+  @Test
+  public void defaultIncludesTls13Ciphers() throws Exception {
+    // For versions greater than 8, the default is TLS 1.3
+    assumeThat(IS_JAVA_1_8, is(false));
+
+    defaultIncludesDEfaultTlsVersionCiphers("TLSv1.3");
+  }
+
+  private void defaultIncludesDEfaultTlsVersionCiphers(String sslVersion)
+      throws InitialisationException, KeyManagementException, NoSuchAlgorithmException {
     DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     tlsContextFactory.initialise();
     SSLSocketFactory defaultFactory = tlsContextFactory.createSslContext().getSocketFactory();
-    SSLContext tls12Context = SSLContext.getInstance("TLSv1.2");
-    tls12Context.init(null, null, null);
-    SSLSocketFactory tls12Factory = tls12Context.getSocketFactory();
+    SSLContext tlsContext = SSLContext.getInstance(sslVersion);
+    tlsContext.init(null, null, null);
+    SSLSocketFactory tlsFactory = tlsContext.getSocketFactory();
 
-    assertThat(defaultFactory.getDefaultCipherSuites(), arrayContainingInAnyOrder(tls12Factory.getDefaultCipherSuites()));
+    assertThat(defaultFactory.getDefaultCipherSuites(), arrayContainingInAnyOrder(tlsFactory.getDefaultCipherSuites()));
   }
 
 }
