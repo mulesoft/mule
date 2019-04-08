@@ -15,8 +15,15 @@ import static org.mule.runtime.core.internal.context.thread.notification.ThreadN
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntUnaryOperator;
+import java.util.function.Supplier;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -29,14 +36,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
-
 import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntUnaryOperator;
-import java.util.function.Supplier;
 
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
@@ -133,7 +133,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
         processor.transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
         ReactorSink<CoreEvent> sink =
-            new DefaultReactorSink<>(processor.sink(),
+            new DefaultReactorSink<>(processor.sink(BUFFER),
                                      () -> awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
                                                                       currentTimeMillis()),
                                      createOnEventConsumer(), sinkBufferSize);

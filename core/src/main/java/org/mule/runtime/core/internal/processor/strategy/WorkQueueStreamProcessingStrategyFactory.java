@@ -17,6 +17,7 @@ import static org.mule.runtime.core.internal.context.thread.notification.ThreadN
 import static org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory.WaitStrategy.valueOf;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.util.concurrent.WaitStrategy.blocking;
 import static reactor.util.concurrent.WaitStrategy.busySpin;
@@ -51,6 +52,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.FluxSink.OverflowStrategy;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.WorkQueueProcessor;
 
@@ -132,7 +134,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamWork
             .transform(function)
             .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
       }
-      return buildSink(processor.sink(), () -> {
+      return buildSink(processor.sink(BUFFER), () -> {
         long start = currentTimeMillis();
         if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
           LOGGER.warn("WorkQueueProcessor of ProcessingStrategy for flow '{}' not shutDown in {} ms. Forcing shutdown...",
