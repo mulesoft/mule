@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
@@ -32,7 +33,6 @@ import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
@@ -61,11 +61,8 @@ public class PollingSourceWrapperTestCase {
   private SourceCallback callbackMock;
 
   @InjectMocks
-  private PollingSourceWrapper<Object, Object> pollingSourceWrapper = new PollingSourceWrapper<Object, Object>(
-                                                                                                               Mockito
-                                                                                                                   .mock(PollingSource.class),
-                                                                                                               Mockito
-                                                                                                                   .mock(Scheduler.class));
+  private PollingSourceWrapper<Object, Object> pollingSourceWrapper =
+      new PollingSourceWrapper<Object, Object>(mock(PollingSource.class), mock(Scheduler.class));
 
   @Before
   public void setUp() throws Exception {
