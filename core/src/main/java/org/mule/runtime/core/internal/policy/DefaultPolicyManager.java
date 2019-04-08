@@ -31,17 +31,18 @@ import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link PolicyManager}.
@@ -62,8 +63,11 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   private final AtomicBoolean isPoliciesAvailable = new AtomicBoolean(false);
 
+  private final Executor syncExecutor = Runnable::run;
+
   private final Cache<String, SourcePolicy> noPolicySourceInstances =
       Caffeine.newBuilder()
+          .executor(syncExecutor)
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
           .build();
 
@@ -71,10 +75,12 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   private final Cache<Pair<String, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
       Caffeine.newBuilder()
+          .executor(syncExecutor)
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
           .build();
   private final Cache<List<Policy>, OperationPolicy> operationPolicyInnerCache =
       Caffeine.newBuilder()
+          .executor(syncExecutor)
           .removalListener((key, value, cause) -> disposeIfNeeded(value, LOGGER))
           .build();
 
@@ -196,7 +202,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
         isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
       });
     }
-
 
     isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
 

@@ -101,8 +101,13 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
         .filter(p -> p.getPolicyId().equals(parametrizedPolicyId)).findFirst();
 
     registeredPolicyInstanceProvider.ifPresent(provider -> {
-      provider.getApplicationPolicyInstance().dispose();
+
       registeredPolicyInstanceProviders.remove(provider);
+
+      // Run callback before disposing the policy to be able to dispose Composite Policies before policy schedulers are shutdown
+      policiesChangedCallback.run();
+
+      provider.getApplicationPolicyInstance().dispose();
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
           .filter(p -> p.policyTemplate.equals(provider.getApplicationPolicyInstance().getPolicyTemplate()))
@@ -111,6 +116,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
       if (!registeredPolicyTemplate.isPresent()) {
         throw new IllegalStateException("Cannot find registered policy template");
       }
+
       registeredPolicyTemplate.get().count--;
       if (registeredPolicyTemplate.get().count == 0) {
         application.getRegionClassLoader()
@@ -119,8 +125,6 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
         registeredPolicyTemplates.remove(registeredPolicyTemplate.get());
       }
     });
-
-    policiesChangedCallback.run();
 
     return registeredPolicyInstanceProvider.isPresent();
   }

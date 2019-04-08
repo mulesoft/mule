@@ -10,6 +10,7 @@ import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -107,7 +108,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void singlePolicy() throws Exception {
+  public void singlePolicy() {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
@@ -125,7 +126,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void compositePolicy() throws Exception {
+  public void compositePolicy() {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
@@ -143,7 +144,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void emptyPolicyList() throws Exception {
+  public void emptyPolicyList() {
     compositeOperationPolicy = new CompositeOperationPolicy(emptyList(),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
@@ -156,7 +157,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
       Processor firstPolicyOperationPolicyProcessor = mock(Processor.class);
       when(firstPolicyOperationPolicyProcessor.apply(any()))
           .thenAnswer(inv -> {
-            Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) inv.getArgument(0));
+            Flux<CoreEvent> baseFlux = Flux.from(inv.getArgument(0));
             if (policyChangeThread) {
               baseFlux = baseFlux.publishOn(Schedulers.single());
             }
@@ -181,7 +182,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   public void nextProcessorExecutionFailurePropagates() throws Exception {
     RuntimeException policyException = new RuntimeException("policy failure");
     doAnswer(inv -> {
-      Mono<CoreEvent> baseMono = Mono.just((CoreEvent) inv.getArgument(1));
+      Mono<CoreEvent> baseMono = Mono.just(inv.getArgument(1));
       if (processChangeThread) {
         baseMono = baseMono.publishOn(Schedulers.single());
       }
@@ -220,6 +221,24 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
     assertThat(operationPolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
     assertThat(operationPolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
+  }
+
+  @Test
+  public void processAfterPolicyDispose() throws MuleException {
+    expectedException.expect(MessagingException.class);
+
+    compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
+                                                            operationPolicyParametersTransformer,
+                                                            operationPolicyProcessorFactory);
+
+    compositeOperationPolicy.dispose();
+
+    try {
+      from(compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
+                                            operationLocation)).block();
+    } catch (Exception throwable) {
+      throw rxExceptionToMuleException(throwable);
+    }
   }
 
   public static final class InvocationsRecordingCompositeOperationPolicy extends CompositeOperationPolicy {

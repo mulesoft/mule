@@ -22,6 +22,7 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -259,8 +260,7 @@ public class DefaultPolicyInstance extends AbstractComponent
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       return publisher -> from(publisher)
-          .transform(super.onPipeline(pipeline))
-          .doOnComplete(() -> stopSchedulers());
+          .transform(super.onPipeline(pipeline));
     }
 
     @Override
