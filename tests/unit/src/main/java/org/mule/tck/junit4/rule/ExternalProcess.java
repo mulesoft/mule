@@ -10,10 +10,6 @@ import static java.util.Arrays.asList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import org.junit.rules.ExternalResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,6 +19,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
+
+import org.junit.rules.ExternalResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Executes a process that starts a server required by the test.
@@ -69,12 +69,14 @@ public final class ExternalProcess extends ExternalResource {
           if (daemonStartedPredicate.test(line)) {
             Thread.sleep(500);
             started.set(true);
-            // return;
           }
           line = reader.readLine();
         }
       } catch (IOException | InterruptedException e) {
-        throw new RuntimeException(e);
+        if (p.isAlive()) {
+          LOGGER.error("Exception reading process output", e);
+        }
+        return;
       }
     });
 
