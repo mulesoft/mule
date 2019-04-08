@@ -8,14 +8,12 @@ package org.mule.module.http.internal.request;
 
 import static java.lang.String.format;
 import static java.util.regex.Matcher.quoteReplacement;
-import static java.util.regex.Pattern.compile;
 import org.mule.api.MuleEvent;
 import org.mule.module.http.internal.HttpMessageBuilder;
 import org.mule.module.http.internal.HttpParamType;
 import org.mule.module.http.internal.ParameterMap;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 {
@@ -48,9 +46,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 
             String value = quoteReplacement(uriParamValue);
 
-            Pattern pattern = compile("\\{" + uriParamName + "}");
-
-            path = pattern.matcher(path).replaceAll(value);
+            path = path.replaceAll(format("\\{%s\\}", uriParamName), value);
         }
         return path;
     }
