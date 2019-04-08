@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.request;
 
+import static java.lang.String.format;
+import static java.util.regex.Matcher.quoteReplacement;
 import org.mule.api.MuleEvent;
 import org.mule.module.http.internal.HttpMessageBuilder;
 import org.mule.module.http.internal.HttpParamType;
@@ -39,10 +41,10 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 
             if (uriParamValue == null)
             {
-                throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
+                throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
             }
 
-            path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
+            path = path.replaceAll(format("\\{%s\\}", uriParamName), quoteReplacement(uriParamValue));
         }
         return path;
     }

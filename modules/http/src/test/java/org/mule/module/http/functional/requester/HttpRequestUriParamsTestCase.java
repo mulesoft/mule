@@ -6,10 +6,11 @@
  */
 package org.mule.module.http.functional.requester;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.isA;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.rules.ExpectedException.none;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -101,6 +102,36 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase
         expectedException.expectCause(isA(NullPointerException.class));
         expectedException.expectMessage(containsString("Expression {testParam2} evaluated to null."));
         flow.process(event);
+    }
+
+    @Test
+    public void uriParamsContainsReservedUriCharacter() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("reservedUriCharacter");
+
+        MuleEvent event = getTestEvent(TEST_PAYLOAD);
+
+        event.getMessage().setInvocationProperty("paramName", "testParam");
+        event.getMessage().setInvocationProperty("paramValue", "$a");
+
+        flow.process(event);
+
+        assertThat(uri, is("/testPath/$a"));
+    }
+
+    @Test
+    public void uriParamsWithRegEx() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("regEx");
+
+        MuleEvent event = getTestEvent(TEST_PAYLOAD);
+
+        event.getMessage().setInvocationProperty("paramName", "[1-9]");
+        event.getMessage().setInvocationProperty("paramValue", "abc");
+
+        flow.process(event);
+
+        assertThat(uri, is("/testPath/abc"));
     }
 
 }
