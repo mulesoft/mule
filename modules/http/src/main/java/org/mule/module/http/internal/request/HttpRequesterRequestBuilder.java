@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 {
 
-    ParameterMap getQueryParams(MuleEvent event)
+    public ParameterMap getQueryParams(MuleEvent event)
     {
         return resolveParams(event, HttpParamType.QUERY_PARAM);
     }
@@ -30,7 +30,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder
         return resolveParams(event, HttpParamType.HEADER);
     }
 
-    String replaceUriParams(String path, MuleEvent event)
+    public String replaceUriParams(String path, MuleEvent event)
     {
         ParameterMap uriParamMap = resolveParams(event, HttpParamType.URI_PARAM);
 
