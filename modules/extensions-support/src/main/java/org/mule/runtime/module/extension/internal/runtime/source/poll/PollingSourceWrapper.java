@@ -17,9 +17,14 @@ import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItem
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.FILTERED_BY_WATERMARK;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.SOURCE_STOPPING;
+import static org.mule.runtime.extension.api.runtime.source.PollingSource.IDS_ON_UPDATED_WATERMARK_OS_NAME_SUFFIX;
+import static org.mule.runtime.extension.api.runtime.source.PollingSource.OS_NAME_MASK;
+import static org.mule.runtime.extension.api.runtime.source.PollingSource.RECENTLY_PROCESSED_IDS_OS_NAME_SUFFIX;
+import static org.mule.runtime.extension.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
+import static org.mule.runtime.extension.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
+import static org.mule.runtime.extension.api.runtime.source.PollingSource.WATERMARK_OS_NAME_SUFFIX;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.fromRunnable;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -72,9 +77,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
-  private static final String WATERMARK_OS_KEY = "watermark";
-  private static final String UPDATED_WATERMARK_OS_KEY = "updatedWatermark";
   private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
+  private static final String INFLIGHT_IDS_OS_NAME_SUFFIX = "inflight-ids";
 
   private final PollingSource<T, A> delegate;
   private final Scheduler scheduler;
@@ -96,7 +100,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
   private ComponentLocation componentLocation;
   private String flowName;
-  private String keyPrefix;
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
   private org.mule.runtime.api.scheduler.Scheduler executor;
 
@@ -110,8 +113,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   public void onStart(SourceCallback<T, A> sourceCallback) throws MuleException {
     delegate.onStart(sourceCallback);
     flowName = componentLocation.getRootContainerName();
-    keyPrefix = "_pollingSource_" + flowName + "/";
-    inflightIdsObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey("inflight-ids"),
+    inflightIdsObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(INFLIGHT_IDS_OS_NAME_SUFFIX),
                                                                        ObjectStoreSettings.builder()
                                                                            .persistent(false)
                                                                            .maxEntries(1000)
@@ -119,11 +121,12 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
                                                                            .expirationInterval(20000L)
                                                                            .build());
 
-    recentlyProcessedIds = objectStoreManager.getOrCreateObjectStore(formatKey("recently-processed-ids"), unmanagedPersistent());
+    recentlyProcessedIds = objectStoreManager.getOrCreateObjectStore(formatKey(RECENTLY_PROCESSED_IDS_OS_NAME_SUFFIX),
+                                                                     unmanagedPersistent());
     idsOnUpdatedWatermark =
-        objectStoreManager.getOrCreateObjectStore(formatKey("ids-on-updated-watermark"), unmanagedPersistent());
+        objectStoreManager.getOrCreateObjectStore(formatKey(IDS_ON_UPDATED_WATERMARK_OS_NAME_SUFFIX), unmanagedPersistent());
 
-    watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey("watermark"), unmanagedPersistent());
+    watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(WATERMARK_OS_NAME_SUFFIX), unmanagedPersistent());
     executor = schedulerService.customScheduler(SchedulerConfig.config()
         .withMaxConcurrentTasks(1)
         .withWaitAllowed(true)
@@ -134,7 +137,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   }
 
   private String formatKey(String key) {
-    return keyPrefix + key;
+    return format(OS_NAME_MASK, flowName, key);
   }
 
   @Override
@@ -270,10 +273,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     private void setUpdatedWatermark(Serializable updatedWatermark) {
       try {
         this.updatedWatermark = updatedWatermark;
-        if (watermarkObjectStore.contains(UPDATED_WATERMARK_OS_KEY)) {
-          watermarkObjectStore.remove(UPDATED_WATERMARK_OS_KEY);
+        if (watermarkObjectStore.contains(UPDATED_WATERMARK_ITEM_OS_KEY)) {
+          watermarkObjectStore.remove(UPDATED_WATERMARK_ITEM_OS_KEY);
         }
-        watermarkObjectStore.store(UPDATED_WATERMARK_OS_KEY, updatedWatermark);
+        watermarkObjectStore.store(UPDATED_WATERMARK_ITEM_OS_KEY, updatedWatermark);
       } catch (ObjectStoreException e) {
         throw new MuleRuntimeException(
                                        createStaticMessage("An error occurred while trying to update the updatedWatermark in the the object store"),
@@ -466,16 +469,16 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
   private void updateWatermark(Serializable value, Comparator comparator) {
     try {
-      if (watermarkObjectStore.contains(WATERMARK_OS_KEY)) {
-        Serializable currentValue = watermarkObjectStore.retrieve(WATERMARK_OS_KEY);
+      if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
+        Serializable currentValue = watermarkObjectStore.retrieve(WATERMARK_ITEM_OS_KEY);
         if (compareWatermarks(currentValue, value, comparator) >= 0) {
           return;
         }
-        watermarkObjectStore.remove(WATERMARK_OS_KEY);
+        watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
       }
 
       updateRecentlyProcessedIds();
-      watermarkObjectStore.store(WATERMARK_OS_KEY, value);
+      watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, value);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(
                                      createStaticMessage(format("Failed to update watermark value for message source at location '%s'. %s",
@@ -507,8 +510,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
   private Serializable getCurrentWatermark() {
     try {
-      if (watermarkObjectStore.contains(WATERMARK_OS_KEY)) {
-        return watermarkObjectStore.retrieve(WATERMARK_OS_KEY);
+      if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
+        return watermarkObjectStore.retrieve(WATERMARK_ITEM_OS_KEY);
       } else {
         return null;
       }
@@ -522,8 +525,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
   private Serializable getUpdatedWatermark() {
     try {
-      if (watermarkObjectStore.contains(UPDATED_WATERMARK_OS_KEY)) {
-        return watermarkObjectStore.retrieve(UPDATED_WATERMARK_OS_KEY);
+      if (watermarkObjectStore.contains(UPDATED_WATERMARK_ITEM_OS_KEY)) {
+        return watermarkObjectStore.retrieve(UPDATED_WATERMARK_ITEM_OS_KEY);
       } else {
         return null;
       }
