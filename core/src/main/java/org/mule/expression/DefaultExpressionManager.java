@@ -424,7 +424,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
                                      boolean nonBooleanReturnsTrue,
                                      String expression)
     {
-        if (result == null || result == NullPayload.getInstance())
+        if (result == null || NullPayload.getInstance().equals(result))
         {
             return nullReturnsTrue;
         }
