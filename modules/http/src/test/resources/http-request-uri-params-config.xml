@@ -43,4 +43,20 @@
         </http:request>
     </flow>
 
+    <flow name="reservedUriCharacter">
+        <http:request config-ref="config" path="testPath/{testParam}">
+            <http:request-builder>
+                <http:uri-param paramName="#[paramName]" value="#[paramValue]" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+    <flow name="regEx">
+        <http:request config-ref="config" path="testPath/{8}">
+            <http:request-builder>
+                <http:uri-param paramName="#[paramName]" value="#[paramValue]" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
 </mule>
