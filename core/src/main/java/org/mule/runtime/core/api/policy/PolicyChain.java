@@ -124,7 +124,7 @@ public class PolicyChain extends AbstractComponent
             .andThen(req -> ((BaseEventContext) req.getContext())
                 .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
             .andThen(notificationHelper.notification(PROCESS_START)))
-        .compose(eventPub -> applyWithChildContext(eventPub, processorChain, ofNullable(getLocation()),
+        .compose(eventPub -> applyWithChildContext(eventPub, chainWithMPs, ofNullable(getLocation()),
                                                    policyChainErrorHandler()))
         .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
   }
