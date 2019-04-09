@@ -205,7 +205,7 @@
         <junitVersion>4.12</junitVersion>
         <log4jVersion>2.11.0</log4jVersion>
         <disruptorVersion>3.3.7</disruptorVersion>
-        <mockitoVersion>2.23.4</mockitoVersion>
+        <mockitoVersion>2.26.0</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <projectReactorVersion>3.2.6.RELEASE</projectReactorVersion>
