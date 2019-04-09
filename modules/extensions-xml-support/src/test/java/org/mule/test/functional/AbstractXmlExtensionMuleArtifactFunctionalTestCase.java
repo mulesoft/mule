@@ -89,9 +89,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
           final ExtensionModel extensionModel =
               new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), dslResolvingContext, params);
           extensions.add(extensionModel);
-        }
-        for (ExtensionModel extension : extensions) {
-          extensionManager.registerExtension(extension);
+          extensionManager.registerExtension(extensionModel);
         }
       }
     });

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   private static final String COMPATIBILITY_XSD =
       "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
   private static final String TEST_XSD = "http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd";
+  private static final int MAX_RESOLUTION_FAILURE_THRESHOLD = 10;
 
   private static Boolean internalIsRunningTests;
 
@@ -58,8 +60,11 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   private final EntityResolver muleEntityResolver;
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
   private Optional<ExtensionSchemaGenerator> extensionSchemaFactory;
-  private Map<String, Boolean> checkedEntities; // It saves already checked entities so that if the resolution already failed
-  // once, it will raise and exception and not loop failing over and over again.
+  /**
+   * Saves already checked entities so that if the resolution fails more than {@link #MAX_RESOLUTION_FAILURE_THRESHOLD}
+   * it will raise and exception instead of looping in failure over and over again.
+   */
+  private Map<String, AtomicInteger> checkedEntities;
 
   /**
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
@@ -107,13 +112,16 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
       inputSource = generateFromExtensions(publicId, systemId);
     }
     if (inputSource == null) {
-      if (checkedEntities.get(systemId) != null) {
-        String namespaceNotFound =
-            publicId == null ? format("Can't resolve %s", systemId) : format("Can't resolve %s (%s)", publicId, systemId);
-        String message = format("%s, A dependency or plugin might be missing", namespaceNotFound);
-        throw new MuleRuntimeException(createStaticMessage(message));
+      AtomicInteger failures = checkedEntities.get(systemId);
+      if (failures != null) {
+        if (failures.incrementAndGet() > MAX_RESOLUTION_FAILURE_THRESHOLD) {
+          String namespaceNotFound =
+              publicId == null ? format("Can't resolve %s", systemId) : format("Can't resolve %s (%s)", publicId, systemId);
+          String message = format("%s, A dependency or plugin might be missing", namespaceNotFound);
+          throw new MuleRuntimeException(createStaticMessage(message));
+        }
       } else {
-        checkedEntities.put(systemId, true);
+        checkedEntities.put(systemId, new AtomicInteger(1));
       }
     }
     return inputSource;
