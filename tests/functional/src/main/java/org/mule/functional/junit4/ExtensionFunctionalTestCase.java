@@ -113,7 +113,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     } else {
       for (GeneratedResource resource : resources) {
         URL generatedResourceURL = new File(generatedResourcesDirectory, resource.getPath()).toURI().toURL();
-        URLClassLoader.newInstance(new URL[]{generatedResourceURL}, cl);
+        URLClassLoader.newInstance(new URL[] {generatedResourceURL}, cl);
       }
 
     }
