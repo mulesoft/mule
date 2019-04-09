@@ -18,27 +18,15 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -46,9 +34,13 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 @SmallTest
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(MuleArtifactClassLoader.class)
 public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String RESOURCE_IN_CLASSES_AND_JAR = "test-resource-1.txt";
@@ -97,8 +89,6 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     domainDir = MuleFoldersUtil.getDomainFolder(DOMAIN_NAME);
     assertThat(domainDir.mkdirs(), is(true));
     FileUtils.stringToFile(new File(domainDir, RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
-
-    mockStatic(MuleArtifactClassLoader.class);
 
     // Create app class loader
     domainCL =
