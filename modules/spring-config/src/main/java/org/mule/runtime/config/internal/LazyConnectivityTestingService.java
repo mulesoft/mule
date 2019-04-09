@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal;
 import static com.google.common.base.Throwables.getCausalChain;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -47,10 +46,9 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
   public ConnectionValidationResult testConnection(Location location) {
     try {
       lazyComponentInitializer.initializeComponent(location);
+    } catch (NoSuchComponentModelException e) {
+      throw new ObjectNotFoundException(location.toString());
     } catch (MuleRuntimeException e) {
-      if (e.getCause() instanceof NoSuchComponentModelException) {
-        throw new ObjectNotFoundException(location.toString());
-      }
       List<Throwable> causalChain = getCausalChain(e);
       return unknownFailureResponse(lastMessage(causalChain), e);
     } catch (Exception e) {
