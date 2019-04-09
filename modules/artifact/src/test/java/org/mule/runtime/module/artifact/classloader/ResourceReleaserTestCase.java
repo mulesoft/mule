@@ -16,7 +16,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -58,9 +57,14 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
         .getContextClassLoader()));
   }
 
+  // This empty class was added as a workaround of a mockito issue:
+  // https://github.com/mockito/mockito/issues/1419
+  private static abstract class AbstractDriver implements Driver {
+  }
+
   @Test
   public void notDeregisterJdbcDriversDifferentClassLoaders() throws Exception {
-    Driver jdbcDriver = mock(Driver.class);
+    Driver jdbcDriver = mock(AbstractDriver.class);
     TestArtifactClassLoader classLoader =
         new TestArtifactClassLoader(new TestArtifactClassLoader(Thread.currentThread().getContextClassLoader()));
     try {
@@ -77,7 +81,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deregisterJdbcDriversSameClassLoaders() throws Exception {
-    Driver jdbcDriver = mock(Driver.class);
+    Driver jdbcDriver = mock(AbstractDriver.class);
     registerDriver(jdbcDriver);
 
     assertThat(list(getDrivers()), hasItem(jdbcDriver));
