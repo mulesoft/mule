@@ -37,11 +37,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
-import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
@@ -68,7 +64,7 @@ import javax.inject.Inject;
 @OnException(HeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
 @Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class, ReconnectableHeisenbergSource.class})
-@Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
+@Export(classes = HeisenbergExtension.class, resources = "methRecipe.json")
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Drug.class, subTypes = {Meta.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})

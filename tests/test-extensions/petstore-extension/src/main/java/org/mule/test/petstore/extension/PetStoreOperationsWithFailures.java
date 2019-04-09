@@ -11,6 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
    */
   private static List<Thread> connectionThreads = new ArrayList<>();
 
+  @Ignore
   public static List<Thread> getConnectionThreads() {
     return unmodifiableList(connectionThreads);
   }

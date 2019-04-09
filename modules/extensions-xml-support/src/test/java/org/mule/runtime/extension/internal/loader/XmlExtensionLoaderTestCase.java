@@ -54,7 +54,6 @@ import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
-import org.mule.runtime.internal.dsl.DslConstants;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -402,9 +401,9 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
         fail("Should not have reached up to this point, the XML is invalid and the ExtensionModel should not be generated.");
       } catch (MuleRuntimeException e) {
         assertThat(e.getMessage(), containsString("There were '2' error"));
-        assertThat(e.getMessage(), containsString("Invalid content was found starting with element 'mule:fake-request-config'"));
-        assertThat(e.getMessage(),
-                   containsString("Invalid content was found starting with element 'mule:non-existing-operation'"));
+        assertThat(e.getMessage(), containsString("Invalid content was found starting with element"));
+        assertThat(e.getMessage(), containsString("fake-request-config"));
+        assertThat(e.getMessage(), containsString("non-existing-operation"));
       }
     } else {
       ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
