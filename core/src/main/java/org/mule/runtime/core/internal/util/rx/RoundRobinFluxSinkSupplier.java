@@ -31,7 +31,7 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
   private final IntUnaryOperator update;
 
   public RoundRobinFluxSinkSupplier(int size, Supplier<FluxSink<T>> sinkFactory) {
-    final List<FluxSink<T>> sinks = new ArrayList<FluxSink<T>>(size);
+    final List<FluxSink<T>> sinks = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       sinks.add(sinkFactory.get());
     }

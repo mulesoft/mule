@@ -11,6 +11,8 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 
@@ -20,13 +22,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-
-import org.reactivestreams.Publisher;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -35,8 +36,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -63,6 +66,9 @@ public class CompositeOperationPolicy
 
   private final LoadingCache<String, RoundRobinFluxSinkSupplier<CoreEvent>> policySinks;
 
+  private final AtomicBoolean disposed;
+  private final FunctionalReadWriteLock readWriteLock;
+
   /**
    * Creates a new composite policy.
    * <p>
@@ -81,8 +87,9 @@ public class CompositeOperationPolicy
                                   OperationPolicyProcessorFactory operationPolicyProcessorFactory) {
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
-
-    policySinks = newBuilder()
+    this.disposed = new AtomicBoolean(false);
+    this.readWriteLock = readWriteLock();
+    this.policySinks = newBuilder()
         .removalListener((String key, RoundRobinFluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
         })
@@ -163,11 +170,19 @@ public class CompositeOperationPolicy
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                       OperationParametersProcessor parametersProcessor, ComponentLocation operationLocation) {
-    return Mono.create(callerSink -> {
-      FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
-      policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
-                                              operationExecutionFunction,
-                                              parametersProcessor, callerSink));
+    return readWriteLock.withReadLock(lockReleaser -> {
+      if (!disposed.get()) {
+        return Mono.create(callerSink -> {
+          FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
+          policySink
+              .next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
+                                            operationExecutionFunction,
+                                            parametersProcessor, callerSink));
+        });
+      } else {
+        MessagingException me = new MessagingException(createStaticMessage("Operation policy already disposed"), operationEvent);
+        return Mono.error(me);
+      }
     });
   }
 
@@ -193,6 +208,9 @@ public class CompositeOperationPolicy
 
   @Override
   public void dispose() {
-    policySinks.invalidateAll();
+    readWriteLock.withWriteLock(() -> {
+      policySinks.invalidateAll();
+      disposed.set(true);
+    });
   }
 }

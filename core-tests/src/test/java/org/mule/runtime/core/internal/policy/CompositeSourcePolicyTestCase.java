@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -37,7 +38,10 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -109,7 +113,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   }
 
   @Test
-  public void singlePolicy() throws Exception {
+  public void singlePolicy() {
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy), flowExecutionProcessor,
                                                       of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
 
@@ -128,7 +132,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   }
 
   @Test
-  public void compositePolicy() throws Exception {
+  public void compositePolicy() {
     compositeSourcePolicy =
         new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
                                   of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
@@ -150,13 +154,13 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void emptyPolicyList() throws Exception {
+  public void emptyPolicyList() {
     compositeSourcePolicy = new CompositeSourcePolicy(emptyList(), flowExecutionProcessor,
                                                       of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
   }
 
   @Test
-  public void policyExecutionFailureBeforeNextPropagates() throws Exception {
+  public void policyExecutionFailureBeforeNextPropagates() {
     RuntimeException policyException = new RuntimeException("policy failure");
     final Component policyComponent = mock(Component.class);
     when(policyComponent.getLocation()).thenReturn(fromSingleComponent("http-policy:proxy"));
@@ -165,7 +169,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
       Processor secondPolicySourcePolicyProcessor = mock(Processor.class);
       when(secondPolicySourcePolicyProcessor.apply(any(Publisher.class)))
           .thenAnswer(inv -> {
-            Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) inv.getArgument(0));
+            Flux<CoreEvent> baseFlux = Flux.from(inv.getArgument(0));
             if (policyChangeThread) {
               baseFlux = baseFlux.publishOn(Schedulers.single());
             }
@@ -187,7 +191,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   }
 
   @Test
-  public void policyExecutionFailureAfterNextPropagates() throws Exception {
+  public void policyExecutionFailureAfterNextPropagates() {
     RuntimeException policyException = new RuntimeException("policy failure");
     final Component policyComponent = mock(Component.class);
     when(policyComponent.getLocation()).thenReturn(fromSingleComponent("http-policy:proxy"));
@@ -202,7 +206,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
       Processor secondPolicySourcePolicyProcessor = mock(Processor.class);
       when(secondPolicySourcePolicyProcessor.apply(any(Publisher.class)))
           .thenAnswer(inv -> {
-            Flux<CoreEvent> baseFlux = Flux.from((Publisher<CoreEvent>) inv.getArgument(0));
+            Flux<CoreEvent> baseFlux = Flux.from(inv.getArgument(0));
             if (policyChangeThread) {
               baseFlux = baseFlux.publishOn(Schedulers.single());
             }
@@ -241,6 +245,26 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     assertThat(sourcePolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
     assertThat(sourcePolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
+  }
+
+  @Test
+  public void processAfterPolicyDispose() {
+    Map<String, Object> errorParameters = ImmutableMap.of("param", "value");
+    when(sourcePolicyParametersTransformer.fromMessageToErrorResponseParameters(initialEvent.getMessage()))
+        .thenReturn(errorParameters);
+
+    compositeSourcePolicy =
+        new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
+                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+
+    compositeSourcePolicy.dispose();
+
+    Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
+        from(compositeSourcePolicy.process(initialEvent, sourceParametersProcessor)).block();
+
+    assertThat(sourcePolicyResult.getRight(), nullValue());
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent(), is(initialEvent));
+    assertThat(sourcePolicyResult.getLeft().getErrorResponseParameters().get(), is(errorParameters));
   }
 
   public static final class InvocationsRecordingCompositeSourcePolicy extends CompositeSourcePolicy {
