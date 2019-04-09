@@ -10,7 +10,7 @@
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.mulesoft.org/schema/mule/module-a http://www.mulesoft.org/schema/mule/module-a/current/mule-module-a.xsd
-           http://www.mulesoft.org/schema/mule/module-b http://www.mulesoft.org/schema/mule/module-a/current/mule-module-b.xsd
+           http://www.mulesoft.org/schema/mule/module-b http://www.mulesoft.org/schema/mule/module-b/current/mule-module-b.xsd
            http://www.mulesoft.org/schema/mule/module-w http://www.mulesoft.org/schema/mule/module-w/current/mule-module-w.xsd">
     <operation name="op1">
         <body>
