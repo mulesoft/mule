@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -20,10 +21,12 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -40,11 +43,11 @@ import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
+import java.util.List;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
@@ -95,8 +98,15 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       return Scope.super.apply(publisher);
     } else {
-      return from(publisher)
-          .transform(event -> applyWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
+      // TODO MULE-16687 Remove this `if` statement and use apply... always.
+      final LocationPart parentLoc = getLocation().getParts().get(getLocation().getParts().size() - 3);
+      if (parentLoc.getPartIdentifier().filter(tcid -> SCOPE.equals(tcid.getType())).isPresent()) {
+        return from(publisher)
+            .flatMap(event -> processWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
+      } else {
+        return from(publisher)
+            .transform(event -> applyWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
+      }
     }
   }
 
