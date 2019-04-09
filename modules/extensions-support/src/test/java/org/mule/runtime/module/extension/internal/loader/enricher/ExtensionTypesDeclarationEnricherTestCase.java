@@ -17,7 +17,6 @@ import org.mule.runtime.extension.api.declaration.type.annotation.Infrastructure
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
-import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Methylamine;
@@ -51,7 +50,7 @@ public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestC
   @Test
   public void assertTypes() throws Exception {
     assertTypes(extensionModel.getTypes(), true, "Type %s was not present",
-                Ricin.class, KnockeableDoor.class, HeisenbergException.class, CarWash.class,
+                Ricin.class, KnockeableDoor.class, CarWash.class,
                 Weapon.class, Weapon.WeaponAttributes.class, PersonalInfo.class, Methylamine.class);
 
     assertTypes(extensionModel.getTypes(), false, "Invalid type %s was exported",

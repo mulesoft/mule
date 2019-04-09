@@ -12,6 +12,7 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
@@ -69,8 +70,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
       fail("Should not have reached this point as the document is malformed and an exception should have been thrown using the default constructor");
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
-      assertThat(getStackTrace(e),
-                 containsString("Can't resolve http://www.mulesoft.org/schema/mule/co"));
+      assertThat(getStackTrace(e), containsString("Cannot find the declaration of element 'mule'"));
     }
   }
 
@@ -81,8 +81,8 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
       fail("Should not have reached this point as the document is malformed and an exception should have been thrown using the default constructor");
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
-      assertThat(getStackTrace(e),
-                 containsString("Invalid content was found starting with element 'ext:whatever'"));
+      assertThat(getStackTrace(e), anyOf(containsString("Invalid content was found starting with element 'ext:whatever'"),
+                                         containsString("Error loading: mule-wrong-schema-location.xml, Can't resolve http://www.mulesoft.org/schema/mule/core/current/ext.xsd")));
     }
   }
 
