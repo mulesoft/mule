@@ -242,8 +242,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private static BeanDependencyResolver getBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
                                                                   Map<String, Object> components) {
-    return beanNames -> beanNames.stream().map(name -> configurationDependencyResolver
-        .resolveComponentDependencies(name)).collect(toList()).stream()
+    return beanNames -> beanNames.stream().flatMap(name -> configurationDependencyResolver
+        .resolveComponentDependencies(name).stream())
         .map(componentName -> components.get(componentName))
         .filter(Objects::nonNull)
         .collect(toList());
