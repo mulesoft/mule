@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -21,11 +23,31 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-public final class ClassLoaderConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
+/**
+ * A {@link ConnectionProviderWrapper} which makes sure that all delegate methods are executed with a given {@link #classLoader}
+ *
+ * @param <C> the generic type of the connections the delegate produces
+ * @since 4.2.0
+ */
+public class ClassLoaderConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
+
+  /**
+   * Creates a new wrapper for the given {@code provider}
+   *
+   * @param provider    the delegate
+   * @param classLoader the {@link ClassLoader} to use
+   * @param <C>         the generic type of the connections the delegate produces
+   * @return a new instance
+   */
+  public static <C> ClassLoaderConnectionProviderWrapper<C> newInstance(ConnectionProvider<C> provider, ClassLoader classLoader) {
+    return provider instanceof PoolingConnectionProvider
+        ? new PoolingClassLoaderConnectionProviderWrapper<>(provider, classLoader)
+        : new ClassLoaderConnectionProviderWrapper<>(provider, classLoader);
+  }
 
   private final ClassLoader classLoader;
 
-  public ClassLoaderConnectionProviderWrapper(ConnectionProvider provider, ClassLoader classLoader) {
+  private ClassLoaderConnectionProviderWrapper(ConnectionProvider<C> provider, ClassLoader classLoader) {
     super(provider);
     this.classLoader = classLoader;
   }
@@ -74,7 +96,7 @@ public final class ClassLoaderConnectionProviderWrapper<C> extends ConnectionPro
     return Optional.empty();
   }
 
-  private void onClassLoader(CheckedRunnable runnable) {
+  protected void onClassLoader(CheckedRunnable runnable) {
     onClassLoader(runnable, RuntimeException.class);
   }
 
@@ -93,5 +115,28 @@ public final class ClassLoaderConnectionProviderWrapper<C> extends ConnectionPro
     return withContextClassLoader(classLoader, callable, expectedException, e -> {
       throw new MuleRuntimeException(e);
     });
+  }
+
+  private static class PoolingClassLoaderConnectionProviderWrapper<C> extends ClassLoaderConnectionProviderWrapper<C> implements
+      PoolingConnectionProvider<C> {
+
+    private PoolingClassLoaderConnectionProviderWrapper(ConnectionProvider provider, ClassLoader classLoader) {
+      super(provider, classLoader);
+      checkArgument(provider instanceof PoolingConnectionProvider, "Delegate is not a pooling provider");
+    }
+
+    @Override
+    public void onBorrow(C connection) {
+      onClassLoader(() -> getPoolingDelegate().onBorrow(connection));
+    }
+
+    @Override
+    public void onReturn(C connection) {
+      onClassLoader(() -> getPoolingDelegate().onReturn(connection));
+    }
+
+    private PoolingConnectionProvider<C> getPoolingDelegate() {
+      return (PoolingConnectionProvider<C>) getDelegate();
+    }
   }
 }
