@@ -206,6 +206,7 @@
         <log4jVersion>2.11.0</log4jVersion>
         <disruptorVersion>3.3.7</disruptorVersion>
         <mockitoVersion>2.26.0</mockitoVersion>
+        <byteBuddyVersion>1.9.10</byteBuddyVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <projectReactorVersion>3.2.6.RELEASE</projectReactorVersion>
@@ -772,6 +773,19 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- Added to avoid conflicting transitive versions from Mockito and PowerMock -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byteBuddyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byteBuddyVersion}</version>
+            </dependency>
+
             <dependency>
                 <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
                 <groupId>com.googlecode.multithreadedtc</groupId>
