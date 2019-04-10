@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.config.HasPoolingProfile;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -27,9 +26,9 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
-import javax.inject.Inject;
-
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -54,7 +53,7 @@ public abstract class ConnectionProviderWrapper<C>
    *
    * @param delegate the {@link ConnectionProvider} to be wrapped
    */
-  ConnectionProviderWrapper(ConnectionProvider<C> delegate) {
+  public ConnectionProviderWrapper(ConnectionProvider<C> delegate) {
     this.delegate = delegate;
   }
 
