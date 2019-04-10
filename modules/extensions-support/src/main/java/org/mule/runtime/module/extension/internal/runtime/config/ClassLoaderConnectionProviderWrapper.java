@@ -27,7 +27,7 @@ import java.util.concurrent.Callable;
  * A {@link ConnectionProviderWrapper} which makes sure that all delegate methods are executed with a given {@link #classLoader}
  *
  * @param <C> the generic type of the connections the delegate produces
- * @since 4.2.0
+ * @since 4.1.6
  */
 public class ClassLoaderConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
