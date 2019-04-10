@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -37,15 +38,15 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   public static final ThreadGroup UNIT_TEST_THREAD_GROUP = new ThreadGroup(SimpleUnitTestSupportScheduler.class.getSimpleName());
 
-  private SimpleUnitTestSupportScheduler scheduler =
+  private final SimpleUnitTestSupportScheduler scheduler =
       new SimpleUnitTestSupportScheduler(8,
                                          new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName(),
                                                                 SimpleUnitTestSupportSchedulerService.class.getClassLoader(),
                                                                 UNIT_TEST_THREAD_GROUP),
                                          new AbortPolicy());
 
-  private List<Scheduler> customSchedulers = synchronizedList(new ArrayList<>());
-  private List<Scheduler> decorators = synchronizedList(new ArrayList<>());
+  private final List<Scheduler> customSchedulers = synchronizedList(new ArrayList<>());
+  private final List<Scheduler> decorators = synchronizedList(new ArrayList<>());
 
   @Override
   public String getName() {
@@ -154,12 +155,14 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
-    SimpleUnitTestSupportLifecycleSchedulerDecorator spied =
-        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(resolveSchedulerCreationLocation(), scheduler, this));
+    return withContextClassLoader(SimpleUnitTestSupportSchedulerService.class.getClassLoader(), () -> {
+      SimpleUnitTestSupportLifecycleSchedulerDecorator spied =
+          spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(resolveSchedulerCreationLocation(), scheduler, this));
 
-    doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString());
-    doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString(), any());
-    return spied;
+      doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString());
+      doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString(), any());
+      return spied;
+    });
   }
 
   private String resolveSchedulerCreationLocation() {
@@ -232,7 +235,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   private class TestSchedulerView implements SchedulerView {
 
-    private Scheduler scheduler;
+    private final Scheduler scheduler;
 
     /**
      * Creates a reporting view for a {@link Scheduler}.
