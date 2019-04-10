@@ -83,10 +83,13 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS, extraInterfaces = {Component.class})
   private FlowConstruct flowConstruct;
 
-  private FlowProcessingPhase phase = new FlowProcessingPhase(registry);
+  private final FlowProcessingPhase phase = new FlowProcessingPhase(registry);
 
   @Before
-  public void before() {
+  public void before() throws MuleException {
+    when(mockTemplate.getOriginalMessage()).thenReturn(TEST_PAYLOAD);
+    when(mockRequestResponseTemplate.getOriginalMessage()).thenReturn(TEST_PAYLOAD);
+
     when(notificationManager.isNotificationEnabled(any(Class.class))).thenReturn(true);
     when(muleContext.getNotificationManager()).thenReturn(notificationManager);
     phase.setMuleContext(muleContext);
