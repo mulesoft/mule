@@ -14,7 +14,16 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
+import org.mule.maven.client.api.MavenClient;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.internal.util.JarInfo;
+
+import com.vdurmont.semver4j.Semver;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -31,17 +40,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-
-import org.mule.maven.client.api.MavenClient;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
-
-import com.vdurmont.semver4j.Semver;
 
 /**
  * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} responsible of resolving dependencies
@@ -205,21 +203,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .forEach(bundleDependency -> {
           Model effectiveModel;
           try {
-            // system scope dependencies are always availables and are not looked up in a repository
-            if (bundleDependency.getScope().equals(SYSTEM)) {
-              effectiveModel =
-                  mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryFolder));
-            } else {
-              BundleDescriptor descriptor = bundleDependency.getDescriptor();
-              effectiveModel = mavenClient.getEffectiveModel(toFile(mavenClient
-                  .resolveBundleDescriptor(new org.mule.maven.client.api.model.BundleDescriptor.Builder()
-                      .setGroupId(descriptor.getGroupId())
-                      .setArtifactId(descriptor.getArtifactId())
-                      .setVersion(descriptor.getVersion())
-                      .setType(POM)
-                      .build())
-                  .getBundleUri().toURL()), empty());
-            }
+            effectiveModel = mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryFolder));
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }
