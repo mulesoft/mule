@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleDeploymentProperties",
+          "fieldName": "MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY",
+          "elementKind": "field",
+          "justification": "MULE-16654"
+        },
+        {
           "code": "java.method.added",
           "new": "method java.lang.String org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider::maskPasswords(java.lang.String, java.lang.String)",
           "package": "org.mule.runtime.core.privileged.execution",
