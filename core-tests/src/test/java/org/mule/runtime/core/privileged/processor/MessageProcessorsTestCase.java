@@ -215,8 +215,14 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     } catch (Throwable t) {
       assertThat(t, is(instanceOf(MessagingException.class)));
       assertThat(t.getCause(), is(exception));
-      assertThat(((MessagingException) t).getEvent().getContext(), is((instanceOf(DefaultEventContext.class))));
+      assertThat(((MessagingException) t).getEvent().getContext(), equalTo(input.getContext()));
     }
+  }
+
+  @Test
+  public void processWithChildContextBlockingSuccessInChainRegainsParentContext() throws Exception {
+    CoreEvent event = processWithChildContextBlocking(input, createChain(map), Optional.empty());
+    assertThat(event.getContext(), equalTo(input.getContext()));
   }
 
   @Test
