@@ -30,6 +30,14 @@ import java.util.function.Function;
  */
 public class CollectListForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
 
+  public CollectListForkJoinStrategyFactory() {
+    super();
+  }
+
+  public CollectListForkJoinStrategyFactory(boolean mergeVariables) {
+    super(mergeVariables);
+  }
+
   @Override
   protected Function<List<CoreEvent>, CoreEvent> createResultEvent(CoreEvent original,
                                                                    CoreEvent.Builder resultBuilder) {

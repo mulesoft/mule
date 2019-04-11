@@ -440,7 +440,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     }).collect(toList());
   }
 
-  private MessageProcessorChain createChain(Processor processor) throws MuleException {
+  protected MessageProcessorChain createChain(Processor processor) throws MuleException {
     MessageProcessorChain chain = newChain(Optional.empty(), processor);
     chain.setMuleContext(muleContext);
     return chain;

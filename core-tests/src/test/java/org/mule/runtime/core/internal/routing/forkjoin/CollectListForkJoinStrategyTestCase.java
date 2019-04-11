@@ -7,11 +7,14 @@
 package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.COLLECT_LIST;
 
 import java.util.List;
@@ -57,6 +60,47 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
     List<Message> resultList = (List<Message>) result.getMessage().getPayload().getValue();
     assertThat(resultList, hasSize(3));
     assertThat(resultList, hasItems(route1Result, route2Result, route3Result));
+  }
+
+  @Test
+  @Description("Checks that variables are not merged if set as it")
+  public void flowVarsNotMerged() throws Throwable {
+    strategy = new CollectListForkJoinStrategyFactory(false).createForkJoinStrategy(processingStrategy, 1, true, 50, scheduler,
+                                                                                    timeoutErrorType);
+    final String beforeVarName = "before";
+    final String beforeVarValue = "beforeValue";
+    final String beforeVar2Name = "before2";
+    final String beforeVar2Value = "before2Value";
+    final String beforeVar2NewValue = "before2NewValue";
+    final String fooVarName = "foo";
+    final String fooVarValue = "fooValue1";
+    final String fooVar2Name = "foo2";
+    final String fooVar2Value1 = "foo2Value1";
+    final String fooVar2Value2 = "foo2Value2";
+
+    CoreEvent original = builder(this.<CoreEvent>newEvent())
+        .addVariable(beforeVarName, beforeVarValue)
+        .addVariable(beforeVar2Name, beforeVar2Value)
+        .build();
+
+    RoutingPair pair1 = RoutingPair.of(original, createChain(event -> builder(event)
+        .addVariable(beforeVar2Name, beforeVar2NewValue)
+        .addVariable(fooVarName, fooVarValue)
+        .addVariable(fooVar2Name, fooVar2Value1)
+        .build()));
+    RoutingPair pair2 = RoutingPair.of(original, createChain(event -> builder(event)
+        .addVariable(fooVar2Name, fooVar2Value2)
+        .build()));
+
+    CoreEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2));
+
+    assertThat(result.getVariables().keySet(), hasSize(2));
+
+    assertThat(result.getVariables().keySet(), hasItems(beforeVarName, beforeVar2Name));
+    assertThat(result.getVariables().keySet(), not(hasItems(fooVarName, fooVarName, fooVar2Name)));
+
+    assertThat(result.getVariables().get(beforeVarName).getValue(), equalTo(beforeVarValue));
+    assertThat(result.getVariables().get(beforeVar2Name).getValue(), equalTo(beforeVar2Value));
   }
 
 }
