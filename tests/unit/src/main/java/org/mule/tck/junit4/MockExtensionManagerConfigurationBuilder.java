@@ -7,16 +7,15 @@
 package org.mule.tck.junit4;
 
 import static java.util.Collections.emptySet;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-
-import org.mockito.Answers;
-import org.mockito.Mockito;
 
 /**
  * {@link ConfigurationBuilder} used to provide a mock implementation of {@link ExtensionManager} with an empty set of extensions.
@@ -33,9 +32,11 @@ public class MockExtensionManagerConfigurationBuilder implements ConfigurationBu
   @Override
   public void configure(MuleContext muleContext) {
     if (muleContext.getExtensionManager() == null) {
-      ExtensionManager mockExtensionManager = mock(ExtensionManager.class, Answers.RETURNS_DEEP_STUBS.get());
-      when(mockExtensionManager.getExtensions()).thenReturn(emptySet());
-      muleContext.setExtensionManager(mockExtensionManager);
+      withContextClassLoader(MockExtensionManagerConfigurationBuilder.class.getClassLoader(), () -> {
+        ExtensionManager mockExtensionManager = mock(ExtensionManager.class, RETURNS_DEEP_STUBS.get());
+        when(mockExtensionManager.getExtensions()).thenReturn(emptySet());
+        muleContext.setExtensionManager(mockExtensionManager);
+      });
     }
   }
 }
