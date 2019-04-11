@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 
@@ -32,6 +33,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -202,6 +204,18 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
       processToApply(input, error);
     } finally {
       assertThat(from(responsePublisher).toFuture().isDone(), is(false));
+    }
+  }
+
+  @Test
+  public void processWithChildContextBlockingErrorInChainRegainsParentContext() throws Exception {
+    try {
+      processWithChildContextBlocking(input, createChain(error), Optional.empty());
+      fail("Exception expected");
+    } catch (Throwable t) {
+      assertThat(t, is(instanceOf(MessagingException.class)));
+      assertThat(t.getCause(), is(exception));
+      assertThat(((MessagingException) t).getEvent().getContext(), is((instanceOf(DefaultEventContext.class))));
     }
   }
 
