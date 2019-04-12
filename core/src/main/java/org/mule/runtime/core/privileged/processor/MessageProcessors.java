@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static reactor.core.publisher.Mono.from;
@@ -341,6 +342,11 @@ public class MessageProcessors {
       try {
         result = Mono.from(childResponsePublisher).block();
       } catch (Throwable t) {
+        Throwable throwable = unwrap(t);
+        if (throwable instanceof MessagingException) {
+          final MessagingException error = (MessagingException) throwable;
+          throw rxExceptionToMuleException(new MessagingException(toParentContext(error.getEvent()), error));
+        }
         if (t.getCause() instanceof InterruptedException) {
           currentThread().interrupt();
         }

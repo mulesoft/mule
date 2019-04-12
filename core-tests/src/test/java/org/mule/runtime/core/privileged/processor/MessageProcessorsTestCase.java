@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
@@ -21,6 +22,7 @@ import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 
@@ -38,7 +40,6 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -203,6 +204,24 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     } finally {
       assertThat(from(responsePublisher).toFuture().isDone(), is(false));
     }
+  }
+
+  @Test
+  public void processWithChildContextBlockingErrorInChainRegainsParentContext() throws Exception {
+    try {
+      processWithChildContextBlocking(input, createChain(error), Optional.empty());
+      fail("Exception expected");
+    } catch (Throwable t) {
+      assertThat(t, is(instanceOf(MessagingException.class)));
+      assertThat(t.getCause(), is(exception));
+      assertThat(((MessagingException) t).getEvent().getContext(), sameInstance(input.getContext()));
+    }
+  }
+
+  @Test
+  public void processWithChildContextBlockingSuccessInChainRegainsParentContext() throws Exception {
+    CoreEvent event = processWithChildContextBlocking(input, createChain(map), Optional.empty());
+    assertThat(event.getContext(), sameInstance(input.getContext()));
   }
 
   @Test
