@@ -39,8 +39,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
-import org.slf4j.Logger;
-
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,12 +50,17 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+
 /**
  * Implement a retry policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
  * times. If this maximum is exceeded, fails with an exception.
  */
 @NoExtend
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
+
+  private static final String EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG =
+      "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.";
 
   public static final String SECURE_HASH_EXPR_FORMAT = "" +
       "%%dw 2.0" + lineSeparator() +
@@ -181,9 +184,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     try {
       messageId = getIdForEvent(event);
     } catch (ExpressionRuntimeException e) {
-      LOGGER
-          .warn(
-                "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG, e);
+      } else {
+        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG);
+      }
       return null;
     } catch (Exception ex) {
       exceptionSeen = of(ex);
