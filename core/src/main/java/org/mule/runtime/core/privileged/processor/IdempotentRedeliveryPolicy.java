@@ -67,6 +67,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       "output text/plain" + lineSeparator() +
       "import dw::Crypto" + lineSeparator() +
       "---" + lineSeparator() +
+      "if (payload.^mimeType startsWith 'application/java') " +
+      "java!java::util::Objects::hashCode(payload) " +
+      "else " +
       "Crypto::hashWith(payload.^raw, '%s')";
 
   private static final Logger LOGGER = getLogger(IdempotentRedeliveryPolicy.class);
