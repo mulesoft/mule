@@ -23,11 +23,11 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
+import com.google.common.collect.ImmutableSet;
 import com.vdurmont.semver4j.Semver;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +49,6 @@ import org.apache.maven.model.Plugin;
  */
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
-  private static final String POM = "pom";
   private MavenClient mavenClient;
   private Set<BundleDependency> nonProvidedDependencies;
   private File temporaryFolder;
@@ -65,15 +64,20 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   @Override
-  protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
-    return resolveDependencies(bundleDependency.getAdditionalDependencies()).stream()
-        .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri).collect(toList());
+  protected void replaceBundleDependency(BundleDependency original, BundleDependency modified) {
+    super.replaceBundleDependency(original, processPluginAdditionalDependenciesURIs(modified));
+  }
+
+  private BundleDependency processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
+    return new BundleDependency.Builder(bundleDependency)
+        .setAdditionalDependencies(resolveDependencies(bundleDependency.getAdditionalDependencies()))
+        .build();
   }
 
   // TODO: MULE-15768
   // TODO: MULE-16026 all the following logic is duplicated from the mule-packager.
-  private List<org.mule.maven.client.api.model.BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
-    List<org.mule.maven.client.api.model.BundleDependency> resolvedAdditionalDependencies = new ArrayList<>();
+  private Set<BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
+    List<BundleDependency> resolvedAdditionalDependencies = new ArrayList<>();
     additionalDependencies.stream()
         .map(BundleDependency::getDescriptor)
         .map(descriptor -> new org.mule.maven.client.api.model.BundleDescriptor.Builder()
@@ -86,14 +90,30 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
           resolveDependency(bundleDescriptor)
               .forEach(additionalDep -> updateAdditionalDependencyOrFail(resolvedAdditionalDependencies, additionalDep));
         });
-    return resolvedAdditionalDependencies;
+    return ImmutableSet.copyOf(resolvedAdditionalDependencies);
   }
 
-  private List<org.mule.maven.client.api.model.BundleDependency> resolveDependency(org.mule.maven.client.api.model.BundleDescriptor dependencyBundleDescriptor) {
-    List<org.mule.maven.client.api.model.BundleDependency> resolvedDependencies = new ArrayList<>();
-    resolvedDependencies.add(mavenClient.resolveBundleDescriptor(dependencyBundleDescriptor));
-    resolvedDependencies.addAll(mavenClient.resolveBundleDescriptorDependencies(false, false, dependencyBundleDescriptor));
+  private List<BundleDependency> resolveDependency(org.mule.maven.client.api.model.BundleDescriptor mavenDependencyBundleDescriptor) {
+    List<BundleDependency> resolvedDependencies = new ArrayList<>();
+    resolvedDependencies.add(toBundleDescriptor(mavenClient.resolveBundleDescriptor(mavenDependencyBundleDescriptor)));
+    resolvedDependencies
+        .addAll(mavenClient.resolveBundleDescriptorDependencies(false, false, mavenDependencyBundleDescriptor).stream()
+            .map(mavenBundleDependency -> toBundleDescriptor(mavenBundleDependency)).collect(toList()));
     return resolvedDependencies;
+  }
+
+  private BundleDependency toBundleDescriptor(org.mule.maven.client.api.model.BundleDependency resolveBundleDescriptor) {
+    return new BundleDependency.Builder()
+        .setDescriptor(new BundleDescriptor.Builder()
+            .setGroupId(resolveBundleDescriptor.getDescriptor().getGroupId())
+            .setArtifactId(resolveBundleDescriptor.getDescriptor().getArtifactId())
+            .setBaseVersion(resolveBundleDescriptor.getDescriptor().getBaseVersion())
+            .setVersion(resolveBundleDescriptor.getDescriptor().getVersion())
+            .setType(resolveBundleDescriptor.getDescriptor().getType())
+            .setClassifier(resolveBundleDescriptor.getDescriptor().getClassifier().orElse(null))
+            .build())
+        .setBundleUri(resolveBundleDescriptor.getBundleUri())
+        .build();
   }
 
   @Override
@@ -134,9 +154,9 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .forEach(this::exportBundleDependencyAndTransitiveDependencies);
   }
 
-  private void updateAdditionalDependencyOrFail(List<org.mule.maven.client.api.model.BundleDependency> additionalDependencies,
-                                                org.mule.maven.client.api.model.BundleDependency bundleDependency) {
-    Reference<org.mule.maven.client.api.model.BundleDependency> replace = new Reference<>();
+  private void updateAdditionalDependencyOrFail(List<BundleDependency> additionalDependencies,
+                                                BundleDependency bundleDependency) {
+    Reference<BundleDependency> replace = new Reference<>();
     additionalDependencies.stream()
         .filter(additionalBundleDependency -> StringUtils.equals(additionalBundleDependency.getDescriptor().getGroupId(),
                                                                  bundleDependency.getDescriptor().getGroupId())

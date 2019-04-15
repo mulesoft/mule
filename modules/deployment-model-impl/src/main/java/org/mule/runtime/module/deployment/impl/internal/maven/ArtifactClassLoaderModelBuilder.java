@@ -36,7 +36,6 @@ import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -268,21 +267,19 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
           .filter(bundleDependency -> bundleDependency.getAdditionalDependencies() != null
               && !bundleDependency.getAdditionalDependencies().isEmpty())
           .forEach(
-                   bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency)
-                       .forEach(uri -> {
+                   bundleDependency -> bundleDependency.getAdditionalDependencies()
+                       .forEach(additionalBundleDependency -> {
                          try {
-                           containing(uri.toURL());
+                           containing(additionalBundleDependency.getBundleUri().toURL());
                          } catch (MalformedURLException e) {
                            throw new ArtifactDescriptorCreateException(
                                                                        format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
                                                                               artifactFolder.getAbsolutePath(),
-                                                                              uri),
+                                                                              additionalBundleDependency.getBundleUri()),
                                                                        e);
                          }
                        }));
     }
   }
-
-  protected abstract List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency);
 
 }
