@@ -1319,9 +1319,9 @@
             </dependency>
 
             <dependency>
-		<groupId>org.mule.mvel</groupId>
-		<artifactId>mule-mvel2</artifactId>
-		<version>${muleMvelVersion}</version>
+                <groupId>org.mule.mvel</groupId>
+                <artifactId>mule-mvel2</artifactId>
+                <version>${muleMvelVersion}</version>
             </dependency>
 
             <dependency>
