@@ -258,7 +258,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
     try {
       block(sink -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
-                                            operationLocation, sink));
+                                                     operationLocation, sink));
     } catch (Exception throwable) {
       throw rxExceptionToMuleException(throwable);
     }
