@@ -168,7 +168,7 @@
         <commonsLangVersion>2.6</commonsLangVersion>
         <commonsLang3Version>3.6</commonsLang3Version>
         <commonsNetVersion>3.5</commonsNetVersion>
-        <cxfVersion>2.7.19-MULE-SPRING-3-001</cxfVersion>
+        <cxfVersion>2.7.19-MULE-SPRING-3-002</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
@@ -189,7 +189,7 @@
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaMailVersion>1.5.4</javaMailVersion>
-        <javaXmlBindVersion>2.3.0-MULE-001</javaXmlBindVersion>
+        <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.15.0.Final</jbossTsVersion>
