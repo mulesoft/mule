@@ -60,8 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -85,16 +83,8 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * We cache transformer searches so that we only search once
      */
-    protected ConcurrentHashMap/* <String, Transformer> */ exactTransformerCache = new ConcurrentHashMap/*
-                                                                                                         * <String,
-                                                                                                         * Transformer>
-                                                                                                         */(8);
-    protected ConcurrentHashMap/* Map<String, List<Transformer>> */ transformerListCache = new ConcurrentHashMap/*
-                                                                                                                 * <String,
-                                                                                                                 * List<
-                                                                                                                 * Transformer
-                                                                                                                 * >>
-                                                                                                                 */(8);
+    protected ConcurrentHashMap/*<String, Transformer>*/ exactTransformerCache = new ConcurrentHashMap/*<String, Transformer>*/(8);
+    protected ConcurrentHashMap/*Map<String, List<Transformer>>*/ transformerListCache = new ConcurrentHashMap/*<String, List<Transformer>>*/(8);
 
     private MuleContext muleContext;
 
@@ -123,11 +113,10 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
      */
     public void initialise() throws InitialisationException
     {
-        // no-op
+        //no-op
 
-        // This is called when the MuleContext starts up, and should only do initialisation for any state on this class,
-        // the lifecycle
-        // for the registries will be handled by the LifecycleManager on the registry that this class wraps
+        //This is called when the MuleContext starts up, and should only do initialisation for any state on this class, the lifecycle
+        //for the registries will be handled by the LifecycleManager on the registry that this class wraps
     }
 
     /**
@@ -206,9 +195,9 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      *
-     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)}
-     *             instead. This method should only be used internally to discover transformers, typically a user does
-     *             not need ot do this directly
+     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
+     *             method should only be used internally to discover transformers, typically a user does not need ot do this
+     *             directly
      */
     @Deprecated
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
@@ -219,9 +208,9 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      *
-     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)}
-     *             instead. This method should only be used internally to discover transformers, typically a user does
-     *             not need ot do this directly
+     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
+     *             method should only be used internally to discover transformers, typically a user does not need ot do this
+     *             directly
      */
     @Deprecated
     public List<Transformer> lookupTransformers(Class input, Class output)
@@ -511,11 +500,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
                 transformersWriteLock.unlock();
             }
         }
-    }
-
-    private String getConverterKey(Transformer t)
-    {
-        return t.getName() != null ? t.getName() : generateTransformerName(t.getClass(), t.getReturnDataType());
     }
 
     /**
@@ -985,6 +969,11 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
             }
             return 0;
         }
+    }
+
+    public static String getConverterKey(Transformer t)
+    {
+        return t.getName() != null ? t.getName() : generateTransformerName(t.getClass(), t.getReturnDataType());
     }
 }
 

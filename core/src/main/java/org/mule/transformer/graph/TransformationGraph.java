@@ -6,15 +6,17 @@
  */
 package org.mule.transformer.graph;
 
-import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DataType;
+import static org.mule.registry.MuleRegistryHelper.getConverterKey;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.mule.api.transformer.Converter;
+import org.mule.api.transformer.DataType;
 
 /**
  * Represents the set of transformations between {@link DataType} based on the
@@ -24,9 +26,9 @@ public class TransformationGraph extends DirectedMultigraph<DataType<?>, Transfo
 {
 
     protected final Log logger = LogFactory.getLog(getClass());
-    
-    private Set<Converter> registeredConverters = new HashSet<Converter>();
-    
+
+    protected Map<String, Converter> registeredConverters = new HashMap<String, Converter>();
+
     public TransformationGraph()
     {
         super(TransformationEdge.class);
@@ -34,7 +36,7 @@ public class TransformationGraph extends DirectedMultigraph<DataType<?>, Transfo
 
     public void addConverter(Converter converter)
     {
-        if (registeredConverters.contains(converter))
+        if (registeredConverters.containsKey(getConverterKey(converter)))
         {
             if (logger.isDebugEnabled())
             {
@@ -60,12 +62,12 @@ public class TransformationGraph extends DirectedMultigraph<DataType<?>, Transfo
             addEdge(sourceDataType, returnDataType, new TransformationEdge(converter));
         }
 
-        registeredConverters.add(converter);
+        registeredConverters.put(getConverterKey(converter), converter);
     }
-    
+
     public void removeConverter(Converter converter)
     {
-        if (!registeredConverters.contains(converter))
+        if (!registeredConverters.containsKey(getConverterKey(converter)))
         {
             if (logger.isDebugEnabled())
             {
@@ -104,6 +106,6 @@ public class TransformationGraph extends DirectedMultigraph<DataType<?>, Transfo
             }
         }
 
-        registeredConverters.remove(converter);
+        registeredConverters.remove(getConverterKey(converter));
     }
 }

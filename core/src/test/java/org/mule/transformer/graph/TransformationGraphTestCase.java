@@ -6,24 +6,25 @@
  */
 package org.mule.transformer.graph;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.Set;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.builder.MockConverterBuilder;
-
-import java.util.Set;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 @SmallTest
 public class TransformationGraphTestCase extends AbstractMuleTestCase
@@ -60,13 +61,13 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         TransformationGraph graph = new TransformationGraph();
         graph.addConverter(xmlToJson);
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
 
-        assertEquals(1, graph.edgeSet().size());
-        assertTrue(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(1));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE), is(false));
     }
 
     @Test
@@ -78,13 +79,13 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         graph.addConverter(xmlToJson);
         graph.addConverter(xmlToJson);
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
 
-        assertEquals(1, graph.edgeSet().size());
-        assertTrue(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(1));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE), is(false));
     }
 
     @Test
@@ -95,17 +96,17 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         TransformationGraph graph = new TransformationGraph();
         graph.addConverter(xmlToJson);
 
-        assertEquals(3, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
-        assertTrue(graph.containsVertex(INPUT_STREAM_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(3));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(INPUT_STREAM_DATA_TYPE), is(true));
 
-        assertEquals(2, graph.edgeSet().size());
-        assertTrue(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(2));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE), is(false));
 
-        assertTrue(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE));
+        assertThat(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE), is(false));
     }
 
     @Test
@@ -117,8 +118,8 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         graph.addConverter(xmlToJson);
         graph.removeConverter(xmlToJson);
 
-        assertEquals(0, graph.vertexSet().size());
-        assertEquals(0, graph.edgeSet().size());
+        assertThat(graph.vertexSet(), is(empty()));
+        assertThat(graph.edgeSet(), is(empty()));
     }
 
     @Test
@@ -131,12 +132,12 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         graph.addConverter(xmlToJson);
         graph.removeConverter(betterXmlToJson);
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
 
-        assertEquals(1, graph.edgeSet().size());
-        assertTrue(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(1));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(true));
     }
 
     @Test
@@ -148,27 +149,29 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         graph.addConverter(xmlToJson);
         graph.removeConverter(xmlToJson);
 
-        assertEquals(0, graph.vertexSet().size());
-        assertEquals(0, graph.edgeSet().size());
+        assertThat(graph.vertexSet(), is(empty()));
+        assertThat(graph.edgeSet(), is(empty()));
     }
 
     @Test
     public void multipleConvertersFromSameSourceToResultTypes()
     {
         Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJson.getName()).thenReturn("xmlToJson");
         Converter betterXmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(betterXmlToJson.getName()).thenReturn("betterXmlToJson");
 
         TransformationGraph graph = new TransformationGraph();
         graph.addConverter(xmlToJson);
         graph.addConverter(betterXmlToJson);
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
 
-        assertEquals(2, graph.edgeSet().size());
-        assertTrue(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(2));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE), is(false));
 
         assertContainsTransformer(graph.edgesOf(JSON_DATA_TYPE), xmlToJson);
         assertContainsTransformer(graph.edgesOf(JSON_DATA_TYPE), betterXmlToJson);
@@ -178,19 +181,21 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
     public void removesFirstDuplicateConverterAdded()
     {
         Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJson.getName()).thenReturn("xmlToJson");
         Converter betterXmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(betterXmlToJson.getName()).thenReturn("betterXmlToJson");
 
         TransformationGraph graph = new TransformationGraph();
         graph.addConverter(xmlToJson);
         graph.addConverter(betterXmlToJson);
         graph.removeConverter(xmlToJson);
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
 
         Set<TransformationEdge> transformationEdges = graph.edgesOf(JSON_DATA_TYPE);
-        assertEquals(1, transformationEdges.size());
+        assertThat(transformationEdges, hasSize(1));
         assertContainsTransformer(transformationEdges, betterXmlToJson);
     }
 
@@ -205,12 +210,12 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         graph.addConverter(betterXmlToJson);
         graph.removeConverter(betterXmlToJson);
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
 
         Set<TransformationEdge> transformationEdges = graph.edgesOf(JSON_DATA_TYPE);
-        assertEquals(1, transformationEdges.size());
+        assertThat(transformationEdges, hasSize(1));
         assertContainsTransformer(transformationEdges, xmlToJson);
     }
 
@@ -218,29 +223,33 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
     public void multipleConvertersFromDifferentSourceToSameResultTypes()
     {
         Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJson.getName()).thenReturn("xmlToJson");
         Converter objectToJson = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(objectToJson.getName()).thenReturn("objectToJson");
 
         TransformationGraph graph = new TransformationGraph();
         graph.addConverter(xmlToJson);
         graph.addConverter(objectToJson);
 
-        assertEquals(3, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
-        assertTrue(graph.containsVertex(INPUT_STREAM_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(3));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(INPUT_STREAM_DATA_TYPE), is(true));
 
-        assertEquals(2, graph.edgeSet().size());
-        assertTrue(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE));
-        assertTrue(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(2));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE), is(false));
+        assertThat(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE), is(false));
     }
 
     @Test
     public void removeFirstAddedConverterWithDifferentSourceToSameResultTypes()
     {
         Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJson.getName()).thenReturn("xmlToJson");
         Converter objectToJson = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(objectToJson.getName()).thenReturn("objectToJson");
 
         TransformationGraph graph = new TransformationGraph();
         graph.addConverter(xmlToJson);
@@ -248,37 +257,54 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         graph.removeConverter(xmlToJson);
 
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
-        assertTrue(graph.containsVertex(INPUT_STREAM_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(INPUT_STREAM_DATA_TYPE), is(true));
 
-        assertEquals(1, graph.edgeSet().size());
-        assertFalse(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE));
-        assertTrue(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(1));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(false));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE), is(false));
+        assertThat(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE), is(false));
+    }
+    
+    @Test
+    public void reregisterDoesNotLeak()
+    {
+        Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJson.getName()).thenReturn("xmlToJson");
+        Converter xmlToJsonCopy = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJsonCopy.getName()).thenReturn("xmlToJson");
+        
+        TransformationGraph graph = new TransformationGraph();
+        graph.addConverter(xmlToJson);
+        graph.addConverter(xmlToJsonCopy);
+        
+        assertThat(graph.registeredConverters.keySet(), hasSize(1));
     }
 
     @Test
     public void removeSecondAddedConverterWithDifferentSourceToSameResultTypes()
     {
         Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJson.getName()).thenReturn("xmlToJson");
         Converter objectToJson = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(objectToJson.getName()).thenReturn("objectToJson");
 
         TransformationGraph graph = new TransformationGraph();
         graph.addConverter(xmlToJson);
         graph.addConverter(objectToJson);
         graph.removeConverter(objectToJson);
 
-        assertEquals(2, graph.vertexSet().size());
-        assertTrue(graph.containsVertex(JSON_DATA_TYPE));
-        assertTrue(graph.containsVertex(XML_DATA_TYPE));
+        assertThat(graph.vertexSet(), hasSize(2));
+        assertThat(graph.containsVertex(JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsVertex(XML_DATA_TYPE), is(true));
 
-        assertEquals(1, graph.edgeSet().size());
-        assertTrue(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE));
-        assertFalse(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE));
-        assertFalse(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE));
+        assertThat(graph.edgeSet(), hasSize(1));
+        assertThat(graph.containsEdge(XML_DATA_TYPE, JSON_DATA_TYPE), is(true));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, XML_DATA_TYPE), is(false));
+        assertThat(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE), is(false));
+        assertThat(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE), is(false));
     }
 
     private void assertContainsTransformer(Set<TransformationEdge> transformationEdges, Transformer transformer)
