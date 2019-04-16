@@ -413,6 +413,32 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   @Test
+  public void streamAfterRestart() throws Exception {
+    flow = flowBuilder.get().processors(cpuLightProcessor).build();
+    flow.initialise();
+    flow.start();
+
+    CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
+    for (int i = 0; i < STREAM_ITERATIONS; i++) {
+      dispatchFlow(newEvent(), t -> latch.countDown(), response -> bubble(new AssertionError("Unexpected error")));
+    }
+    assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+
+    flow.stop();
+    cpuLight = new TestScheduler(2, CPU_LIGHT, false);
+    blocking = new TestScheduler(4, IO, true);
+    cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
+    ringBuffer = new TestScheduler(1, RING_BUFFER, true);
+    flow.start();
+
+    CountDownLatch latchAfter = new CountDownLatch(STREAM_ITERATIONS);
+    for (int i = 0; i < STREAM_ITERATIONS; i++) {
+      dispatchFlow(newEvent(), t -> latchAfter.countDown(), response -> bubble(new AssertionError("Unexpected error")));
+    }
+    assertThat(latchAfter.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+  }
+
+  @Test
   public void concurrentStream() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor).build();
     flow.initialise();
