@@ -67,7 +67,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       "output text/plain" + lineSeparator() +
       "import dw::Crypto" + lineSeparator() +
       "---" + lineSeparator() +
-      "if (payload.^mimeType startsWith 'application/java') " +
+      "if ((payload.^mimeType startsWith 'application/java') and payload.^class != 'java.lang.String') " +
       "java!java::util::Objects::hashCode(payload) " +
       "else " +
       "Crypto::hashWith(payload.^raw, '%s')";
