@@ -34,6 +34,7 @@ import static org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPol
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -72,6 +73,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
@@ -80,18 +82,18 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   public static final int MAX_REDELIVERY_COUNT = 5;
   private static ObjectSerializer serializer;
 
-  private MuleContextWithRegistry mockMuleContext = mockMuleContext();
-  private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
-  private Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
-  private Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
-  private InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
+  private final MuleContextWithRegistry mockMuleContext = mockMuleContext();
+  private final ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
+  private final Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
+  private final Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
+  private final InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
   private CoreEvent event;
-  private Latch waitLatch = new Latch();
-  private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
-  private ExpressionManager expressionManager = mock(ExpressionManager.class);
+  private final Latch waitLatch = new Latch();
+  private final CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
+  private final ExpressionManager expressionManager = mock(ExpressionManager.class);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
-  private AtomicInteger count = new AtomicInteger();
-  private ObjectStore mockObjectStore = mock(ObjectStore.class);
+  private final AtomicInteger count = new AtomicInteger();
+  private final ObjectStore mockObjectStore = mock(ObjectStore.class);
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -208,6 +210,20 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     verify(mockObjectStore).close();
   }
 
+  @Test
+  public void javaObject() throws MuleException {
+    final Object payloadValue = mock(Object.class);
+    when(expressionManager.evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(CoreEvent.class)))
+        .thenAnswer(inv -> new TypedValue<>("" + payloadValue.hashCode(), STRING));
+
+    irp.initialise();
+
+    when(message.getPayload()).thenReturn(new TypedValue<>(payloadValue, OBJECT));
+    processUntilFailure();
+
+    verify(payloadValue).hashCode();
+  }
+
   private void processUntilFailure() {
     for (int i = 0; i < MAX_REDELIVERY_COUNT + 2; i++) {
       try {
@@ -235,7 +251,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   public static class SerializationObjectStore extends TemplateObjectStore<RedeliveryCounter> {
 
-    private Map<String, Serializable> store = new HashMap<>();
+    private final Map<String, Serializable> store = new HashMap<>();
 
     @Override
     protected boolean doContains(String key) throws ObjectStoreException {
@@ -296,7 +312,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   public static class InMemoryObjectStore extends TemplateObjectStore<RedeliveryCounter> {
 
-    private Map<String, RedeliveryCounter> store = new HashMap<>();
+    private final Map<String, RedeliveryCounter> store = new HashMap<>();
 
     @Override
     protected boolean doContains(String key) throws ObjectStoreException {
