@@ -38,6 +38,12 @@
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <version>${xstreamVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xpp3</groupId>
+                    <artifactId>xpp3_min</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--
             This dependency is needed by some extra XStream converters
@@ -49,7 +55,7 @@
         </dependency>
         <dependency>
             <groupId>xpp3</groupId>
-            <artifactId>xpp3_min</artifactId>
+            <artifactId>xpp3</artifactId>
             <version>${xmlPullVersion}</version>
         </dependency>
         <dependency>
