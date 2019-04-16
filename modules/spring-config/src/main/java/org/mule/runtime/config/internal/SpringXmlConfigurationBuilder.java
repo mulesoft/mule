@@ -15,17 +15,12 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -38,7 +33,12 @@ import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStra
 import org.mule.runtime.core.internal.registry.CompositeMuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -58,8 +58,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
-  private ArtifactType artifactType;
-  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionsProvider;
+  private final ArtifactType artifactType;
+  private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionsProvider;
 
   public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                        ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -246,7 +246,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   @Override
-  protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception {
+  protected synchronized void applyLifecycle(LifecycleManager lifecycleManager) throws Exception {
     // If the MuleContext is started, start all objects in the new Registry.
     if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME)) {
       lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
