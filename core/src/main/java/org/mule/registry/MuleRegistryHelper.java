@@ -40,6 +40,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.util.Predicate;
 import org.mule.util.SpiUtils;
@@ -47,6 +48,8 @@ import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import com.google.common.collect.ImmutableList;
+
+import static org.mule.transformer.TransformerUtils.generateTransformerName;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,6 +61,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -98,7 +102,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * Transformers are registered on context start, then they are usually not unregistered
      */
-    private Collection<Transformer> transformers = new CopyOnWriteArrayList<Transformer>();
+    private Map<String, Transformer> transformers = new ConcurrentHashMap<String, Transformer>();
 
     public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext)
     {
@@ -299,7 +303,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
         readLock.lock();
         try
         {
-            for (Transformer transformer : transformers)
+            for (Transformer transformer : transformers.values())
             {
                 // The transformer must have the DiscoveryTransformer interface if we are
                 // going to find it here
@@ -486,11 +490,11 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
             {
                 if (action == TransformerResolver.RegistryAction.ADDED)
                 {
-                    transformers.add(t);
+                    transformers.put(getConverterKey(t), t);
                 }
                 else
                 {
-                    transformers.remove(t);
+                    transformers.remove(getConverterKey(t));
                 }
             }
             finally
@@ -498,6 +502,11 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
                 transformersWriteLock.unlock();
             }
         }
+    }
+
+    private String getConverterKey(Transformer t)
+    {
+        return t.getName()!=null?t.getName():generateTransformerName(t.getClass(), t.getReturnDataType());
     }
 
     /**

@@ -20,6 +20,7 @@ import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.types.DataTypeFactory;
@@ -35,6 +36,7 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
 {
 
     private static final DataType<Orange> ORANGE_DATA_TYPE = DataTypeFactory.create(Orange.class);
+    private static final DataType<Banana> BANANA_DATA_TYPE = DataTypeFactory.create(Banana.class);
 
     private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
     private final MuleContext muleContext = mock(MuleContext.class);
@@ -75,4 +77,23 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
         assertEquals(1, transformers.size());
         assertEquals(stringToOrange, transformers.get(0));
     }
+    
+    @Test
+    public void reregisterDoesNotLeakTransformer() throws Exception
+    {
+        Converter stringToBanana = new MockConverterBuilder().from(DataTypeFactory.STRING).to(BANANA_DATA_TYPE).build();
+        stringToBanana.setName("StringToBanana");
+        
+        Converter copyStringToBanana = new MockConverterBuilder().from(DataTypeFactory.STRING).to(BANANA_DATA_TYPE).build();
+        copyStringToBanana.setName("StringToBanana");
+        
+        muleRegistryHelper.registerTransformer(stringToBanana);
+        muleRegistryHelper.registerTransformer(copyStringToBanana);
+        muleRegistryHelper.lookupTransformers(DataTypeFactory.STRING, BANANA_DATA_TYPE);
+
+        List<Transformer> transformers = muleRegistryHelper.lookupTransformers(DataTypeFactory.STRING, BANANA_DATA_TYPE);
+        
+        assertEquals(1, transformers.size());
+    }
+    
 }
