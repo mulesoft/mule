@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.lifecycle;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -95,7 +96,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   }
 
   @Override
-  public void fireLifecycle(String destinationPhase) throws LifecycleException {
+  public synchronized void fireLifecycle(String destinationPhase) throws LifecycleException {
     checkPhase(destinationPhase);
     if (isDirectTransition(destinationPhase) || isLastPhaseExecutionFailed()) {
       // transition to phase without going through other phases first

@@ -54,8 +54,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
-  private ArtifactType artifactType;
-  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionsProvider;
+  private final ArtifactType artifactType;
+  private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionsProvider;
 
   public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                        ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -222,7 +222,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   @Override
-  protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception {
+  protected synchronized void applyLifecycle(LifecycleManager lifecycleManager) throws Exception {
     // If the MuleContext is started, start all objects in the new Registry.
     if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME)) {
       lifecycleManager.fireLifecycle(Startable.PHASE_NAME);

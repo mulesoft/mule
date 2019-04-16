@@ -43,7 +43,7 @@ public abstract class AbstractRegistry implements Registry {
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   protected MuleContext muleContext;
-  private RegistryLifecycleManager lifecycleManager;
+  private final RegistryLifecycleManager lifecycleManager;
 
   protected AbstractRegistry(String id, MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
     if (id == null) {
@@ -122,7 +122,7 @@ public abstract class AbstractRegistry implements Registry {
   }
 
   @Override
-  public void fireLifecycle(String phase) throws LifecycleException {
+  public synchronized void fireLifecycle(String phase) throws LifecycleException {
     // Implicitly call stop if necessary when disposing
     if (Disposable.PHASE_NAME.equals(phase) && lifecycleManager.getState().isStarted()) {
       getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);

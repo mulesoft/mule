@@ -10,6 +10,7 @@ import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -54,7 +55,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   /**
    * A reference to Mule's internal registry
    */
-  private DefaultRegistryBroker registry;
+  private final DefaultRegistryBroker registry;
 
   /**
    * We cache transformer searches so that we only search once
@@ -64,23 +65,23 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   protected ConcurrentHashMap/* Map<String, List<Transformer>> */ transformerListCache =
       new ConcurrentHashMap/* <String, List<Transformer>> */(8);
 
-  private MuleContext muleContext;
+  private final MuleContext muleContext;
 
   private final ReadWriteLock transformerResolversLock = new ReentrantReadWriteLock();
 
   /**
    * Transformer transformerResolvers are registered on context start, then they are not unregistered.
    */
-  private List<TransformerResolver> transformerResolvers = new ArrayList<>();
+  private final List<TransformerResolver> transformerResolvers = new ArrayList<>();
 
   private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
 
-  private Map<Object, Object> postProcessedObjects = new HashMap<>();
+  private final Map<Object, Object> postProcessedObjects = new HashMap<>();
 
   /**
    * Transformers are registered on context start, then they are usually not unregistered
    */
-  private Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
+  private final Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
 
   public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext) {
     this.registry = registry;
@@ -109,7 +110,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   }
 
   @Override
-  public void fireLifecycle(String phase) throws LifecycleException {
+  public synchronized void fireLifecycle(String phase) throws LifecycleException {
     if (Initialisable.PHASE_NAME.equals(phase)) {
       registry.initialise();
     } else if (Disposable.PHASE_NAME.equals(phase)) {
@@ -119,6 +120,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
     }
   }
 
+  @Override
   public MuleContext getMuleContext() {
     return muleContext;
   }
