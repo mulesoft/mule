@@ -210,6 +210,20 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     verify(mockObjectStore).close();
   }
 
+  @Test
+  public void javaObject() throws MuleException {
+    final Object payloadValue = mock(Object.class);
+    when(expressionManager.evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(CoreEvent.class)))
+        .thenAnswer(inv -> new TypedValue<>("" + payloadValue.hashCode(), STRING));
+
+    irp.initialise();
+
+    when(message.getPayload()).thenReturn(new TypedValue<>(payloadValue, OBJECT));
+    processUntilFailure();
+
+    verify(payloadValue).hashCode();
+  }
+
   private void processUntilFailure() {
     for (int i = 0; i < MAX_REDELIVERY_COUNT + 2; i++) {
       try {
