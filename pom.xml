@@ -177,7 +177,7 @@
         but the PGP module would need some work in order to use it -->
         <cryptixJceVersion>20050328</cryptixJceVersion>
         <cryptixVersion>20050405</cryptixVersion>
-        <cxfVersion>2.7.15</cxfVersion>
+        <cxfVersion>2.7.19-MULE-SPRING-3-002</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
@@ -198,7 +198,7 @@
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
-        <javaXmlBindVersion>2.1.9</javaXmlBindVersion>
+        <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.15.0.Final</jbossTsVersion>
