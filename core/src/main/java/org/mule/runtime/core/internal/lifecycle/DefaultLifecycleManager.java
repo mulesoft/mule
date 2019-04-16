@@ -11,11 +11,11 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager;
 
 
@@ -37,7 +37,7 @@ public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycl
 
 
   @Override
-  public void fireInitialisePhase(LifecycleCallback<T> callback) throws InitialisationException {
+  public synchronized void fireInitialisePhase(LifecycleCallback<T> callback) throws InitialisationException {
     checkPhase(Initialisable.PHASE_NAME);
     if (logger.isInfoEnabled()) {
       logger.info("Initialising Bean: " + lifecycleManagerId);
@@ -52,7 +52,7 @@ public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycl
   }
 
   @Override
-  public void fireStartPhase(LifecycleCallback<T> callback) throws MuleException {
+  public synchronized void fireStartPhase(LifecycleCallback<T> callback) throws MuleException {
     checkPhase(Startable.PHASE_NAME);
     if (logger.isInfoEnabled()) {
       logger.info("Starting Bean: " + lifecycleManagerId);
@@ -61,7 +61,7 @@ public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycl
   }
 
   @Override
-  public void fireStopPhase(LifecycleCallback<T> callback) throws MuleException {
+  public synchronized void fireStopPhase(LifecycleCallback<T> callback) throws MuleException {
     checkPhase(Stoppable.PHASE_NAME);
     if (logger.isInfoEnabled()) {
       logger.info("Stopping Bean: " + lifecycleManagerId);
@@ -70,7 +70,7 @@ public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycl
   }
 
   @Override
-  public void fireDisposePhase(LifecycleCallback<T> callback) {
+  public synchronized void fireDisposePhase(LifecycleCallback<T> callback) {
     checkPhase(Disposable.PHASE_NAME);
     if (logger.isInfoEnabled()) {
       logger.info("Disposing Bean: " + lifecycleManagerId);
