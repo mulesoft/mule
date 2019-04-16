@@ -6,24 +6,25 @@
  */
 package org.mule.transformer.graph;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 
+import java.util.List;
+
+import org.junit.Test;
+import org.mockito.Mockito;
 import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.CompositeConverter;
 import org.mule.transformer.builder.MockConverterBuilder;
-
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 @SmallTest
 public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestCase
@@ -45,7 +46,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
 
         List<Converter> converters = lookupStrategyTransformation.lookupConverters(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE);
 
-        assertEquals(0, converters.size());
+        assertThat(converters, is(empty()));
     }
 
     @Test
@@ -56,7 +57,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
 
         List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertEquals(0, converters.size());
+        assertThat(converters, is(empty()));
     }
 
     @Test
@@ -67,8 +68,8 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
 
         List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, XML_DATA_TYPE);
 
-        assertEquals(1, converters.size());
-        assertEquals(inputStreamToXml, converters.get(0));
+        assertThat(converters, hasSize(1));
+        assertThat(converters.get(0), sameInstance(inputStreamToXml));
     }
 
     @Test
@@ -87,15 +88,17 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
     public void findsMultipleDirectTransformations() throws Exception
     {
         Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Mockito.when(inputStreamToXml.getName()).thenReturn("inputStreamToXml");
         graph.addConverter(inputStreamToXml);
         Converter betterInputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+        Mockito.when(betterInputStreamToXml.getName()).thenReturn("betterInputStreamToXml");
         graph.addConverter(betterInputStreamToXml);
 
         List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, XML_DATA_TYPE);
 
-        assertEquals(2, converters.size());
-        Assert.assertTrue(converters.contains(inputStreamToXml));
-        Assert.assertTrue(converters.contains(betterInputStreamToXml));
+        assertThat(converters, hasSize(2));
+        assertThat(converters, hasItem(inputStreamToXml));
+        assertThat(converters, hasItem(betterInputStreamToXml));
     }
 
     @Test
@@ -108,7 +111,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
 
         List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertEquals(1, converters.size());
+        assertThat(converters, hasSize(1));
         assertContainsCompositeTransformer(converters, inputStreamToString, stringToJson);
     }
 
@@ -130,7 +133,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
 
         List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, XML_DATA_TYPE);
 
-        assertEquals(4, converters.size());
+        assertThat(converters, hasSize(4));
         assertContainsCompositeTransformer(converters, inputStreamToString, stringToXml);
         assertContainsCompositeTransformer(converters, inputStreamToJson, jsonToXml);
         assertContainsCompositeTransformer(converters, inputStreamToString, stringToJson, jsonToXml);
