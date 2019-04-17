@@ -11,6 +11,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -21,6 +22,9 @@ import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
+
+import static org.mule.transformer.TransformerUtils.generateTransformerName;
+import static org.mule.transformer.TransformerUtils.getTransformationLength;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,6 +37,7 @@ import org.slf4j.LoggerFactory;
 public class TransformerUtils
 {
 
+    private static final String LENGTH_STRING = "_length_";
     private static Logger LOGGER = LoggerFactory.getLogger(AbstractTransformer.class);
     public static final String COMMA = ",";
 
@@ -262,5 +267,22 @@ public class TransformerUtils
             transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
         }
         return transformerName;
+    }
+    
+    public static int getTransformationLength(Transformer transformer)
+    {
+        if (transformer instanceof CompositeConverter)
+        {
+            return ((CompositeConverter) transformer).getConverters().size();
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    public static String getConverterKey(Transformer t)
+    {
+        return t.getName() != null ? t.getName() + LENGTH_STRING + getTransformationLength(t) : generateTransformerName(t.getClass(), t.getReturnDataType()) + LENGTH_STRING + getTransformationLength(t);
     }
 }
