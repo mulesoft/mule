@@ -259,9 +259,13 @@ public final class StringMessageUtils
                     {
                         value = "****";
                     }
-                    else if (name.toString().contains("authorization") || name.toString().contains("secret"))
+                    else
                     {
-                        value = "****";
+                        String stringName = name.toString();
+                        if (stringName.contains("authorization") || stringName.contains("secret"))
+                        {
+                            value = "****";
+                        }
                     }
                     buf.append("    ").append(name).append("=").append(value).append(SystemUtils.LINE_SEPARATOR);
                 }
