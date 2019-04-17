@@ -6,18 +6,18 @@
  */
 package org.mule.transformer.graph;
 
-import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.transformer.CompositeConverter;
+import static org.mule.transformer.TransformerUtils.getTransformationLength;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.mule.api.transformer.Converter;
+import org.mule.api.transformer.DataType;
+
 /**
- * Filters a list of {@link Converter} returning a new list containing only the
- * converters with the lower transformation path length.
+ * Filters a list of {@link Converter} returning a new list containing only the converters with the lower transformation
+ * path length.
  */
 public class TransformationLengthConverterFilter implements ConverterFilter
 {
@@ -25,7 +25,7 @@ public class TransformationLengthConverterFilter implements ConverterFilter
     @Override
     public List<Converter> filter(List<Converter> converters, DataType<?> source, DataType<?> result)
     {
-        if (converters.size() ==0)
+        if (converters.size() == 0)
         {
             return Collections.emptyList();
         }
@@ -59,15 +59,5 @@ public class TransformationLengthConverterFilter implements ConverterFilter
         });
     }
 
-    private int getTransformationLength(Converter converter)
-    {
-        if (converter instanceof CompositeConverter)
-        {
-            return ((CompositeConverter) converter).getConverters().size();
-        }
-        else
-        {
-            return 1;
-        }
-    }
+
 }
