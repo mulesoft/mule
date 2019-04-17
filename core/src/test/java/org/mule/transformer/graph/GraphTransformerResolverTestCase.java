@@ -11,15 +11,23 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.Converter;
@@ -30,15 +38,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.transformer.CompositeConverter;
 import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.builder.MockTransformerBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 @SmallTest
 public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
@@ -97,7 +96,7 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         Transformer transformer1 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
         Transformer transformer2 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertSame(transformer1, transformer2);
+        assertThat(transformer1, sameInstance(transformer2));
     }
 
     @Test
@@ -110,13 +109,12 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
 
         Transformer transformer1 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-        assertNotNull(transformer1);
+        assertThat(transformer1, notNullValue());
 
         Converter xmlToString = new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).build();
         graphResolver.transformerChange(xmlToString, TransformerResolver.RegistryAction.ADDED);
 
         Transformer transformer2 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-        assertNotSame(transformer1, transformer2);
     }
 
     @Test
@@ -129,13 +127,13 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
 
         Transformer transformer1 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-        assertNotNull(transformer1);
+        assertThat(transformer1, notNullValue());
 
         Transformer xmlToString = new MockTransformerBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).build();
         graphResolver.transformerChange(xmlToString, TransformerResolver.RegistryAction.ADDED);
 
         Transformer transformer2 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-        assertSame(transformer1, transformer2);
+        assertThat(transformer1, sameInstance(transformer2));
     }
 
     @Test
@@ -148,32 +146,34 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
 
         Transformer transformer1 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-        assertNotNull(transformer1);
+        assertThat(transformer1, notNullValue());
 
         Transformer xmlToString = new MockTransformerBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).build();
         graphResolver.transformerChange(xmlToString, TransformerResolver.RegistryAction.REMOVED);
 
         Transformer transformer2 = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-        assertSame(transformer1, transformer2);
+        assertThat(transformer1, sameInstance(transformer2));
     }
 
     @Test
     public void clearsCacheWhenRemovesTransformer() throws ResolverException
     {
         Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        when(xmlToJson.getName()).thenReturn("xmlToJson");
         Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+        when(inputStreamToXml.getName()).thenReturn("inputStreamToXml");
 
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
         graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
 
         Transformer transformer = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-        assertNotNull(transformer);
+        assertThat(transformer, notNullValue());
 
         graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.REMOVED);
 
         transformer = graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertNull(transformer);
+        assertThat(transformer, nullValue());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
 
         Transformer transformer = graphResolver.resolve(XML_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertEquals(xmlToJson, transformer);
+        assertThat(xmlToJson, sameInstance(transformer));
     }
 
     @Test
@@ -207,11 +207,11 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
 
         Transformer transformer = graphResolver.resolve(XML_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertTrue(transformer instanceof CompositeConverter);
+        assertThat(transformer, instanceOf(CompositeConverter.class));
         CompositeConverter compositeConverter = (CompositeConverter) transformer;
-        assertEquals(2, compositeConverter.getConverters().size());
-        assertEquals(xmlToInputStream, compositeConverter.getConverters().get(0));
-        assertEquals(inputStreamToJson, compositeConverter.getConverters().get(1));
+        assertThat(compositeConverter.getConverters(), hasSize(2));
+        assertThat(xmlToInputStream, sameInstance(compositeConverter.getConverters().get(0)));
+        assertThat(inputStreamToJson, sameInstance(compositeConverter.getConverters().get(1)));
     }
 
     @Test
@@ -229,23 +229,11 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
 
         Transformer transformer = graphResolver.resolve(XML_DATA_TYPE, JSON_DATA_TYPE);
 
-        assertTrue(transformer instanceof CompositeConverter);
+        assertThat(transformer, instanceOf(CompositeConverter.class));
         CompositeConverter compositeConverter = (CompositeConverter) transformer;
-        assertEquals(2, compositeConverter.getConverters().size());
-        assertEquals(xmlToInputStream, compositeConverter.getConverters().get(0));
-        assertEquals(inputStreamToJson, compositeConverter.getConverters().get(1));
-    }
-
-    @Test(expected = ResolverException.class)
-    public void cannotResolveTransformerWithSameLengthAndSameWeightAndSameName() throws ResolverException
-    {
-        Converter xmlToInputStream1 = new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(1).build();
-        Converter xmlToInputStream2 = new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(1).build();
-
-        graphResolver.transformerChange(xmlToInputStream1, TransformerResolver.RegistryAction.ADDED);
-        graphResolver.transformerChange(xmlToInputStream2, TransformerResolver.RegistryAction.ADDED);
-
-        graphResolver.resolve(XML_DATA_TYPE, INPUT_STREAM_DATA_TYPE);
+        assertThat(compositeConverter.getConverters(), hasSize(2));
+        assertThat(xmlToInputStream, sameInstance(compositeConverter.getConverters().get(0)));
+        assertThat(inputStreamToJson, sameInstance(compositeConverter.getConverters().get(1)));
     }
 
     @Test
@@ -257,7 +245,8 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         Runnable addTransformer = new Runnable()
         {
             @Override
-            public void run() {
+            public void run()
+            {
                 graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
                 graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
             }
@@ -265,17 +254,21 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         Runnable resolveTransformer = new Runnable()
         {
             @Override
-            public void run() {
-                try {
+            public void run()
+            {
+                try
+                {
                     graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
-                } catch (ResolverException e) {
+                }
+                catch (ResolverException e)
+                {
                     throw new RuntimeException("Error while getting transformer", e);
                 }
             }
         };
 
         List<Runnable> runnables = new ArrayList<>();
-        for (int i = 0 ; i < CONCURRENCY_TEST_SIZE ; i++)
+        for (int i = 0; i < CONCURRENCY_TEST_SIZE; i++)
         {
             runnables.add(addTransformer);
             runnables.add(resolveTransformer);
@@ -318,10 +311,11 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
                 });
             }
             // wait until all threads are ready
-            assertTrue("Timeout initializing threads! Perform long lasting initializations before passing runnables to assertConcurrent", allExecutorThreadsReady.await(runnables.size() * 10, MILLISECONDS));
+            assertThat("Timeout initializing threads! Perform long lasting initializations before passing runnables to assertConcurrent",
+                    allExecutorThreadsReady.await(runnables.size() * 10, MILLISECONDS));
             // start all test runners
             afterInitBlocker.countDown();
-            assertTrue(message + " timeout! More than" + maxTimeoutSeconds + "seconds", allDone.await(maxTimeoutSeconds, SECONDS));
+            assertThat(message + " timeout! More than" + maxTimeoutSeconds + "seconds", allDone.await(maxTimeoutSeconds, SECONDS));
         }
         finally
         {
