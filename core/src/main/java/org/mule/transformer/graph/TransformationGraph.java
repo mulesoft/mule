@@ -6,7 +6,7 @@
  */
 package org.mule.transformer.graph;
 
-import static org.mule.registry.MuleRegistryHelper.getConverterKey;
+import static org.mule.transformer.TransformerUtils.getConverterKey;
 
 import java.util.HashMap;
 import java.util.Map;

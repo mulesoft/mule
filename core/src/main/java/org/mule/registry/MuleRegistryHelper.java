@@ -40,7 +40,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.util.Predicate;
 import org.mule.util.SpiUtils;
@@ -49,7 +48,7 @@ import org.mule.util.UUID;
 
 import com.google.common.collect.ImmutableList;
 
-import static org.mule.transformer.TransformerUtils.generateTransformerName;
+import static org.mule.transformer.TransformerUtils.getConverterKey;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -970,11 +969,5 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
             return 0;
         }
     }
-
-    public static String getConverterKey(Transformer t)
-    {
-        return t.getName() != null ? t.getName() : generateTransformerName(t.getClass(), t.getReturnDataType());
-    }
 }
-
 
