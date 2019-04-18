@@ -72,19 +72,4 @@ public abstract class AbstractGrantType implements HttpAuthentication, Applicati
     {
         return clientId;
     }
-    
-    protected String getAccessToken(final ConfigOAuthContext context, final String resourceOwnerId)
-    {
-        final String accessToken;
-        context.getContextForResourceOwner(resourceOwnerId).getRefreshUserOAuthContextLock().lock();
-        try
-        {
-            accessToken = context.getContextForResourceOwner(resourceOwnerId).getAccessToken();
-        }
-        finally
-        {
-            context.getContextForResourceOwner(resourceOwnerId).getRefreshUserOAuthContextLock().unlock();
-        }
-        return accessToken;
-    }
 }

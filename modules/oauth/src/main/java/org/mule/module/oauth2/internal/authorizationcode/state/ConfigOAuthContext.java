@@ -30,7 +30,8 @@ public class ConfigOAuthContext
     }
 
     /**
-     * Retrieves the oauth context for a particular user. If there's no state for that user a new state is retrieve so never returns null.
+     * Retrieves the oauth context for a particular user. If there's no state for that user a new state is retrieve so
+     * never returns null.
      *
      * @param resourceOwnerId id of the user.
      * @return oauth state
@@ -38,37 +39,36 @@ public class ConfigOAuthContext
     public ResourceOwnerOAuthContext getContextForResourceOwner(final String resourceOwnerId)
     {
         ResourceOwnerOAuthContext resourceOwnerOAuthContext = null;
-        if (!oauthContextStore.containsKey(resourceOwnerId))
+
+        final Lock lock = lockFactory.createLock(configName + "-config-oauth-context");
+        lock.lock();
+        try
         {
-            final Lock lock = lockFactory.createLock(configName + "-config-oauth-context");
-            final Lock resourceLock = createLockForResourceOwner(resourceOwnerId);
-            lock.lock();
+            Lock resourceLock = createLockForResourceOwner(resourceOwnerId);
+            resourceLock.lock();
             try
             {
-                resourceLock.lock();
-                try
+                if (!oauthContextStore.containsKey(resourceOwnerId))
                 {
-                    if (!oauthContextStore.containsKey(resourceOwnerId))
-                    {
-                        resourceOwnerOAuthContext = new ResourceOwnerOAuthContext(createLockForResourceOwner(resourceOwnerId), resourceOwnerId);
-                        oauthContextStore.put(resourceOwnerId, resourceOwnerOAuthContext);
-                    }
+                    resourceOwnerOAuthContext = new ResourceOwnerOAuthContext(createLockForResourceOwner(resourceOwnerId), resourceOwnerId);
+                    oauthContextStore.put(resourceOwnerId, resourceOwnerOAuthContext);
                 }
-                finally
+                else
                 {
-                    resourceLock.unlock();
+                    resourceOwnerOAuthContext = oauthContextStore.get(resourceOwnerId);
+                    resourceOwnerOAuthContext.setRefreshUserOAuthContextLock(resourceLock);
                 }
             }
             finally
             {
-                lock.unlock();
+                resourceLock.unlock();
             }
         }
-        if (resourceOwnerOAuthContext == null)
+        finally
         {
-            resourceOwnerOAuthContext = oauthContextStore.get(resourceOwnerId);
-            resourceOwnerOAuthContext.setRefreshUserOAuthContextLock(createLockForResourceOwner(resourceOwnerId));
+            lock.unlock();
         }
+
         return resourceOwnerOAuthContext;
     }
 
