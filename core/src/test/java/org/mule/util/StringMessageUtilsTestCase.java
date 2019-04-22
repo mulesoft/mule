@@ -6,10 +6,14 @@
  */
 package org.mule.util;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -18,7 +22,7 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class StringMessageUtilsTestCase extends AbstractMuleTestCase
+public class StringMessageUtilsTestCase extends AbstractMuleContextTestCase
 {
     @Test
     public void toStringOnStringShouldReturnTheString()
@@ -115,7 +119,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testFormattedString() throws Exception
+    public void testFormattedString()
     {
         String result;
         String msg1 = "There is not substitution here";
@@ -141,9 +145,9 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testBoilerPlate() throws Exception
+    public void testBoilerPlate()
     {
-        List<String> msgs = new ArrayList<String>();
+        List<String> msgs = new ArrayList<>();
         msgs.add("This");
         msgs.add("is a");
         msgs.add("Boiler Plate");
@@ -157,9 +161,9 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testBoilerPlate2() throws Exception
+    public void testBoilerPlate2()
     {
-        List<String> msgs = new ArrayList<String>();
+        List<String> msgs = new ArrayList<>();
         msgs.add("This");
         msgs.add("is a");
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
@@ -191,6 +195,21 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 
         result = StringMessageUtils.truncate(msg, 10, true);
         assertEquals("this is a ...[10 of 37]", result);
+    }
+
+    @Test
+    public void headersToStringWithoutKeyWords()
+    {
+        MuleMessage message = getTestMuleMessage();
+        message.setProperty("password", "123", PropertyScope.INBOUND);
+        message.setProperty("secret", "shh", PropertyScope.INBOUND);
+        message.setProperty("authorization", "granted", PropertyScope.INBOUND);
+
+        String headers = StringMessageUtils.headersToString(message);
+
+        assertThat(headers, not(containsString("123")));
+        assertThat(headers, not(containsString("shh")));
+        assertThat(headers, not(containsString("granted")));
     }
 
     private class TestObject
