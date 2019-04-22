@@ -69,6 +69,12 @@ public interface RetryPolicyTemplate {
     return applyPolicy(publisher, IMMEDIATE_SCHEDULER);
   }
 
+  /**
+   * Indicates if this policy is currently enabled or not.
+   *
+   * @return Whether {@code this} policy is enabled or not
+   * @since 4.3.0
+   */
   default boolean isEnabled() {
     return true;
   }

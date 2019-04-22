@@ -12,10 +12,21 @@ import reactor.core.Disposable;
 import reactor.core.publisher.MonoSink;
 import reactor.util.context.Context;
 
+/**
+ * Base class for wrappers of a {@link MonoSink}
+ *
+ * @param <T> the generic type of the items flowing through the sink
+ * @since 4.3.0
+ */
 public abstract class MonoSinkWrapper<T> implements MonoSink<T> {
 
   protected final MonoSink<T> delegate;
 
+  /**
+   * Creates a new instance
+   *
+   * @param delegate the delegate
+   */
   public MonoSinkWrapper(MonoSink<T> delegate) {
     this.delegate = delegate;
   }

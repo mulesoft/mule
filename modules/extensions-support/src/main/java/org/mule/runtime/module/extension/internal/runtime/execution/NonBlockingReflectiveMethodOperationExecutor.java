@@ -28,9 +28,7 @@ public class NonBlockingReflectiveMethodOperationExecutor<M extends ComponentMod
 
   protected void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     final ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
-    final CompletionCallbackFacade facade = new CompletionCallbackFacade(callback);
-
-    context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, facade);
+    context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, callback);
 
     executor.execute(executionContext);
   }

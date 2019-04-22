@@ -32,6 +32,11 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 
+/**
+ * Base class for {@link CompletableComponentExecutor} that use reflection to invoke the actual application logic
+ *
+ * @since 4.3.0
+ */
 abstract class AbstractReflectiveMethodOperationExecutor<M extends ComponentModel>
     implements CompletableComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 

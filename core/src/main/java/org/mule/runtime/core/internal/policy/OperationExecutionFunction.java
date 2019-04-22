@@ -25,7 +25,7 @@ public interface OperationExecutionFunction {
    *
    * @param parameters the set of parameters required to execute the function.
    * @param operationEvent the event to use for executing the operation.
-   * @return an {@link CoreEvent} as result of the operation execution.
+   * @param sink a {@link MonoSink} on which the operation result is to be notified on
    */
   void execute(Map<String, Object> parameters, CoreEvent operationEvent, MonoSink<CoreEvent> sink);
 
