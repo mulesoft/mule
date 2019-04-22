@@ -19,6 +19,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,11 +32,11 @@ public class ClientCredentialsTokenRequestConcurrentTestCase extends AbstractOAu
 
     private CountDownLatch latch = new CountDownLatch(NUM_REQUESTS);
 
-    private static final int NUM_REQUESTS = 100;
+    private static final int NUM_REQUESTS = 1000;
 
     private static final String STATUS = "http.status";
 
-    private int responseCount = 0;
+    private AtomicInteger responseCount = new AtomicInteger(0);
 
     @Rule
     public SystemProperty tokenUrl = new SystemProperty("token.url", format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
@@ -77,7 +78,7 @@ public class ClientCredentialsTokenRequestConcurrentTestCase extends AbstractOAu
 
         latch.await();
 
-        assertThat(responseCount, equalTo(NUM_REQUESTS));
+        assertThat(responseCount.get(), equalTo(NUM_REQUESTS));
     }
 
     private class TestForRaceConditionRunnable implements Runnable
@@ -90,7 +91,7 @@ public class ClientCredentialsTokenRequestConcurrentTestCase extends AbstractOAu
                 MuleEvent event = runFlow("request", getTestEvent(TEST_MESSAGE));
                 if (event.getMessage().<Integer> getInboundProperty(STATUS) == SC_UNAUTHORIZED)
                 {
-                    responseCount++;
+                    responseCount.getAndIncrement();
                 }
 
             }
