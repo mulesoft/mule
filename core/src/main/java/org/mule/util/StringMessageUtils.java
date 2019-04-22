@@ -255,9 +255,17 @@ public final class StringMessageUtils
                     {
                         value = "<<<MuleMessage>>>";
                     }
-                    if (name.equals("password") || name.toString().contains("secret") || name.equals("pass"))
+                    if (name.equals("password") || name.equals("pass"))
                     {
                         value = "****";
+                    }
+                    else
+                    {
+                        String stringName = name.toString();
+                        if (stringName.contains("authorization") || stringName.contains("secret"))
+                        {
+                            value = "****";
+                        }
                     }
                     buf.append("    ").append(name).append("=").append(value).append(SystemUtils.LINE_SEPARATOR);
                 }
