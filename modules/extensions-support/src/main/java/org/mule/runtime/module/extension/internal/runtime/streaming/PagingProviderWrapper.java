@@ -15,7 +15,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
