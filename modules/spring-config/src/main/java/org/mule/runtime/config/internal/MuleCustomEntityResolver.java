@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ResourceUtils;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -24,6 +15,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ResourceUtils;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+
 /**
  * Custom entity resolver based on Spring's schema resolver.
  *
@@ -32,54 +32,101 @@ import java.util.Properties;
 public class MuleCustomEntityResolver implements EntityResolver {
 
   public static final String CUSTOM_SCHEMA_MAPPINGS_LOCATION = "META-INF/mule.schemas";
+  public static final String CUSTOM_SPRING_SCHEMA_MAPPINGS_LOCATION = "META-INF/spring.schemas";
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleCustomEntityResolver.class);
 
-  private ClassLoader classLoader;
-  private Map<String, String> schemaMappings;
+  private final ClassLoader classLoader;
+  private final Map<String, String> muleSchemaMappings;
+  private final Map<String, String> appPluginsSchemaMappings;
 
   MuleCustomEntityResolver(ClassLoader classLoader) {
     this.classLoader = classLoader;
-    this.schemaMappings = getSchemaMappings();
+    this.muleSchemaMappings = getMuleSchemaMappings();
+    this.appPluginsSchemaMappings = getAppPluginsSchemaMappings();
   }
 
   @Override
   public InputSource resolveEntity(String publicId, String systemId) {
     if (systemId != null) {
-      String resourceLocation = this.schemaMappings.get(systemId);
-      if (resourceLocation != null) {
-        // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
-        InputStream is = this.classLoader.getResourceAsStream(resourceLocation);
-        if (is == null) {
-          LOGGER.debug("Couldn't find XML schema [" + systemId + "]: " + resourceLocation);
-          return null;
-        }
-        InputSource source = new InputSource(is);
-        source.setPublicId(publicId);
-        source.setSystemId(systemId);
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
-        }
-        return source;
+      // Runtime takes precedence over plugins, to avoid a misbehaving plugin to override something from the runtime
+      InputSource source =
+          resoveEntityInClassloader(muleSchemaMappings, publicId, systemId, MuleCustomEntityResolver.class.getClassLoader());
+
+      if (source == null) {
+        source = resoveEntityInClassloader(appPluginsSchemaMappings, publicId, systemId, this.classLoader);
       }
+
+      return source;
     }
     return null;
+  }
+
+  private static InputSource resoveEntityInClassloader(Map<String, String> schemaMappings, String publicId, String systemId,
+                                                       ClassLoader cl) {
+    String resourceLocation = schemaMappings.get(systemId);
+    if (resourceLocation != null) {
+      // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
+      InputStream is = cl.getResourceAsStream(resourceLocation);
+      if (is == null) {
+        LOGGER.debug("Couldn't find XML schema [" + systemId + "]: " + resourceLocation);
+        return null;
+      }
+      InputSource source = new InputSource(is);
+      source.setPublicId(publicId);
+      source.setSystemId(systemId);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
+      }
+      return source;
+    } else {
+      return null;
+    }
   }
 
   /**
    * Load the specified schema mappings.
    */
-  private Map<String, String> getSchemaMappings() {
+  private Map<String, String> getMuleSchemaMappings() {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Loading schema mappings from [" + CUSTOM_SCHEMA_MAPPINGS_LOCATION + "]");
     }
     try {
-      Properties mappings =
+      Properties muleMappings =
+          loadAllProperties(CUSTOM_SCHEMA_MAPPINGS_LOCATION, MuleCustomEntityResolver.class.getClassLoader());
+      Properties springMappings =
+          loadAllProperties(CUSTOM_SPRING_SCHEMA_MAPPINGS_LOCATION, MuleCustomEntityResolver.class.getClassLoader());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Loaded Mule schema mappings: " + muleMappings);
+        LOGGER.debug("Loaded Spring schema mappings: " + springMappings);
+      }
+      Map<String, String> schemaMappings = new HashMap<>(muleMappings.size(), springMappings.size());
+
+      CollectionUtils.mergePropertiesIntoMap(muleMappings, schemaMappings);
+      CollectionUtils.mergePropertiesIntoMap(springMappings, schemaMappings);
+      return schemaMappings;
+    } catch (IOException ex) {
+      throw new IllegalStateException(
+                                      "Unable to load schema mappings from location [" + CUSTOM_SCHEMA_MAPPINGS_LOCATION + "]",
+                                      ex);
+    }
+  }
+
+  /**
+   * Load the specified schema mappings.
+   */
+  private Map<String, String> getAppPluginsSchemaMappings() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Loading schema mappings from [" + CUSTOM_SCHEMA_MAPPINGS_LOCATION + "]");
+    }
+    try {
+      Properties appPluginsMappings =
           loadAllProperties(CUSTOM_SCHEMA_MAPPINGS_LOCATION, this.classLoader);
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Loaded schema mappings: " + mappings);
+        LOGGER.debug("Loaded App Plugins schema mappings: " + appPluginsMappings);
       }
-      Map<String, String> schemaMappings = new HashMap<>(mappings.size());
-      CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
+      Map<String, String> schemaMappings = new HashMap<>(appPluginsMappings.size());
+
+      CollectionUtils.mergePropertiesIntoMap(appPluginsMappings, schemaMappings);
       return schemaMappings;
     } catch (IOException ex) {
       throw new IllegalStateException(
