@@ -32,7 +32,7 @@ public class ClientCredentialsTokenRequestConcurrentTestCase extends AbstractOAu
 
     private CountDownLatch latch = new CountDownLatch(NUM_REQUESTS);
 
-    private static final int NUM_REQUESTS = 100;
+    private static final int NUM_REQUESTS = 1000;
 
     private static final String STATUS = "http.status";
 

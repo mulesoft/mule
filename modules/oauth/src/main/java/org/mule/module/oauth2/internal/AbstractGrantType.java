@@ -8,7 +8,6 @@ package org.mule.module.oauth2.internal;
 
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 

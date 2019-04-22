@@ -20,13 +20,11 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.oauth2.api.RequestAuthenticationException;
 import org.mule.module.oauth2.internal.AbstractGrantType;
 import org.mule.module.oauth2.internal.OAuthTokenMuleException;
-import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 
 /**
