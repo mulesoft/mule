@@ -8,10 +8,14 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,10 +35,12 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
   private static final Logger LOGGER = getLogger(PagingProviderWrapper.class);
 
   private final PagingProvider<C, T> delegate;
+  private final ExtensionModel extensionModel;
   private boolean closed = false;
 
-  public PagingProviderWrapper(PagingProvider<C, T> delegate) {
+  public PagingProviderWrapper(PagingProvider<C, T> delegate, ExtensionModel extensionModel) {
     this.delegate = delegate;
+    this.extensionModel = extensionModel;
   }
 
   /**
@@ -65,18 +71,20 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
       return null;
     }
 
-    List<T> page = delegate.getPage(connection);
-    if (isEmpty(page)) {
-      try {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
+    List<T> page = withContextClassLoader(MuleExtensionUtils.getClassLoader(extensionModel), () -> {
+      List<T> delegatePage = delegate.getPage(connection);
+      if (isEmpty(delegatePage)) {
+        try {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
+          }
+          close(connection);
+        } catch (Exception e) {
+          handleCloseException(e);
         }
-
-        close(connection);
-      } catch (Exception e) {
-        handleCloseException(e);
       }
-    }
+      return delegatePage;
+    });
 
     return page;
   }
