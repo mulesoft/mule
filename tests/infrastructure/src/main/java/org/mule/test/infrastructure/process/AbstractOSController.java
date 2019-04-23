@@ -10,6 +10,7 @@ package org.mule.test.infrastructure.process;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -119,14 +120,15 @@ public abstract class AbstractOSController {
     } catch (ExecuteException e) {
       return e.getExitValue();
     } catch (Exception e) {
-      throw new MuleControllerException("Error executing [" + commandLine.getExecutable() + " " + commandLine.getArguments()
+      throw new MuleControllerException("Error executing [" + commandLine.getExecutable() + " "
+          + Arrays.toString(commandLine.getArguments())
           + "]", e);
     }
   }
 
   protected Map<Object, Object> copyEnvironmentVariables() {
     Map<String, String> env = System.getenv();
-    Map<Object, Object> newEnv = new HashMap<Object, Object>();
+    Map<Object, Object> newEnv = new HashMap<>();
     for (Map.Entry<String, String> it : env.entrySet()) {
       newEnv.put(it.getKey(), it.getValue());
     }

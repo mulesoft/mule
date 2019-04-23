@@ -7,11 +7,13 @@
 
 package org.mule.test.infrastructure.process;
 
+import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,7 +50,9 @@ public class WindowsController extends AbstractOSController {
     final int returnCode = super.stop(args);
     int errorRemove = runSync("remove");
     if (errorRemove != 0 && errorRemove != 0x424) {
-      throw new MuleControllerException("The mule instance couldn't be removed as a service");
+      if (forceDeleteService() != 0) {
+        throw new MuleControllerException("The mule instance couldn't be removed as a service");
+      }
     }
     return returnCode;
   }
@@ -56,8 +60,8 @@ public class WindowsController extends AbstractOSController {
   @Override
   public int getProcessId() {
     return getServiceList().stream()
-        .filter(s -> isServiceRunning(s))
-        .map(s -> getId(s)).findAny()
+        .filter(this::isServiceRunning)
+        .map(this::getId).findAny()
         .orElseThrow(() -> new MuleControllerException("No mule instance is running"));
   }
 
@@ -71,16 +75,17 @@ public class WindowsController extends AbstractOSController {
       throw new MuleControllerException("PID pattern not recognized in " + getServiceStatus);
     }
     String[] resultArray = result.split(": ");
-    return Integer.parseInt(resultArray[1]);
+    return parseInt(resultArray[1]);
   }
 
   @Override
   public int status(String... args) {
-    return getServiceList().stream().filter(s -> isServiceRunning(s)).findAny().isPresent() ? 0 : 1;
+    return getServiceList().stream().anyMatch(this::isServiceRunning) ? 0 : 1;
   }
 
   private List<String> getServiceList() {
-    return isNotEmpty(muleAppName) ? Arrays.asList(muleAppName) : Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME);
+    return isNotEmpty(muleAppName) ? Collections.singletonList(muleAppName)
+        : Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME);
   }
 
   private boolean isServiceRunning(String serviceName) {
@@ -99,12 +104,20 @@ public class WindowsController extends AbstractOSController {
       BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
       String line = "";
       while ((line = reader.readLine()) != null) {
-        output.append(line + "\n");
+        output.append(line).append("\n");
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
     return output.toString();
+  }
+
+  private int forceDeleteService() {
+    return getServiceList().stream().anyMatch(this::deleteService) ? 0 : 1;
+  }
+
+  private boolean deleteService(String serviceName) {
+    return executeCmd("sc delete \"" + serviceName + "\" ").contains("SUCCESS");
   }
 
   @Override
