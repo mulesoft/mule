@@ -24,6 +24,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -75,6 +76,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -225,16 +227,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void onException(ConnectionException exception) {
     if (!reconnecting.compareAndSet(false, true)) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(format("Message source '%s' on root component '%s' failed to reconnect. Error was: %s",
-                                                                // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
-                                                                sourceModel.getName(),
-                                                                getLocation().getRootContainerName(),
-                                                                exception.getMessage())),
-                                     exception);
+      LOGGER.error(format(
+                          "Message source '%s' on flow '%s' threw Connection Exception but reconnection is already in progress. Error was: %s",
+                          sourceModel.getName(),
+                          getLocation().getRootContainerName(),
+                          exception.getMessage()),
+                   exception);
+      return;
     }
 
-    LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
+    LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
@@ -250,15 +252,38 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
           }
         }));
 
-    reconnectionAction
-        .doOnSuccess(v -> onReconnectionSuccessful())
-        .doOnError(this::onReconnectionFailed)
-        .doAfterTerminate(() -> reconnecting.set(false))
-        .subscribe();
+    CompletableFuture<Void> reconnectionFuture = reconnectionAction
+        .doOnSuccess(v -> {
+          onReconnectionSuccessful();
+          LOGGER.error(">>>>>>> RECONNECTED VIEJA!!");
+          reconnecting.set(false);
+        })
+        .doOnError(e -> {
+          onReconnectionFailed(e);
+          LOGGER.error(">>>>>>> RECONNECTED FAILED VIEJA!!");
+          reconnecting.set(false);
+        })
+        //.doAfterTerminate(() -> reconnecting.set(false))
+        .subscribeOn(fromExecutorService(retryScheduler))
+        .toFuture();
+
+    reconnectionFuture.whenComplete((v, e) -> {
+      try {
+        if (e != null) {
+          onReconnectionFailed(e);
+          LOGGER.error(">>>>>>> RECONNECTED FAILED VIEJA!!");
+        } else {
+          onReconnectionSuccessful();
+          LOGGER.error(">>>>>>> RECONNECTED VIEJA!!");
+        }
+      } finally {
+        reconnecting.set(false);
+      }
+    });
   }
 
   private void onReconnectionSuccessful() {
-    if (LOGGER.isDebugEnabled()) {
+    if (LOGGER.isWarnEnabled()) {
       LOGGER.warn("Message source '{}' on root component '{}' successfully reconnected",
                   sourceAdapter.getName(), getLocation().getRootContainerName());
     }
