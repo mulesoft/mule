@@ -3,7 +3,3 @@ http\://www.mulesoft.org/schema/mule/core/current/mule-core-common.xsd=META-INF/
 http\://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd=META-INF/mule-domain.xsd
 http\://www.mulesoft.org/schema/mule/module/current/mule-module.xsd=META-INF/mule-module.xsd
 http\://www.mulesoft.org/schema/mule/schemadoc/current/mule-schemadoc.xsd=META-INF/mule-schemadoc.xsd
-http\://www.springframework.org/schema/beans/spring-beans.xsd=org/springframework/beans/factory/xml/spring-beans.xsd
-http\://www.springframework.org/schema/context/spring-context.xsd=org/springframework/context/config/spring-context.xsd
-http\://www.springframework.org/schema/security/spring-security.xsd=org/springframework/security/config/spring-security.xsd
-http\://www.springframework.org/schema/util/spring-util.xsd=org/springframework/beans/factory/xml/spring-util.xsd
