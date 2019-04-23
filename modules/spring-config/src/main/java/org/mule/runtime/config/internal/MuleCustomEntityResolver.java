@@ -63,6 +63,12 @@ public class MuleCustomEntityResolver implements EntityResolver {
 
   private static InputSource resoveEntityInClassloader(Map<String, String> schemaMappings, String publicId, String systemId,
                                                        ClassLoader cl) {
+    if (systemId.startsWith("http://www.springframework.org/") && systemId.endsWith("-current.xsd")) {
+      LOGGER
+          .warn("Usage of `-current` spring schemas is discouraged, since it may lead to unexpected changes if the Spring version is upgraded."
+              + " Schema found: " + systemId);
+    }
+
     String resourceLocation = schemaMappings.get(systemId);
     if (resourceLocation != null) {
       // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
@@ -136,13 +142,12 @@ public class MuleCustomEntityResolver implements EntityResolver {
   }
 
   /**
-   * Load all properties from the specified class path resource
-   * (in ISO-8859-1 encoding), using the given class loader.
-   * <p>Merges properties if more than one resource of the same name
-   * found in the class path.
+   * Load all properties from the specified class path resource (in ISO-8859-1 encoding), using the given class loader.
+   * <p>
+   * Merges properties if more than one resource of the same name found in the class path.
+   *
    * @param resourceName the name of the class path resource
-   * @param classLoader the ClassLoader to use for loading
-   * (or {@code null} to use the default class loader)
+   * @param classLoader the ClassLoader to use for loading (or {@code null} to use the default class loader)
    * @return the populated Properties instance
    * @throws IOException if loading failed
    */
