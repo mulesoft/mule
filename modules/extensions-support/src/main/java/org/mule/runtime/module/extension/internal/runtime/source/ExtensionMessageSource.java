@@ -79,8 +79,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -225,19 +225,20 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void onException(ConnectionException exception) {
     if (!reconnecting.compareAndSet(false, true)) {
-      throw new MuleRuntimeException(createStaticMessage(format(
-                                                                "Message source '%s' on flow '%s' failed to reconnect. Error was: %s",
-                                                                sourceModel.getName(),
-                                                                getLocation().getRootContainerName(),
-                                                                exception.getMessage())),
-                                     exception);
+      LOGGER.error(format(
+                          "Message source '%s' on flow '%s' found connection error but reconnection is already in progress. Error was: %s",
+                          sourceModel.getName(),
+                          getLocation().getRootContainerName(),
+                          exception.getMessage()),
+                   exception);
     }
 
     LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
-    Publisher<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
+    Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
+        .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
         .orElseGet(() -> create(sink -> {
           try {
             exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
@@ -248,7 +249,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
           }
         }));
 
-    from(retryPolicyTemplate.applyPolicy(reconnectionAction, retryScheduler))
+    reconnectionAction
         .doOnSuccess(v -> onReconnectionSuccessful())
         .doOnError(this::onReconnectionFailed)
         .doAfterTerminate(() -> reconnecting.set(false))
