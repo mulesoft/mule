@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_REQUEST_STREAMING;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
@@ -44,6 +45,8 @@ import java.util.function.Function;
  * @since 4.0
  */
 public final class StreamingUtils {
+
+  private static boolean requestStreamingDisabled = (System.getProperty(MULE_DISABLE_REQUEST_STREAMING) != null);
 
   /**
    * Executes the given function {@code f} considering that the given {@code event} might have a {@link CursorProvider} as
@@ -394,5 +397,9 @@ public final class StreamingUtils {
   public static boolean supportsStreaming(ComponentModel componentModel) {
     return componentModel instanceof ConnectableComponentModel
         && ((ConnectableComponentModel) componentModel).supportsStreaming();
+  }
+
+  public static boolean isRequestStreamingEnabled() {
+    return !requestStreamingDisabled;
   }
 }
