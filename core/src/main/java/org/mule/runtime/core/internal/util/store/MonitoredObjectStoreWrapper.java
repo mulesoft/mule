@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.Comparator.comparing;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
@@ -42,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class MonitoredObjectStoreWrapper<T extends Serializable> extends TemplateObjectStore<T>
     implements Runnable, MuleContextAware, Initialisable, Disposable {
 
-  private static Logger logger = LoggerFactory.getLogger(MonitoredObjectStoreWrapper.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(MonitoredObjectStoreWrapper.class);
 
   protected MuleContext context;
   private Scheduler scheduler;
@@ -136,9 +139,6 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   }
 
   private ObjectStore<StoredObject<T>> getStore() {
-    if (baseStore == null) {
-      baseStore = ((MuleContextWithRegistries) context).getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
-    }
     return baseStore;
   }
 
@@ -156,23 +156,29 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
 
   public void expire() {
     try {
-      final long now = System.currentTimeMillis();
+      LOGGER.debug("Starting expiry on {}...", getStore().toString());
+
+      final long now = currentTimeMillis();
       List<String> keys = allKeys();
-      int excess = maxEntries != null ? (allKeys().size() - maxEntries) : 0;
+      int excess = maxEntries != null ? (keys.size() - maxEntries) : 0;
 
       PriorityQueue<StoredObject<T>> sortedMaxEntries = null;
 
       if (excess > 0) {
+        LOGGER.trace("Will expire {} entries from {}", excess, getStore().toString());
         sortedMaxEntries = new PriorityQueue<>(excess, comparing(paramT -> paramT.timestamp));
       }
 
-      ObjectStore<StoredObject<T>> store = getStore();
       for (String key : keys) {
-        StoredObject<T> obj = store.retrieve(key);
+        StoredObject<T> obj = expiryRetrieve(key);
+        if (obj == null) {
+          excess--;
+          continue;
+        }
 
         if (entryTtl != null && now - obj.getTimestamp() >= entryTtl) {
-          remove(key);
-          excess--;
+          LOGGER.trace("Expiring entry '{}' from {} due to TTL...", key, getStore().toString());
+          expiryRemove(key);
         } else if (maxEntries != null && excess > 0) {
           sortedMaxEntries.offer(obj);
         }
@@ -181,13 +187,31 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
       if (sortedMaxEntries != null) {
         StoredObject<T> obj = sortedMaxEntries.poll();
         while (obj != null && excess > 0) {
-          remove(obj.getKey());
+          LOGGER.trace("Expiring entry '{}' from {} due to size excess...", obj.getKey(), getStore().toString());
           excess--;
+          expiryRemove(obj.getKey());
           obj = sortedMaxEntries.poll();
         }
       }
     } catch (Exception e) {
-      logger.warn("Running expiry on " + baseStore + " threw " + e + ":" + e.getMessage(), e);
+      LOGGER.warn("Running expiry on " + getStore() + " threw " + e.getClass().getName() + ":" + e.getMessage(), e);
+    }
+  }
+
+  private StoredObject<T> expiryRetrieve(String key) throws ObjectStoreException {
+    try {
+      return getStore().retrieve(key);
+    } catch (ObjectDoesNotExistException e) {
+      LOGGER.trace("Entry '{}' from {} already removed", key, getStore().toString());
+      return null;
+    }
+  }
+
+  private void expiryRemove(String key) throws ObjectStoreException {
+    try {
+      remove(key);
+    } catch (ObjectDoesNotExistException e) {
+      LOGGER.trace("Entry '{}' from {} already removed", key, getStore().toString());
     }
   }
 
@@ -205,9 +229,12 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
       name = UUID.getUUID();
     }
 
+    if (baseStore == null) {
+      baseStore = ((MuleContextWithRegistries) context).getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
+    }
+
     if (expirationInterval <= 0) {
-      throw new IllegalArgumentException(CoreMessages
-          .propertyHasInvalidValue("expirationInterval", new Long(expirationInterval)).toString());
+      throw new IllegalArgumentException(propertyHasInvalidValue("expirationInterval", new Long(expirationInterval)).toString());
     }
 
     if (scheduler == null) {
