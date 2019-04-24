@@ -14,7 +14,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
@@ -23,8 +22,6 @@ import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.ConcurrentHashMap;
 import org.mule.runtime.api.util.Pair;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Tracks and manages the connections that are started on a {@link Source}
@@ -34,7 +31,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class SourceConnectionManager {
 
   private static final ReentrantLock lock = new ReentrantLock();
-  //private static AtomicInteger transactionCounter = new AtomicInteger(0);
   private final ConnectionManager connectionManager;
   private final Map<Reference<Object>, Pair<Integer, ConnectionHandler<Object>>> connections = new ConcurrentHashMap<>();
 
@@ -63,8 +59,6 @@ public class SourceConnectionManager {
       Reference<Object> connReference = new Reference<>(connection);
       int count = getConnectionRefCount(connReference) + 1;
       connections.put(connReference, new Pair(count, connectionHandler));
-      //transactionCounter.addAndGet(1);
-      System.out.println(String.format("CONNECTION++ %d", count));
       return (T) connection;
     } finally {
       lock.unlock();
@@ -77,24 +71,19 @@ public class SourceConnectionManager {
    * @param connection the connection to be released
    */
   void release(Object connection) {
-    /*if (transactionCounter.decrementAndGet() > 0) {
-      return;
-    }*/
+    Reference<Object> connReference = new Reference<>(connection);
     lock.lock();
     try {
-      Reference<Object> connReference = new Reference<>(connection);
       int count = getConnectionRefCount(connReference) - 1;
       ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
       if (count > 0) {
         connections.put(connReference, new Pair(count, connectionHandler));
-        System.out.println(String.format("RELEASE CONNECTION-- %d", count));
         return;
       }
       if (connectionHandler != null) {
-        connectionHandler.release(); //check this needs to be done even with count > 0
+        connectionHandler.release();
       }
       connections.remove(connReference);
-      System.out.println(String.format("RELEASE REMOVED CONNECTION"));
     } finally {
       lock.unlock();
     }
@@ -106,24 +95,19 @@ public class SourceConnectionManager {
    * @param connection the connection to be invalidated
    */
   void invalidate(Object connection) {
-    /*if (transactionCounter.decrementAndGet() > 0) {
-      return;
-    }*/
+    Reference<Object> connReference = new Reference<>(connection);
     lock.lock();
     try {
-      Reference<Object> connReference = new Reference<>(connection);
       int count = getConnectionRefCount(connReference) - 1;
       ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
       if (count > 0) {
         connections.put(connReference, new Pair(count, connectionHandler));
-        System.out.println(String.format("INVALIDATE CONNECTION-- %d", count));
         return;
       }
       if (connectionHandler != null) {
-        connectionHandler.invalidate(); //check this needs to be done even with count > 0
+        connectionHandler.invalidate();
       }
       connections.remove(connReference);
-      System.out.println(String.format("INVALIDATE REMOVED CONNECTION"));
     } finally {
       lock.unlock();
     }
@@ -162,7 +146,7 @@ public class SourceConnectionManager {
   <T> Optional<ConnectionHandler<T>> getConnectionHandler(T connection) {
     lock.lock();
     try {
-      return ofNullable((ConnectionHandler<T>) connections.get(new Reference<>(connection)).getSecond());
+      return ofNullable(connections.get(new Reference<>(connection))).map(c -> (ConnectionHandler<T>) (((Pair) c).getSecond()));
     } finally {
       lock.unlock();
     }
@@ -170,17 +154,5 @@ public class SourceConnectionManager {
 
   private int getConnectionRefCount(Reference<Object> connection) {
     return connections.containsKey(connection) ? connections.get(connection).getFirst() : 0;
-  }
-
-  private <T> ConnectionHandler<T> decreaseConnectionRefCountAndRemoveIfZero(Reference<Object> connReference) {
-    ConnectionHandler<T> connectionHandler;
-    int count = getConnectionRefCount(connReference) - 1;
-    if (count > 0) {
-      connectionHandler = (ConnectionHandler<T>) connections.get(connReference).getSecond();
-      connections.put(connReference, new Pair(count, connections.get(connReference).getSecond()));
-    } else {
-      connectionHandler = (ConnectionHandler<T>) connections.remove(connReference).getSecond();
-    }
-    return connectionHandler;
   }
 }
