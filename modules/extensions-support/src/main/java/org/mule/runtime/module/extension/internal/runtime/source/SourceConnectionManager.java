@@ -24,6 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mule.runtime.api.util.Pair;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
+
 /**
  * Tracks and manages the connections that are started on a {@link Source}
  *
@@ -57,7 +58,8 @@ public class SourceConnectionManager {
     Object connection = connectionHandler.getConnection();
     Reference<Object> connReference = new Reference<>(connection);
     withLock(lock, () -> {
-      connections.computeIfAbsent(connReference, k -> new Pair(new AtomicInteger(0), connectionHandler)).getFirst().incrementAndGet();
+      ((AtomicInteger) connections.computeIfAbsent(connReference, k -> new Pair(new AtomicInteger(0), connectionHandler))
+          .getFirst()).incrementAndGet();
     });
     return (T) connection;
   }
