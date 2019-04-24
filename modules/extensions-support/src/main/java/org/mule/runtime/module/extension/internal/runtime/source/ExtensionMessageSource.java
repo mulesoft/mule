@@ -231,6 +231,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                           getLocation().getRootContainerName(),
                           exception.getMessage()),
                    exception);
+      return;
     }
 
     LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
