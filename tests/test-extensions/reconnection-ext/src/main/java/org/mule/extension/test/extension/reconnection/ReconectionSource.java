@@ -33,28 +33,24 @@ public class ReconectionSource extends Source<ReconnectableConnection, Void> {
   @Override
   public void onStart(SourceCallback<ReconnectableConnection, Void> sourceCallback) throws MuleException {
     ReconnectableConnection connection;
-    try {
-      connection = connectionProvider.connect();
-      scheduler = schedulerService.ioScheduler();
-      scheduler.execute(() -> {
-        boolean shouldFinish = false;
-        while (!shouldFinish) {
-          try {
-            Thread.sleep(1000);
-          } catch (InterruptedException e) {
-            shouldFinish = true;
-          }
-          if (ReconnectableConnectionProvider.fail) {
-            sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
-            shouldFinish = true;
-          } else {
-            sourceCallback.handle(Result.<ReconnectableConnection, Void>builder().output(connection).build());
-          }
+    connection = connectionProvider.connect();
+    scheduler = schedulerService.ioScheduler();
+    scheduler.execute(() -> {
+      boolean shouldFinish = false;
+      while (!shouldFinish) {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          shouldFinish = true;
         }
-      });
-    } catch (Exception e) {
-      sourceCallback.onConnectionException(new ConnectionException(e));
-    }
+        if (ReconnectableConnectionProvider.fail) {
+          sourceCallback.onConnectionException(new ConnectionException(new RuntimeException(), connection));
+          shouldFinish = true;
+        } else {
+          sourceCallback.handle(Result.<ReconnectableConnection, Void>builder().output(connection).build());
+        }
+      }
+    });
   }
 
   @Override

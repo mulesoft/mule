@@ -225,16 +225,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void onException(ConnectionException exception) {
     if (!reconnecting.compareAndSet(false, true)) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(format("Message source '%s' on root component '%s' failed to reconnect. Error was: %s",
-                                                                // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
-                                                                sourceModel.getName(),
-                                                                getLocation().getRootContainerName(),
-                                                                exception.getMessage())),
-                                     exception);
+      LOGGER.error(format(
+                          "Message source '%s' on flow '%s' found connection error but reconnection is already in progress. Error was: %s",
+                          sourceModel.getName(),
+                          getLocation().getRootContainerName(),
+                          exception.getMessage()),
+                   exception);
+      return;
     }
 
-    LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
+    LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
                        sourceAdapter.getName(), getLocation().getRootContainerName()),
                 exception);
 
@@ -258,15 +258,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionSuccessful() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.warn("Message source '{}' on root component '{}' successfully reconnected",
-                  sourceAdapter.getName(), getLocation().getRootContainerName());
+    if (LOGGER.isWarnEnabled()) {
+      LOGGER.warn("Message source '{}' on flow '{}' successfully reconnected",
+                  sourceModel.getName(), getLocation().getRootContainerName());
     }
   }
 
   private void onReconnectionFailed(Throwable exception) {
-    LOGGER.error(format("Message source '%s' on root component '%s' could not be reconnected. Will be shutdown. %s",
-                        sourceAdapter.getName(), getLocation().getRootContainerName(), exception.getMessage()),
+    LOGGER.error(format("Message source '%s' on flow '%s' could not be reconnected. Will be shutdown. %s",
+                        sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
     shutdown();
   }
@@ -278,7 +278,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         disposeSource();
         startSource();
       } else {
-        LOGGER.warn(format("Message source '%s' on root component '%s' is stopped. Not doing restart", sourceAdapter.getName(),
+        LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
       }
     }
