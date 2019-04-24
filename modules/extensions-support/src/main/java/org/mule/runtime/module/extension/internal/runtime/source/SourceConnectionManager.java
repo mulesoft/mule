@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,7 +34,7 @@ public class SourceConnectionManager {
 
   private static final ReentrantLock lock = new ReentrantLock();
   private final ConnectionManager connectionManager;
-  private final Map<Reference<Object>, Pair<AtomicInteger, ConnectionHandler<Object>>> connections = new ConcurrentHashMap<>();
+  private final Map<Reference<Object>, Pair<AtomicInteger, ConnectionHandler<Object>>> connections = new HashMap<>();
 
   /**
    * Creates a new instance
