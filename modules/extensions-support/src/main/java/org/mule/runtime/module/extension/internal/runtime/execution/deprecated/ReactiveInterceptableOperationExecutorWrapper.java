@@ -34,7 +34,7 @@ import org.slf4j.Logger;
  * Dependency injection and lifecycle phases will also be propagated to the {@link #delegate}
  *
  * @since 4.0
- * @deprecated since 4.2
+ * @deprecated since 4.3
  */
 @Deprecated
 public final class ReactiveInterceptableOperationExecutorWrapper<M extends ComponentModel> extends AbstractInterceptable

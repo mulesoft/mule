@@ -22,7 +22,7 @@ import java.util.function.Function;
  * blocking execution engine and decorated through {@link InterceptableOperationExecutorWrapper}, so that the items in the
  * {@link #interceptors} list can apply.
  *
- * @since 4.2
+ * @since 4.3
  */
 public final class CompletableOperationExecutorFactoryWrapper<T extends ComponentModel>
     implements CompletableComponentExecutorFactory<T>, OperationArgumentResolverFactory<T> {

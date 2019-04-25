@@ -371,7 +371,7 @@ public class MuleExtensionUtils {
    * @param operationModel an {@link OperationModel}
    * @return a {@link ComponentExecutorFactory}
    * @throws IllegalOperationModelDefinitionException if the operation is not properly enriched
-   * @deprecated since 4.2. Use {@link #getOperationExecutorFactory(ComponentModel)} instead
+   * @deprecated since 4.3. Use {@link #getOperationExecutorFactory(ComponentModel)} instead
    */
   @Deprecated
   public static <T extends ComponentModel> ComponentExecutorFactory<T> getLegacyOperationExecutorFactory(T operationModel) {

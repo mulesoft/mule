@@ -41,7 +41,7 @@ import org.slf4j.Logger;
  * Implementation of {@link ComponentExecutor} which works by using reflection to invoke a method from a class.
  *
  * @since 3.7.0
- * @deprecated since 4.2
+ * @deprecated since 4.3
  */
 @Deprecated
 public class ReactiveReflectiveMethodOperationExecutor<M extends ComponentModel>

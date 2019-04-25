@@ -16,7 +16,7 @@ import reactor.core.publisher.MonoSink;
  * project Reactor.
  *
  * @since 4.0
- * @deprecated since 4.2
+ * @deprecated since 4.3
  */
 @Deprecated
 final class MonoCompletionCallback implements CompletionCallback<Object, Object> {

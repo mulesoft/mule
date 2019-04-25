@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 /**
  * Implementation of {@link ReflectiveMethodOperationExecutor} which works by using reflection to invoke a method from a class.
  *
- * @since 4.2.0
+ * @since 4.3
  */
 public class ReflectiveMethodOperationExecutor<M extends ComponentModel> extends AbstractReflectiveMethodOperationExecutor<M> {
 

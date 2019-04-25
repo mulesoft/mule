@@ -29,7 +29,7 @@ import java.util.Map;
  * {@link ReflectiveMethodOperationExecutor}.
  *
  * @param <T> the type of the class in which the implementing method is declared
- * @since 4.2
+ * @since 3.7
  */
 public final class ReflectiveOperationExecutorFactory<T, M extends ComponentModel> implements
     CompletableComponentExecutorFactory<M> {

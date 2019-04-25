@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory
  * A {@link ModelProperty} meant to be used on {@link ComponentModel component models},
  * which provides access to a {@link ComponentExecutorFactory} used to execute such component
  *
- * @since 4.0
+ * @since 4.3
  */
 public final class CompletableComponentExecutorModelProperty implements ModelProperty {
 

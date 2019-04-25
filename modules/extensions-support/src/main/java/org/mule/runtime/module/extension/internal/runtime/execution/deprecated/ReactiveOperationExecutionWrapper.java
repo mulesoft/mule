@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 
 import java.util.Map;
@@ -42,6 +43,7 @@ import reactor.core.publisher.Mono;
  * It also implements {@link Lifecycle} and {@link MuleContextAware}, propagating those to the decoratee if necessary
  *
  * @since 4.0
+ * @deprecated since 4.3. Use {@link CompletableOperationExecutorFactoryWrapper} instead
  */
 public final class ReactiveOperationExecutionWrapper<M extends ComponentModel>
     implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle, MuleContextAware {

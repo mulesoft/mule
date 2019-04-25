@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory
  * which provides access to a {@link ComponentExecutorFactory} used to execute such component
  *
  * @since 4.0
- * @deprecated since 4.2. Use {@link CompletableComponentExecutorModelProperty} instead.
+ * @deprecated since 4.3. Use {@link CompletableComponentExecutorModelProperty} instead.
  */
 @Deprecated
 public final class ComponentExecutorModelProperty implements ModelProperty {

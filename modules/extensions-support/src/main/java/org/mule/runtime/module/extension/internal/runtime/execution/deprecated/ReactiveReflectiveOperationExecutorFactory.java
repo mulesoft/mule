@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @param <T> the type of the class in which the implementing method is declared
  * @since 3.7.0
- * @deprecated since 4.2
+ * @deprecated since 4.3
  */
 @Deprecated
 public final class ReactiveReflectiveOperationExecutorFactory<T, M extends ComponentModel>

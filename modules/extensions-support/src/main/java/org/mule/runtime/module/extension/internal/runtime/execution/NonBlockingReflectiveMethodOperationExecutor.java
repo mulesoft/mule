@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 /**
  * Implementation of {@link NonBlockingReflectiveMethodOperationExecutor} which works by using reflection to invoke a method from a class.
  *
- * @since 4.2.0
+ * @since 4.3
  */
 public class NonBlockingReflectiveMethodOperationExecutor<M extends ComponentModel>
     extends AbstractReflectiveMethodOperationExecutor<M> {
