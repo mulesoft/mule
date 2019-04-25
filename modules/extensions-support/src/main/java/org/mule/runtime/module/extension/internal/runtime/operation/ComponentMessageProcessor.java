@@ -92,11 +92,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableMap;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -105,6 +100,11 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
 
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
@@ -189,13 +189,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .flatMap(checkedFunction(event -> {
           final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
           final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
-          final PrecalculatedExecutionContextAdapter<T> precalculatedContext = getPrecalculatedContext(event);
           final Scheduler currentScheduler = ((InternalEvent) event).getInternalParameter(PROCESSOR_SCHEDULER_CONTEXT_KEY);
 
           OperationExecutionFunction operationExecutionFunction;
 
-          if (getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
-              && precalculatedContext != null) {
+          if (shouldUsePrecalculatedContext(event)) {
             ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
             operationExecutionFunction = (parameters, operationEvent) -> {
@@ -255,7 +253,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {
-    if (getLocation() != null && getPrecalculatedContext(event) != null) {
+    if (shouldUsePrecalculatedContext(event)) {
       // If the event already contains an execution context, use that one.
       // Only for interceptable components!
       return getPrecalculatedContext(event).getConfiguration();
@@ -263,6 +261,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       // Otherwise, generate the context as usual.
       return getConfiguration(event);
     }
+  }
+
+  private boolean shouldUsePrecalculatedContext(CoreEvent event) {
+    return getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
+        && getPrecalculatedContext(event) != null;
   }
 
   /**

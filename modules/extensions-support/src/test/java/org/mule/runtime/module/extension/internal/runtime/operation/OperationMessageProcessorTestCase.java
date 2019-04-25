@@ -21,6 +21,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -87,6 +88,16 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -97,16 +108,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
-
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -448,6 +449,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                                               "core:interceptionComponent", messageProcessor)));
 
     verify(operationExecutor).execute(context.get());
+    verify(context.get(), atLeastOnce()).getConfiguration();
     messageProcessor.disposeResolvedParameters(context.get());
   }
 
@@ -468,6 +470,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     verify(operationExecutor, never()).execute(context.get());
     verify(operationExecutor).execute(any(ExecutionContext.class));
+    verify(context.get(), never()).getConfiguration();
     messageProcessor.disposeResolvedParameters(context.get());
   }
 
