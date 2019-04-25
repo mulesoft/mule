@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Optional.ofNullable;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -16,10 +17,14 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import java.util.function.Consumer;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.mule.runtime.api.util.Pair;
+import com.github.benmanes.caffeine.cache.Cache;
+import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 
 /**
  * Tracks and manages the connections that are started on a {@link Source}
@@ -28,8 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SourceConnectionManager {
 
+  private final ReentrantLock lock = new ReentrantLock();
   private final ConnectionManager connectionManager;
-  private final Map<Reference<Object>, ConnectionHandler<Object>> connections = new ConcurrentHashMap<>();
+  private final Cache<Reference<Object>, Pair<AtomicInteger, ConnectionHandler<Object>>> connections =
+      Caffeine.newBuilder().build();
 
   /**
    * Creates a new instance
@@ -51,8 +58,11 @@ public class SourceConnectionManager {
   <T> T getConnection(ConfigurationInstance config) throws ConnectionException {
     ConnectionHandler<Object> connectionHandler = connectionManager.getConnection(config.getValue());
     Object connection = connectionHandler.getConnection();
-    connections.put(new Reference<>(connection), connectionHandler);
-
+    Reference<Object> connReference = new Reference<>(connection);
+    withLock(lock, () -> {
+      ((AtomicInteger) connections.get(connReference, k -> new Pair(new AtomicInteger(0), connectionHandler))
+          .getFirst()).incrementAndGet();
+    });
     return (T) connection;
   }
 
@@ -62,10 +72,10 @@ public class SourceConnectionManager {
    * @param connection the connection to be released
    */
   void release(Object connection) {
-    ConnectionHandler<Object> connectionHandler = connections.remove(new Reference<>(connection));
-    if (connectionHandler != null) {
-      connectionHandler.release();
-    }
+    decreaseConnectionReferenceCount(new Reference<>(connection), connHandler -> {
+      if (connHandler != null)
+        connHandler.release();
+    });
   }
 
   /**
@@ -74,10 +84,10 @@ public class SourceConnectionManager {
    * @param connection the connection to be invalidated
    */
   void invalidate(Object connection) {
-    ConnectionHandler<Object> connectionHandler = connections.remove(new Reference<>(connection));
-    if (connectionHandler != null) {
-      connectionHandler.invalidate();
-    }
+    decreaseConnectionReferenceCount(new Reference<>(connection), connHandler -> {
+      if (connHandler != null)
+        connHandler.invalidate();
+    });
   }
 
   /**
@@ -87,7 +97,7 @@ public class SourceConnectionManager {
    * @return a {@link ConnectionValidationResult}
    */
   ConnectionValidationResult testConnectivity(Object connection) {
-    ConnectionHandler<Object> connectionHandler = connections.get(new Reference<>(connection));
+    ConnectionHandler<Object> connectionHandler = connections.getIfPresent(new Reference<>(connection)).getSecond();
     if (connectionHandler == null) {
       throw new IllegalArgumentException("Cannot validate a connection which was not generated through this "
           + ConnectionProvider.class.getSimpleName());
@@ -105,6 +115,19 @@ public class SourceConnectionManager {
    * through this component
    */
   <T> Optional<ConnectionHandler<T>> getConnectionHandler(T connection) {
-    return ofNullable((ConnectionHandler<T>) connections.get(new Reference<>(connection)));
+    return ofNullable(connections.getIfPresent(new Reference<>(connection)))
+        .map(c -> (ConnectionHandler<T>) (((Pair) c).getSecond()));
   }
+
+  private void decreaseConnectionReferenceCount(Reference<Object> connReference,
+                                                Consumer<ConnectionHandler<Object>> consumer) {
+    withLock(lock, () -> {
+      if (connections.getIfPresent(connReference).getFirst().decrementAndGet() > 0) {
+        return;
+      }
+      consumer.accept(connections.getIfPresent(connReference).getSecond());
+      connections.invalidate(connReference);
+    });
+  }
+
 }
