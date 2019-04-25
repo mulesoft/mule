@@ -21,13 +21,13 @@ import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleState;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is a base implementation of the {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} interface and provides almost
@@ -45,17 +45,17 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
   protected transient final Logger logger = LoggerFactory.getLogger(AbstractLifecycleManager.class);
 
   protected String lifecycleManagerId;
-  protected String currentPhase = NotInLifecyclePhase.PHASE_NAME;
-  protected String executingPhase = null;
-  private Set<String> directTransitions = new HashSet<>();
+  protected volatile String currentPhase = NotInLifecyclePhase.PHASE_NAME;
+  protected volatile String executingPhase = null;
+  private final Set<String> directTransitions = new HashSet<>();
   protected Set<String> phaseNames = new LinkedHashSet<>(4);
   protected Set<String> completedPhases = new LinkedHashSet<>(4);
   protected O object;
   protected LifecycleState state;
-  private String lastPhaseExecuted;
-  private boolean lastPhaseExecutionFailed;
+  private volatile String lastPhaseExecuted;
+  private volatile boolean lastPhaseExecutionFailed;
 
-  private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<>();
+  private final TreeMap<String, LifecycleCallback> callbacks = new TreeMap<>();
 
   public AbstractLifecycleManager(String id, O object) {
     lifecycleManagerId = id;
@@ -122,7 +122,7 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
   }
 
   @Override
-  public void fireLifecycle(String phase) throws LifecycleException {
+  public synchronized void fireLifecycle(String phase) throws LifecycleException {
     checkPhase(phase);
     invokePhase(phase, object, callbacks.get(phase));
   }

@@ -8,32 +8,21 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.util.Optional.empty;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({FileUtils.class})
-@PowerMockIgnore("javax.management.*")
+@SmallTest
 public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   private static final String ARTIFACT_ID = "test";
@@ -50,17 +39,13 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
 
     deployer.deployArtifact(createMockApplication(), empty());
 
-    mockStatic(FileUtils.class);
-    PowerMockito.doThrow(new IOException()).when(FileUtils.class);
-    deleteDirectory(Matchers.eq(getAppDataFolder(ARTIFACT_ID)));
-
     deployer.undeployArtifact(ARTIFACT_ID);
   }
 
   private Application createMockApplication() {
     Application artifact = mock(Application.class);
     ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-    when(descriptor.getDataFolderName()).thenReturn(ARTIFACT_ID);
+    when(descriptor.getDataFolderName()).thenReturn(ARTIFACT_ID).thenThrow(new RuntimeException((new IOException())));
     when(artifact.getDescriptor()).thenReturn(descriptor);
     when(artifact.getArtifactName()).thenReturn(ARTIFACT_ID);
     return artifact;

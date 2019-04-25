@@ -30,9 +30,9 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
@@ -42,6 +42,7 @@ import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
@@ -68,6 +69,7 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -81,6 +83,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({ArtifactDescriptorResult.class, ArtifactResult.class})
 @PowerMockIgnore("javax.management.*")
 @SmallTest
+@Ignore("MULE-16671")
 public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   @Rule
@@ -461,8 +464,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   class ArtifactMatcher extends TypeSafeMatcher<Artifact> {
 
-    private String groupId;
-    private String artifactId;
+    private final String groupId;
+    private final String artifactId;
 
     public ArtifactMatcher(String groupId, String artifactId) {
       this.groupId = groupId;

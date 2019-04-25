@@ -24,6 +24,15 @@ public interface MessageWithHeaders {
 
   /**
    * @param headerName name of the header
+   * @return whether or not the header is present in the message
+   * @since 1.2
+   */
+  default boolean containsHeader(String headerName) {
+    return getHeaderValue(headerName) != null;
+  }
+
+  /**
+   * @param headerName name of the header
    * @return first value of the header
    */
   String getHeaderValue(String headerName);

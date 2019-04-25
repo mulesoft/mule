@@ -69,6 +69,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
       super(caseInsensitiveMultiMap, caseInsensitiveMultiMap.optimized);
       this.paramsMap = unmodifiableMap(paramsMap);
     }
+
   }
 
   @Override

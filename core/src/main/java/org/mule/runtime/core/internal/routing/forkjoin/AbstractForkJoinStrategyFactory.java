@@ -67,6 +67,15 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
 
   public static final String TIMEOUT_EXCEPTION_DESCRIPTION = "Route Timeout";
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
+  private final boolean mergeVariables;
+
+  public AbstractForkJoinStrategyFactory() {
+    this(true);
+  }
+
+  public AbstractForkJoinStrategyFactory(boolean mergeVariables) {
+    this.mergeVariables = mergeVariables;
+  }
 
   @Override
   public ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
@@ -172,6 +181,9 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
 
   private Consumer<List<CoreEvent>> mergeVariables(CoreEvent original, CoreEvent.Builder result) {
     return list -> {
+      if (!mergeVariables) {
+        return;
+      }
       Map<String, TypedValue> routeVars = new HashMap<>();
       list.forEach(event -> event.getVariables().forEach((key, value) -> {
         // Only merge variables that have been added or mutated in routes

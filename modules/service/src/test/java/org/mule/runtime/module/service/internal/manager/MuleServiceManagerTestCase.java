@@ -47,6 +47,9 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
     service2 = mockService();
 
     when(serviceDiscoverer.discoverServices()).thenReturn(Arrays.asList(service1, service2));
+    when(service1.getName()).thenReturn("Awesome Service");
+    when(service2.getName()).thenReturn("Yet another awesome Service");
+
     muleServiceManager = new MuleServiceManager(serviceDiscoverer);
   }
 
@@ -91,5 +94,26 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
     InOrder inOrder = inOrder(service1, service2);
     inOrder.verify((Stoppable) service1).stop();
     inOrder.verify((Stoppable) service2).stop();
+  }
+
+  @Test
+  public void httpAndSchedulerServicesAreStoppedInOrder() throws Exception {
+    Service mockSchedulerService = mockService();
+    when(mockSchedulerService.getName()).thenReturn("Scheduler service");
+    Service mockHttpService = mockService();
+    when(mockHttpService.getName()).thenReturn("HTTP Service");
+
+    when(serviceDiscoverer.discoverServices()).thenReturn(Arrays.asList(
+                                                                        service1,
+                                                                        mockSchedulerService,
+                                                                        service2,
+                                                                        mockHttpService));
+
+    muleServiceManager.start();
+    muleServiceManager.stop();
+
+    InOrder inOrder = inOrder(mockHttpService, mockSchedulerService);
+    inOrder.verify((Stoppable) mockHttpService).stop();
+    inOrder.verify((Stoppable) mockSchedulerService).stop();
   }
 }

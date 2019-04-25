@@ -101,6 +101,7 @@ public class MuleArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     URL resource = classLoader.findResource(request + ":" + resourceName);
     assertThat(resource, is(notNullValue()));
     assertThat(resource, is(equalTo(new URL("jar:" + expectedArtifactLocation.toString() + "!/" + resourceName))));
+    assertThat(resource.openConnection().getUseCaches(), is(false));
     assertThat(readLines(resource.openStream()).get(0), is(expectedLine));
   }
 

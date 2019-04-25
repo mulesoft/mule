@@ -17,9 +17,9 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.notification.FlowConstructNotification;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager;
 
@@ -35,7 +35,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
    * logger used by this class
    */
   private static final Logger logger = getLogger(FlowConstructLifecycleManager.class);
-  private NotificationDispatcher notificationFirer;
+  private final NotificationDispatcher notificationFirer;
 
   public FlowConstructLifecycleManager(FlowConstruct flowConstruct, NotificationDispatcher notificationFirer) {
     super(flowConstruct.getName(), flowConstruct);
@@ -43,7 +43,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
   }
 
   @Override
-  public void fireInitialisePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+  public synchronized void fireInitialisePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
     checkPhase(Initialisable.PHASE_NAME);
     // TODO No pre notification
     if (logger.isInfoEnabled()) {
@@ -55,7 +55,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
 
 
   @Override
-  public void fireStartPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+  public synchronized void fireStartPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
     checkPhase(Startable.PHASE_NAME);
     if (logger.isInfoEnabled()) {
       logger.info("Starting flow: " + getLifecycleObject().getName());
@@ -67,7 +67,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
 
 
   @Override
-  public void fireStopPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+  public synchronized void fireStopPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
     checkPhase(Stoppable.PHASE_NAME);
     if (logger.isInfoEnabled()) {
       logger.info("Stopping flow: " + getLifecycleObject().getName());
@@ -78,7 +78,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
   }
 
   @Override
-  public void fireDisposePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
+  public synchronized void fireDisposePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
     checkPhase(Disposable.PHASE_NAME);
     if (logger.isInfoEnabled()) {
       logger.info("Disposing flow: " + getLifecycleObject().getName());

@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 public class MuleServiceManager implements ServiceManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleServiceManager.class);
+  private static final String SCHEDULER_SERVICE_ARTIFACT_ID = "Scheduler service";
+  private static final String HTTP_SERVICE_ARTIFACT_PREFIX = "HTTP";
 
   private final ServiceDiscoverer serviceDiscoverer;
   private List<Service> services = new ArrayList<>();
@@ -67,14 +69,37 @@ public class MuleServiceManager implements ServiceManager {
     }
   }
 
+  /**
+   * Stop all discovered services. In the case of 'HTTP' and 'Scheduler' service, if present, they should be stopped last and in
+   * that order.
+   *
+   * @throws MuleException
+   */
   @Override
   public void stop() throws MuleException {
+    Service schedulerService = null, httpService = null;
     for (Service service : services) {
-      try {
-        stopIfNeeded(service);
-      } catch (Exception e) {
-        LOGGER.warn(format("Failed to stop service '%s': %s", service.getName(), e.getMessage()), e);
+      if (service.getName().equals(SCHEDULER_SERVICE_ARTIFACT_ID)) {
+        schedulerService = service;
+      } else if (service.getName().contains(HTTP_SERVICE_ARTIFACT_PREFIX)) {
+        httpService = service;
+      } else {
+        doStopService(service);
       }
+    }
+    if (httpService != null) {
+      doStopService(httpService);
+    }
+    if (schedulerService != null) {
+      doStopService(schedulerService);
+    }
+  }
+
+  protected void doStopService(Service service) {
+    try {
+      stopIfNeeded(service);
+    } catch (Exception e) {
+      LOGGER.warn(format("Failed to stop service '%s': %s", service.getName(), e.getMessage()), e);
     }
   }
 

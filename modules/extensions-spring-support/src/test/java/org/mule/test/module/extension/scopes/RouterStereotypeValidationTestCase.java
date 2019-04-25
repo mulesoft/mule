@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.scopes;
 
+import static org.hamcrest.Matchers.containsString;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
@@ -19,7 +20,8 @@ public class RouterStereotypeValidationTestCase extends InvalidExtensionConfigTe
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
     expectedException.expect(ConfigurationException.class);
-    expectedException.expectMessage("Invalid content was found starting with element 'set-variable'");
+    expectedException.expectMessage(containsString("Invalid content was found starting with element"));
+    expectedException.expectMessage(containsString("set-variable"));
   }
 
 }

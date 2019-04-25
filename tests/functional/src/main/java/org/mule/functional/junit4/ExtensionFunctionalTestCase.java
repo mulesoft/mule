@@ -26,6 +26,7 @@ import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscovere
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -101,11 +102,20 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
       throws Exception {
     ClassLoader cl = getClass().getClassLoader();
     Method method = findMethod(cl.getClass(), "addURL", URL.class);
-    method.setAccessible(true);
 
-    for (GeneratedResource resource : resources) {
-      URL generatedResourceURL = new File(generatedResourcesDirectory, resource.getPath()).toURI().toURL();
-      method.invoke(cl, generatedResourceURL);
+    if (method != null) {
+      method.setAccessible(true);
+
+      for (GeneratedResource resource : resources) {
+        URL generatedResourceURL = new File(generatedResourcesDirectory, resource.getPath()).toURI().toURL();
+        method.invoke(cl, generatedResourceURL);
+      }
+    } else {
+      for (GeneratedResource resource : resources) {
+        URL generatedResourceURL = new File(generatedResourcesDirectory, resource.getPath()).toURI().toURL();
+        URLClassLoader.newInstance(new URL[] {generatedResourceURL}, cl);
+      }
+
     }
   }
 

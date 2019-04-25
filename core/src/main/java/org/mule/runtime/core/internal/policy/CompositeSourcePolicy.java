@@ -72,7 +72,7 @@ public class CompositeSourcePolicy
     super(parameterizedPolicies, sourcePolicyParametersTransformer);
     this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
-    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory());
+    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory(), sourcePolicyParametersTransformer);
     this.policyEventMapper = new PolicyEventMapper();
   }
 

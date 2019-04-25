@@ -6,7 +6,7 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.runtime</groupId>
-        <version>4.2.0-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-module-deployment</artifactId>
@@ -49,6 +49,11 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <!--for the extensions configuration builder-->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-extensions-api</artifactId>
         </dependency>
         <dependency>
             <!--for the extensions configuration builder-->
@@ -180,6 +185,12 @@
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
             <version>${powermockVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${javaXmlBindVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
