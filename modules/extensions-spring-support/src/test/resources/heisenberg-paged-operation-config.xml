@@ -48,4 +48,8 @@
         <heisenberg:sticky-paged-operation config-ref="heisenberg"/>
     </flow>
 
+    <flow name="pagedOperationWithProperClassLoader">
+        <heisenberg:paged-operation-with-proper-class-loader config-ref="heisenberg"/>
+    </flow>
+
 </mule>

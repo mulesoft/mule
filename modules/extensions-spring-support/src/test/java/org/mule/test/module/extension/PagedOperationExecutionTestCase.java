@@ -79,6 +79,12 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
     assertThat(connectionId1, equalTo(connectionId2));
   }
 
+  @Test
+  public void pagedOperationWithProperClassLoader() throws Exception {
+    Iterator iterator = getCursor("pagedOperationWithProperClassLoader");
+    assertThat(iterator.next(), is(1));
+  }
+
   private <T> CursorIterator<T> getCursor(String flowName) throws Exception {
     CursorIteratorProvider provider =
         (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().run().getMessage().getPayload()
