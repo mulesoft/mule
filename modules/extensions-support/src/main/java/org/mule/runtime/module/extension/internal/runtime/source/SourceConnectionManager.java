@@ -16,6 +16,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import java.util.function.Consumer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,9 +71,10 @@ public class SourceConnectionManager {
    * @param connection the connection to be released
    */
   void release(Object connection) {
-    Reference<Object> connReference = new Reference<>(connection);
-    ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
-    decreaseConnectionReferenceCount(connReference, connectionHandler, () -> connectionHandler.release());
+    decreaseConnectionReferenceCount(new Reference<>(connection), connHandler -> {
+      if (connHandler != null)
+        connHandler.release();
+    });
   }
 
   /**
@@ -81,9 +83,10 @@ public class SourceConnectionManager {
    * @param connection the connection to be invalidated
    */
   void invalidate(Object connection) {
-    Reference<Object> connReference = new Reference<>(connection);
-    ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
-    decreaseConnectionReferenceCount(connReference, connectionHandler, () -> connectionHandler.invalidate());
+    decreaseConnectionReferenceCount(new Reference<>(connection), connHandler -> {
+      if (connHandler != null)
+        connHandler.invalidate();
+    });
   }
 
   /**
@@ -93,8 +96,7 @@ public class SourceConnectionManager {
    * @return a {@link ConnectionValidationResult}
    */
   ConnectionValidationResult testConnectivity(Object connection) {
-    ConnectionHandler<Object> connectionHandler;
-    connectionHandler = connections.get(new Reference<>(connection)).getSecond();
+    ConnectionHandler<Object> connectionHandler = connections.get(new Reference<>(connection)).getSecond();
     if (connectionHandler == null) {
       throw new IllegalArgumentException("Cannot validate a connection which was not generated through this "
           + ConnectionProvider.class.getSimpleName());
@@ -115,15 +117,13 @@ public class SourceConnectionManager {
     return ofNullable(connections.get(new Reference<>(connection))).map(c -> (ConnectionHandler<T>) (((Pair) c).getSecond()));
   }
 
-  private void decreaseConnectionReferenceCount(Reference<Object> connReference, ConnectionHandler<Object> connectionHandler,
-                                                Runnable runnable) {
+  private void decreaseConnectionReferenceCount(Reference<Object> connReference,
+                                                Consumer<ConnectionHandler<Object>> consumer) {
     withLock(lock, () -> {
       if (connections.get(connReference).getFirst().decrementAndGet() > 0) {
         return;
       }
-      if (connectionHandler != null) {
-        runnable.run();
-      }
+      consumer.accept(connections.get(connReference).getSecond());
       connections.remove(connReference);
     });
   }
