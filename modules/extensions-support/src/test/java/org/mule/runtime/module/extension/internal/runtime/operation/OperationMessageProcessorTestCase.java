@@ -21,6 +21,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -441,6 +442,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                                               "core:interceptionComponent", messageProcessor)));
 
     verify(operationExecutor).execute(context.get());
+    verify(context.get(), atLeastOnce()).getConfiguration();
     messageProcessor.disposeResolvedParameters(context.get());
   }
 
@@ -461,6 +463,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     verify(operationExecutor, never()).execute(context.get());
     verify(operationExecutor).execute(any(ExecutionContext.class));
+    verify(context.get(), never()).getConfiguration();
     messageProcessor.disposeResolvedParameters(context.get());
   }
 
