@@ -84,17 +84,6 @@ public class SourceConnectionManager {
     Reference<Object> connReference = new Reference<>(connection);
     ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
     decreaseConnectionReferenceCount(connReference, connectionHandler, () -> connectionHandler.invalidate());
-    /*Reference<Object> connReference = new Reference<>(connection);
-    withLock(lock, () -> {
-      if (connections.get(connReference).getFirst().decrementAndGet() > 0) {
-        return;
-      }
-      ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
-      if (connectionHandler != null) {
-        connectionHandler.invalidate();
-      }
-      connections.remove(connReference);
-    });*/
   }
 
   /**
@@ -132,7 +121,6 @@ public class SourceConnectionManager {
       if (connections.get(connReference).getFirst().decrementAndGet() > 0) {
         return;
       }
-      //ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
       if (connectionHandler != null) {
         runnable.run();
       }
