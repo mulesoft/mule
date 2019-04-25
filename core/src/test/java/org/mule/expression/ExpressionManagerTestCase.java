@@ -6,17 +6,21 @@
  */
 package org.mule.expression;
 
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.api.config.MuleProperties.MULE_DEFAULT_BOOLEAN_VALUE;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
@@ -139,6 +143,23 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
         // Boolean value
         assertTrue(muleContext.getExpressionManager().evaluateBoolean("string:true", msg));
         assertFalse(muleContext.getExpressionManager().evaluateBoolean("string:false", msg));
+    }
+
+    @Test
+    public void testDefaultExpressionFilterActsLikeBooleanValueOfInvalidString()
+    {
+        setProperty(MULE_DEFAULT_BOOLEAN_VALUE, "false");
+        ExpressionFilter filter = new ExpressionFilter("payload");
+        clearProperty(MULE_DEFAULT_BOOLEAN_VALUE);
+
+        filter.setMuleContext(muleContext);
+
+        assertEquals(Boolean.valueOf("on"),filter.accept(new DefaultMuleMessage("on", muleContext)));
+        assertEquals(Boolean.valueOf("yes"),filter.accept(new DefaultMuleMessage("yes", muleContext)));
+        assertEquals(Boolean.valueOf("no"),filter.accept(new DefaultMuleMessage("no", muleContext)));
+        assertEquals(Boolean.valueOf("off"),filter.accept(new DefaultMuleMessage("off", muleContext)));
+        assertEquals(Boolean.valueOf("trues"),filter.accept(new DefaultMuleMessage("trues", muleContext)));
+        assertEquals(Boolean.valueOf("falses"),filter.accept(new DefaultMuleMessage("falses", muleContext)));
     }
 
     @Test
