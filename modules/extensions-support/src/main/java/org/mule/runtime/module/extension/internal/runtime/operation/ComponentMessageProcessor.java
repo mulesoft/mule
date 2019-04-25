@@ -193,7 +193,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
           OperationExecutionFunction operationExecutionFunction;
 
-          if (usePrecalculatedContext(event)) {
+          if (shouldUsePrecalculatedContext(event)) {
             ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
             operationExecutionFunction = (parameters, operationEvent) -> {
@@ -253,7 +253,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {
-    if (usePrecalculatedContext(event)) {
+    if (shouldUsePrecalculatedContext(event)) {
       // If the event already contains an execution context, use that one.
       // Only for interceptable components!
       return getPrecalculatedContext(event).getConfiguration();
@@ -263,7 +263,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private boolean usePrecalculatedContext(CoreEvent event) {
+  private boolean shouldUsePrecalculatedContext(CoreEvent event) {
     return getLocation() != null && isInterceptedComponent(getLocation(), (InternalEvent) event)
         && getPrecalculatedContext(event) != null;
   }
