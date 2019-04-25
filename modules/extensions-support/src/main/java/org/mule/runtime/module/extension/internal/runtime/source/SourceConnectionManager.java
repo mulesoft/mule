@@ -32,7 +32,7 @@ import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
  */
 public class SourceConnectionManager {
 
-  private static final ReentrantLock lock = new ReentrantLock();
+  private final ReentrantLock lock = new ReentrantLock();
   private final ConnectionManager connectionManager;
   private final Map<Reference<Object>, Pair<AtomicInteger, ConnectionHandler<Object>>> connections = new HashMap<>();
 
@@ -71,16 +71,8 @@ public class SourceConnectionManager {
    */
   void release(Object connection) {
     Reference<Object> connReference = new Reference<>(connection);
-    withLock(lock, () -> {
-      if (connections.get(new Reference<>(connection)).getFirst().decrementAndGet() > 0) {
-        return;
-      }
-      ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
-      if (connectionHandler != null) {
-        connectionHandler.release();
-      }
-      connections.remove(connReference);
-    });
+    ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
+    decreaseConnectionReferenceCount(connReference, connectionHandler, () -> connectionHandler.release());
   }
 
   /**
@@ -90,6 +82,9 @@ public class SourceConnectionManager {
    */
   void invalidate(Object connection) {
     Reference<Object> connReference = new Reference<>(connection);
+    ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
+    decreaseConnectionReferenceCount(connReference, connectionHandler, () -> connectionHandler.invalidate());
+    /*Reference<Object> connReference = new Reference<>(connection);
     withLock(lock, () -> {
       if (connections.get(connReference).getFirst().decrementAndGet() > 0) {
         return;
@@ -99,7 +94,7 @@ public class SourceConnectionManager {
         connectionHandler.invalidate();
       }
       connections.remove(connReference);
-    });
+    });*/
   }
 
   /**
@@ -129,6 +124,20 @@ public class SourceConnectionManager {
    */
   <T> Optional<ConnectionHandler<T>> getConnectionHandler(T connection) {
     return ofNullable(connections.get(new Reference<>(connection))).map(c -> (ConnectionHandler<T>) (((Pair) c).getSecond()));
+  }
+
+  private void decreaseConnectionReferenceCount(Reference<Object> connReference, ConnectionHandler<Object> connectionHandler,
+                                                Runnable runnable) {
+    withLock(lock, () -> {
+      if (connections.get(connReference).getFirst().decrementAndGet() > 0) {
+        return;
+      }
+      //ConnectionHandler<Object> connectionHandler = connections.get(connReference).getSecond();
+      if (connectionHandler != null) {
+        runnable.run();
+      }
+      connections.remove(connReference);
+    });
   }
 
 }
