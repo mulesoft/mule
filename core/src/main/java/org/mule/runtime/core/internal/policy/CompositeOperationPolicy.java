@@ -15,7 +15,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -148,7 +147,7 @@ public class CompositeOperationPolicy
 
           OperationExecutionFunction operationExecutionFunction =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
-          return operationExecutionFunction.execute(parametersMap, event);
+          return Mono.<CoreEvent>create(sink -> operationExecutionFunction.execute(parametersMap, event, sink));
         })
         .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
@@ -168,21 +167,24 @@ public class CompositeOperationPolicy
   }
 
   @Override
-  public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
-                                      OperationParametersProcessor parametersProcessor, ComponentLocation operationLocation) {
-    return readWriteLock.withReadLock(lockReleaser -> {
+  public void process(CoreEvent operationEvent,
+                      OperationExecutionFunction operationExecutionFunction,
+                      OperationParametersProcessor parametersProcessor,
+                      ComponentLocation operationLocation,
+                      MonoSink<CoreEvent> sink) {
+
+    readWriteLock.withReadLock(lockReleaser -> {
       if (!disposed.get()) {
-        return Mono.create(callerSink -> {
-          FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
-          policySink
-              .next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
-                                            operationExecutionFunction,
-                                            parametersProcessor, callerSink));
-        });
+        FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
+
+        policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
+                                                operationExecutionFunction,
+                                                parametersProcessor, sink));
       } else {
-        MessagingException me = new MessagingException(createStaticMessage("Operation policy already disposed"), operationEvent);
-        return Mono.error(me);
+        sink.error(new MessagingException(createStaticMessage("Operation policy already disposed"), operationEvent));
       }
+
+      return null;
     });
   }
 

@@ -9,11 +9,10 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.runtime.function.FunctionExecutorFactory;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 
 /**
  * A {@link ModelProperty} meant to be used on {@link OperationModel operation models},
- * which provides access to a {@link ComponentExecutorFactory} used to execute such
+ * which provides access to a {@link FunctionExecutorFactory} used to execute such
  * operation
  *
  * @since 4.0
@@ -26,14 +25,14 @@ public final class FunctionExecutorModelProperty implements ModelProperty {
   /**
    * Creates a new instance
    *
-   * @param executorFactory a {@link ComponentExecutorFactory}
+   * @param executorFactory a {@link FunctionExecutorFactory}
    */
   public FunctionExecutorModelProperty(FunctionExecutorFactory executorFactory) {
     this.executorFactory = executorFactory;
   }
 
   /**
-   * @return a {@link ComponentExecutorFactory}
+   * @return a {@link FunctionExecutorFactory}
    */
   public FunctionExecutorFactory getExecutorFactory() {
     return executorFactory;

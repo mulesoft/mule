@@ -45,7 +45,7 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
 
   @Override
   public void dispose() {
-    fluxSinks.forEach(s -> s.complete());
+    fluxSinks.forEach(FluxSink::complete);
   }
 
   @Override

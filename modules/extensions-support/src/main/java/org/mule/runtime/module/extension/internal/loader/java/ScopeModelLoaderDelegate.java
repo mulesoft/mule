@@ -11,14 +11,13 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.processNonBlockingOperation;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
@@ -88,8 +87,9 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     if (method.isPresent() && declaringClass.isPresent()) {
       scope.withModelProperty(new ImplementingMethodModelProperty(method.get()))
-          .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
-                                                                                                         method.get())));
+          .withModelProperty(new CompletableComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory(declaringClass
+              .get(),
+                                                                                                                  method.get())));
     }
 
     processMimeType(scope, scopeMethod);

@@ -72,8 +72,8 @@ import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
@@ -90,10 +90,10 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.HashMap;
 
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -371,9 +371,10 @@ public final class ExtensionsTestUtils {
     when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(property);
   }
 
-  public static void mockExecutorFactory(OperationModel operationModel, ComponentExecutorFactory operationExecutorFactory) {
-    when(operationModel.getModelProperty(ComponentExecutorModelProperty.class))
-        .thenReturn(of(new ComponentExecutorModelProperty(operationExecutorFactory)));
+  public static void mockExecutorFactory(OperationModel operationModel,
+                                         CompletableComponentExecutorFactory operationExecutorFactory) {
+    when(operationModel.getModelProperty(CompletableComponentExecutorModelProperty.class))
+        .thenReturn(of(new CompletableComponentExecutorModelProperty(operationExecutorFactory)));
   }
 
   public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory(StreamingManager streamingManager) {

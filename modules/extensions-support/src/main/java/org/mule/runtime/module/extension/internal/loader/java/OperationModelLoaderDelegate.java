@@ -16,7 +16,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
@@ -29,7 +28,7 @@ import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
@@ -128,8 +127,10 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       if (method.isPresent() && declaringClass.isPresent()) {
         operationDeclarer
             .withModelProperty(new ImplementingMethodModelProperty(method.get()))
-            .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
-                                                                                                           method.get())));
+            .withModelProperty(new CompletableComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory(declaringClass
+                .get(),
+                                                                                                                    method
+                                                                                                                        .get())));
       }
 
       loader.addExceptionEnricher(operationMethod, operationDeclarer);

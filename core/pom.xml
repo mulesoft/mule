@@ -215,6 +215,11 @@
             <artifactId>caffeine</artifactId>
             <version>${caffeineVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>failsafe</artifactId>
+            <version>2.0.1</version>
+        </dependency>
 
         <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>

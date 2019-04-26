@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 
@@ -31,7 +31,7 @@ import java.util.Optional;
  * Among other things, it adds the concept of variables, which are key-value pairs in order to contain state that is not specific
  * to the operation but to the extensions framework itself. It's not to contain operation parameters as its
  * {@link #getParameter(String)} counter part. It's meant for things like connection pointers, state to be shared between
- * {@link Interceptor interceptors} and {@link ComponentExecutor operation executors}, etc.
+ * {@link Interceptor interceptors} and {@link CompletableComponentExecutor operation executors}, etc.
  *
  * @since 3.7.0
  */

@@ -11,7 +11,6 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -22,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
@@ -90,8 +89,9 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     if (method.isPresent() && declaringClass.isPresent()) {
       router
           .withModelProperty(new ImplementingMethodModelProperty(method.get()))
-          .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
-                                                                                                         method.get())));
+          .withModelProperty(new CompletableComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory(declaringClass
+              .get(),
+                                                                                                                  method.get())));
     }
 
 

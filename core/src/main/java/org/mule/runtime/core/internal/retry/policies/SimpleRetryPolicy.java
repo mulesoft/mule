@@ -6,11 +6,7 @@
  */
 package org.mule.runtime.core.internal.retry.policies;
 
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
 import static java.time.Duration.ofMillis;
-import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
-import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
@@ -20,25 +16,24 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.core.scheduler.Schedulers.immediate;
 import static reactor.retry.Retry.onlyIf;
-
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.retry.policy.PolicyStatus;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-import reactor.core.Disposable;
+import net.jodah.failsafe.Failsafe;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 import reactor.retry.BackoffDelay;
 import reactor.retry.Retry;
@@ -50,18 +45,59 @@ import reactor.retry.RetryExhaustedException;
 public class SimpleRetryPolicy implements RetryPolicy {
 
   private static final Logger LOGGER = getLogger(SimpleRetryPolicy.class);
-  private static final reactor.core.scheduler.Scheduler TRANSACTIONAL_RETRY_SCHEDULER = new TransactionalRetryScheduler();
 
   protected RetryCounter retryCounter;
 
-  private volatile int count = DEFAULT_RETRY_COUNT;
-  private volatile Duration frequency = ofMillis(DEFAULT_FREQUENCY);
+  private final int count;
+  private final Duration frequency;
 
   public SimpleRetryPolicy(long frequency, int retryCount) {
     this.frequency = ofMillis(frequency);
     this.count = retryCount;
     this.retryCounter = new RetryCounter();
   }
+
+  @Override
+  public <T> CompletableFuture<T> applyPolicy(Supplier<CompletableFuture<T>> futureSupplier,
+                                              Predicate<Throwable> shouldRetry,
+                                              Consumer<Throwable> onRetry,
+                                              Consumer<Throwable> onExhausted,
+                                              Function<Throwable, Throwable> errorFunction,
+                                              Scheduler retryScheduler) {
+
+    net.jodah.failsafe.RetryPolicy<Object> actingPolicy = new net.jodah.failsafe.RetryPolicy<>()
+        .handleIf(shouldRetry)
+        .withMaxRetries(count != RETRY_COUNT_FOREVER ? count : -1)
+        .withDelay(frequency)
+        .onRetry(listener -> onRetry.accept(listener.getLastFailure()))
+        .onRetriesExceeded(listener -> {
+          LOGGER.info("Retry attempts exhausted. Failing...");
+          Throwable t = errorFunction.apply(listener.getFailure());
+          onExhausted.accept(t);
+        });
+
+    final IsFirst first = new IsFirst();
+    final LazyValue<Boolean> isTransanctional = new LazyValue<>(() -> isTransactionActive());
+
+    return Failsafe.with(actingPolicy)
+        .with(new ConditionalExecutorServiceDecorator(retryScheduler, s -> first.isFirst() || isTransanctional.get()))
+        .getStageAsync(futureSupplier::get);
+  }
+
+  private class IsFirst {
+
+    private boolean first = true;
+
+    public boolean isFirst() {
+      if (first) {
+        first = false;
+        return true;
+      }
+
+      return false;
+    }
+  }
+
 
   @Override
   public <T> Publisher<T> applyPolicy(Publisher<T> publisher,
@@ -78,8 +114,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
           retry = retry.retryMax(count - 1);
         }
 
+        final LazyValue<Boolean> isTransanctional = new LazyValue<>(() -> isTransactionActive());
         reactor.core.scheduler.Scheduler reactorRetryScheduler =
-            fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransactionActive()));
+            fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransanctional.get()));
 
         Mono<T> retryMono = from(publisher)
             .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler)
@@ -155,57 +192,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
     @Override
     protected AtomicInteger initialValue() {
       return new AtomicInteger(0);
-    }
-  }
-
-  private static class TransactionalRetryScheduler implements reactor.core.scheduler.Scheduler {
-
-    private final reactor.core.scheduler.Scheduler delegate = immediate();
-
-    @Override
-    public Disposable schedule(Runnable task) {
-      return delegate.schedule(task);
-    }
-
-    @Override
-    public Disposable schedule(Runnable task, long delay, TimeUnit unit) {
-      try {
-        sleep(unit.toMillis(delay));
-      } catch (InterruptedException e) {
-        currentThread().interrupt();
-        throw new RuntimeException(e);
-      }
-      return schedule(task);
-    }
-
-    @Override
-    public Disposable schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit) {
-      return delegate.schedulePeriodically(task, initialDelay, period, unit);
-    }
-
-    @Override
-    public long now(TimeUnit unit) {
-      return delegate.now(unit);
-    }
-
-    @Override
-    public Worker createWorker() {
-      return delegate.createWorker();
-    }
-
-    @Override
-    public void dispose() {
-      delegate.dispose();
-    }
-
-    @Override
-    public void start() {
-      delegate.start();
-    }
-
-    @Override
-    public boolean isDisposed() {
-      return delegate.isDisposed();
     }
   }
 }

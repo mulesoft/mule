@@ -11,7 +11,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -35,7 +34,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.soap.SoapAttributes;
 import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -98,7 +97,7 @@ public class SoapInvokeOperationDeclarer {
         .describedAs(OPERATION_DESCRIPTION)
         .requiresConnection(true)
         .blocking(true)
-        .withModelProperty(new ComponentExecutorModelProperty(new SoapOperationExecutorFactory()))
+        .withModelProperty(new CompletableComponentExecutorModelProperty(new SoapOperationExecutorFactory()))
         .withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
 
     soapErrors.forEach(operation::withErrorModel);

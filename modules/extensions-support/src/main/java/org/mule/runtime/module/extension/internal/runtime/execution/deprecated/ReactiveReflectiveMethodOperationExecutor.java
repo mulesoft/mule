@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -41,16 +41,18 @@ import org.slf4j.Logger;
  * Implementation of {@link ComponentExecutor} which works by using reflection to invoke a method from a class.
  *
  * @since 3.7.0
+ * @deprecated since 4.3
  */
-public class ReflectiveMethodOperationExecutor<M extends ComponentModel>
+@Deprecated
+public class ReactiveReflectiveMethodOperationExecutor<M extends ComponentModel>
     implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
+  private static final Logger LOGGER = getLogger(ReactiveReflectiveMethodOperationExecutor.class);
 
   private final ReflectiveMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
-  public ReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+  public ReactiveReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     executor =
         new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
   }

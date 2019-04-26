@@ -53,6 +53,7 @@ public final class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate {
     this.count = count;
   }
 
+  @Override
   public RetryPolicy createRetryInstance() {
     return new SimpleRetryPolicy(frequency, count);
   }

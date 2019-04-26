@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.privileged.extension;
 
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 
 public class TestNonBlockingOperationDeclarationEnricher implements DeclarationEnricher {
 
@@ -18,7 +18,7 @@ public class TestNonBlockingOperationDeclarationEnricher implements DeclarationE
         .filter(o -> o.getName().equals("doSomethingAsync"))
         .findFirst()
         .ifPresent(operation -> operation.addModelProperty(
-                                                           new ComponentExecutorModelProperty((model,
-                                                                                               params) -> new PrivilegedNonBlockingComponentExecutor())));
+                                                           new CompletableComponentExecutorModelProperty((model,
+                                                                                                          params) -> new PrivilegedNonBlockingComponentExecutor())));
   }
 }

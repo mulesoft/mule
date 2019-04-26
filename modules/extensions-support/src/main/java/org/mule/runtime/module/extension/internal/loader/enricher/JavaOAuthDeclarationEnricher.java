@@ -19,7 +19,6 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.UNAUTHORIZE_OPERATION_NAME;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -43,8 +42,8 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.UnauthorizeOperationExecutor;
 
@@ -168,7 +167,8 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       operation.setRequiresConnection(false);
       operation.setSupportsStreaming(false);
       operation.setTransactional(false);
-      operation.addModelProperty(new ComponentExecutorModelProperty((model, params) -> new UnauthorizeOperationExecutor()));
+      operation
+          .addModelProperty(new CompletableComponentExecutorModelProperty((model, params) -> new UnauthorizeOperationExecutor()));
 
       ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
       group.showInDsl(false);

@@ -102,6 +102,23 @@ public class Exceptions {
   }
 
   /**
+   * Adapt a {@link CheckedBiConsumer} to a {@link BiConsumer} propagating any exceptions thrown by the {@code checkedBiConsumer}
+   * using {@link reactor.core.Exceptions#propagate(Throwable)}. Useful when using existing methods which throw checked exceptions
+   * to avoid try/catch blocks and improve readability.
+   *
+   * @param checkedBiConsumer the biconsumer that throws a checked exception
+   * @param <T> the type of the first argument to the function
+   * @param <U> the type of the second argument to the function
+   * @return a biconsumer that adapts {@code checkedBiConsumer} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
+   *         exceptions
+   * @see reactor.core.Exceptions#propagate(Throwable)
+   * @since 4.3.0
+   */
+  public static <T, U> BiConsumer<T, U> checkedBiConsumer(CheckedBiConsumer<T, U> checkedBiConsumer) {
+    return checkedBiConsumer::accept;
+  }
+
+  /**
    * Adapt a {@link CheckedPredicate} to a {@link Predicate} propagating any exceptions thrown by the {@link CheckedPredicate}
    * using {@link reactor.core.Exceptions#propagate(Throwable)}. Useful when using existing methods which throw checked exceptions
    * to avoid try/catch blocks and improve readability.

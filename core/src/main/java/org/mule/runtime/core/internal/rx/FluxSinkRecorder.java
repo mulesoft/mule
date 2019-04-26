@@ -25,7 +25,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   private volatile FluxSink<T> fluxSink;
 
   // If a fluxSink as not yet been accepted, events are buffered until one is accepted
-  private final List<Runnable> bufferedEvents = new ArrayList<Runnable>();
+  private final List<Runnable> bufferedEvents = new ArrayList<>();
 
   @Override
   public void accept(FluxSink<T> fluxSink) {
@@ -44,9 +44,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
     synchronized (this) {
       if (fluxSink == null) {
         present = false;
-        bufferedEvents.add(() -> {
-          fluxSink.next(response);
-        });
+        bufferedEvents.add(() -> fluxSink.next(response));
       }
     }
 
