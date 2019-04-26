@@ -6,7 +6,7 @@
  */
 package org.mule.routing.filters;
 
-import static java.lang.Boolean.valueOf;
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static org.mule.api.config.MuleProperties.MULE_DEFAULT_BOOLEAN_VALUE;
 import static org.mule.util.ClassUtils.equal;
@@ -14,7 +14,6 @@ import static org.mule.util.ClassUtils.hash;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transport.PropertyScope;
@@ -57,7 +56,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     private ExpressionConfig config;
     private String fullExpression;
     private boolean nullReturnsTrue = false;
-    private boolean nonBooleanReturnsTrue = valueOf(getProperty(MULE_DEFAULT_BOOLEAN_VALUE, "true"));
+    private boolean nonBooleanReturnsTrue = parseBoolean(getProperty(MULE_DEFAULT_BOOLEAN_VALUE, "true"));
     private MuleContext muleContext;
 
     /**
@@ -247,7 +246,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
 
     public void setNonBooleanReturnsTrue(boolean nonBooleanReturnsTrue)
     {
-        this.nonBooleanReturnsTrue = nonBooleanReturnsTrue ;
+        this.nonBooleanReturnsTrue = nonBooleanReturnsTrue;
     }
 
     public boolean isNonBooleanReturnsTrue()
