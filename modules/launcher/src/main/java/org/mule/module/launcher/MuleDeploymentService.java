@@ -22,6 +22,7 @@ import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.launcher.application.CompositeApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.DefaultApplicationFactory;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
+import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.launcher.domain.DefaultDomainFactory;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.domain.DomainClassLoaderRepository;
@@ -66,6 +67,7 @@ public class MuleDeploymentService implements DeploymentService
     private final ObservableList<Application> applications = new ObservableList<Application>();
     private final ObservableList<Domain> domains = new ObservableList<Domain>();
     private final List<StartupListener> startupListeners = new ArrayList<StartupListener>();
+    private final List<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
     /**
      * TODO: move to setter as in previous version.
@@ -150,6 +152,18 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void stop()
     {
+        for (ShutdownListener listener : shutdownListeners)
+        {
+            try
+            {
+                listener.execute();
+            }
+            catch (Throwable t)
+            {
+                logger.error(t);
+            }
+        }
+
         deploymentDirectoryWatcher.stop();
     }
 
@@ -318,6 +332,18 @@ public class MuleDeploymentService implements DeploymentService
     public void removeStartupListener(StartupListener listener)
     {
         this.startupListeners.remove(listener);
+    }
+
+    @Override
+    public void addShutdownListener(ShutdownListener listener)
+    {
+        this.shutdownListeners.add(listener);
+    }
+
+    @Override
+    public void removeShutdownListener(ShutdownListener listener)
+    {
+        this.removeShutdownListener(listener);
     }
 
     @Override

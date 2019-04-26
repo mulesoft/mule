@@ -50,6 +50,7 @@ import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.TestApplicationFactory;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.launcher.builder.ApplicationFileBuilder;
 import org.mule.module.launcher.builder.ApplicationPluginFileBuilder;
 import org.mule.module.launcher.builder.DomainFileBuilder;
@@ -93,6 +94,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -3785,6 +3787,32 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             super.undeployArtifact(artifactId);
             undeployLatch.countDown();
+        }
+    }
+    
+    @Test
+    public void shutdownListenerInvoked() throws Exception
+    {
+        deploymentService.start();
+        TestShutdownListener shutdownListener = new TestShutdownListener();
+        deploymentService.addShutdownListener(shutdownListener);
+        deploymentService.stop();
+        assertThat(shutdownListener.isInvoked(), is(true));
+    }
+    
+    public static class TestShutdownListener implements ShutdownListener
+    {
+        boolean invoked = false;
+        
+        @Override
+        public void execute()
+        {
+            invoked = true;
+        }
+        
+        public boolean isInvoked()
+        {
+            return invoked;
         }
     }
 }
