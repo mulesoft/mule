@@ -8,7 +8,7 @@ package org.mule.routing.filters;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
-import static org.mule.api.config.MuleProperties.MULE_DEFAULT_BOOLEAN_VALUE;
+import static org.mule.api.config.MuleProperties.MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE;
 import static org.mule.util.ClassUtils.equal;
 import static org.mule.util.ClassUtils.hash;
 
@@ -56,7 +56,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     private ExpressionConfig config;
     private String fullExpression;
     private boolean nullReturnsTrue = false;
-    private boolean nonBooleanReturnsTrue = parseBoolean(getProperty(MULE_DEFAULT_BOOLEAN_VALUE, "true"));
+    private boolean nonBooleanReturnsTrue = parseBoolean(getProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "true"));
     private MuleContext muleContext;
 
     /**

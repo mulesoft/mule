@@ -203,5 +203,5 @@ public class MuleProperties
     public static final String MULE_FAIL_IF_DELETE_OPEN_FILE = SYSTEM_PROPERTY_PREFIX + "failIfDeleteOpenFile";
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
     public static final String DISABLE_ERROR_COUNT_ON_ERROR_NOTIFICATION_DISABLED = SYSTEM_PROPERTY_PREFIX + "disable.error.count.on.error.notifications.disabled";
-    public static final String MULE_DEFAULT_BOOLEAN_VALUE = SYSTEM_PROPERTY_PREFIX + "default.boolean.value";
+    public static final String MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE = SYSTEM_PROPERTY_PREFIX + "expressionFilter.nonBooleanReturnsTrue";
 }

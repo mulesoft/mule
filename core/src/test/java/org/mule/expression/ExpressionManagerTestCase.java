@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.api.config.MuleProperties.MULE_DEFAULT_BOOLEAN_VALUE;
+import static org.mule.api.config.MuleProperties.MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.DefaultMuleMessage;
@@ -151,7 +151,7 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testDefaultExpressionFilterActsLikeBooleanValueOfInvalidStringUsingSystemProperty() throws Exception
     {
-        testWithSystemProperty(MULE_DEFAULT_BOOLEAN_VALUE, "false", new TestCallback()
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "false", new TestCallback()
         {
             @Override
             public void run()
@@ -174,7 +174,7 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testNonBooleanReturnsFalseUsingSystemProperty() throws Exception
     {
-        testWithSystemProperty(MULE_DEFAULT_BOOLEAN_VALUE, "false", new TestCallback()
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "false", new TestCallback()
         {
             @Override
             public void run()
@@ -197,7 +197,7 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testNonBooleanReturnsTrueUsingSystemProperty() throws Exception
     {
-        testWithSystemProperty(MULE_DEFAULT_BOOLEAN_VALUE, "true", new TestCallback()
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "true", new TestCallback()
         {
             @Override
             public void run()
