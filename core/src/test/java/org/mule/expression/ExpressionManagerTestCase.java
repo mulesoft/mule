@@ -7,8 +7,6 @@
 package org.mule.expression;
 
 import static java.lang.Boolean.valueOf;
-import static java.lang.System.clearProperty;
-import static java.lang.System.setProperty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -18,12 +16,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.api.config.MuleProperties.MULE_DEFAULT_BOOLEAN_VALUE;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.routing.filters.ExpressionFilter;
+import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
@@ -149,71 +149,73 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testDefaultExpressionFilterActsLikeBooleanValueOfInvalidString()
+    public void testDefaultExpressionFilterActsLikeBooleanValueOfInvalidString() throws Exception
     {
-        // Set default value
-        setProperty(MULE_DEFAULT_BOOLEAN_VALUE, "false");
-        ExpressionFilter filter = new ExpressionFilter("payload");
-        assertThat(filter.isNonBooleanReturnsTrue(), is(false));
+        testWithSystemProperty(MULE_DEFAULT_BOOLEAN_VALUE, "false", new TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                assertThat(filter.isNonBooleanReturnsTrue(), is(false));
 
-        // Check that after unset the system property the default value is still the same
-        clearProperty(MULE_DEFAULT_BOOLEAN_VALUE);
-        assertThat(filter.isNonBooleanReturnsTrue(), is(false));
+                filter.setMuleContext(muleContext);
 
-        filter.setMuleContext(muleContext);
-
-        assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(valueOf("on")));
-        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(valueOf("yes")));
-        assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(valueOf("no")));
-        assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(valueOf("off")));
-        assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(valueOf("trues")));
-        assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(valueOf("falses")));
+                assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(valueOf("on")));
+                assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(valueOf("yes")));
+                assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(valueOf("no")));
+                assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(valueOf("off")));
+                assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(valueOf("trues")));
+                assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(valueOf("falses")));
+            }
+        });
     }
 
     @Test
-    public void testNonBooleanReturnsFalse()
+    public void testNonBooleanReturnsFalse() throws Exception
     {
-        // Set default value
-        setProperty(MULE_DEFAULT_BOOLEAN_VALUE, "false");
-        ExpressionFilter filter = new ExpressionFilter("payload");
-        assertThat(filter.isNonBooleanReturnsTrue(), is(false));
+        testWithSystemProperty(MULE_DEFAULT_BOOLEAN_VALUE, "false", new TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                assertThat(filter.isNonBooleanReturnsTrue(), is(false));
 
-        // Check that after unset the system property the default value is still the same
-        clearProperty(MULE_DEFAULT_BOOLEAN_VALUE);
-        assertThat(filter.isNonBooleanReturnsTrue(), is(false));
+                filter.setMuleContext(muleContext);
 
-
-        filter.setMuleContext(muleContext);
-
-        assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(false));
-        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(false));
-        assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(false));
-        assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(false));
-        assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(false));
-        assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(false));
+                assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(false));
+                assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(false));
+                assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(false));
+                assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(false));
+                assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(false));
+                assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(false));
+            }
+        });
     }
 
     @Test
-    public void testNonBooleanReturnsTrue()
+    public void testNonBooleanReturnsTrue() throws Exception
     {
-        // Set default value
-        setProperty(MULE_DEFAULT_BOOLEAN_VALUE, "true");
-        ExpressionFilter filter = new ExpressionFilter("payload");
-        assertThat(filter.isNonBooleanReturnsTrue(), is(true));
+        testWithSystemProperty(MULE_DEFAULT_BOOLEAN_VALUE, "true", new TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                assertThat(filter.isNonBooleanReturnsTrue(), is(true));
 
-        // Check that after unset the system property the default value is still the same
-        clearProperty(MULE_DEFAULT_BOOLEAN_VALUE);
-        assertThat(filter.isNonBooleanReturnsTrue(), is(true));
 
+                filter.setMuleContext(muleContext);
 
-        filter.setMuleContext(muleContext);
-
-        assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(true));
+                assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(true));
+                assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(true));
+                assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(true));
+                assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(true));
+                assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(true));
+                assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(true));
+            }
+        });
     }
 
     @Test
