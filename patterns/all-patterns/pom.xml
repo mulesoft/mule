@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.patterns</groupId>
         <artifactId>mule-patterns</artifactId>
-        <version>3.9.3-SNAPSHOT</version>
+        <version>3.9.4-SNAPSHOT</version>
     </parent>
     <artifactId>mule-patterns-all</artifactId>
     <packaging>pom</packaging>

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests.archetypes</groupId>
         <artifactId>mule-tests-archetypes</artifactId>
-        <version>3.9.3-SNAPSHOT</version>
+        <version>3.9.4-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tests.archetypes</groupId>
     <artifactId>configuration-pattern-archetype</artifactId>
