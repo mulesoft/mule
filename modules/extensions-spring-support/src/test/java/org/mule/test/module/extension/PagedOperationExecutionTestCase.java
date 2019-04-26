@@ -80,8 +80,8 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
   }
 
   @Test
-  public void pagedOperationWithProperClassLoader() throws Exception {
-    Iterator iterator = getCursor("pagedOperationWithProperClassLoader");
+  public void pagedOperationWithExtensionClassLoader() throws Exception {
+    Iterator iterator = getCursor("pagedOperationWithExtensionClassLoader");
     assertThat(iterator.next(), is(1));
   }
 

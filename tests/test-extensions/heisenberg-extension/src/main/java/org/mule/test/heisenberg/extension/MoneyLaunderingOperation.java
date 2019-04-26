@@ -189,7 +189,7 @@ public class MoneyLaunderingOperation {
     };
   }
 
-  public PagingProvider<HeisenbergConnection, Integer> pagedOperationWithProperClassLoader() {
+  public PagingProvider<HeisenbergConnection, Integer> pagedOperationWithExtensionClassLoader() {
     return new PagingProvider<HeisenbergConnection, Integer>() {
 
       @Override
