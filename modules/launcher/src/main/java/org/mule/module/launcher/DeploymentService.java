@@ -62,6 +62,8 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
      * Adds a shutdown listener to be triggered on deployment service shutdown
      * 
      * @param shutdown listener to be added
+     *
+     * @since 3.9.3
      */
     void addShutdownListener(ShutdownListener listener);
     
@@ -69,6 +71,8 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
      * Removes a shutdown listener to be triggered on deployment service shutdown
      * 
      * @param shutdown listener to be removed
+     * 
+     * @since 3.9.3
      */
     void removeShutdownListener(ShutdownListener listener);
     /**
