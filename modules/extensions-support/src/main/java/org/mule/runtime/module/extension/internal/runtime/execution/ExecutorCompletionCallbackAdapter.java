@@ -12,6 +12,8 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
 /**
  * Adapts an {@link ExecutorCallback} into a {@link CompletionCallback}
+ *
+ * @since 4.3
  */
 public class ExecutorCompletionCallbackAdapter implements CompletionCallback<Object, Object> {
 
