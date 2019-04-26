@@ -6,16 +6,16 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.domain.Domain;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.Properties;
+
+import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.artifact.ShutdownListener;
+import org.mule.module.launcher.domain.Domain;
 
 /**
  *  Manages deploy of mule applications
@@ -58,6 +58,23 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
 
     void removeStartupListener(StartupListener listener);
 
+    /**
+     * Adds a shutdown listener to be triggered on deployment service shutdown
+     * 
+     * @param shutdown listener to be added
+     *
+     * @since 3.9.3
+     */
+    void addShutdownListener(ShutdownListener listener);
+    
+    /**
+     * Removes a shutdown listener to be triggered on deployment service shutdown
+     * 
+     * @param shutdown listener to be removed
+     * 
+     * @since 3.9.3
+     */
+    void removeShutdownListener(ShutdownListener listener);
     /**
      * Obtains the object used to synchronize the service.
      *
