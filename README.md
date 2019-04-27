@@ -28,7 +28,7 @@ Get Started
 
 1. Launch Mule Studio by double-clicking AnypointStudio.app (Mac) or AnypointStudio.exe (Windows).  
      Launch Mule as a standalone from the command line by executing ./bin/mule (Mac) or mule.bat (Windows). 
-     Refer to the [Mule Installation Guide](https://developer.mulesoft.com/docs/display/current/Installing) for more details. 
+     Refer to the [Mule Installation Guide](https://docs.mulesoft.com/mule-runtime/4.1/mule-standalone) for more details. 
 
 Mule is up and kicking! Check out [Anypoint Exchange](https://www.mulesoft.com/exchange) to explore the potential of Mule.
 
