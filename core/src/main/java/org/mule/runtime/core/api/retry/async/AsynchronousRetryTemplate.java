@@ -68,6 +68,11 @@ public final class AsynchronousRetryTemplate extends AbstractComponent
   }
 
   @Override
+  public boolean isEnabled() {
+    return delegate.isEnabled();
+  }
+
+  @Override
   public RetryPolicy createRetryInstance() {
     return delegate.createRetryInstance();
   }
