@@ -48,6 +48,7 @@ import org.mule.util.UUID;
 
 import com.google.common.collect.ImmutableList;
 
+import static java.util.Collections.synchronizedMap;
 import static org.mule.transformer.TransformerUtils.getConverterKey;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -99,7 +101,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * Transformers are registered on context start, then they are usually not unregistered
      */
-    private Map<String, Transformer> transformers = new ConcurrentHashMap<String, Transformer>();
+    private Map<String, Transformer> transformers = synchronizedMap(new LinkedHashMap<String, Transformer>());
 
     public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext)
     {
