@@ -21,6 +21,7 @@ import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupS
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
 
+import org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -135,5 +136,12 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
     expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName, PARENT_FIRST));
 
     lookupPolicy.extend(singletonMap(overrideClassName, PARENT_FIRST));
+  }
+
+  @Test
+  public void jaxbNotSystemInJava11() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("javax.xml"));
+
+    assertThat(lookupPolicy.getPackageLookupStrategy("javax.xml.bind.attachment"), instanceOf(ChildFirstLookupStrategy.class));
   }
 }
