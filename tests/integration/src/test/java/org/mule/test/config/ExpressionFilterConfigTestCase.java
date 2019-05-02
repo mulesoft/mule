@@ -102,14 +102,16 @@ public class ExpressionFilterConfigTestCase extends FunctionalTestCase
         checkBooleanValuesAreNotChanged(filter);
     }
 
-    private void checkBooleanValuesAreNotChanged(ExpressionFilter filter) {
+    private void checkBooleanValuesAreNotChanged(ExpressionFilter filter)
+    {
         assertThat(filter.accept(new DefaultMuleMessage("false", muleContext)), is(false));
         assertThat(filter.accept(new DefaultMuleMessage("FaLsE", muleContext)), is(false));
         assertThat(filter.accept(new DefaultMuleMessage("true", muleContext)), is(true));
         assertThat(filter.accept(new DefaultMuleMessage("TrUe", muleContext)), is(true));
     }
 
-    private ExpressionFilter getFilter(String endpointName) throws EndpointException, InitialisationException {
+    private ExpressionFilter getFilter(String endpointName) throws EndpointException, InitialisationException
+    {
         EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder(endpointName);
         assertNotNull(eb);
         InboundEndpoint ep = eb.buildInboundEndpoint();
