@@ -4038,6 +4038,12 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="nonBooleanReturnsTrue" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Whether the filter should return true if the specified expression is not true or false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

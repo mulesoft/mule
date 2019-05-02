@@ -10,6 +10,8 @@ MULE-15004: The HTTP listener's socket server timeout default was changed from 0
 MULE-15264: Message attachments now respect the order of their introduction, meaning their addition order will match the order in which they are sent to external services and the order in which they are received from external services will match the order in which they are stored.
 MULE-15344: HTTP will now follow RFC-2616 to determine the mime type when no Content-Type header is sent but data is available (using application/octet-stream). When no data is available it will now use */*.
 MULE-15340: The initializeStaticBusInstance configuration for the CXF module has been deprecated due to security issues. If you are setting this to false, you should migrate to the default configuration.
+MULE-15730: TLS keystore entries must now reference at least one key to use or reference a key alias. Using an invalid keystore will result in an initialisation failure.
+MULE-16763: The nonBooleanReturnsTrue attribute was added to the expression-filter xsd. To keep the previous behavior it should be set to the opposite of nullReturnsTrue attribute.
 
 Migration changes from 3.9.0 to 3.9.x
 MULE-14381: By default, the File Connector processes empty files. For disabling this behavior use the mule.transport.file.ignoreEmptyFiles=true system property
