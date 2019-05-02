@@ -83,7 +83,7 @@ public class ExpressionFilterConfigTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testConfigNonBooleanReturnsFalse() throws Exception
+    public void configNonBooleanReturnsFalse() throws Exception
     {
         EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint4");
         assertNotNull(eb);
@@ -103,7 +103,7 @@ public class ExpressionFilterConfigTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testConfigNonBooleanReturnsTrue() throws Exception
+    public void configNonBooleanReturnsTrue() throws Exception
     {
         EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint5");
         assertNotNull(eb);
