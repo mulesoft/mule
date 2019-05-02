@@ -16,6 +16,7 @@ MULE-15264: Message attachments now respect the order of their introduction, mea
 MULE-15344: HTTP will now follow RFC-2616 to determine the mime type when no Content-Type header is sent but data is available (using application/octet-stream). When no data is available it will now use */*.
 MULE-15340: The initializeStaticBusInstance configuration for the CXF module has been deprecated due to security issues. If you are setting this to false, you should migrate to the default configuration.
 MULE-15730: TLS keystore entries must now reference at least one key to use or reference a key alias. Using an invalid keystore will result in an initialisation failure.
+MULE-16763: The nonBooleanReturnsTrue attribute was added to the expression-filter xsd. To keep the previous behavior it should be set to the opposite of nullReturnsTrue attribute.
 
 Migration changes from 3.8.x to 3.9.x
 MULE-12245: Old Xalan and Xerces implementations were removed in favor of the newer versions included in Java. Only minor incompatibilities could result such as ordering changes of some XML attributes.
