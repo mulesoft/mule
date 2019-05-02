@@ -75,8 +75,14 @@ public class FtpConnectionFactory implements PoolableObjectFactory
     public void destroyObject(Object obj) throws Exception
     {
         FTPClient client = (FTPClient) obj;
-        client.logout();
-        client.disconnect();
+        try
+        {
+            client.logout();
+        }
+        finally
+        {
+            client.disconnect();
+        }
     }
 
     public boolean validateObject(Object obj)

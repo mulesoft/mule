@@ -13,6 +13,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +33,9 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.pool.ObjectPool;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * Test configuration of FTP connector. It's all done in code, no configuration files
@@ -47,6 +50,12 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
     static final String RESOURCE_PATH = "somePath";
     
     protected static FTPClient client = mock(FTPClient.class);
+
+    @Before
+    public void resetClinet()
+    {
+        reset(client);
+    }
 
     @Override
     public Connector createConnector() throws Exception
@@ -211,6 +220,28 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
         
         verify(client).disconnect();
 
+    }
+    
+    @Test
+    public void alwaysAttemptToDisconnectOnDestroyObject() throws Exception
+    {
+        final ImmutableEndpoint endpoint = muleContext.getEndpointFactory()
+                                                      .getOutboundEndpoint("ftp://test:test@example.com");
+        FtpConnectionFactory testFactory = new FtpConnectionFactory(endpoint.getEndpointURI());
+
+        // This is done so that an exception is raised on logout too
+        doThrow(Exception.class).when(client).logout();
+
+        try
+        {
+            testFactory.destroyObject(client);
+        }
+        catch (Exception e)
+        {
+
+        }
+        
+        verify(client).disconnect();
     }
 
     private FtpConnector createFtpConnector(final ImmutableEndpoint endpoint)
