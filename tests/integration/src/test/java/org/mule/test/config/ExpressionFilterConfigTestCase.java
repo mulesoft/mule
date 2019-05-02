@@ -6,12 +6,16 @@
  */
 package org.mule.test.config;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.routing.filters.ExpressionFilter;
@@ -76,5 +80,45 @@ public class ExpressionFilterConfigTestCase extends FunctionalTestCase
         assertEquals("a.b.c", filter.getExpression());
         assertEquals("something", filter.getCustomEvaluator());
         assertFalse(filter.isNullReturnsTrue());
+    }
+
+    @Test
+    public void testConfigNonBooleanReturnsFalse() throws Exception
+    {
+        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint4");
+        assertNotNull(eb);
+
+        InboundEndpoint ep = eb.buildInboundEndpoint();
+        assertThat(ep.getFilter(), instanceOf(ExpressionFilter.class));
+        ExpressionFilter filter = (ExpressionFilter) ep.getFilter();
+        assertThat(filter.isNonBooleanReturnsTrue(), is(false));
+
+        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(false));
+
+        // boolean values are not changed
+        assertThat(filter.accept(new DefaultMuleMessage("false", muleContext)), is(false));
+        assertThat(filter.accept(new DefaultMuleMessage("FaLsE", muleContext)), is(false));
+        assertThat(filter.accept(new DefaultMuleMessage("true", muleContext)), is(true));
+        assertThat(filter.accept(new DefaultMuleMessage("TrUe", muleContext)), is(true));
+    }
+
+    @Test
+    public void testConfigNonBooleanReturnsTrue() throws Exception
+    {
+        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint5");
+        assertNotNull(eb);
+
+        InboundEndpoint ep = eb.buildInboundEndpoint();
+        assertThat(ep.getFilter(), instanceOf(ExpressionFilter.class));
+        ExpressionFilter filter = (ExpressionFilter) ep.getFilter();
+        assertThat(filter.isNonBooleanReturnsTrue(), is(true));
+
+        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(true));
+
+        // boolean values are not changed
+        assertThat(filter.accept(new DefaultMuleMessage("false", muleContext)), is(false));
+        assertThat(filter.accept(new DefaultMuleMessage("FaLsE", muleContext)), is(false));
+        assertThat(filter.accept(new DefaultMuleMessage("true", muleContext)), is(true));
+        assertThat(filter.accept(new DefaultMuleMessage("TrUe", muleContext)), is(true));
     }
 }

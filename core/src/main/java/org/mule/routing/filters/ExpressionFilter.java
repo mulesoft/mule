@@ -262,12 +262,13 @@ public class ExpressionFilter implements Filter, MuleContextAware
 
         final ExpressionFilter other = (ExpressionFilter) obj;
         return equal(config, other.config) && equal(delegateFilter, other.delegateFilter)
-               && nullReturnsTrue == other.nullReturnsTrue;
+               && nullReturnsTrue == other.nullReturnsTrue
+               && nonBooleanReturnsTrue == other.nonBooleanReturnsTrue;
     }
 
     @Override
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), config, delegateFilter, nullReturnsTrue});
+        return hash(new Object[]{this.getClass(), config, delegateFilter, nullReturnsTrue, nonBooleanReturnsTrue});
     }
 }
