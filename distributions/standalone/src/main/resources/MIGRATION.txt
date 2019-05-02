@@ -39,10 +39,7 @@ MULE-12612: As FTP reconnection is at operation level, FTP connector does not su
 MULE-13164: Inconsistent null return from one-way VM inbound endpoint. From Mule 3.9 one-way inbound VM endpoints will now consistently return null to Flow using a request-response outbound endpoint or Mule Client using send(). (In previous versions a successful response led to null return yet an error resulted in a message being returned.)
 MULE-11246: The secretAliasId parameter isn't mandatory anymore. If not given, Mule will take the secretAliasId from the message to decrypt. Additionally, from 3.9.x the secretAliasId must be an hexadecimal value.
 MULE-11161: The default PGP Encryption algorithm has been changed from CAST5 to AES 256.
-<<<<<<< HEAD
 MULE-14601: For that Json Schema Validator refuses payloads with duplicate keys, set the mule.json.validator.allowDuplicateKeys system property to false.
-=======
->>>>>>> c2e645cca2... MULE-15344: HTTP request uses existing DataType when content or type are empty (#7020)
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.

@@ -208,4 +208,5 @@ public class MuleProperties
     public static final String MULE_JMS_INITIAL_REDELIVERY_DELAY = SYSTEM_PROPERTY_PREFIX + "jms.initialRedeliveryDelay";
     public static final String MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION = SYSTEM_PROPERTY_PREFIX + "xml.resetControllerAfterEachTransformation";
     public static final String DISABLE_ERROR_COUNT_ON_ERROR_NOTIFICATION_DISABLED = SYSTEM_PROPERTY_PREFIX + "disable.error.count.on.error.notifications.disabled";
+    public static final String MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE = SYSTEM_PROPERTY_PREFIX + "expressionFilter.nonBooleanReturnsTrue";
 }

@@ -19,12 +19,4 @@
     <endpoint name="endpoint3" address="test://test">
         <expression-filter evaluator="custom" expression="a.b.c" customEvaluator="something"/>
     </endpoint>
-
-    <endpoint name="endpoint4" address="test://test">
-        <expression-filter expression="payload" nonBooleanReturnsTrue="false"/>
-    </endpoint>
-
-    <endpoint name="endpoint5" address="test://test">
-        <expression-filter expression="payload" nonBooleanReturnsTrue="true"/>
-    </endpoint>
 </mule>

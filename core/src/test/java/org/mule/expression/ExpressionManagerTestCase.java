@@ -15,12 +15,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.api.config.MuleProperties.MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.routing.filters.ExpressionFilter;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
@@ -168,6 +171,49 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
         filter.setNonBooleanReturnsTrue(true);
         assertNonBooleanReturnValue(filter, true);
     }
+
+    @Test
+    public void defaultExpressionFilterActsLikeBooleanValueOfInvalidStringUsingSystemProperty() throws Exception
+    {
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "false", new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                compareWithBooleanValueOfBehavior(filter);
+            }
+        });
+    }
+
+    @Test
+    public void nonBooleanReturnsFalseUsingSystemProperty() throws Exception
+    {
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "false", new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                assertNonBooleanReturnValue(filter, false);
+            }
+        });
+    }
+
+    @Test
+    public void nonBooleanReturnsTrueUsingSystemProperty() throws Exception
+    {
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "true", new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                assertNonBooleanReturnValue(filter,true);
+            }
+        });
+    }
+
 
     private void assertNonBooleanReturnValue(ExpressionFilter filter, boolean nonBooleanExpectedReturnValue)
     {
