@@ -62,6 +62,15 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         this.doThreading = threadingProfile.isDoThreading();
         this.threadTimeout = threadingProfile.getThreadWaitTimeout();
+
+        if (threadingProfile.getMaxThreadsActive() == 1)
+        {
+            logger.warn(
+                    "The threading profile was set to use only one active. This thread shall be used for the work manager polling. " +
+                        "Async Processing strategy will not be able to schedule works!" +
+                        "Please verify the threading profile configuration and update the maxThreads");
+        }
+
         workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
         {
