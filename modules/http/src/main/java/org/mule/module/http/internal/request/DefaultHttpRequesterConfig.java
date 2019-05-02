@@ -77,6 +77,10 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private boolean started = false;
     private TlsContextFactory defaultTlsContextFactory;
 
+    public static int getDefaultConnectionIdleTimeout() {
+        return DEFAULT_CONNECTION_IDLE_TIMEOUT;
+    }
+
     @Override
     public void initialise() throws InitialisationException
     {
