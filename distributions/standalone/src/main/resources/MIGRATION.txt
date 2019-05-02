@@ -11,12 +11,12 @@ MULE-15264: Message attachments now respect the order of their introduction, mea
 MULE-15344: HTTP will now follow RFC-2616 to determine the mime type when no Content-Type header is sent but data is available (using application/octet-stream). When no data is available it will now use */*.
 MULE-15340: The initializeStaticBusInstance configuration for the CXF module has been deprecated due to security issues. If you are setting this to false, you should migrate to the default configuration.
 MULE-15730: TLS keystore entries must now reference at least one key to use or reference a key alias. Using an invalid keystore will result in an initialisation failure.
-MULE-16763: The nonBooleanReturnsTrue attribute was added to the expression-filter xsd. To keep the previous behavior it should be set to the opposite of nullReturnsTrue attribute.
 
 Migration changes from 3.9.0 to 3.9.x
 MULE-14381: By default, the File Connector processes empty files. For disabling this behavior use the mule.transport.file.ignoreEmptyFiles=true system property
 MULE-14507: The HTTP Requester now sends a zero content length in empty payloads scenarios. For disabling this behavior use the mule.http.client.avoidZeroContentLength=true system property.
 MULE-14878: The HTTP Listener now sets the message correlation ID as an outbound property as well. To disable this behavior use the mule.http.server.ignoreCorrelationId=true system property.
+MULE-16763: The mule.expressionFilter.nonBooleanReturnsTrue system property was added. To keep the previous behavior it should be set to the opposite of nullReturnsTrue attribute.
 
 Migration changes from 3.8.6 to 3.8.x
 MULE-8817: spring-messaging was upgraded from 4.1.9 to 4.3.17
