@@ -17,7 +17,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -85,40 +87,33 @@ public class ExpressionFilterConfigTestCase extends FunctionalTestCase
     @Test
     public void configNonBooleanReturnsFalse() throws Exception
     {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint4");
-        assertNotNull(eb);
-
-        InboundEndpoint ep = eb.buildInboundEndpoint();
-        assertThat(ep.getFilter(), instanceOf(ExpressionFilter.class));
-        ExpressionFilter filter = (ExpressionFilter) ep.getFilter();
+        ExpressionFilter filter = getFilter("endpoint4");
         assertThat(filter.isNonBooleanReturnsTrue(), is(false));
-
         assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(false));
+        checkBooleanValuesAreNotChanged(filter);
+    }
 
-        // boolean values are not changed
+    @Test
+    public void configNonBooleanReturnsTrue() throws Exception
+    {
+        ExpressionFilter filter = getFilter("endpoint5");
+        assertThat(filter.isNonBooleanReturnsTrue(), is(true));
+        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(true));
+        checkBooleanValuesAreNotChanged(filter);
+    }
+
+    private void checkBooleanValuesAreNotChanged(ExpressionFilter filter) {
         assertThat(filter.accept(new DefaultMuleMessage("false", muleContext)), is(false));
         assertThat(filter.accept(new DefaultMuleMessage("FaLsE", muleContext)), is(false));
         assertThat(filter.accept(new DefaultMuleMessage("true", muleContext)), is(true));
         assertThat(filter.accept(new DefaultMuleMessage("TrUe", muleContext)), is(true));
     }
 
-    @Test
-    public void configNonBooleanReturnsTrue() throws Exception
-    {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint5");
+    private ExpressionFilter getFilter(String endpointName) throws EndpointException, InitialisationException {
+        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder(endpointName);
         assertNotNull(eb);
-
         InboundEndpoint ep = eb.buildInboundEndpoint();
         assertThat(ep.getFilter(), instanceOf(ExpressionFilter.class));
-        ExpressionFilter filter = (ExpressionFilter) ep.getFilter();
-        assertThat(filter.isNonBooleanReturnsTrue(), is(true));
-
-        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(true));
-
-        // boolean values are not changed
-        assertThat(filter.accept(new DefaultMuleMessage("false", muleContext)), is(false));
-        assertThat(filter.accept(new DefaultMuleMessage("FaLsE", muleContext)), is(false));
-        assertThat(filter.accept(new DefaultMuleMessage("true", muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage("TrUe", muleContext)), is(true));
+        return (ExpressionFilter) ep.getFilter();
     }
 }
