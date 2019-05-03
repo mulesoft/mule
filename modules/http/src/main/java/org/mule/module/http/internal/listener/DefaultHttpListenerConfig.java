@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.module.http.internal.request.DefaultHttpRequesterConfig.getDefaultConnectionIdleTimeout;
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -28,6 +27,7 @@ import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
@@ -52,7 +52,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
 
     // The listener default timeout is bigger than our requester default timeout to avoid 'Remotely closed' exception
     // when you start sending a request on an existing connection just before the timeout occurs.
-    public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = getDefaultConnectionIdleTimeout() + 10000;
+    public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = DefaultHttpRequesterConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT + 10000;
 
     private HttpConstants.Protocols protocol = HttpConstants.Protocols.HTTP;
     private String name;

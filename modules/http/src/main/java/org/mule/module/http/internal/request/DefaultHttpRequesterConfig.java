@@ -39,7 +39,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
 {
     public static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
     private static final int UNLIMITED_CONNECTIONS = -1;
-    private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+    public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
     private static final int DEFAULT_RESPONSE_BUFFER_SIZE =  10 * 1024;
 
@@ -76,10 +76,6 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private boolean initialised = false;
     private boolean started = false;
     private TlsContextFactory defaultTlsContextFactory;
-
-    public static int getDefaultConnectionIdleTimeout() {
-        return DEFAULT_CONNECTION_IDLE_TIMEOUT;
-    }
 
     @Override
     public void initialise() throws InitialisationException
