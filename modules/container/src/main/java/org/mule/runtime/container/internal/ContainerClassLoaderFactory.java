@@ -46,7 +46,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class ContainerClassLoaderFactory {
 
-  private static final String DEFAULT_JRE_EXTENSION_PACKAGES = "javax.,com.sun.,org.w3c.dom,org.omg.,org.xml.sax,org.ietf.jgss";
+  private static final String DEFAULT_JRE_EXTENSION_PACKAGES = "javax.,org.w3c.dom,org.omg.,org.xml.sax,org.ietf.jgss";
   private static final boolean ALLOW_JRE_EXTENSION = valueOf(getProperty(MULE_ALLOW_JRE_EXTENSION, "true"));
   private static final String[] JRE_EXTENDABLE_PACKAGES =
       getProperty(MULE_JRE_EXTENSION_PACKAGES, DEFAULT_JRE_EXTENSION_PACKAGES).split(",");
