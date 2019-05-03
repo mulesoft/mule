@@ -27,6 +27,7 @@ import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
@@ -49,7 +50,9 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     public static final int DEFAULT_MAX_THREADS = 128;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+    // The listener default timeout is bigger than our requester default timeout to avoid 'Remotely closed' exception
+    // when you start sending a request on an existing connection just before the timeout occurs.
+    public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = DefaultHttpRequesterConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT + 10000;
 
     private HttpConstants.Protocols protocol = HttpConstants.Protocols.HTTP;
     private String name;
