@@ -55,8 +55,6 @@ import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -70,6 +68,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.slf4j.Logger;
 
 /**
  * Factory that creates a class loader hierarchy to emulate the one used in a mule standalone container.
@@ -91,8 +91,8 @@ public class IsolatedClassLoaderFactory {
 
   private static final String APP_NAME = "app";
 
-  private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
-  private PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
+  private final ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
+  private final PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
@@ -467,7 +467,7 @@ public class IsolatedClassLoaderFactory {
         if (url == null && getParent() != null) {
           url = getParent().getResource(name);
           // Filter if it is not a resource from the jre
-          if (url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
+          if (url != null && url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
             return url;
           } else {
             return null;
