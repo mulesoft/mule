@@ -10,9 +10,10 @@ package org.mule.runtime.container.internal;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ALLOW_JRE_EXTENSION;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.container.api.ModuleRepository;
@@ -29,7 +30,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * Creates the classLoader for the Mule container.
- * <p/>
+ * <p>
  * This classLoader must be used as the parent classLoader for any other Mule artifact depending only on the container.
  */
 public class ContainerClassLoaderFactory {
@@ -71,7 +71,7 @@ public class ContainerClassLoaderFactory {
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
       // Container classLoader is just an adapter, it does not owns any resource
-      return new EnumerationAdapter<>(Collections.emptyList());
+      return new EnumerationAdapter<>(emptyList());
     }
   }
 
@@ -176,7 +176,8 @@ public class ContainerClassLoaderFactory {
       for (String exportedPackage : muleModule.getExportedPackages()) {
         // Let artifacts extend non "java." JRE packages
         result.put(exportedPackage, ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)
-            ? PARENT_FIRST : containerOnlyLookupStrategy);
+            ? PARENT_FIRST
+            : containerOnlyLookupStrategy);
       }
     }
 

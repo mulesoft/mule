@@ -134,14 +134,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   }
 
   private boolean isSystemPackage(String packageName) {
-    packageName = packageName + PACKAGE_SEPARATOR;
-
-    for (String systemPackage : rootSystemPackages) {
-      if (packageName.startsWith(systemPackage)) {
-        return true;
-      }
-    }
-
-    return false;
+    return rootSystemPackages.contains(packageName + PACKAGE_SEPARATOR)
+        || rootSystemPackages.contains(packageName);
   }
 }
