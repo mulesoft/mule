@@ -21,6 +21,7 @@ import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupS
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
 
+import org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -45,11 +46,11 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
 
   @Test
   public void extendingCustomLookupStrategyForSystemPackage() throws Exception {
-    final String overrideClassName = Object.class.getName();
+    final String overrideClassName = Object.class.getPackage().getName();
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName, CHILD_FIRST));
 
-    new MuleClassLoaderLookupPolicy(emptyMap(), singleton(SYSTEM_PACKAGE))
+    new MuleClassLoaderLookupPolicy(emptyMap(), singleton(JAVA_PACKAGE))
         .extend(singletonMap(overrideClassName, CHILD_FIRST));
   }
 
@@ -71,11 +72,8 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
 
   @Test
   public void usesParentOnlyForSystemPackage() throws Exception {
-    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(SYSTEM_PACKAGE));
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(JAVA_PACKAGE));
 
-    assertThat(lookupPolicy.getClassLookupStrategy(Object.class.getName()), sameInstance(PARENT_ONLY));
-
-    lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(JAVA_PACKAGE));
     assertThat(lookupPolicy.getClassLookupStrategy(Object.class.getName()), sameInstance(PARENT_ONLY));
   }
 
@@ -128,12 +126,19 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
 
   @Test
   public void cannotExtendPolicyWithSystemPackage() throws Exception {
-    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(SYSTEM_PACKAGE));
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(JAVA_PACKAGE));
 
-    final String overrideClassName = Object.class.getName();
+    final String overrideClassName = Object.class.getPackage().getName();
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName, PARENT_FIRST));
 
     lookupPolicy.extend(singletonMap(overrideClassName, PARENT_FIRST));
+  }
+
+  @Test
+  public void jaxbNotSystemInJava11() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("javax.xml"));
+
+    assertThat(lookupPolicy.getPackageLookupStrategy("javax.xml.bind.attachment"), instanceOf(ChildFirstLookupStrategy.class));
   }
 }

@@ -11,9 +11,9 @@ import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToStrin
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -58,14 +58,14 @@ public class ContainerClassLoaderFilterFactory {
     return packages;
   }
 
-  public static class ContainerClassLoaderFilter implements ClassLoaderFilter {
+  private static class ContainerClassLoaderFilter implements ClassLoaderFilter {
 
     public static final String CLASS_PACKAGE_SPLIT_REGEX = "\\.";
     public static final String RESOURCE_PACKAGE_SPLIT_REGEX = "/";
     private final ClassLoaderFilter moduleClassLoaderFilter;
     private final Set<String> bootPackages;
 
-    public ContainerClassLoaderFilter(ClassLoaderFilter moduleClassLoaderFilter, Set<String> bootPackages) {
+    private ContainerClassLoaderFilter(ClassLoaderFilter moduleClassLoaderFilter, Set<String> bootPackages) {
       this.moduleClassLoaderFilter = moduleClassLoaderFilter;
       this.bootPackages = bootPackages;
     }
