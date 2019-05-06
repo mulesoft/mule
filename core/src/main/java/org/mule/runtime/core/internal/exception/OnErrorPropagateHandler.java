@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -51,6 +52,24 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     }
     return transaction.getComponentLocation().get().getRootContainerName()
         .equals(this.getRootContainerLocation().getGlobalName());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TemplateOnErrorHandler copy(Location localizeFor) {
+    OnErrorPropagateHandler cpy = new OnErrorPropagateHandler();
+    cpy.setFlowLocation(localizeFor);
+    cpy.setWhen(this.when);
+    cpy.setHandleException(this.handleException);
+    cpy.setErrorType(this.errorType);
+    cpy.setMessageProcessors(this.getMessageProcessors());
+    cpy.setEnableNotifications(this.isEnableNotifications());
+    cpy.setLogException(this.logException);
+    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setAnnotations(this.getAnnotations());
+    return cpy;
   }
 
   @Override
