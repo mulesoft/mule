@@ -10,20 +10,18 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.completeSuccessIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -43,10 +41,6 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
-import com.google.common.collect.Iterators;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +49,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
+
+import com.google.common.collect.Iterators;
 
 import reactor.core.publisher.Mono;
 
@@ -162,10 +160,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             : p)
         // For each TypedValue part process the nested chain using the event from the previous part.
         .flatMapSequential(typedValue -> {
-          EventContext parentContext = currentEvent.get().getContext();
           BaseEventContext childContext = newChildContext(currentEvent.get(), ofNullable(getLocation()));
 
-          Builder partEventBuilder = builder(childContext, currentEvent.get());
+          Builder partEventBuilder = builder(currentEvent.get());
           if (typedValue.getValue() instanceof EventBuilderConfigurer) {
             // Support EventBuilderConfigurer currently used by Batch Module
             EventBuilderConfigurer configurer = (EventBuilderConfigurer) typedValue.getValue();
@@ -182,19 +179,10 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             partEventBuilder.message(Message.builder().payload(typedValue).build());
           }
 
-          return Mono.from(just(partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build())
-              .transform(nestedChain)
-              .doOnNext(completeSuccessIfNeeded(childContext, true))
-              .switchIfEmpty(Mono.from(childContext.getResponsePublisher()))
-              .map(result -> quickCopy(parentContext, result))
-              .doOnNext(result -> currentEvent.set(CoreEvent.builder(result).build()))
-              .doOnError(MessagingException.class,
-                         me -> me.setProcessedEvent(quickCopy(parentContext, me.getEvent())))
-              .doOnSuccess(result -> {
-                if (result == null) {
-                  childContext.success();
-                }
-              }));
+          return Mono
+              .from(processWithChildContext(partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build(),
+                                            nestedChain, childContext))
+              .doOnNext(result -> currentEvent.set(CoreEvent.builder(result).build()));
         },
                            // Force sequential execution of the chain for each element
                            1)
