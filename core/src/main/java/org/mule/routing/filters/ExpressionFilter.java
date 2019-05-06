@@ -6,6 +6,9 @@
  */
 package org.mule.routing.filters;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static org.mule.api.config.MuleProperties.MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE;
 import static org.mule.util.ClassUtils.equal;
 import static org.mule.util.ClassUtils.hash;
 
@@ -53,6 +56,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     private ExpressionConfig config;
     private String fullExpression;
     private boolean nullReturnsTrue = false;
+    private boolean nonBooleanReturnsTrue = parseBoolean(getProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "true"));
     private MuleContext muleContext;
 
     /**
@@ -120,8 +124,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
         try
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            return muleContext.getExpressionManager().evaluateBoolean(expr, message, nullReturnsTrue,
-                !nullReturnsTrue);
+            return muleContext.getExpressionManager().evaluateBoolean(expr, message, nullReturnsTrue, nonBooleanReturnsTrue);
         }
         finally
         {
@@ -241,6 +244,16 @@ public class ExpressionFilter implements Filter, MuleContextAware
         this.nullReturnsTrue = nullReturnsTrue;
     }
 
+    public void setNonBooleanReturnsTrue(boolean nonBooleanReturnsTrue)
+    {
+        this.nonBooleanReturnsTrue = nonBooleanReturnsTrue;
+    }
+
+    public boolean isNonBooleanReturnsTrue()
+    {
+        return nonBooleanReturnsTrue;
+    }
+
     @Override
     public boolean equals(Object obj)
     {
@@ -249,12 +262,13 @@ public class ExpressionFilter implements Filter, MuleContextAware
 
         final ExpressionFilter other = (ExpressionFilter) obj;
         return equal(config, other.config) && equal(delegateFilter, other.delegateFilter)
-               && nullReturnsTrue == other.nullReturnsTrue;
+               && nullReturnsTrue == other.nullReturnsTrue
+               && nonBooleanReturnsTrue == other.nonBooleanReturnsTrue;
     }
 
     @Override
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), config, delegateFilter, nullReturnsTrue});
+        return hash(new Object[]{this.getClass(), config, delegateFilter, nullReturnsTrue, nonBooleanReturnsTrue});
     }
 }

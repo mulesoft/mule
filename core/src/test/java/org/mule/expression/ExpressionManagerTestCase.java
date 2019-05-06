@@ -6,17 +6,24 @@
  */
 package org.mule.expression;
 
+import static java.lang.Boolean.valueOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.api.config.MuleProperties.MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.routing.filters.ExpressionFilter;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
@@ -139,6 +146,101 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
         // Boolean value
         assertTrue(muleContext.getExpressionManager().evaluateBoolean("string:true", msg));
         assertFalse(muleContext.getExpressionManager().evaluateBoolean("string:false", msg));
+    }
+
+    @Test
+    public void defaultExpressionFilterActsLikeBooleanValueOfInvalidString() throws Exception
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload");
+        filter.setNonBooleanReturnsTrue(false);
+        assertNonBooleanReturnValue(filter, false);
+    }
+
+    @Test
+    public void nonBooleanReturnsFalse() throws Exception
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload");
+        filter.setNonBooleanReturnsTrue(false);
+        compareWithBooleanValueOfBehavior(filter);
+    }
+
+    @Test
+    public void nonBooleanReturnsTrue() throws Exception
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload");
+        filter.setNonBooleanReturnsTrue(true);
+        assertNonBooleanReturnValue(filter, true);
+    }
+
+    @Test
+    public void defaultExpressionFilterActsLikeBooleanValueOfInvalidStringUsingSystemProperty() throws Exception
+    {
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "false", new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                compareWithBooleanValueOfBehavior(filter);
+            }
+        });
+    }
+
+    @Test
+    public void nonBooleanReturnsFalseUsingSystemProperty() throws Exception
+    {
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "false", new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                assertNonBooleanReturnValue(filter, false);
+            }
+        });
+    }
+
+    @Test
+    public void nonBooleanReturnsTrueUsingSystemProperty() throws Exception
+    {
+        testWithSystemProperty(MULE_EXPRESSION_FILTER_DEFAULT_BOOLEAN_VALUE, "true", new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run()
+            {
+                ExpressionFilter filter = new ExpressionFilter("payload");
+                assertNonBooleanReturnValue(filter,true);
+            }
+        });
+    }
+
+
+    private void assertNonBooleanReturnValue(ExpressionFilter filter, boolean nonBooleanExpectedReturnValue)
+    {
+        assertThat(filter.isNonBooleanReturnsTrue(), is(nonBooleanExpectedReturnValue));
+
+        filter.setMuleContext(muleContext);
+
+        assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(nonBooleanExpectedReturnValue));
+        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(nonBooleanExpectedReturnValue));
+        assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(nonBooleanExpectedReturnValue));
+        assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(nonBooleanExpectedReturnValue));
+        assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(nonBooleanExpectedReturnValue));
+        assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(nonBooleanExpectedReturnValue));
+    }
+
+    private void compareWithBooleanValueOfBehavior(ExpressionFilter filter)
+    {
+        assertThat(filter.isNonBooleanReturnsTrue(), is(false));
+
+        filter.setMuleContext(muleContext);
+
+        assertThat(filter.accept(new DefaultMuleMessage("on", muleContext)), is(valueOf("on")));
+        assertThat(filter.accept(new DefaultMuleMessage("yes", muleContext)), is(valueOf("yes")));
+        assertThat(filter.accept(new DefaultMuleMessage("no", muleContext)), is(valueOf("no")));
+        assertThat(filter.accept(new DefaultMuleMessage("off", muleContext)), is(valueOf("off")));
+        assertThat(filter.accept(new DefaultMuleMessage("trues", muleContext)), is(valueOf("trues")));
+        assertThat(filter.accept(new DefaultMuleMessage("falses", muleContext)), is(valueOf("falses")));
     }
 
     @Test

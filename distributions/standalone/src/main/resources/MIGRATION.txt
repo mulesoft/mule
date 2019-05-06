@@ -8,6 +8,7 @@ Migration changes from 3.8.7 to 3.8.x
 MULE-15264: Message attachments now respect the order of their introduction, meaning their addition order will match the order in which they are sent to external services and the order in which they are received from external services will match the order in which they are stored.
 MULE-15344: HTTP will now follow RFC-2616 to determine the mime type when no Content-Type header is sent but data is available (using application/octet-stream). When no data is available it will now use */*.
 MULE-15340: The initializeStaticBusInstance configuration for the CXF module has been deprecated due to security issues. If you are setting this to false, you should migrate to the default configuration.
+MULE-16763: The mule.expressionFilter.nonBooleanReturnsTrue system property was added. To keep the previous behavior it should be set to the opposite of nullReturnsTrue attribute.
 
 Migration changes from 3.8.6 to 3.8.x
 MULE-8817: spring-messaging was upgraded from 4.1.9 to 4.3.17
