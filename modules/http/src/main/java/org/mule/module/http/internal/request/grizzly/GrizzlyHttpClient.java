@@ -9,7 +9,9 @@ package org.mule.module.http.internal.request.grizzly;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.MAX_HTTP_PACKET_HEADER_SIZE;
 import static java.lang.Boolean.getBoolean;
+import static java.lang.Integer.getInteger;
 import static java.lang.Integer.valueOf;
+import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
@@ -68,10 +70,11 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
-import com.ning.http.client.generators.InputStreamBlockingBodyGenerator;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.providers.grizzly.FeedableBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
+import com.ning.http.client.providers.grizzly.NonBlockingInputStreamFeeder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,7 +103,14 @@ public class GrizzlyHttpClient implements HttpClient
 
     public static final String AVOID_ZERO_CONTENT_LENGTH = SYSTEM_PROPERTY_PREFIX + "http.client.avoidZeroContentLength";
 
-    private static final String STREAM_REQUEST = SYSTEM_PROPERTY_PREFIX + ".http.client.streamRequest";
+    private static final String ENABLE_REQUEST_STREAMING_PROPERTY_NAME = SYSTEM_PROPERTY_PREFIX + "http.requestStreaming.enable";
+    private static boolean requestStreamingEnabled = getProperties().containsKey(ENABLE_REQUEST_STREAMING_PROPERTY_NAME);
+
+    private static final int DEFAULT_REQUEST_STREAMING_BUFFER_SIZE = 8 * 1024;
+    private static final String REQUEST_STREAMING_BUFFER_LEN_PROPERTY_NAME =
+        SYSTEM_PROPERTY_PREFIX + "http.requestStreaming.bufferSize";
+    private static int requestStreamingBufferSize =
+        getInteger(REQUEST_STREAMING_BUFFER_LEN_PROPERTY_NAME, DEFAULT_REQUEST_STREAMING_BUFFER_SIZE);
 
     private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
@@ -133,7 +143,6 @@ public class GrizzlyHttpClient implements HttpClient
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
     private boolean avoidZeroContentLength = getBoolean(AVOID_ZERO_CONTENT_LENGTH);
-    private boolean streamRequest = getBoolean(STREAM_REQUEST);
 
     public GrizzlyHttpClient(HttpClientConfiguration config)
     {
@@ -522,17 +531,7 @@ public class GrizzlyHttpClient implements HttpClient
                 {
                     if (request.getEntity() instanceof InputStreamHttpEntity)
                     {
-                        InputStreamBodyGenerator bodyGenerator;
-                        InputStream inputStream = ((InputStreamHttpEntity) request.getEntity()).getInputStream();
-                        if (streamRequest)
-                        {
-                            bodyGenerator = new InputStreamBlockingBodyGenerator(inputStream);
-                        }
-                        else
-                        {
-                            bodyGenerator = new InputStreamBodyGenerator(inputStream);
-                        }
-                        builder.setBody(bodyGenerator);
+                        setStreamingBodyToRequestBuilder((InputStreamHttpEntity) request.getEntity(), builder);
                     }
                     else if (request.getEntity() instanceof ByteArrayHttpEntity)
                     {
@@ -598,6 +597,22 @@ public class GrizzlyHttpClient implements HttpClient
         builder.setUrl(request.getUri());
 
         return builder.build();
+    }
+
+    private void setStreamingBodyToRequestBuilder(InputStreamHttpEntity entity, RequestBuilder builder) throws IOException
+    {
+        if (isRequestStreamingEnabled())
+        {
+            FeedableBodyGenerator bodyGenerator = new FeedableBodyGenerator();
+            FeedableBodyGenerator.Feeder nonBlockingFeeder =
+                new NonBlockingInputStreamFeeder(bodyGenerator, entity.getInputStream(), requestStreamingBufferSize);
+            bodyGenerator.setFeeder(nonBlockingFeeder);
+            builder.setBody(bodyGenerator);
+        }
+        else
+        {
+            builder.setBody(new InputStreamBodyGenerator(entity.getInputStream()));
+        }
     }
 
     protected RequestBuilder createRequestBuilder(HttpRequest request, RequestConfigurer requestConfigurer) throws IOException
@@ -877,4 +892,7 @@ public class GrizzlyHttpClient implements HttpClient
         }
     }
 
+    private static boolean isRequestStreamingEnabled() {
+        return requestStreamingEnabled;
+    }
 }
