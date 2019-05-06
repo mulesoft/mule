@@ -10,11 +10,13 @@ MULE-15004: The HTTP listener's socket server timeout default was changed from 0
 MULE-15264: Message attachments now respect the order of their introduction, meaning their addition order will match the order in which they are sent to external services and the order in which they are received from external services will match the order in which they are stored.
 MULE-15344: HTTP will now follow RFC-2616 to determine the mime type when no Content-Type header is sent but data is available (using application/octet-stream). When no data is available it will now use */*.
 MULE-15340: The initializeStaticBusInstance configuration for the CXF module has been deprecated due to security issues. If you are setting this to false, you should migrate to the default configuration.
+MULE-15730: TLS keystore entries must now reference at least one key to use or reference a key alias. Using an invalid keystore will result in an initialisation failure.
 
 Migration changes from 3.9.0 to 3.9.x
 MULE-14381: By default, the File Connector processes empty files. For disabling this behavior use the mule.transport.file.ignoreEmptyFiles=true system property
 MULE-14507: The HTTP Requester now sends a zero content length in empty payloads scenarios. For disabling this behavior use the mule.http.client.avoidZeroContentLength=true system property.
 MULE-14878: The HTTP Listener now sets the message correlation ID as an outbound property as well. To disable this behavior use the mule.http.server.ignoreCorrelationId=true system property.
+MULE-16763: The mule.expressionFilter.nonBooleanReturnsTrue system property was added. To keep the previous behavior it should be set to the opposite of nullReturnsTrue attribute.
 
 Migration changes from 3.8.6 to 3.8.x
 MULE-8817: spring-messaging was upgraded from 4.1.9 to 4.3.17
@@ -37,10 +39,7 @@ MULE-12612: As FTP reconnection is at operation level, FTP connector does not su
 MULE-13164: Inconsistent null return from one-way VM inbound endpoint. From Mule 3.9 one-way inbound VM endpoints will now consistently return null to Flow using a request-response outbound endpoint or Mule Client using send(). (In previous versions a successful response led to null return yet an error resulted in a message being returned.)
 MULE-11246: The secretAliasId parameter isn't mandatory anymore. If not given, Mule will take the secretAliasId from the message to decrypt. Additionally, from 3.9.x the secretAliasId must be an hexadecimal value.
 MULE-11161: The default PGP Encryption algorithm has been changed from CAST5 to AES 256.
-<<<<<<< HEAD
 MULE-14601: For that Json Schema Validator refuses payloads with duplicate keys, set the mule.json.validator.allowDuplicateKeys system property to false.
-=======
->>>>>>> c2e645cca2... MULE-15344: HTTP request uses existing DataType when content or type are empty (#7020)
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
