@@ -43,9 +43,7 @@ import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.util.BeanUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Timer;
@@ -109,7 +107,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private boolean noLocal;
 
-    private boolean persistentDelivery;
+    private boolean persistentDelivery = true;
 
     private boolean honorQosHeaders;
 
