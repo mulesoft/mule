@@ -6,14 +6,11 @@
  */
 package org.mule.transport.jms.config;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -40,6 +37,7 @@ import java.util.Collection;
 
 import javax.jms.Session;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -62,96 +60,94 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
     }
 
     @Test
-    public void testDefaultConfig() throws Exception
+    public void testDefaultConfig()
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnectorDefaults");
-        assertNotNull(c);
+        assertThat(c, is(notNullValue()));
 
-        assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory() instanceof TestConnectionFactory);
-        assertEquals(Session.AUTO_ACKNOWLEDGE, c.getAcknowledgementMode());
-        assertNull(c.getUsername());
-        assertNull(c.getPassword());
+        assertThat(c.getConnectionFactory(), is(notNullValue()));
+        assertThat(c.getConnectionFactory(), is(instanceOf(TestConnectionFactory.class)));
+        assertThat(Session.AUTO_ACKNOWLEDGE, is(c.getAcknowledgementMode()));
+        assertThat(c.getUsername(), is(nullValue()));
+        assertThat(c.getPassword(), is(nullValue()));
 
-        assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory() instanceof TestRedeliveryHandlerFactory);
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
+        assertThat(c.getRedeliveryHandlerFactory(), is(notNullValue()));
+        assertThat(c.getRedeliveryHandlerFactory(), is(instanceOf(TestRedeliveryHandlerFactory.class)));
+        assertThat(c.getRedeliveryHandlerFactory().create(), is(instanceOf(TestRedeliveryHandler.class)));
 
-        assertNull(c.getClientId());
-        assertFalse(c.isDurable());
-        assertFalse(c.isNoLocal());
-        assertFalse(c.isPersistentDelivery());
-        assertEquals(0, c.getMaxRedelivery());
-        assertTrue(c.isCacheJmsSessions());
-        assertTrue(c.isEagerConsumer());
-        assertEquals(4, c.getNumberOfConcurrentTransactedReceivers());
-        assertFalse(c.isEmbeddedMode());
+        assertThat(c.getClientId(), is(nullValue()));
+        assertThat(c.isDurable(), is(false));
+        assertThat(c.isNoLocal(), is(false));
+        assertThat(c.isPersistentDelivery(), is(true));
+        assertThat(c.getMaxRedelivery(), is(0));
+        assertThat(c.isCacheJmsSessions(), is(true));
+        assertThat(c.isEagerConsumer(), is(true));
+        assertThat(c.getNumberOfConcurrentTransactedReceivers(), is(4));
+        assertThat(c.isEmbeddedMode(), is(false));
     }
 
     @Test
-    public void testConnectorConfig() throws Exception
+    public void testConnectorConfig()
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector1");
-        assertNotNull(c);
+        assertThat(c, is(notNullValue()));
 
-        assertNotNull(c.getConnectionFactory());
+        assertThat(c.getConnectionFactory(), is(instanceOf(TestConnectionFactory.class)));
+        assertThat(c.getAcknowledgementMode(), is(Session.DUPS_OK_ACKNOWLEDGE));
+        assertThat(c.getUsername(), is("myuser"));
+        assertThat(c.getPassword(), is("mypass"));
 
-        assertTrue(c.getConnectionFactory() instanceof TestConnectionFactory);
-        assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
-        assertEquals("myuser", c.getUsername());
-        assertEquals("mypass", c.getPassword());
+        assertThat(c.getRedeliveryHandlerFactory(), is(notNullValue()));
+        assertThat(c.getRedeliveryHandlerFactory().create(), is(instanceOf(TestRedeliveryHandler.class)));
 
-        assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
+        assertThat(c.getClientId(), is("myClient"));
+        assertThat(c.isDurable(), is(true));
+        assertThat(c.isNoLocal(), is(true));
+        assertThat(c.isPersistentDelivery(), is(true));
+        assertThat(c.getMaxRedelivery(), is(5));
+        assertThat(c.isCacheJmsSessions(), is(true));
+        assertThat(c.isEagerConsumer(), is(false));
 
-        assertEquals("myClient", c.getClientId());
-        assertTrue(c.isDurable());
-        assertTrue(c.isNoLocal());
-        assertTrue(c.isPersistentDelivery());
-        assertEquals(5, c.getMaxRedelivery());
-        assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isEagerConsumer());
-
-        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should
-                                                   // be changed in the config
+        assertThat(c.getSpecification(), is("1.1")); // 1.0.2b is the default, should
+        // be changed in the config
         // test properties, default is 4
-        assertEquals(7, c.getNumberOfConcurrentTransactedReceivers());
-        assertTrue(c.isEmbeddedMode());
+        assertThat(c.getNumberOfConcurrentTransactedReceivers(), is(7));
+        assertThat(c.isEmbeddedMode(), is(true));
     }
 
     @Test
-    public void testCustomConnectorConfig() throws Exception
+    public void testCustomConnectorConfig()
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector2");
-        assertNotNull(c);
+        assertThat(c, is(notNullValue()));
 
-        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should
+        assertThat(c.getSpecification(), is("1.1")); // 1.0.2b is the default, should
                                                    // be changed in the config
     }
 
     @Test
-    public void testTestConnectorConfig() throws Exception
+    public void testTestConnectorConfig()
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector3");
-        assertNotNull(c);
+        assertThat(c, is(notNullValue()));
 
-        assertNotNull(c.getConnectionFactory());
+        assertThat(c.getConnectionFactory(), is(notNullValue()));
 
-        assertTrue(c.getConnectionFactory() instanceof TestConnectionFactory);
-        assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
+        assertThat(c.getConnectionFactory(), is(instanceOf(TestConnectionFactory.class)));
+        assertThat(Session.DUPS_OK_ACKNOWLEDGE, is(c.getAcknowledgementMode()));
 
-        assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
+        assertThat(c.getRedeliveryHandlerFactory(), is(notNullValue()));
+        assertThat(c.getRedeliveryHandlerFactory().create(), is(instanceOf(TestRedeliveryHandler.class)));
 
-        assertEquals("myClient", c.getClientId());
-        assertTrue(c.isDurable());
-        assertTrue(c.isNoLocal());
-        assertTrue(c.isPersistentDelivery());
-        assertEquals(5, c.getMaxRedelivery());
-        assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isEagerConsumer());
+        assertThat(c.getClientId(), is("myClient"));
+        assertThat(c.isDurable(), is(true));
+        assertThat(c.isNoLocal(), is(true));
+        assertThat(c.isPersistentDelivery(), is(true));
+        assertThat(c.getMaxRedelivery(), is(5));
+        assertThat(c.isCacheJmsSessions(), is(true));
+        assertThat(c.isEagerConsumer(), is(false));
 
-        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should
+        assertThat(c.getSpecification(), is("1.1")); // 1.0.2b is the default, should
                                                    // be changed in the config
     }
 
@@ -161,23 +157,23 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         ImmutableEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointBuilder("endpoint1")
             .buildInboundEndpoint();
-        assertNotNull(endpoint1);
+        assertThat(endpoint1, is(notNullValue()));
         Filter filter1 = endpoint1.getFilter();
-        assertNotNull(filter1);
-        assertTrue(filter1 instanceof JmsSelectorFilter);
-        assertEquals(1, endpoint1.getProperties().size());
-        assertEquals("true", endpoint1.getProperty(JmsConstants.DISABLE_TEMP_DESTINATIONS_PROPERTY));
+        assertThat(filter1, is(notNullValue()));
+        assertThat(filter1, is(instanceOf(JmsSelectorFilter.class)));
+        assertThat(endpoint1.getProperties().size(), is(1));
+        assertThat(endpoint1.getProperty(JmsConstants.DISABLE_TEMP_DESTINATIONS_PROPERTY), CoreMatchers.<Object>is("true"));
 
         ImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointBuilder("endpoint2")
             .buildOutboundEndpoint();
-        assertNotNull(endpoint2);
+        assertThat(endpoint2, is(notNullValue()));
         Filter filter2 = endpoint2.getFilter();
-        assertNotNull(filter2);
-        assertTrue(filter2 instanceof NotFilter);
+        assertThat(filter2, is(notNullValue()));
+        assertThat(filter2, is(instanceOf(NotFilter.class)));
         Filter filter3 = ((NotFilter) filter2).getFilter();
-        assertNotNull(filter3);
-        assertTrue(filter3 instanceof JmsPropertyFilter);
+        assertThat(filter3, is(notNullValue()));
+        assertThat(filter3, is(instanceOf(JmsPropertyFilter.class)));
 
         InboundEndpoint inboundEndpoint;
 
@@ -194,9 +190,10 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
                 .getMessageSource()).getEndpoints().get(0);
         }
 
-        assertNotNull(inboundEndpoint);
-        assertEquals(1, inboundEndpoint.getProperties().size());
-        assertEquals("testCustomDurableName", inboundEndpoint.getProperty(JmsConstants.DURABLE_NAME_PROPERTY));
+        assertThat(inboundEndpoint, is(notNullValue()));
+        assertThat(inboundEndpoint.getProperties().size(), is(1));
+        assertThat(inboundEndpoint.getProperty(JmsConstants.DURABLE_NAME_PROPERTY),
+                   CoreMatchers.<Object>is("testCustomDurableName"));
     }
 
     @Test
@@ -205,11 +202,11 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         ImmutableEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointBuilder("endpoint3")
             .buildInboundEndpoint();
-        assertNotNull(endpoint3);
+        assertThat(endpoint3, is(notNullValue()));
         TestTransactionFactory factory = (TestTransactionFactory) endpoint3.getTransactionConfig()
             .getFactory();
-        assertNotNull(factory);
-        assertEquals("foo", factory.getValue());
+        assertThat(factory, is(notNullValue()));
+        assertThat(factory.getValue(), is("foo"));
     }
 
     @Test
@@ -218,44 +215,42 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         ImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointBuilder("endpoint4")
             .buildInboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals(XaTransactionFactory.class, endpoint.getTransactionConfig().getFactory().getClass());
-        assertEquals(MuleTransactionConfig.ACTION_ALWAYS_JOIN, endpoint.getTransactionConfig().getAction());
+        assertThat(endpoint, is(notNullValue()));
+        assertThat(endpoint.getTransactionConfig().getFactory(), is(CoreMatchers.instanceOf(XaTransactionFactory.class)));
+        assertThat(endpoint.getTransactionConfig().getAction(), is(MuleTransactionConfig.ACTION_ALWAYS_JOIN));
     }
 
     @Test
-    public void testJndiConnectorAtributes() throws Exception
+    public void testJndiConnectorAttributes() throws Exception
     {
         JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsJndiConnector");
         assertThat("connection factory must be created only after connect so reconnection works when JNDI context is not yet available during start", connector.getConnectionFactory(), nullValue());
         connector.connect();
-        assertNotNull(connector);
+        assertThat(connector, is(notNullValue()));
 
-        assertEquals("org.mule.transport.jms.test.JmsTestContextFactory", connector.getJndiInitialFactory());
-        assertEquals("jndi://test", connector.getJndiProviderUrl());
-        assertEquals("jms/connectionFactory", connector.getConnectionFactoryJndiName());
-        assertEquals("org.mule.transport.jms.test.TestConnectionFactory", connector.getConnectionFactory()
-            .getClass()
-            .getName());
-        assertTrue(connector.isJndiDestinations());
-        assertTrue(connector.isForceJndiDestinations());
-        assertEquals("value", connector.getJndiProviderProperties().get("key"));
-        assertEquals("customValue", connector.getConnectionFactoryProperties().get("customProperty"));
-        assertEquals("customValue",
-            ((TestConnectionFactory) connector.getConnectionFactory()).getCustomProperty());
+        assertThat(connector.getJndiInitialFactory(), is("org.mule.transport.jms.test.JmsTestContextFactory"));
+        assertThat(connector.getJndiProviderUrl(), is("jndi://test"));
+        assertThat(connector.getConnectionFactoryJndiName(), is("jms/connectionFactory"));
+        assertThat(connector.getConnectionFactory().getClass().getName(), is("org.mule.transport.jms.test.TestConnectionFactory"));
+        assertThat(connector.isJndiDestinations(), is(true));
+        assertThat(connector.isForceJndiDestinations(), is(true));
+        assertThat(connector.getJndiProviderProperties().get("key"), CoreMatchers.<Object>is("value"));
+        assertThat(connector.getConnectionFactoryProperties().get("customProperty"), CoreMatchers.<Object>is("customValue"));
+        assertThat(((TestConnectionFactory) connector.getConnectionFactory()).getCustomProperty(),
+                   CoreMatchers.<Object>is("customValue"));
     }
 
     @Test
-    public void testActiveMqConnectorConfig() throws Exception
+    public void testActiveMqConnectorConfig()
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsActiveMqConnector");
-        assertNotNull(c);
+        assertThat(c, is(notNullValue()));
 
-        assertEquals(1, c.getNumberOfConsumers());
+        assertThat(c.getNumberOfConsumers(), is(1));
 
         c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsActiveMqConnectorXa");
-        assertNotNull(c);
+        assertThat(c, is(notNullValue()));
 
-        assertEquals(1, c.getNumberOfConsumers());
+        assertThat(c.getNumberOfConsumers(), is(1));
     }
 }
