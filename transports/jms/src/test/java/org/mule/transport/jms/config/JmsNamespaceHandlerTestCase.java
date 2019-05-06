@@ -66,6 +66,8 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         assertThat(c, is(notNullValue()));
 
         assertThat(c.getConnectionFactory(), is(notNullValue()));
+
+        assertThat(c.getConnectionFactory(), is(notNullValue()));
         assertThat(c.getConnectionFactory(), is(instanceOf(TestConnectionFactory.class)));
         assertThat(Session.AUTO_ACKNOWLEDGE, is(c.getAcknowledgementMode()));
         assertThat(c.getUsername(), is(nullValue()));
@@ -216,7 +218,7 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
             .lookupEndpointBuilder("endpoint4")
             .buildInboundEndpoint();
         assertThat(endpoint, is(notNullValue()));
-        assertThat(endpoint.getTransactionConfig().getFactory(), is(CoreMatchers.instanceOf(XaTransactionFactory.class)));
+        assertThat(endpoint.getTransactionConfig().getFactory(), is(instanceOf(XaTransactionFactory.class)));
         assertThat(endpoint.getTransactionConfig().getAction(), is(MuleTransactionConfig.ACTION_ALWAYS_JOIN));
     }
 
