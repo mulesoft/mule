@@ -57,7 +57,7 @@ public abstract class AbstractQueryMetadataProvider implements QueryMetadataProv
 
     protected final Query query;
     protected final DbConfigResolver dbConfigResolver;
-    private Map<Integer, MetaDataModel> dbToMetaDataType;
+    private volatile Map<Integer, MetaDataModel> dbToMetaDataType;
 
     public AbstractQueryMetadataProvider(DbConfigResolver dbConfigResolver, Query query)
     {

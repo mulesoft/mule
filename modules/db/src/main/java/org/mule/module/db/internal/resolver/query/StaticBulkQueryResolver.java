@@ -17,7 +17,7 @@ import org.mule.module.db.internal.parser.QueryTemplateParser;
 public class StaticBulkQueryResolver extends AbstractBulkQueryResolver
 {
 
-    private BulkQuery bulkQuery;
+    private volatile BulkQuery bulkQuery;
 
     public StaticBulkQueryResolver(String bulkQuery, QueryTemplateParser queryTemplateParser)
     {
