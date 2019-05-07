@@ -25,6 +25,7 @@ public class PetStoreClient {
   private int disconnectCount;
   private Date openingDate;
   private List<Date> closedForHolidays;
+  private Long timeOfCreation;
 
   private List<LocalDateTime> discountDates;
 
@@ -37,6 +38,7 @@ public class PetStoreClient {
     this.openingDate = openingDate;
     this.closedForHolidays = closedForHolidays;
     this.discountDates = discountDates;
+    this.timeOfCreation = System.currentTimeMillis();
   }
 
   public List<String> getPets(String ownerName, PetStoreConnector config) {
@@ -83,5 +85,9 @@ public class PetStoreClient {
 
   public List<LocalDateTime> getDiscountDates() {
     return discountDates;
+  }
+
+  public long getTimeOfCreation() {
+    return timeOfCreation;
   }
 }

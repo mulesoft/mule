@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <petstore:config name="pooled-config-with-eviction" cashierName="jim">
+        <petstore:pooled-connection username="john" password="doe">
+            <pooling-profile  minEvictionMillis="3000" evictionCheckIntervalMillis="1000"/>
+        </petstore:pooled-connection>
+        <petstore:pets>
+            <petstore:pet value="Lassie" />
+            <petstore:pet value="Sapo Pepe" />
+            <petstore:pet value="My mother's parrot" />
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="get-connection-age">
+        <petstore:get-connection-age config-ref="pooled-config-with-eviction"/>
+    </flow>
+    
+</mule>
