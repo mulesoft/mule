@@ -48,7 +48,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
                                 ExtensionConnectionSupplier connectionSupplier) {
-    this.delegate = new PagingProviderWrapper<>(delegate);
+
+    this.delegate = new PagingProviderWrapper(delegate, executionContext.getExtensionModel());
     this.config = config;
     this.executionContext = executionContext;
     this.connectionSupplier = connectionSupplier;
