@@ -9,6 +9,7 @@ package org.mule.test.heisenberg.extension;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -184,6 +185,31 @@ public class MoneyLaunderingOperation {
       @Override
       public boolean useStickyConnections() {
         return true;
+      }
+    };
+  }
+
+  public PagingProvider<HeisenbergConnection, Integer> pagedOperationWithExtensionClassLoader() {
+    return new PagingProvider<HeisenbergConnection, Integer>() {
+
+      @Override
+      public List<Integer> getPage(HeisenbergConnection heisenbergConnection) {
+        if (Thread.currentThread().getContextClassLoader() != getClass().getClassLoader()) {
+          throw new RuntimeException("Class Loader was not properly switched by the Paging Provider Wrapper");
+        }
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(1);
+        return list;
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(HeisenbergConnection heisenbergConnection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close(HeisenbergConnection heisenbergConnection) throws MuleException {
+        heisenbergConnection.disconnect();
       }
     };
   }

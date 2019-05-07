@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -57,6 +58,9 @@ public class PagingProviderProducerTestCase {
     ConnectionHandler handler = mock(ConnectionHandler.class);
     when(handler.getConnection()).thenReturn(new Object());
     when(extensionConnectionSupplier.getConnection(executionContext)).thenReturn(handler);
+
+    ExtensionModel extensionModel = mock(ExtensionModel.class);
+    when(executionContext.getExtensionModel()).thenReturn(extensionModel);
   }
 
   @Test
