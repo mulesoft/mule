@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
 
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
@@ -32,7 +33,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
 
   private final Map<String, LookupStrategy> configuredLookupStrategies;
   private final Set<String> rootSystemPackages;
-  private final Map<String, LookupStrategy> lookupStrategies;
+  private final LazyValue<Map<String, LookupStrategy>> lookupStrategies;
 
   /**
    * Creates a new lookup policy based on the provided configuration.
@@ -46,7 +47,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
     checkArgument(rootSystemPackages != null, "System packages cannot be null");
     this.rootSystemPackages = normalizeRootSystemPackages(rootSystemPackages);
     this.configuredLookupStrategies = normalizeLookupStrategies(lookupStrategies);
-    this.lookupStrategies = new HashMap<>(configuredLookupStrategies);
+    this.lookupStrategies = new LazyValue<>(new HashMap<>(configuredLookupStrategies));
   }
 
   private Map<String, LookupStrategy> normalizeLookupStrategies(Map<String, LookupStrategy> lookupStrategies) {
@@ -98,21 +99,15 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
 
   @Override
   public LookupStrategy getPackageLookupStrategy(String packageName) {
-    LookupStrategy lookupStrategy = lookupStrategies.get(packageName);
+    LookupStrategy lookupStrategy = lookupStrategies.get().get(packageName);
     if (lookupStrategy == null) {
-      synchronized (this) {
-        lookupStrategy = lookupStrategies.get(packageName);
-        if (lookupStrategy == null) {
           if (isSystemPackage(packageName)) {
             lookupStrategy = PARENT_ONLY;
           } else {
             lookupStrategy = CHILD_FIRST;
           }
-          lookupStrategies.put(packageName, lookupStrategy);
-        }
-      }
+          lookupStrategies.get().put(packageName, lookupStrategy);
     }
-
     return lookupStrategy;
   }
 
