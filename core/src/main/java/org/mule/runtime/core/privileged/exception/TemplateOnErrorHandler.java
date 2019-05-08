@@ -323,12 +323,17 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   /**
-   * Creates a copy of this ErrorHandler, with the defined location to retrieve the {@link ProcessingStrategy}.
+   * Creates a copy of this ErrorHandler, with the defined location. This location allows to retrieve the
+   * {@link ProcessingStrategy}, and define is a running {@link org.mule.runtime.core.api.transaction.Transaction} is
+   * owned by the {@link org.mule.runtime.core.api.construct.Flow} or {@link org.mule.runtime.core.internal.processor.TryScope}
+   * executing this ErrorHandler.
    * This is intended to be used when having references to Global ErrorHandlers, since each instance reference
-   * should run with the processing strategy defined by the flow referencing it
-   * @param localizeFor
+   * should run with the processing strategy defined by the flow referencing it, and be able to rollback transactions.
+   * @param buildFor
    * @return copy of this ErrorHandler with location to retrieve {@link ProcessingStrategy}
+   *
+   * @since 4.3.0
    */
-  public abstract TemplateOnErrorHandler copy(Location localizeFor);
+  public abstract TemplateOnErrorHandler copy(Location buildFor);
 
 }

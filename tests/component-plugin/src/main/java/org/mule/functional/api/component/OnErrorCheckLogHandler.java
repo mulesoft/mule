@@ -56,9 +56,9 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
    * {@inheritDoc}
    */
   @Override
-  public TemplateOnErrorHandler copy(Location localizeFor) {
+  public TemplateOnErrorHandler copy(Location buildFor) {
     OnErrorCheckLogHandler cpy = new OnErrorCheckLogHandler();
-    cpy.setFlowLocation(localizeFor);
+    cpy.setFlowLocation(buildFor);
     cpy.propagate = this.propagate;
     cpy.succeedIfNoLog = this.succeedIfNoLog;
     cpy.exceptionLogged = this.exceptionLogged;

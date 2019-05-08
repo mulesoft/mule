@@ -63,9 +63,9 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
    * {@inheritDoc}
    */
   @Override
-  public TemplateOnErrorHandler copy(Location localizeFor) {
+  public TemplateOnErrorHandler copy(Location buildFor) {
     OnErrorPropagateHandler cpy = new OnErrorPropagateHandler();
-    cpy.setFlowLocation(localizeFor);
+    cpy.setFlowLocation(buildFor);
     cpy.setWhen(this.when);
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
