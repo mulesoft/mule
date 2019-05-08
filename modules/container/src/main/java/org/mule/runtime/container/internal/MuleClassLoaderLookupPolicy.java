@@ -101,12 +101,12 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   public LookupStrategy getPackageLookupStrategy(String packageName) {
     LookupStrategy lookupStrategy = lookupStrategies.get().get(packageName);
     if (lookupStrategy == null) {
-          if (isSystemPackage(packageName)) {
-            lookupStrategy = PARENT_ONLY;
-          } else {
-            lookupStrategy = CHILD_FIRST;
-          }
-          lookupStrategies.get().put(packageName, lookupStrategy);
+      if (isSystemPackage(packageName)) {
+        lookupStrategy = PARENT_ONLY;
+      } else {
+        lookupStrategy = CHILD_FIRST;
+      }
+      lookupStrategies.get().put(packageName, lookupStrategy);
     }
     return lookupStrategy;
   }
