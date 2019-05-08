@@ -7,9 +7,10 @@
 
 package org.mule.module.db.internal.resolver.query;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,24 +25,24 @@ public class StaticBulkQueryResolverTestCase extends AbstractBulkQueryResolverTe
 {
 
     @Test
-    public void doesNotResolvesBulkQueryWhenThereIsNoEvent() throws Exception
+    public void doesNotResolvesBulkQueryWhenThereIsNoEvent()
     {
         StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver(BULK_SQL_QUERY, null);
 
         BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(null);
 
-        assertThat(resolvedBulkQuery, nullValue());
+        assertThat(resolvedBulkQuery, is(nullValue()));
     }
 
     @Test(expected = QueryResolutionException.class)
-    public void throwsErrorOnEmptyBulkQuery() throws Exception
+    public void throwsErrorOnEmptyBulkQuery()
     {
         StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver("", null);
         bulkQueryResolver.resolve(muleEvent);
     }
 
     @Test
-    public void resolvesStaticBulkQuery() throws Exception
+    public void resolvesStaticBulkQuery()
     {
         QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
@@ -53,7 +54,7 @@ public class StaticBulkQueryResolverTestCase extends AbstractBulkQueryResolverTe
     }
 
     @Test
-    public void cachesResolvedBulkQueries() throws Exception
+    public void cachesResolvedBulkQueries()
     {
         QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
