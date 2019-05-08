@@ -45,13 +45,18 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     };
   }
 
+  private boolean isTransactionInGlobalErrorHandler(String transactionRootContainer) {
+    return flowLocation.isPresent() && transactionRootContainer.equals(flowLocation.get().getGlobalName());
+  }
+
   private boolean isOwnedTransaction() {
     TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
       return false;
     }
-    return transaction.getComponentLocation().get().getRootContainerName()
-        .equals(this.getRootContainerLocation().getGlobalName());
+    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
+    return transactionContainerName.equals(this.getRootContainerLocation().getGlobalName())
+        || isTransactionInGlobalErrorHandler(transactionContainerName);
   }
 
   /**

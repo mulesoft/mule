@@ -70,7 +70,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Inject
   private ConfigurationProperties configurationProperties;
 
-  private Optional<Location> flowLocation = empty();
+  protected Optional<Location> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
 
   protected String when;
