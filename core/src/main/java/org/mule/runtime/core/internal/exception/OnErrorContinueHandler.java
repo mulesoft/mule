@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -80,6 +81,24 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   @Override
   public boolean accept(CoreEvent event) {
     return !sourceError(event) && super.accept(event);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
+    OnErrorContinueHandler cpy = new OnErrorContinueHandler();
+    cpy.setFlowLocation(buildFor);
+    cpy.setWhen(this.when);
+    cpy.setHandleException(this.handleException);
+    cpy.setErrorType(this.errorType);
+    cpy.setMessageProcessors(this.getMessageProcessors());
+    cpy.setEnableNotifications(this.isEnableNotifications());
+    cpy.setLogException(this.logException);
+    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setAnnotations(this.getAnnotations());
+    return cpy;
   }
 
   private boolean sourceError(CoreEvent event) {
