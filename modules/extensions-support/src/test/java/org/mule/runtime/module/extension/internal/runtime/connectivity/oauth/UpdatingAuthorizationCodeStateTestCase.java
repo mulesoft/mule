@@ -54,7 +54,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   @Before
   public void before() {
     oAuthConfig = new OAuthConfig("configName",
-                                  new AuthCodeConfig("key", "secret", "url", "url", "scope", "id", null, null),
+                                  new AuthorizationCodeConfig("key", "secret", "url", "url", "scope", "id", null, null),
                                   mock(OAuthCallbackConfig.class),
                                   empty(),
                                   new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),

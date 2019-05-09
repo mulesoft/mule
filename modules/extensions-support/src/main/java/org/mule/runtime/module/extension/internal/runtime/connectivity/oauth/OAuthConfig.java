@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -18,50 +18,31 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class OAuthConfig {
+public abstract class OAuthConfig<T extends OAuthGrantType> {
 
   private final String ownerConfigName;
-  private final AuthCodeConfig authCodeConfig;
-  private final OAuthCallbackConfig callbackConfig;
   private final Optional<OAuthObjectStoreConfig> storeConfig;
-  private final AuthorizationCodeGrantType grantType;
   private final Map<String, String> customParameters;
   private final Map<Field, String> parameterExtractors;
 
   public OAuthConfig(String ownerConfigName,
-                     AuthCodeConfig authCodeConfig,
-                     OAuthCallbackConfig callbackConfig,
                      Optional<OAuthObjectStoreConfig> storeConfig,
-                     AuthorizationCodeGrantType grantType,
                      Map<String, String> customParameters,
                      Map<Field, String> parameterExtractors) {
     this.ownerConfigName = ownerConfigName;
-    this.authCodeConfig = authCodeConfig;
-    this.callbackConfig = callbackConfig;
     this.storeConfig = storeConfig;
-    this.grantType = grantType;
     this.customParameters = customParameters;
     this.parameterExtractors = parameterExtractors;
   }
+
+  public abstract T getGrantType();
 
   public String getOwnerConfigName() {
     return ownerConfigName;
   }
 
-  public AuthCodeConfig getAuthCodeConfig() {
-    return authCodeConfig;
-  }
-
-  public OAuthCallbackConfig getCallbackConfig() {
-    return callbackConfig;
-  }
-
   public Optional<OAuthObjectStoreConfig> getStoreConfig() {
     return storeConfig;
-  }
-
-  public AuthorizationCodeGrantType getGrantType() {
-    return grantType;
   }
 
   public Map<String, String> getCustomParameters() {

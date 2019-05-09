@@ -8,6 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -16,7 +20,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class AuthCodeConfig {
+public final class AuthorizationCodeConfig extends OAuthConfig<AuthorizationCodeGrantType> {
 
   private final String consumerKey;
   private final String consumerSecret;
@@ -26,9 +30,26 @@ public final class AuthCodeConfig {
   private final String resourceOwnerId;
   private final String before;
   private final String after;
+  private final OAuthCallbackConfig callbackConfig;
+  private final AuthorizationCodeGrantType grantType;
 
-  public AuthCodeConfig(String consumerKey, String consumerSecret, String authorizationUrl, String accessTokenUrl,
-                        String scope, String resourceOwnerId, String before, String after) {
+
+  public AuthorizationCodeConfig(String ownerConfigName,
+                                 Optional<OAuthObjectStoreConfig> storeConfig,
+                                 Map<String, String> customParameters,
+                                 Map<Field, String> parameterExtractors,
+                                 AuthorizationCodeGrantType grantType,
+                                 OAuthCallbackConfig callbackConfig,
+                                 String consumerKey,
+                                 String consumerSecret,
+                                 String authorizationUrl,
+                                 String accessTokenUrl,
+                                 String scope,
+                                 String resourceOwnerId,
+                                 String before,
+                                 String after) {
+    super(ownerConfigName, storeConfig, customParameters, parameterExtractors);
+
     this.consumerKey = consumerKey;
     this.consumerSecret = consumerSecret;
     this.authorizationUrl = authorizationUrl;
@@ -37,6 +58,13 @@ public final class AuthCodeConfig {
     this.resourceOwnerId = resourceOwnerId;
     this.before = before;
     this.after = after;
+    this.callbackConfig = callbackConfig;
+    this.grantType = grantType;
+  }
+
+  @Override
+  public AuthorizationCodeGrantType getGrantType() {
+    return grantType;
   }
 
   public String getConsumerKey() {
@@ -69,5 +97,9 @@ public final class AuthCodeConfig {
 
   public Optional<String> getAfter() {
     return ofNullable(after);
+  }
+
+  public OAuthCallbackConfig getCallbackConfig() {
+    return callbackConfig;
   }
 }

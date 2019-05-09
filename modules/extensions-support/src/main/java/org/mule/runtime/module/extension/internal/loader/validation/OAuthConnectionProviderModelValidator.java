@@ -14,7 +14,9 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -36,24 +38,48 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
 
       @Override
       protected void onConnectionProvider(ConnectionProviderModel model) {
-        model.getModelProperty(ImplementingTypeModelProperty.class)
+        Class<?> implementingType = model.getModelProperty(ImplementingTypeModelProperty.class)
             .map(ImplementingTypeModelProperty::getType)
-            .filter(type -> type.getAnnotation(AuthorizationCode.class) != null)
-            .ifPresent(type -> {
-              List<Field> stateFields = getFields(type).stream()
-                  .filter(f -> f.getType().equals(AuthorizationCodeState.class))
-                  .collect(toList());
+            .orElse(null);
 
-              if (stateFields.size() != 1) {
-                throw new IllegalConnectionProviderModelDefinitionException(
-                                                                            format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
-                                                                                + "one (and only one) field of type %s. %d were found",
-                                                                                   type,
-                                                                                   AuthorizationCodeState.class.getName(),
-                                                                                   stateFields.size()));
-              }
-            });
+        if (implementingType == null) {
+          return;
+        }
+
+        AuthorizationCode authCode = implementingType.getAnnotation(AuthorizationCode.class);
+        ClientCredentials clientCredentials = implementingType.getAnnotation(ClientCredentials.class);
+
+        if (authCode != null && clientCredentials != null) {
+          throw new IllegalConnectionProviderModelDefinitionException(format(
+              "Connection Provider of class '%s' is attempting to support both authorization code and client credentials "
+                         + "grant types. Each connection provider can only support one grant type at a time.",
+                     implementingType));
+        }
+
+        if (authCode != null) {
+          validateStateField(implementingType, AuthorizationCodeState.class, "authorization code");
+        }
+
+        if (clientCredentials != null) {
+          validateStateField(implementingType, ClientCredentialsState.class, "client credentials");
+        }
       }
     }.walk(model);
+  }
+
+  private void validateStateField(Class<?> implementingType, Class<?> stateFieldType, String grantType) {
+    List<Field> stateFields = getFields(implementingType).stream()
+        .filter(f -> f.getType().equals(stateFieldType))
+        .collect(toList());
+
+    if (stateFields.size() != 1) {
+      throw new IllegalConnectionProviderModelDefinitionException(
+          format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
+                     + "one (and only one) field of type %s. %d were found",
+                 implementingType,
+                 grantType,
+                 AuthorizationCodeState.class.getName(),
+                 stateFields.size()));
+    }
   }
 }

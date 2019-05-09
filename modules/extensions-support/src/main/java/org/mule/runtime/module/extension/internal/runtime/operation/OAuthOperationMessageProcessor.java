@@ -26,7 +26,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.AuthorizationCodeConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -90,7 +90,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
           return;
         }
 
-        OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
+        AuthorizationCodeConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
         if (connectionProvider == null) {
           delegate.error(e);
           return;
@@ -138,10 +138,10 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
         : extractOfType(t, AccessTokenExpiredException.class).orElse(null);
   }
 
-  private OAuthConnectionProviderWrapper getOAuthConnectionProvider(ExecutionContextAdapter operationContext) {
+  private AuthorizationCodeConnectionProviderWrapper getOAuthConnectionProvider(ExecutionContextAdapter operationContext) {
     ConfigurationInstance config = ((ConfigurationInstance) operationContext.getConfiguration().get());
     ConnectionProvider provider =
-        unwrapProviderWrapper(config.getConnectionProvider().get(), OAuthConnectionProviderWrapper.class);
-    return provider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) provider : null;
+        unwrapProviderWrapper(config.getConnectionProvider().get(), AuthorizationCodeConnectionProviderWrapper.class);
+    return provider instanceof AuthorizationCodeConnectionProviderWrapper ? (AuthorizationCodeConnectionProviderWrapper) provider : null;
   }
 }

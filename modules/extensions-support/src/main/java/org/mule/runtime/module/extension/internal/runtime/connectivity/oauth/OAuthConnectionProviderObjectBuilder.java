@@ -42,7 +42,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
@@ -52,8 +52,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-
-import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -69,14 +67,14 @@ import java.util.function.BiConsumer;
 
 /**
  * A specialization of {@link DefaultConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
- * into {@link OAuthConnectionProviderWrapper} instances.
+ * into {@link AuthorizationCodeConnectionProviderWrapper} instances.
  *
  * @since 4.0
  */
 public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionProviderObjectBuilder<C> implements Startable {
 
   private final ExtensionsOAuthManager oauthManager;
-  private final AuthorizationCodeGrantType grantType;
+  private final OAuthGrantType grantType;
   private final Map<Field, String> callbackValues;
 
   public OAuthConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
@@ -110,11 +108,11 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                                          getCustomParameters(result),
                                          getCallbackValues());
 
-    provider = new OAuthConnectionProviderWrapper<>(provider,
-                                                    config,
-                                                    getCallbackValues(),
-                                                    oauthManager,
-                                                    reconnectionConfig);
+    provider = new AuthorizationCodeConnectionProviderWrapper<>(provider,
+                                                                config,
+                                                                getCallbackValues(),
+                                                                oauthManager,
+                                                                reconnectionConfig);
     return provider;
   }
 
@@ -131,20 +129,20 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                                          getCustomParameters(result),
                                          getCallbackValues());
 
-    provider = new OAuthConnectionProviderWrapper<>(provider,
-                                                    config,
-                                                    getCallbackValues(),
-                                                    oauthManager,
-                                                    reconnectionConfig);
+    provider = new AuthorizationCodeConnectionProviderWrapper<>(provider,
+                                                                config,
+                                                                getCallbackValues(),
+                                                                oauthManager,
+                                                                reconnectionConfig);
     return new Pair<>(provider, result);
   }
 
-  private AuthCodeConfig buildAuthCodeConfig(ResolverSetResult result) throws MuleException {
+  private AuthorizationCodeConfig buildAuthCodeConfig(ResolverSetResult result) {
     Map<String, Object> map = (Map<String, Object>) result.get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
     return buildAuthCodeConfig(map);
   }
 
-  private AuthCodeConfig buildAuthCodeConfig(CoreEvent event) throws MuleException {
+  private AuthorizationCodeConfig buildAuthCodeConfig(CoreEvent event) throws MuleException {
     ValueResolver<?> valueResolver = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
     try (ValueResolvingContext context = getResolvingContextFor(event)) {
       Map<String, Object> map = (Map<String, Object>) valueResolver.resolve(context);
@@ -152,15 +150,15 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
     }
   }
 
-  private AuthCodeConfig buildAuthCodeConfig(Map<String, Object> map) {
-    return new AuthCodeConfig((String) map.get(CONSUMER_KEY_PARAMETER_NAME),
-                              (String) map.get(CONSUMER_SECRET_PARAMETER_NAME),
-                              (String) map.get(AUTHORIZATION_URL_PARAMETER_NAME),
-                              (String) map.get(ACCESS_TOKEN_URL_PARAMETER_NAME),
-                              (String) map.get(SCOPES_PARAMETER_NAME),
-                              (String) map.get(RESOURCE_OWNER_ID_PARAMETER_NAME),
-                              (String) map.get(BEFORE_FLOW_PARAMETER_NAME),
-                              (String) map.get(AFTER_FLOW_PARAMETER_NAME));
+  private AuthorizationCodeConfig buildAuthCodeConfig(Map<String, Object> map) {
+    return new AuthorizationCodeConfig((String) map.get(CONSUMER_KEY_PARAMETER_NAME),
+                                       (String) map.get(CONSUMER_SECRET_PARAMETER_NAME),
+                                       (String) map.get(AUTHORIZATION_URL_PARAMETER_NAME),
+                                       (String) map.get(ACCESS_TOKEN_URL_PARAMETER_NAME),
+                                       (String) map.get(SCOPES_PARAMETER_NAME),
+                                       (String) map.get(RESOURCE_OWNER_ID_PARAMETER_NAME),
+                                       (String) map.get(BEFORE_FLOW_PARAMETER_NAME),
+                                       (String) map.get(AFTER_FLOW_PARAMETER_NAME));
   }
 
   private OAuthCallbackConfig buildOAuthCallbackConfig(CoreEvent event) throws MuleException {
@@ -247,9 +245,8 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
     }
   }
 
-  private AuthorizationCodeGrantType getGrantType() {
-    return providerModel.getModelProperty(OAuthModelProperty.class)
-        .map(p -> (AuthorizationCodeGrantType) p.getGrantTypes().get(0)).get();
+  private OAuthGrantType getGrantType() {
+    return providerModel.getModelProperty(OAuthModelProperty.class).map(p -> p.getGrantTypes().get(0)).get();
   }
 
   private String sanitizePath(String path) {
@@ -265,7 +262,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
       ValueResolver<?> oauthAuthCodeGroup = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
       MapValueResolver mapResolver = staticOnly((MapValueResolver) oauthAuthCodeGroup);
       ctxForConfig = getResolvingContextFor(initialiserEvent);
-      AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(ctxForConfig));
+      AuthorizationCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(ctxForConfig));
       Optional<OAuthObjectStoreConfig> storeConfig = buildOAuthObjectStoreConfig(initialiserEvent);
 
       mapResolver = staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME));

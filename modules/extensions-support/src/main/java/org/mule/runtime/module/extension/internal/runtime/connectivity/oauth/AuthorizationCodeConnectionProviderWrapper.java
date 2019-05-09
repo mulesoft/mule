@@ -37,24 +37,25 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C> implements NoConnectivityTest {
+public class AuthorizationCodeConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C>
+    implements NoConnectivityTest {
 
-  private final OAuthConfig oauthConfig;
+  private final AuthorizationCodeConfig oauthConfig;
   private final Map<Field, String> callbackValues;
-  private final ExtensionsOAuthManager oauthManager;
+  private final AuthorizationCodeOAuthHandler oauthHandler;
   private final FieldSetter<ConnectionProvider<C>, AuthorizationCodeState> authCodeStateSetter;
   private final RunOnce dance;
 
   private AuthorizationCodeOAuthDancer dancer;
 
-  public OAuthConnectionProviderWrapper(ConnectionProvider<C> delegate,
-                                        OAuthConfig oauthConfig,
-                                        Map<Field, String> callbackValues,
-                                        ExtensionsOAuthManager oauthManager,
-                                        ReconnectionConfig reconnectionConfig) {
+  public AuthorizationCodeConnectionProviderWrapper(ConnectionProvider<C> delegate,
+                                                    AuthorizationCodeConfig oauthConfig,
+                                                    Map<Field, String> callbackValues,
+                                                    AuthorizationCodeOAuthHandler oauthHandler,
+                                                    ReconnectionConfig reconnectionConfig) {
     super(delegate, reconnectionConfig);
     this.oauthConfig = oauthConfig;
-    this.oauthManager = oauthManager;
+    this.oauthHandler = oauthHandler;
     authCodeStateSetter = getAuthCodeStateSetter(delegate);
     this.callbackValues = unmodifiableMap(callbackValues);
     dance = Once.of(this::updateAuthState);
@@ -96,25 +97,25 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
 
     if (stateFields.size() != 1) {
       throw new IllegalConnectionProviderModelDefinitionException(
-                                                                  format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
-                                                                      + "one (and only one) field of type %s. %d were found",
-                                                                         delegate.getClass().getName(),
-                                                                         AuthorizationCodeState.class.getName(),
-                                                                         stateFields.size()));
+          format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
+                     + "one (and only one) field of type %s. %d were found",
+                 delegate.getClass().getName(),
+                 AuthorizationCodeState.class.getName(),
+                 stateFields.size()));
     }
 
     return new FieldSetter<>(stateFields.get(0));
   }
 
   private ResourceOwnerOAuthContext getContext() {
-    return oauthManager.getOAuthContext(oauthConfig)
+    return oauthHandler.getOAuthContext(oauthConfig)
         .orElseThrow(() -> new IllegalArgumentException("OAuth authorization dance not yet performed for resourceOwnerId "
-            + oauthConfig.getAuthCodeConfig().getResourceOwnerId()));
+                                                            + oauthConfig.getResourceOwnerId()));
   }
 
   @Override
   public void start() throws MuleException {
-    dancer = oauthManager.register(oauthConfig);
+    dancer = oauthHandler.register(oauthConfig);
     super.start();
   }
 }
