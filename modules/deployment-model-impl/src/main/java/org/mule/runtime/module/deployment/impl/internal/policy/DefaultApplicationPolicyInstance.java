@@ -24,6 +24,7 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.Policy;
@@ -61,7 +62,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final MuleContextListener muleContextListener;
   private ArtifactContext policyContext;
-  private PolicyInstance policyInstance;
+  private LazyValue<PolicyInstance> policyInstance;
   private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   /**
@@ -147,12 +148,11 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
     policyContext.getMuleContext().getNotificationManager().addInterfaceToType(PolicyNotificationListener.class,
                                                                                PolicyNotification.class);
-
     notificationListeners.forEach(listenerRegistry::registerListener);
   }
 
-  private void initPolicyInstance() throws InitialisationException {
-    policyInstance = policyContext.getRegistry().lookupByType(PolicyInstance.class).get();
+  private PolicyInstance initPolicyInstance() {
+    return policyContext.getRegistry().lookupByType(PolicyInstance.class).get();
   }
 
   @Override
@@ -172,14 +172,10 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public void initialise() throws InitialisationException {
-    if (policyInstance == null) {
-      synchronized (this) {
-        if (policyContext == null) {
-          initPolicyContext();
-        }
-        initPolicyInstance();
-      }
+    if (policyInstance == null && policyContext == null) {
+      initPolicyContext();
     }
+    policyInstance = new LazyValue<>(this::initPolicyInstance);
   }
 
   @Override
@@ -191,13 +187,13 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public Optional<Policy> getSourcePolicy() {
-    return policyInstance.getSourcePolicyChain()
+    return policyInstance.get().getSourcePolicyChain()
         .map(chain -> new Policy(chain, parametrization.getId()));
   }
 
   @Override
   public Optional<Policy> getOperationPolicy() {
-    return policyInstance.getOperationPolicyChain()
+    return policyInstance.get().getOperationPolicyChain()
         .map(chain -> new Policy(chain, parametrization.getId()));
   }
 
