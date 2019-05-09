@@ -28,6 +28,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -117,14 +118,14 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
     if (isHeavyPackage(artifactFile)) {
-      return createHeavyPackageClassLoaderModel(artifactFile, attributes);
+      return createHeavyPackageClassLoaderModel(artifactFile, attributes, artifactType);
     } else {
       return createLightPackageClassLoaderModel(artifactFile, attributes, artifactType);
     }
   }
 
-  private ClassLoaderModel createHeavyPackageClassLoaderModel(File artifactFile,
-                                                              Map<String, Object> attributes) {
+  protected ClassLoaderModel createHeavyPackageClassLoaderModel(File artifactFile,
+                                                                Map<String, Object> attributes, ArtifactType artifactType) {
     File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
 
     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
@@ -337,8 +338,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   }
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
-
-
 
   /**
    * Loads the URLs of the class loader for this artifact.
