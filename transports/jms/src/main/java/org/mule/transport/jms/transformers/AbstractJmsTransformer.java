@@ -36,6 +36,7 @@ import javax.jms.Session;
 
 public abstract class AbstractJmsTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
 {
+
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public AbstractJmsTransformer()
@@ -45,7 +46,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
     }
 
     protected abstract void declareInputOutputClasses();
-    
+
     protected Message transformToMessage(MuleMessage message) throws Exception
     {
         Session session = null;
@@ -101,7 +102,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
                     {
                         logger.debug("Closing non-transacted jms session: " + session);
                     }
-                    connector.closeQuietly(session);
+                    connector.closeQuietly(session, true);
                 }
                 else if (!muleTx.hasResource(connector.getConnection()))
                 {
@@ -109,9 +110,9 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Closing an orphaned, but transacted jms session: " + session +
-                                ", transaction: " + muleTx);
+                                     ", transaction: " + muleTx);
                     }
-                    connector.closeQuietly(session);
+                    connector.closeQuietly(session, true);
                 }
             }
             // aggressively killing any session refs
@@ -124,7 +125,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         if (logger.isDebugEnabled())
         {
             logger.debug("Message type received is: " +
-                    ClassUtils.getSimpleName(source.getClass()));
+                         ClassUtils.getSimpleName(source.getClass()));
         }
 
         // Try to figure out our endpoint's JMS Specification and fall back to
@@ -195,7 +196,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
     {
         if (endpoint != null)
         {
-            return ((JmsConnector)endpoint.getConnector()).getTransactionalResource(endpoint);
+            return ((JmsConnector) endpoint.getConnector()).getTransactionalResource(endpoint);
         }
         else
         {

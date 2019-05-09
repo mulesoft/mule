@@ -772,7 +772,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             catch (TransactionException e)
             {
-                closeQuietly(session);
+                closeQuietly(session, false);
                 throw new RuntimeException("Could not bind session to current transaction", e);
             }
         }
@@ -846,7 +846,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             else
             {
-                closeQuietly(session);
+                closeQuietly(session, false);
             }
         }
         else if (logger.isDebugEnabled())
@@ -1055,27 +1055,40 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+    public void closeQuietly(Session session)
+    {
+        this.closeQuietly(session, false);
+    }
+
+
     /**
      * Closes the MuleSession without throwing an exception (an error message is logged
      * instead).
      *
      * @param session
      */
-    public void closeQuietly(Session session)
+    public void closeQuietly(Session session, boolean deferred)
     {
-        if (session != null)
+        if (deferred)
         {
-            try
+            deferSessionClose(session);
+        }
+        else
+        {
+            if (session != null)
             {
-                close(session);
-            }
-            catch (Exception e)
-            {
-                logger.warn("Failed to close jms session consumer: " + e.getMessage());
-            }
-            finally
-            {
-                session = null;
+                try
+                {
+                    close(session);
+                }
+                catch (Exception e)
+                {
+                    logger.warn("Failed to close jms session consumer: " + e.getMessage());
+                }
+                finally
+                {
+                    session = null;
+                }
             }
         }
     }
@@ -1759,7 +1772,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 }
                 else if (closable instanceof Session)
                 {
-                    JmsConnector.this.closeQuietly((Session) closable);
+                    JmsConnector.this.closeQuietly((Session) closable, false);
                 }
                 else
                 {
