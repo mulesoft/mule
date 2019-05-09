@@ -148,7 +148,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
     policyContext.getMuleContext().getNotificationManager().addInterfaceToType(PolicyNotificationListener.class,
                                                                                PolicyNotification.class);
-
     notificationListeners.forEach(listenerRegistry::registerListener);
   }
 
