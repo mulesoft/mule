@@ -4,10 +4,10 @@
       "ignore": [
         {
           "code": "java.method.abstractMethodAdded",
-          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::copy(org.mule.runtime.api.component.location.Location)",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
           "package": "org.mule.runtime.core.privileged.exception",
           "classSimpleName": "TemplateOnErrorHandler",
-          "methodName": "copy",
+          "methodName": "duplicateFor",
           "elementKind": "method",
           "justification": "Each Error Handler ref needs a copy of every inner error handler"
         }
@@ -19,10 +19,10 @@
       "ignore": [
         {
           "code": "java.method.abstractMethodAdded",
-          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::copy(org.mule.runtime.api.component.location.Location)",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
           "package": "org.mule.runtime.core.privileged.exception",
           "classSimpleName": "TemplateOnErrorHandler",
-          "methodName": "copy",
+          "methodName": "duplicateFor",
           "elementKind": "method",
           "justification": "Each Error Handler ref needs a copy of every inner error handler"
         }
@@ -380,10 +380,10 @@
         },
         {
           "code": "java.method.abstractMethodAdded",
-          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::copy(org.mule.runtime.api.component.location.Location)",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
           "package": "org.mule.runtime.core.privileged.exception",
           "classSimpleName": "TemplateOnErrorHandler",
-          "methodName": "copy",
+          "methodName": "duplicateFor",
           "elementKind": "method",
           "justification": "Each Error Handler ref needs a copy of every inner error handler"
         }
