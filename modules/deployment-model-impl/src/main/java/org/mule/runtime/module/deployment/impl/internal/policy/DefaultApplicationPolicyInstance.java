@@ -152,10 +152,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     notificationListeners.forEach(listenerRegistry::registerListener);
   }
 
-  private PolicyInstance initPolicyInstance() throws InitialisationException {
-    if (policyContext == null) {
-      initPolicyContext();
-    }
+  private PolicyInstance initPolicyInstance() {
     return policyContext.getRegistry().lookupByType(PolicyInstance.class).get();
   }
 
@@ -176,7 +173,10 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public void initialise() throws InitialisationException {
-    policyInstance = new LazyValue<>(this.initPolicyInstance());
+    if (policyInstance == null && policyContext == null) {
+      initPolicyContext();
+    }
+    policyInstance = new LazyValue<>(this::initPolicyInstance);
   }
 
   @Override
