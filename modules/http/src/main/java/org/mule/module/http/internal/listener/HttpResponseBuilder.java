@@ -71,8 +71,8 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     private String reasonPhrase;
     private boolean disablePropertiesAsHeaders = false;
     private HttpStreamingType responseStreaming = AUTO;
-    private boolean multipartEntityWithNoMultipartContentyTypeWarned;
-    private boolean mapPayloadButNoUrlEncodedContentyTypeWarned;
+    private boolean multipartEntityWithNoMultipartContentTypeWarned;
+    private boolean mapPayloadButNoUrlEncodedContentTypeWarned;
     private AttributeEvaluator statusCodeEvaluator;
     private AttributeEvaluator reasonPhraseEvaluator;
     private MuleContext muleContext;
@@ -381,19 +381,19 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
 
     private void warnMapPayloadButNoUrlEncodedContentType(String contentType)
     {
-        if (!mapPayloadButNoUrlEncodedContentyTypeWarned)
+        if (!mapPayloadButNoUrlEncodedContentTypeWarned)
         {
-            logger.warn(String.format("Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s", contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
-            mapPayloadButNoUrlEncodedContentyTypeWarned = true;
+            logger.warn(String.format("Payload is a Map which will be used to generate an url encoded http body but Content-Type specified is %s and not %s", contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
+            mapPayloadButNoUrlEncodedContentTypeWarned = true;
         }
     }
 
     private void warnNoMultipartContentTypeButMultipartEntity(String contentType)
     {
-        if (!multipartEntityWithNoMultipartContentyTypeWarned)
+        if (!multipartEntityWithNoMultipartContentTypeWarned)
         {
             logger.warn(String.format("Sending http response with Content-Type %s but the message has attachment and a multipart entity is generated", contentType));
-            multipartEntityWithNoMultipartContentyTypeWarned = true;
+            multipartEntityWithNoMultipartContentTypeWarned = true;
         }
     }
 
