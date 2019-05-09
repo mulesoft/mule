@@ -150,15 +150,10 @@ import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.IdempotentMessageValidator;
-import org.mule.runtime.core.internal.routing.MessageChunkAggregator;
-import org.mule.runtime.core.internal.routing.MessageChunkSplitter;
 import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
-import org.mule.runtime.core.internal.routing.Resequencer;
+import org.mule.runtime.core.internal.routing.ParallelForEach;
 import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
-import org.mule.runtime.core.internal.routing.SimpleCollectionAggregator;
-import org.mule.runtime.core.internal.routing.ParallelForEach;
-import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
@@ -476,36 +471,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition("expression", fromFixedValue("true").build()).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("message-chunk-splitter")
-        .withTypeDefinition(fromType(MessageChunkSplitter.class))
-        .withSetterParameterDefinition("messageSize", fromSimpleParameter("messageSize").build()).build());
-
-    ComponentBuildingDefinition.Builder baseAggregatorDefinition = baseDefinition
-        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-        .withSetterParameterDefinition("failOnTimeout", fromSimpleParameter("failOnTimeout").build())
-        .withSetterParameterDefinition("processedGroupsObjectStore",
-                                       fromSimpleReferenceParameter("processed-groups-object-store").build())
-        .withSetterParameterDefinition("eventGroupsObjectStore",
-                                       fromSimpleReferenceParameter("event-groups-object-store").build())
-        .withSetterParameterDefinition("persistentStores", fromSimpleParameter("persistentStores").build())
-        .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build());
-
-    componentBuildingDefinitions.add(baseAggregatorDefinition.withIdentifier("message-chunk-aggregator")
-        .withTypeDefinition(fromType(MessageChunkAggregator.class)).build());
-
-    componentBuildingDefinitions.add(baseAggregatorDefinition.withIdentifier("collection-aggregator")
-        .withTypeDefinition(fromType(SimpleCollectionAggregator.class))
-        .build());
-
-    componentBuildingDefinitions.add(baseAggregatorDefinition.withIdentifier("resequencer")
-        .withTypeDefinition(fromType(Resequencer.class))
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("splitter")
-        .withTypeDefinition(fromType(Splitter.class))
-        .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
-        .withSetterParameterDefinition("filterOnErrorType", fromSimpleParameter("filterOnErrorType").build())
-        .build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier(SCHEDULER)
