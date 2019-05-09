@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
+import static org.mule.runtime.extension.api.security.CredentialsPlacement.BASIC_AUTH_HEADER;
+import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
+import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.extension.api.security.CredentialsPlacement;
+import org.mule.runtime.oauth.api.builder.ClientCredentialsLocation;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 /**
@@ -27,6 +32,18 @@ public final class ExtensionsOAuthUtils {
                                                config.getCallbackConfig().getExternalCallbackUrl(),
                                                config.getConsumerKey(),
                                                config.getConsumerSecret());
+  }
+
+  public static ClientCredentialsLocation toCredentialsLocation(CredentialsPlacement placement) {
+    if (placement == BASIC_AUTH_HEADER) {
+      return ClientCredentialsLocation.BASIC_AUTH_HEADER;
+    } else if (placement == QUERY_PARAMS) {
+      return ClientCredentialsLocation.QUERY_PARAMS;
+    } else if (placement == BODY) {
+      return ClientCredentialsLocation.BODY;
+    } else {
+      throw new IllegalArgumentException("Unsupported CredentialsPlacement type " + placement.name());
+    }
   }
 
   private ExtensionsOAuthUtils() {}

@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
+import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
@@ -32,10 +33,10 @@ import java.util.Map;
 /**
  * A {@link ReconnectableConnectionProviderWrapper} which makes sure that by the time the
  * {@link ConnectionProvider#connect()} method is invoked on the delegate, the authorization dance has
- * been completed and the {@link AuthorizationCodeState} and {@link OAuthCallbackValue} fields have
+ * been completed and the {@link org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState} and {@link OAuthCallbackValue} fields have
  * been properly injected
  *
- * @since 4.0
+ * @since 4.2.1
  */
 public class ClientCredentialsConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C>
     implements NoConnectivityTest {
@@ -46,7 +47,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends Reconnectable
   private final FieldSetter<ConnectionProvider<C>, AuthorizationCodeState> authCodeStateSetter;
   private final RunOnce dance;
 
-  private AuthorizationCodeOAuthDancer dancer;
+  private ClientCredentialsOAuthDancer dancer;
 
   public ClientCredentialsConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                                     ClientCredentialsConfig oauthConfig,

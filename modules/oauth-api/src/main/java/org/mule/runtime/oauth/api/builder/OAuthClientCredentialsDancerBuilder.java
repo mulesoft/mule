@@ -16,6 +16,15 @@ import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
 public interface OAuthClientCredentialsDancerBuilder extends OAuthDancerBuilder<ClientCredentialsOAuthDancer> {
 
   /**
+   * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
+   *
+   * @param listener the {@link ClientCredentialsListener} to be added
+   * @throws IllegalArgumentException if the {@code listener} is {@code null}
+   * @since 4.2.1
+   */
+  void addListener(ClientCredentialsListener listener);
+
+  /**
    * @param encodeClientCredentialsInBody If @{code true}, the client id and client secret will be sent in the request body.
    *        Otherwise, they will be sent as basic authentication.
    *

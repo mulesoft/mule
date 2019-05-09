@@ -13,16 +13,11 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
@@ -57,38 +52,26 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
-public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler {
+public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<AuthorizationCodeOAuthDancer> {
 
-  private static final Logger LOGGER = getLogger(AuthorizationCodeOAuthHandler.class);
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
 
-  private final MuleExpressionLanguage expressionEvaluator;
-  private final Function<OAuthConfig, ObjectStore> objectStoreLocator;
-  private Registry registry;
-  private final MuleContext muleContext;
-
-  private final Map<String, AuthorizationCodeOAuthDancer> dancers = new ConcurrentHashMap<>();
-  private boolean started = false;
+  private final Registry registry;
 
   public AuthorizationCodeOAuthHandler(LazyValue<HttpService> httpService,
                                        LazyValue<OAuthService> oauthService, LockFactory lockFactory,
                                        MuleExpressionLanguage expressionEvaluator,
                                        Function<OAuthConfig, ObjectStore> objectStoreLocator,
-                                       Registry registry, MuleContext muleContext) {
-    super(httpService, oauthService, lockFactory);
-    this.expressionEvaluator = expressionEvaluator;
-    this.objectStoreLocator = objectStoreLocator;
+                                       Registry registry,
+                                       MuleContext muleContext) {
+    super(httpService, oauthService, lockFactory, expressionEvaluator, objectStoreLocator, muleContext);
     this.registry = registry;
-    this.muleContext = muleContext;
   }
 
   /**
@@ -110,8 +93,8 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler {
   /**
    * Performs the refresh token flow
    *
-   * @param ownerConfigName    the name of the extension config which obtained the token
-   * @param resourceOwnerId    the id of the user to be invalidated
+   * @param ownerConfigName the name of the extension config which obtained the token
+   * @param resourceOwnerId the id of the user to be invalidated
    */
   public void refreshToken(String ownerConfigName, String resourceOwnerId) {
     AuthorizationCodeOAuthDancer dancer = dancers.get(ownerConfigName);
@@ -160,41 +143,6 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler {
     }
 
     dancer.invalidateContext(resourceOwnerId);
-  }
-
-  @Override
-  public void start() throws MuleException {
-    for (AuthorizationCodeOAuthDancer dancer : dancers.values()) {
-      start(dancer);
-    }
-    started = true;
-  }
-
-  private void start(AuthorizationCodeOAuthDancer dancer) throws MuleException {
-    initialiseIfNeeded(dancer, muleContext);
-    startIfNeeded(dancer);
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    dancers.forEach((key, dancer) -> {
-      try {
-        disable(key, dancer);
-      } catch (Exception e) {
-        LOGGER.warn("Found exception while trying to stop OAuth callback for config " + key, e);
-      }
-    });
-    dancers.clear();
-  }
-
-  private void disable(String ownerConfigName, AuthorizationCodeOAuthDancer dancer) {
-    try {
-      stopIfNeeded(dancer);
-    } catch (Exception e) {
-      LOGGER.warn("Found exception trying to Stop OAuth dancer for config " + ownerConfigName, e);
-    } finally {
-      disposeIfNeeded(dancer, LOGGER);
-    }
   }
 
   private AuthorizationCodeOAuthDancer createDancer(AuthorizationCodeConfig config, List<AuthorizationCodeListener> listeners)
@@ -309,8 +257,10 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler {
     };
   }
 
-  private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(OAuthConfig config,
-                                                                                                     Flow flow) {
+  private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(
+      AuthorizationCodeConfig config,
+      Flow flow) {
+
     return (callbackContext, oauthContext) -> {
       AuthorizationCodeState state = toAuthorizationCodeState(config, oauthContext);
       CoreEvent event = (CoreEvent) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)

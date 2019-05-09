@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 
@@ -15,7 +16,10 @@ import java.util.Optional;
 
 public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantType> {
 
+  private final String clientId;
+  private final String clientSecret;
   private final String tokenUrl;
+  private final String scope;
   private final CredentialsPlacement credentialsPlacement;
   private final ClientCredentialsGrantType grantType;
 
@@ -23,13 +27,27 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
                                  Optional<OAuthObjectStoreConfig> storeConfig,
                                  Map<String, String> customParameters,
                                  Map<Field, String> parameterExtractors,
+                                 String clientId,
+                                 String clientSecret,
                                  String tokenUrl,
+                                 String scope,
                                  CredentialsPlacement credentialsPlacement,
                                  ClientCredentialsGrantType grantType) {
     super(ownerConfigName, storeConfig, customParameters, parameterExtractors);
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
     this.tokenUrl = tokenUrl;
+    this.scope = scope;
     this.credentialsPlacement = credentialsPlacement;
     this.grantType = grantType;
+  }
+
+  public String getClientId() {
+    return clientId;
+  }
+
+  public String getClientSecret() {
+    return clientSecret;
   }
 
   public String getTokenUrl() {
@@ -38,6 +56,10 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
 
   public CredentialsPlacement getCredentialsPlacement() {
     return credentialsPlacement;
+  }
+
+  public Optional<String> getScope() {
+    return ofNullable(scope);
   }
 
   @Override
