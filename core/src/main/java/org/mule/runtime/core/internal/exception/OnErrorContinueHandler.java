@@ -87,7 +87,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
    * {@inheritDoc}
    */
   @Override
-  public TemplateOnErrorHandler copy(Location buildFor) {
+  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
     OnErrorContinueHandler cpy = new OnErrorContinueHandler();
     cpy.setFlowLocation(buildFor);
     cpy.setWhen(this.when);

@@ -329,11 +329,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    * executing this ErrorHandler.
    * This is intended to be used when having references to Global ErrorHandlers, since each instance reference
    * should run with the processing strategy defined by the flow referencing it, and be able to rollback transactions.
-   * @param buildFor
+   * @param location
    * @return copy of this ErrorHandler with location to retrieve {@link ProcessingStrategy}
    *
    * @since 4.3.0
    */
-  public abstract TemplateOnErrorHandler copy(Location buildFor);
+  public abstract TemplateOnErrorHandler duplicateFor(Location location);
 
 }
