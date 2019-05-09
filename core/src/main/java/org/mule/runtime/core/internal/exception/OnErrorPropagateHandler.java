@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -44,13 +45,36 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     };
   }
 
+  private boolean isTransactionInGlobalErrorHandler(String transactionRootContainer) {
+    return flowLocation.isPresent() && transactionRootContainer.equals(flowLocation.get().getGlobalName());
+  }
+
   private boolean isOwnedTransaction() {
     TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
       return false;
     }
-    return transaction.getComponentLocation().get().getRootContainerName()
-        .equals(this.getRootContainerLocation().getGlobalName());
+    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
+    return transactionContainerName.equals(this.getRootContainerLocation().getGlobalName())
+        || isTransactionInGlobalErrorHandler(transactionContainerName);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
+    OnErrorPropagateHandler cpy = new OnErrorPropagateHandler();
+    cpy.setFlowLocation(buildFor);
+    cpy.setWhen(this.when);
+    cpy.setHandleException(this.handleException);
+    cpy.setErrorType(this.errorType);
+    cpy.setMessageProcessors(this.getMessageProcessors());
+    cpy.setEnableNotifications(this.isEnableNotifications());
+    cpy.setLogException(this.logException);
+    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setAnnotations(this.getAnnotations());
+    return cpy;
   }
 
   @Override

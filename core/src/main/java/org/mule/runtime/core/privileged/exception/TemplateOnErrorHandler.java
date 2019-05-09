@@ -13,6 +13,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -30,6 +31,7 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -70,11 +72,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Inject
   private ConfigurationProperties configurationProperties;
 
+  protected Optional<Location> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
   private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
 
   protected String when;
-  private boolean handleException;
+  protected boolean handleException;
 
   protected String errorType = null;
   protected ErrorTypeMatcher errorTypeMatcher = null;
@@ -201,12 +204,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     super.doInitialise(muleContext);
 
     Optional<ProcessingStrategy> processingStrategy = empty();
-    if (getLocation() != null) {
+    if (flowLocation.isPresent()) {
+      processingStrategy = getProcessingStrategy(locator, flowLocation.get());
+    } else if (getLocation() != null) {
       processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
     }
-    configuredMessageProcessors =
-        newChain(processingStrategy,
-                 getMessageProcessors());
+    configuredMessageProcessors = newChain(processingStrategy, getMessageProcessors());
 
     if (configuredMessageProcessors != null) {
       configuredMessageProcessors.setMuleContext(muleContext);
@@ -324,5 +327,23 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   public void setRootContainerName(String rootContainerName) {
     updateRootContainerName(rootContainerName, this);
   }
+
+  protected void setFlowLocation(Location location) {
+    this.flowLocation = ofNullable(location);
+  }
+
+  /**
+   * Creates a copy of this ErrorHandler, with the defined location. This location allows to retrieve the
+   * {@link ProcessingStrategy}, and define if a running {@link org.mule.runtime.core.api.transaction.Transaction} is
+   * owned by the {@link org.mule.runtime.core.api.construct.Flow} or {@link org.mule.runtime.core.internal.processor.TryScope}
+   * executing this ErrorHandler.
+   * This is intended to be used when having references to Global ErrorHandlers, since each instance reference
+   * should run with the processing strategy defined by the flow referencing it, and be able to rollback transactions.
+   * @param location
+   * @return copy of this ErrorHandler with location to retrieve {@link ProcessingStrategy}
+   *
+   * @since 4.1.6
+   */
+  public abstract TemplateOnErrorHandler duplicateFor(Location location);
 
 }

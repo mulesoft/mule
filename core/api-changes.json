@@ -114,6 +114,33 @@
           "fieldName": "OBJECT_STREAMING_GHOST_BUSTER",
           "elementKind": "field",
           "justification": "Needed to avoid leak on foreach"
+        },
+        {
+          "code": "java.method.abstractMethodAdded",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "duplicateFor",
+          "elementKind": "method",
+          "justification": "Each Error Handler ref needs a copy of every inner error handler"
+        },
+        {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.flowLocation",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "fieldName": "flowLocation",
+          "elementKind": "field",
+          "justification": "Each Error Handler ref needs a copy of every inner error handler"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFlowLocation(org.mule.runtime.api.component.location.Location)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "setFlowLocation",
+          "elementKind": "method",
+          "justification": "Each Error Handler ref needs a copy of every inner error handler"
         }
       ]
     }
