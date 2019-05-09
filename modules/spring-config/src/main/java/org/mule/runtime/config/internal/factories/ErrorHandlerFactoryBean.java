@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.factories;
 
 import org.mule.runtime.core.internal.exception.ErrorHandler;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
@@ -19,24 +20,28 @@ import java.util.List;
  */
 public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandler> {
 
-  private ErrorHandler delegate;
+  private GlobalErrorHandler delegate;
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private String name;
 
   @Override
   public ErrorHandler doGetObject() throws Exception {
-    ErrorHandler errorHandler;
     if (delegate != null) {
-      errorHandler = delegate;
+      return delegate.createLocalErrorHandler(this.getRootContainerLocation());
+    }
+
+    ErrorHandler errorHandler;
+    if (name != null) {
+      errorHandler = new GlobalErrorHandler();
+      errorHandler.setName(name);
     } else {
       errorHandler = new ErrorHandler();
-      errorHandler.setName(name);
-      errorHandler.setExceptionListeners(exceptionListeners);
     }
+    errorHandler.setExceptionListeners(exceptionListeners);
     return errorHandler;
   }
 
-  public void setDelegate(ErrorHandler delegate) {
+  public void setDelegate(GlobalErrorHandler delegate) {
     this.delegate = delegate;
   }
 

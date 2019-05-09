@@ -9,6 +9,7 @@ package org.mule.functional.api.component;
 import static org.junit.Assert.fail;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -49,6 +50,28 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
   protected Function<CoreEvent, Publisher<CoreEvent>> route(Exception exception) {
     handledException = true;
     return super.route(exception);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
+    OnErrorCheckLogHandler cpy = new OnErrorCheckLogHandler();
+    cpy.setFlowLocation(buildFor);
+    cpy.propagate = this.propagate;
+    cpy.succeedIfNoLog = this.succeedIfNoLog;
+    cpy.exceptionLogged = this.exceptionLogged;
+    cpy.handledException = this.handledException;
+    cpy.setWhen(this.when);
+    cpy.setHandleException(this.handleException);
+    cpy.setErrorType(this.errorType);
+    cpy.setMessageProcessors(this.getMessageProcessors());
+    cpy.setEnableNotifications(this.isEnableNotifications());
+    cpy.setLogException(this.logException);
+    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setAnnotations(this.getAnnotations());
+    return cpy;
   }
 
   @Override

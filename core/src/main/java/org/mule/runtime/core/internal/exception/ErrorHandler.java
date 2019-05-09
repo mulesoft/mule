@@ -47,7 +47,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default error handler must accept any event.";
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
-  private String name;
+  protected String name;
 
   @Inject
   private NotificationDispatcher notificationDispatcher;

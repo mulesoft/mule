@@ -1,4 +1,34 @@
 {
+  "4.3.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.abstractMethodAdded",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "duplicateFor",
+          "elementKind": "method",
+          "justification": "Each Error Handler ref needs a copy of every inner error handler"
+        }
+      ]
+    }
+  },
+  "4.2.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.abstractMethodAdded",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "duplicateFor",
+          "elementKind": "method",
+          "justification": "Each Error Handler ref needs a copy of every inner error handler"
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [
@@ -347,6 +377,15 @@
           "classSimpleName": "Transaction",
           "elementKind": "interface",
           "justification": "This interface is not intended to be implemented."
+        },
+        {
+          "code": "java.method.abstractMethodAdded",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "duplicateFor",
+          "elementKind": "method",
+          "justification": "Each Error Handler ref needs a copy of every inner error handler"
         }
       ]
     }
