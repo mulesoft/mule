@@ -7,11 +7,11 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,9 +21,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +33,6 @@ import javax.inject.Inject;
  */
 class AbstractInterceptorAdapter {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractInterceptorAdapter.class);
-
   @Inject
   private MuleContext muleContext;
 
@@ -45,7 +40,12 @@ class AbstractInterceptorAdapter {
   protected ExtendedExpressionManager expressionManager;
 
   protected Map<String, ProcessorParameterValue> getResolvedParams(final InternalEvent eventWithResolvedParams) {
-    return eventWithResolvedParams.getInternalParameter(INTERCEPTION_RESOLVED_PARAMS);
+    Map<String, ProcessorParameterValue> params = eventWithResolvedParams.getInternalParameter(INTERCEPTION_RESOLVED_PARAMS);
+    if (params == null) {
+      return emptyMap();
+    }
+
+    return params;
   }
 
   protected InternalEvent addResolvedParameters(InternalEvent event, Component component, Map<String, String> dslParameters) {

@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -64,7 +65,13 @@ public class ComponentExecutorCompletableAdapterFactory<T extends ComponentModel
 
     @Override
     public void execute(ExecutionContext<T> executionContext, ExecutorCallback callback) {
-      from(delegate.execute(executionContext)).subscribe(callback::complete, callback::error);
+      try {
+        from(delegate.execute(executionContext))
+            .switchIfEmpty(just(""))
+            .subscribe(callback::complete, callback::error);
+      } catch (Throwable t) {
+        callback.error(t);
+      }
     }
 
     @Override
