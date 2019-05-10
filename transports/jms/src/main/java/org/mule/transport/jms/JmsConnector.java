@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
@@ -53,6 +54,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -234,7 +237,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     protected BlockingQueue<Object> deferredCloseQueue = new LinkedBlockingQueue<>();
 
-    private Thread deferredCloseThread;
+    private DeferredJmsResourceCloser deferredCloseThread;
 
     ////////////////////////////////////////////////////////////////////////
     // Methods
@@ -787,7 +790,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
         if (isHandlingException.get())
         {
-            throw new JMSException("Canno create session while exception is being handled");
+            throw new JMSException("Cannot create session while exception is being handled");
         }
 
         return jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
@@ -798,7 +801,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         // Clear connector exception handling flag
         logger.debug("Setting 'isHandlingException' flag to false");
-        setHandlingException(false);
+        isHandlingException.set(false);
 
         //TODO: This should never be null or an exception should be thrown
         if (connection != null)
@@ -861,6 +864,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             deferredCloseQueue.put(session);
         }
+        catch (NullPointerException e)
+        {
+            logger.warn("Deferred closable is 'null'", e);
+        }
         catch (InterruptedException e)
         {
             logger.warn("Thread was interrupted while deferring session close.");
@@ -880,6 +887,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             try
             {
                 stopping = true;
+                if (!deferredCloseQueue.isEmpty())
+                {
+                    deferredCloseThread.waitForEmptyQueueOrTimeout(20, SECONDS);
+                }
                 deferredCloseThread.interrupt();
                 // Clear all remaining closables
                 // TODO: Maybe add some mechanism for waiting for reamining resources to be closed.
@@ -990,6 +1001,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         try
         {
             deferredCloseQueue.put(producer);
+        }
+        catch (NullPointerException e)
+        {
+            logger.warn("Deferred closable is 'null'", e);
         }
         catch (InterruptedException e)
         {
@@ -1751,18 +1766,22 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     private class DeferredJmsResourceCloser extends Thread
     {
 
+        private final Logger LOGGER = getLogger(DeferredJmsResourceCloser.class);
+        private Semaphore awaitForEmptyQueueSync = new Semaphore(0);
+        private AtomicBoolean exitOnEmptyQueue = new AtomicBoolean(false);
+
         DeferredJmsResourceCloser()
         {
             super("DeferredJMSResourcesCloser");
         }
 
-        Logger LOGGER = getLogger(DeferredJmsResourceCloser.class);
 
         @Override
         public void run()
         {
             // If thread is interrupted, it's because the connector is being stopped. Die
-            while (!Thread.currentThread().isInterrupted())
+            while (!Thread.currentThread().isInterrupted()
+                   && !(deferredCloseQueue.isEmpty() && exitOnEmptyQueue.get()))
             {
                 // If queue is empty, this locks waiting for next element
                 Object closable = takeLoggingOnInterrupt();
@@ -1779,6 +1798,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                     // This case should represent a misuse, or that of closabe being null, which is caused by this thread being interrupted.
                     LOGGER.warn("A JMS Resource of class {} was inserted in the deferred close queue, but wasn't able to be closed.", closable.getClass().getName());
                 }
+            }
+            if (exitOnEmptyQueue.get())
+            {
+                awaitForEmptyQueueSync.release();
             }
         }
 
@@ -1798,6 +1821,19 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 LOGGER.warn("Deferred closing thread was interrupted while taking a queued closable.");
             }
             return null;
+        }
+
+        public void waitForEmptyQueueOrTimeout(int amount, TimeUnit unit)
+        {
+            exitOnEmptyQueue.set(true);
+            try
+            {
+                awaitForEmptyQueueSync.tryAcquire(amount, unit);
+            }
+            catch (InterruptedException e)
+            {
+                logger.warn("Was interrupted while waiting for cleaner thread to empty queue");
+            }
         }
     }
 
