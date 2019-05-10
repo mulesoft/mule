@@ -17,14 +17,20 @@ import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -37,9 +43,15 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,7 +59,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
 
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.SynchronousSink;
 
 @SmallTest
 public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
@@ -207,6 +221,44 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void processToApplyWithChildContextCompletes() throws MuleException {
+    AtomicBoolean completed = new AtomicBoolean();
+    ((BaseEventContext) (input.getContext())).onComplete((e, t) -> completed.set(true));
+
+    final CoreEvent result = processToApplyWithChildContext(input, publisher -> from(publisher));
+    ((BaseEventContext) result.getContext()).success();
+
+    assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
+    assertThat(completed.get(), is(true));
+  }
+
+  @Test
+  public void processToApplyWithChildContextEmptyCompletes() throws MuleException {
+    AtomicBoolean completed = new AtomicBoolean();
+    ((BaseEventContext) (input.getContext())).onComplete((e, t) -> completed.set(true));
+
+    final CoreEvent result = processToApplyWithChildContext(input, publisher -> from(publisher)
+        .doOnNext(ev -> ((BaseEventContext) ev.getContext()).success()));
+    ((BaseEventContext) result.getContext()).success();
+
+    assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
+    assertThat(completed.get(), is(true));
+  }
+
+  @Test
+  public void processToApplyWithChildContextProcessNested() throws MuleException {
+    AtomicBoolean completed = new AtomicBoolean();
+    ((BaseEventContext) (input.getContext())).onComplete((e, t) -> completed.set(true));
+
+    final CoreEvent result = processToApplyWithChildContext(input, publisher -> from(publisher)
+        .flatMap(e -> Mono.from(processWithChildContext(e, p -> from(p), Optional.empty()))));
+    ((BaseEventContext) result.getContext()).success();
+
+    assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
+    assertThat(completed.get(), is(true));
+  }
+
+  @Test
   public void processWithChildContextBlockingErrorInChainRegainsParentContext() throws Exception {
     try {
       processWithChildContextBlocking(input, createChain(error), Optional.empty());
@@ -222,6 +274,207 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public void processWithChildContextBlockingSuccessInChainRegainsParentContext() throws Exception {
     CoreEvent event = processWithChildContextBlocking(input, createChain(map), Optional.empty());
     assertThat(event.getContext(), sameInstance(input.getContext()));
+  }
+
+  @Test
+  public void applyWithinProcessSuccess() {
+    final CoreEvent result = from(processWithChildContext(input,
+                                                          pub -> applyWithChildContext(pub, eventPub -> eventPub,
+                                                                                       Optional.empty()),
+                                                          newChildContext(input, Optional.empty())))
+                                                              .block();
+
+    assertThat(result, sameInstance(input));
+  }
+
+  @Test
+  public void applyWithinProcessError() {
+    final NullPointerException expected = new NullPointerException();
+
+    thrown.expect(hasRootCause(sameInstance(expected)));
+
+    from(processWithChildContext(input,
+                                 pub -> Flux.from(pub)
+                                     .transform(ep -> applyWithChildContext(ep,
+                                                                            eventPub -> Flux.from(eventPub)
+                                                                                .handle(failWithExpected(expected)),
+                                                                            Optional.empty())),
+                                 newChildContext(input, Optional.empty())))
+                                     .block();
+  }
+
+  @Test
+  public void processWithinProcessError() {
+    final NullPointerException expected = new NullPointerException();
+
+    thrown.expect(hasRootCause(sameInstance(expected)));
+
+    from(processWithChildContext(input,
+                                 pub -> Flux.from(pub)
+                                     .flatMap(event -> processWithChildContext(event,
+                                                                               eventPub -> Flux.from(eventPub)
+                                                                                   .handle(failWithExpected(expected)),
+                                                                               Optional.empty())),
+                                 newChildContext(input, Optional.empty())))
+                                     .block();
+  }
+
+  @Test
+  public void applyWithinProcessErrorWithChainErrorHandling() {
+    nestedChildContextsProcessApply(true, completeWithErrorPropagate(), completeWithErrorPropagate());
+  }
+
+  @Test
+  public void processWithinProcessErrorWithChainErrorHandling() {
+    nestedChildContextsProcessProcess(true, completeWithErrorPropagate(), completeWithErrorPropagate());
+  }
+
+  @Test
+  public void applyWithinApplyErrorWithChainErrorHandling() {
+    nestedChildContextsApplyApply(true, completeWithErrorPropagate(), completeWithErrorPropagate());
+  }
+
+  @Test
+  public void processWithinApplyErrorWithChainErrorHandling() {
+    nestedChildContextsApplyProcess(true, completeWithErrorPropagate(), completeWithErrorPropagate());
+  }
+
+  @Test
+  public void applyErrorContinueWithinProcessWithChainErrorHandling() {
+    nestedChildContextsProcessApply(false, completeWithErrorPropagate(), completeWithErrorContinue());
+  }
+
+  @Test
+  public void processErrorContinueWithinProcessWithChainErrorHandling() {
+    nestedChildContextsProcessProcess(false, completeWithErrorPropagate(), completeWithErrorContinue());
+  }
+
+  @Test
+  public void applyErrorContinueWithinApplyWithChainErrorHandling() {
+    nestedChildContextsApplyApply(false, completeWithErrorPropagate(), completeWithErrorContinue());
+  }
+
+  @Test
+  public void processErrorContinueWithinApplyWithChainErrorHandling() {
+    nestedChildContextsApplyProcess(false, completeWithErrorPropagate(), completeWithErrorContinue());
+  }
+
+  @Test
+  public void applyWithinProcessErrorContinueWithChainErrorHandling() {
+    nestedChildContextsProcessApply(false, completeWithErrorContinue(), completeWithErrorPropagate());
+  }
+
+  @Test
+  public void processWithinProcessErrorContinueWithChainErrorHandling() {
+    nestedChildContextsProcessProcess(false, completeWithErrorContinue(), completeWithErrorPropagate());
+  }
+
+  @Test
+  public void applyWithinApplyErrorWithContinueChainErrorHandling() {
+    nestedChildContextsApplyApply(false, completeWithErrorContinue(), completeWithErrorPropagate());
+  }
+
+  @Test
+  public void processWithinApplyErrorContinueWithChainErrorHandling() {
+    nestedChildContextsApplyProcess(false, completeWithErrorContinue(), completeWithErrorPropagate());
+  }
+
+  private void nestedChildContextsApplyProcess(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
+                                               BiConsumer<Throwable, Object> innerErrorConsumer) {
+    final NullPointerException expected = new NullPointerException();
+
+    if (exceptionExpected) {
+      thrown.expect(hasRootCause(sameInstance(expected)));
+    }
+
+    just(input).transform(inputPub -> applyWithChildContext(inputPub,
+                                                            pub -> Flux.from(pub)
+                                                                .flatMap(event -> processWithChildContext(event,
+                                                                                                          innerChain(innerErrorConsumer,
+                                                                                                                     expected),
+                                                                                                          Optional.empty()))
+                                                                .onErrorContinue(outerErrorConsumer),
+                                                            Optional.empty()))
+        .block();
+  }
+
+  private void nestedChildContextsApplyApply(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
+                                             BiConsumer<Throwable, Object> innerErrorConsumer) {
+    final NullPointerException expected = new NullPointerException();
+
+    if (exceptionExpected) {
+      thrown.expect(hasRootCause(sameInstance(expected)));
+    }
+
+    just(input).transform(inputPub -> applyWithChildContext(inputPub,
+                                                            pub -> Flux.from(pub)
+                                                                .transform(ep -> applyWithChildContext(ep,
+                                                                                                       innerChain(innerErrorConsumer,
+                                                                                                                  expected),
+                                                                                                       Optional.empty()))
+                                                                .onErrorContinue(outerErrorConsumer),
+                                                            Optional.empty()))
+        .block();
+  }
+
+  private void nestedChildContextsProcessApply(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
+                                               BiConsumer<Throwable, Object> innerErrorConsumer) {
+    final NullPointerException expected = new NullPointerException();
+
+    if (exceptionExpected) {
+      thrown.expect(hasRootCause(sameInstance(expected)));
+    }
+
+    from(processWithChildContext(input,
+                                 pub -> Flux.from(pub)
+                                     .transform(ep -> applyWithChildContext(ep,
+                                                                            innerChain(innerErrorConsumer, expected),
+                                                                            Optional.empty()))
+                                     .onErrorContinue(outerErrorConsumer),
+                                 newChildContext(input, Optional.empty())))
+                                     .block();
+  }
+
+  private void nestedChildContextsProcessProcess(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
+                                                 BiConsumer<Throwable, Object> innerErrorConsumer) {
+    final NullPointerException expected = new NullPointerException();
+
+    if (exceptionExpected) {
+      thrown.expect(hasRootCause(sameInstance(expected)));
+    }
+
+    from(processWithChildContext(input,
+                                 pub -> Flux.from(pub)
+                                     .flatMap(event -> processWithChildContext(event,
+                                                                               innerChain(innerErrorConsumer, expected),
+                                                                               Optional.empty()))
+                                     .onErrorContinue(outerErrorConsumer),
+                                 newChildContext(input, Optional.empty())))
+                                     .block();
+  }
+
+  private ReactiveProcessor innerChain(BiConsumer<Throwable, Object> innerErrorConsumer, final NullPointerException expected) {
+    return eventPub -> Flux.from(eventPub)
+        .handle(failWithExpected(expected))
+        .onErrorContinue(innerErrorConsumer);
+  }
+
+  private BiConsumer<? super CoreEvent, SynchronousSink<CoreEvent>> failWithExpected(final Exception expected) {
+    return (event, sink) -> sink.error(new MessagingException(event, expected));
+  }
+
+  private BiConsumer<Throwable, Object> completeWithErrorPropagate() {
+    return (error, event) -> {
+      final PrivilegedEvent errorEvent = (PrivilegedEvent) ((MessagingException) error).getEvent();
+      errorEvent.getContext().error(error);
+    };
+  }
+
+  private BiConsumer<Throwable, Object> completeWithErrorContinue() {
+    return (error, event) -> {
+      final PrivilegedEvent errorEvent = (PrivilegedEvent) ((MessagingException) error).getEvent();
+      (errorEvent.getContext()).success(errorEvent);
+    };
   }
 
   @Test
@@ -432,5 +685,4 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   private interface InternalReactiveProcessor extends ReactiveProcessor, InternalProcessor {
 
   }
-
 }
