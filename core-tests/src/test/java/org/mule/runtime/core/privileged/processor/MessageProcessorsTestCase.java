@@ -466,7 +466,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   private BiConsumer<Throwable, Object> completeWithErrorPropagate() {
     return (error, event) -> {
       final PrivilegedEvent errorEvent = (PrivilegedEvent) ((MessagingException) error).getEvent();
-      System.out.println("propagating error... " + errorEvent.getContext().getDepthLevel());
       errorEvent.getContext().error(error);
     };
   }
@@ -474,7 +473,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   private BiConsumer<Throwable, Object> completeWithErrorContinue() {
     return (error, event) -> {
       final PrivilegedEvent errorEvent = (PrivilegedEvent) ((MessagingException) error).getEvent();
-      System.out.println("continuing after error... " + errorEvent.getContext().getDepthLevel());
       (errorEvent.getContext()).success(errorEvent);
     };
   }
