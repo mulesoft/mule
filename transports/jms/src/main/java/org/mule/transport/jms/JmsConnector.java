@@ -811,7 +811,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 connection.start();
                 // Create a new thread and fire it on each start call
                 // TODO: Shoould add in the interrupt method a wait stage, and some kind of kill to assure it has shutdown
-                deferredCloseThread = new DeferredJmsResourceCloser();
+                deferredCloseThread = new DeferredJmsResourceCloser(this, deferredCloseQueue);
                 deferredCloseThread.start();
             }
             catch (JMSException e)
@@ -1763,84 +1763,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         return true;
     }
-    private class DeferredJmsResourceCloser extends Thread
-    {
-
-        private final Logger LOGGER = getLogger(DeferredJmsResourceCloser.class);
-        private Semaphore awaitForEmptyQueueSync = new Semaphore(0);
-        private AtomicBoolean exitOnEmptyQueue = new AtomicBoolean(false);
-
-        DeferredJmsResourceCloser()
-        {
-            super("DeferredJMSResourcesCloser");
-        }
-
-
-        @Override
-        public void run()
-        {
-            // If thread is interrupted, it's because the connector is being stopped. Die
-            while (!Thread.currentThread().isInterrupted()
-                   && !(deferredCloseQueue.isEmpty() && exitOnEmptyQueue.get()))
-            {
-                // If queue is empty, this locks waiting for next element
-                Object closable = takeLoggingOnInterrupt();
-                if (closable instanceof MessageProducer)
-                {
-                    JmsConnector.this.closeQuietly((MessageProducer) closable);
-                }
-                else if (closable instanceof Session)
-                {
-                    JmsConnector.this.closeQuietly((Session) closable, false);
-                }
-                else
-                {
-                    // This case should represent a misuse, or that of closabe being null, which is caused by this thread being interrupted.
-                    LOGGER.warn("A JMS Resource of class {} was inserted in the deferred close queue, but wasn't able to be closed.", closable.getClass().getName());
-                }
-            }
-            if (exitOnEmptyQueue.get())
-            {
-                awaitForEmptyQueueSync.release();
-            }
-        }
-
-        /**
-         * Tries to pop the element at the front of the queue, <b>blocking if it's empty</b>.
-         *
-         * @return the {@link Object} at the front of the queue, or <b>null</b> if it was interrupted while waiting
-         */
-        private Object takeLoggingOnInterrupt()
-        {
-            try
-            {
-                return deferredCloseQueue.take();
-            }
-            catch (InterruptedException e)
-            {
-                LOGGER.warn("Deferred closing thread was interrupted while taking a queued closable.");
-            }
-            return null;
-        }
-
-        public void waitForEmptyQueueOrTimeout(int amount, TimeUnit unit)
-        {
-            exitOnEmptyQueue.set(true);
-            try
-            {
-                awaitForEmptyQueueSync.tryAcquire(amount, unit);
-            }
-            catch (InterruptedException e)
-            {
-                logger.warn("Was interrupted while waiting for cleaner thread to empty queue");
-            }
-        }
-    }
 
     public void setHandlingException(boolean isHandling)
     {
         isHandlingException.set(isHandling);
     }
-
-
 }
