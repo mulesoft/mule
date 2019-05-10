@@ -6,11 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
+import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BASIC_AUTH_HEADER;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.ImmutableAuthorizationCodeState;
 import org.mule.runtime.oauth.api.builder.ClientCredentialsLocation;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
@@ -44,6 +50,13 @@ public final class ExtensionsOAuthUtils {
     } else {
       throw new IllegalArgumentException("Unsupported CredentialsPlacement type " + placement.name());
     }
+  }
+
+  public static OAuthConnectionProviderWrapper getOAuthConnectionProvider(ExecutionContextAdapter operationContext) {
+    ConfigurationInstance config = ((ConfigurationInstance) operationContext.getConfiguration().get());
+    ConnectionProvider provider =
+        unwrapProviderWrapper(config.getConnectionProvider().get(), OAuthConnectionProviderWrapper.class);
+    return provider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) provider : null;
   }
 
   private ExtensionsOAuthUtils() {}

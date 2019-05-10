@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 
 import java.lang.reflect.Field;
@@ -22,16 +23,19 @@ public abstract class OAuthConfig<T extends OAuthGrantType> {
 
   private final String ownerConfigName;
   private final Optional<OAuthObjectStoreConfig> storeConfig;
-  private final Map<String, String> customParameters;
+  private final MultiMap<String, String> customParameters;
+  private final MultiMap<String, String> customHeaders;
   private final Map<Field, String> parameterExtractors;
 
   public OAuthConfig(String ownerConfigName,
                      Optional<OAuthObjectStoreConfig> storeConfig,
-                     Map<String, String> customParameters,
+                     MultiMap<String, String> customParameters,
+                     MultiMap<String, String> customHeaders,
                      Map<Field, String> parameterExtractors) {
     this.ownerConfigName = ownerConfigName;
     this.storeConfig = storeConfig;
     this.customParameters = customParameters;
+    this.customHeaders = customHeaders;
     this.parameterExtractors = parameterExtractors;
   }
 
@@ -45,8 +49,12 @@ public abstract class OAuthConfig<T extends OAuthGrantType> {
     return storeConfig;
   }
 
-  public Map<String, String> getCustomParameters() {
+  public MultiMap<String, String> getCustomParameters() {
     return customParameters;
+  }
+
+  public MultiMap<String, String> getCustomHeaders() {
+    return customHeaders;
   }
 
   public Map<Field, String> getParameterExtractors() {

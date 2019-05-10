@@ -4,12 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,13 +16,13 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
-import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,11 +33,10 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class AuthorizationCodeConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C>
+public class AuthorizationCodeConnectionProviderWrapper<C> extends OAuthConnectionProviderWrapper<C>
     implements NoConnectivityTest {
 
   private final AuthorizationCodeConfig oauthConfig;
-  private final Map<Field, String> callbackValues;
   private final AuthorizationCodeOAuthHandler oauthHandler;
   private final FieldSetter<ConnectionProvider<C>, AuthorizationCodeState> authCodeStateSetter;
   private final RunOnce dance;
@@ -53,11 +48,10 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends Reconnectable
                                                     Map<Field, String> callbackValues,
                                                     AuthorizationCodeOAuthHandler oauthHandler,
                                                     ReconnectionConfig reconnectionConfig) {
-    super(delegate, reconnectionConfig);
+    super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    authCodeStateSetter = getAuthCodeStateSetter(delegate);
-    this.callbackValues = unmodifiableMap(callbackValues);
+    authCodeStateSetter = getOAuthStateSetter(delegate, AuthorizationCodeState.class, "Authorization Code");
     dance = Once.of(this::updateAuthState);
   }
 
@@ -76,35 +70,23 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends Reconnectable
     updateOAuthParameters(delegate, context);
   }
 
-  private void updateOAuthParameters(ConnectionProvider<C> delegate, ResourceOwnerOAuthContext context) {
-    Map<String, Object> responseParameters = context.getTokenResponseParameters();
-    callbackValues.keySet().forEach(field -> {
-      String key = field.getName();
-      if (responseParameters.containsKey(key)) {
-        new FieldSetter<>(field).set(delegate, responseParameters.get(key));
-      }
-    });
+  @Override
+  public void refreshToken(String resourceOwnerId) {
+    oauthHandler.refreshToken(oauthConfig.getOwnerConfigName(), resourceOwnerId);
+  }
+
+  @Override
+  public void invalidate(String resourceOwnerId) {
+    oauthHandler.invalidate(oauthConfig.getOwnerConfigName(), resourceOwnerId);
+  }
+
+  @Override
+  public OAuthGrantType getGrantType() {
+    return oauthConfig.getGrantType();
   }
 
   public String getResourceOwnerId() {
     return getContext().getResourceOwnerId();
-  }
-
-  private FieldSetter<ConnectionProvider<C>, AuthorizationCodeState> getAuthCodeStateSetter(ConnectionProvider<C> delegate) {
-    List<Field> stateFields = getFields(delegate.getClass()).stream()
-        .filter(f -> f.getType().equals(AuthorizationCodeState.class))
-        .collect(toList());
-
-    if (stateFields.size() != 1) {
-      throw new IllegalConnectionProviderModelDefinitionException(
-          format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
-                     + "one (and only one) field of type %s. %d were found",
-                 delegate.getClass().getName(),
-                 AuthorizationCodeState.class.getName(),
-                 stateFields.size()));
-    }
-
-    return new FieldSetter<>(stateFields.get(0));
   }
 
   private ResourceOwnerOAuthContext getContext() {

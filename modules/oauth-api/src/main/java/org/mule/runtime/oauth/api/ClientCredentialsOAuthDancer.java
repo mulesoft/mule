@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.oauth.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.oauth.api.builder.ClientCredentialsListener;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
@@ -17,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ClientCredentialsOAuthDancer {
 
   /**

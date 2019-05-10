@@ -4,11 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.extension.api.security.CredentialsPlacement;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
+import org.mule.runtime.extension.api.security.CredentialsPlacement;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthObjectStoreConfig;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -25,7 +28,8 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
 
   public ClientCredentialsConfig(String ownerConfigName,
                                  Optional<OAuthObjectStoreConfig> storeConfig,
-                                 Map<String, String> customParameters,
+                                 MultiMap<String, String> customParameters,
+                                 MultiMap<String, String> customHeaders,
                                  Map<Field, String> parameterExtractors,
                                  String clientId,
                                  String clientSecret,
@@ -33,7 +37,7 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
                                  String scope,
                                  CredentialsPlacement credentialsPlacement,
                                  ClientCredentialsGrantType grantType) {
-    super(ownerConfigName, storeConfig, customParameters, parameterExtractors);
+    super(ownerConfigName, storeConfig, customParameters, customHeaders, parameterExtractors);
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.tokenUrl = tokenUrl;

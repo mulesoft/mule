@@ -4,11 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthObjectStoreConfig;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -36,7 +40,7 @@ public final class AuthorizationCodeConfig extends OAuthConfig<AuthorizationCode
 
   public AuthorizationCodeConfig(String ownerConfigName,
                                  Optional<OAuthObjectStoreConfig> storeConfig,
-                                 Map<String, String> customParameters,
+                                 MultiMap<String, String> customParameters,
                                  Map<Field, String> parameterExtractors,
                                  AuthorizationCodeGrantType grantType,
                                  OAuthCallbackConfig callbackConfig,
@@ -48,7 +52,7 @@ public final class AuthorizationCodeConfig extends OAuthConfig<AuthorizationCode
                                  String resourceOwnerId,
                                  String before,
                                  String after) {
-    super(ownerConfigName, storeConfig, customParameters, parameterExtractors);
+    super(ownerConfigName, storeConfig, customParameters, emptyMultiMap(), parameterExtractors);
 
     this.consumerKey = consumerKey;
     this.consumerSecret = consumerSecret;

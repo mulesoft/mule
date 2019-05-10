@@ -7,13 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.RESOURCE_OWNER_ID_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthConnectionProvider;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-
-import javax.inject.Inject;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
  * Synthetic {@link CompletableComponentExecutor} which invalidates a given user's OAuth context.
@@ -22,16 +21,14 @@ import javax.inject.Inject;
  */
 public class UnauthorizeOperationExecutor implements CompletableComponentExecutor<ComponentModel> {
 
-  @Inject
-  private ExtensionsOAuthManager oauthManager;
-
   @Override
   public void execute(ExecutionContext<ComponentModel> executionContext, ExecutorCallback callback) {
-    ConfigurationInstance config = executionContext.getConfiguration().get();
     String ownerId = executionContext.hasParameter(RESOURCE_OWNER_ID_PARAMETER_NAME)
         ? executionContext.getParameter(RESOURCE_OWNER_ID_PARAMETER_NAME)
         : DEFAULT_RESOURCE_OWNER_ID;
-    oauthManager.invalidate(config.getName(), ownerId);
+
+    OAuthConnectionProviderWrapper provider = getOAuthConnectionProvider((ExecutionContextAdapter) executionContext);
+    provider.invalidate(ownerId);
 
     callback.complete(null);
   }

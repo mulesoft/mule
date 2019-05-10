@@ -4,47 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
-import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
-import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
-import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.ClientCredentialsListener;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCredentialsOAuthDancer> {
-
-  public ClientCredentialsOAuthHandler(LazyValue<HttpService> httpService,
-                                       LazyValue<OAuthService> oauthService,
-                                       LockFactory lockFactory,
-                                       MuleExpressionLanguage expressionEvaluator,
-                                       Function<OAuthConfig, ObjectStore> objectStoreLocator,
-                                       MuleContext muleContext) {
-    super(httpService, oauthService, lockFactory, expressionEvaluator, objectStoreLocator, muleContext);
-  }
 
   /**
    * Becomes aware of the given {@code config} and makes sure that the access token callback
@@ -65,46 +47,54 @@ public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCreden
   /**
    * Performs the refresh token flow
    *
-   * @param ownerConfigName the name of the extension config which obtained the token
+   * @param config a registered {@link ClientCredentialsConfig}
    */
-  public void refreshToken(String ownerConfigName) {
-    ClientCredentialsOAuthDancer dancer = dancers.get(ownerConfigName);
+  public void refreshToken(ClientCredentialsConfig config) {
+    ClientCredentialsOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
 
     try {
       dancer.refreshToken().get();
     } catch (Exception e) {
       throw new MuleRuntimeException(
-          createStaticMessage(format("Could not refresh token for config '%s'", ownerConfigName)), e);
+          createStaticMessage(format("Could not refresh token for config '%s'", config.getOwnerConfigName())), e);
     }
   }
 
   /**
-   * @param config an {@link OAuthConfig}
-   * @return the {@link ResourceOwnerOAuthContext} for the given {@code config} or {@link Optional#empty()}
-   * if authorization hasn't yet taken place or has been invalidated
+   * Retrieves the {@link ResourceOwnerOAuthContext} for the given {@code config}. If no such context yet exists,
+   * then it performs the OAuth authorization and returns the resulting context.
+   *
+   * @param config a {@link ClientCredentialsConfig}
+   * @return the {@link ResourceOwnerOAuthContext} for the given {@code config}.
    */
-  public Optional<ResourceOwnerOAuthContext> getOAuthContext(ClientCredentialsConfig config) {
+  public ResourceOwnerOAuthContext getOAuthContext(ClientCredentialsConfig config) {
     ClientCredentialsOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
     if (dancer == null) {
-      return empty();
+      throw new IllegalStateException(
+          format("Client Credentials dancer for config '%s' not yet registered", config.getOwnerConfigName()));
     }
 
     ResourceOwnerOAuthContext contextForResourceOwner = dancer.getContext();
 
     if (contextForResourceOwner == null || contextForResourceOwner.getAccessToken() == null) {
-      return empty();
+      try {
+        dancer.accessToken().get();
+        contextForResourceOwner = dancer.getContext();
+      } catch (Exception e) {
+
+      }
     }
 
-    return of(contextForResourceOwner);
+    return contextForResourceOwner;
   }
 
   /**
-   * Invalidates the OAuth state
+   * Invalidates the OAuth state associated to the given {@code config}
    *
-   * @param ownerConfigName the name of the extension config which obtained the token
+   * @param config a registered {@link ClientCredentialsConfig}
    */
-  public void invalidate(String ownerConfigName) {
-    ClientCredentialsOAuthDancer dancer = dancers.get(ownerConfigName);
+  public void invalidate(ClientCredentialsConfig config) {
+    ClientCredentialsOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
     if (dancer == null) {
       return;
     }
@@ -141,10 +131,9 @@ public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCreden
       dancerBuilder.scopes(scopes);
     }
 
-
     dancerBuilder
-        // TODO: Check with Rodro. It sounds like this should be supported
-        //.customParameters(config.getCustomParameters())
+        .customParameters(config.getCustomParameters())
+        .customHeaders(config.getCustomHeaders())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
     listeners.forEach(dancerBuilder::addListener);

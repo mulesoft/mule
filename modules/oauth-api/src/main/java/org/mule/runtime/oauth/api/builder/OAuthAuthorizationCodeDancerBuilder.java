@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
@@ -23,6 +24,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
+@NoImplement
 public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<AuthorizationCodeOAuthDancer> {
 
   /**

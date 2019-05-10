@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -20,18 +20,16 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -40,10 +38,11 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.ServerNotFoundException;
 import org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
-import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -56,23 +55,19 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import javax.inject.Inject;
+
 import org.reactivestreams.Publisher;
 
 public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<AuthorizationCodeOAuthDancer> {
 
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
 
-  private final Registry registry;
+  @Inject
+  private Registry registry;
 
-  public AuthorizationCodeOAuthHandler(LazyValue<HttpService> httpService,
-                                       LazyValue<OAuthService> oauthService, LockFactory lockFactory,
-                                       MuleExpressionLanguage expressionEvaluator,
-                                       Function<OAuthConfig, ObjectStore> objectStoreLocator,
-                                       Registry registry,
-                                       MuleContext muleContext) {
-    super(httpService, oauthService, lockFactory, expressionEvaluator, objectStoreLocator, muleContext);
-    this.registry = registry;
-  }
+  // TODO: MULE-10837 this should be a plain old @Inject
+  private LazyValue<HttpService> httpService;
 
   /**
    * Becomes aware of the given {@code config} and makes sure that the access token callback
@@ -287,4 +282,9 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
         .block();
   }
 
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    httpService = new LazyLookup<>(HttpService.class, muleContext);
+  }
 }
