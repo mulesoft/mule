@@ -31,10 +31,12 @@ import org.slf4j.Logger;
 class DeferredJmsResourceCloser extends Thread
 {
 
-    private JmsConnector jmsConnector;
     private final Logger LOGGER = getLogger(DeferredJmsResourceCloser.class);
+
     private final JmsConnector connector;
     private final BlockingQueue<Object> queue;
+    private final QueueWaitInterruptedSignaler queueWaitInterrupted = new QueueWaitInterruptedSignaler();
+
     private Semaphore awaitForEmptyQueueSync = new Semaphore(0);
     private AtomicBoolean exitOnEmptyQueue = new AtomicBoolean(false);
 
@@ -45,7 +47,6 @@ class DeferredJmsResourceCloser extends Thread
     DeferredJmsResourceCloser(JmsConnector jmsConnector, BlockingQueue<Object> deferredCloseQueue)
     {
         super("DeferredJMSResourcesCloser");
-        this.jmsConnector = jmsConnector;
         this.connector = jmsConnector;
         this.queue = deferredCloseQueue;
     }
@@ -60,7 +61,11 @@ class DeferredJmsResourceCloser extends Thread
         {
             // If queue is empty, this locks waiting for next element
             Object closable = takeLoggingOnInterrupt();
-            if (closable instanceof MessageProducer)
+            if (closable instanceof QueueWaitInterruptedSignaler)
+            {
+                // Interruption already signaled. Continue.
+            }
+            else if (closable instanceof MessageProducer)
             {
                 connector.closeQuietly((MessageProducer) closable);
             }
@@ -100,7 +105,7 @@ class DeferredJmsResourceCloser extends Thread
         {
             LOGGER.warn("Thread was interrupted waiting for a resource to be deferred: ", e);
         }
-        return null;
+        return queueWaitInterrupted;
     }
 
     /**
@@ -120,6 +125,14 @@ class DeferredJmsResourceCloser extends Thread
         catch (InterruptedException e)
         {
             LOGGER.warn("Thread was interrupted while waiting for deferred-close-queue to be emptied: ", e);
+        }
+    }
+
+    private class QueueWaitInterruptedSignaler
+    {
+
+        QueueWaitInterruptedSignaler()
+        {
         }
     }
 }
