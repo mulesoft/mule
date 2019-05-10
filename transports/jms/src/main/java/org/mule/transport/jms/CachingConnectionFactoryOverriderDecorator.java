@@ -13,8 +13,8 @@ import javax.jms.ConnectionFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
 /**
- * Decorator that overrides a Spring-bean defined {@link CachingConnectionFactory}, putting instead a {@link CustomCachingConnectionFactory},
- * which we have control over.
+ * Decorator that overrides a Spring-bean defined {@link CachingConnectionFactory}, putting instead a {@link
+ * CustomCachingConnectionFactory}, which we have control over.
  */
 public class CachingConnectionFactoryOverriderDecorator implements ConnectionFactoryDecorator
 {
@@ -26,8 +26,12 @@ public class CachingConnectionFactoryOverriderDecorator implements ConnectionFac
     {
         ConnectionFactory targetConnectionFactory = ((CachingConnectionFactory) connectionFactory).getTargetConnectionFactory();
         decoratedFactory = new CustomCachingConnectionFactory(targetConnectionFactory, jmsConnector.getUsername(), jmsConnector.getPassword(), jmsConnector);
-        // TODO: Extract somehow from the Spring-bean-defined CachingConnectionFactory its properties, and configure them in
-        // the CustomCachingConnectionFactory.
+
+        // Copy connection factory setting for those from the overwritten one
+        CachingConnectionFactory overwrittenConnectionFactory = (CachingConnectionFactory) connectionFactory;
+        decoratedFactory.setCacheConsumers(overwrittenConnectionFactory.isCacheConsumers());
+        decoratedFactory.setCacheProducers(overwrittenConnectionFactory.isCacheProducers());
+        decoratedFactory.setSessionCacheSize(overwrittenConnectionFactory.getSessionCacheSize());
 
         return decoratedFactory;
     }
