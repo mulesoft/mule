@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -53,7 +54,7 @@ public class DeferredCloserTestCase
             @Override
             public Void answer(InvocationOnMock invocation)
             {
-                System.out.printf("Something arrived to close #%d: %s\n", closureCounter.getAndIncrement(), invocation.getArguments()[0].toString());
+                notifyImClosingSomething(invocation.getArguments()[0]);
                 return null;
             }
         };
@@ -67,7 +68,40 @@ public class DeferredCloserTestCase
     }
 
     @Test(timeout = 10000)
-    public void restartThread() throws InterruptedException
+    public void closeRemainingObjectWhenTerminateAndWaitCalledTest() throws InterruptedException
+    {
+        thread.start();
+
+        // Print sth, wait and again
+        queue.put(producer);
+        silentSleep(1000);
+        queue.put(session);
+        silentSleep(1000);
+
+        doAnswer(new Answer()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws InterruptedException
+            {
+                System.out.println("Waiting some time");
+                notifyImClosingSomething(invocation.getArguments()[0]);
+                Thread.sleep(5000);
+                return null;
+            }
+        }).when(connector).closeQuietly(any(Session.class));
+
+        queue.put(session);
+        // Should have popped session, and start 5 sec. wait
+        queue.put(producer);
+        queue.put(producer);
+        queue.put(producer);
+        thread.waitForEmptyQueueOrTimeout(6, SECONDS);
+        thread.interrupt();
+        probeGetsEmptied();
+    }
+
+    @Test(timeout = 10000)
+    public void keepsClosingAfterRestartTest() throws InterruptedException
     {
         thread.start();
 
@@ -90,7 +124,7 @@ public class DeferredCloserTestCase
     }
 
     @Test(timeout = 10000)
-    public void closingTest() throws InterruptedException
+    public void closeSomeObjectsTest() throws InterruptedException
     {
         queue.put(producer);
 
@@ -104,6 +138,11 @@ public class DeferredCloserTestCase
         queue.put(producer);
 
         probeGetsEmptied();
+    }
+
+    private void notifyImClosingSomething(Object something)
+    {
+        System.out.printf("Something arrived to close #%d: %s\n", closureCounter.getAndIncrement(), something.toString());
     }
 
     private void probeGetsEmptied()
