@@ -27,7 +27,8 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
  */
 public final class ExtensionsOAuthUtils {
 
-  public static AuthorizationCodeState toAuthorizationCodeState(AuthorizationCodeConfig config, ResourceOwnerOAuthContext context) {
+  public static AuthorizationCodeState toAuthorizationCodeState(AuthorizationCodeConfig config,
+                                                                ResourceOwnerOAuthContext context) {
     return new ImmutableAuthorizationCodeState(context.getAccessToken(),
                                                context.getRefreshToken(),
                                                context.getResourceOwnerId(),

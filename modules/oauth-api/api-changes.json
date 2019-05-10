@@ -28,6 +28,50 @@
           "methodName": "addListener",
           "elementKind": "method",
           "justification": "New feature fixes bug"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
+          "new": "interface org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "elementKind": "interface",
+          "justification": "Annotation was missing"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer",
+          "new": "interface org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "ClientCredentialsOAuthDancer",
+          "elementKind": "interface",
+          "justification": "Annotation was missing"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "elementKind": "interface",
+          "justification": "Annotation was missing"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthClientCredentialsDancerBuilder",
+          "elementKind": "interface",
+          "justification": "Annotation was missing"
         }
       ]
     }

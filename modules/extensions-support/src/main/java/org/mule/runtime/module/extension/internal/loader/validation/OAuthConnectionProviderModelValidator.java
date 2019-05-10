@@ -51,9 +51,9 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
 
         if (authCode != null && clientCredentials != null) {
           throw new IllegalConnectionProviderModelDefinitionException(format(
-              "Connection Provider of class '%s' is attempting to support both authorization code and client credentials "
-                         + "grant types. Each connection provider can only support one grant type at a time.",
-                     implementingType));
+                                                                             "Connection Provider of class '%s' is attempting to support both authorization code and client credentials "
+                                                                                 + "grant types. Each connection provider can only support one grant type at a time.",
+                                                                             implementingType));
         }
 
         if (authCode != null) {
@@ -74,12 +74,12 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
 
     if (stateFields.size() != 1) {
       throw new IllegalConnectionProviderModelDefinitionException(
-          format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
-                     + "one (and only one) field of type %s. %d were found",
-                 implementingType,
-                 grantType,
-                 AuthorizationCodeState.class.getName(),
-                 stateFields.size()));
+                                                                  format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
+                                                                      + "one (and only one) field of type %s. %d were found",
+                                                                         implementingType,
+                                                                         grantType,
+                                                                         AuthorizationCodeState.class.getName(),
+                                                                         stateFields.size()));
     }
   }
 }

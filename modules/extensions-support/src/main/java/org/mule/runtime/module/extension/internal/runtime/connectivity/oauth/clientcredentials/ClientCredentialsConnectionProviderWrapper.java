@@ -79,9 +79,10 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
     final ConnectionProvider<C> delegate = getDelegate();
     ResourceOwnerOAuthContext context = getContext();
     oauthStateSetter.set(delegate, new UpdatingClientCredentialsState(
-        dancer,
-        context,
-        updatedContext -> updateOAuthParameters(delegate, updatedContext)));
+                                                                      dancer,
+                                                                      context,
+                                                                      updatedContext -> updateOAuthParameters(delegate,
+                                                                                                              updatedContext)));
 
     updateOAuthParameters(delegate, context);
   }

@@ -65,7 +65,7 @@ public class ClientCredentialsConnectionProviderObjectBuilder<C> extends BaseOAu
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.doBuild(result);
     provider = wrapProvider(result, provider, getClientCredentialsParams(result));
-    
+
     return provider;
   }
 

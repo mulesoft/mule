@@ -56,7 +56,9 @@ public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCreden
       dancer.refreshToken().get();
     } catch (Exception e) {
       throw new MuleRuntimeException(
-          createStaticMessage(format("Could not refresh token for config '%s'", config.getOwnerConfigName())), e);
+                                     createStaticMessage(format("Could not refresh token for config '%s'",
+                                                                config.getOwnerConfigName())),
+                                     e);
     }
   }
 
@@ -71,7 +73,8 @@ public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCreden
     ClientCredentialsOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
     if (dancer == null) {
       throw new IllegalStateException(
-          format("Client Credentials dancer for config '%s' not yet registered", config.getOwnerConfigName()));
+                                      format("Client Credentials dancer for config '%s' not yet registered",
+                                             config.getOwnerConfigName()));
     }
 
     ResourceOwnerOAuthContext contextForResourceOwner = dancer.getContext();
@@ -109,7 +112,8 @@ public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCreden
     OAuthClientCredentialsDancerBuilder dancerBuilder =
         oauthService.get().clientCredentialsGrantTypeDancerBuilder(lockId -> lockFactory.createLock(lockId),
                                                                    new LazyObjectStoreToMapAdapter(
-                                                                       () -> objectStoreLocator.apply(config)),
+                                                                                                   () -> objectStoreLocator
+                                                                                                       .apply(config)),
                                                                    expressionEvaluator);
 
     final ClientCredentialsGrantType grantType = config.getGrantType();

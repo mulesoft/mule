@@ -78,9 +78,9 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
     if (providerGenerics.size() != 1) {
       // TODO: MULE-9220: Add a syntax validator for this
       throw new IllegalConnectionProviderModelDefinitionException(
-          format("Connection provider class '%s' was expected to have 1 generic type "
-                     + "(for the connection type) but %d were found",
-                 providerType.getName(), providerGenerics.size()));
+                                                                  format("Connection provider class '%s' was expected to have 1 generic type "
+                                                                      + "(for the connection type) but %d were found",
+                                                                         providerType.getName(), providerGenerics.size()));
     }
 
     providerDeclarer = declarer.withConnectionProvider(name).describedAs(description);

@@ -98,9 +98,9 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
       dancer.refreshToken(resourceOwnerId).get();
     } catch (Exception e) {
       throw new MuleRuntimeException(
-          createStaticMessage(format("Could not refresh token for resourceOwnerId '%s' using config '%s'",
-                                     resourceOwnerId, ownerConfigName)),
-          e);
+                                     createStaticMessage(format("Could not refresh token for resourceOwnerId '%s' using config '%s'",
+                                                                resourceOwnerId, ownerConfigName)),
+                                     e);
     }
   }
 
@@ -147,7 +147,8 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
         oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> lockFactory.createLock(lockId),
                                                                    new LazyObjectStoreToMapAdapter(
-                                                                       () -> objectStoreLocator.apply(config)),
+                                                                                                   () -> objectStoreLocator
+                                                                                                       .apply(config)),
                                                                    expressionEvaluator);
     final AuthorizationCodeGrantType grantType = config.getGrantType();
     final OAuthCallbackConfig callbackConfig = config.getCallbackConfig();
@@ -173,9 +174,9 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
       httpServer = httpService.get().getServerFactory().lookup(callbackConfig.getListenerConfig());
     } catch (ServerNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage(format(
-          "Connector '%s' defines '%s' as the http:listener-config to use for provisioning callbacks, but no such definition "
-              + "exists in the application configuration",
-          config.getOwnerConfigName(), callbackConfig.getListenerConfig())),
+                                                                "Connector '%s' defines '%s' as the http:listener-config to use for provisioning callbacks, but no such definition "
+                                                                    + "exists in the application configuration",
+                                                                config.getOwnerConfigName(), callbackConfig.getListenerConfig())),
                                      e);
     }
 
@@ -211,11 +212,11 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
                        httpServer.getServerAddress().getIp(),
                        httpServer.getServerAddress().getPort(),
                        callbackConfig.getCallbackPath())
-            .toExternalForm();
+                           .toExternalForm();
       } catch (MalformedURLException e) {
         throw new MuleRuntimeException(createStaticMessage(format(
-            "Could not derive a external callback url from <http:listener-config> '%s'",
-            callbackConfig.getListenerConfig())),
+                                                                  "Could not derive a external callback url from <http:listener-config> '%s'",
+                                                                  callbackConfig.getListenerConfig())),
                                        e);
       }
     });
@@ -226,7 +227,7 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
       return new Pair<>(lookupFlow(config.getBefore()), lookupFlow(config.getAfter()));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not obtain 'before' and 'after' OAuth flows defined by "
-                                                             + "config " + config.getOwnerConfigName(), e));
+          + "config " + config.getOwnerConfigName(), e));
     }
   }
 
@@ -253,8 +254,8 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
   }
 
   private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(
-      AuthorizationCodeConfig config,
-      Flow flow) {
+                                                                                                     AuthorizationCodeConfig config,
+                                                                                                     Flow flow) {
 
     return (callbackContext, oauthContext) -> {
       AuthorizationCodeState state = toAuthorizationCodeState(config, oauthContext);
@@ -277,8 +278,10 @@ public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<Authorizatio
     return from(childPublisher)
         .onErrorMap(MuleException.class,
                     e -> new MuleRuntimeException(createStaticMessage(
-                        format("Error found while execution flow '%s' which is configured in the '%s' parameter "
-                                   + "of the '%s' config", flow.getName(), callbackType, config.getOwnerConfigName()), e)))
+                                                                      format("Error found while execution flow '%s' which is configured in the '%s' parameter "
+                                                                          + "of the '%s' config", flow.getName(), callbackType,
+                                                                             config.getOwnerConfigName()),
+                                                                      e)))
         .block();
   }
 

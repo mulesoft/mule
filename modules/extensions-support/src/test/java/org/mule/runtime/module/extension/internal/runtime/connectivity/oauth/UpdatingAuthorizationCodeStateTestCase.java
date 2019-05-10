@@ -16,6 +16,7 @@ import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
@@ -43,7 +44,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   private static final String NEW_TOKEN = "newToken";
   private static final String NEW_REFRESH_TOKEN = "newRefresh";
 
-  private OAuthConfig oAuthConfig;
+  private AuthorizationCodeConfig oAuthConfig;
 
   @Mock
   private AuthorizationCodeOAuthDancer dancer;
@@ -56,13 +57,13 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
 
   @Before
   public void before() {
-    oAuthConfig = new OAuthConfig("configName",
-                                  new AuthorizationCodeConfig("key", "secret", "url", "url", "scope", "id", null, null),
-                                  mock(OAuthCallbackConfig.class),
-                                  empty(),
-                                  new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
-                                  emptyMap(),
-                                  emptyMap());
+    oAuthConfig = new AuthorizationCodeConfig("configName",
+                                              empty(),
+                                              emptyMultiMap(),
+                                              emptyMap(),
+                                              new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
+                                              mock(OAuthCallbackConfig.class),
+                                              "key", "secret", "url", "url", "scope", "id", null, null);
 
     when(initialContext.getAccessToken()).thenReturn(ACCESS_TOKEN);
     when(initialContext.getRefreshToken()).thenReturn(REFRESH_TOKEN);

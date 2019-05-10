@@ -92,7 +92,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends OAuthConnecti
   private ResourceOwnerOAuthContext getContext() {
     return oauthHandler.getOAuthContext(oauthConfig)
         .orElseThrow(() -> new IllegalArgumentException("OAuth authorization dance not yet performed for resourceOwnerId "
-                                                            + oauthConfig.getResourceOwnerId()));
+            + oauthConfig.getResourceOwnerId()));
   }
 
   @Override

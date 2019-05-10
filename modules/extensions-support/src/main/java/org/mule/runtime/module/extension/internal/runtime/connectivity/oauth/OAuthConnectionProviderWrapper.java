@@ -48,12 +48,12 @@ public abstract class OAuthConnectionProviderWrapper<C> extends ReconnectableCon
 
     if (stateFields.size() != 1) {
       throw new IllegalConnectionProviderModelDefinitionException(
-          format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
-                     + "one (and only one) field of type %s. %d were found",
-                 delegate.getClass().getName(),
-                 grantTypeName,
-                 stateType,
-                 stateFields.size()));
+                                                                  format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
+                                                                      + "one (and only one) field of type %s. %d were found",
+                                                                         delegate.getClass().getName(),
+                                                                         grantTypeName,
+                                                                         stateType,
+                                                                         stateFields.size()));
     }
 
     return new FieldSetter<>(stateFields.get(0));
