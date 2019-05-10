@@ -35,7 +35,6 @@ class DeferredJmsResourceCloser extends Thread
 
     private final JmsConnector connector;
     private final BlockingQueue<Object> queue;
-    private final QueueWaitInterruptedSignaler queueWaitInterrupted = new QueueWaitInterruptedSignaler();
 
     private Semaphore awaitForEmptyQueueSync = new Semaphore(0);
     private AtomicBoolean exitOnEmptyQueue = new AtomicBoolean(false);
@@ -61,11 +60,7 @@ class DeferredJmsResourceCloser extends Thread
         {
             // If queue is empty, this locks waiting for next element
             Object closable = takeLoggingOnInterrupt();
-            if (closable instanceof QueueWaitInterruptedSignaler)
-            {
-                // Interruption already signaled. Continue.
-            }
-            else if (closable instanceof MessageProducer)
+            if (closable instanceof MessageProducer)
             {
                 connector.closeQuietly((MessageProducer) closable);
             }
@@ -76,7 +71,7 @@ class DeferredJmsResourceCloser extends Thread
             else
             {
                 // This case should represent a misuse, or that of closabe being null, which is caused by this thread being interrupted.
-                LOGGER.warn("A JMS Resource of class {} was inserted in the deferred close queue, but wasn't able to be closed.", closable.getClass().getName());
+                LOGGER.warn("A JMS Resource of class {} was inserted in the deferred close queue, but wasn't able to be closed.", closable != null ? closable.getClass().getName() : "NullObject");
             }
         }
         if (exitOnEmptyQueue.get())
@@ -105,7 +100,7 @@ class DeferredJmsResourceCloser extends Thread
         {
             LOGGER.warn("Thread was interrupted waiting for a resource to be deferred: ", e);
         }
-        return queueWaitInterrupted;
+        return null;
     }
 
     /**
@@ -125,14 +120,6 @@ class DeferredJmsResourceCloser extends Thread
         catch (InterruptedException e)
         {
             LOGGER.warn("Thread was interrupted while waiting for deferred-close-queue to be emptied: ", e);
-        }
-    }
-
-    private class QueueWaitInterruptedSignaler
-    {
-
-        QueueWaitInterruptedSignaler()
-        {
         }
     }
 }

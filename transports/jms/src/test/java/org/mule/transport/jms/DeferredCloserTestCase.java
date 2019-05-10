@@ -6,45 +6,85 @@
  */
 package org.mule.transport.jms;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class DeferredCloserTestCase
 {
 
-    BlockingQueue queue = new LinkedBlockingQueue();
-    private Thread printerThread;
+    private BlockingQueue queue = new LinkedBlockingQueue();
+    private DeferredJmsResourceCloser thread;
+    private JmsConnector connector;
+
+    private MessageProducer producer = mock(MessageProducer.class);
+    private Session session = mock(Session.class);
+    private AtomicInteger closureCounter = new AtomicInteger();
 
     @Before
-    public void setupThread() {
-        printerThread = new PrintFromQueueThread();
+    public void setUpThread()
+    {
+        thread = new DeferredJmsResourceCloser(connector, queue);
+    }
+
+    @Before
+    public void setUpJmsConnectorAndResourcesMocks()
+    {
+        this.queue.clear();
+        this.connector = mock(JmsConnector.class);
+        this.closureCounter.set(0);
+        Answer printAndIncrementCounter = new Answer()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation)
+            {
+                System.out.printf("Something arrived to close #%d: %s\n", closureCounter.getAndIncrement(), invocation.getArguments()[0].toString());
+                return null;
+            }
+        };
+
+        doAnswer(printAndIncrementCounter).when(connector).closeQuietly(any(MessageProducer.class));
+        doAnswer(printAndIncrementCounter).when(connector).closeQuietly(any(Session.class));
+
+        // Set more readable toString methods
+        when(producer.toString()).thenReturn("aReProducer");
+        when(session.toString()).thenReturn("aReSession");
     }
 
     @Test(timeout = 10000)
     public void restartThread() throws InterruptedException
     {
-        printerThread.start();
+        thread.start();
 
         // Print sth, wait and again
-        queue.put("Hola 1");
+        queue.put(producer);
         silentSleep(1000);
-        queue.put("Hola 2");
+        queue.put(session);
         silentSleep(1000);
 
         // interrupt thread
-        printerThread.interrupt();
+        thread.interrupt();
         silentSleep(1000);
         // Add two thing in queue
-        queue.put("Hola denuevo 1");
-        queue.put("Hola denuevo 2");
-        printerThread = new PrintFromQueueThread();
-        printerThread.start();
+        queue.put(producer);
+        queue.put(session);
+        thread = new DeferredJmsResourceCloser(connector, queue);
+        thread.start();
 
         probeGetsEmptied();
     }
@@ -52,17 +92,16 @@ public class DeferredCloserTestCase
     @Test(timeout = 10000)
     public void closingTest() throws InterruptedException
     {
+        queue.put(producer);
 
-        queue.put("COMIENZO");
-
-        printerThread.start();
-
-        silentSleep(2000);
-        queue.put("Hola perro");
-
+        thread.start();
 
         silentSleep(2000);
-        queue.put("Chau perro");
+        queue.put(session);
+
+
+        silentSleep(2000);
+        queue.put(producer);
 
         probeGetsEmptied();
     }
@@ -85,34 +124,6 @@ public class DeferredCloserTestCase
         });
     }
 
-    private class PrintFromQueueThread extends Thread
-    {
-
-        PrintFromQueueThread()  {
-            super("PrinterThread");
-        }
-
-        @Override
-        public void run()
-        {
-            while (!Thread.currentThread().isInterrupted())
-            {
-                // Think this will block waiting
-                Object closable;
-                try
-                {
-                    closable = queue.take();
-                    System.out.println(String.format("Just removed this element: %s", closable.toString()));
-                }
-                catch (InterruptedException e)
-                {
-                    System.out.println("Just got interrupted waiting for new elements");
-                }
-            }
-            System.out.println("Just got interrupted");
-        }
-    }
-
     private void silentSleep(Integer millis)
     {
         try
@@ -124,5 +135,4 @@ public class DeferredCloserTestCase
             System.out.println("Main thread interrupted");
         }
     }
-
 }
