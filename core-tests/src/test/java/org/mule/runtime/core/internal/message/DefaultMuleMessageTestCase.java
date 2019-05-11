@@ -19,12 +19,15 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.ds.ByteArrayDataSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -34,8 +37,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataHandler;
-
-import org.junit.Test;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
 
@@ -158,7 +159,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         .mediaType(TEXT)
         .addInboundProperty("bar", "in")
         .addOutboundProperty(FOO_PROPERTY, "out")
-        .exceptionPayload(new DefaultExceptionPayload(new NullPointerException("error")))
         .build();
 
     assertThat(message.toString(), is(equalToIgnoringLineBreaks("\n"
@@ -168,9 +168,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         + "  mediaType=text/plain\n"
         + "  attributes={}\n"
         + "  attributesMediaType=application/json\n"
-        + "  exceptionPayload:\n"
-        + "    message=error\n"
-        + "    exception=java.lang.NullPointerException: error\n"
         + "  Message properties:\n"
         + "    INBOUND scoped properties:\n"
         + "    bar=in\n"
@@ -186,7 +183,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         .mediaType(TEXT)
         .addInboundAttachment("another", new DataHandler(new ByteArrayDataSource("no".getBytes(), TEXT, "another")))
         .addInboundAttachment("field1", new DataHandler(new ByteArrayDataSource("yes".getBytes(), TEXT, "field1")))
-        .exceptionPayload(new DefaultExceptionPayload(new NullPointerException("error")))
         .build();
 
     validateAttachments(message.getInboundAttachmentNames());
@@ -199,7 +195,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         .mediaType(TEXT)
         .addOutboundAttachment("another", new DataHandler(new ByteArrayDataSource("no".getBytes(), TEXT, "another")))
         .addOutboundAttachment("field1", new DataHandler(new ByteArrayDataSource("yes".getBytes(), TEXT, "field1")))
-        .exceptionPayload(new DefaultExceptionPayload(new NullPointerException("error")))
         .build();
 
     validateAttachments(message.getOutboundAttachmentNames());
@@ -211,7 +206,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         .payload(TypedValue.of("test"))
         .mediaType(TEXT)
         .inboundAttachments(getAttachments())
-        .exceptionPayload(new DefaultExceptionPayload(new NullPointerException("error")))
         .build();
 
     validateAttachments(message.getInboundAttachmentNames());
@@ -223,7 +217,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         .payload(TypedValue.of("test"))
         .mediaType(TEXT)
         .outboundAttachments(getAttachments())
-        .exceptionPayload(new DefaultExceptionPayload(new NullPointerException("error")))
         .build();
 
     validateAttachments(message.getOutboundAttachmentNames());

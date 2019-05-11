@@ -9,7 +9,6 @@ package org.mule.functional.junit4;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.io.Serializable;
@@ -104,21 +103,4 @@ public class TestLegacyMessageUtils {
     }
   }
 
-  /**
-   * If an error occurred during the processing of this message this will return a ErrorPayload that contains the root exception
-   * and Mule error code, plus any other related info
-   *
-   * @param message message used to obtain the data from. Must be a {@link InternalMessage}
-   * @return The exception payload (if any) attached to this message
-   * @throws {@link IllegalStateException} if there is any problem accessing the legacy message API using reflection
-   */
-  public static ExceptionPayload getExceptionPayload(Message message) {
-    try {
-      Method method = message.getClass().getMethod("getExceptionPayload");
-      method.setAccessible(true);
-      return (ExceptionPayload) method.invoke(message);
-    } catch (Exception e) {
-      throw new IllegalStateException(LEGACY_MESSAGE_API_ERROR, e);
-    }
-  }
 }

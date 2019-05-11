@@ -25,7 +25,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
@@ -133,7 +132,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {
           Exception exception = new Exception();
           error = createErrorMock(exception);
-          msg = InternalMessage.builder().nullValue().exceptionPayload(new DefaultExceptionPayload(exception)).build();
+          msg = InternalMessage.builder().nullValue().build();
         } else {
           msg = of("No " + rejectIfMatches);
         }

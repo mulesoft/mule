@@ -46,9 +46,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+
+import org.reactivestreams.Publisher;
 
 import org.reactivestreams.Publisher;
 
@@ -141,10 +141,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return event -> {
       if (getMessageProcessors().isEmpty()) {
         return just(event);
-      } else {
-        event = CoreEvent.builder(event)
-            .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
-            .build();
       }
       return from(processWithChildContext(event, configuredMessageProcessors, ofNullable(getLocation()),
                                           NullExceptionHandler.getInstance()));
@@ -176,9 +172,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   protected CoreEvent nullifyExceptionPayloadIfRequired(CoreEvent event) {
     if (this.handleException) {
-      return CoreEvent.builder(event).error(null)
-          .message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
-          .build();
+      return CoreEvent.builder(event).error(null).build();
     } else {
       return event;
     }

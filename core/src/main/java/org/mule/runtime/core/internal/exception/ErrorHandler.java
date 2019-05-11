@@ -23,8 +23,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
-import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
@@ -66,7 +64,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       exception = new MessagingException(event, exception);
     }
 
-    event = addExceptionPayload(exception, event);
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
         return exceptionListener.handleException(exception, event);
@@ -78,7 +75,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     if (exception instanceof MessagingException) {
-      CoreEvent event = addExceptionPayload(exception, ((MessagingException) exception).getEvent());
+      CoreEvent event = ((MessagingException) exception).getEvent();
       ((MessagingException) exception).setProcessedEvent(event);
       try {
         for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
@@ -110,12 +107,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   @Override
   public boolean acceptsAll() {
     return true;
-  }
-
-  private CoreEvent addExceptionPayload(Exception exception, CoreEvent event) {
-    return CoreEvent.builder(event)
-        .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
-        .build();
   }
 
   private void addCriticalErrorHandler() {
