@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
@@ -61,6 +64,21 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
   }
 
   @Override
+  public ConnectionValidationResult validate(C connection) {
+    try {
+      ResourceOwnerOAuthContext context = getContext();
+      if (context.getAccessToken() != null) {
+        return success();
+      } else {
+        String message = "Server did not granted an access token";
+        return failure(message, new IllegalStateException(message));
+      }
+    } catch (Exception e) {
+      return failure("Could not obtain an access token", e);
+    }
+  }
+
+  @Override
   public void refreshToken(String resourceOwnerId) {
     oauthHandler.refreshToken(oauthConfig);
   }
@@ -79,10 +97,9 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
     final ConnectionProvider<C> delegate = getDelegate();
     ResourceOwnerOAuthContext context = getContext();
     oauthStateSetter.set(delegate, new UpdatingClientCredentialsState(
-                                                                      dancer,
-                                                                      context,
-                                                                      updatedContext -> updateOAuthParameters(delegate,
-                                                                                                              updatedContext)));
+        dancer,
+        context,
+        updatedContext -> updateOAuthParameters(delegate, updatedContext)));
 
     updateOAuthParameters(delegate, context);
   }

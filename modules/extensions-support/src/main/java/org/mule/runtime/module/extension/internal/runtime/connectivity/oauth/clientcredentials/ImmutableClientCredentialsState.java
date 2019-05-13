@@ -14,23 +14,16 @@ import java.util.Optional;
 public class ImmutableClientCredentialsState implements ClientCredentialsState {
 
   private final String accessToken;
-  private final String refreshToken;
   private final String expiresIn;
 
-  public ImmutableClientCredentialsState(String accessToken, String refreshToken, String expiresIn) {
+  public ImmutableClientCredentialsState(String accessToken, String expiresIn) {
     this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
     this.expiresIn = expiresIn;
   }
 
   @Override
   public String getAccessToken() {
     return accessToken;
-  }
-
-  @Override
-  public Optional<String> getRefreshToken() {
-    return ofNullable(refreshToken);
   }
 
   @Override

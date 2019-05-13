@@ -17,7 +17,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Extension(name = "Test OAuth Extension")
-@ConnectionProviders({TestOAuthConnectionProvider.class, ScopelessOAuthConnectionProvider.class})
+@ConnectionProviders({TestOAuthConnectionProvider.class,
+    ScopelessOAuthConnectionProvider.class,
+    TestOAuthClientCredentialsProvider.class})
 @Operations(TestOAuthOperations.class)
 @Xml(prefix = "test-oauth")
 public class TestOAuthExtension {

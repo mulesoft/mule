@@ -128,7 +128,6 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       grantTypes.add(new ClientCredentialsGrantType(a.tokenUrl(),
                                                     a.accessTokenExpr(),
                                                     a.expirationExpr(),
-                                                    a.refreshTokenExpr(),
                                                     a.defaultScopes(),
                                                     a.credentialsPlacement()));
 

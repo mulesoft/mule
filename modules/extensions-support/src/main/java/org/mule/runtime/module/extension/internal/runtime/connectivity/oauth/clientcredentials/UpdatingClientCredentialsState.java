@@ -40,19 +40,12 @@ public class UpdatingClientCredentialsState implements ClientCredentialsState {
   }
 
   private void updateDelegate(ResourceOwnerOAuthContext initialContext) {
-    delegate = new ImmutableClientCredentialsState(initialContext.getAccessToken(),
-                                                   initialContext.getRefreshToken(),
-                                                   initialContext.getExpiresIn());
+    delegate = new ImmutableClientCredentialsState(initialContext.getAccessToken(), initialContext.getExpiresIn());
   }
 
   @Override
   public String getAccessToken() {
     return delegate.getAccessToken();
-  }
-
-  @Override
-  public Optional<String> getRefreshToken() {
-    return delegate.getRefreshToken();
   }
 
   @Override
