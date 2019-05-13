@@ -16,6 +16,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 
 @ClientCredentials(tokenUrl = ACCESS_TOKEN_URL, defaultScopes = DEFAULT_SCOPE, credentialsPlacement = QUERY_PARAMS)
 @Alias("client-credentials")
@@ -34,7 +35,8 @@ public class TestOAuthClientCredentialsProvider extends TestOAuthConnectionState
 
   }
 
-  public ClientCredentialsState getClientCredentialsState() {
+  @Override
+  public OAuthState getState() {
     return state;
   }
 

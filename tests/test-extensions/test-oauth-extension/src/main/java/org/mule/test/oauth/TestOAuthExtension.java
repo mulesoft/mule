@@ -6,32 +6,14 @@
  */
 package org.mule.test.oauth;
 
+import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
-import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
-
-import java.util.LinkedList;
-import java.util.List;
 
 @Extension(name = "Test OAuth Extension")
-@ConnectionProviders({TestOAuthConnectionProvider.class,
-    ScopelessOAuthConnectionProvider.class,
-    TestOAuthClientCredentialsProvider.class})
-@Operations(TestOAuthOperations.class)
+@Configurations({AuthCodeConfig.class, ClientCredentialsConfig.class})
 @Xml(prefix = "test-oauth")
 public class TestOAuthExtension {
 
-  private List<AuthCodeRequest> capturedAuthCodeRequests = new LinkedList<>();
-  private List<AuthorizationCodeState> capturedAuthCodeStates = new LinkedList<>();
 
-  public List<AuthCodeRequest> getCapturedAuthCodeRequests() {
-    return capturedAuthCodeRequests;
-  }
-
-  public List<AuthorizationCodeState> getCapturedAuthCodeStates() {
-    return capturedAuthCodeStates;
-  }
 }
