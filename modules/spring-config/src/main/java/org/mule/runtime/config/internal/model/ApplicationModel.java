@@ -430,9 +430,10 @@ public class ApplicationModel {
           }));
     }
 
+    Optional<CompositeConfigurationPropertiesProvider> configurationAttributesProvider = empty();
     if (!configConfigurationPropertiesProviders.isEmpty()) {
-      CompositeConfigurationPropertiesProvider configurationAttributesProvider =
-          new CompositeConfigurationPropertiesProvider(configConfigurationPropertiesProviders);
+      configurationAttributesProvider = of(
+                                           new CompositeConfigurationPropertiesProvider(configConfigurationPropertiesProviders));
       parentConfigurationPropertiesResolver = of(new DefaultConfigurationPropertiesResolver(
                                                                                             deploymentPropertiesConfigurationProperties != null
                                                                                                 ?
@@ -440,7 +441,8 @@ public class ApplicationModel {
                                                                                                 of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
                                                                                                                                               deploymentPropertiesConfigurationProperties))
                                                                                                 : parentConfigurationPropertiesResolver,
-                                                                                            configurationAttributesProvider));
+                                                                                            configurationAttributesProvider
+                                                                                                .get()));
     } else if (deploymentPropertiesConfigurationProperties != null) {
       parentConfigurationPropertiesResolver =
           of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
@@ -450,9 +452,19 @@ public class ApplicationModel {
     DefaultConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
                                                    globalPropertiesConfigurationAttributeProvider);
-    DefaultConfigurationPropertiesResolver systemPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
-                                                   environmentPropertiesConfigurationProvider);
+
+    DefaultConfigurationPropertiesResolver systemPropertiesResolver;
+    if (configurationAttributesProvider.isPresent()) {
+      DefaultConfigurationPropertiesResolver configurationPropertiesResolver =
+          new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
+                                                     configurationAttributesProvider.get());
+      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(of(configurationPropertiesResolver),
+                                                                            environmentPropertiesConfigurationProvider);
+    } else {
+      systemPropertiesResolver = new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
+                                                                            environmentPropertiesConfigurationProvider);
+    }
+
 
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(
