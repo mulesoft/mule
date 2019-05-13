@@ -26,6 +26,7 @@ import org.mule.tck.processor.FlowAssert;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -72,6 +73,10 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     return null;
   }
 
+  protected Map<String, String> artifactProperties() {
+    return emptyMap();
+  }
+
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
     String configResources = getConfigResources();
@@ -83,9 +88,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return createConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInit(), disableXmlValidations());
+      return createConfigurationBuilder(configResources, artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
     }
-    return createConfigurationBuilder(getConfigFiles(), emptyMap(), APP, enableLazyInit(), disableXmlValidations());
+    return createConfigurationBuilder(getConfigFiles(), artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
   }
 
   /**

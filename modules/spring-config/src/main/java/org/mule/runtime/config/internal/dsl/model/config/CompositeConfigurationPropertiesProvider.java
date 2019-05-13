@@ -26,17 +26,27 @@ public class CompositeConfigurationPropertiesProvider implements ConfigurationPr
 
   private static final Logger LOGGER = getLogger(CompositeConfigurationPropertiesProvider.class);
   private List<ConfigurationPropertiesProvider> configurationPropertiesProviders;
+  private boolean initialized = false;
+  private boolean disposed = false;
 
   @Override
   public void dispose() {
+    if (disposed) {
+      return;
+    }
     disposeIfNeeded(configurationPropertiesProviders, LOGGER);
+    disposed = true;
   }
 
   @Override
   public void initialise() throws InitialisationException {
+    if (initialized) {
+      return;
+    }
     for (ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders) {
       initialiseIfNeeded(configurationPropertiesProvider);
     }
+    initialized = true;
   }
 
   public CompositeConfigurationPropertiesProvider(List<ConfigurationPropertiesProvider> configurationPropertiesProviders) {
