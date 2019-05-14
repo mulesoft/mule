@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -68,7 +67,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
     try {
       ResourceOwnerOAuthContext context = getContext();
       if (context.getAccessToken() != null) {
-        return success();
+        return getDelegate().validate(connection);
       } else {
         String message = "Server did not granted an access token";
         return failure(message, new IllegalStateException(message));

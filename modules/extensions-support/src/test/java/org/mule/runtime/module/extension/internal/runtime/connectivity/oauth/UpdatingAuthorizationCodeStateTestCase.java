@@ -60,6 +60,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     oAuthConfig = new AuthorizationCodeConfig("configName",
                                               empty(),
                                               emptyMultiMap(),
+                                              emptyMultiMap(),
                                               emptyMap(),
                                               new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
                                               mock(OAuthCallbackConfig.class),

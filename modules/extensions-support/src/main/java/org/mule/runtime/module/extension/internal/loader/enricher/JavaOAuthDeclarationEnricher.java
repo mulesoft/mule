@@ -127,7 +127,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
             if (annotation != null) {
               validateExpressionSupport(declaration, p, field);
               p.setExpressionSupport(NOT_SUPPORTED);
-              p.addModelProperty(new OAuthParameterModelProperty(annotation.requestAlias()));
+              p.addModelProperty(new OAuthParameterModelProperty(annotation.requestAlias(), annotation.placement()));
             }
           }));
     }

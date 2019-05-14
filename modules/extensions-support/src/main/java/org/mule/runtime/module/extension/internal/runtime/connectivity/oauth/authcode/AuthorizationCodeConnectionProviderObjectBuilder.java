@@ -86,9 +86,11 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
 
     Map<String, String> authCodeParams = getAuthCodeParameterMap(result);
 
+    CustomOAuthParameters customParameters = getCustomParameters(result);
     AuthorizationCodeConfig config = new AuthorizationCodeConfig(ownerConfigName,
                                                                  buildOAuthObjectStoreConfig(result),
-                                                                 getCustomParameters(result),
+                                                                 customParameters.getQueryParams(),
+                                                                 customParameters.getHeaders(),
                                                                  callbackValues,
                                                                  grantType,
                                                                  buildOAuthCallbackConfig(result),
@@ -116,9 +118,11 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
 
     Map<String, String> authCodeParams = getAuthCodeParameterMap(context.getEvent());
 
+    CustomOAuthParameters customParameters = getCustomParameters(result);
     AuthorizationCodeConfig config = new AuthorizationCodeConfig(ownerConfigName,
                                                                  buildOAuthObjectStoreConfig(context.getEvent()),
-                                                                 getCustomParameters(result),
+                                                                 customParameters.getQueryParams(),
+                                                                 customParameters.getHeaders(),
                                                                  callbackValues,
                                                                  grantType,
                                                                  buildOAuthCallbackConfig(context.getEvent()),
@@ -188,9 +192,11 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
       ctxForCallback = getResolvingContextFor(initialiserEvent);
       OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(ctxForCallback));
 
+      CustomOAuthParameters customParameters = getCustomParameters(initialiserEvent);
       return new AuthorizationCodeConfig(ownerConfigName,
                                          storeConfig,
-                                         getCustomParameters(initialiserEvent),
+                                         customParameters.getQueryParams(),
+                                         customParameters.getHeaders(),
                                          callbackValues,
                                          grantType,
                                          callbackConfig,
@@ -214,6 +220,4 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
       }
     }
   }
-
-
 }

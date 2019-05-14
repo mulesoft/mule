@@ -11,9 +11,10 @@ import static java.util.Optional.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_STORE_CONFIG_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OBJECT_STORE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.HEADERS;
+import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.QUERY_PARAMS;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -21,7 +22,7 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,10 +81,9 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
         .ifPresent(property -> delegate.accept(parameter, property)));
   }
 
-  protected String resolveString(CoreEvent event, ValueResolver resolver) throws MuleException {
+  protected Object resolve(CoreEvent event, ValueResolver resolver) throws MuleException {
     try (ValueResolvingContext context = getResolvingContextFor(event)) {
-      Object value = resolver.resolve(context);
-      return value != null ? StringMessageUtils.toString(value) : null;
+      return resolver.resolve(context);
     }
   }
 
@@ -120,35 +121,72 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
         .orElseGet(Collections::emptyMap);
   }
 
-  protected MultiMap<String, String> getCustomParameters(ResolverSetResult result) {
-    MultiMap<String, String> oauthParams = new MultiMap<>();
-    withCustomParameters((parameter, property) -> oauthParams.put(property.getRequestAlias(),
-                                                                  result.get(parameter.getName()).toString()));
-    return oauthParams;
+  protected CustomOAuthParameters getCustomParameters(ResolverSetResult result) {
+    return getCustomParameters(key -> result.get(key));
   }
 
   protected String sanitizePath(String path) {
     return !path.startsWith("/") ? "/" + path : path;
   }
 
-  protected MultiMap<String, String> getCustomParameters(CoreEvent event) {
-    MultiMap<String, String> oauthParams = new MultiMap<>();
+  protected CustomOAuthParameters getCustomParameters(CoreEvent event) {
+    return getCustomParameters((CheckedFunction<String, Object>) key -> {
+      ValueResolver resolver = resolverSet.getResolvers().get(key);
+      if (resolver != null) {
+        return resolve(event, resolver);
+      }
+
+      return null;
+    });
+  }
+
+  private CustomOAuthParameters getCustomParameters(Function<String, Object> valueFunction) {
+    CustomOAuthParameters params = new CustomOAuthParameters();
     withCustomParameters((parameter, property) -> {
       String alias = property.getRequestAlias();
       if (StringUtils.isBlank(alias)) {
         alias = parameter.getName();
       }
 
-      ValueResolver resolver = resolverSet.getResolvers().get(alias);
-      if (resolver != null) {
-        try {
-          oauthParams.put(alias, resolveString(event, resolver));
-        } catch (MuleException e) {
-          throw new MuleRuntimeException(e);
-        }
+      final Object value = valueFunction.apply(alias);
+
+      if (value == null) {
+        return;
+      }
+
+      final MultiMap<String, String> target;
+
+      if (property.getPlacement() == QUERY_PARAMS) {
+        target = params.getQueryParams();
+      } else if (property.getPlacement() == HEADERS) {
+        target = params.getHeaders();
+      } else {
+        throw new IllegalArgumentException("Unknown parameter placement: " + property.getPlacement());
+      }
+
+      if (value instanceof Map) {
+        target.putAll((Map) value);
+      } else if (value instanceof List) {
+        target.put(alias, (List) value);
+      } else {
+        target.put(alias, value.toString());
       }
     });
 
-    return oauthParams;
+    return params;
+  }
+
+  protected class CustomOAuthParameters {
+
+    private MultiMap<String, String> queryParams = new MultiMap<>();
+    private MultiMap<String, String> headers = new MultiMap<>();
+
+    public MultiMap<String, String> getQueryParams() {
+      return queryParams;
+    }
+
+    public MultiMap<String, String> getHeaders() {
+      return headers;
+    }
   }
 }

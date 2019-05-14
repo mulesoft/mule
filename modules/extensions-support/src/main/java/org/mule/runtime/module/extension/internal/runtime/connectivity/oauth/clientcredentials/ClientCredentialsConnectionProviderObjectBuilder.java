@@ -17,7 +17,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -80,10 +79,12 @@ public class ClientCredentialsConnectionProviderObjectBuilder<C> extends BaseOAu
 
   private ConnectionProvider<C> wrapProvider(ResolverSetResult result, ConnectionProvider<C> provider,
                                              Map<String, String> clientCredentialsParams) {
+    CustomOAuthParameters customParameters = getCustomParameters(result);
+
     ClientCredentialsConfig config = new ClientCredentialsConfig(ownerConfigName,
                                                                  buildOAuthObjectStoreConfig(result),
-                                                                 getCustomParameters(result),
-                                                                 MultiMap.emptyMultiMap(), // TODO
+                                                                 customParameters.getQueryParams(),
+                                                                 customParameters.getHeaders(),
                                                                  callbackValues,
                                                                  clientCredentialsParams.get(CLIENT_ID_PARAMETER_NAME),
                                                                  clientCredentialsParams.get(CLIENT_SECRET_PARAMETER_NAME),
