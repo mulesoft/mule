@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.exception.ExceptionUtils.hasCause;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
@@ -33,7 +34,6 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -430,7 +430,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     } catch (Exception e) {
       // NoSuchBeanDefinitionException can be ignored
       if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Error while unregistering Mule security manager"),
+        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule security manager"),
                                        e);
       }
     }
@@ -441,8 +441,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
         muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
       } catch (RegistrationException e) {
-        throw new MuleRuntimeException(I18nMessageFactory
-            .createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"), e);
+        throw new MuleRuntimeException(createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"),
+                                       e);
       }
     }
   }
@@ -454,7 +454,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     } catch (Exception e) {
       // NoSuchBeanDefinitionException can be ignored
       if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Error while unregistering Mule configuration"),
+        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule configuration"),
                                        e);
       }
     }
