@@ -63,6 +63,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   @Inject
   ConfigurationProperties configurationProperties;
 
+  private Boolean lazyInit = null;
+
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
    * exception message if an exception occurs. Switching on DEBUG level logging with automatically set this flag to true.
@@ -489,8 +491,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     if (configurationProperties == null) {
       this.configurationProperties =
           ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_CONFIGURATION_PROPERTIES);
+      lazyInit = configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
     }
-    return configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+    return lazyInit;
   }
 
   protected boolean verifyContextNotInitialized() {
