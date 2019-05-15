@@ -12,15 +12,15 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -34,7 +34,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.util.Pair;
@@ -46,14 +45,10 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +56,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+
+import reactor.core.publisher.Mono;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -106,11 +105,11 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
    */
   public static final String MODULE_CONNECTION_GLOBAL_ELEMENT_NAME = "connection";
 
-  private Map<String, String> properties;
-  private Map<String, String> parameters;
-  private ExtensionModel extensionModel;
-  private OperationModel operationModel;
-  private ExpressionManager expressionManager;
+  private final Map<String, String> properties;
+  private final Map<String, String> parameters;
+  private final ExtensionModel extensionModel;
+  private final OperationModel operationModel;
+  private final ExpressionManager expressionManager;
 
   public ModuleOperationMessageProcessorChainBuilder(Map<String, String> properties,
                                                      Map<String, String> parameters,
@@ -139,12 +138,12 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
   static public class ModuleOperationProcessorChain extends DefaultMessageProcessorChain
       implements Processor {
 
-    private Map<String, Pair<String, MetadataType>> properties;
-    private Map<String, Pair<String, MetadataType>> parameters;
-    private boolean returnsVoid;
-    private ExpressionManager expressionManager;
-    private Optional<String> target;
-    private String targetValue;
+    private final Map<String, Pair<String, MetadataType>> properties;
+    private final Map<String, Pair<String, MetadataType>> parameters;
+    private final boolean returnsVoid;
+    private final ExpressionManager expressionManager;
+    private final Optional<String> target;
+    private final String targetValue;
 
     ModuleOperationProcessorChain(String name, Processor head, List<Processor> processors,
                                   List<Processor> processorsForLifecycle,
@@ -213,8 +212,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
           .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
               .push(new FlowStackElement(moduleOperationName, null)))
           .concatMap(request -> {
-            Publisher<CoreEvent> child = processWithChildContext(createEventWithParameters(request), super::apply,
-                                                                 ofNullable(getLocation()));
+            Publisher<CoreEvent> child = processWithChildContextDontComplete(createEventWithParameters(request), super::apply,
+                                                                             ofNullable(getLocation()));
             return from(child).doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop())
                 .onErrorMap(MessagingException.class, remapMessagingException())
                 .doOnError(MessagingException.class, me -> ((DefaultFlowCallStack) me.getEvent().getFlowCallStack()).pop())

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.message.Message;
@@ -124,7 +124,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
       final Function<Context, Context> innerChainCtxMapping =
           ((InternalEvent) event).getInternalParameter(INNER_CHAIN_CTX_MAPPING);
 
-      from(processWithChildContext(event, chain, ofNullable(chain.getLocation())))
+      from(processWithChildContextDontComplete(event, chain, ofNullable(chain.getLocation())))
           .doOnSuccess(this::handleSuccess)
           .doOnError(error -> {
             if (error instanceof MessagingException) {
