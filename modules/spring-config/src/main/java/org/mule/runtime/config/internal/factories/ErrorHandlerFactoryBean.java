@@ -31,7 +31,7 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
     }
 
     ErrorHandler errorHandler;
-    if (name != null) {
+    if (isGlobalErrorHandler()) {
       errorHandler = new GlobalErrorHandler();
       errorHandler.setName(name);
     } else {
@@ -39,6 +39,10 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
     }
     errorHandler.setExceptionListeners(exceptionListeners);
     return errorHandler;
+  }
+
+  private boolean isGlobalErrorHandler() {
+    return getLocation().getParts().size() == 1;
   }
 
   public void setDelegate(GlobalErrorHandler delegate) {
