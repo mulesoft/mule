@@ -369,7 +369,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }
     }
 
-    public static javax.xml.transform.Source toXmlSource(XMLStreamReader src) throws Exception {
+    public static javax.xml.transform.Source toXmlSource(XMLStreamReader src) throws Exception
+    {
         // StaxSource requires that we advance to a start element/document event
         if (!src.isStartElement() &&
             src.getEventType() != XMLStreamConstants.START_DOCUMENT)
@@ -568,17 +569,21 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * @param writer
      * @throws XMLStreamException
      */
-    public static void copy(XMLStreamReader reader, XMLStreamWriter writer) throws XMLStreamException {
+    public static void copy(XMLStreamReader reader, XMLStreamWriter writer) throws XMLStreamException
+    {
         copy(reader, writer, false);
     }
     public static void copy(XMLStreamReader reader, XMLStreamWriter writer,
-                            boolean fragment) throws XMLStreamException {
+                            boolean fragment) throws XMLStreamException
+    {
         // number of elements read in
         int read = 0;
         int event = reader.getEventType();
 
-        while (reader.hasNext()) {
-            switch (event) {
+        while (reader.hasNext())
+        {
+            switch (event)
+            {
             case XMLStreamConstants.START_ELEMENT:
                 read++;
                 writeStartElement(reader, writer);
@@ -586,7 +591,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
             case XMLStreamConstants.END_ELEMENT:
                 writer.writeEndElement();
                 read--;
-                if (read <= 0 && !fragment) {
+                if (read <= 0 && !fragment)
+                {
                     return;
                 }
                 break;
@@ -606,53 +612,64 @@ public class XMLUtils extends org.mule.util.XMLUtils
     }
 
     private static void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer)
-        throws XMLStreamException {
+        throws XMLStreamException
+    {
         String local = reader.getLocalName();
         String uri = reader.getNamespaceURI();
         String prefix = reader.getPrefix();
-        if (prefix == null) {
+        if (prefix == null)
+        {
             prefix = "";
         }
 
-        
 //        System.out.println("STAXUTILS:writeStartElement : node name : " + local +  " namespace URI" + uri);
         boolean writeElementNS = false;
-        if (uri != null) {
+        if (uri != null)
+        {
             String boundPrefix = writer.getPrefix(uri);
-            if (boundPrefix == null || !prefix.equals(boundPrefix)) {
+            if (boundPrefix == null || !prefix.equals(boundPrefix))
+            {
                 writeElementNS = true;
             }
         }
 
         // Write out the element name
-        if (uri != null) {
-            if (prefix.length() == 0 && StringUtils.isEmpty(uri)) {
+        if (uri != null)
+        {
+            if (prefix.length() == 0 && StringUtils.isEmpty(uri))
+            {
                 writer.writeStartElement(local);
                 writer.setDefaultNamespace(uri);
 
-            } else {
+            } else
+            {
                 writer.writeStartElement(prefix, local, uri);
                 writer.setPrefix(prefix, uri);
             }
-        } else {
+        } else
+        {
             writer.writeStartElement(local);
         }
 
         // Write out the namespaces
-        for (int i = 0; i < reader.getNamespaceCount(); i++) {
+        for (int i = 0; i < reader.getNamespaceCount(); i++)
+        {
             String nsURI = reader.getNamespaceURI(i);
             String nsPrefix = reader.getNamespacePrefix(i);
-            if (nsPrefix == null) {
+            if (nsPrefix == null)
+            {
                 nsPrefix = "";
             }
 
-            if (nsPrefix.length() == 0) {
+            if (nsPrefix.length() == 0)
+            {
                 writer.writeDefaultNamespace(nsURI);
             } else {
                 writer.writeNamespace(nsPrefix, nsURI);
             }
 
-            if (nsURI.equals(uri) && nsPrefix.equals(prefix)) {
+            if (nsURI.equals(uri) && nsPrefix.equals(prefix))
+            {
                 writeElementNS = false;
             }
         }
@@ -660,8 +677,10 @@ public class XMLUtils extends org.mule.util.XMLUtils
         // Check if the namespace still needs to be written.
         // We need this check because namespace writing works
         // different on Woodstox and the RI.
-        if (writeElementNS) {
-            if (prefix.length() == 0) {
+        if (writeElementNS)
+        {
+            if (prefix.length() == 0)
+            {
                 writer.writeDefaultNamespace(uri);
             } else {
                 writer.writeNamespace(prefix, uri);
@@ -669,15 +688,19 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }        
         
         // Write out attributes
-        for (int i = 0; i < reader.getAttributeCount(); i++) {
+        for (int i = 0; i < reader.getAttributeCount(); i++)
+        {
             String ns = reader.getAttributeNamespace(i);
             String nsPrefix = reader.getAttributePrefix(i);
-            if (ns == null || ns.length() == 0) {
+            if (ns == null || ns.length() == 0)
+            {
                 writer.writeAttribute(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
-            } else if (nsPrefix == null || nsPrefix.length() == 0) {
+            } else if (nsPrefix == null || nsPrefix.length() == 0)
+            {
                 writer.writeAttribute(reader.getAttributeNamespace(i), reader.getAttributeLocalName(i),
                                       reader.getAttributeValue(i));
-            } else {
+            } else
+            {
                 writer.writeAttribute(reader.getAttributePrefix(i), reader.getAttributeNamespace(i), reader
                     .getAttributeLocalName(i), reader.getAttributeValue(i));
             }
@@ -709,8 +732,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
      */
     public static Node selectOne(String xpath, Node node) throws XPathExpressionException
     {
-            XPath xp = createXPath(node);
-            return (Node) xp.evaluate(xpath, node, XPathConstants.NODE);
+        XPath xp = createXPath(node);
+        return (Node) xp.evaluate(xpath, node, XPathConstants.NODE);
     }
 
     /**
@@ -722,8 +745,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
      */
     public static String selectValue(String xpath, Node node) throws XPathExpressionException
     {
-            XPath xp = createXPath(node);
-            return (String) xp.evaluate(xpath, node, XPathConstants.STRING);
+        XPath xp = createXPath(node);
+        return (String) xp.evaluate(xpath, node, XPathConstants.STRING);
     }
 
     /**
@@ -735,14 +758,14 @@ public class XMLUtils extends org.mule.util.XMLUtils
      */
     public static List<Node> select(String xpath, Node node) throws XPathExpressionException
     {
-            XPath xp = createXPath(node);
-            NodeList nl = (NodeList) xp.evaluate(xpath, node, XPathConstants.NODESET);
-            List<Node> nodeList = new ArrayList<>(nl.getLength());
-            for (int i = 0; i < nl.getLength(); i++)
-            {
-                nodeList.add(nl.item(i));
-            }
-            return nodeList;
+        XPath xp = createXPath(node);
+        NodeList nl = (NodeList) xp.evaluate(xpath, node, XPathConstants.NODESET);
+        List<Node> nodeList = new ArrayList<>(nl.getLength());
+        for (int i = 0; i < nl.getLength(); i++)
+        {
+            nodeList.add(nl.item(i));
+        }
+        return nodeList;
     }
 
     public static Object createInstance(String className)
@@ -761,7 +784,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
         return factory;
     }
 
-    public static TransformerFactory createSaxonTransformerFactory() {
+    public static TransformerFactory createSaxonTransformerFactory()
+    {
         TransformerFactory factory = (TransformerFactory) createInstance(SAXON_TRANSFORMER_FACTORY);
 
         XMLSecureFactories.createDefault().configureTransformerFactory(factory);
@@ -769,7 +793,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
         return factory;
     }
 
-    public static XMLInputFactory createWstxXmlInputFactory() {
+    public static XMLInputFactory createWstxXmlInputFactory()
+    {
         XMLInputFactory factory = (XMLInputFactory) createInstance(WSTX_INPUT_FACTORY);
 
         setMaxAttributeSizeProperty(factory);
@@ -779,7 +804,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
         return factory;
     }
 
-    public static XMLInputFactory createWstxXmlInputFactory(Boolean externalEntities, Boolean expandEntities) {
+    public static XMLInputFactory createWstxXmlInputFactory(Boolean externalEntities, Boolean expandEntities)
+    {
         XMLInputFactory factory = (XMLInputFactory) createInstance(WSTX_INPUT_FACTORY);
 
         setMaxAttributeSizeProperty(factory);
@@ -789,7 +815,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
         return factory;
     }
 
-    private static void setMaxAttributeSizeProperty(XMLInputFactory factory) {
+    private static void setMaxAttributeSizeProperty(XMLInputFactory factory)
+    {
         String maxAttributeSizeProperty = getProperty(MULE_MAX_ATTRIBUTE_SIZE);
         if(maxAttributeSizeProperty != null)
         {
