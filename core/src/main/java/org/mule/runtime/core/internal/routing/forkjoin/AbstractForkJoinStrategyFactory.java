@@ -11,7 +11,7 @@ import static java.time.Duration.ofMillis;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.defer;
@@ -37,8 +37,6 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -49,6 +47,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -125,13 +125,15 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
           .transform(pair.getRoute());
-      return from(processWithChildContext(pair.getEvent(),
-                                          applyProcessingStrategy(processingStrategy, route, maxConcurrency), empty()))
-                                              .timeout(ofMillis(timeout),
-                                                       onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair),
-                                                       timeoutScheduler)
-                                              .onErrorResume(MessagingException.class,
-                                                             me -> delayErrors ? just(me.getEvent()) : error(me))
+      return from(processWithChildContextDontComplete(pair.getEvent(),
+                                                      applyProcessingStrategy(processingStrategy, route, maxConcurrency),
+                                                      empty()))
+                                                          .timeout(ofMillis(timeout),
+                                                                   onTimeout(processingStrategy, delayErrors, timeoutErrorType,
+                                                                             pair),
+                                                                   timeoutScheduler)
+                                                          .onErrorResume(MessagingException.class,
+                                                                         me -> delayErrors ? just(me.getEvent()) : error(me))
 
       ;
     };
