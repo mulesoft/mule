@@ -49,10 +49,9 @@ public abstract class AbstractQueryTimeoutTestCase extends AbstractDbIntegration
      * was successful is assumed that the error is because of an aborted execution.
      * @throws Exception
      */
-    @Test
-    public void timeoutsQuery() throws Exception
+    protected void timeoutsQuery(String flowName) throws Exception
     {
-        MuleEvent responseEvent = runFlow(QUERY_TIMEOUT_FLOW, 0);
+        MuleEvent responseEvent = runFlow(flowName, 0);
 
         MuleMessage response = responseEvent.getMessage();
         assertThat(response.getExceptionPayload(), is(Matchers.nullValue()));
@@ -67,6 +66,12 @@ public abstract class AbstractQueryTimeoutTestCase extends AbstractDbIntegration
         {
             // Expected
         }
+    }
+
+    @Test
+    public void timeoutsQueryTest() throws Exception
+    {
+        timeoutsQuery(QUERY_TIMEOUT_FLOW);
     }
 
     @Before
