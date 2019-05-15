@@ -140,6 +140,9 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
     MuleConfiguration configuration = muleContext.getConfiguration();
     if (configuration instanceof DefaultMuleConfiguration) {
       DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
+      // First of all set the lazyInit mode or not to allow modifications to the configuration
+      defaultConfig.setLazyInit(configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false));
+
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
       defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
@@ -147,7 +150,6 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
       defaultConfig.setDynamicConfigExpiration(config.getDynamicConfigExpiration());
-      defaultConfig.setLazyInit(configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false));
       validateDefaultErrorHandler();
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 

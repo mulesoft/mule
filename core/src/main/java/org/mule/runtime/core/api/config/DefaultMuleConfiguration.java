@@ -54,7 +54,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
-  private Boolean lazyInit = null;
+  private boolean lazyInit;
 
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
@@ -487,7 +487,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   }
 
   protected boolean verifyContextNotInitialized() {
-    if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
+    // LazyInit needs to be able to change the configuration
+    if (muleContext != null && !isLazyInit() && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
       logger.warn("Cannot modify MuleConfiguration once the MuleContext has been initialized.  Modification will be ignored.");
       return false;
     } else {
