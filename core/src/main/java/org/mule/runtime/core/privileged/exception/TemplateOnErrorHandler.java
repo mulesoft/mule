@@ -23,7 +23,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -50,8 +50,6 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +57,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 @NoExtend
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
@@ -146,8 +146,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
             .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
             .build();
       }
-      return from(processWithChildContext(event, configuredMessageProcessors, ofNullable(getLocation()),
-                                          NullExceptionHandler.getInstance()));
+      return from(processWithChildContextDontComplete(event, configuredMessageProcessors, ofNullable(getLocation()),
+                                                      NullExceptionHandler.getInstance()));
     };
   }
 
