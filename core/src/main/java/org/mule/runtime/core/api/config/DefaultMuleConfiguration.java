@@ -8,16 +8,13 @@ package org.mule.runtime.core.api.config;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -33,7 +30,6 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,8 +40,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -59,9 +53,6 @@ import org.slf4j.Logger;
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
-
-  @Inject
-  ConfigurationProperties configurationProperties;
 
   private Boolean lazyInit = null;
 
@@ -487,13 +478,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     }
   }
 
-  private boolean isLazyInit() {
-    if (configurationProperties == null) {
-      this.configurationProperties =
-          ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_CONFIGURATION_PROPERTIES);
-      lazyInit = configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
-    }
+  public boolean isLazyInit() {
     return lazyInit;
+  }
+
+  public void setLazyInit(boolean lazyInit) {
+    this.lazyInit = lazyInit;
   }
 
   protected boolean verifyContextNotInitialized() {
