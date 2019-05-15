@@ -772,7 +772,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
     public static XMLInputFactory createWstxXmlInputFactory() {
         XMLInputFactory factory = (XMLInputFactory) createInstance(WSTX_INPUT_FACTORY);
 
-        factory.setProperty(P_MAX_ATTRIBUTE_SIZE, MAX_VALUE);
+        setMaxAttributeSizeProperty(factory);
 
         XMLSecureFactories.createDefault().configureXMLInputFactory(factory);
 
