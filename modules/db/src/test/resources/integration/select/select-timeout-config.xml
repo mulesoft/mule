@@ -10,4 +10,10 @@
             <db:parameterized-query>select * from PLANET where DELAY(#[payload]) = 1 order by ID</db:parameterized-query>
         </db:select>
     </flow>
+
+    <flow name="queryTimeoutParameter">
+        <db:select config-ref="dbConfig" queryTimeout="${queryTimeoutParamValue}">
+            <db:parameterized-query>select * from PLANET where DELAY(#[payload]) = 1 order by ID</db:parameterized-query>
+        </db:select>
+    </flow>
 </mule>
