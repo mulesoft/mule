@@ -15,7 +15,6 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstant
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
@@ -28,10 +27,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +35,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.io.Files.createTempDir;
 import static java.lang.Boolean.valueOf;
@@ -47,7 +42,6 @@ import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.concat;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -260,27 +254,44 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       Set<BundleDependency> nonProvidedDependencies = dependencies.stream()
           .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
           .map(dependencyConverter::convert).collect(Collectors.toSet());
+
+      Set<BundleDependency> extendedDependencies = extractRequiredTransitiveDependencies(nonProvidedDependencies);
+
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
           newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
-                                                mavenClient, attributes, nonProvidedDependencies);
+                                                mavenClient, attributes, extendedDependencies);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
                                        new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
           .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
           .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
-      Set<BundleDependency> missingApiDependencyBundles = findMissingApiDependencies(dependencies, attributes,
-                                                                                     includeProvidedDependencies, mavenRepository,
-                                                                                     mavenReactorResolver, temporaryDirectory);
-      loadUrls(artifactFile, classLoaderModelBuilder, concat(nonProvidedDependencies.stream(),
-                                                             missingApiDependencyBundles.stream()).collect(toSet()));
-      Stream<BundleDependency> allBundleDependencies = dependencies.stream().map(dependencyConverter::convert);
-      classLoaderModelBuilder.dependingOn(concat(allBundleDependencies,
-                                                 missingApiDependencyBundles.stream()).collect(toSet()));
+
+      loadUrls(artifactFile, classLoaderModelBuilder, extendedDependencies);
+      classLoaderModelBuilder.dependingOn(extendedDependencies);
+
       return classLoaderModelBuilder.build();
     } finally {
       deleteQuietly(temporaryDirectory.get());
     }
+  }
+
+  private Set<BundleDependency> extractRequiredTransitiveDependencies(Set<BundleDependency> dependencies) {
+    //Depending on the dependency classifier, based on how the MavenClient resolves the dependencies, some
+    //dependencies are not in the list returned by the {@link MavenClient} but as transitive dependencies.
+    Set<BundleDependency> allRequiredDependencies = new HashSet<>();
+    for (BundleDependency dep : dependencies) {
+      allRequiredDependencies.add(dep);
+      if (dep.getDescriptor().getClassifier().map(API_CLASSIFIERS::contains).orElse(false)) {
+        allRequiredDependencies.addAll(
+                                       dep.getTransitiveDependencies().stream().filter(
+                                                                                       td -> td.getDescriptor().getClassifier()
+                                                                                           .map(API_CLASSIFIERS::contains)
+                                                                                           .orElse(false))
+                                           .collect(Collectors.toList()));
+      }
+    }
+    return allRequiredDependencies;
   }
 
   protected abstract LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
@@ -294,50 +305,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                               org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                                                               Map<String, Object> attributes);
 
-  // TODO: MULE-15577 - Review plugin and API definition resolution
-  private Set<BundleDependency> findMissingApiDependencies(List<org.mule.maven.client.api.model.BundleDependency> dependencies,
-                                                           Map<String, Object> attributes,
-                                                           boolean includeProvidedDependencies, Optional<File> mavenRepository,
-                                                           Optional<MavenReactorResolver> mavenReactorResolver,
-                                                           Optional<File> temporaryDirectory) {
-    Set<org.mule.maven.client.api.model.BundleDependency> apiDependencies = dependencies.stream()
-        .filter(dependency -> {
-          Optional<String> classifier = dependency.getDescriptor().getClassifier();
-          return classifier.isPresent() && API_CLASSIFIERS.contains(classifier.get());
-        })
-        .collect(toSet());
-
-    Deque<org.mule.maven.client.api.model.BundleDependency> dependenciesToCheck = new ArrayDeque<>(apiDependencies);
-    Set<org.mule.maven.client.api.model.BundleDependency> missingApiDependencies = new HashSet<>();
-
-    while (!dependenciesToCheck.isEmpty()) {
-      File pom = getPom(dependenciesToCheck.pop());
-      for (org.mule.maven.client.api.model.BundleDependency apiDependency : mavenClient
-          .resolveArtifactDependencies(pom, includeTestDependencies(attributes), includeProvidedDependencies,
-                                       mavenRepository, mavenReactorResolver, temporaryDirectory)) {
-        if (noEquivalentPresent(apiDependencies, apiDependency) && noEquivalentPresent(missingApiDependencies, apiDependency)) {
-          missingApiDependencies.add(apiDependency);
-          dependenciesToCheck.add(apiDependency);
-        }
-      }
-    }
-
-    DependencyConverter dependencyConverter = new DependencyConverter();
-    return missingApiDependencies.stream().map(dependencyConverter::convert).collect(toSet());
-  }
-
-  private File getPom(org.mule.maven.client.api.model.BundleDependency dependency) {
-    String zipPath = dependency.getBundleUri().getPath();
-    String dependencyPath = zipPath.substring(0, zipPath.lastIndexOf("/"));
-    org.mule.maven.client.api.model.BundleDescriptor descriptor = dependency.getDescriptor();
-    return new File(format(POM_LOCATION_FORMAT, dependencyPath, descriptor.getArtifactId(), descriptor.getVersion()));
-  }
-
-  private boolean noEquivalentPresent(Set<org.mule.maven.client.api.model.BundleDependency> dependencies,
-                                      org.mule.maven.client.api.model.BundleDependency dependency) {
-    return dependencies.stream()
-        .noneMatch(currentApiArtifact -> currentApiArtifact.getDescriptor().equals(dependency.getDescriptor()));
-  }
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
 
