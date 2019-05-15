@@ -1,5 +1,5 @@
 {
-  "name": "test-app",
+  "name": "raml-api-app",
   "minMuleVersion": "4.0.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {

@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.empty;
@@ -21,7 +22,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.maven.client.api.model.BundleScope.COMPILE;
@@ -41,6 +44,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,18 +131,23 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     org.mule.maven.client.api.model.BundleDependency minorLibBundle =
         createBundleDependency("other.company", "dummy-lib", "1.1.0", "raml-fragment");
 
+    org.mule.maven.client.api.model.BundleDependency mockedTraitBundleDependency = spy(TRAIT_BUNDLE);
+
+    when(mockedTraitBundleDependency.getTransitiveDependencies()).thenReturn(singletonList(minorLibBundle));
+
     when(mockMavenClient.resolveArtifactDependencies(any(), anyBoolean(), anyBoolean(), any(), any(), any()))
-        .thenReturn(asList(regularDependency, API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE));
+        .thenReturn(asList(regularDependency, API_BUNDLE, LIB_BUNDLE, mockedTraitBundleDependency));
     when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(API_BUNDLE.getDescriptor())), anyBoolean(),
                                                      anyBoolean(), any(), any(), any()))
-                                                         .thenReturn(asList(LIB_BUNDLE, TRAIT_BUNDLE));
+                                                         .thenReturn(asList(LIB_BUNDLE, mockedTraitBundleDependency));
     when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(LIB_BUNDLE.getDescriptor())), anyBoolean(),
                                                      anyBoolean(), any(), any(), any()))
                                                          .thenReturn(emptyList());
     when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(minorLibBundle.getDescriptor())), anyBoolean(),
                                                      anyBoolean(), any(), any(), any()))
                                                          .thenReturn(emptyList());
-    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(TRAIT_BUNDLE.getDescriptor())), anyBoolean(),
+    when(mockMavenClient.resolveArtifactDependencies(argThat(new FileNameMatcher(mockedTraitBundleDependency.getDescriptor())),
+                                                     anyBoolean(),
                                                      anyBoolean(), any(), any(), any()))
                                                          .thenReturn(singletonList(minorLibBundle));
 

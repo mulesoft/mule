@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,6 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
@@ -56,6 +56,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 /**
@@ -251,15 +252,16 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
       DependencyConverter dependencyConverter = new DependencyConverter();
 
-      Set<BundleDependency> nonProvidedDependencies = dependencies.stream()
-          .filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
-          .map(dependencyConverter::convert).collect(Collectors.toSet());
+      Set<BundleDependency> resolvedDependencies = dependencies.stream().map(dependencyConverter::convert).collect(toSet());
+      Set<BundleDependency> resolvedExtendedDependencies = extractRequiredTransitiveDependencies(resolvedDependencies);
 
-      Set<BundleDependency> extendedDependencies = extractRequiredTransitiveDependencies(nonProvidedDependencies);
+      Set<BundleDependency> nonProvidedDependencies =
+          resolvedDependencies.stream().filter(dep -> !PROVIDED.equals(dep.getScope())).collect(Collectors.toSet());
+      Set<BundleDependency> nonProvidedExtendedDependencies = extractRequiredTransitiveDependencies(nonProvidedDependencies);
 
       final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
           newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
-                                                mavenClient, attributes, extendedDependencies);
+                                                mavenClient, attributes, nonProvidedExtendedDependencies);
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -267,8 +269,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
           .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
 
-      loadUrls(artifactFile, classLoaderModelBuilder, extendedDependencies);
-      classLoaderModelBuilder.dependingOn(extendedDependencies);
+      loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedExtendedDependencies);
+      classLoaderModelBuilder.dependingOn(resolvedExtendedDependencies);
 
       return classLoaderModelBuilder.build();
     } finally {
@@ -276,7 +278,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
   }
 
-  private Set<BundleDependency> extractRequiredTransitiveDependencies(Set<BundleDependency> dependencies) {
+  private Set<BundleDependency> extractRequiredTransitiveDependencies(Collection<BundleDependency> dependencies) {
     //Depending on the dependency classifier, based on how the MavenClient resolves the dependencies, some
     //dependencies are not in the list returned by the {@link MavenClient} but as transitive dependencies.
     Set<BundleDependency> allRequiredDependencies = new HashSet<>();

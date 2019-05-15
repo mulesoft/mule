@@ -9,8 +9,9 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static com.google.common.io.Files.createTempDir;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.core.IsNot.not;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
@@ -60,14 +61,51 @@ public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassL
   }
 
   @Test
-  public void apiTestCase() throws Exception {
-    File artifactFile = getApplicationFolder("apps/test-app");
+  public void allApiDependenciesAreAddedRAML() throws Exception {
+    File artifactFile = getApplicationFolder("apps/raml-api-app");
     ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
     assertThat(classLoaderModel.getDependencies(), hasItems(
                                                             bundleDependency("raml-api-a"),
                                                             bundleDependency("raml-api-b"),
                                                             bundleDependency("raml-fragment", "1.0.0"),
                                                             bundleDependency("raml-fragment", "2.0.0")));
+  }
+
+  @Test
+  public void allApiDependenciesAreAddedWSDL() throws Exception {
+    File artifactFile = getApplicationFolder("apps/wsdl-api-app");
+    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
+    assertThat(classLoaderModel.getDependencies(), hasItems(
+                                                            bundleDependency("wsdl-api-a"),
+                                                            bundleDependency("wsdl-api-b"),
+                                                            bundleDependency("wsdl-fragment", "1.0.0"),
+                                                            bundleDependency("wsdl-fragment", "2.0.0")));
+  }
+
+  @Test
+  public void allApiDependenciesAreAddedOAS() throws Exception {
+    File artifactFile = getApplicationFolder("apps/oas-api-app");
+    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
+    assertThat(classLoaderModel.getDependencies(), hasItems(
+                                                            bundleDependency("oas-api-a"),
+                                                            bundleDependency("oas-api-b"),
+                                                            bundleDependency("oas-fragment", "1.0.0"),
+                                                            bundleDependency("oas-fragment", "2.0.0")));
+  }
+
+
+  @Test
+  public void apiTransitiveDependenciesDontOverrideMavenResolved() throws Exception {
+    File artifactFile = getApplicationFolder("apps/api-app");
+    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
+    assertThat(classLoaderModel.getDependencies(), hasItems(
+                                                            bundleDependency("wsdl-api-a"),
+                                                            bundleDependency("wsdl-api-b"),
+                                                            bundleDependency("wsdl-fragment", "1.0.0"),
+                                                            bundleDependency("wsdl-fragment", "2.0.0"),
+                                                            bundleDependency("library", "1.0.0")));
+    assertThat(classLoaderModel.getDependencies(), not(hasItem(
+                                                               bundleDependency("library", "2.0.0"))));
   }
 
   private ClassLoaderModel loadClassLoaderModel(File artifactFile) throws InvalidDescriptorLoaderException {
