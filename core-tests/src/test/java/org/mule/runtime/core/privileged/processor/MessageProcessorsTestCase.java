@@ -28,6 +28,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -389,10 +390,11 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     just(input).transform(inputPub -> applyWithChildContext(inputPub,
                                                             pub -> Flux.from(pub)
-                                                                .flatMap(event -> processWithChildContext(event,
-                                                                                                          innerChain(innerErrorConsumer,
-                                                                                                                     expected),
-                                                                                                          Optional.empty()))
+                                                                .flatMap(event -> processWithChildContextDontComplete(event,
+                                                                                                                      innerChain(innerErrorConsumer,
+                                                                                                                                 expected),
+                                                                                                                      Optional
+                                                                                                                          .empty()))
                                                                 .onErrorContinue(outerErrorConsumer),
                                                             Optional.empty()))
         .block();
@@ -445,9 +447,10 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     from(processWithChildContext(input,
                                  pub -> Flux.from(pub)
-                                     .flatMap(event -> processWithChildContext(event,
-                                                                               innerChain(innerErrorConsumer, expected),
-                                                                               Optional.empty()))
+                                     .flatMap(event -> processWithChildContextDontComplete(event,
+                                                                                           innerChain(innerErrorConsumer,
+                                                                                                      expected),
+                                                                                           Optional.empty()))
                                      .onErrorContinue(outerErrorConsumer),
                                  newChildContext(input, Optional.empty())))
                                      .block();

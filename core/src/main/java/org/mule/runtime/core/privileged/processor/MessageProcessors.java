@@ -246,6 +246,26 @@ public class MessageProcessors {
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation) {
     BaseEventContext childContext = newChildContext(event, componentLocation);
+    return internalProcessWithChildContextAlwaysComplete(event, quickCopy(childContext, event), processor, true);
+  }
+
+  /**
+   * Process a {@link ReactiveProcessor} using a child {@link BaseEventContext}. This is useful if it is necessary to perform
+   * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * After executing the provided processor, the {@link EventContext} of the given event will be completed.
+   * <p>
+   * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
+   * since the returned publisher already configures its error handling.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @param componentLocation
+   * @return the future result of processing processor.
+   */
+  public static Publisher<CoreEvent> processWithChildContextDontComplete(CoreEvent event, ReactiveProcessor processor,
+                                                                         Optional<ComponentLocation> componentLocation) {
+    BaseEventContext childContext = newChildContext(event, componentLocation);
     return internalProcessWithChildContext(quickCopy(childContext, event), processor, true);
   }
 
@@ -287,6 +307,31 @@ public class MessageProcessors {
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation,
                                                              FlowExceptionHandler exceptionHandler) {
+    BaseEventContext childContext = child(((BaseEventContext) event.getContext()), componentLocation, exceptionHandler);
+    return internalProcessWithChildContextAlwaysComplete(event, quickCopy(childContext, event), processor, true);
+  }
+
+  /**
+   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
+   * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * After executing the provided processor, the {@link EventContext} of the given event will be completed.
+   * <p>
+   * The {@link FlowExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to handle
+   * any errors that occur.
+   * <p>
+   * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
+   * since the returned publisher already configures its error handling.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @param componentLocation
+   * @param exceptionHandler used to handle {@link Exception}'s.
+   * @return the future result of processing processor.
+   */
+  public static Publisher<CoreEvent> processWithChildContextDontComplete(CoreEvent event, ReactiveProcessor processor,
+                                                                         Optional<ComponentLocation> componentLocation,
+                                                                         FlowExceptionHandler exceptionHandler) {
     BaseEventContext childContext = child(((BaseEventContext) event.getContext()), componentLocation, exceptionHandler);
     return internalProcessWithChildContext(quickCopy(childContext, event), processor, true);
   }
@@ -378,6 +423,21 @@ public class MessageProcessors {
             .toProcessor())
         .map(MessageProcessors::toParentContext)
         .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true));
+  }
+
+  private static Publisher<CoreEvent> internalProcessWithChildContextAlwaysComplete(CoreEvent event,
+                                                                                    CoreEvent eventChildCtx,
+                                                                                    ReactiveProcessor processor,
+                                                                                    boolean completeParentIfEmpty) {
+    return Mono.from(internalProcessWithChildContext(eventChildCtx, processor, completeParentIfEmpty))
+        .doOnSuccess(result -> {
+          if (result == null) {
+            ((BaseEventContext) event.getContext()).success();
+          }
+        })
+        .doOnError(e -> {
+          ((BaseEventContext) event.getContext()).error(e);
+        });
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,

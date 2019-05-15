@@ -24,7 +24,7 @@ import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createE
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
@@ -67,8 +67,6 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +78,8 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
+
+import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -399,8 +399,8 @@ public class ModuleFlowProcessingPhase
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return Flux.from(publisher)
-          .flatMap(p -> processWithChildContext(p, pub -> template.routeEventAsync(pub),
-                                                Optional.empty(), flowConstruct.getExceptionListener()));
+          .flatMap(p -> processWithChildContextDontComplete(p, pub -> template.routeEventAsync(pub),
+                                                            Optional.empty(), flowConstruct.getExceptionListener()));
     }
 
     @Override

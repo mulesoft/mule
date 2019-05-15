@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptio
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -31,13 +31,13 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 
@@ -91,7 +91,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .flatMap(event -> Mono.from(processWithChildContext(event, nestedChain, ofNullable(getLocation())))
+        .flatMap(event -> Mono.from(processWithChildContextDontComplete(event, nestedChain, ofNullable(getLocation())))
             .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
             }, getThrowableFunction(event), timer)));
   }

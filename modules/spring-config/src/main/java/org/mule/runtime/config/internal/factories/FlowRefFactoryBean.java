@@ -46,6 +46,12 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBui
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
@@ -57,12 +63,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
 
 import reactor.core.publisher.Mono;
 
@@ -245,14 +245,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                       ((Flow) resolvedReferencedProcessor).getExceptionListener())
             : processWithChildContext(event, referencedProcessor,
                                       ofNullable(FlowRefFactoryBean.this.getLocation())))
-            .doOnSuccess(result -> {
-              if (result == null) {
-                ((BaseEventContext) event.getContext()).success();
-              }
-            })
-            .doOnError(e -> {
-              ((BaseEventContext) event.getContext()).error(e);
-            })
             .map(outputToTarget(event, target, targetValue, expressionManager));
       });
     }
