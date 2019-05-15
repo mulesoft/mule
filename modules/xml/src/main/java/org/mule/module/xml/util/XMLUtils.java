@@ -826,9 +826,9 @@ public class XMLUtils extends org.mule.util.XMLUtils
                 factory.setProperty(P_MAX_ATTRIBUTE_SIZE, maxAttributeSizeProperty);
                 return;
             }
-            else if (LOGGER.isDebugEnabled())
+            else
             {
-                LOGGER.debug("Invalid " + P_MAX_ATTRIBUTE_SIZE + " property value");
+                LOGGER.warn("Invalid " + P_MAX_ATTRIBUTE_SIZE + " property value");
             }
         }
         factory.setProperty(P_MAX_ATTRIBUTE_SIZE, MAX_VALUE);
