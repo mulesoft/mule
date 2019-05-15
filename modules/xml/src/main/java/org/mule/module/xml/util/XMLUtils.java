@@ -6,6 +6,13 @@
  */
 package org.mule.module.xml.util;
 
+import static com.ctc.wstx.api.WstxInputProperties.P_MAX_ATTRIBUTE_SIZE;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.parseInt;
+import static java.lang.System.getProperty;
+import static org.mule.api.config.MuleProperties.MULE_MAX_ATTRIBUTE_SIZE;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.createWithConfig;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -61,6 +68,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
 import org.dom4j.io.DocumentSource;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -88,6 +96,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
     // Shipped with Mule
     public static final String SAXON_TRANSFORMER_FACTORY = "net.sf.saxon.TransformerFactoryImpl";
     public static final String WSTX_INPUT_FACTORY = "com.ctc.wstx.stax.WstxInputFactory";
+
+    private static final Logger LOGGER = getLogger(XMLUtils.class);
 
     /**
      * Converts a DOM to an XML string.
@@ -762,6 +772,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
     public static XMLInputFactory createWstxXmlInputFactory() {
         XMLInputFactory factory = (XMLInputFactory) createInstance(WSTX_INPUT_FACTORY);
 
+        factory.setProperty(P_MAX_ATTRIBUTE_SIZE, MAX_VALUE);
+
         XMLSecureFactories.createDefault().configureXMLInputFactory(factory);
 
         return factory;
@@ -770,9 +782,28 @@ public class XMLUtils extends org.mule.util.XMLUtils
     public static XMLInputFactory createWstxXmlInputFactory(Boolean externalEntities, Boolean expandEntities) {
         XMLInputFactory factory = (XMLInputFactory) createInstance(WSTX_INPUT_FACTORY);
 
-        XMLSecureFactories.createWithConfig(externalEntities, expandEntities).configureXMLInputFactory(factory);
+        setMaxAttributeSizeProperty(factory);
+
+        createWithConfig(externalEntities, expandEntities).configureXMLInputFactory(factory);
 
         return factory;
+    }
+
+    private static void setMaxAttributeSizeProperty(XMLInputFactory factory) {
+        String maxAttributeSizeProperty = getProperty(MULE_MAX_ATTRIBUTE_SIZE);
+        if(maxAttributeSizeProperty != null)
+        {
+            Integer maxAttributeSize = parseInt(maxAttributeSizeProperty);
+            if(maxAttributeSize > 0 && maxAttributeSize < MAX_VALUE)
+            {
+                factory.setProperty(P_MAX_ATTRIBUTE_SIZE, maxAttributeSizeProperty);
+                return;
+            }
+            else if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Invalid " + P_MAX_ATTRIBUTE_SIZE + " property value");
+            }
+        }
+        factory.setProperty(P_MAX_ATTRIBUTE_SIZE, MAX_VALUE);
     }
 
     /**
