@@ -794,12 +794,13 @@ public class XMLUtils extends org.mule.util.XMLUtils
         if(maxAttributeSizeProperty != null)
         {
             Integer maxAttributeSize = parseInt(maxAttributeSizeProperty);
-            if(maxAttributeSize > 0 && maxAttributeSize < MAX_VALUE)
+            if(maxAttributeSize > 0)
             {
                 factory.setProperty(P_MAX_ATTRIBUTE_SIZE, maxAttributeSizeProperty);
                 return;
             }
-            else if (LOGGER.isDebugEnabled()) {
+            else if (LOGGER.isDebugEnabled())
+            {
                 LOGGER.debug("Invalid " + P_MAX_ATTRIBUTE_SIZE + " property value");
             }
         }

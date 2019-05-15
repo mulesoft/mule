@@ -40,7 +40,8 @@ public abstract class AbstractDomXmlTransformersTestCase extends AbstractXmlTran
     return trans;
   }
 
-  static void writeXml(Node n) throws TransformerException {
+  static void writeXml(Node n) throws TransformerException
+  {
     TransformerFactory tf = TransformerFactory.newInstance();
     javax.xml.transform.Transformer t = tf.newTransformer();
     t.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -57,11 +58,13 @@ public abstract class AbstractDomXmlTransformersTestCase extends AbstractXmlTran
     return resultData;
   }
 
-  void setTestData(String srcData) {
+  void setTestData(String srcData)
+  {
     this.srcData = srcData;
   }
 
-  public void setResultData(Document resultData) {
+  public void setResultData(Document resultData)
+  {
     this.resultData = resultData;
   }
 }
