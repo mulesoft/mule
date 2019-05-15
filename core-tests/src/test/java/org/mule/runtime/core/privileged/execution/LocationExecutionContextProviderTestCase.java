@@ -49,6 +49,20 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
 
   }
 
+  @Test
+  public void nonLiteralPasswordNotMasked() {
+    String xmlDWGeneratedPassword =
+        "<http:body ><![CDATA[#[\"grant_type=password&client_id=mt2-web-ui&username=\" ++ dw::core::URL::encodeURIComponent(vars.keycloakUsername!) ++ \"&password=\" ++ dw::core::URL::encodeURIComponent(vars.keycloakPassword!)]]]>\\"
+            +
+            "</http:body>\n<http:headers><![CDATA[#[output application/java --- {\"Accept\" : \"application/json\",\"Content-Type\" : \"application/x-www-form-urlencoded\"]]>\\"
+            +
+            "</http:headers>";
+    withXmlElement(component, xmlDWGeneratedPassword);
+    String sanitized = getSourceXML(component);
+    assertThat(sanitized, equalTo(xmlDWGeneratedPassword));
+  }
+
+
   private void withXmlElement(Component component, String value) {
     when(component.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY)).thenReturn(value);
   }
