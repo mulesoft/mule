@@ -34,16 +34,15 @@
 
 package org.mule.module.xml.stax;
 
-import javanet.staxutils.DummyLocator;
-import javanet.staxutils.StAXReaderToContentHandler;
-import javanet.staxutils.helpers.XMLFilterImplEx;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import javanet.staxutils.DummyLocator;
+import javanet.staxutils.StAXReaderToContentHandler;
+import javanet.staxutils.helpers.XMLFilterImplEx;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -170,7 +169,7 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
             }
             while (depth != 0);
 
-            // procees any remaining comments or PIs
+            // process any remaining comments or PIs
             if (isDocument)
             {
                 while (event != XMLStreamConstants.END_DOCUMENT)
