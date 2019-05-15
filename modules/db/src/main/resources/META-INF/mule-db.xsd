@@ -59,7 +59,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="queryTimeout" type="xsd:integer" default="0">
+        <xsd:attribute name="queryTimeout" default="0">
             <xsd:annotation>
                 <xsd:documentation>
                     Indicates the minimum amount of time in seconds before the JDBC driver attempts to cancel a running statement. No timeout is used by default.
