@@ -33,7 +33,7 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
 
   private static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
   private static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
-  private static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"]*)\"");
+  private static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"|>|\n]*)\"");
   private static final String PASSWORD_MASK = "<<credentials>>";
   public static final String PASSWORD_ATTRIBUTE_MASK = "password=\"%s\"";
 
