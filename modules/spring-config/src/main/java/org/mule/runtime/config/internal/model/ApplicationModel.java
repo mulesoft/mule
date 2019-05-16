@@ -475,12 +475,14 @@ public class ApplicationModel {
                                                        : of(systemPropertiesResolver),
                                                    externalPropertiesConfigurationProvider);
     if (deploymentPropertiesConfigurationProperties == null) {
+      externalPropertiesResolver.setAsRootResolver();
       this.configurationProperties = new PropertiesResolverConfigurationProperties(externalPropertiesResolver);
     } else {
       // finally the first configuration properties resolver should be deployment properties as they have precedence over the rest
-      this.configurationProperties =
-          new PropertiesResolverConfigurationProperties(new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver),
-                                                                                                   deploymentPropertiesConfigurationProperties));
+      DefaultConfigurationPropertiesResolver deploymentPropertiesResolver =
+          new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver), deploymentPropertiesConfigurationProperties);
+      deploymentPropertiesResolver.setAsRootResolver();
+      this.configurationProperties = new PropertiesResolverConfigurationProperties(deploymentPropertiesResolver);
     }
 
     try {
