@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.exception.ExceptionUtils.hasCause;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
@@ -21,17 +22,18 @@ import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SER
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -165,7 +167,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   /**
    * Custom logic to only enable those components that should be created when MuleContext is created.
-   * MuleConfiguration for instance is immutable and once the MuleContext is started we cannot change its values.
    * TransactionManagerFactory should be created before a TransactionManager is defined in the configuration.
    */
   private void enableMuleObjects() {
@@ -173,9 +174,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                                                              componentBuildingDefinitionRegistry);
     new MinimalApplicationModelGenerator(dependencyResolver, true)
         .getMinimalModel(componentModel -> {
-          if (componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-            return true;
-          }
           AtomicBoolean transactionFactoryType = new AtomicBoolean(false);
           TypeDefinitionVisitor visitor = new TypeDefinitionVisitor() {
 
@@ -334,6 +332,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(dependencyResolver);
+      // Force initialization of configuration component...
+      resetMuleConfiguration(minimalApplicationModelGenerator);
+      // User input components to be initialized...
       Reference<ApplicationModel> minimalApplicationModel = new Reference<>();
       predicateOptional
           .ifPresent(predicate -> minimalApplicationModel.set(minimalApplicationModelGenerator.getMinimalModel(predicate)));
@@ -429,7 +430,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     } catch (Exception e) {
       // NoSuchBeanDefinitionException can be ignored
       if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Error while unregistering Mule security manager"),
+        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule security manager"),
                                        e);
       }
     }
@@ -440,10 +441,25 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
         muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
       } catch (RegistrationException e) {
-        throw new MuleRuntimeException(I18nMessageFactory
-            .createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"), e);
+        throw new MuleRuntimeException(createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"),
+                                       e);
       }
     }
+  }
+
+  private void resetMuleConfiguration(MinimalApplicationModelGenerator minimalApplicationModelGenerator) {
+    // Always unregister first the default configuration from Mule.
+    try {
+      muleContext.getRegistry().unregisterObject(OBJECT_MULE_CONFIGURATION);
+    } catch (Exception e) {
+      // NoSuchBeanDefinitionException can be ignored
+      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
+        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule configuration"),
+                                       e);
+      }
+    }
+    minimalApplicationModelGenerator
+        .getMinimalModel(componentModel -> componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER));
   }
 
   @Override
