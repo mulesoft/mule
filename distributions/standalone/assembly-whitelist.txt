@@ -416,10 +416,10 @@
 /mule-standalone-${productVersion}/lib/opt/spring-jdbc-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-jms-4.1.9.RELEASE-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/spring-messaging-4.3.17.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-security-config-4.2.3.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-security-core-4.2.3.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-security-web-4.2.3.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-security-ldap-4.2.3.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/spring-security-config-4.2.12.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/spring-security-core-4.2.12.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/spring-security-web-4.2.12.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/spring-security-ldap-4.2.12.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-ldap-core-2.3.2.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-tx-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-4.1.9.RELEASE.jar
