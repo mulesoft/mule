@@ -192,8 +192,8 @@
 /mule-standalone-${productVersion}/lib/opt/animal-sniffer-annotations-1.14.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-3.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.53.jar
-/mule-standalone-${productVersion}/lib/opt/ant-1.9.6.jar
-/mule-standalone-${productVersion}/lib/opt/ant-launcher-1.9.6.jar
+/mule-standalone-${productVersion}/lib/opt/ant-1.9.14.jar
+/mule-standalone-${productVersion}/lib/opt/ant-launcher-1.9.14.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-runtime-3.5.2.jar
 /mule-standalone-${productVersion}/lib/opt/aopalliance-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/asm-3.1.jar
