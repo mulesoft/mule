@@ -223,7 +223,7 @@
         <slf4jVersion>1.7.24</slf4jVersion>
         <smackVersion>3.4.1</smackVersion>
         <springVersion>4.3.19.RELEASE</springVersion>
-        <springSecurityVersion>4.2.8.RELEASE</springSecurityVersion>
+        <springSecurityVersion>4.2.12.RELEASE</springSecurityVersion>
         <springLdapVersion>2.3.2.RELEASE</springLdapVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
