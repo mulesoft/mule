@@ -19,7 +19,7 @@ public class CredentialsMaskUtil
     public static final Pattern BARE_URL_PATTERN = compile("[a-z]*://([^@]*)@");
     public static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
     public static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
-    public static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"|\n|>]*)\"");
+    public static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"|\n]*)\"");
     public static final Pattern PASSWORD_PATTERN_NO_QUOTES = compile("password=([^\\s;]+)");
     public static final Pattern USER_PATTERN_NO_QUOTES = compile("user=([^\\s;]+)");
     public static final String PASSWORD_MASK = "<<credentials>>";
