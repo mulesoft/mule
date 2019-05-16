@@ -202,7 +202,7 @@
         <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
         <junitVersion>4.12</junitVersion>
         <jythonVersion>2.7.1</jythonVersion>
-        <jrubyVersion>9.1.16.0</jrubyVersion>
+        <jrubyVersion>9.2.7.0</jrubyVersion>
         <log4jVersion>2.8.2</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>

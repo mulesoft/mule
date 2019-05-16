@@ -42,7 +42,7 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
         return Arrays.asList(new Object[][] {
                                              {"groovy", "groovy", "Groovy Scripting Engine", "2.0", "return 10"},
                                              {"jython", "py", "jython", "2.7.1", "print \"hello world\""},
-                                             {"jruby", "rb", "JSR 223 JRuby Engine", "9.1.16.0", "1.+ 2"},
+                                             {"jruby", "rb", "JSR 223 JRuby Engine", "9.2.7.0", "1.+ 2"},
                                              {"rhino", "js", "Mozilla Rhino", "1.6R5", "print(\"hello world\");"},
                                              {"rhino", "js", "Mozilla Rhino", "1.6 release 2", "print(\"hello world\");"}
         });
