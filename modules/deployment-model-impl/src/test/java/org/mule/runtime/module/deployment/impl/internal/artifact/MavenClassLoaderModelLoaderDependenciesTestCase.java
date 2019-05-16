@@ -84,6 +84,18 @@ public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassL
                                                             bundleDependency("oas-fragment", "2.0.0")));
   }
 
+  @Test
+  public void apiDependsOnLibraryThatDependsOnApiThatDependsOnApi() throws Exception {
+    File artifactFile = getApplicationFolder("apps/api-multiple-levels-app");
+    ClassLoaderModel classLoaderModel = loadClassLoaderModel(artifactFile);
+    assertThat(classLoaderModel.getDependencies(), hasItems(
+            bundleDependency("raml-api-a"),
+            bundleDependency("library-depends-on-api"),
+            bundleDependency("api-depends-on-library"),
+            bundleDependency("raml-fragment", "1.0.0"),
+            bundleDependency("raml-fragment", "2.0.0")));
+  }
+
 
   @Test
   public void apiTransitiveDependenciesDontOverrideMavenResolved() throws Exception {
