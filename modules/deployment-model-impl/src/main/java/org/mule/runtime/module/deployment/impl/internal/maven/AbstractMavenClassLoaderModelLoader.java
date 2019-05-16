@@ -229,8 +229,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     return new File(artifactFile, CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION);
   }
 
-  private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile,
-                                                              Map<String, Object> attributes,
+  protected Set<BundleDependency> resolveArtifactDependencies(File artifactFile, Map<String, Object> attributes,
                                                               ArtifactType artifactType) {
     Optional<File> mavenRepository = ofNullable(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation());
     if (!mavenRepository.isPresent()) {
@@ -249,33 +248,38 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                   includeProvidedDependencies, mavenRepository,
                                                   mavenReactorResolver,
                                                   temporaryDirectory);
-
       DependencyConverter dependencyConverter = new DependencyConverter();
-
-      Set<BundleDependency> resolvedDependencies = dependencies.stream().map(dependencyConverter::convert).collect(toSet());
-      Set<BundleDependency> resolvedExtendedDependencies = extractRequiredTransitiveDependencies(resolvedDependencies);
-
-      Set<BundleDependency> nonProvidedDependencies =
-          resolvedDependencies.stream().filter(dep -> !PROVIDED.equals(dep.getScope())).collect(Collectors.toSet());
-      Set<BundleDependency> nonProvidedExtendedDependencies = extractRequiredTransitiveDependencies(nonProvidedDependencies);
-
-      final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-          newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
-                                                mavenClient, attributes, nonProvidedExtendedDependencies);
-      classLoaderModelBuilder
-          .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
-          .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
-                                       new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
-          .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
-          .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
-
-      loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedExtendedDependencies);
-      classLoaderModelBuilder.dependingOn(resolvedExtendedDependencies);
-
-      return classLoaderModelBuilder.build();
+      return dependencies.stream().map(dependencyConverter::convert).collect(toSet());
     } finally {
       deleteQuietly(temporaryDirectory.get());
     }
+  }
+
+  private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile,
+                                                              Map<String, Object> attributes,
+                                                              ArtifactType artifactType) {
+
+    Set<BundleDependency> resolvedDependencies = resolveArtifactDependencies(artifactFile, attributes, artifactType);
+    Set<BundleDependency> resolvedExtendedDependencies = extractRequiredTransitiveDependencies(resolvedDependencies);
+
+    Set<BundleDependency> nonProvidedDependencies =
+        resolvedDependencies.stream().filter(dep -> !PROVIDED.equals(dep.getScope())).collect(Collectors.toSet());
+    Set<BundleDependency> nonProvidedExtendedDependencies = extractRequiredTransitiveDependencies(nonProvidedDependencies);
+
+    final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
+        newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
+                                              mavenClient, attributes, nonProvidedExtendedDependencies);
+    classLoaderModelBuilder
+        .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
+        .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
+                                     new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
+        .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
+        .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
+
+    loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedExtendedDependencies);
+    classLoaderModelBuilder.dependingOn(resolvedExtendedDependencies);
+
+    return classLoaderModelBuilder.build();
   }
 
   private Set<BundleDependency> extractRequiredTransitiveDependencies(Collection<BundleDependency> dependencies) {

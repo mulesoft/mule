@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -86,6 +89,19 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
         new HeavyweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, packagerClassLoaderModel);
     configClassLoaderModelBuilder(heavyweightClassLoaderModelBuilder, attributes);
     return heavyweightClassLoaderModelBuilder;
+  }
+
+  @Override
+  protected Set<BundleDependency> resolveArtifactDependencies(File artifactFile, Map<String, Object> attributes,
+                                                              ArtifactType artifactType) {
+    //if(attributes instanceof PluginExtendedClassLoaderModelAttributes) {
+    //  BundleDescriptor pluginBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
+    //  ArtifactDescriptor deployableArtifactDescriptor = ((PluginExtendedClassLoaderModelAttributes) attributes).getDeployableArtifactDescriptor();
+    //  Set<BundleDependency> deployableArtifactDescriptorDependencies = deployableArtifactDescriptor.getClassLoaderModel().getDependencies();
+    //  BundleDependency pluginDependencyInDeployableArtifact = deployableArtifactDescriptorDependencies.stream().filter(dep -> dep.getDescriptor().equals(pluginBundleDescriptor)).findFirst().orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find required descriptor. Looking for: " + pluginBundleDescriptor + " in " + deployableArtifactDescriptorDependencies)));
+    //  return pluginDependencyInDeployableArtifact.getTransitiveDependencies();
+    //}
+    return super.resolveArtifactDependencies(artifactFile, attributes, artifactType);
   }
 
   private void configClassLoaderModelBuilder(ArtifactClassLoaderModelBuilder classLoaderModelBuilder,

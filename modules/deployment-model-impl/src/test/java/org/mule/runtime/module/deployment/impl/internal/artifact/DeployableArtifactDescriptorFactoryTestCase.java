@@ -37,6 +37,7 @@ import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
+import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -59,7 +60,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.BaseMatcher;
@@ -265,6 +265,26 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     assertThat(classLoaderModel.getUrls().length, is(1));
     assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependencyWithTransitiveDependency() throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependency");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    final String expectedPluginArtifactId = "test-plugin-with-transitive-dependency";
+
+    assertThat(classLoaderModel.getDependencies().size(), is(1));
+    assertThat(classLoaderModel.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
+
+    assertThat(classLoaderModel.getUrls().length, is(1));
+    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+
+    ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
+
+    assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
+    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), hasItem(bundleDependency("test-transitive-dependency")));
   }
 
   @Test
