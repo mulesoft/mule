@@ -30,10 +30,6 @@ import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -44,6 +40,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.slf4j.Logger;
+
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext. TODO
  * MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
@@ -52,6 +52,8 @@ import java.util.Map;
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
+
+  private boolean lazyInit;
 
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
@@ -469,8 +471,17 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     }
   }
 
+  public boolean isLazyInit() {
+    return lazyInit;
+  }
+
+  public void setLazyInit(boolean lazyInit) {
+    this.lazyInit = lazyInit;
+  }
+
   protected boolean verifyContextNotInitialized() {
-    if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
+    // LazyInit needs to be able to change the configuration
+    if (muleContext != null && !isLazyInit() && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
       logger.warn("Cannot modify MuleConfiguration once the MuleContext has been initialized.  Modification will be ignored.");
       return false;
     } else {
@@ -479,7 +490,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   }
 
   protected boolean verifyContextNotStarted() {
-    if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME)) {
+    // LazyInit needs to be able to change the configuration
+    if (muleContext != null && !isLazyInit() && muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME)) {
       logger.warn("Cannot modify MuleConfiguration once the MuleContext has been started.  Modification will be ignored.");
       return false;
     } else {

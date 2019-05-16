@@ -141,6 +141,24 @@
           "methodName": "setFlowLocation",
           "elementKind": "method",
           "justification": "Each Error Handler ref needs a copy of every inner error handler"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.config.DefaultMuleConfiguration::isLazyInit()",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "methodName": "isLazyInit",
+          "elementKind": "method",
+          "justification": "Allow lazy init to modify configurations during different initializations"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setLazyInit(boolean)",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "methodName": "setLazyInit",
+          "elementKind": "method",
+          "justification": "Allow lazy init to modify configurations during different initializations"
         }
       ]
     }

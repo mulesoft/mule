@@ -8,8 +8,10 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,11 +25,11 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
-import org.springframework.beans.factory.SmartFactoryBean;
-
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
  * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the otherwise read-only MuleConfiguration. It
@@ -42,6 +44,9 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
 
   @Inject
   private Registry registry;
+
+  @Inject
+  private ConfigurationProperties configurationProperties;
 
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
   // any properties not set by the user.
@@ -135,6 +140,9 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
     MuleConfiguration configuration = muleContext.getConfiguration();
     if (configuration instanceof DefaultMuleConfiguration) {
       DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
+      // First of all set the lazyInit mode or not to allow modifications to the configuration
+      defaultConfig.setLazyInit(configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false));
+
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
       defaultConfig.setShutdownTimeout(config.getShutdownTimeout());

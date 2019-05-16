@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.event.EventContext;
