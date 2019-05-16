@@ -170,7 +170,7 @@
         <commonsNetVersion>3.5</commonsNetVersion>
         <cxfVersion>2.7.19-MULE-SPRING-3-002</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
-        <dom4jVersion>1.6.1</dom4jVersion>
+        <dom4jVersion>2.1.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
@@ -1046,9 +1046,9 @@
                 <version>${jdom2Version}</version>
             </dependency>
             <dependency>
-                <groupId>dom4j</groupId>
+                <groupId>org.dom4j</groupId>
                 <artifactId>dom4j</artifactId>
-                <version>${dom4jVersion}</version>
+                <version>2.1.1</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
@@ -1080,6 +1080,12 @@
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
                 <version>${jaxenVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>dom4j</groupId>
+                        <artifactId>dom4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!--
                 override the wss4j version that's used in the cxf module and
@@ -1375,7 +1381,7 @@
                 <version>${saxonVersion}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>dom4j</groupId>
+                        <groupId>org.dom4j</groupId>
                         <artifactId>dom4j</artifactId>
                     </exclusion>
                     <exclusion>
@@ -1434,7 +1440,7 @@
                         <artifactId>annotations</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>dom4j</groupId>
+                        <groupId>org.dom4j</groupId>
                         <artifactId>dom4j</artifactId>
                     </exclusion>
                     <exclusion>
