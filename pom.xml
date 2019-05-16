@@ -153,7 +153,7 @@
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
         <activemqVersion>5.11.1</activemqVersion>
-        <antVersion>1.9.6</antVersion>
+        <antVersion>1.9.14</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <aspectjVersion>1.8.10</aspectjVersion>
         <apacheHttpCoreVersion>4.4.6</apacheHttpCoreVersion>
