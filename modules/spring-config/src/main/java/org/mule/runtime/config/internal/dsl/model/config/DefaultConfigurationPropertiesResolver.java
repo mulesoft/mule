@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static java.util.Optional.empty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -42,6 +44,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   private final ConfigurationPropertiesProvider configurationPropertiesProvider;
   private Cache<String, Object> resolutionCache = CacheBuilder.<String, String>newBuilder().build();
   private boolean initialized = false;
+  private Optional<ConfigurationPropertiesResolver> rootResolver = empty();
 
   public DefaultConfigurationPropertiesResolver(Optional<ConfigurationPropertiesResolver> parentResolver,
                                                 ConfigurationPropertiesProvider configurationPropertiesProvider) {
@@ -127,7 +130,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     while (prefixIndex != -1) {
       int suffixIndex = testValue.indexOf(PLACEHOLDER_SUFFIX, prefixIndex + PLACEHOLDER_PREFIX.length());
       innerPlaceholderKey = testValue.substring(prefixIndex + PLACEHOLDER_PREFIX.length(), suffixIndex);
-      Object objectValueFound = resolvePlaceholderKeyValue(innerPlaceholderKey);
+      Object objectValueFound = rootResolver.orElse(this).resolvePlaceholderKeyValue(innerPlaceholderKey);
       // only use the value as string if it's a concat of placeholders
       if (value.equals(PLACEHOLDER_PREFIX + innerPlaceholderKey + PLACEHOLDER_SUFFIX)) {
         return objectValueFound;
@@ -139,4 +142,20 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     return testValue;
   }
 
+  private void propagateRootResolver(ConfigurationPropertiesResolver rootResolver) {
+    this.parentResolver.ifPresent(resolver -> {
+      if (resolver instanceof DefaultConfigurationPropertiesResolver) {
+        ((DefaultConfigurationPropertiesResolver) resolver).setRootResolver(rootResolver);
+      }
+    });
+  }
+
+  private void setRootResolver(ConfigurationPropertiesResolver rootResolver) {
+    this.rootResolver = of(rootResolver);
+    propagateRootResolver(rootResolver);
+  }
+
+  public void setAsRootResolver() {
+    propagateRootResolver(this);
+  }
 }
