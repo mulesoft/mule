@@ -143,11 +143,19 @@
         -->
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
+<<<<<<< HEAD
         <activemqVersion>5.14.5</activemqVersion>
         <antVersion>1.9.6</antVersion>
         <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
+=======
+        <activemqVersion>5.15.0</activemqVersion>
+        <antVersion>1.9.14</antVersion>
+        <antlrVersion>3.5.2</antlrVersion>
+        <asmVersion>6.2</asmVersion>
+        <aspectjVersion>1.9.1</aspectjVersion>
+>>>>>>> 740d73ecfc... MULE-16808: Update Apache Ant to 1.9.14 in 3.x (#7872)
         <asyncHttpClientVersion>1.14-MULE-009</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.60</bouncycastleVersion>
