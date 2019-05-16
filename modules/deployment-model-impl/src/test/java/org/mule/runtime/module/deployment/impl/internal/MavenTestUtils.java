@@ -1,10 +1,21 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.module.deployment.impl.internal;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.lang3.ArrayUtils.toArray;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModel;
+import static org.mule.tck.ZipUtils.compress;
 
+import org.mule.tck.ZipUtils;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
@@ -25,20 +36,24 @@ public class MavenTestUtils {
 
   public static void installArtifact(File artifactFile, File repositoryLocation) throws IOException, XmlPullParserException {
     String artifactExtension = getExtension(artifactFile.getName());
-    if(POM.equals(artifactExtension)) {
+    if (POM.equals(artifactExtension)) {
       installPom(artifactFile, repositoryLocation);
-    }else {
+    } else {
       Model pomModel = getPomModel(artifactFile);
-      File packagedArtifact = artifactFile;
-      if(artifactFile.isDirectory()) {
-        packagedArtifact = packageArtifact(artifactFile);
-      }
+      File packagedArtifact = packageArtifact(artifactFile, pomModel);
       installArtifact(packagedArtifact, repositoryLocation, pomModel);
     }
   }
 
-  private static File packageArtifact(File explodedArtifactFile) {
-    return new CompilerUtils.JarCompiler().compiling(explodedArtifactFile).compile(explodedArtifactFile.getName());
+  private static File packageArtifact(File explodedArtifactFile, Model pomModel) {
+    String fileNameInRepo = pomModel.getArtifactId()
+        + "-" + pomModel.getVersion()
+        + (pomModel.getPackaging() != null ? "-" + pomModel.getPackaging() : "")
+        + ".jar";
+    File compressedFile = new File(fileNameInRepo);
+    compress(compressedFile, listFiles(explodedArtifactFile, null, true).stream()
+        .map(f -> new ZipUtils.ZipResource(f.getAbsolutePath(), f.getAbsolutePath().substring(explodedArtifactFile.getAbsolutePath().length() + 1))).toArray(ZipUtils.ZipResource[]::new));
+    return compressedFile;
   }
 
   private static void installPom(File pomFile, File repositoryLocation) throws IOException, XmlPullParserException {
@@ -47,16 +62,18 @@ public class MavenTestUtils {
     try (FileReader pomReader = new FileReader(pomFile)) {
       pomModel = reader.read(pomReader);
     }
+    pomModel.setPomFile(pomFile);
     installArtifact(pomFile, repositoryLocation, pomModel);
   }
 
-  private static void installArtifact(File artifactFile, File repositoryLocation, Model pomModel) throws IOException, XmlPullParserException {
+  private static void installArtifact(File artifactFile, File repositoryLocation, Model pomModel)
+      throws IOException {
     List<String> artifactLocationInRepo = new ArrayList<>(asList(pomModel.getGroupId().split("\\.")));
     artifactLocationInRepo.add(pomModel.getArtifactId());
     artifactLocationInRepo.add(pomModel.getVersion());
 
     Path pathToArtifactLocationInRepo =
-            Paths.get(repositoryLocation.getAbsolutePath(), artifactLocationInRepo.toArray(new String[0]));
+        Paths.get(repositoryLocation.getAbsolutePath(), artifactLocationInRepo.toArray(new String[0]));
     File artifactLocationInRepoFile = pathToArtifactLocationInRepo.toFile();
 
     artifactLocationInRepoFile.mkdirs();
@@ -65,7 +82,7 @@ public class MavenTestUtils {
 
     //Copy the pom without the classifier.
     String pomFileName = artifactFile.getName().replaceFirst("(.*\\.[0-9]*\\.[0-9]*\\.?[0-9]?).*", "$1") + ".pom";
-    copyFile(artifactFile, new File(pathToArtifactLocationInRepo.toString(), pomFileName), true);
+    copyFile(pomModel.getPomFile(), new File(pathToArtifactLocationInRepo.toString(), pomFileName), true);
   }
 
 }

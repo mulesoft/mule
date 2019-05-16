@@ -5,15 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>test</groupId>
-    <artifactId>plugin-dependency-with-transitive-dependency</artifactId>
+    <artifactId>plugin-with-transitive-dependency</artifactId>
     <version>1.0.0</version>
+    <packaging>mule-plugin</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>test</groupId>
-            <artifactId>plugin-with-transitive-dependency</artifactId>
+            <groupId>org.mule.test</groupId>
+            <artifactId>library</artifactId>
             <version>1.0.0</version>
-            <classifier>mule-plugin</classifier>
+            <type>pom</type>
         </dependency>
     </dependencies>
 </project>

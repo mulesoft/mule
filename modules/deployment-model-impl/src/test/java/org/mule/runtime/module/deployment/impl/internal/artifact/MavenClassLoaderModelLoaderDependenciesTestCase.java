@@ -15,6 +15,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
+import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.installArtifact;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoaderConfigurationTestCase.MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModel;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
@@ -25,17 +26,9 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -54,9 +47,7 @@ public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassL
     File dependenciesFolder =
         new File(MavenClassLoaderModelLoaderDependenciesTestCase.class.getClassLoader().getResource("dependencies").toURI());
     for (File dependencyFile : dependenciesFolder.listFiles()) {
-      if (!dependencyFile.isDirectory()) {
-        installDependency(dependencyFile);
-      }
+      installArtifact(dependencyFile, new File(repositoryLocation.getValue()));
     }
   }
 
@@ -121,30 +112,4 @@ public class MavenClassLoaderModelLoaderDependenciesTestCase extends MavenClassL
                             .build());
     return mavenClassLoaderModelLoader.load(artifactFile, attributes, APP);
   }
-
-
-  private static void installDependency(File dependencyFile) throws IOException, XmlPullParserException {
-    MavenXpp3Reader reader = new MavenXpp3Reader();
-    Model pomModel;
-    try (FileReader pomReader = new FileReader(dependencyFile)) {
-      pomModel = reader.read(pomReader);
-    }
-
-    List<String> dependencyLocationInRepo = new ArrayList<>(asList(pomModel.getGroupId().split("\\.")));
-    dependencyLocationInRepo.add(pomModel.getArtifactId());
-    dependencyLocationInRepo.add(pomModel.getVersion());
-
-    Path pathToDependencyLocationInRepo =
-        Paths.get(repositoryLocation.getValue(), dependencyLocationInRepo.toArray(new String[0]));
-    File artifactLocationInRepoFile = pathToDependencyLocationInRepo.toFile();
-
-    artifactLocationInRepoFile.mkdirs();
-
-    copyFile(dependencyFile, new File(pathToDependencyLocationInRepo.toString(), dependencyFile.getName()), true);
-
-    //Copy the pom without the classifier.
-    String pomFileName = dependencyFile.getName().replaceFirst("(.*\\.[0-9]*\\.[0-9]*\\.?[0-9]?).*", "$1") + ".pom";
-    copyFile(dependencyFile, new File(pathToDependencyLocationInRepo.toString(), pomFileName), true);
-  }
-
 }

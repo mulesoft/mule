@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>test</groupId>
-    <artifactId>plugin-dependency-with-transitive-dependency</artifactId>
+    <artifactId>plugin-dependency-with-transitive-dependencies</artifactId>
     <version>1.0.0</version>
 
     <dependencies>
         <dependency>
             <groupId>test</groupId>
-            <artifactId>plugin-with-transitive-dependency</artifactId>
+            <artifactId>plugin-with-transitive-dependencies</artifactId>
             <version>1.0.0</version>
             <classifier>mule-plugin</classifier>
         </dependency>
