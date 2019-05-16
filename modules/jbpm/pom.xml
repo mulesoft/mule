@@ -53,6 +53,10 @@
                     <groupId>antlr</groupId>
                     <artifactId>antlr</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- Make sure we are using the same version as Drools -->
