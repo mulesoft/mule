@@ -178,7 +178,7 @@
         <geronimoSpecsJaxRpcVersion>2.1</geronimoSpecsJaxRpcVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <servletApiVersion>3.1.0</servletApiVersion>
-        <grizzlyVersion>2.3.36-MULE-008</grizzlyVersion>
+        <grizzlyVersion>2.3.36-MULE-009</grizzlyVersion>
         <guavaVersion>26.0-android</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hk2Version>2.3.0-b05</hk2Version>
