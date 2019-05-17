@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -59,6 +60,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -310,8 +312,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   protected void doStart() throws MuleException {
     super.doStart();
-    sink = processingStrategy.createSink(this, processFlowFunction());
     try {
+      sink = processingStrategy.createSink(this, processFlowFunction());
       startIfStartable(pipeline);
     } catch (Exception e) {
       stopOnFailure(e);

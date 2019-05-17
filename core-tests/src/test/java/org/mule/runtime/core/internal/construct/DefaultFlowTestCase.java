@@ -32,13 +32,14 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static reactor.core.publisher.Mono.just;
 
-import org.junit.Ignore;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -49,11 +50,20 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -61,11 +71,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiFunction;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -75,7 +80,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private DefaultFlowBuilder.DefaultFlow flow;
   private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
-  private BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction;
+  private final BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -334,6 +339,35 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
       assertThat(e.getCause(), instanceOf(MuleException.class));
       assertThat(e.getCause().getCause(), sameInstance(startException));
     }
+  }
 
+
+  @Test
+  public void workQueueSchedulerRejectsDoesntStartFlow() throws Exception {
+    Processor processor = mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+
+
+    final ProcessingStrategy processingStrategy = new WorkQueueStreamProcessingStrategyFactory() {
+
+      @Override
+      protected Supplier<Scheduler> getRingBufferSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
+        return () -> {
+          final Scheduler rejectingScheduler = mock(Scheduler.class);
+          doThrow(new RejectedExecutionException("rejected by test")).when(rejectingScheduler).execute(any());
+          return rejectingScheduler;
+        };
+      }
+    }.create(muleContext, FLOW_NAME);
+
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(singletonList(processor))
+        .processingStrategyFactory((muleContext, s) -> processingStrategy)
+        .build();
+
+    flow.initialise();
+
+    expectedException.expectMessage("No subscriptions active for processor.");
+    flow.start();
   }
 }
