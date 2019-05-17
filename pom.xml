@@ -149,7 +149,7 @@
 
         <asmVersion>6.2</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
-        <asyncHttpClientVersion>1.14-MULE-006</asyncHttpClientVersion>
+        <asyncHttpClientVersion>1.14-MULE-009</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.60</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
@@ -178,7 +178,7 @@
         <geronimoSpecsJaxRpcVersion>2.1</geronimoSpecsJaxRpcVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <servletApiVersion>3.1.0</servletApiVersion>
-        <grizzlyVersion>2.3.36-MULE-005</grizzlyVersion>
+        <grizzlyVersion>2.3.36-MULE-009</grizzlyVersion>
         <guavaVersion>26.0-android</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hk2Version>2.3.0-b05</hk2Version>
