@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -114,7 +115,9 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
     Set<BundleDependency> allTransitiveDependencies = new HashSet<>();
     for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependencies()) {
       allTransitiveDependencies.add(transitiveDependency);
-      allTransitiveDependencies.addAll(collectTransitiveDependencies(transitiveDependency));
+      if (transitiveDependency.getDescriptor().getClassifier().map(c -> !MULE_PLUGIN_CLASSIFIER.equals(c)).orElse(true)) {
+        allTransitiveDependencies.addAll(collectTransitiveDependencies(transitiveDependency));
+      }
     }
     return allTransitiveDependencies;
   }
