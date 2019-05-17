@@ -314,8 +314,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
     assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), hasItems(
-            bundleDependency("library-with-dependency"),
-            bundleDependency("library")));
+                                                                                  bundleDependency("library-with-dependency"),
+                                                                                  bundleDependency("library")));
   }
 
   @Test

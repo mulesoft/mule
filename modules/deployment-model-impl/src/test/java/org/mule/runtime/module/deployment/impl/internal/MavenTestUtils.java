@@ -52,7 +52,9 @@ public class MavenTestUtils {
         + ".jar";
     File compressedFile = new File(fileNameInRepo);
     compress(compressedFile, listFiles(explodedArtifactFile, null, true).stream()
-        .map(f -> new ZipUtils.ZipResource(f.getAbsolutePath(), f.getAbsolutePath().substring(explodedArtifactFile.getAbsolutePath().length() + 1))).toArray(ZipUtils.ZipResource[]::new));
+        .map(f -> new ZipUtils.ZipResource(f.getAbsolutePath(),
+                                           f.getAbsolutePath().substring(explodedArtifactFile.getAbsolutePath().length() + 1)))
+        .toArray(ZipUtils.ZipResource[]::new));
     return compressedFile;
   }
 

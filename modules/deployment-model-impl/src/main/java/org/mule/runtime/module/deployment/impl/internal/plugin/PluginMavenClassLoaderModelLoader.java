@@ -95,11 +95,16 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   @Override
   protected Set<BundleDependency> resolveArtifactDependencies(File artifactFile, Map<String, Object> attributes,
                                                               ArtifactType artifactType) {
-    if(attributes instanceof PluginExtendedClassLoaderModelAttributes) {
+    if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
       BundleDescriptor pluginBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
-      ArtifactDescriptor deployableArtifactDescriptor = ((PluginExtendedClassLoaderModelAttributes) attributes).getDeployableArtifactDescriptor();
-      Set<BundleDependency> deployableArtifactDescriptorDependencies = deployableArtifactDescriptor.getClassLoaderModel().getDependencies();
-      BundleDependency pluginDependencyInDeployableArtifact = deployableArtifactDescriptorDependencies.stream().filter(dep -> dep.getDescriptor().equals(pluginBundleDescriptor)).findFirst().orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find required descriptor. Looking for: " + pluginBundleDescriptor + " in " + deployableArtifactDescriptorDependencies)));
+      ArtifactDescriptor deployableArtifactDescriptor =
+          ((PluginExtendedClassLoaderModelAttributes) attributes).getDeployableArtifactDescriptor();
+      Set<BundleDependency> deployableArtifactDescriptorDependencies =
+          deployableArtifactDescriptor.getClassLoaderModel().getDependencies();
+      BundleDependency pluginDependencyInDeployableArtifact = deployableArtifactDescriptorDependencies.stream()
+          .filter(dep -> dep.getDescriptor().equals(pluginBundleDescriptor)).findFirst()
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find required descriptor. Looking for: "
+              + pluginBundleDescriptor + " in " + deployableArtifactDescriptorDependencies)));
       return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
     }
     return super.resolveArtifactDependencies(artifactFile, attributes, artifactType);
@@ -107,7 +112,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   private Set<BundleDependency> collectTransitiveDependencies(BundleDependency rootDependency) {
     Set<BundleDependency> allTransitiveDependencies = new HashSet<>();
-    for(BundleDependency transitiveDependency : rootDependency.getTransitiveDependencies()) {
+    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependencies()) {
       allTransitiveDependencies.add(transitiveDependency);
       allTransitiveDependencies.addAll(collectTransitiveDependencies(transitiveDependency));
     }
