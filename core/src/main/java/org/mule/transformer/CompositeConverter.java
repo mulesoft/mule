@@ -260,4 +260,10 @@ public class CompositeConverter implements Converter
     {
         return new LinkedList<Converter>(chain);
     }
+
+    @Override
+    public String toString()
+    {
+        return this.getClass().getSimpleName() + "[name: " + getName() + "; chain: " + getConverters().toString() + "]";
+    }
 }
