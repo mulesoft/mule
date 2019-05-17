@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.privileged.transformer;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -29,9 +29,9 @@ import java.util.List;
  */
 public final class CompositeConverter extends AbstractComponent implements Converter, MuleContextAware {
 
-  private String name;
+  private final String name;
 
-  private LinkedList<Converter> chain;
+  private final LinkedList<Converter> chain;
 
   private MuleContext muleContext;
 
@@ -176,5 +176,10 @@ public final class CompositeConverter extends AbstractComponent implements Conve
 
   public LinkedList<Converter> getConverters() {
     return new LinkedList<>(chain);
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + "[name: " + getName() + "; chain: " + getConverters().toString() + "]";
   }
 }
