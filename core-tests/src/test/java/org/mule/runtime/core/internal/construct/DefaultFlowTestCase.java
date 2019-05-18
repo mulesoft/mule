@@ -346,14 +346,14 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   public void workQueueSchedulerRejectsDoesntStartFlow() throws Exception {
     Processor processor = mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
 
+    final Scheduler rejectingScheduler = mock(Scheduler.class);
+    doThrow(new RejectedExecutionException("rejected by test")).when(rejectingScheduler).execute(any());
 
     final ProcessingStrategy processingStrategy = new WorkQueueStreamProcessingStrategyFactory() {
 
       @Override
       protected Supplier<Scheduler> getRingBufferSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
         return () -> {
-          final Scheduler rejectingScheduler = mock(Scheduler.class);
-          doThrow(new RejectedExecutionException("rejected by test")).when(rejectingScheduler).execute(any());
           return rejectingScheduler;
         };
       }
@@ -368,6 +368,11 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow.initialise();
 
     expectedException.expectMessage("No subscriptions active for processor.");
-    flow.start();
+
+    try {
+      flow.start();
+    } finally {
+      verify(rejectingScheduler).shutdownNow();
+    }
   }
 }
