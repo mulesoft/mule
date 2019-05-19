@@ -260,15 +260,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                               ArtifactType artifactType) {
 
     Set<BundleDependency> resolvedDependencies = resolveArtifactDependencies(artifactFile, attributes, artifactType);
-    Set<BundleDependency> resolvedExtendedDependencies = extractRequiredTransitiveDependencies(resolvedDependencies);
 
     Set<BundleDependency> nonProvidedDependencies =
         resolvedDependencies.stream().filter(dep -> !PROVIDED.equals(dep.getScope())).collect(Collectors.toSet());
-    Set<BundleDependency> nonProvidedExtendedDependencies = extractRequiredTransitiveDependencies(nonProvidedDependencies);
 
     final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
         newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
-                                              mavenClient, attributes, nonProvidedExtendedDependencies);
+                                              mavenClient, attributes, nonProvidedDependencies);
     classLoaderModelBuilder
         .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
         .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
@@ -276,28 +274,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
         .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
 
-    loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedExtendedDependencies);
-    classLoaderModelBuilder.dependingOn(resolvedExtendedDependencies);
+    loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies);
+    classLoaderModelBuilder.dependingOn(resolvedDependencies);
 
     return classLoaderModelBuilder.build();
-  }
-
-  private Set<BundleDependency> extractRequiredTransitiveDependencies(Collection<BundleDependency> dependencies) {
-    //Depending on the dependency classifier, based on how the MavenClient resolves the dependencies, some
-    //dependencies are not in the list returned by the {@link MavenClient} but as transitive dependencies.
-    Set<BundleDependency> allRequiredDependencies = new HashSet<>();
-    for (BundleDependency dep : dependencies) {
-      allRequiredDependencies.add(dep);
-      if (dep.getDescriptor().getClassifier().map(API_CLASSIFIERS::contains).orElse(false)) {
-        allRequiredDependencies.addAll(
-                                       dep.getTransitiveDependencies().stream().filter(
-                                                                                       td -> td.getDescriptor().getClassifier()
-                                                                                           .map(API_CLASSIFIERS::contains)
-                                                                                           .orElse(false))
-                                           .collect(Collectors.toList()));
-      }
-    }
-    return allRequiredDependencies;
   }
 
   protected abstract LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
