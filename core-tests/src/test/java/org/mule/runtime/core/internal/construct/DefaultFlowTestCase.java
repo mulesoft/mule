@@ -17,8 +17,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -40,6 +40,8 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -51,6 +53,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -59,7 +62,9 @@ import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -78,7 +83,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private DefaultFlowBuilder.DefaultFlow flow;
   private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
-  private BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction;
+  private final BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -370,6 +375,39 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
       assertThat(e.getCause(), instanceOf(MuleException.class));
       assertThat(e.getCause().getCause(), sameInstance(startException));
     }
+  }
 
+  @Test
+  public void workQueueSchedulerRejectsDoesntStartFlow() throws Exception {
+    Processor processor = mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+
+    final Scheduler rejectingScheduler = mock(Scheduler.class);
+    doThrow(new RejectedExecutionException("rejected by test")).when(rejectingScheduler).execute(any());
+
+    final ProcessingStrategy processingStrategy = new WorkQueueStreamProcessingStrategyFactory() {
+
+      @Override
+      protected Supplier<Scheduler> getRingBufferSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
+        return () -> {
+          return rejectingScheduler;
+        };
+      }
+    }.create(muleContext, FLOW_NAME);
+
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(singletonList(processor))
+        .processingStrategyFactory((muleContext, s) -> processingStrategy)
+        .build();
+
+    flow.initialise();
+
+    expectedException.expectMessage("No subscriptions active for processor.");
+
+    try {
+      flow.start();
+    } finally {
+      verify(rejectingScheduler).shutdownNow();
+    }
   }
 }

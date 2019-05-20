@@ -320,8 +320,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   protected void doStart() throws MuleException {
     super.doStart();
-    sink = processingStrategy.createSink(this, processFlowFunction());
     try {
+      sink = processingStrategy.createSink(this, processFlowFunction());
       startIfStartable(pipeline);
     } catch (Exception e) {
       stopOnFailure(e);
