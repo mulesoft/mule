@@ -89,9 +89,9 @@
 /mule-standalone-${productVersion}/lib/boot/log4j-slf4j-impl-2.8.2.jar
 /mule-standalone-${productVersion}/lib/boot/log4j-jul-2.8.2.jar
 /mule-standalone-${productVersion}/lib/boot/slf4j-api-1.7.24.jar
-/mule-standalone-${productVersion}/lib/boot/jackson-databind-2.9.7.jar
+/mule-standalone-${productVersion}/lib/boot/jackson-databind-2.9.8.jar
 /mule-standalone-${productVersion}/lib/boot/jackson-annotations-2.9.0.jar
-/mule-standalone-${productVersion}/lib/boot/jackson-core-2.9.7.jar
+/mule-standalone-${productVersion}/lib/boot/jackson-core-2.9.8.jar
 
 #
 # /lib/boot/exec
