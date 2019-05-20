@@ -11,6 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
@@ -28,6 +29,7 @@ import static reactor.util.concurrent.WaitStrategy.sleeping;
 import static reactor.util.concurrent.WaitStrategy.yielding;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -42,17 +44,16 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.FluxSink.OverflowStrategy;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.WorkQueueProcessor;
 
@@ -134,6 +135,15 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamWork
             .transform(function)
             .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
       }
+
+      if (!processor.hasDownstreams()) {
+        processor.forceShutdown();
+        throw new MuleRuntimeException(createStaticMessage("No subscriptions active for processor."));
+      } else if (processor.downstreamCount() < subscriberCount) {
+        processor.forceShutdown();
+        throw new MuleRuntimeException(createStaticMessage("Not enough subscriptions active for processor."));
+      }
+
       return buildSink(processor.sink(BUFFER), () -> {
         long start = currentTimeMillis();
         if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
