@@ -90,46 +90,6 @@
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <!-- see http://jira.codehaus.org/browse/MNG-3007
-                 depending on whether jaxen is resolved via dist.codehaus.org
-                 or the central repo we get transitive dependencies that we
-                 don't want here
-                 -->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.ibm.icu</groupId>
-                    <artifactId>icu4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-                <!-- no !"?$ XML parsers whatsoever -->
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xmlParserAPIs</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xom</groupId>
-                    <artifactId>xom</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jdom</artifactId>
-                    <groupId>jdom</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <!-- Test dependencies -->
 
