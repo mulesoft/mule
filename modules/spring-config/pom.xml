@@ -104,6 +104,7 @@
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
+            <version>1.1.1</version>
             <scope>test</scope>
             <!-- see http://jira.codehaus.org/browse/MNG-3007
                  depending on whether jaxen is resolved via dist.codehaus.org
