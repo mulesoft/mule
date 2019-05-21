@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
@@ -24,6 +25,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -65,6 +67,8 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import reactor.core.publisher.Flux;
 
 /**
  * Processes {@link CoreEvent}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
@@ -177,8 +181,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     if (processingStrategy.isSynchronous()) {
       scheduler = schedulerService
           .ioScheduler(muleContext.getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation()));
-      reactorScheduler = fromExecutorService(scheduler);
+    } else {
+      scheduler = schedulerService
+          .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation()));
     }
+    reactorScheduler = fromExecutorService(scheduler);
 
     startIfNeeded(delegate);
     super.start();
@@ -192,7 +199,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       scheduler.stop();
       scheduler = null;
     }
-    if (processingStrategy.isSynchronous() && reactorScheduler != null) {
+    if (reactorScheduler != null) {
       reactorScheduler.dispose();
       reactorScheduler = null;
     }
@@ -218,13 +225,20 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .cast(PrivilegedEvent.class)
-        .doOnNext(request -> just(request)
-            .map(event -> asyncEvent(event))
-            .map(event -> {
-              sink.accept(event);
-              return event;
-            })
-            .subscribe(requestUnbounded()))
+        .doOnNext(request -> {
+          Flux<CoreEvent> asyncPublisher = just(request)
+              .map(event -> asyncEvent(event));
+
+          if (isTransactionActive() && !processingStrategy.isSynchronous()) {
+            asyncPublisher = asyncPublisher.publishOn(reactorScheduler);
+          }
+
+          asyncPublisher.map(event -> {
+            sink.accept(event);
+            return event;
+          })
+              .subscribe(requestUnbounded());
+        })
         .cast(CoreEvent.class);
   }
 
