@@ -34,6 +34,7 @@ import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.duplicatePackageMappingError;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.illegalPackageMappingError;
+
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -43,9 +44,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.EnumerationMatcher;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -54,6 +52,8 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -74,6 +74,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private static final String SPECIFIC_ARTIFACT_ID = "test-artifact";
   private static final String SPECIFIC_ARTIFACT_ID_WITH_SPACES = "test-artifact-with-spaces";
   private static final String ARTIFACT_VERSION = "1.0.0";
+  private static final String ARTIFACT_SNAPSHOT_TIMESTAMPED_VERSION = "1.0.0-20190514.200154-1";
+  private static final String ARTIFACT_SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
   private static final String SPECIFIC_RESOURCE_FORMAT = "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID + ":%s:%s:%s:%s";
   private static final String SPECIFIC_RESOURCE_FORMAT_WITH_SPACES =
       "resource::" + GROUP_ID + ":" + SPECIFIC_ARTIFACT_ID_WITH_SPACES + ":%s:%s:%s:%s";
@@ -562,6 +564,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                 .setGroupId(GROUP_ID)
                 .setArtifactId(SPECIFIC_ARTIFACT_ID)
                 .setVersion(ARTIFACT_VERSION)
+                .setBaseVersion(ARTIFACT_VERSION)
                 .setClassifier("raml")
                 .setType("zip")
                 .build())
@@ -577,6 +580,33 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
     verify(appDescriptor, times(1)).getClassLoaderModel();
+  }
+
+  @Test
+  public void normalizedBaseVersionForSnapshots() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    ArtifactDescriptor appDescriptor = mock(ArtifactDescriptor.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
+        .dependingOn(newHashSet(new BundleDependency.Builder()
+            .setBundleUri(API_LOCATION.toURI())
+            .setDescriptor(new BundleDescriptor.Builder()
+                .setGroupId(GROUP_ID)
+                .setArtifactId(SPECIFIC_ARTIFACT_ID)
+                .setVersion(ARTIFACT_SNAPSHOT_TIMESTAMPED_VERSION)
+                .setBaseVersion(ARTIFACT_SNAPSHOT_VERSION)
+                .setClassifier("raml")
+                .setType("zip")
+                .build())
+            .build()))
+        .build();
+
+    when(appDescriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
+
+    String apiResource = format(SPECIFIC_RESOURCE_FORMAT, ARTIFACT_SNAPSHOT_VERSION, "raml", "zip", API_RESOURCE_NAME);
+    assertThat(regionClassLoader.findResource(apiResource), is(API_LOADED_RESOURCE));
+    verify(appDescriptor).getClassLoaderModel();
   }
 
   @Test
@@ -665,6 +695,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
         .setGroupId(GROUP_ID)
         .setArtifactId(SPECIFIC_ARTIFACT_ID)
         .setVersion(ARTIFACT_VERSION)
+        .setBaseVersion(ARTIFACT_VERSION)
         .setClassifier("mule-plugin")
         .setType("jar")
         .build());
@@ -697,6 +728,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                 .setGroupId(GROUP_ID)
                 .setArtifactId(artifactId)
                 .setVersion(ARTIFACT_VERSION)
+                .setBaseVersion(ARTIFACT_VERSION)
                 .setClassifier(apiKind)
                 .setType("zip")
                 .build())

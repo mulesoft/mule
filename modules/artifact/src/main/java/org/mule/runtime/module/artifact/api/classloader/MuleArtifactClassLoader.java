@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -144,6 +145,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             .setGroupId(groupId)
             .setArtifactId(artifactId)
             .setVersion(version)
+            // As the requested version could be an SNAPSHOT we have to compare using baseVersion instead of version
+            .setBaseVersion(version)
             .setClassifier(classifier)
             .setType(type)
             .build();
@@ -207,7 +210,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     return new BundleDescriptor.Builder()
         .setGroupId(groupId)
         .setArtifactId(urlMatcher.group(1))
+        // This should be modified if we would need to work with timestamped SNAPSHOT versions
         .setVersion(urlMatcher.group(2))
+        .setBaseVersion(urlMatcher.group(2))
         .setClassifier(urlMatcher.group(3))
         .setType(urlMatcher.group(4))
         .build();
@@ -218,14 +223,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   boolean isRequestedArtifact(BundleDescriptor descriptor, BundleDescriptor artifact, Supplier<Boolean> onVersionMismatch) {
-    return isRequestedArtifact(descriptor, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
+    return isRequestedArtifact(descriptor, artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(),
                                artifact.getClassifier(), artifact.getType(), onVersionMismatch);
   }
 
   boolean isRequestedArtifact(BundleDescriptor descriptor, String groupId, String artifactId, String version,
                               Optional<String> classifier, String type, Supplier<Boolean> onVersionMismatch) {
     boolean versionResult = true;
-    if (!descriptor.getVersion().equals(version) && !WILDCARD.equals(version)) {
+    if (!descriptor.getBaseVersion().equals(version) && !WILDCARD.equals(version)) {
       versionResult = onVersionMismatch.get();
     }
     return descriptor.getGroupId().equals(groupId) && descriptor.getArtifactId().equals(artifactId) && versionResult

@@ -18,6 +18,7 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -256,20 +257,22 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       if (matcher.matches()) {
         String groupId = matcher.group(1);
         String artifactId = matcher.group(2);
-        String version = matcher.group(3);
+        String baseVersion = matcher.group(3);
         String classifier = matcher.group(4);
         String type = matcher.group(5);
         String resource = matcher.group(6);
         LOGGER.debug("Region request for '{}' in group '{}', artifact '{}' and version '{}', with classifier '{}' and type '{}'.",
-                     resource, groupId, artifactId, version, classifier, type);
+                     resource, groupId, artifactId, baseVersion, classifier, type);
         String normalizedResource = normalize(resource, true);
 
-        if (API_CLASSIFIERS.contains(classifier) && "zip".equals(type) && !WILDCARD.equals(version)) {
+        if (API_CLASSIFIERS.contains(classifier) && "zip".equals(type) && !WILDCARD.equals(baseVersion)) {
           // Check whether it's a resource from an API dependency, since all those should be considered exported
           BundleDescriptor requiredDescriptor = new BundleDescriptor.Builder()
               .setGroupId(groupId)
               .setArtifactId(artifactId)
-              .setVersion(version)
+              .setVersion(baseVersion)
+              // As the requested version could be an SNAPSHOT we have to compare using baseVersion instead of version
+              .setBaseVersion(baseVersion)
               .setClassifier(classifier)
               .setType(type)
               .build();
@@ -307,9 +310,9 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
               BundleDescriptor descriptor = artifactClassLoader.getArtifactDescriptor().getBundleDescriptor();
               // The descriptor may not be present during some tests
               if (descriptor != null
-                  && isRequestedArtifact(descriptor, groupId, artifactId, version, ofNullable(classifier), type, () -> {
+                  && isRequestedArtifact(descriptor, groupId, artifactId, baseVersion, ofNullable(classifier), type, () -> {
                     LOGGER.warn("Required version '{}' for artifact '{}:{}' not found. Searching in available version '{}'...",
-                                version, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+                                baseVersion, descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
                     return true;
                   })) {
                 return artifactClassLoader.findResource(normalizedResource);
