@@ -216,6 +216,10 @@
                     <groupId>javax.mail</groupId>
                     <artifactId>mailapi</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>jakarta.mail</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
