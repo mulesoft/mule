@@ -6,16 +6,27 @@
  */
 package org.mule.module.xml.transformer;
 
+import static com.ctc.wstx.api.WstxInputProperties.P_MAX_ATTRIBUTE_SIZE;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.parseInt;
+import static java.lang.System.getProperty;
+import static javax.xml.stream.XMLOutputFactory.newInstance;
+import static javax.xml.transform.OutputKeys.ENCODING;
+import static org.mule.api.config.MuleProperties.MULE_MAX_ATTRIBUTE_SIZE;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.xml.util.XMLUtils.getTransformer;
+import static org.mule.module.xml.util.XMLUtils.toXmlSource;
+import static org.mule.transformer.types.DataTypeFactory.BYTE_ARRAY;
+import static org.mule.transformer.types.DataTypeFactory.STRING;
+import static org.mule.transformer.types.DataTypeFactory.create;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.createDefault;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.createWithConfig;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
-import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,7 +35,6 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -51,29 +61,49 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
 
     public AbstractXmlTransformer()
     {
-        registerSourceType(DataTypeFactory.STRING);
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        registerSourceType(DataTypeFactory.create(javax.xml.transform.Source.class));
-        registerSourceType(DataTypeFactory.create(org.xml.sax.InputSource.class));
-        registerSourceType(DataTypeFactory.create(org.dom4j.Node.class));
-        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
-        registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
-        registerSourceType(DataTypeFactory.create(org.w3c.dom.Element.class));
-        registerSourceType(DataTypeFactory.create(java.io.InputStream.class));
-        registerSourceType(DataTypeFactory.create(org.mule.api.transport.OutputHandler.class));
-        registerSourceType(DataTypeFactory.create(javax.xml.stream.XMLStreamReader.class));
-        registerSourceType(DataTypeFactory.create(org.mule.module.xml.transformer.DelayedResult.class));
-        setReturnDataType(DataTypeFactory.create(byte[].class, MimeTypes.XML));
+        registerSourceType(STRING);
+        registerSourceType(BYTE_ARRAY);
+        registerSourceType(create(javax.xml.transform.Source.class));
+        registerSourceType(create(org.xml.sax.InputSource.class));
+        registerSourceType(create(org.dom4j.Node.class));
+        registerSourceType(create(org.dom4j.Document.class));
+        registerSourceType(create(org.w3c.dom.Document.class));
+        registerSourceType(create(org.w3c.dom.Element.class));
+        registerSourceType(create(java.io.InputStream.class));
+        registerSourceType(create(org.mule.api.transport.OutputHandler.class));
+        registerSourceType(create(javax.xml.stream.XMLStreamReader.class));
+        registerSourceType(create(org.mule.module.xml.transformer.DelayedResult.class));
+        setReturnDataType(create(byte[].class, MimeTypes.XML));
     }
 
     @Override
     public final void initialise() throws InitialisationException
     {
-        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, null).getXMLInputFactory();
+        xmlInputFactory = createWithConfig(acceptExternalEntities, null).getXMLInputFactory();
+        setMaxAttributeSizeProperty();
         useStaxSource = !acceptExternalEntities;
-        xmlOutputFactory = XMLOutputFactory.newInstance();
+        xmlOutputFactory = newInstance();
 
         this.doInitialise();
+    }
+
+    private void setMaxAttributeSizeProperty()
+    {
+        String maxAttributeSizeProperty = getProperty(MULE_MAX_ATTRIBUTE_SIZE);
+        if(maxAttributeSizeProperty != null)
+        {
+            int maxAttributeSize = parseInt(maxAttributeSizeProperty);
+            if(maxAttributeSize > 0)
+            {
+                xmlInputFactory.setProperty(P_MAX_ATTRIBUTE_SIZE, maxAttributeSizeProperty);
+                return;
+            }
+            else
+            {
+                logger.warn("Invalid " + MULE_MAX_ATTRIBUTE_SIZE + " property value");
+            }
+        }
+        xmlInputFactory.setProperty(P_MAX_ATTRIBUTE_SIZE, MAX_VALUE);
     }
 
     protected void doInitialise() throws InitialisationException
@@ -147,12 +177,12 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
 
             try
             {
-                DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
+                DocumentBuilderFactory factory = createDefault().getDocumentBuilderFactory();
                 result = new DOMResult(factory.newDocumentBuilder().newDocument());
             }
             catch (Exception e)
             {
-                throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not create result document"), e);
+                throw new MuleRuntimeException(createStaticMessage("Could not create result document"), e);
             }
 
             return new ResultHolder()
@@ -252,7 +282,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
             return ((Node) obj).asXML();
         }
         // No easy fix, so use the transformer.
-        Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+        Source src = toXmlSource(xmlInputFactory, useStaxSource, obj);
         if (src == null)
         {
             return null;
@@ -261,10 +291,10 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
 
-        Transformer idTransformer = XMLSecureFactories.createDefault().getTransformerFactory().newTransformer();
+        Transformer idTransformer = createDefault().getTransformerFactory().newTransformer();
         if (outputEncoding != null)
         {
-            idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+            idTransformer.setOutputProperty(ENCODING, outputEncoding);
         }
         idTransformer.transform(src, result);
         return writer.getBuffer().toString();
@@ -287,7 +317,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     protected String convertToBytes(Object obj, String outputEncoding) throws Exception
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
-        Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+        Source src = toXmlSource(xmlInputFactory, useStaxSource, obj);
         if (src == null)
         {
             return null;
@@ -296,8 +326,8 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
 
-        Transformer idTransformer = XMLUtils.getTransformer();
-        idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+        Transformer idTransformer = getTransformer();
+        idTransformer.setOutputProperty(ENCODING, outputEncoding);
         idTransformer.transform(src, result);
         return writer.getBuffer().toString();
     }
@@ -305,7 +335,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     protected void writeToStream(Object obj, String outputEncoding, OutputStream output) throws Exception
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
-        Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+        Source src = toXmlSource(xmlInputFactory, useStaxSource, obj);
         if (src == null)
         {
             return;
@@ -313,8 +343,8 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
 
         StreamResult result = new StreamResult(output);
 
-        Transformer idTransformer = XMLUtils.getTransformer();
-        idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+        Transformer idTransformer = getTransformer();
+        idTransformer.setOutputProperty(ENCODING, outputEncoding);
         idTransformer.transform(src, result);
     }
     

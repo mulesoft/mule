@@ -6,7 +6,10 @@
  */
 package org.mule.util.xmlsecurity;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.util.xmlsecurity.XMLSecureFactoriesCache.getInstance;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
@@ -52,31 +55,31 @@ public class XMLSecureFactories
 
     private XMLSecureFactories()
     {
-        String externalEntitiesValue = System.getProperty(EXTERNAL_ENTITIES_PROPERTY, "false");
-        externalEntities = Boolean.parseBoolean(externalEntitiesValue);
+        String externalEntitiesValue = getProperty(EXTERNAL_ENTITIES_PROPERTY, "false");
+        externalEntities = parseBoolean(externalEntitiesValue);
 
-        String expandEntitiesValue = System.getProperty(EXPAND_ENTITIES_PROPERTY, "false");
-        expandEntities = Boolean.parseBoolean(expandEntitiesValue);
+        String expandEntitiesValue = getProperty(EXPAND_ENTITIES_PROPERTY, "false");
+        expandEntities = parseBoolean(expandEntitiesValue);
     }
 
     public DocumentBuilderFactory getDocumentBuilderFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getDocumentBuilderFactory(externalEntities, expandEntities);
+        return getInstance().getDocumentBuilderFactory(externalEntities, expandEntities);
     }
 
     public SAXParserFactory getSAXParserFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getSAXParserFactory(externalEntities, expandEntities);
+        return getInstance().getSAXParserFactory(externalEntities, expandEntities);
     }
 
     public XMLInputFactory getXMLInputFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getXMLInputFactory(externalEntities, expandEntities);
+        return getInstance().getXMLInputFactory(externalEntities, expandEntities);
     }
 
     public TransformerFactory getTransformerFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getTransformerFactory(externalEntities, expandEntities);
+        return getInstance().getTransformerFactory(externalEntities, expandEntities);
     }
 
     public void configureTransformerFactory(TransformerFactory factory)
