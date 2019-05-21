@@ -6,13 +6,14 @@
  */
 package org.mule.module.xml.transformer;
 
+import static javax.xml.transform.OutputKeys.ENCODING;
+import static org.mule.module.xml.util.XMLUtils.getTransformer;
+import static org.mule.module.xml.util.XMLUtils.toXmlSource;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -27,7 +28,7 @@ import org.xml.sax.ContentHandler;
  */
 public class XmlToDomDocument extends AbstractXmlTransformer implements DiscoverableTransformer
 {
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+    private int priorityWeighting = DEFAULT_PRIORITY_WEIGHTING;
 
     @Override
     public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
@@ -35,7 +36,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
         Object src = message.getPayload();
         try
         {
-            Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
+            Source sourceDoc = toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
             if (sourceDoc == null)
             {
                 return null;
@@ -72,8 +73,8 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
                 }
             }
 
-            Transformer idTransformer = XMLUtils.getTransformer();
-            idTransformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+            Transformer idTransformer = getTransformer();
+            idTransformer.setOutputProperty(ENCODING, encoding);
             idTransformer.transform(sourceDoc, holder.getResult());
 
             return holder.getResultObject();

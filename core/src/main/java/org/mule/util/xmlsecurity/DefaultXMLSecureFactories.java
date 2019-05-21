@@ -12,24 +12,25 @@ import static javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA;
 import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
+import static javax.xml.stream.XMLInputFactory.newInstance;
+import static org.apache.commons.logging.LogFactory.getLog;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import javax.xml.XMLConstants;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Create different XML factories configured through the same interface for disabling vulnerabilities.
  */
 public class DefaultXMLSecureFactories
 {
-    private final static Log logger = LogFactory.getLog(DefaultXMLSecureFactories.class);
+    private final static Log logger = getLog(DefaultXMLSecureFactories.class);
 
     public static DocumentBuilderFactory createDocumentBuilderFactory(Boolean externalEntities, Boolean expandEntities)
     {
@@ -70,11 +71,10 @@ public class DefaultXMLSecureFactories
 
     public static XMLInputFactory createXmlInputFactory(Boolean externalEntities, Boolean expandEntities)
     {
-        XMLInputFactory factory = XMLInputFactory.newInstance();
+        XMLInputFactory factory = newInstance();
 
         factory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, externalEntities);
         factory.setProperty(SUPPORT_DTD, expandEntities);
-
         return factory;
     }
 

@@ -34,9 +34,20 @@
 
 package org.mule.module.xml.stax;
 
-import javanet.staxutils.DummyLocator;
-import javanet.staxutils.StAXReaderToContentHandler;
-import javanet.staxutils.helpers.XMLFilterImplEx;
+import static javax.xml.stream.XMLStreamConstants.ATTRIBUTE;
+import static javax.xml.stream.XMLStreamConstants.CDATA;
+import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
+import static javax.xml.stream.XMLStreamConstants.COMMENT;
+import static javax.xml.stream.XMLStreamConstants.DTD;
+import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.ENTITY_DECLARATION;
+import static javax.xml.stream.XMLStreamConstants.ENTITY_REFERENCE;
+import static javax.xml.stream.XMLStreamConstants.NAMESPACE;
+import static javax.xml.stream.XMLStreamConstants.NOTATION_DECLARATION;
+import static javax.xml.stream.XMLStreamConstants.PROCESSING_INSTRUCTION;
+import static javax.xml.stream.XMLStreamConstants.SPACE;
+import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -44,6 +55,9 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import javanet.staxutils.DummyLocator;
+import javanet.staxutils.StAXReaderToContentHandler;
+import javanet.staxutils.helpers.XMLFilterImplEx;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -92,18 +106,18 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
 
             // if the parser is at the start document, procees any comments or PIs
             int event = staxStreamReader.getEventType();
-            if (event == XMLStreamConstants.START_DOCUMENT)
+            if (event == START_DOCUMENT)
             {
                 isDocument = true;
                 event = staxStreamReader.next();
-                while (event != XMLStreamConstants.START_ELEMENT)
+                while (event != START_ELEMENT)
                 {
                     switch (event)
                     {
-                        case XMLStreamConstants.COMMENT :
+                        case COMMENT :
                             handleComment();
                             break;
-                        case XMLStreamConstants.PROCESSING_INSTRUCTION :
+                        case PROCESSING_INSTRUCTION :
                             handlePI();
                             break;
                     }
@@ -111,7 +125,7 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
                 }
             }
 
-            if (event != XMLStreamConstants.START_ELEMENT)
+            if (event != START_ELEMENT)
                 throw new IllegalStateException("The current event is not START_ELEMENT\n but" + event);
 
             do
@@ -121,45 +135,45 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
                 // The spec only really describes 11 of them.
                 switch (event)
                 {
-                    case XMLStreamConstants.START_ELEMENT :
+                    case START_ELEMENT :
                         depth++;
                         handleStartElement();
                         break;
-                    case XMLStreamConstants.END_ELEMENT :
+                    case END_ELEMENT :
                         handleEndElement();
                         depth--;
                         break;
-                    case XMLStreamConstants.CHARACTERS :
+                    case CHARACTERS :
                         handleCharacters();
                         break;
-                    case XMLStreamConstants.ENTITY_REFERENCE :
+                    case ENTITY_REFERENCE :
                         handleEntityReference();
                         break;
-                    case XMLStreamConstants.PROCESSING_INSTRUCTION :
+                    case PROCESSING_INSTRUCTION :
                         handlePI();
                         break;
-                    case XMLStreamConstants.COMMENT :
+                    case COMMENT :
                         handleComment();
                         break;
-                    case XMLStreamConstants.DTD :
+                    case DTD :
                         handleDTD();
                         break;
-                    case XMLStreamConstants.ATTRIBUTE :
+                    case ATTRIBUTE :
                         handleAttribute();
                         break;
-                    case XMLStreamConstants.NAMESPACE :
+                    case NAMESPACE :
                         handleNamespace();
                         break;
-                    case XMLStreamConstants.CDATA :
+                    case CDATA :
                         handleCDATA();
                         break;
-                    case XMLStreamConstants.ENTITY_DECLARATION :
+                    case ENTITY_DECLARATION :
                         handleEntityDecl();
                         break;
-                    case XMLStreamConstants.NOTATION_DECLARATION :
+                    case NOTATION_DECLARATION :
                         handleNotationDecl();
                         break;
-                    case XMLStreamConstants.SPACE :
+                    case SPACE :
                         handleSpace();
                         break;
                     default :
@@ -170,17 +184,17 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
             }
             while (depth != 0);
 
-            // procees any remaining comments or PIs
+            // process any remaining comments or PIs
             if (isDocument)
             {
                 while (event != XMLStreamConstants.END_DOCUMENT)
                 {
                     switch (event)
                     {
-                        case XMLStreamConstants.COMMENT :
+                        case COMMENT :
                             handleComment();
                             break;
-                        case XMLStreamConstants.PROCESSING_INSTRUCTION :
+                        case PROCESSING_INSTRUCTION :
                             handlePI();
                             break;
                     }
@@ -346,7 +360,7 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
         AttributesImpl attrs = new AttributesImpl();
 
         int eventType = staxStreamReader.getEventType();
-        if (eventType != XMLStreamConstants.ATTRIBUTE && eventType != XMLStreamConstants.START_ELEMENT)
+        if (eventType != ATTRIBUTE && eventType != START_ELEMENT)
         {
             throw new InternalError("getAttributes() attempting to process: " + eventType);
         }

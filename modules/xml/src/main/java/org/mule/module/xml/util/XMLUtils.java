@@ -6,6 +6,16 @@
  */
 package org.mule.module.xml.util;
 
+import static javax.xml.stream.XMLStreamConstants.ATTRIBUTE;
+import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
+import static javax.xml.stream.XMLStreamConstants.END_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.NAMESPACE;
+import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
+import static javax.xml.xpath.XPathFactory.newInstance;
+import static org.mule.util.IOUtils.getResourceAsStream;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.createDefault;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -15,8 +25,6 @@ import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
-import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -33,7 +41,6 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -50,7 +57,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
@@ -99,7 +105,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
      */
     public static Transformer getTransformer() throws TransformerConfigurationException
     {
-        return XMLSecureFactories.createDefault().getTransformerFactory().newTransformer();
+        return createDefault().getTransformerFactory().newTransformer();
     }
 
     public static org.dom4j.Document toDocument(Object obj, MuleContext muleContext) throws Exception
@@ -121,7 +127,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
             reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA, true);
             reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING, true);
             
-            InputStream xsdAsStream = IOUtils.getResourceAsStream(externalSchemaLocation, XMLUtils.class);
+            InputStream xsdAsStream = getResourceAsStream(externalSchemaLocation, XMLUtils.class);
             if (xsdAsStream == null)
             {
                 throw new IllegalArgumentException("Couldn't find schema at " + externalSchemaLocation);
@@ -248,7 +254,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     private static org.w3c.dom.Document parseXML(InputSource source) throws Exception
     {
-        DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
+        DocumentBuilderFactory factory = createDefault().getDocumentBuilderFactory();
         return factory.newDocumentBuilder().parse(source);
     }
 
@@ -354,7 +360,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
     public static javax.xml.transform.Source toXmlSource(XMLStreamReader src) throws Exception {
         // StaxSource requires that we advance to a start element/document event
         if (!src.isStartElement() &&
-            src.getEventType() != XMLStreamConstants.START_DOCUMENT)
+            src.getEventType() != START_DOCUMENT)
         {
             src.nextTag();
         }
@@ -462,7 +468,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     public static Node toDOMNode(Object src, MuleEvent event) throws Exception
     {
-        DocumentBuilderFactory builderFactory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
+        DocumentBuilderFactory builderFactory = createDefault().getDocumentBuilderFactory();
         builderFactory.setNamespaceAware(true);
 
         return toDOMNode(src, event, builderFactory);
@@ -510,7 +516,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
             XMLStreamReader xsr = (XMLStreamReader) src;
 
             // StaxSource requires that we advance to a start element/document event
-            if (!xsr.isStartElement() && xsr.getEventType() != XMLStreamConstants.START_DOCUMENT)
+            if (!xsr.isStartElement() && xsr.getEventType() != START_DOCUMENT)
             {
                 xsr.nextTag();
             }
@@ -534,7 +540,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     private static String getOuterXml(XMLStreamReader xmlr) throws TransformerFactoryConfigurationError, TransformerException
     {
-        Transformer transformer = XMLSecureFactories.createDefault().getTransformerFactory().newTransformer();
+        Transformer transformer = createDefault().getTransformerFactory().newTransformer();
         StringWriter stringWriter = new StringWriter();
         transformer.transform(new StaxSource(xmlr), new StreamResult(stringWriter));
         return stringWriter.toString();
@@ -561,24 +567,24 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
         while (reader.hasNext()) {
             switch (event) {
-            case XMLStreamConstants.START_ELEMENT:
+            case START_ELEMENT:
                 read++;
                 writeStartElement(reader, writer);
                 break;
-            case XMLStreamConstants.END_ELEMENT:
+            case END_ELEMENT:
                 writer.writeEndElement();
                 read--;
                 if (read <= 0 && !fragment) {
                     return;
                 }
                 break;
-            case XMLStreamConstants.CHARACTERS:
+            case CHARACTERS:
                 writer.writeCharacters(reader.getText());
                 break;
-            case XMLStreamConstants.START_DOCUMENT:
-            case XMLStreamConstants.END_DOCUMENT:
-            case XMLStreamConstants.ATTRIBUTE:
-            case XMLStreamConstants.NAMESPACE:
+            case START_DOCUMENT:
+            case END_DOCUMENT:
+            case ATTRIBUTE:
+            case NAMESPACE:
                 break;
             default:
                 break;
@@ -674,7 +680,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
      */
     private static XPath createXPath(Node node)
     {
-        XPath xp = XPathFactory.newInstance().newXPath();
+        XPath xp = newInstance().newXPath();
         if (node instanceof Document)
         {
             xp.setNamespaceContext(new XPathNamespaceContext((Document) node));
@@ -726,8 +732,6 @@ public class XMLUtils extends org.mule.util.XMLUtils
             }
             return nodeList;
     }
-
-
 
     /**
      * The default namespace context that will read namespaces from the current document if the
