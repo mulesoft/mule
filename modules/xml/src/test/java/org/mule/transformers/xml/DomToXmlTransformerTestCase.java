@@ -8,13 +8,13 @@ package org.mule.transformers.xml;
 
 import static org.mule.api.config.MuleProperties.MULE_MAX_ATTRIBUTE_SIZE;
 import static org.mule.module.xml.util.XMLUtils.toXMLStreamReader;
+import static org.mule.transformer.types.DataTypeFactory.create;
 import static org.mule.util.IOUtils.getResourceAsStream;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 
@@ -33,7 +33,7 @@ public class DomToXmlTransformerTestCase extends AbstractMuleContextTestCase
   public void domToXmlWithSmallInput() throws Exception
   {
     XmlToDomDocument transformer = createObject(XmlToDomDocument.class);
-    transformer.setReturnDataType(DataTypeFactory.create(org.w3c.dom.Document.class));
+    transformer.setReturnDataType(create(org.w3c.dom.Document.class));
 
     InputStream is = getResourceAsStream("small.xml", XMLTestUtils.class);
     XMLStreamReader sr = toXMLStreamReader(transformer.getXMLInputFactory(), is);
