@@ -19,11 +19,11 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATION
 import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ComponentCustomAttributeRetrieve.from;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -43,8 +43,6 @@ import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +59,8 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
  *
@@ -76,7 +76,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
           .build();
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
-  private BeanDefinitionPostProcessor beanDefinitionPostProcessor;
+  private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
 
   public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
@@ -128,7 +128,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .findFirst()
         .ifPresent(annotationsCdm -> annotationsCdm.getInnerComponents().forEach(
                                                                                  annotationCdm -> previousAnnotations
-                                                                                     .put(new QName(from(annotationCdm)
+                                                                                     .put(new QName(annotationCdm.getIdentifier()
                                                                                          .getNamespaceUri(),
                                                                                                     annotationCdm
                                                                                                         .getIdentifier()
