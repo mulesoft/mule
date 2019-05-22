@@ -15,7 +15,6 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -210,7 +209,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
-        .flatMap(source.getBackPressureStrategy() == WAIT ? flowWaitMapper() : flowFailDropMapper());
+        .flatMap(routeThroughProcessingStrategy());
+  }
+
+  protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy() {
+    return event -> {
+      Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
+      sink.accept(event);
+      return Mono.from(responsePublisher);
+    };
   }
 
   /**
