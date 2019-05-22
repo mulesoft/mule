@@ -159,6 +159,7 @@ public class ModuleFlowProcessingPhase
 
         just(templateEvent)
             .doOnNext(onMessageReceived(template, messageProcessContext, flowConstruct))
+            .doOnNext(event -> flowConstruct.checkBackpressure(event))
             // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when
             // complete.
             .flatMap(request -> from(policy.process(request, template))
