@@ -33,13 +33,13 @@ public class StringToEnum extends AbstractTransformer implements DiscoverableTra
    *
    * @param enumClass the class of the transformed values
    */
-  public StringToEnum(Class<? extends Enum> enumClass, String namespace) {
+  public StringToEnum(Class<? extends Enum> enumClass) {
     checkArgument(enumClass != null, "enumClass cannot be null");
     this.enumClass = enumClass;
 
     registerSourceType(DataType.fromType(String.class));
     setReturnDataType(DataType.fromType(enumClass));
-    setName(format("StringTo%s%sTransformer", namespace, enumClass.getSimpleName()));
+    setName(format("StringTo%sTransformer", enumClass.getName()));
   }
 
   @Override
