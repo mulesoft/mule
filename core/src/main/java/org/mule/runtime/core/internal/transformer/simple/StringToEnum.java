@@ -39,7 +39,7 @@ public class StringToEnum extends AbstractTransformer implements DiscoverableTra
 
     registerSourceType(DataType.fromType(String.class));
     setReturnDataType(DataType.fromType(enumClass));
-    setName(format("StringTo%sTransformer", enumClass.getSimpleName()));
+    setName(format("StringTo%sTransformer", enumClass.getName()));
   }
 
   @Override

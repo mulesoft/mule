@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -48,6 +49,12 @@ public class StringToEnumTestCase extends AbstractMuleTestCase {
   public void nullClass() {
     expectedException.expect(IllegalArgumentException.class);
     new StringToEnum(null);
+  }
+
+  @Test
+  public void name() {
+    String name = format("StringTo%sTransformer", TestEnum.class.getName());
+    assertThat(transformer.getName(), is(name));
   }
 
 }
