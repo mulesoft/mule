@@ -222,16 +222,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     };
   }
 
-  /**
-   * If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
-   */
-  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper();
-
-  /**
-   * If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
-   */
-  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper();
-
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
         .doOnNext(beforeProcessors())
