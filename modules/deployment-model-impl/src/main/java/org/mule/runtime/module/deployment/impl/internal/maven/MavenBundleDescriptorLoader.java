@@ -71,6 +71,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setArtifactId(packagerClassLoaderModel.getArtifactCoordinates().getArtifactId())
           .setGroupId(packagerClassLoaderModel.getArtifactCoordinates().getGroupId())
           .setVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
+          .setBaseVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
           .setType(packagerClassLoaderModel.getArtifactCoordinates().getType())
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
           .build();
