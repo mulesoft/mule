@@ -210,7 +210,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                          new BundleDescriptor.Builder().setArtifactId(d.getArtifactCoordinates().getArtifactId())
                              .setGroupId(d.getArtifactCoordinates().getGroupId())
                              .setClassifier(d.getArtifactCoordinates().getClassifier())
-                             .setType(d.getArtifactCoordinates().getType()).setVersion(d.getArtifactCoordinates().getVersion())
+                             .setType(d.getArtifactCoordinates().getType())
+                             .setVersion(d.getArtifactCoordinates().getVersion())
+                             .setBaseVersion(d.getArtifactCoordinates().getVersion())
                              .build())
           .setBundleUri(bundle.toURI())
           .build();
