@@ -321,6 +321,13 @@ public class MuleProperties {
       MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 
   /**
+   * System property for the default maximum allowed length of xml attribute values
+   *
+   * @since 4.2.1
+   */
+  public static final String MULE_MAX_ATTRIBUTE_SIZE = PROPERTY_PREFIX + "XML_MAX_ATTRIBUTE_SIZE";
+
+  /**
    * @return Whether MEL is set as the default EL according to {@link #MULE_MEL_AS_DEFAULT}
    * @since 4.2.0
    */
