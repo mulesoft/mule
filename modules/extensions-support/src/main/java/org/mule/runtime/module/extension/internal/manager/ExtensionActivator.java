@@ -80,7 +80,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
           final Class<Enum> enumClass = (Class<Enum>) type;
           if (enumTypes.add(enumClass)) {
             try {
-              StringToEnum stringToEnum = new StringToEnum(enumClass);
+              StringToEnum stringToEnum = new StringToEnum(enumClass, extensionModel.getName());
               registerObject(muleContext, getName(stringToEnum), stringToEnum, Transformer.class);
             } catch (MuleException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "

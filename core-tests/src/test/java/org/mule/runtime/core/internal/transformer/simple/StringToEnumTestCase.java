@@ -27,7 +27,7 @@ public class StringToEnumTestCase extends AbstractMuleTestCase {
     A, B
   }
 
-  private StringToEnum transformer = new StringToEnum(TestEnum.class);
+  private StringToEnum transformer = new StringToEnum(TestEnum.class, "TestClass");
 
   @Test
   public void transform() throws Exception {
@@ -47,7 +47,12 @@ public class StringToEnumTestCase extends AbstractMuleTestCase {
   @Test
   public void nullClass() {
     expectedException.expect(IllegalArgumentException.class);
-    new StringToEnum(null);
+    new StringToEnum(null, null);
+  }
+
+  @Test
+  public void name() {
+    assertThat(transformer.getName(), is("StringToTestClassTestEnumTransformer"));
   }
 
 }
