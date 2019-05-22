@@ -83,6 +83,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private Sink sink;
   private final int maxConcurrency;
   private final ComponentInitialStateManager componentInitialStateManager;
+  private BackPressureStrategySelector backpressureStrategySelector;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
@@ -111,6 +112,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     processingStrategy = this.processingStrategyFactory.create(muleContext, getName());
+    backpressureStrategySelector = new BackPressureStrategySelector(this);
   }
 
   /**
@@ -411,5 +413,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   public ProcessingStrategyFactory getProcessingStrategyFactory() {
     return processingStrategyFactory;
+  }
+
+  @Override
+  public void checkBackpressure(CoreEvent event) throws RejectedExecutionException {
+    backpressureStrategySelector.check(event);
   }
 }

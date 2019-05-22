@@ -10,12 +10,15 @@ import static org.mule.runtime.core.internal.processor.strategy.DirectProcessing
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
+
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct through which messages are
@@ -55,5 +58,13 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Compo
   default ProcessingStrategy getProcessingStrategy() {
     return DIRECT_PROCESSING_STRATEGY_INSTANCE;
   }
+
+  /**
+   * Check if backpressure will be fired in the {@link ProcessingStrategy} upon emitting an event
+   *
+   * @param event the event about to be processed
+   * @throws RejectedExecutionException
+   */
+  default void checkBackpressure(CoreEvent event) throws RejectedExecutionException {}
 
 }
