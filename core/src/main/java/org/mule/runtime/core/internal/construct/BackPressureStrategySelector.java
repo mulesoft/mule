@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.RejectedExecutionException;
+
+import org.slf4j.Logger;
 
 public class BackPressureStrategySelector {
 
   private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
+
+  private final Logger LOGGER = getLogger(BackPressureStrategySelector.class);
 
   private AbstractPipeline abstractPipeline;
   private final MessagingExceptionResolver exceptionResolver;
@@ -27,7 +29,7 @@ public class BackPressureStrategySelector {
     this.exceptionResolver = new MessagingExceptionResolver(abstractPipeline);
   }
 
-  protected void checkBackpressureWithWaitStrategy(CoreEvent event) {
+  protected void checkBackpressureWithWaitStrategy(CoreEvent event) throws FlowBackPressureException {
     boolean accepted = false;
     while (!accepted) {
       try {
@@ -38,28 +40,21 @@ public class BackPressureStrategySelector {
         try {
           Thread.sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
-          handleOverload(event, new FlowBackPressureException(abstractPipeline.getName(), ree));
+          throw new FlowBackPressureException(abstractPipeline.getName(), ree);
         }
       }
     }
   }
 
-  protected void checkBackpressureWithFailDropStrategy(CoreEvent event) {
+  protected void checkBackpressureWithFailDropStrategy(CoreEvent event) throws FlowBackPressureException {
     try {
       abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
     } catch (RejectedExecutionException ree) {
-      handleOverload(event, new FlowBackPressureException(abstractPipeline.getName(), ree));
+      throw new FlowBackPressureException(abstractPipeline.getName(), ree);
     }
   }
 
-  private void handleOverload(CoreEvent request, Throwable overloadException) {
-    MessagingException me = new MessagingException(request, overloadException, abstractPipeline);
-    ((BaseEventContext) request.getContext())
-        .error(exceptionResolver.resolve(me, ((PrivilegedMuleContext) abstractPipeline.getMuleContext()).getErrorTypeLocator(),
-                                         abstractPipeline.getMuleContext().getExceptionContextProviders()));
-  }
-
-  public void check(CoreEvent event) {
+  public void check(CoreEvent event) throws FlowBackPressureException {
     if (abstractPipeline.getSource().getBackPressureStrategy() == MessageSource.BackPressureStrategy.WAIT) {
       checkBackpressureWithWaitStrategy(event);
     } else {
