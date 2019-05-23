@@ -11,7 +11,6 @@ import static java.util.Collections.unmodifiableList;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,11 +24,13 @@ public class DefaultProcessorsTrace implements ProcessorsTrace {
 
   /**
    * Adds a message processor path to the list of processors that were executed as part of the processing of this event.
-   * 
+   *
    * @param processorPath the path to mask as executed.
    */
   public synchronized void addExecutedProcessors(String processorPath) {
-    executedProcessors.add(processorPath);
+    if (!executedProcessors.contains(processorPath)) {
+      executedProcessors.add(processorPath);
+    }
   }
 
   @Override
