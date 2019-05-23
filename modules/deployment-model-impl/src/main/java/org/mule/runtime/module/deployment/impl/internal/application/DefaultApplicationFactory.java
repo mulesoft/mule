@@ -18,7 +18,6 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
@@ -27,6 +26,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
@@ -170,13 +170,13 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   private Domain getApplicationDomain(ApplicationDescriptor descriptor) {
-    Domain domain;
-
+    Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
     try {
-      if (descriptor.getDomainDescriptor().isPresent()) {
-        domain = domainRepository.getDomain(descriptor.getDomainDescriptor().get());
+      if (domainBundleDescriptor.isPresent()) {
+        BundleDescriptor bundleDescriptor = domainBundleDescriptor.get();
+        return domainRepository.getDomain(bundleDescriptor);
       } else {
-        domain = domainRepository.getDomain(descriptor.getDomainName());
+        return domainRepository.getDomain(descriptor.getDomainName());
       }
     } catch (DomainNotFoundException e) {
       throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
@@ -185,8 +185,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     } catch (IncompatibleDomainVersionException e) {
       throw new DeploymentException(e.getI18nMessage(), e);
     }
-
-    return domain;
   }
 
   private Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors(ApplicationDescriptor descriptor) {
