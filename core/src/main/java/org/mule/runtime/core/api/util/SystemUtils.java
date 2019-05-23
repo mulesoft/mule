@@ -11,8 +11,9 @@ import static org.apache.commons.lang3.StringUtils.indexOf;
 import static org.apache.commons.lang3.StringUtils.substring;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
-import org.mule.runtime.api.exception.MuleException;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.nio.charset.Charset;
@@ -85,6 +86,10 @@ public class SystemUtils {
     return JAVA_VM_VENDOR.toLowerCase().contains("openjdk");
   }
 
+  public static boolean isAdoptOpenJDK() {
+    return JAVA_VM_VENDOR.toLowerCase().contains("adoptopenjdk");
+  }
+
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
 
   private static CommandLine parseCommandLine(String args[], String opts[][]) throws MuleException {
@@ -114,7 +119,7 @@ public class SystemUtils {
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
   public static Map<String, Object> getCommandLineOptions(String args[], String opts[][]) throws MuleException {
     CommandLine line = parseCommandLine(args, opts);
-    Map<String, Object> ret = new HashMap<String, Object>();
+    Map<String, Object> ret = new HashMap<>();
     Option[] options = line.getOptions();
 
     for (Option option : options) {
@@ -139,7 +144,7 @@ public class SystemUtils {
     }
 
     // the result map of property key/value pairs
-    final Map<String, String> result = new HashMap<String, String>();
+    final Map<String, String> result = new HashMap<>();
 
     // where to begin looking for key/value tokens
     int tokenStart = 0;
