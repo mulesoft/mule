@@ -6,7 +6,17 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.lang.System.getProperty;
+import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+import static org.mule.runtime.core.api.util.SystemUtils.isAdoptOpenJDK;
+import static org.mule.runtime.core.api.util.SystemUtils.isAppleJDK;
+import static org.mule.runtime.core.api.util.SystemUtils.isIbmJDK;
+import static org.mule.runtime.core.api.util.SystemUtils.isOpenJDK;
+import static org.mule.runtime.core.api.util.SystemUtils.isSunJDK;
+import static org.mule.runtime.core.internal.util.VersionRange.VERSION_RANGES;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.util.SystemUtils;
 
@@ -150,8 +160,6 @@ public class JdkVersionUtils {
         return false;
       return true;
     }
-
-
   }
 
   public static class JdkVersionRange extends VersionRange {
@@ -180,22 +188,22 @@ public class JdkVersionUtils {
     }
   }
 
-  private static final Logger logger = LoggerFactory.getLogger(JdkVersionUtils.class);
+  private static final Logger logger = getLogger(JdkVersionUtils.class);
 
   /**
    * pattern with groups for major, minor, micro, update and milestone (if exists).
    * major_version.minor_version.micro_version[_update_version][-milestone]
    */
   public static final Pattern JDK_VERSION =
-      Pattern.compile("^([0-9]+)(?:\\.([0-9]+))?(?:\\.([0-9]+))?(?:_([0-9]+))?(?:-?(.+))?$");
+      compile("^([0-9]+)(?:\\.([0-9]+))?(?:\\.([0-9]+))?(?:_([0-9]+))?(?:-?(.+))?$");
 
   public static List<JdkVersionRange> createJdkVersionRanges(String versionsString) {
-    Matcher m = VersionRange.VERSION_RANGES.matcher(versionsString);
+    Matcher m = VERSION_RANGES.matcher(versionsString);
     if (!m.find()) {
-      throw new IllegalArgumentException("Version range doesn't match pattern: " + VersionRange.VERSION_RANGES.pattern());
+      throw new IllegalArgumentException("Version range doesn't match pattern: " + VERSION_RANGES.pattern());
     }
 
-    List<JdkVersionRange> versions = new ArrayList<JdkVersionRange>();
+    List<JdkVersionRange> versions = new ArrayList<>();
     do {
       versions.add(new JdkVersionRange(m.group(1)));
     } while (m.find());
@@ -204,7 +212,7 @@ public class JdkVersionUtils {
   }
 
   public static JdkVersion getJdkVersion() {
-    return new JdkVersion(System.getProperty(JAVA_VERSION_PROPERTY));
+    return new JdkVersion(getProperty(JAVA_VERSION_PROPERTY));
   }
 
   public static String getSupportedJdks() {
@@ -212,7 +220,7 @@ public class JdkVersionUtils {
   }
 
   public static boolean isSupportedJdkVendor() {
-    return SystemUtils.isSunJDK() || SystemUtils.isAppleJDK() || SystemUtils.isIbmJDK();
+    return isSunJDK() || isAppleJDK() || isIbmJDK() ||isOpenJDK() || isAdoptOpenJDK();
   }
 
   public static String getRecommendedJdks() {
