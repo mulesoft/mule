@@ -71,5 +71,7 @@ public interface ProcessingStrategy {
    *
    * @throws RejectedExecutionException
    */
-  default void checkBackpressureEmitting(CoreEvent event) throws RejectedExecutionException {}
+  default boolean checkBackpressureEmitting(CoreEvent event) {
+    return false;
+  }
 }

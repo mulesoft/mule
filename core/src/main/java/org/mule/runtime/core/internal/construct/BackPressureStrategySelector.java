@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.construct;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 
 import java.util.concurrent.RejectedExecutionException;
 
@@ -22,14 +22,13 @@ public class BackPressureStrategySelector {
   private final Logger LOGGER = getLogger(BackPressureStrategySelector.class);
 
   private AbstractPipeline abstractPipeline;
-  private final MessagingExceptionResolver exceptionResolver;
 
   public BackPressureStrategySelector(AbstractPipeline abstractPipeline) {
     this.abstractPipeline = abstractPipeline;
-    this.exceptionResolver = new MessagingExceptionResolver(abstractPipeline);
   }
 
-  protected void checkBackpressureWithWaitStrategy(CoreEvent event) throws FlowBackPressureException {
+  protected void checkBackpressureWithWaitStrategy(CoreEvent event, FlowExceptionHandler exceptionHandler)
+      throws FlowBackPressureException {
     boolean accepted = false;
     while (!accepted) {
       try {
@@ -40,25 +39,29 @@ public class BackPressureStrategySelector {
         try {
           Thread.sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
-          throw new FlowBackPressureException(abstractPipeline.getName(), ree);
+          FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName(), ree);
+          exceptionHandler.handleException(exception, event);
+          throw exception;
         }
       }
     }
   }
 
-  protected void checkBackpressureWithFailDropStrategy(CoreEvent event) throws FlowBackPressureException {
-    try {
-      abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
-    } catch (RejectedExecutionException ree) {
-      throw new FlowBackPressureException(abstractPipeline.getName(), ree);
+  protected void checkBackpressureWithFailDropStrategy(CoreEvent event, FlowExceptionHandler exceptionHandler)
+      throws FlowBackPressureException {
+    if (!abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event)) {
+      FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName());
+      exceptionHandler.handleException(exception, event);
+      throw exception;
     }
   }
 
-  public void check(CoreEvent event) throws FlowBackPressureException {
+  public void checkNotifyingExceptionListener(CoreEvent event, FlowExceptionHandler exceptionHandler)
+      throws FlowBackPressureException {
     if (abstractPipeline.getSource().getBackPressureStrategy() == MessageSource.BackPressureStrategy.WAIT) {
-      checkBackpressureWithWaitStrategy(event);
+      checkBackpressureWithWaitStrategy(event, exceptionHandler);
     } else {
-      checkBackpressureWithFailDropStrategy(event);
+      checkBackpressureWithFailDropStrategy(event, exceptionHandler);
     }
   }
 }

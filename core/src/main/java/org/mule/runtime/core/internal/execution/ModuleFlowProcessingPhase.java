@@ -50,6 +50,7 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -285,6 +286,9 @@ public class ModuleFlowProcessingPhase
                                         PhaseResultNotifier phaseResultNotifier,
                                         Consumer<Either<MessagingException, CoreEvent>> terminateConsumer) {
     return throwable -> {
+      if (throwable instanceof FlowBackPressureException) {
+        // Handle backpressure.
+      }
       onTerminate(flowConstruct, messageSource, terminateConsumer, left(throwable));
       throwable = throwable instanceof SourceErrorException ? throwable.getCause() : throwable;
       Exception failureException = throwable instanceof Exception ? (Exception) throwable : new DefaultMuleException(throwable);

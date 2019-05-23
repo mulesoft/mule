@@ -156,6 +156,12 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
           ? v
           : MIN_VALUE;
 
+  /**
+   * Check the capacity of the processing strategy to process events at the moment.
+   *
+   * @param event the event about to be processed
+   * @return true if the event can be accepted for processing
+   */
   private boolean checkCapacity(CoreEvent event) {
     if (lastRetryTimestamp.get() != MIN_VALUE) {
       if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
@@ -185,10 +191,10 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   }
 
   @Override
-  public void checkBackpressureEmitting(CoreEvent event) throws RejectedExecutionException {
+  public boolean checkBackpressureEmitting(CoreEvent event) {
     // TODO: This should check somehow whether the sink#emit will fail or not, but that cannot be extracted so straighforwadly
     // from it.
-    checkBackpressureAccepting(event);
+    return checkCapacity(event);
   }
 
   protected final class ProactorSinkWrapper<E> implements ReactorSink<E> {
