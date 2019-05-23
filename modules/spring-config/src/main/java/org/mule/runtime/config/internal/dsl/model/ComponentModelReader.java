@@ -11,10 +11,12 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_ROOT_
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.model.ApplicationModel.POLICY_ROOT_ELEMENT;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.SimpleConfigAttribute;
+import org.mule.runtime.internal.dsl.DslConstants;
 
 import java.util.List;
 import java.util.Properties;
@@ -37,9 +39,11 @@ public class ComponentModelReader {
   public ComponentModel extractComponentDefinitionModel(ConfigLine configLine, String configFileName) {
 
     String namespace = configLine.getNamespace() == null ? CORE_PREFIX : configLine.getNamespace();
+    String namespaceUri = configLine.getNamespaceUri() == null ? DslConstants.CORE_NAMESPACE : configLine.getNamespaceUri();
     ComponentModel.Builder builder = new ComponentModel.Builder()
         .setIdentifier(builder()
             .namespace(namespace)
+            .namespaceUri(namespaceUri)
             .name(configLine.getIdentifier())
             .build())
         .setTextContent(resolveValueIfIsPlaceHolder(configLine.getTextContent()))

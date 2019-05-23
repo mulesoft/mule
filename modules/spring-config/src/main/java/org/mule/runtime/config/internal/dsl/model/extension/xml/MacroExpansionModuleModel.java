@@ -19,9 +19,11 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MODULE_OPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -86,7 +88,7 @@ public class MacroExpansionModuleModel {
 
   /**
    * Used to leave breadcrumbs of which is the flow's name containing the macro expanded chain.
-   * 
+   *
    * @see CommonBeanDefinitionCreator#processMacroExpandedAnnotations(ComponentModel, java.util.Map)
    */
   public static final String ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME = "ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME";
@@ -291,7 +293,10 @@ public class MacroExpansionModuleModel {
         referencesOperationsWithinModule(operationRefModel) ? configRefParentTnsName : getConfigRefName(operationRefModel);
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
-        .setIdentifier(builder().namespace(CORE_PREFIX).name("module-operation-chain").build());
+        .setIdentifier(builder()
+            .namespace(CORE_PREFIX)
+            .namespaceUri(CORE_NAMESPACE)
+            .name("module-operation-chain").build());
 
     processorChainBuilder.addParameter("moduleName", extensionModel.getXmlDslModel().getPrefix(), false);
     processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
@@ -420,10 +425,15 @@ public class MacroExpansionModuleModel {
   private ComponentModel getParameterChild(Map<String, String> parameters, String wrapperParameters, String entryParameter) {
     ComponentModel.Builder parametersBuilder = new ComponentModel.Builder();
     parametersBuilder
-        .setIdentifier(builder().namespace(CORE_PREFIX).name(wrapperParameters).build());
+        .setIdentifier(builder()
+            .namespace(CORE_PREFIX)
+            .namespaceUri(CORE_NAMESPACE)
+            .name(wrapperParameters).build());
     parameters.forEach((paramName, paramValue) -> {
       ComponentModel.Builder parameterBuilder = new ComponentModel.Builder();
-      parameterBuilder.setIdentifier(builder().namespace(CORE_PREFIX)
+      parameterBuilder.setIdentifier(builder()
+          .namespace(CORE_PREFIX)
+          .namespaceUri(CORE_NAMESPACE)
           .name(entryParameter).build());
 
       parameterBuilder.addParameter(KEY_ATTRIBUTE_NAME, paramName, false);

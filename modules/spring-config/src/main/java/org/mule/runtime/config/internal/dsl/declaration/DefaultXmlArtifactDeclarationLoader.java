@@ -43,7 +43,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
@@ -166,8 +166,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   public DefaultXmlArtifactDeclarationLoader(DslResolvingContext context) {
     this.context = context;
     this.resolvers = context.getExtensions().stream()
-        .collect(toMap(e -> e.getXmlDslModel().getPrefix(), e -> DslSyntaxResolver.getDefault(e, context)));
-    this.context.getExtensions().forEach(e -> extensionsByNamespace.put(e.getXmlDslModel().getPrefix(), e));
+        .collect(toMap(e -> e.getXmlDslModel().getNamespace(), e -> DslSyntaxResolver.getDefault(e, context)));
+    this.context.getExtensions().forEach(e -> extensionsByNamespace.put(e.getXmlDslModel().getNamespace(), e));
   }
 
   /**
@@ -326,7 +326,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
             filterAttributes(line.getConfigAttributes(), entry -> !successCallbackAttributes.containsKey(entry.getKey())
                 && !errorCallbackAttributes.containsKey(entry.getKey()));
 
-        declareComponentModel(line.getNamespace(), line.getIdentifier(), sourceAttributes, line.getChildren(), model,
+        declareComponentModel(line.getNamespaceUri(), line.getIdentifier(), sourceAttributes, line.getChildren(), model,
                               extensionElementsDeclarer::newSource).ifPresent(declarer -> {
                                 final DslElementSyntax elementDsl = dsl.resolve(model);
                                 model.getSuccessCallback()
@@ -504,8 +504,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private Optional<ComponentElementDeclarer> declareComponentModel(final ConfigLine line,
                                                                    ComponentModel model,
                                                                    Function<String, ComponentElementDeclarer> declarerBuilder) {
-    return declareComponentModel(line.getNamespace(), line.getIdentifier(), line.getConfigAttributes(), line.getChildren(), model,
-                                 declarerBuilder);
+    return declareComponentModel(line.getNamespaceUri(), line.getIdentifier(), line.getConfigAttributes(), line.getChildren(),
+                                 model, declarerBuilder);
   }
 
   private Optional<ComponentElementDeclarer> declareComponentModel(String namespace, String identifier,
@@ -1022,11 +1022,11 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   }
 
   private String getNamespace(ConfigLine configLine) {
-    return getNamespace(configLine.getNamespace());
+    return getNamespace(configLine.getNamespaceUri());
   }
 
   private String getNamespace(String namespace) {
-    return namespace == null ? CORE_PREFIX : namespace;
+    return namespace == null ? CORE_NAMESPACE : namespace;
   }
 
   private void copyExplicitAttributes(Map<String, SimpleConfigAttribute> attributes,
