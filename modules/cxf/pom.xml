@@ -98,7 +98,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -150,7 +150,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -194,7 +194,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -242,7 +242,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -286,7 +286,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -322,7 +322,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -370,7 +370,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -414,7 +414,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -470,7 +470,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -523,7 +523,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -576,7 +576,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -621,7 +621,7 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
                 </exclusion>
-                <!-- We use javax.mail -->
+                <!-- We use jakarta.mail -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
@@ -811,8 +811,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>javax.activation</groupId>

@@ -66,8 +66,8 @@
             <version>${geronimoSpecsJaxRpcVersion}</version>
         </dependency>
          <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>

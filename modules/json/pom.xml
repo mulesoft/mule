@@ -99,8 +99,8 @@
             <version>${staxApiVersion}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.java-json-tools</groupId>
@@ -128,8 +128,8 @@
                     <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                	<groupId>javax.mail</groupId>
-                	<artifactId>mailapi</artifactId>
+                	<groupId>jakarta.mail</groupId>
+                	<artifactId>jakarta.mail-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
