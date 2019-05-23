@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util;
 
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.util.SystemUtils;
 
@@ -195,7 +196,7 @@ public class JdkVersionUtils {
       throw new IllegalArgumentException("Version range doesn't match pattern: " + VersionRange.VERSION_RANGES.pattern());
     }
 
-    List<JdkVersionRange> versions = new ArrayList<JdkVersionRange>();
+    List<JdkVersionRange> versions = new ArrayList<>();
     do {
       versions.add(new JdkVersionRange(m.group(1)));
     } while (m.find());
@@ -212,7 +213,13 @@ public class JdkVersionUtils {
   }
 
   public static boolean isSupportedJdkVendor() {
-    return SystemUtils.isSunJDK() || SystemUtils.isAppleJDK() || SystemUtils.isIbmJDK();
+    return SystemUtils.isSunJDK() ||
+        SystemUtils.isAdoptOpenJDK() ||
+        SystemUtils.isOpenJDK() ||
+        SystemUtils.isAmazonJDK() ||
+        SystemUtils.isAzulJDK() ||
+        SystemUtils.isAppleJDK() ||
+        SystemUtils.isIbmJDK();
   }
 
   public static String getRecommendedJdks() {
