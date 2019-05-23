@@ -8,6 +8,8 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils;
 
 /**
  * Provides access to {@link Domain} available on the container
@@ -15,9 +17,18 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 public interface DomainRepository {
 
   /**
-   * @param name domain name to find. Non empty.
-   * @return a {@link Domain} corresponding to the given name or null is no such domain exists.
+   * Gets a domain compatible with the given bundle descriptor. The version must be compatible
+   * (see {@link BundleDescriptorUtils#isCompatibleVersion(String, String)} for more information).
+   *
+   * @param descriptor Descriptor of the domain to find.
+   * @return a {@link Domain} corresponding to the given descriptor or null is no such domain exists.
    */
-  Domain getDomain(String name);
+  Domain getDomain(BundleDescriptor descriptor) throws DomainNotFoundException, IncompatibleDomainVersionException;
 
+  /**
+   * Gets a domain which name matches exactly with the given parameter.
+   * @param name Name of the domain to find.
+   * @return a {@link} corresponding to the given name or null if no such domain exists.
+   */
+  Domain getDomain(String name) throws DomainNotFoundException;
 }

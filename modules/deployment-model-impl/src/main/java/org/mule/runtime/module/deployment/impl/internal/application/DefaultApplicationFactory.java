@@ -18,6 +18,7 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
@@ -28,7 +29,9 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
@@ -167,10 +170,20 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   private Domain getApplicationDomain(ApplicationDescriptor descriptor) {
-    Domain domain = domainRepository.getDomain(descriptor.getDomainName());
-    if (domain == null) {
-      throw new DeploymentException(createStaticMessage(format("Domain '%s' "
-          + "has to be deployed in order to deploy Application '%s'", descriptor.getDomainName(), descriptor.getName())));
+    Domain domain;
+
+    try {
+      if (descriptor.getDomainDescriptor().isPresent()) {
+        domain = domainRepository.getDomain(descriptor.getDomainDescriptor().get());
+      } else {
+        domain = domainRepository.getDomain(descriptor.getDomainName());
+      }
+    } catch (DomainNotFoundException e) {
+      throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
+                                                               descriptor.getDomainName(), descriptor.getName())),
+                                    e);
+    } catch (IncompatibleDomainVersionException e) {
+      throw new DeploymentException(e.getI18nMessage(), e);
     }
 
     return domain;

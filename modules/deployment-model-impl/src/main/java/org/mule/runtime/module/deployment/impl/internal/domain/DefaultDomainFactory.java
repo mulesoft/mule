@@ -26,6 +26,7 @@ import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResol
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
@@ -124,25 +125,37 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   }
 
   public void dispose(DomainWrapper domain) {
-    domainManager.removeDomain(domain.getArtifactName());
+    domainManager.removeDomain(domain);
   }
 
   public void start(DomainWrapper domainWrapper) {
     domainManager.addDomain(domainWrapper);
   }
 
+  private Domain getDomainIfPresentOrNull(DomainDescriptor domainDescriptor) {
+    try {
+      BundleDescriptor bundleDescriptor = domainDescriptor.getBundleDescriptor();
+      if (bundleDescriptor != null) {
+        return domainManager.getDomain(bundleDescriptor);
+      } else {
+        return domainManager.getDomain(domainDescriptor.getName());
+      }
+    } catch (DomainNotFoundException | IncompatibleDomainVersionException e) {
+      return null;
+    }
+  }
+
   @Override
   protected Domain doCreateArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
     String domainName = domainLocation.getName();
-    Domain domain = domainManager.getDomain(domainName);
+    DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
+    Domain domain = getDomainIfPresentOrNull(domainDescriptor);
     if (domain != null) {
       throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
     }
     if (domainName.contains(" ")) {
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
-
-    DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(emptySet(), domainDescriptor.getPlugins().stream().collect(toList()), true);

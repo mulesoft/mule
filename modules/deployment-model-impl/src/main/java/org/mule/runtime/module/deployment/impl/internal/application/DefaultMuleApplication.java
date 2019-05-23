@@ -57,7 +57,9 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
@@ -149,9 +151,22 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     return descriptor;
   }
 
+  private Domain internalGetDomain() throws IncompatibleDomainVersionException, DomainNotFoundException {
+    if (descriptor.getDomainDescriptor().isPresent()) {
+      return domainRepository.getDomain(descriptor.getDomainDescriptor().get());
+    } else {
+      return domainRepository.getDomain(descriptor.getDomainName());
+    }
+  }
+
   @Override
   public Domain getDomain() {
-    return domainRepository.getDomain(descriptor.getDomainName());
+    try {
+      return internalGetDomain();
+    } catch (IncompatibleDomainVersionException | DomainNotFoundException e) {
+      // return null to avoid breaking api
+      return null;
+    }
   }
 
   @Override
@@ -211,7 +226,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setPolicyProvider(policyManager)
               .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider);
 
-      Domain domain = domainRepository.getDomain(descriptor.getDomainName());
+      Domain domain = internalGetDomain();
       if (domain.getRegistry() != null) {
         artifactBuilder.setParentArtifact(domain);
       }
