@@ -297,6 +297,8 @@
 /mule-standalone-${productVersion}/lib/opt/javax.servlet-api-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/javax.transaction-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
+/mule-standalone-${productVersion}/lib/opt/jakarta.activation-1.2.1.jar
+/mule-standalone-${productVersion}/lib/opt/jakarta.mail-1.6.3.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-runtime-2.3.1-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.3.1-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-core-2.3.0.1.jar
@@ -310,7 +312,6 @@
 /mule-standalone-${productVersion}/lib/opt/FastInfoset-1.2.15.jar
 /mule-standalone-${productVersion}/lib/opt/istack-commons-runtime-3.0.7.jar
 /mule-standalone-${productVersion}/lib/opt/istack-commons-tools-3.0.7.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-api-2.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
