@@ -29,7 +29,10 @@ public class DefaultProcessorsTrace implements ProcessorsTrace
      */
     public void addExecutedProcessors(String processorPath)
     {
-        executedProcessors.add(processorPath);
+        if (!executedProcessors.contains(processorPath))
+        {
+            executedProcessors.add(processorPath);
+        }
     }
 
     @Override
