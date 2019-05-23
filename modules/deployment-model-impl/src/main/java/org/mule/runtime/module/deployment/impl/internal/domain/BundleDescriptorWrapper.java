@@ -29,9 +29,6 @@ class BundleDescriptorWrapper {
     int result = bundleDescriptor.getGroupId().hashCode();
     result = 31 * result + bundleDescriptor.getArtifactId().hashCode();
     result = 31 * result + version.getMajor().hashCode();
-    if (bundleDescriptor.getClassifier().isPresent()) {
-      result = 31 * result + bundleDescriptor.getClassifier().get().hashCode();
-    }
     result = 31 * result + bundleDescriptor.getType().hashCode();
     return result;
   }
