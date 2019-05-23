@@ -217,7 +217,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy() {
     return event -> {
       Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
-      sink.accept(event);
+      try {
+        sink.accept(event);
+      } catch (RejectedExecutionException e) {
+        // Handle the case in which the event execution is rejected from the scheduler.
+        ((BaseEventContext) event.getContext()).error(e);
+      }
       return Mono.from(responsePublisher);
     };
   }
