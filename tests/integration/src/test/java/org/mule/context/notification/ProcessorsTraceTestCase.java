@@ -146,8 +146,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
                 "/secondFlowStatic/processors/0",
                 "/flow/processors/0",
-                "/secondFlowStatic/processors/1",
-                "/flow/processors/0"));
+                "/secondFlowStatic/processors/1"));
     }
 
     @Test
@@ -174,8 +173,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, hasExecutedProcessors(
                 "/secondFlowDynamic/processors/0",
                 "/flow/processors/0",
-                "/secondFlowDynamic/processors/1",
-                "/flow/processors/0"));
+                "/secondFlowDynamic/processors/1"));
     }
 
     @Test
