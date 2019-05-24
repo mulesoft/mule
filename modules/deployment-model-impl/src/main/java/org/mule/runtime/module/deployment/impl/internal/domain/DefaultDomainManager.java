@@ -28,7 +28,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(bundleDescriptor);
     Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
     if (domain == null) {
-      throw new DomainNotFoundException(bundleDescriptor.getArtifactFileName());
+      return getDomain(bundleDescriptor.getArtifactFileName());
     }
 
     String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
@@ -49,20 +49,39 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     return domain;
   }
 
+  private String getDomainName(Domain domain) {
+    String domainName;
+    BundleDescriptor bundleDescriptor = domain.getDescriptor().getBundleDescriptor();
+    if (bundleDescriptor != null) {
+      domainName = bundleDescriptor.getArtifactFileName();
+    } else {
+      domainName = domain.getDescriptor().getName();
+    }
+    if (!domainName.endsWith("-mule-domain")) {
+      domainName += "-mule-domain";
+    }
+    return domainName;
+  }
+
+  private String getDomainAlreadyExistsErrorMessage(String domainName) {
+    return format("Domain '%s' already exists", domainName);
+  }
+
   @Override
   public void addDomain(Domain domain) {
     BundleDescriptor bundleDescriptor = domain.getDescriptor().getBundleDescriptor();
-    String domainName;
+    String domainName = getDomainName(domain);
+
+    if (domainsByName.containsKey(domainName)) {
+      throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(domain.getArtifactName()));
+    }
 
     if (bundleDescriptor != null) {
       final BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(bundleDescriptor);
       if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
-        throw new IllegalArgumentException(format("Domain '%s' already exists", domain.getArtifactName()));
+        throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(domain.getArtifactName()));
       }
       domainsByDescriptor.put(bundleDescriptorWrapper, domain);
-      domainName = bundleDescriptor.getArtifactFileName();
-    } else {
-      domainName = domain.getDescriptor().getName();
     }
 
     domainsByName.put(domainName, domain);
@@ -71,14 +90,11 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
   @Override
   public void removeDomain(Domain domain) {
     BundleDescriptor bundleDescriptor = domain.getDescriptor().getBundleDescriptor();
-    String domainName;
+    String domainName = getDomainName(domain);
 
     if (bundleDescriptor != null) {
       final BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(bundleDescriptor);
       domainsByDescriptor.remove(bundleDescriptorWrapper);
-      domainName = bundleDescriptor.getArtifactFileName();
-    } else {
-      domainName = domain.getDescriptor().getName();
     }
 
     domainsByName.remove(domainName);

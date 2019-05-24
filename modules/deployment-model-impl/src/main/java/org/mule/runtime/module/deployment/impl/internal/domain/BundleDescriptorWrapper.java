@@ -58,6 +58,18 @@ class BundleDescriptorWrapper {
       return false;
     }
 
+    if (!myBundleDescriptor.getGroupId().equals(otherBundleDescriptor.getGroupId())) {
+      return false;
+    }
+
+    if (!myBundleDescriptor.getArtifactId().equals(otherBundleDescriptor.getArtifactId())) {
+      return false;
+    }
+
+    if (!myBundleDescriptor.getType().equals(otherBundleDescriptor.getType())) {
+      return false;
+    }
+
     Semver mySemver = new Semver(myBundleDescriptor.getVersion());
     Semver otherSemver = new Semver(otherBundleDescriptor.getVersion());
     return mySemver.getMajor().equals(otherSemver.getMajor());
