@@ -30,7 +30,6 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -51,8 +50,10 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -82,7 +83,6 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -163,18 +163,25 @@ public class ModuleFlowProcessingPhase
             .doOnNext(onMessageReceived(template, messageProcessContext, flowConstruct))
             .doOnNext(event -> flowConstruct.checkBackpressure(event))
             .doOnError(FlowBackPressureException.class, backpressureError -> {
-              logger.error("Delegating backpressure exception to policyFailure");
-              SourcePolicyFailureResult result =
-                  new SourcePolicyFailureResult(new MessagingException(templateEvent, backpressureError), () -> new HashMap<>());
-              policyFailure(phaseContext, flowConstruct, messageSource).apply(result);
             })
             // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when
             // complete.
-            .flatMap(request -> from(policy.process(request, template))
-                // Perform processing of result by sending success or error response and handle errors that occur.
-                // Returns Publisher<Void> to signal when this is complete or if it failed.
-                .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct, messageSource),
-                                                             policySuccess(phaseContext, flowConstruct, messageSource))))
+            .flatMap(request -> from(policy.process(request, template)))
+            // Perform processing of result by sending success or error response and handle errors that occur.
+            // Returns Publisher<Void> to signal when this is complete or if it failed.
+            .onErrorResume(FlowBackPressureException.class, exception -> {
+              CoreEvent errorEvent =
+                  CoreEvent.builder(templateEvent)
+                      .error(ErrorBuilder.builder(exception)
+                          .errorType(((DefaultMuleContext) muleContext).getErrorTypeLocator().lookupErrorType(exception))
+                          .build())
+                      .build();
+              SourcePolicyFailureResult result =
+                  new SourcePolicyFailureResult(new MessagingException(errorEvent, exception), () -> new HashMap<>());
+              return Mono.just(left(result));
+            })
+            .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct, messageSource),
+                                                         policySuccess(phaseContext, flowConstruct, messageSource)))
             .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
             .doOnError(onFailure(flowConstruct, messageSource, phaseResultNotifier, terminateConsumer))
             // Complete EventContext via responseCompletion Mono once everything is done.
