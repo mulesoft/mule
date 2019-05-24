@@ -221,11 +221,6 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
     }
 
     @Override
-    public boolean reserveEventEmission(CoreEvent event) {
-      return true;
-    }
-
-    @Override
     public final void dispose() {
       innerSink.dispose();
     }

@@ -89,13 +89,6 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
 
     E intoSink(CoreEvent event);
 
-    /**
-     * @return whether or not the event emission will be accepted, checking backpressure
-     */
-    default boolean reserveEventEmission(CoreEvent event) {
-      return true;
-    }
-
   }
 
   /**
@@ -151,13 +144,6 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     @Override
     public E intoSink(CoreEvent event) {
       return (E) event;
-    }
-
-    @Override
-    public boolean reserveEventEmission(CoreEvent event) {
-      // TODO: Should extract canEmitEvent logic from #emit logic. Maybe wrap the #fluxSink in some kind of
-      // FutureEventEmitterSink?
-      return true;
     }
 
     @Override
