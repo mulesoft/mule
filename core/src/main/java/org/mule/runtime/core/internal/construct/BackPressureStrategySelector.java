@@ -6,21 +6,20 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 
 import java.util.concurrent.RejectedExecutionException;
 
-import org.slf4j.Logger;
-
+/**
+ * Implements the different backpressure handling strategies, and checks against a
+ * {@link org.mule.runtime.core.api.processor.strategy.ProcessingStrategy} whether or not backpressure is fired, before and event
+ * being processing.
+ */
 public class BackPressureStrategySelector {
 
   private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
-
-  private final Logger LOGGER = getLogger(BackPressureStrategySelector.class);
 
   private AbstractPipeline abstractPipeline;
   private final MessagingExceptionResolver exceptionResolver;
@@ -30,7 +29,13 @@ public class BackPressureStrategySelector {
     exceptionResolver = new MessagingExceptionResolver(abstractPipeline);
   }
 
-  protected void checkBackpressureWithWaitStrategy(CoreEvent event, FlowExceptionHandler exceptionHandler)
+  /**
+   * Wait backpressure strategy. Implements a busy-wait strategy.
+   *
+   * @param event the event about to begin processing
+   * @throws FlowBackPressureException
+   */
+  protected void checkWithWaitStrategy(CoreEvent event)
       throws FlowBackPressureException {
     boolean accepted = false;
     while (!accepted) {
@@ -43,28 +48,39 @@ public class BackPressureStrategySelector {
           Thread.sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
           FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName(), ree);
-          // exceptionHandler.handleException(exception, event);
           throw exception;
         }
       }
     }
   }
 
-  protected void checkBackpressureWithFailDropStrategy(CoreEvent event, FlowExceptionHandler exceptionHandler)
+  /**
+   * Drop backpressure strategy. If backpressure is fired on the incoming event, it get's dropped from processing.
+   *
+   * @param event the event about to begin processing
+   * @throws FlowBackPressureException
+   */
+  protected void checkWithFailDropStrategy(CoreEvent event)
       throws FlowBackPressureException {
     if (!abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event)) {
       FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName());
-      // exceptionHandler.handleException(exception, event);
       throw exception;
     }
   }
 
-  public void checkNotifyingExceptionListener(CoreEvent event, FlowExceptionHandler exceptionHandler)
+  /**
+   * Decides which {@link org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy} to apply for a certain
+   * {@link MessageSource}, and check whether a backpressure signal will be fired upon entering the processing stage.
+   *
+   * @param event the event about to begin processing
+   * @throws FlowBackPressureException
+   */
+  public void check(CoreEvent event)
       throws FlowBackPressureException {
     if (abstractPipeline.getSource().getBackPressureStrategy() == MessageSource.BackPressureStrategy.WAIT) {
-      checkBackpressureWithWaitStrategy(event, exceptionHandler);
+      checkWithWaitStrategy(event);
     } else {
-      checkBackpressureWithFailDropStrategy(event, exceptionHandler);
+      checkWithFailDropStrategy(event);
     }
   }
 }

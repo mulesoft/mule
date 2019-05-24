@@ -413,7 +413,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   public void checkBackpressure(CoreEvent event) throws RuntimeException {
     try {
-      backpressureStrategySelector.checkNotifyingExceptionListener(event, this.getExceptionListener());
+      backpressureStrategySelector.check(event);
     } catch (FlowBackPressureException e) {
       throw propagate(e);
     }
