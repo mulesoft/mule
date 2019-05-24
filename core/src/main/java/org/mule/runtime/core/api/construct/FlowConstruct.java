@@ -65,6 +65,6 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Compo
    * @param event the event about to be processed
    * @throws RejectedExecutionException
    */
-  default void checkBackpressure(CoreEvent event) throws RejectedExecutionException {}
+  default void checkBackpressure(CoreEvent event) throws RuntimeException {}
 
 }
