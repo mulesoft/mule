@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.internal.util.ConcurrencyUtils.safeUnlock;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.ACCEPTED;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.FILTERED_BY_WATERMARK;
@@ -459,7 +460,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     try {
       runnable.run();
     } finally {
-      lock.unlock();
+      safeUnlock(lock);
     }
   }
 
@@ -504,7 +505,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       });
       recentlyProcessedIds.clear();
     } finally {
-      osClearingLock.unlock();
+      safeUnlock(osClearingLock);
     }
   }
 
@@ -563,7 +564,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       } else {
         try {
           inflightIdsObjectStore.store(id, id);
-          callbackContext.addVariable(ITEM_RELEASER_CTX_VAR, new ItemReleaser(id, lock));
+          callbackContext.addVariable(ITEM_RELEASER_CTX_VAR, new ItemReleaser(id));
           return true;
         } catch (ObjectStoreException e) {
           LOGGER.error(format("Flow at source '%s' could not track item '%s' as being processed. %s",
@@ -578,7 +579,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
                    e);
       return false;
     } finally {
-      lock.unlock();
+      safeUnlock(lock);
     }
   }
 
@@ -595,11 +596,9 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private class ItemReleaser {
 
     private final String id;
-    private final Lock lock;
 
-    private ItemReleaser(String id, Lock lock) {
+    private ItemReleaser(String id) {
       this.id = id;
-      this.lock = lock;
     }
 
     private void release() {
