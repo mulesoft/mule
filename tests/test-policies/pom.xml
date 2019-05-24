@@ -68,13 +68,19 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- Required test extensions -->
         <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-some-extension</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-http</artifactId>
+            <version>${muleHttpServiceVersion}</version>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-http</artifactId>
+            <version>${muleHttpServiceVersion}</version>
             <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>
