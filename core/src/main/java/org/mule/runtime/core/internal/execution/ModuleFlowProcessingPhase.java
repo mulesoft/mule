@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
@@ -50,7 +51,6 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -70,7 +70,6 @@ import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +95,7 @@ import reactor.core.publisher.Mono;
 public class ModuleFlowProcessingPhase
     extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> implements Initialisable {
 
+  private static final String FLOW_BACK_PRESSURE_ERROR_TYPE_NOT_FOUND = "FLOW_BACK_PRESSURE error type not found";
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
@@ -108,6 +108,7 @@ public class ModuleFlowProcessingPhase
 
   @Inject
   private InterceptorManager processorInterceptorManager;
+  private ErrorType flowBackPressureErrorType;
 
   public ModuleFlowProcessingPhase(PolicyManager policyManager) {
     this.policyManager = policyManager;
@@ -122,6 +123,7 @@ public class ModuleFlowProcessingPhase
     sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND).get();
     sourceErrorResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_GENERATE).get();
     sourceErrorResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_SEND).get();
+    flowBackPressureErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE).get();
 
     if (processorInterceptorManager != null) {
       processorInterceptorManager.getSourceInterceptorFactories().stream().forEach(interceptorFactory -> {
@@ -161,25 +163,17 @@ public class ModuleFlowProcessingPhase
 
         just(templateEvent)
             .doOnNext(onMessageReceived(template, messageProcessContext, flowConstruct))
+            // Check backpressure against source dependant strategy
             .doOnNext(event -> flowConstruct.checkBackpressure(event))
-            .doOnError(FlowBackPressureException.class, backpressureError -> {
-            })
             // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when
             // complete.
             .flatMap(request -> from(policy.process(request, template)))
+            // In case backpressure was fired, the exception will be propagated as a SourcePolicyFailureResult, wrapping inside
+            // the backpressure exception
+            .onErrorResume(FlowBackPressureException.class,
+                           mapBackPressureExceptionToPolicyFailureResult(template, templateEvent))
             // Perform processing of result by sending success or error response and handle errors that occur.
             // Returns Publisher<Void> to signal when this is complete or if it failed.
-            .onErrorResume(FlowBackPressureException.class, exception -> {
-              CoreEvent errorEvent =
-                  CoreEvent.builder(templateEvent)
-                      .error(ErrorBuilder.builder(exception)
-                          .errorType(((DefaultMuleContext) muleContext).getErrorTypeLocator().lookupErrorType(exception))
-                          .build())
-                      .build();
-              SourcePolicyFailureResult result =
-                  new SourcePolicyFailureResult(new MessagingException(errorEvent, exception), () -> new HashMap<>());
-              return Mono.just(left(result));
-            })
             .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct, messageSource),
                                                          policySuccess(phaseContext, flowConstruct, messageSource)))
             .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
@@ -196,6 +190,37 @@ public class ModuleFlowProcessingPhase
     } catch (Exception t) {
       phaseResultNotifier.phaseFailure(t);
     }
+  }
+
+  /**
+   * By wrapping the thrown backpressure exception in an {@link Either} which contains the {@link SourcePolicyFailureResult}, one
+   * can consider as if the backpressure signal was fired from inside the policy + flow execution chain, and reuse all handling
+   * logic.
+   *
+   * @param template the processing template being used
+   * @param event the event that caused the backpressure signal to be fired
+   * @return
+   */
+  protected Function<FlowBackPressureException, Mono<? extends Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>> mapBackPressureExceptionToPolicyFailureResult(ModuleFlowProcessingPhaseTemplate template,
+                                                                                                                                                                            CoreEvent event) {
+    return exception -> {
+
+      // Build error event
+      CoreEvent errorEvent =
+          CoreEvent.builder(event)
+              .error(ErrorBuilder.builder(exception)
+                  .errorType(flowBackPressureErrorType)
+                  .build())
+              .build();
+
+      // Since the decision whether the event is handled by the source onError or onBackPressure callback's is made in
+      // SourceAdapter by checking the ErrorType, the exception is wrapped
+      SourcePolicyFailureResult result =
+          new SourcePolicyFailureResult(new MessagingException(errorEvent, exception),
+                                        () -> template.getFailedExecutionResponseParametersFunction().apply(errorEvent));
+
+      return just(left(result));
+    };
   }
 
   /*
