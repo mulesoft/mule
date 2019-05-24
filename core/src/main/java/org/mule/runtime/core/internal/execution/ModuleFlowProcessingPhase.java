@@ -325,14 +325,10 @@ public class ModuleFlowProcessingPhase
                                         PhaseResultNotifier phaseResultNotifier,
                                         Consumer<Either<MessagingException, CoreEvent>> terminateConsumer) {
     return throwable -> {
-      if (throwable instanceof FlowBackPressureException) {
-        // Handle backpressure.
-      } else {
-        onTerminate(flowConstruct, messageSource, terminateConsumer, left(throwable));
-        throwable = throwable instanceof SourceErrorException ? throwable.getCause() : throwable;
-        Exception failureException = throwable instanceof Exception ? (Exception) throwable : new DefaultMuleException(throwable);
-        phaseResultNotifier.phaseFailure(failureException);
-      }
+      onTerminate(flowConstruct, messageSource, terminateConsumer, left(throwable));
+      throwable = throwable instanceof SourceErrorException ? throwable.getCause() : throwable;
+      Exception failureException = throwable instanceof Exception ? (Exception) throwable : new DefaultMuleException(throwable);
+      phaseResultNotifier.phaseFailure(failureException);
     };
   }
 
