@@ -10,6 +10,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 
 import java.util.concurrent.RejectedExecutionException;
 
@@ -22,9 +23,11 @@ public class BackPressureStrategySelector {
   private final Logger LOGGER = getLogger(BackPressureStrategySelector.class);
 
   private AbstractPipeline abstractPipeline;
+  private final MessagingExceptionResolver exceptionResolver;
 
   public BackPressureStrategySelector(AbstractPipeline abstractPipeline) {
     this.abstractPipeline = abstractPipeline;
+    exceptionResolver = new MessagingExceptionResolver(abstractPipeline);
   }
 
   protected void checkBackpressureWithWaitStrategy(CoreEvent event, FlowExceptionHandler exceptionHandler)
@@ -40,7 +43,7 @@ public class BackPressureStrategySelector {
           Thread.sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
           FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName(), ree);
-          exceptionHandler.handleException(exception, event);
+          // exceptionHandler.handleException(exception, event);
           throw exception;
         }
       }
@@ -51,7 +54,7 @@ public class BackPressureStrategySelector {
       throws FlowBackPressureException {
     if (!abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event)) {
       FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName());
-      exceptionHandler.handleException(exception, event);
+      // exceptionHandler.handleException(exception, event);
       throw exception;
     }
   }

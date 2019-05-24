@@ -69,6 +69,7 @@ import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -161,6 +162,12 @@ public class ModuleFlowProcessingPhase
         just(templateEvent)
             .doOnNext(onMessageReceived(template, messageProcessContext, flowConstruct))
             .doOnNext(event -> flowConstruct.checkBackpressure(event))
+            .doOnError(FlowBackPressureException.class, backpressureError -> {
+              logger.error("Delegating backpressure exception to policyFailure");
+              SourcePolicyFailureResult result =
+                  new SourcePolicyFailureResult(new MessagingException(templateEvent, backpressureError), () -> new HashMap<>());
+              policyFailure(phaseContext, flowConstruct, messageSource).apply(result);
+            })
             // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when
             // complete.
             .flatMap(request -> from(policy.process(request, template))
@@ -288,11 +295,12 @@ public class ModuleFlowProcessingPhase
     return throwable -> {
       if (throwable instanceof FlowBackPressureException) {
         // Handle backpressure.
+      } else {
+        onTerminate(flowConstruct, messageSource, terminateConsumer, left(throwable));
+        throwable = throwable instanceof SourceErrorException ? throwable.getCause() : throwable;
+        Exception failureException = throwable instanceof Exception ? (Exception) throwable : new DefaultMuleException(throwable);
+        phaseResultNotifier.phaseFailure(failureException);
       }
-      onTerminate(flowConstruct, messageSource, terminateConsumer, left(throwable));
-      throwable = throwable instanceof SourceErrorException ? throwable.getCause() : throwable;
-      Exception failureException = throwable instanceof Exception ? (Exception) throwable : new DefaultMuleException(throwable);
-      phaseResultNotifier.phaseFailure(failureException);
     };
   }
 
