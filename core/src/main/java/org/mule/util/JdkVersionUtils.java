@@ -8,13 +8,13 @@ package org.mule.util;
 
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang.SystemUtils.JAVA_VENDOR;
-import static org.apache.commons.logging.LogFactory.getLog;
 import static org.mule.util.SystemUtils.isAdoptOpenJDK;
 import static org.mule.util.SystemUtils.isAppleJDK;
 import static org.mule.util.SystemUtils.isIbmJDK;
 import static org.mule.util.SystemUtils.isOpenJDK;
 import static org.mule.util.SystemUtils.isSunJDK;
 import static org.mule.util.VersionRange.VERSION_RANGES;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.config.MuleManifest;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 public class JdkVersionUtils
 {
@@ -228,7 +228,7 @@ public class JdkVersionUtils
         }
     }
     
-    private static final Log logger = getLog(JdkVersionUtils.class);
+    private static final Logger logger = getLogger(JdkVersionUtils.class);
     
     /** 
      * pattern with groups for major, minor, micro, update and milestone (if exists).
