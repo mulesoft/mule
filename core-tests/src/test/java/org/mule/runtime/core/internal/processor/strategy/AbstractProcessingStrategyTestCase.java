@@ -659,7 +659,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                         })
             .transform(triggerableMessageSource.getListener())
             .doOnNext(event -> processed.getAndIncrement())
-            .doOnError(e -> rejected.getAndIncrement()).subscribe());
+            .doOnError(e -> rejected.getAndIncrement())
+            .subscribe());
         if (i == STREAM_ITERATIONS / 2) {
           latch.release();
         }
@@ -667,7 +668,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
       new PollingProber(DEFAULT_TIMEOUT * 10, DEFAULT_POLLING_INTERVAL)
           .check(new JUnitLambdaProbe(() -> {
-            LOGGER.info("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
+            LOGGER.error("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
 
             assertThat("total", rejected.get() + processed.get(), totalAssertion);
             assertThat("processed", processed.get(), processedAssertion);

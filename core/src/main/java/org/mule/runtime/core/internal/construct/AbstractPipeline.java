@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -32,6 +31,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
@@ -59,7 +60,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -220,8 +220,18 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       try {
         sink.accept(event);
       } catch (RejectedExecutionException e) {
+        // Wrap actual cause in a backpressure exception
+        FlowBackPressureException wrappedException = new FlowBackPressureException(this.getName(), e);
         // Handle the case in which the event execution is rejected from the scheduler.
-        ((BaseEventContext) event.getContext()).error(e);
+        // Build error event
+        CoreEvent errorEvent =
+            CoreEvent.builder(event)
+                .error(ErrorBuilder.builder(e)
+                    .errorType(muleContext.getErrorTypeRepository()
+                        .getErrorType(Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE).get())
+                    .build())
+                .build();
+        ((BaseEventContext) event.getContext()).error(new MessagingException(errorEvent, wrappedException));
       }
       return Mono.from(responsePublisher);
     };
