@@ -225,8 +225,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
       try {
         // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
-        // preemptively as the maxConcurrency one, before policies execution
-        if (getSource().getBackPressureStrategy() == WAIT) {
+        // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
+        // default
+        if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
           sink.accept(event);
         } else {
           if (!sink.emit(event)) {
