@@ -14,11 +14,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.notification.ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+
+import org.junit.Test;
+import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.notification.ClusterNodeNotification;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-
-import org.junit.Test;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
@@ -28,11 +31,8 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
 
   @Override
   public void before() throws Exception {
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CLUSTER_SERVICE, new TestClusterService());
     super.before();
-
-    SchedulerController schedulerController = mock(SchedulerController.class);
-    when(schedulerController.isPrimarySchedulingInstance()).thenReturn(false);
-    ((DefaultMuleContext) muleContext).setSchedulerController(schedulerController);
   }
 
   @Override
@@ -57,5 +57,14 @@ public class ClusterExtensionMessageSourceTestCase extends AbstractExtensionMess
         .fireNotification(new ClusterNodeNotification("you're up", PRIMARY_CLUSTER_NODE_SELECTED));
     verify(sourceAdapter, atLeastOnce()).initialise();
     verify(sourceAdapter, times(1)).start();
+  }
+
+  private static class TestClusterService implements ClusterService {
+
+    @Override
+    public boolean isPrimaryPollingInstance() {
+      return false;
+    }
+
   }
 }
