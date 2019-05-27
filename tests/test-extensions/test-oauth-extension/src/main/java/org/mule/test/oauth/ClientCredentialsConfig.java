@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 
 @ConnectionProviders(TestOAuthClientCredentialsProvider.class)
 @Operations(TestOAuthOperations.class)
-@Configuration(name="client-credentials")
+@Configuration(name = "client-credentials")
 public class ClientCredentialsConfig {
 
 }

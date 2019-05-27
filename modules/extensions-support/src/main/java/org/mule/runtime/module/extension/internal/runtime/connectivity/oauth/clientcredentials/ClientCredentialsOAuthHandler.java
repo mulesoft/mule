@@ -85,7 +85,9 @@ public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCreden
         contextForResourceOwner = dancer.getContext();
       } catch (Exception e) {
         throw new MuleRuntimeException(
-            createStaticMessage(format("Could not obtain access token for config '%s'", config.getOwnerConfigName())), e);
+                                       createStaticMessage(format("Could not obtain access token for config '%s'",
+                                                                  config.getOwnerConfigName())),
+                                       e);
       }
     }
 
