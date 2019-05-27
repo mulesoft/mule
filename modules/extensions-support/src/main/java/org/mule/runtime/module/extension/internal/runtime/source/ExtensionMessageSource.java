@@ -24,6 +24,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
 
+import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -110,6 +111,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ExpressionManager expressionManager;
+
+  @Inject
+  private ClusterService clusterService;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -597,6 +601,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private boolean shouldRunOnThisNode() {
-    return primaryNodeOnly ? muleContext.isPrimaryPollingInstance() : true;
+    return primaryNodeOnly ? clusterService.isPrimaryPollingInstance() : true;
   }
 }
