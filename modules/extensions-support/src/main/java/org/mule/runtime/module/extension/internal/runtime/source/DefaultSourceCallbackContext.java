@@ -75,18 +75,20 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
 
     this.connection = connection;
 
-    if (sourceCallback.getTransactionConfig().isTransacted() && connection instanceof TransactionalConnection) {
-      ConnectionHandler<Object> connectionHandler = sourceCallback.getSourceConnectionManager().getConnectionHandler(connection)
-          .orElseThrow(() -> {
-            releaseConnection();
-            return new TransactionException(createWrongConnectionMessage(connection));
-          });
+    try {
+      if (sourceCallback.getTransactionConfig().isTransacted() && connection instanceof TransactionalConnection) {
+        ConnectionHandler<Object> connectionHandler = sourceCallback.getSourceConnectionManager().getConnectionHandler(connection)
+            .orElseThrow(() -> new TransactionException(createWrongConnectionMessage(connection)));
 
-      sourceCallback.getTransactionSourceBinder().bindToTransaction(sourceCallback.getTransactionConfig(),
-                                                                    sourceCallback.getConfigurationInstance(),
-                                                                    sourceCallback.getSourceLocation(),
-                                                                    connectionHandler);
-      transactionHandle = DEFAULT_TRANSACTION_HANDLE;
+        sourceCallback.getTransactionSourceBinder().bindToTransaction(sourceCallback.getTransactionConfig(),
+                                                                      sourceCallback.getConfigurationInstance(),
+                                                                      sourceCallback.getSourceLocation(),
+                                                                      connectionHandler);
+        transactionHandle = DEFAULT_TRANSACTION_HANDLE;
+      }
+    } catch (TransactionException txE) {
+      releaseConnection();
+      throw txE;
     }
 
     return transactionHandle;
