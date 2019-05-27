@@ -295,8 +295,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void classLoaderModelWithPluginDependencyWithMultipleTransitiveDependenciesLevels() throws Exception {
     installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-with-dependency-1.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifact(getArtifact("dependencies/library-with-dependency-a-1.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifact(getArtifact("dependencies/library-with-dependency-b-1.0.0.pom"), new File(repositoryLocation.getValue()));
     installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifact(getArtifact("dependencies/library-2.0.0.pom"), new File(repositoryLocation.getValue()));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependencies");
 
@@ -314,9 +316,12 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
     assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), hasItems(
-                                                                                  bundleDependency("library-with-dependency"),
-                                                                                  bundleDependency("library")));
+                                                                                  bundleDependency("library-with-dependency-a"),
+                                                                                  bundleDependency("library-with-dependency-b"),
+                                                                                  bundleDependency("library", "1.0.0")));
+    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), not(hasItem(bundleDependency("library", "2.0.0"))));
   }
+
 
   @Test
   public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
