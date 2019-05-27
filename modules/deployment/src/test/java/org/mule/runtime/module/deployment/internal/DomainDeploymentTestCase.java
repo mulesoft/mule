@@ -1030,7 +1030,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void mantainsDomainFolderOnExplodedAppDeploymentError() throws Exception {
+  public void maintainsDomainFolderOnExplodedAppDeploymentError() throws Exception {
     startDeployment();
 
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);

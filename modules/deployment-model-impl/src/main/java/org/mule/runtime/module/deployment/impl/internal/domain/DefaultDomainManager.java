@@ -28,7 +28,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(bundleDescriptor);
     Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
     if (domain == null) {
-      return getDomain(bundleDescriptor.getArtifactFileName());
+      return getDomain(normalizeName(bundleDescriptor.getArtifactFileName()));
     }
 
     String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
@@ -42,11 +42,19 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
 
   @Override
   public Domain getDomain(String domainName) throws DomainNotFoundException {
-    Domain domain = domainsByName.get(domainName);
+    Domain domain = domainsByName.get(normalizeName(domainName));
     if (domain == null) {
       throw new DomainNotFoundException(domainName);
     }
     return domain;
+  }
+
+  private String normalizeName(String name) {
+    if (name.endsWith("-mule-domain")) {
+      return name;
+    } else {
+      return name + "-mule-domain";
+    }
   }
 
   private String getDomainName(Domain domain) {
@@ -57,10 +65,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     } else {
       domainName = domain.getDescriptor().getName();
     }
-    if (!domainName.endsWith("-mule-domain")) {
-      domainName += "-mule-domain";
-    }
-    return domainName;
+    return normalizeName(domainName);
   }
 
   private String getDomainAlreadyExistsErrorMessage(String domainName) {
