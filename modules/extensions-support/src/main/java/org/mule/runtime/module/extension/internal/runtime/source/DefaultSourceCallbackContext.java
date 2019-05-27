@@ -86,9 +86,9 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
                                                                       connectionHandler);
         transactionHandle = DEFAULT_TRANSACTION_HANDLE;
       }
-    } catch (TransactionException txE) {
+    } catch (Exception e) {
       releaseConnection();
-      throw txE;
+      throw e;
     }
 
     return transactionHandle;
