@@ -132,6 +132,10 @@
                 	<groupId>java.sun.mail</groupId>
                 	<artifactId>javax.mail</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mailapi</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
