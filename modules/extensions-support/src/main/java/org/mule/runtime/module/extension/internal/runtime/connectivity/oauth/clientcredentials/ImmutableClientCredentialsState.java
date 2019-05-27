@@ -11,6 +11,11 @@ import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 
 import java.util.Optional;
 
+/**
+ * Immutable implementation of {@link ClientCredentialsState}
+ *
+ * @since 4.2.1
+ */
 public class ImmutableClientCredentialsState implements ClientCredentialsState {
 
   private final String accessToken;

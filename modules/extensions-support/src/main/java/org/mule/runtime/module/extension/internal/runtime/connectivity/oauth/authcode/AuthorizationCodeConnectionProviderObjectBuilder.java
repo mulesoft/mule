@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
-import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthObjectStoreConfig;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
@@ -48,7 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A specialization of {@link DefaultConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
+ * A specialization of {@link BaseOAuthConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
  * into {@link AuthorizationCodeConnectionProviderWrapper} instances.
  *
  * @since 4.0

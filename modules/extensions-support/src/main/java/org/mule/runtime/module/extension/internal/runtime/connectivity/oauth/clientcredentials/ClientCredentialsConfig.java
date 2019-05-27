@@ -17,6 +17,11 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * {@link OAuthConfig} specialization for client credentials grant type
+ *
+ * @since 4.2.1
+ */
 public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantType> {
 
   private final String clientId;

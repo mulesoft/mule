@@ -37,9 +37,17 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 
-public abstract class BaseOAuthHandler<Dancer> implements Lifecycle {
+/**
+ * Contains base logic for extensions which require OAuth authentication. It tracks and handles the obtained
+ * tokens and provides base functionality.
+ * <p>
+ * One concrete implementation of this class must exist per each supported grant type.
+ *
+ * @param <Dancer> The generic type of the OAuth dancer to use
+ */
+public abstract class OAuthHandler<Dancer> implements Lifecycle {
 
-  private static final Logger LOGGER = getLogger(BaseOAuthHandler.class);
+  private static final Logger LOGGER = getLogger(OAuthHandler.class);
 
   @Inject
   protected MuleContext muleContext;

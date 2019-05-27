@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
-import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -34,10 +33,10 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * A specialization of {@link DefaultConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
+ * A specialization of {@link BaseOAuthConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
  * into {@link ClientCredentialsConnectionProviderWrapper} instances.
  *
- * @since 4.0
+ * @since 4.2.1
  */
 public class ClientCredentialsConnectionProviderObjectBuilder<C> extends BaseOAuthConnectionProviderObjectBuilder<C> {
 

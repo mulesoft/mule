@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
@@ -26,7 +26,12 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.List;
 
-public class ClientCredentialsOAuthHandler extends BaseOAuthHandler<ClientCredentialsOAuthDancer> {
+/**
+ * {@link OAuthHandler} implementation for the client credentials grant type
+ *
+ * @since 4.2.1
+ */
+public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredentialsOAuthDancer> {
 
   /**
    * Becomes aware of the given {@code config} and makes sure that the access token callback

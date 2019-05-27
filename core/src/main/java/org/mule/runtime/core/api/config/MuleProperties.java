@@ -160,7 +160,16 @@ public class MuleProperties {
   @Deprecated
   public static final String OBJECT_EXTENSION_OAUTH_MANAGER = "extensions.oauth.manager";
 
+  /**
+   * Registry key for the {@code AuthorizationCodeOAuthHandler}
+   * @since 4.2.1
+   */
   public static final String OBJECT_EXTENSION_AUTH_CODE_HANDLER = "extensions.authCode.handler";
+
+  /**
+   * Registry key for the {@code ClientCredentialsOAuthHandler}
+   * @since 4.2.1
+   */
   public static final String OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER = "extensions.clientCredentials.handler";
 
   public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";

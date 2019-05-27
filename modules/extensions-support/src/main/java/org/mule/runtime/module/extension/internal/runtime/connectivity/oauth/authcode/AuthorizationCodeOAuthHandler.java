@@ -38,7 +38,7 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.ServerNotFoundException;
 import org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
@@ -59,7 +59,12 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 
-public class AuthorizationCodeOAuthHandler extends BaseOAuthHandler<AuthorizationCodeOAuthDancer> {
+/**
+ * {@link OAuthHandler} implementation for the authorization code grant type
+ *
+ * @since 4.2.1
+ */
+public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCodeOAuthDancer> {
 
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
 

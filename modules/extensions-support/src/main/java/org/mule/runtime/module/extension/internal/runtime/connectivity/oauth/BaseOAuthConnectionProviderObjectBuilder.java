@@ -46,6 +46,13 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Base class for {@link DefaultConnectionProviderObjectBuilder} specializations which yield OAuth enabled connection
+ * providers
+ *
+ * @param <C> the generic type of the connections to be produced
+ * @since 4.2.1
+ */
 public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionProviderObjectBuilder<C> {
 
   public BaseOAuthConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
