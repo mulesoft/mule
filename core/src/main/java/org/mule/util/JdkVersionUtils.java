@@ -6,8 +6,16 @@
  */
 package org.mule.util;
 
+import static java.util.regex.Pattern.compile;
+import static org.apache.commons.lang.SystemUtils.JAVA_VENDOR;
+import static org.apache.commons.logging.LogFactory.getLog;
+import static org.mule.util.SystemUtils.isAdoptOpenJDK;
+import static org.mule.util.SystemUtils.isAppleJDK;
+import static org.mule.util.SystemUtils.isIbmJDK;
+import static org.mule.util.SystemUtils.isOpenJDK;
+import static org.mule.util.SystemUtils.isSunJDK;
+import static org.mule.util.VersionRange.VERSION_RANGES;
 import org.mule.config.MuleManifest;
-import org.mule.util.VersionRange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class JdkVersionUtils
 {
@@ -186,8 +193,6 @@ public class JdkVersionUtils
 				return false;
 			return true;
 		}
-		
-		
     }
     
     public static class JdkVersionRange extends VersionRange
@@ -223,20 +228,20 @@ public class JdkVersionUtils
         }
     }
     
-    private static final Log logger = LogFactory.getLog(JdkVersionUtils.class);
+    private static final Log logger = getLog(JdkVersionUtils.class);
     
     /** 
      * pattern with groups for major, minor, micro, update and milestone (if exists).
      * major_version.minor_version.micro_version[_update_version][-milestone]
      */
-    public static final Pattern JDK_VERSION = Pattern.compile("^([0-9]+)(?:\\.([0-9]+))?(?:\\.([0-9]+))?(?:_([0-9]+))?(?:-?(.+))?$");
+    public static final Pattern JDK_VERSION = compile("^([0-9]+)(?:\\.([0-9]+))?(?:\\.([0-9]+))?(?:_([0-9]+))?(?:-?(.+))?$");
 
     public static List<JdkVersionRange> createJdkVersionRanges(String versionsString)
     {
-		Matcher m = VersionRange.VERSION_RANGES.matcher(versionsString);
+		Matcher m = VERSION_RANGES.matcher(versionsString);
 		if (!m.find())
 		{
-			throw new IllegalArgumentException("Version range doesn't match pattern: " + VersionRange.VERSION_RANGES.pattern());
+			throw new IllegalArgumentException("Version range doesn't match pattern: " + VERSION_RANGES.pattern());
 		}
 		
 		List<JdkVersionRange> versions = new ArrayList<JdkVersionRange>();
@@ -261,7 +266,7 @@ public class JdkVersionUtils
         
     public static boolean isSupportedJdkVendor()
     {
-    	return SystemUtils.isSunJDK() || SystemUtils.isAppleJDK() || SystemUtils.isIbmJDK(); 
+    	return isSunJDK() || isAppleJDK() || isIbmJDK() || isAdoptOpenJDK() || isOpenJDK();
     }
     
     public static String getRecommendedJdks()
@@ -333,7 +338,7 @@ public class JdkVersionUtils
         if (!isSupportedJdkVendor())
         {
             logger.info("You're executing with a JDK made by a vendor that is not on the recommended list of vendors. Vendor: "
-                            + SystemUtils.JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
+                            + JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
         }
     }
 }

@@ -149,18 +149,26 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
     public static boolean isSunJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("SUN") != -1
-               || SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("ORACLE") != -1;
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("sun")
+               || SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("oracle");
     }
 
     public static boolean isAppleJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("APPLE") != -1;
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("apple");
     }
 
     public static boolean isIbmJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("ibm");
+    }
+
+    public static boolean isAdoptOpenJDK() {
+        return JAVA_VM_VENDOR.toLowerCase().contains("adoptopenjdk");
+    }
+
+    public static boolean isOpenJDK() {
+        return JAVA_VM_VENDOR.toLowerCase().contains("openjdk");
     }
     
     public static final boolean IS_JAVA_1_7 = (JAVA_VERSION_TRIMMED != null) 
