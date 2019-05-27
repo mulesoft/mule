@@ -185,9 +185,18 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
         }
         return null;
       }
+
+      if (isNullBean(object)) {
+        return null;
+      }
+
       applyLifecycleIfPrototype(object, key, applyLifecycle);
       return object;
     }
+  }
+
+  private boolean isNullBean(Object bean) {
+    return bean != null && "org.springframework.beans.factory.support.NullBean".equals(bean.getClass().getName());
   }
 
   private void applyLifecycleIfPrototype(Object object, String key, boolean applyLifecycle) {
