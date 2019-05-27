@@ -212,7 +212,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
     @Override
     public final boolean emit(CoreEvent event) {
-      return checkCapacity(event) && innerSink.emit(event);
+      return innerSink.emit(event);
     }
 
     @Override
