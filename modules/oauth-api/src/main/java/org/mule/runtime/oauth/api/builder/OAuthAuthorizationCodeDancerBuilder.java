@@ -110,6 +110,31 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
   OAuthAuthorizationCodeDancerBuilder customParameters(Supplier<Map<String, String>> customParameters);
 
   /**
+   * There are OAuth implementations that require or allow extra headers to be sent when calling the Authentication URL
+   * of the OAS.
+   * <p>
+   * Invoking this method overrides any prior invokations to {@link #customHeaders(Supplier)}
+   *
+   * @param customHeaders the extra headers to be sent with the authorization request to {@link #authorizationUrl(String)}.
+   * @return this builder
+   * @sincer 4.2.1
+   */
+  OAuthAuthorizationCodeDancerBuilder customHeaders(Map<String, String> customHeaders);
+
+  /**
+   * There are OAuth implementations that require or allow extra headers to be sent when calling the Authentication URL
+   * of the OAS.
+   * <p>
+   * Invoking this method overrides any prior invokations to {@link #customParameters(Map)}
+   *
+   * @param customHeaders A {@link Supplier} the extra headers to be sent with the authorization request
+   *                         to {@link #authorizationUrl(String)}.
+   * @return this builder
+   * @since 4.2.1
+   */
+  OAuthAuthorizationCodeDancerBuilder customHeaders(Supplier<Map<String, String>> customHeaders);
+
+  /**
    * Mule will add some internal stuff to the state that is sent to the Authorization server. When the callback is received, those
    * will be removed to be processed, and the {@code state} as specified in this method will be honored.
    *
