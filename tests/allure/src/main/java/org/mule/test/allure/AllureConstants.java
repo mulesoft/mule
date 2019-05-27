@@ -431,6 +431,7 @@ public interface AllureConstants {
   interface LifecycleAndDependencyInjectionFeature {
 
     String LIFECYCLE_AND_DEPENDENCY_INJECTION = "Lifecycle and Dependency Injection";
+    String NULL_OBJECTS_IN_SPRING5_REGISTRY = "Spring 5 handling of null objects";
 
     interface ObjectFactoryStory {
 
