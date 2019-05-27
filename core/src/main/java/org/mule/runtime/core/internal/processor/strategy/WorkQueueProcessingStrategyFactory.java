@@ -17,7 +17,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -58,11 +57,6 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       return new StreamPerEventSink(pipeline, createOnEventConsumer());
-    }
-
-    @Override
-    public boolean checkBackpressureEmitting(CoreEvent event) {
-      return true;
     }
 
     @Override
