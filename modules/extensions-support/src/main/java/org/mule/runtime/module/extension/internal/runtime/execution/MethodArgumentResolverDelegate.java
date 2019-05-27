@@ -14,7 +14,6 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Resolv
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,7 +25,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
@@ -49,6 +47,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.BackPressureContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
@@ -95,13 +94,10 @@ import java.util.function.Supplier;
 public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate, Initialisable {
 
   @Inject
-  private Registry registry;
-
-  @Inject
-  private PolicyManager policyManager;
-
-  @Inject
   private ReflectionCache reflectionCache;
+
+  @Inject
+  private ExtensionsClientProcessorsStrategyFactory extensionsClientProcessorsStrategyFactory;
 
   @Inject
   private ExpressionManager expressionManager;
@@ -198,7 +194,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (CompletionCallback.class.equals(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (ExtensionsClient.class.equals(parameterType)) {
-        argumentResolver = new ExtensionsClientArgumentResolver(registry, policyManager);
+        argumentResolver = new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory);
       } else if (RouterCompletionCallback.class.equals(parameterType)) {
         argumentResolver = ROUTER_CALLBACK_ARGUMENT_RESOLVER;
       } else if (VoidCompletionCallback.class.equals(parameterType)) {
