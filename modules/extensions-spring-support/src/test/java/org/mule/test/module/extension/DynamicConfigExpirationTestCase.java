@@ -54,6 +54,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
       assertThat(e.getMessage(), is(not("Config should not have been expired")));
     }
 
+    assertExpired(config, 5000, 1000);
     assertInitialised(config);
   }
 
@@ -63,7 +64,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
         invokeDynamicConfig("dynamicWithCustomExpirationForSource", "heisenbergWithCustomExpirationForSource", "Walter Blanco");
 
     try {
-      assertExpired(config, 15000, 1000);
+      assertExpired(config, 10000, 1000);
       fail("Config should not have been expired");
     } catch (AssertionError e) {
       assertThat(e.getMessage(), is(not("Config should not have been expired")));
@@ -73,7 +74,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
     sourceWithDynamicConfig.stop();
 
-    assertExpired(config, 10000, 100);
+    assertExpired(config, 6000, 100);
 
   }
 
