@@ -363,7 +363,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
-  public void appWithPluginAsSystemDependencyIsResolved() throws Exception{
+  public void appWithPluginAsSystemDependencyIsResolved() throws Exception {
     installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
     installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-as-system");
