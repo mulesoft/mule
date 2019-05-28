@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.2.1-SNAPSHOT</version>
+        <version>4.2.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-subtypes-extension</artifactId>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-model</artifactId>
-            <version>4.2.1-SNAPSHOT</version>
+            <version>4.2.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

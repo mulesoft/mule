@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.2.1-SNAPSHOT</version>
+        <version>4.2.2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-launcher</artifactId>
     <packaging>jar</packaging>
