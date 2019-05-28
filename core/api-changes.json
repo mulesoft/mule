@@ -18,6 +18,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.abstractMethodAdded",
+          "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "duplicateFor",
+          "elementKind": "method",
+          "justification": "MULE-16890: AdoptJdk shown as un unsupported vendor"
+        },
+        {
           "code": "java.annotation.added",
           "old": "interface org.mule.runtime.core.api.lifecycle.LifecycleManager",
           "new": "interface org.mule.runtime.core.api.lifecycle.LifecycleManager",
