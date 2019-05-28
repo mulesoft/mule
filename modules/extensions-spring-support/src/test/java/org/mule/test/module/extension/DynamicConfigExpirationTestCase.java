@@ -73,7 +73,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
     sourceWithDynamicConfig.stop();
 
-    assertExpired(config, 5000, 100);
+    assertExpired(config, 10000, 100);
 
   }
 

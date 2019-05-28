@@ -65,6 +65,7 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -81,6 +82,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -160,10 +162,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       CoreEvent initialiserEvent = null;
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
-        Optional<ConfigurationInstance> configurationInstance = getConfiguration(initialiserEvent);
-        configurationInstance
-            .ifPresent(configurationInstanceObject -> ((MutableConfigurationStats) (configurationInstanceObject.getStatistics()))
-                .addInflightOperation());
+        Optional<ConfigurationInstance> configurationInstance = startUsingConfiguration(initialiserEvent);
         sourceAdapter =
             sourceAdapterFactory.createAdapter(configurationInstance,
                                                createSourceCallbackFactory(),
@@ -204,10 +203,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     if (sourceAdapter != null) {
       try {
         CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
-        Optional<ConfigurationInstance> configurationInstance = getConfiguration(initialiserEvent);
-        configurationInstance
-            .ifPresent(configurationInstanceObject -> ((MutableConfigurationStats) (configurationInstanceObject.getStatistics()))
-                .discountInflightOperation());
+        stopUsingConfiguration(initialiserEvent);
         sourceAdapter.stop();
         if (usesDynamicConfiguration()) {
           disposeSource();
@@ -616,4 +612,24 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private boolean shouldRunOnThisNode() {
     return primaryNodeOnly ? clusterService.isPrimaryPollingInstance() : true;
   }
+
+  private Optional<ConfigurationInstance> startUsingConfiguration(CoreEvent event){
+    return getConfigurationAndTryToMutateStats(event, (mutableConfigurationStats -> mutableConfigurationStats.addRunningSource()));
+  }
+
+  private void stopUsingConfiguration(CoreEvent event){
+    getConfigurationAndTryToMutateStats(event, (mutableConfigurationStats -> mutableConfigurationStats.discountRunningSource()));
+  }
+
+  private Optional<ConfigurationInstance> getConfigurationAndTryToMutateStats(CoreEvent event, Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer){
+    Optional<ConfigurationInstance> configurationInstanceOptional = getConfiguration(event);
+    configurationInstanceOptional.ifPresent(configurationInstance -> {
+      ConfigurationStats configurationStats = configurationInstance.getStatistics();
+      if(configurationStats instanceof MutableConfigurationStats){
+        mutableConfigurationStatsConsumer.accept((MutableConfigurationStats) configurationStats);
+      }
+    });
+    return configurationInstanceOptional;
+  }
+
 }

@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 final class DefaultMutableConfigurationStats implements MutableConfigurationStats {
 
   private final AtomicInteger inflightOperations = new AtomicInteger(0);
+  private final AtomicInteger runningSources = new AtomicInteger(0);
   private final TimeSupplier timeSupplier;
   private long lastUsedMillis;
 
@@ -60,6 +61,14 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    * {@inheritDoc}
    */
   @Override
+  public int getRunningSources() {
+    return runningSources.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public int addInflightOperation() {
     updateLastUsed();
     return inflightOperations.incrementAndGet();
@@ -72,5 +81,23 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
   public int discountInflightOperation() {
     updateLastUsed();
     return inflightOperations.decrementAndGet();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int addRunningSource() {
+    updateLastUsed();
+    return runningSources.incrementAndGet();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int discountRunningSource() {
+    updateLastUsed();
+    return runningSources.decrementAndGet();
   }
 }
