@@ -132,30 +132,17 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     domainManager.addDomain(domainWrapper);
   }
 
-  private Domain getDomainIfPresentOrNull(DomainDescriptor domainDescriptor) {
-    try {
-      BundleDescriptor bundleDescriptor = domainDescriptor.getBundleDescriptor();
-      if (bundleDescriptor != null) {
-        return domainManager.getDomain(bundleDescriptor);
-      } else {
-        return domainManager.getDomain(domainDescriptor.getName());
-      }
-    } catch (DomainNotFoundException | IncompatibleDomainVersionException e) {
-      return null;
-    }
-  }
-
   @Override
   protected Domain doCreateArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
     String domainName = domainLocation.getName();
-    DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
-    Domain domain = getDomainIfPresentOrNull(domainDescriptor);
-    if (domain != null) {
+    if (domainManager.contains(domainName)) {
       throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
     }
     if (domainName.contains(" ")) {
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
+
+    DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(emptySet(), domainDescriptor.getPlugins().stream().collect(toList()), true);

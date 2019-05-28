@@ -49,27 +49,22 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     return domain;
   }
 
-  private String normalizeName(String name) {
-    if (name.endsWith("-mule-domain")) {
-      return name;
-    } else {
-      return name + "-mule-domain";
+  @Override
+  public boolean contains(BundleDescriptor descriptor) {
+    BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(descriptor);
+    if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
+      Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
+      String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
+      String expectedVersion = descriptor.getVersion();
+      return isCompatibleVersion(availableVersion, expectedVersion);
     }
+
+    return contains(descriptor.getArtifactFileName());
   }
 
-  private String getDomainName(Domain domain) {
-    String domainName;
-    BundleDescriptor bundleDescriptor = domain.getDescriptor().getBundleDescriptor();
-    if (bundleDescriptor != null) {
-      domainName = bundleDescriptor.getArtifactFileName();
-    } else {
-      domainName = domain.getDescriptor().getName();
-    }
-    return normalizeName(domainName);
-  }
-
-  private String getDomainAlreadyExistsErrorMessage(String domainName) {
-    return format("Domain '%s' already exists", domainName);
+  @Override
+  public boolean contains(String name) {
+    return domainsByName.containsKey(normalizeName(name));
   }
 
   @Override
@@ -78,13 +73,13 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     String domainName = getDomainName(domain);
 
     if (domainsByName.containsKey(domainName)) {
-      throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(domain.getArtifactName()));
+      throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(domainName));
     }
 
     if (bundleDescriptor != null) {
       final BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(bundleDescriptor);
       if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
-        throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(domain.getArtifactName()));
+        throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(domainName));
       }
       domainsByDescriptor.put(bundleDescriptorWrapper, domain);
     }
@@ -103,5 +98,21 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     }
 
     domainsByName.remove(domainName);
+  }
+
+  private static String normalizeName(String name) {
+    if (name.endsWith("-mule-domain")) {
+      return name;
+    } else {
+      return name + "-mule-domain";
+    }
+  }
+
+  private static String getDomainName(Domain domain) {
+    return normalizeName(domain.getArtifactName());
+  }
+
+  private static String getDomainAlreadyExistsErrorMessage(String domainName) {
+    return format("Domain '%s' already exists", domainName);
   }
 }
