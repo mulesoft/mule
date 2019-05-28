@@ -69,6 +69,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -159,8 +160,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       CoreEvent initialiserEvent = null;
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
+        Optional<ConfigurationInstance> configurationInstance = getConfiguration(initialiserEvent);
+        configurationInstance
+            .ifPresent(configurationInstanceObject -> ((MutableConfigurationStats) (configurationInstanceObject.getStatistics()))
+                .addInflightOperation());
         sourceAdapter =
-            sourceAdapterFactory.createAdapter(getConfiguration(initialiserEvent),
+            sourceAdapterFactory.createAdapter(configurationInstance,
                                                createSourceCallbackFactory(),
                                                this,
                                                sourceConnectionManager,
@@ -198,7 +203,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void stopSource() throws MuleException {
     if (sourceAdapter != null) {
       try {
+        CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
+        Optional<ConfigurationInstance> configurationInstance = getConfiguration(initialiserEvent);
+        configurationInstance
+            .ifPresent(configurationInstanceObject -> ((MutableConfigurationStats) (configurationInstanceObject.getStatistics()))
+                .discountInflightOperation());
         sourceAdapter.stop();
+        if (usesDynamicConfiguration()) {
+          disposeSource();
+        }
       } catch (Exception e) {
         throw new DefaultMuleException(format("Found exception stopping source '%s' of root component '%s'",
                                               sourceAdapter.getName(),

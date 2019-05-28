@@ -7,17 +7,26 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.junit.Test;
 
 public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Inject
+  @Named("sourceWithDynamicConfig")
+  public Flow sourceWithDynamicConfig;
 
   @Override
   protected String getConfigFile() {
@@ -42,12 +51,30 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
       assertExpired(config, 1500, 100);
       fail("Config should not have been expired");
     } catch (AssertionError e) {
-      //all good
+      assertThat(e.getMessage(), is(not("Config should not have been expired")));
     }
 
-    assertExpired(config, 5000, 1000);
+    assertInitialised(config);
+  }
+
+  @Test
+  public void doNotExpireDynamicConfigWithCustomExpirationUsedBySource() throws Exception {
+    HeisenbergExtension config =
+        invokeDynamicConfig("dynamicWithCustomExpirationForSource", "heisenbergWithCustomExpirationForSource", "Walter Blanco");
+
+    try {
+      assertExpired(config, 15000, 1000);
+      fail("Config should not have been expired");
+    } catch (AssertionError e) {
+      assertThat(e.getMessage(), is(not("Config should not have been expired")));
+    }
 
     assertInitialised(config);
+
+    sourceWithDynamicConfig.stop();
+
+    assertExpired(config, 5000, 100);
+
   }
 
   private void assertInitialised(HeisenbergExtension config) {
