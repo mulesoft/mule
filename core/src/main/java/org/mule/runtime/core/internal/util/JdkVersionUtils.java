@@ -220,7 +220,7 @@ public class JdkVersionUtils {
   }
 
   public static boolean isSupportedJdkVendor() {
-    return isSunJDK() || isAppleJDK() || isIbmJDK() ||isOpenJDK() || isAdoptOpenJDK();
+    return isSunJDK() || isAppleJDK() || isIbmJDK() || isOpenJDK() || isAdoptOpenJDK();
   }
 
   public static String getRecommendedJdks() {
