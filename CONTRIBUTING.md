@@ -284,7 +284,7 @@ git push origin dev/yourreponame/bug/yourJIRAissuenumber -f
 
 Ready to submit your patch for review and merging? Initiate a pull request in github!
 
-1. Review the [MuleSoft Contributor's Agreement](http://www.mulesoft.org/legal/contributor-agreement.html). Before any contribution is accepted, we need you to run the following notebook [script ](https://api-notebook.anypoint.mulesoft.com/notebooks#bc1cf75a0284268407e4). This script will ask you to login to github and accept our Contributor's Agreement. That process creates an issue in our contributors project with your name.
+1. Review the [MuleSoft Contributor's Agreement](http://www.mulesoft.org/legal/contributor-agreement.html). Before any contribution is accepted, we need you to run the following notebook [script ](https://api-notebook.anypoint.mulesoft.com/notebooks/#380297ed0e474010ff43). This script will ask you to login to github and accept our Contributor's Agreement. That process creates an issue in our contributors project with your name.
 2. From the repo of your branch, click the Pull Request button.
 3. In the Pull Request Preview dialog, enter a title and optional description of your changes, review the commits that form part of your pull request, then click Send Pull Request (Refer to github's [detailed instructions](https://help.github.com/articles/using-pull-requests) for submitting a pull request).
 4. Mule's core dev team reviews the pull request and may initiate discussion or ask questions about your changes in a Pull Request Discussion. The team can then merge your commits with the master where appropriate. We will validate acceptance of the agreement at this step. 
