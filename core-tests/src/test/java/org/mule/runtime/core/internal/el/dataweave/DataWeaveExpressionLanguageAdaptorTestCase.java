@@ -693,8 +693,4 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     }
   }
 
-  public enum TestEnum {
-    PEPE, TATO
-  }
-
 }
