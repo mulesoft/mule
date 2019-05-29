@@ -81,7 +81,8 @@
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${jakartaMailVersion}</version>
         </dependency>
         <dependency>
             <!-- Use this one, already bundled with Mule, juel-api duplicates it and is excluded -->
