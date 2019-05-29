@@ -71,18 +71,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -103,6 +91,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -193,7 +193,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected Scheduler custom;
   protected Scheduler ringBuffer;
   protected Scheduler asyncExecutor;
-  protected ExecutorService cachedThreadPool = newFixedThreadPool(4);
+  protected ExecutorService cachedThreadPool = newFixedThreadPool(4, new NamedThreadFactory("cachedThreadPool"));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
