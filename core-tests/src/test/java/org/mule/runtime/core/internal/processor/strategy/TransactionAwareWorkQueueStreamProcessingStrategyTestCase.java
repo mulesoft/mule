@@ -20,8 +20,11 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueStreamProcessingStrategyFactory.TransactionAwareWorkQueueStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import org.junit.After;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -29,10 +32,16 @@ import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
-public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends WorkQueueStreamProcessingStrategyTestCase {
+public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends WorkQueueStreamProcessingStrategyTestCase
+    implements TransactionAwareProcessingStragyTestCase {
 
   public TransactionAwareWorkQueueStreamProcessingStrategyTestCase(Mode mode) {
     super(mode);
+  }
+
+  @After
+  public void cleanUpTx() {
+    TransactionCoordination.getInstance().rollbackCurrentTransaction();
   }
 
   @Override
@@ -63,5 +72,4 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends W
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
-
 }

@@ -12,12 +12,16 @@ import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.construct.Flow.builder;
@@ -57,6 +61,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -70,18 +75,7 @@ import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
+import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,6 +97,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -193,7 +199,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected Scheduler custom;
   protected Scheduler ringBuffer;
   protected Scheduler asyncExecutor;
-  protected ExecutorService cachedThreadPool = newFixedThreadPool(4);
+  protected ExecutorService cachedThreadPool = newFixedThreadPool(4, new NamedThreadFactory("cachedThreadPool"));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -489,6 +495,48 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public abstract void tx() throws Exception;
+
+  @Test
+  public void txSameThreadPolicyHonored() throws Exception {
+    assumeThat(this, instanceOf(TransactionAwareProcessingStragyTestCase.class));
+
+    triggerableMessageSource = new TriggerableMessageSource();
+
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    flow.initialise();
+    flow.start();
+
+    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    processFlow(newEvent());
+
+    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
+    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
+  }
+
+  @Test
+  public void txSameThreadPolicyHonoredWithAsyncProcessorInFlow() throws Exception {
+    assumeThat(this, instanceOf(TransactionAwareProcessingStragyTestCase.class));
+
+    triggerableMessageSource = new TriggerableMessageSource();
+
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(asyncProcessor, cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    flow.initialise();
+    flow.start();
+
+    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    processFlow(newEvent());
+
+    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
+    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
+  }
+
+  protected static interface TransactionAwareProcessingStragyTestCase {
+
+  }
 
   protected void singleIORW(Callable<CoreEvent> eventSupplier, Matcher<Iterable<? extends String>> schedulerNameMatcher)
       throws Exception {
