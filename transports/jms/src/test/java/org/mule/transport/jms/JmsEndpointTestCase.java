@@ -162,7 +162,7 @@ public class JmsEndpointTestCase extends AbstractMuleContextTestCase
         url.initialise();
         assertEquals("jms", url.getScheme());
         assertEquals("[[testgroup]]test.queue", url.getAddress());
-        assertNull( url.getResourceInfo());
+        assertNull(url.getResourceInfo());
         assertEquals("jms://?address=[[testgroup]]test.queue", url.toString());
     }
 
@@ -173,7 +173,7 @@ public class JmsEndpointTestCase extends AbstractMuleContextTestCase
         url.initialise();
         assertEquals("jms", url.getScheme());
         assertEquals("[[testgroup]]test.queue", url.getAddress());
-        assertNull( url.getResourceInfo());
+        assertNull(url.getResourceInfo());
         assertEquals("jms://%5B%5Btestgroup%5D%5Dtest.queue", url.toString());
     }
 
@@ -199,5 +199,37 @@ public class JmsEndpointTestCase extends AbstractMuleContextTestCase
         assertEquals("jms://topic:%5B%5Btestgroup%5D%5Dtest.topic", url.toString());
     }
 
+    @Test
+    public void testColonAsSimpleSeparator() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms://queues:queue", muleContext);
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("queues:queue", url.getAddress());
+        assertEquals("queues", url.getResourceInfo());
+        assertEquals("jms://queues:queue", url.toString());
+    }
+
+    @Test
+    public void testColonAsDoubleSeparator() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms://queues:cat:queue1", muleContext);
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("queues:cat:queue1", url.getAddress());
+        assertEquals("queues", url.getResourceInfo());
+        assertEquals("jms://queues:cat:queue1", url.toString());
+    }
+
+    @Test
+    public void testColonAsSeparatorWithUserInfo() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms://user:password@cat:queues", muleContext);
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("cat:queues", url.getAddress());
+        assertEquals("cat", url.getResourceInfo());
+        assertEquals("jms://user:****@cat:queues", url.toString());
+    }
 
 }
