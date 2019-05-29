@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,19 +20,19 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory.TransactionAwareProactorStreamWorkQueueProcessingStrategy;
-import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.After;
-import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 
 @Feature(PROCESSING_STRATEGIES)
 public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
-    extends ProactorStreamWorkQueueProcessingStrategyTestCase {
+    extends ProactorStreamWorkQueueProcessingStrategyTestCase
+    implements TransactionAwareProcessingStragyTestCase {
 
   public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
     super(mode);
@@ -73,39 +72,5 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
-  }
-
-  @Test
-  public void txSameThreadPolicyHonored() throws Exception {
-    triggerableMessageSource = new TriggerableMessageSource();
-
-    flow = flowBuilder.get()
-        .source(triggerableMessageSource)
-        .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
-
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
-    processFlow(newEvent());
-
-    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
-    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
-  }
-
-  @Test
-  public void txSameThreadPolicyHonoredWithAsyncProcessorInFlow() throws Exception {
-    triggerableMessageSource = new TriggerableMessageSource();
-
-    flow = flowBuilder.get()
-        .source(triggerableMessageSource)
-        .processors(asyncProcessor, cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
-
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
-    processFlow(newEvent());
-
-    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
-    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
   }
 }

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -23,17 +22,15 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory.TransactionAwareProactorStreamEmitterProcessingStrategy;
-import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -45,7 +42,8 @@ import io.qameta.allure.Story;
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
 public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
-    extends ProactorStreamEmitterProcessingStrategyTestCase {
+    extends ProactorStreamEmitterProcessingStrategyTestCase
+    implements TransactionAwareProcessingStragyTestCase {
 
   @Rule
   public SystemProperty lazyTxCheck;
@@ -58,10 +56,9 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
   @Parameterized.Parameters(name = "{0}, {1}")
   public static Collection<Object[]> parameters() {
-    final List<Object[]> asList = asList(new Object[][] {
+    return asList(new Object[][] {
         {Mode.FLOW, true}, {SOURCE, true},
         {Mode.FLOW, false}, {SOURCE, false}});
-    return asList;
   }
 
   @After
@@ -96,39 +93,5 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
-  }
-
-  @Test
-  public void txSameThreadPolicyHonored() throws Exception {
-    triggerableMessageSource = new TriggerableMessageSource();
-
-    flow = flowBuilder.get()
-        .source(triggerableMessageSource)
-        .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
-
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
-    processFlow(newEvent());
-
-    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
-    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
-  }
-
-  @Test
-  public void txSameThreadPolicyHonoredWithAsyncProcessorInFlow() throws Exception {
-    triggerableMessageSource = new TriggerableMessageSource();
-
-    flow = flowBuilder.get()
-        .source(triggerableMessageSource)
-        .processors(asyncProcessor, cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
-    flow.initialise();
-    flow.start();
-
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
-    processFlow(newEvent());
-
-    assertThat(threads.toString(), threads, hasSize(equalTo(1)));
-    assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
   }
 }
