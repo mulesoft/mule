@@ -120,8 +120,8 @@
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-alpha-1.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-alpha-1.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-apikit-3.9.3-+
-/mule-standalone-${productVersion}/lib/mule/mule-module-apikit-spi-3.9.3-+
+/mule-standalone-${productVersion}/lib/mule/mule-module-apikit-3.9.4-+
+/mule-standalone-${productVersion}/lib/mule/mule-module-apikit-spi-3.9.4-+
 /mule-standalone-${productVersion}/lib/mule/mule-module-atom-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-builders-${productVersion}.jar
