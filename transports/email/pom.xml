@@ -63,7 +63,8 @@
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${jakartaMailVersion}</version>
         </dependency>
 
         <!-- Unit tests only -->

@@ -188,7 +188,7 @@
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
-        <javaMailVersion>1.5.4</javaMailVersion>
+        <jakartaMailVersion>1.6.3</jakartaMailVersion>
         <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
@@ -739,9 +739,8 @@
                 <version>${javax.transaction.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.mail</groupId>
-                <artifactId>javax.mail</artifactId>
-                <version>${javaMailVersion}</version>
+                <groupId>java.sun.mail</groupId>
+                <artifactId>jakarta.mail</artifactId>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.activation</groupId>
