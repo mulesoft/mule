@@ -65,10 +65,6 @@
             <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
             <version>${geronimoSpecsJaxRpcVersion}</version>
         </dependency>
-         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-        </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>

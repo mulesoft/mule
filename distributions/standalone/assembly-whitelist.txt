@@ -304,6 +304,7 @@
 /mule-standalone-${productVersion}/lib/opt/javax.json-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/javax.servlet-api-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
+/mule-standalone-${productVersion}/lib/opt/jakarta.mail-1.6.3.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-runtime-2.3.1-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.3.1-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-core-2.3.0.1.jar
@@ -373,8 +374,6 @@
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.1.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-8.0.0.jar
-/mule-standalone-${productVersion}/lib/opt/javax.mail-1.5.4.jar
-/mule-standalone-${productVersion}/lib/opt/mailapi-1.5.4.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.15.jar
 /mule-standalone-${productVersion}/lib/opt/mimepull-1.9.3.jar
 /mule-standalone-${productVersion}/lib/opt/modulator-1.0.jar
@@ -394,7 +393,7 @@
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v1-3.8.8-+
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-3.8.8-+
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.29.jar
+/mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.30.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.35.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
