@@ -24,7 +24,7 @@ public interface ProcessingStrategyFactory {
 
   /**
    * Provides a hint to users of the fsactoy about the concrete type of {@link ProcessingStrategy} to be built.
-   * 
+   *
    * @return a reference to the concrete implememntation of the {@link ProcessingStrategy} this factory will create.
    */
   default Class<? extends ProcessingStrategy> getProcessingStrategyType() {
