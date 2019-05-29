@@ -10,12 +10,15 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleException;
 
+import java.util.Set;
+
 /**
  * Exception type for representing a failure due to domain not found.
  */
 public final class DomainNotFoundException extends MuleException {
 
-  public DomainNotFoundException(String domainName) {
-    super(createStaticMessage(format("The domain '%s' was not found", domainName)));
+  public DomainNotFoundException(String domainName, Set<BundleDescriptorWrapper> availableDomains) {
+    super(createStaticMessage(format("The domain '%s' was not found. Available domains: [%s]", domainName,
+                                     availableDomains.toString())));
   }
 }

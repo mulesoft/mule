@@ -47,6 +47,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -169,7 +170,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
     when(applicationDescriptorFactory.create(any(), any())).thenReturn(descriptor);
-    when(domainRepository.getDomain(any(BundleDescriptor.class))).thenThrow(new DomainNotFoundException(DOMAIN_NAME));
+    when(domainRepository.getDomain(any(BundleDescriptor.class)))
+        .thenThrow(new DomainNotFoundException(DOMAIN_NAME, new HashSet<>()));
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME), empty());
   }

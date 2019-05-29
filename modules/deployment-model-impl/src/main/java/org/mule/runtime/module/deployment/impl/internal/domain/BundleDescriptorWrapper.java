@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import com.vdurmont.semver4j.Semver;
@@ -18,19 +19,25 @@ import com.vdurmont.semver4j.Semver;
 class BundleDescriptorWrapper {
 
   private final BundleDescriptor bundleDescriptor;
+  private final String domainName;
 
   BundleDescriptorWrapper(BundleDescriptor bundleDescriptor) {
     this.bundleDescriptor = bundleDescriptor;
+    this.domainName = bundleDescriptor.getArtifactId();
+  }
+
+  BundleDescriptorWrapper(DomainDescriptor domainDescriptor) {
+    this.bundleDescriptor = domainDescriptor.getBundleDescriptor();
+    if (bundleDescriptor == null) {
+      this.domainName = domainDescriptor.getName();
+    } else {
+      this.domainName = bundleDescriptor.getArtifactId();
+    }
   }
 
   @Override
   public int hashCode() {
-    Semver version = new Semver(bundleDescriptor.getVersion());
-    int result = bundleDescriptor.getGroupId().hashCode();
-    result = 31 * result + bundleDescriptor.getArtifactId().hashCode();
-    result = 31 * result + version.getMajor().hashCode();
-    result = 31 * result + bundleDescriptor.getType().hashCode();
-    return result;
+    return domainName.hashCode();
   }
 
   @Override
@@ -44,18 +51,14 @@ class BundleDescriptorWrapper {
     }
 
     BundleDescriptorWrapper otherDescriptorWrapper = (BundleDescriptorWrapper) otherObject;
-    if (this.hashCode() != otherDescriptorWrapper.hashCode()) {
+    if (!this.domainName.equals(otherDescriptorWrapper.domainName)) {
       return false;
     }
 
     BundleDescriptor myBundleDescriptor = this.bundleDescriptor;
     BundleDescriptor otherBundleDescriptor = otherDescriptorWrapper.bundleDescriptor;
-    if (myBundleDescriptor == null && otherBundleDescriptor == null) {
-      return true;
-    }
-
     if (myBundleDescriptor == null || otherBundleDescriptor == null) {
-      return false;
+      return true;
     }
 
     if (!myBundleDescriptor.getGroupId().equals(otherBundleDescriptor.getGroupId())) {
@@ -73,5 +76,9 @@ class BundleDescriptorWrapper {
     Semver mySemver = new Semver(myBundleDescriptor.getVersion());
     Semver otherSemver = new Semver(otherBundleDescriptor.getVersion());
     return mySemver.getMajor().equals(otherSemver.getMajor());
+  }
+
+  public String toString() {
+    return domainName;
   }
 }

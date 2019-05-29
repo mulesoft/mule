@@ -72,13 +72,14 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     return builder.build();
   }
 
-  private Domain createDomain(String domainName, String version) throws IOException {
-    final DomainDescriptor descriptor = new DomainDescriptor(domainName);
-    descriptor.setBundleDescriptor(createBundleDescriptor(domainName, version));
+  private Domain createDomain(String artifactId, String version) throws IOException {
+    String artifactName = artifactId + "-" + version + "-mule-domain";
+    final DomainDescriptor descriptor = new DomainDescriptor(artifactName);
+    descriptor.setBundleDescriptor(createBundleDescriptor(artifactId, version));
     when(domainDescriptorFactory.create(any(), any())).thenReturn(descriptor);
 
     final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
-    when(domainArtifactClassLoader.getArtifactId()).thenReturn(domainName);
+    when(domainArtifactClassLoader.getArtifactId()).thenReturn(artifactId);
 
     DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
     when(domainClassLoaderBuilderMock.setArtifactDescriptor(any()))
@@ -90,8 +91,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
     when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
 
-    Domain domain = domainFactory.createArtifact(new File(domainName), empty());
-    assertThat(domain.getArtifactName(), is(domainName));
+    Domain domain = domainFactory.createArtifact(new File(artifactName), empty());
+    assertThat(domain.getArtifactName(), is(artifactName));
     assertThat(domain.getDescriptor(), is(descriptor));
     assertThat(domain.getArtifactClassLoader(), is(domainArtifactClassLoader));
     return domain;
@@ -142,7 +143,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
     // second is not
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Domain 'custom-domain' already exists");
+    expectedException.expectMessage("Domain 'custom-domain-1.1.0-mule-domain' already exists");
     domainManager.addDomain(domain);
   }
 
