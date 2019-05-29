@@ -98,17 +98,21 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> {
+        return onNonBlockingProcessorTxAware(publisher -> {
           return from(publisher).transform(processor)
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()))
               .parallel(parallelism)
               .runOn(scheduler);
-        };
+        });
       } else {
         return publisher -> from(publisher)
             .transform(processor)
             .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
       }
+    }
+
+    protected ReactiveProcessor onNonBlockingProcessorTxAware(ReactiveProcessor processor) {
+      return processor;
     }
 
     protected int getParallelism() {

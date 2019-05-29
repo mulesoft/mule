@@ -18,22 +18,34 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
-import org.junit.Test;
 
+@RunWith(Parameterized.class)
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
 @DisplayName("Default processing strategy (used when no processing strategy is configured)")
-public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase {
+public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase
+    implements TransactionAwareProcessingStragyTestCase {
 
   public TransactionAwareWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
+  }
+
+  @After
+  public void cleanUpTx() {
+    TransactionCoordination.getInstance().rollbackCurrentTransaction();
   }
 
   @Override
@@ -60,5 +72,4 @@ public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQue
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
-
 }

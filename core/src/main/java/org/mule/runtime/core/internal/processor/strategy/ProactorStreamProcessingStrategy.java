@@ -31,14 +31,14 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.slf4j.Logger;
-
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.LongUnaryOperator;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.retry.BackoffDelay;
@@ -142,7 +142,7 @@ public abstract class ProactorStreamProcessingStrategy
       }
       return schedulerBusy;
     }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
-        .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
+        .withBackoffScheduler(fromExecutorService(decorateScheduler(getCpuLightScheduler()))));
   }
 
   protected Scheduler getBlockingScheduler() {

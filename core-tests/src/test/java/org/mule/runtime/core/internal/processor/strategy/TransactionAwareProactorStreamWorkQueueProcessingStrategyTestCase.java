@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
@@ -20,18 +21,48 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory.TransactionAwareProactorStreamWorkQueueProcessingStrategy;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 
+@RunWith(Parameterized.class)
 @Feature(PROCESSING_STRATEGIES)
 public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
-    extends ProactorStreamWorkQueueProcessingStrategyTestCase {
+    extends ProactorStreamWorkQueueProcessingStrategyTestCase
+    implements TransactionAwareProcessingStragyTestCase {
 
-  public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
+  @Rule
+  public SystemProperty lazyTxCheck;
+
+  public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode, boolean lazyTxCheck) {
     super(mode);
+    this.lazyTxCheck =
+        new SystemProperty(TransactionAwareProcessingStrategyFactory.class.getName() + ".LAZY_TX_CHECK", "" + lazyTxCheck);
+  }
+
+  @Parameterized.Parameters(name = "{0}, {1}")
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {
+        {Mode.FLOW, true}, {SOURCE, true},
+        {Mode.FLOW, false}, {SOURCE, false}});
+  }
+
+  @After
+  public void cleanUpTx() {
+    TransactionCoordination.getInstance().rollbackCurrentTransaction();
   }
 
   @Override
@@ -64,5 +95,4 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
-
 }
