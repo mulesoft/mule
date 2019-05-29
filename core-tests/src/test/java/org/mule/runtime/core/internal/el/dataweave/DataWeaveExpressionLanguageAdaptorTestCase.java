@@ -551,6 +551,37 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   }
 
   @Test
+  public void handlesOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("'hello' as String {class: 'java.util.Optional'}", testEvent(),
+                                    BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+  }
+
+  @Test
+  public void handlesEmptyOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("null as Null {class: 'java.util.Optional'}", testEvent(), BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+  }
+
+  @Test
+  public void handlesExpectedOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("java!java::util::Optional::of('hello')", DataType.fromType(Optional.class), testEvent(),
+                                    BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+  }
+
+  @Test
+  public void handlesEmptyExpectedOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("java!java::util::Optional::empty()", DataType.fromType(Optional.class), testEvent(),
+                                    BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+  }
+
+  @Test
   public void sessionWithEventAndLocation() throws MuleException {
     ExpressionLanguageSessionAdaptor session =
         expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT);
@@ -660,6 +691,10 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     public Location getRootContainerLocation() {
       return Location.builder().globalName(getRootContainerName()).build();
     }
+  }
+
+  public enum TestEnum {
+    PEPE, TATO
   }
 
 }
