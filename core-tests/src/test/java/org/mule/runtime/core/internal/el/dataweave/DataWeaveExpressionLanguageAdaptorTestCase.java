@@ -551,6 +551,41 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   }
 
   @Test
+  public void handlesOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("'hello' as String {class: 'java.util.Optional'}", testEvent(),
+                                    BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(((Optional) result.getValue()).get(), is("hello"));
+  }
+
+  @Test
+  public void handlesEmptyOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("null as Null {class: 'java.util.Optional'}", testEvent(), BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(result.getValue(), is(empty()));
+  }
+
+  @Test
+  public void handlesExpectedOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("java!java::util::Optional::of('hello')", DataType.fromType(Optional.class), testEvent(),
+                                    BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(((Optional) result.getValue()).get(), is("hello"));
+  }
+
+  @Test
+  public void handlesEmptyExpectedOptional() throws Exception {
+    TypedValue result =
+        expressionLanguage.evaluate("java!java::util::Optional::empty()", DataType.fromType(Optional.class), testEvent(),
+                                    BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(result.getValue(), is(empty()));
+  }
+
+  @Test
   public void sessionWithEventAndLocation() throws MuleException {
     ExpressionLanguageSessionAdaptor session =
         expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT);
