@@ -8,13 +8,14 @@ package org.mule.transport.jms.vendors;
 
 import static javax.jms.Session.AUTO_ACKNOWLEDGE;
 import static javax.jms.Session.DUPS_OK_ACKNOWLEDGE;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mule.transport.jms.activemq.ActiveMQJmsConnector.DEFAULT_BROKER_URL;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -23,6 +24,7 @@ import org.mule.transport.jms.redelivery.JmsXRedeliveryHandler;
 import org.mule.transport.jms.test.TestRedeliveryHandler;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
@@ -41,7 +43,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testConfigurationDefaults()
+    public void testConfigurationDefaults() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
         assertThat(c, is(not(nullValue())));
@@ -57,7 +59,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     }
     
     @Test
-    public void testDefaultActiveMqConnectorConfig()
+    public void testDefaultActiveMqConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnector");
 
@@ -75,7 +77,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         
         assertThat(c.isDurable(), equalTo(false));
         assertThat(c.isNoLocal(), equalTo(false));
-        assertThat(c.isPersistentDelivery(), equalTo(true));
+        assertThat(c.isPersistentDelivery(), equalTo(false));
         assertThat(c.getMaxRedelivery(), equalTo(0));
         assertThat(c.getMaxQueuePrefetch(), equalTo(-1));
         assertThat(c.getMaximumRedeliveryDelay(), equalTo(-1));
@@ -88,7 +90,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     }
     
     @Test
-    public void testCustomActiveMqConnectorConfig()
+    public void testCustomActiveMqConnectorConfig() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("customActiveMqJmsConnector");
 
@@ -124,7 +126,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
      * See MULE-8221
      */
     @Test
-    public void testActiveMqConnectorWithUsernameAndPassword()
+    public void testActiveMqConnectorWithUsernameAndPassword() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnectorWithUsernameAndPassword");
 

@@ -7,10 +7,10 @@
 package org.mule.transport.jms;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -21,15 +21,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.api.transaction.Transaction;
-import org.mule.context.notification.ClusterNodeNotification;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transport.jms.jndi.JndiNameResolver;
-import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -46,6 +37,15 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.context.notification.ClusterNodeNotificationListener;
+import org.mule.api.transaction.Transaction;
+import org.mule.context.notification.ClusterNodeNotification;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transport.jms.jndi.JndiNameResolver;
+import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
 public class JmsConnectorTestCase extends AbstractMuleContextTestCase
@@ -201,7 +201,7 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
     }
     
     @Test
-    public void testCloseConnectionOnErrorOnPostCreationSetup() throws Exception
+    public void testCloseConnectionOnErroOnPostCreationSetup() throws Exception
     {
         Connection connection = mock(Connection.class);
         doThrow(new JMSException("Error on post creation processing")).when(connection).setExceptionListener(any(ExceptionListener.class));
