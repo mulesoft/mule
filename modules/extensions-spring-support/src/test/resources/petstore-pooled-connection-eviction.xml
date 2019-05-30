@@ -7,7 +7,7 @@
 
     <petstore:config name="pooled-config-with-eviction" cashierName="jim">
         <petstore:pooled-connection username="john" password="doe">
-            <pooling-profile minEvictionMillis="3000" evictionCheckIntervalMillis="1000"/>
+            <pooling-profile maxIdle="1" maxActive="1" minEvictionMillis="2000" evictionCheckIntervalMillis="500"/>
         </petstore:pooled-connection>
         <petstore:pets>
             <petstore:pet value="Lassie" />

@@ -20,9 +20,9 @@ import org.junit.Test;
 
 public class PetStorePooledConnectionEvictionTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private static int AMOUNT_OF_TRIES = 5;
-  private static int TIME_BETWEEN_TRIES_IN_MILLIS = 8000;
-  private static Long IMPOSSIBLE_CONNECTION_AGE = 5000L;
+  private static int AMOUNT_OF_TRIES = 2;
+  private static int TIME_BETWEEN_TRIES_IN_MILLIS = 4000;
+  private static Long IMPOSSIBLE_CONNECTION_AGE = 3000L;
 
   @Override
   protected String getConfigFile() {
