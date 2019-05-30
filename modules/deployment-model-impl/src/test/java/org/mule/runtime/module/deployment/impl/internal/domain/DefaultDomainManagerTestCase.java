@@ -119,8 +119,15 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     assertThat(domainCompleteName2, is(domainName2 + "-" + version + "-mule-domain"));
 
     domainManager.addDomain(domain1);
+    assertThat(domainManager.contains(descriptor1), is(true));
+    assertThat(domainManager.contains(domainName1), is(true));
+    assertThat(domainManager.contains(domainCompleteName1), is(true));
     assertThat(domainManager.getDomain(descriptor1), is(domain1));
+    assertThat(domainManager.getDomain(domainName1), is(domain1));
     assertThat(domainManager.getDomain(domainCompleteName1), is(domain1));
+    assertThat(domainManager.contains(descriptor2), is(false));
+    assertThat(domainManager.contains(domainName2), is(false));
+    assertThat(domainManager.contains(domainCompleteName2), is(false));
 
     domainManager.addDomain(domain2);
     assertThat(domainManager.getDomain(descriptor1), is(domain1));
@@ -129,10 +136,19 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     assertThat(domainManager.getDomain(domainCompleteName2), is(domain2));
 
     domainManager.removeDomain(domain1);
+    assertThat(domainManager.contains(descriptor1), is(false));
+    assertThat(domainManager.contains(domainName1), is(false));
+    assertThat(domainManager.contains(domainCompleteName1), is(false));
     assertThat(domainManager.getDomain(descriptor2), is(domain2));
     assertThat(domainManager.getDomain(domainCompleteName2), is(domain2));
 
     domainManager.removeDomain(domain2);
+    assertThat(domainManager.contains(descriptor1), is(false));
+    assertThat(domainManager.contains(domainName1), is(false));
+    assertThat(domainManager.contains(domainCompleteName1), is(false));
+    assertThat(domainManager.contains(descriptor2), is(false));
+    assertThat(domainManager.contains(domainName2), is(false));
+    assertThat(domainManager.contains(domainCompleteName2), is(false));
   }
 
   @Test
@@ -216,5 +232,45 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     expectedException
         .expectMessage("Expected domain 'custom-domain-1.2.0-mule-domain' couldn't be retrieved. It is available the '1.1.0' version");
     domainManager.getDomain(bundleDescriptor);
+  }
+
+  @Test
+  public void cannotAddDomainWithSameName() throws IOException {
+    domainManager.addDomain(createDomain("custom-domain", "1.1.0"));
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException
+        .expectMessage("Trying to add domain 'custom-domain-1.1.1-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
+    domainManager.addDomain(createDomain("custom-domain", "1.1.1"));
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException
+        .expectMessage("Trying to add domain 'custom-domain-1.2.0-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
+    domainManager.addDomain(createDomain("custom-domain", "1.2.0"));
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException
+        .expectMessage("Trying to add domain 'custom-domain-2.1.0-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
+    domainManager.addDomain(createDomain("custom-domain", "2.1.0"));
+  }
+
+  @Test
+  public void replaceDomainByRemovingThePreviousOne() throws IOException {
+    Domain domain = createDomain("custom-domain", "1.1.0");
+    domainManager.addDomain(domain);
+    assertThat(domainManager.contains("custom-domain"), is(true));
+    assertThat(domainManager.contains("custom-domain-1.1.0-mule-domain"), is(true));
+    assertThat(domainManager.contains("custom-domain-1.2.0-mule-domain"), is(false));
+
+    domain.dispose();
+    domainManager.removeDomain(domain);
+    assertThat(domainManager.contains("custom-domain"), is(false));
+    assertThat(domainManager.contains("custom-domain-1.1.0-mule-domain"), is(false));
+    assertThat(domainManager.contains("custom-domain-1.2.0-mule-domain"), is(false));
+
+    domainManager.addDomain(createDomain("custom-domain", "1.2.0"));
+    assertThat(domainManager.contains("custom-domain"), is(true));
+    assertThat(domainManager.contains("custom-domain-1.1.0-mule-domain"), is(false));
+    assertThat(domainManager.contains("custom-domain-1.2.0-mule-domain"), is(true));
   }
 }
