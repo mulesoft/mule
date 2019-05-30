@@ -556,6 +556,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         expressionLanguage.evaluate("'hello' as String {class: 'java.util.Optional'}", testEvent(),
                                     BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(((Optional) result.getValue()).get(), is("hello"));
   }
 
   @Test
@@ -563,6 +564,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     TypedValue result =
         expressionLanguage.evaluate("null as Null {class: 'java.util.Optional'}", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(result.getValue(), is(empty()));
   }
 
   @Test
@@ -571,6 +573,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         expressionLanguage.evaluate("java!java::util::Optional::of('hello')", DataType.fromType(Optional.class), testEvent(),
                                     BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(((Optional) result.getValue()).get(), is("hello"));
   }
 
   @Test
@@ -579,6 +582,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         expressionLanguage.evaluate("java!java::util::Optional::empty()", DataType.fromType(Optional.class), testEvent(),
                                     BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Optional.class)));
+    assertThat(result.getValue(), is(empty()));
   }
 
   @Test
