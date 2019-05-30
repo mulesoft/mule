@@ -66,8 +66,13 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
       }
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
-          .filter(p -> p.policyTemplate.getDescriptor().getBundleDescriptor().getArtifactId()
-              .equals(policyTemplateDescriptor.getBundleDescriptor().getArtifactId()))
+          .filter(p -> p.policyTemplate.getDescriptor().getBundleDescriptor().getGroupId()
+              .equals(policyTemplateDescriptor.getBundleDescriptor().getGroupId()) &&
+              p.policyTemplate.getDescriptor().getBundleDescriptor().getArtifactId()
+                  .equals(policyTemplateDescriptor.getBundleDescriptor().getArtifactId())
+              &&
+              p.policyTemplate.getDescriptor().getBundleDescriptor().getVersion()
+                  .equals(policyTemplateDescriptor.getBundleDescriptor().getVersion()))
           .findAny();
 
       if (!registeredPolicyTemplate.isPresent()) {
