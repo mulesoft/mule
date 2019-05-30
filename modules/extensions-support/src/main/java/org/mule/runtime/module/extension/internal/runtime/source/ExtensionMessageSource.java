@@ -613,19 +613,21 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return primaryNodeOnly ? clusterService.isPrimaryPollingInstance() : true;
   }
 
-  private Optional<ConfigurationInstance> startUsingConfiguration(CoreEvent event){
-    return getConfigurationAndTryToMutateStats(event, (mutableConfigurationStats -> mutableConfigurationStats.addRunningSource()));
+  private Optional<ConfigurationInstance> startUsingConfiguration(CoreEvent event) {
+    return getConfigurationAndTryToMutateStats(event,
+                                               (mutableConfigurationStats -> mutableConfigurationStats.addRunningSource()));
   }
 
-  private void stopUsingConfiguration(CoreEvent event){
+  private void stopUsingConfiguration(CoreEvent event) {
     getConfigurationAndTryToMutateStats(event, (mutableConfigurationStats -> mutableConfigurationStats.discountRunningSource()));
   }
 
-  private Optional<ConfigurationInstance> getConfigurationAndTryToMutateStats(CoreEvent event, Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer){
+  private Optional<ConfigurationInstance> getConfigurationAndTryToMutateStats(CoreEvent event,
+                                                                              Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer) {
     Optional<ConfigurationInstance> configurationInstanceOptional = getConfiguration(event);
     configurationInstanceOptional.ifPresent(configurationInstance -> {
       ConfigurationStats configurationStats = configurationInstance.getStatistics();
-      if(configurationStats instanceof MutableConfigurationStats){
+      if (configurationStats instanceof MutableConfigurationStats) {
         mutableConfigurationStatsConsumer.accept((MutableConfigurationStats) configurationStats);
       }
     });

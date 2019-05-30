@@ -255,7 +255,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private boolean isExpired(ConfigurationInstance configuration) {
     ConfigurationStats stats = configuration.getStatistics();
-    return stats.getRunningSources() == 0 && stats.getInflightOperations() == 0 && expirationPolicy.isExpired(stats.getLastUsedMillis(), MILLISECONDS);
+    return stats.getRunningSources() == 0 && stats.getInflightOperations() == 0
+        && expirationPolicy.isExpired(stats.getLastUsedMillis(), MILLISECONDS);
   }
 
   @Override
