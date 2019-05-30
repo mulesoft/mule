@@ -40,7 +40,7 @@ public class JmsEndpointURIBuilderTest
     public void testWithArtemisFullyQualifiedQueueNameEndedWithColon() throws Exception
     {
         JmsEndpointURIBuilder b = new JmsEndpointURIBuilder();
-        EndpointURI u = b.build(new URI("jms://address:"), null);
+        EndpointURI u = b.build(new URI("jms://queue:"), null);
         assertThat(u.getAddress(), equalTo(""));
     }
 }
