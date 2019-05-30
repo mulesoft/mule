@@ -175,7 +175,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void upgradeDomainMinorReturnsTheSameDomain()
+  public void applicationWorksIfTheDomainHasAHigherMinor()
       throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
     // the app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
@@ -189,7 +189,22 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void upgradeDomainMajorIsNotValid() throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
+  public void applicationWorksIfTheDomainHasAHigherPatch()
+      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
+    // the app references to the old domain
+    BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
+
+    // we upgrade the domain minor
+    Domain upgradedDomain = createDomain("custom-domain", "1.1.1");
+    domainManager.addDomain(upgradedDomain);
+
+    // we retrieve the domain using the descriptor that we have
+    assertThat(domainManager.getDomain(oldBundleDescriptor), is(upgradedDomain));
+  }
+
+  @Test
+  public void applicationDoesNotWorkIfTheDomainHasAHigherMajor()
+      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
     // the app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
 
@@ -204,7 +219,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void downgradeDomainMajorIsNotValid() throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
+  public void applicationDoesNotWorkIfTheDomainHasALowerMajor()
+      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
     // the app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "2.1.0");
 
@@ -219,7 +235,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void downgradeDomainMinorIsNotValid() throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
+  public void applicationDoesNotWorkIfTheDomainHasALowerMinor()
+      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
     // the app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "1.2.0");
 
@@ -235,7 +252,24 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void cannotAddDomainWithSameName() throws IOException {
+  public void applicationDoesNotWorkIfTheDomainHasALowerPatch()
+      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
+    // the app references to a domain
+    BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "1.1.1");
+
+    // we downgrade the domain major
+    Domain downgradedDomain = createDomain("custom-domain", "1.1.0");
+    domainManager.addDomain(downgradedDomain);
+
+    // we cannot retrieve the domain using the descriptor that we have
+    expectedException.expect(IncompatibleDomainVersionException.class);
+    expectedException
+        .expectMessage("Expected domain 'custom-domain-1.1.1-mule-domain' couldn't be retrieved. It is available the '1.1.0' version");
+    domainManager.getDomain(bundleDescriptor);
+  }
+
+  @Test
+  public void cannotAddDomainWithSameArtifactId() throws IOException {
     domainManager.addDomain(createDomain("custom-domain", "1.1.0"));
 
     expectedException.expect(IllegalArgumentException.class);
@@ -255,7 +289,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void replaceDomainByRemovingThePreviousOne() throws IOException {
+  public void domainUpgradeShouldBeDoneByRemovingThePreviousOne() throws IOException {
     Domain domain = createDomain("custom-domain", "1.1.0");
     domainManager.addDomain(domain);
     assertThat(domainManager.contains("custom-domain"), is(true));
