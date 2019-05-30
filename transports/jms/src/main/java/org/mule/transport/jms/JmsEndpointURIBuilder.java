@@ -6,12 +6,12 @@
  */
 package org.mule.transport.jms;
 
-import org.mule.endpoint.ResourceNameEndpointURIBuilder;
-import org.mule.api.endpoint.MalformedEndpointException;
-
-import java.util.Properties;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
+
+import org.mule.api.endpoint.MalformedEndpointException;
+import org.mule.endpoint.ResourceNameEndpointURIBuilder;
 
 /**
  * TODO
@@ -23,7 +23,7 @@ public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder
     {
         super.setEndpoint(uri, props);
 
-		String oldUri = uri.toString();
+        String oldUri = uri.toString();
 
         String newUri = null;
         if (uri.getScheme().equals("topic"))
@@ -34,20 +34,20 @@ public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder
         else if (uri.getScheme().equals("queue"))
         {
             newUri = uri.toString().replace("queue://", "jms://");
-        }//Added by Eugene - dynamic endpoints were resolved to jms://queue:// etc
-		else if (oldUri.startsWith("jms://queue://"))
-		{
-			newUri = uri.toString().replace("jms://queue://", "jms://queue:");
-		}
-		else if (oldUri.startsWith("jms://temp-queue://"))
-		{
-			newUri = uri.toString().replace("jms://temp-queue://", "jms://temp-queue:");
-		}
-		else if (oldUri.startsWith("jms://topic://"))
-		{
-			props.setProperty(RESOURCE_INFO_PROPERTY, "topic");
-			newUri = uri.toString().replace("jms://topic://", "jms://topic:");
-		}
+        } // Added by Eugene - dynamic endpoints were resolved to jms://queue:// etc
+        else if (oldUri.startsWith("jms://queue://"))
+        {
+            newUri = uri.toString().replace("jms://queue://", "jms://queue:");
+        }
+        else if (oldUri.startsWith("jms://temp-queue://"))
+        {
+            newUri = uri.toString().replace("jms://temp-queue://", "jms://temp-queue:");
+        }
+        else if (oldUri.startsWith("jms://topic://"))
+        {
+            props.setProperty(RESOURCE_INFO_PROPERTY, "topic");
+            newUri = uri.toString().replace("jms://topic://", "jms://topic:");
+        }
 
         try
         {
@@ -55,10 +55,34 @@ public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder
             {
                 rewriteURI(new URI(newUri));
             }
+
+            String resourceInfo = props.getProperty(RESOURCE_INFO_PROPERTY);
+
+            if (resourceInfo != null && !resourceInfo.equals("topic") && !resourceInfo.equals("queue"))
+            {
+                this.address = resourceInfo + ":" + this.address;
+            }
         }
         catch (URISyntaxException e)
         {
             throw new MalformedEndpointException(e);
         }
+    }
+
+    @Override
+    protected void processAuthority(String authority)
+    {
+        // this is the case where the port
+        // is empty
+        if (authority.equals(address + ":"))
+        {
+            address = authority;
+        }
+        else
+        {
+            address += authority;
+        }
+
+        processUserInfo();
     }
 }
