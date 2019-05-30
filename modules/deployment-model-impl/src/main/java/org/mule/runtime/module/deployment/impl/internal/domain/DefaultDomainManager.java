@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static java.lang.String.format;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.HashMap;
@@ -77,8 +78,9 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
   @Override
   public void addDomain(Domain domain) {
     final BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(domain.getDescriptor());
-    if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
-      throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(getDomainName(domain)));
+    Domain foundDomain = domainsByDescriptor.get(bundleDescriptorWrapper);
+    if (foundDomain != null) {
+      throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(getDomainName(domain), getDomainName(foundDomain)));
     }
     domainsByDescriptor.put(bundleDescriptorWrapper, domain);
     addNameMappings(domain, bundleDescriptorWrapper);
@@ -111,10 +113,16 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
   }
 
   private static String getDomainName(Domain domain) {
-    return domain.getArtifactName();
+    DomainDescriptor domainDescriptor = domain.getDescriptor();
+    BundleDescriptor bundleDescriptor = domainDescriptor.getBundleDescriptor();
+    if (bundleDescriptor == null) {
+      return domainDescriptor.getName();
+    } else {
+      return bundleDescriptor.getArtifactFileName();
+    }
   }
 
-  private static String getDomainAlreadyExistsErrorMessage(String domainName) {
-    return format("Domain '%s' already exists", domainName);
+  private static String getDomainAlreadyExistsErrorMessage(String requestedDomainName, String foundDomainName) {
+    return format("Trying to add domain '%s', but a domain named '%s' was found", requestedDomainName, foundDomainName);
   }
 }

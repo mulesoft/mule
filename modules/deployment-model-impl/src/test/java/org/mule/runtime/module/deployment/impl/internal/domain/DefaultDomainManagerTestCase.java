@@ -143,7 +143,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
     // second is not
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Domain 'custom-domain-1.1.0-mule-domain' already exists");
+    expectedException
+        .expectMessage("Trying to add domain 'custom-domain-1.1.0-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
     domainManager.addDomain(domain);
   }
 
