@@ -57,15 +57,7 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         }
         else if (authority != null && !authority.equals(address))
         {
-            address += authority;
-
-            int atCharIndex = -1;
-            if (address != null && address.length() != 0 && ((atCharIndex = address.indexOf("@")) > -1))
-            {
-                userInfo = address.substring(0, atCharIndex);
-                address = address.substring(atCharIndex + 1);
-            }
-
+            processAuthority(authority);
         }
 
         // is user info specified?
@@ -93,6 +85,23 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         }
     }
 
+    protected void processAuthority(String authority)
+    {
+        address += authority;
+                
+        processUserInfo();
+    }
+
+    protected void processUserInfo()
+    {
+        int atCharIndex = -1;
+        if (address != null && address.length() != 0 && ((atCharIndex = address.indexOf("@")) > -1))
+        {
+            userInfo = address.substring(0, atCharIndex);
+            address = address.substring(atCharIndex + 1);
+        }
+    }
+    
     private void setResourceInfoAsPropertyIfNeeded(Properties props, String resourceInfo)
     {
         if (resourceInfo != null)
