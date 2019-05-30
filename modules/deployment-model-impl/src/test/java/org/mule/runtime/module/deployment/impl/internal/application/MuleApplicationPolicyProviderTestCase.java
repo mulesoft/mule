@@ -73,10 +73,15 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
       new PolicyParametrization(POLICY_ID3, pointcut, ORDER_POLICY3, emptyMap(), mock(File.class), emptyList());
   private final PolicyTemplateDescriptor policyTemplateDescriptor1 = new PolicyTemplateDescriptor(POLICY_NAME1);
   private final PolicyTemplateDescriptor policyTemplateDescriptor2 = new PolicyTemplateDescriptor(POLICY_NAME2);
+  private final PolicyTemplateDescriptor policyTemplateDescriptorV100 = new PolicyTemplateDescriptor(POLICY_NAME1);
+  private final PolicyTemplateDescriptor policyTemplateDescriptorV101 = new PolicyTemplateDescriptor(POLICY_NAME1);
   private final PolicyPointcutParameters policyPointcutParameters = mock(PolicyPointcutParameters.class);
   private final ApplicationPolicyInstance applicationPolicyInstance1 = mock(ApplicationPolicyInstance.class);
   private final ApplicationPolicyInstance applicationPolicyInstance2 = mock(ApplicationPolicyInstance.class);
   private final ApplicationPolicyInstance applicationPolicyInstance3 = mock(ApplicationPolicyInstance.class);
+  private final ApplicationPolicyInstance applicationPolicyInstance100 = mock(ApplicationPolicyInstance.class);
+  private final ApplicationPolicyInstance applicationPolicyInstance101 = mock(ApplicationPolicyInstance.class);
+
   private final Policy policy1 = mock(Policy.class, POLICY_ID1);
   private final Policy policy2 = mock(Policy.class, POLICY_ID2);
 
@@ -85,9 +90,13 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
 
   private PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
   private PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
+  private PolicyTemplate policyTemplate100 = mock(PolicyTemplate.class);
+  private PolicyTemplate policyTemplate101 = mock(PolicyTemplate.class);
   private RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
   private ArtifactClassLoader policyClassLoader1 = mock(ArtifactClassLoader.class);
   private ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
+  private ArtifactClassLoader policyClassLoader100 = mock(ArtifactClassLoader.class);
+  private ArtifactClassLoader policyClassLoader101 = mock(ArtifactClassLoader.class);
 
   @Before
   public void setUp() throws Exception {
@@ -97,9 +106,15 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     policyClassLoader1 = null;
     when(policyTemplate1.getArtifactClassLoader()).thenReturn(policyClassLoader1);
     when(policyTemplate2.getArtifactClassLoader()).thenReturn(policyClassLoader2);
+    when(policyTemplate100.getArtifactClassLoader()).thenReturn(policyClassLoader100);
+    when(policyTemplate101.getArtifactClassLoader()).thenReturn(policyClassLoader101);
+
 
     when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptor1)).thenReturn(policyTemplate1);
     when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptor2)).thenReturn(policyTemplate2);
+    when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptorV100)).thenReturn(policyTemplate100);
+    when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptorV101)).thenReturn(policyTemplate101);
+
     when(applicationPolicyInstance1.getPointcut()).thenReturn(pointcut);
     when(applicationPolicyInstance1.getOrder()).thenReturn(ORDER_POLICY1);
     when(applicationPolicyInstance1.getOperationPolicy()).thenReturn(of(policy1));
@@ -118,20 +133,44 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     when(applicationPolicyInstance3.getSourcePolicy()).thenReturn(empty());
     when(applicationPolicyInstance3.getPolicyTemplate()).thenReturn(policyTemplate2);
 
-    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization1)).thenReturn(
-                                                                                                          applicationPolicyInstance1);
-    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization2)).thenReturn(
-                                                                                                          applicationPolicyInstance2);
-    when(policyInstanceProviderFactory.create(application, policyTemplate2, parametrization3)).thenReturn(
-                                                                                                          applicationPolicyInstance3);
+    when(applicationPolicyInstance100.getPointcut()).thenReturn(pointcut);
+    when(applicationPolicyInstance100.getOrder()).thenReturn(ORDER_POLICY1);
+    when(applicationPolicyInstance100.getOperationPolicy()).thenReturn(empty());
+    when(applicationPolicyInstance100.getSourcePolicy()).thenReturn(of(policy1));
+    when(applicationPolicyInstance100.getPolicyTemplate()).thenReturn(policyTemplate100);
+
+    when(applicationPolicyInstance101.getPointcut()).thenReturn(pointcut);
+    when(applicationPolicyInstance101.getOrder()).thenReturn(ORDER_POLICY2);
+    when(applicationPolicyInstance101.getOperationPolicy()).thenReturn(empty());
+    when(applicationPolicyInstance101.getSourcePolicy()).thenReturn(of(policy2));
+    when(applicationPolicyInstance101.getPolicyTemplate()).thenReturn(policyTemplate100);
+
+    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization1))
+        .thenReturn(applicationPolicyInstance1);
+    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization2))
+        .thenReturn(applicationPolicyInstance2);
+    when(policyInstanceProviderFactory.create(application, policyTemplate2, parametrization3))
+        .thenReturn(applicationPolicyInstance3);
+    when(policyInstanceProviderFactory.create(application, policyTemplate100, parametrization1))
+        .thenReturn(applicationPolicyInstance100);
+    when(policyInstanceProviderFactory.create(application, policyTemplate100, parametrization2))
+        .thenReturn(applicationPolicyInstance3);
+    when(policyInstanceProviderFactory.create(application, policyTemplate101, parametrization2))
+        .thenReturn(applicationPolicyInstance101);
 
     policyTemplateDescriptor1.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME1).setGroupId("test")
         .setVersion("1.0").build());
     policyTemplateDescriptor2.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME2).setGroupId("test")
         .setVersion("2.0").build());
+    policyTemplateDescriptorV100.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME1).setGroupId("test")
+        .setVersion("1.0.0").build());
+    policyTemplateDescriptorV101.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME1).setGroupId("test")
+        .setVersion("1.0.1").build());
 
     when(policyTemplate1.getDescriptor()).thenReturn(policyTemplateDescriptor1);
     when(policyTemplate2.getDescriptor()).thenReturn(policyTemplateDescriptor2);
+    when(policyTemplate100.getDescriptor()).thenReturn(policyTemplateDescriptorV100);
+    when(policyTemplate101.getDescriptor()).thenReturn(policyTemplateDescriptorV101);
   }
 
   @Test
@@ -387,6 +426,19 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     expectedException.expectCause(isA(IllegalArgumentException.class));
 
     policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+  }
+
+  @Test
+  public void duplicatePolicyArtifactIdDiferentVersion() throws Exception {
+    when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(true);
+    policyProvider.addPolicy(policyTemplateDescriptorV100, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptorV101, parametrization2);
+
+    List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
+
+    assertThat(parameterizedPolicies.size(), equalTo(2));
+    assertThat(parameterizedPolicies.get(0), is(policy1));
+    assertThat(parameterizedPolicies.get(1), is(policy2));
   }
 
 }
