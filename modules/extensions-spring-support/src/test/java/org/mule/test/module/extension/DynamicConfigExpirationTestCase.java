@@ -49,9 +49,9 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
     try {
       assertExpired(config, 1500, 100);
-      fail("Config should not have been expired");
+      throw new IllegalStateException("Config should not have been expired");
     } catch (AssertionError e) {
-      assertThat(e.getMessage(), is(not("Config should not have been expired")));
+      //all good
     }
 
     assertExpired(config, 5000, 1000);
@@ -65,9 +65,9 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
     try {
       assertExpired(config, 10000, 1000);
-      fail("Config should not have been expired");
+      throw new IllegalStateException("Config should not have been expired");
     } catch (AssertionError e) {
-      assertThat(e.getMessage(), is(not("Config should not have been expired")));
+      //all good
     }
 
     assertInitialised(config);
@@ -76,6 +76,13 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
 
     assertExpired(config, 6000, 100);
 
+  }
+
+  @Test
+  public void expirationWorksAfterRestartingSource() throws Exception {
+    doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
+    sourceWithDynamicConfig.start();
+    doNotExpireDynamicConfigWithCustomExpirationUsedBySource();
   }
 
   private void assertInitialised(HeisenbergExtension config) {

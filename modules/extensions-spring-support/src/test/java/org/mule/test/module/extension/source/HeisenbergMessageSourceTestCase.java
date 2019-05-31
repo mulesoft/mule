@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
@@ -57,6 +58,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   public static final int TIMEOUT_MILLIS = 50000;
   public static final int POLL_DELAY_MILLIS = 100;
+  public static final int TIME_WAIT_MILLIS = 3000;
 
   private static final String OUT = "out";
 
@@ -105,6 +107,29 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("source");
 
     assertSourceCompleted();
+  }
+
+  @Test
+  public void sourceRestartedWithDynamicConfig() throws Exception {
+    Long gatheredMoney = HeisenbergSource.gatheredMoney;
+    startFlow("source");
+
+    Thread.sleep(TIME_WAIT_MILLIS);
+    // Check that money is gathered when flow started
+    assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoney));
+
+    stopFlow("source");
+
+    gatheredMoney = HeisenbergSource.gatheredMoney;
+    Thread.sleep(TIME_WAIT_MILLIS);
+    // Check that money is NOT gathered while flow is stopped
+    assertThat(gatheredMoney, is(HeisenbergSource.gatheredMoney));
+
+    startFlow("source");
+    Thread.sleep(TIME_WAIT_MILLIS);
+
+    // Check that money is gathered after flow is restarted
+    assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoney));
   }
 
   protected void assertSourceCompleted() {
@@ -293,6 +318,11 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   protected void startFlow(String flowName) throws Exception {
     flow = (Flow) getFlowConstruct(flowName);
     flow.start();
+  }
+
+  protected void stopFlow(String flowName) throws Exception {
+    flow = (Flow) getFlowConstruct(flowName);
+    flow.stop();
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {

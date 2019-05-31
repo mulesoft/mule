@@ -40,19 +40,15 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    * Increments the return value of {@link #getRunningSources()} by one
    *
    * @return the new value
-   * @since 4.3.0
+   * @since 4.1.6 4.2.2 4.3.0
    */
-  default int addRunningSource() {
-    return 0;
-  }
+  int addRunningSource();
 
   /**
    * Decrements the return value of {@link #getRunningSources()} by one
    *
    * @return the new value
-   * @since 4.3.0
+   * @since 4.1.6 4.2.2 4.3.0
    */
-  default int discountRunningSource() {
-    return 0;
-  }
+  int discountRunningSource();
 }
