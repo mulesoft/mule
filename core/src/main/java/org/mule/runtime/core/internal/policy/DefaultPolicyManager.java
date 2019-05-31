@@ -107,17 +107,17 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   private void invalidateDisposedFlowFromCaches(String flowName) {
     // Invalidate from outer "with policy cache"
     sourcePolicyOuterCache.asMap().keySet().stream()
-        .filter(pair -> pair.getFirst().startsWith(flowName))
+        .filter(pair -> pair.getFirst().equals(flowName))
         .forEach(matchingPair -> sourcePolicyOuterCache.invalidate(matchingPair));
 
     // Invalidate from inner "with policy cache"
     sourcePolicyInnerCache.asMap().keySet().stream()
-        .filter(pair -> pair.getFirst().startsWith(flowName))
+        .filter(pair -> pair.getFirst().equals(flowName))
         .forEach(matchingPair -> sourcePolicyInnerCache.invalidate(matchingPair));
 
     // Invalidate from "no policy cache"
     noPolicySourceInstances.asMap().keySet().stream()
-        .filter(key -> key.startsWith(flowName))
+        .filter(key -> key.equals(flowName))
         .forEach(matchingPair -> noPolicySourceInstances.invalidate(matchingPair));
   }
 
@@ -128,20 +128,20 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     final ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
 
     if (!isPoliciesAvailable.get()) {
-      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getLocation().getLocation());
+      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getLocation().getRootContainerName());
 
       if (policy != null) {
         return policy;
       }
 
-      return noPolicySourceInstances.get(source.getLocation().getLocation(), k -> new NoSourcePolicy(flowExecutionProcessor));
+      return noPolicySourceInstances.get(source.getLocation().getRootContainerName(), k -> new NoSourcePolicy(flowExecutionProcessor));
     }
 
     final PolicyPointcutParameters sourcePointcutParameters = ((InternalEvent) sourceEvent)
         .getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS);
 
     final Pair<String, PolicyPointcutParameters> policyKey =
-        new Pair<>(source.getLocation().getLocation(), sourcePointcutParameters);
+        new Pair<>(source.getLocation().getRootContainerName(), sourcePointcutParameters);
 
     final SourcePolicy policy = sourcePolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
@@ -149,7 +149,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     }
 
     return sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
-        .get(new Pair<>(source.getLocation().getLocation(),
+        .get(new Pair<>(source.getLocation().getRootContainerName(),
                         policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
              innerKey -> innerKey.getSecond().isEmpty()
                  ? new NoSourcePolicy(flowExecutionProcessor)
