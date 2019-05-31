@@ -49,6 +49,11 @@ public class PetStoreOperations {
   public static boolean shouldFailWithConnectionException;
   public static AtomicInteger operationExecutionCounter = new AtomicInteger(0);
 
+  public Long getConnectionAge(@Connection PetStoreClient client,
+                               @Config PetStoreConnector config) {
+    return System.currentTimeMillis() - client.getTimeOfCreation();
+  }
+
   @MediaType(TEXT_PLAIN)
   public String echoWithSignature(String message) {
     return message + " echoed by Petstore";
