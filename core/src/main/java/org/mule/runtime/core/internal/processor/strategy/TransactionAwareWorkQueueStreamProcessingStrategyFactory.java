@@ -68,7 +68,7 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       Sink workQueueSink = super.createSink(flowConstruct, pipeline);
-      Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
+      Sink syncSink = new StreamPerThreadSink(pipeline, createOnEventConsumer(), flowConstruct);
       return new TransactionalDelegateSink(syncSink, workQueueSink);
     }
 

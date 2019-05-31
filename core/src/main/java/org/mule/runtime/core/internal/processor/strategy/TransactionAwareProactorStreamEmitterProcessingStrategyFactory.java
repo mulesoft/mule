@@ -87,13 +87,9 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-      if (!LAZY_TX_CHECK) {
-        Sink proactorSink = super.createSink(flowConstruct, pipeline);
-        Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
-        return new TransactionalDelegateSink(syncSink, proactorSink);
-      } else {
-        return super.createSink(flowConstruct, pipeline);
-      }
+      Sink proactorSink = super.createSink(flowConstruct, pipeline);
+      Sink syncSink = new StreamPerThreadSink(pipeline, createOnEventConsumer(), flowConstruct);
+      return new TransactionalDelegateSink(syncSink, proactorSink);
     }
 
     @Override
