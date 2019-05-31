@@ -16,30 +16,43 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-
+import static org.mule.tck.probe.PollingProber.check;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyProvider;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final String POLICY_ID = "policyId";
+  private static final AtomicBoolean processorWasDisposed = new AtomicBoolean(false);
+
+  @Rule
+  public DynamicPort proxyPort = new DynamicPort("listenerPort");
 
   @Inject
   private PolicyProvider policyProvider;
@@ -75,6 +88,11 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     };
   }
 
+  @Before
+  public void setUp() {
+    processorWasDisposed.set(false);
+  }
+
   @Test
   public void parsesPolicy() throws Exception {
     assertThat(policyProvider, instanceOf(TestPolicyProvider.class));
@@ -95,6 +113,13 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     // disposed.
     muleContext.dispose();
     assertThat(schedulerService.getSchedulers().size(), is(0));
+  }
+
+  @Test
+  public void policyCacheEntryGetsEvictedOnFlowDisposal() throws Exception {
+    Thread.sleep(2000);
+    ((Flow) getFlowConstruct("main")).dispose();
+    check(5000, 1000, () -> processorWasDisposed.get());
   }
 
   private static class TestPolicyProvider implements PolicyProvider, Startable {
@@ -132,6 +157,21 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
         PolicyInstance policyInstance = getPolicyFromRegistry();
         policyReference.set(ofNullable(policyInstance));
       }
+    }
+  }
+
+  public static class DisposeListenerMessageProcessor implements Processor, Disposable {
+
+    public DisposeListenerMessageProcessor() {}
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return event;
+    }
+
+    @Override
+    public void dispose() {
+      processorWasDisposed.set(true);
     }
   }
 }
