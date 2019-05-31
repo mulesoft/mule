@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.transaction.xa;
 
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import javax.transaction.Status;
@@ -25,13 +27,13 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
   private Xid localXid;
-  private AbstractXAResourceManager<T> resourceManager;
+  private final AbstractXAResourceManager<T> resourceManager;
   private T localContext;
 
-  public DefaultXASession(AbstractXAResourceManager resourceManager) {
+  public DefaultXASession(AbstractXAResourceManager<T> resourceManager) {
     this.localContext = null;
     this.localXid = null;
-    this.resourceManager = resourceManager;
+    this.resourceManager = requireNonNull(resourceManager);
   }
 
   public XAResource getXAResource() {
@@ -46,10 +48,12 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
   // XAResource implementation
   //
 
+  @Override
   public boolean isSameRM(XAResource xares) throws XAException {
     return xares instanceof DefaultXASession && ((DefaultXASession) xares).getResourceManager().equals(resourceManager);
   }
 
+  @Override
   public void start(Xid xid, int flags) throws XAException {
     if (logger.isDebugEnabled()) {
       logger.debug(new StringBuilder(128).append("Thread ").append(Thread.currentThread())
@@ -91,6 +95,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     resourceManager.addActiveTransactionalResource(localXid, localContext);
   }
 
+  @Override
   public void end(Xid xid, int flags) throws XAException {
     if (logger.isDebugEnabled()) {
       logger.debug(new StringBuilder(128).append("Thread ").append(Thread.currentThread())
@@ -127,6 +132,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     localContext = null;
   }
 
+  @Override
   public void commit(Xid xid, boolean onePhase) throws XAException {
     if (xid == null) {
       throw new XAException(XAException.XAER_PROTO);
@@ -163,6 +169,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     resourceManager.removeSuspendedTransactionalResource(xid);
   }
 
+  @Override
   public void rollback(Xid xid) throws XAException {
     if (xid == null) {
       throw new XAException(XAException.XAER_PROTO);
@@ -188,6 +195,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     resourceManager.removeSuspendedTransactionalResource(xid);
   }
 
+  @Override
   public int prepare(Xid xid) throws XAException {
     if (xid == null) {
       throw new XAException(XAException.XAER_PROTO);
@@ -213,6 +221,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     }
   }
 
+  @Override
   public void forget(Xid xid) throws XAException {
     if (logger.isDebugEnabled()) {
       logger.debug("Forgetting transaction branch " + xid);
@@ -225,10 +234,12 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     resourceManager.removeSuspendedTransactionalResource(xid);
   }
 
+  @Override
   public int getTransactionTimeout() throws XAException {
     return (int) (resourceManager.getDefaultTransactionTimeout() / 1000);
   }
 
+  @Override
   public boolean setTransactionTimeout(int timeout) throws XAException {
     resourceManager.setDefaultTransactionTimeout(timeout * 1000);
     return false;

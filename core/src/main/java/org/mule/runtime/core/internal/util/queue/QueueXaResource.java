@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.core.internal.transaction.xa.AbstractXAResourceManager;
 import org.mule.runtime.core.internal.transaction.xa.DefaultXASession;
 import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
@@ -18,11 +20,12 @@ public class QueueXaResource extends DefaultXASession<XaQueueTypeTransactionCont
   private final XaTransactionRecoverer xaTransactionRecoverer;
   private final QueueProvider queueProvider;
 
-  public QueueXaResource(AbstractXAResourceManager xaResourceManager, XaTransactionRecoverer xaTransactionRecoverer,
+  public QueueXaResource(AbstractXAResourceManager<XaQueueTypeTransactionContextAdapter> xaResourceManager,
+                         XaTransactionRecoverer xaTransactionRecoverer,
                          QueueProvider queueProvider) {
     super(xaResourceManager);
-    this.xaTransactionRecoverer = xaTransactionRecoverer;
-    this.queueProvider = queueProvider;
+    this.xaTransactionRecoverer = requireNonNull(xaTransactionRecoverer);
+    this.queueProvider = requireNonNull(queueProvider);
   }
 
   // XA transaction implementation
