@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
   private final AtomicInteger index = new AtomicInteger(0);
   // Saving update function to avoid creating the lambda every time
   private final IntUnaryOperator update;
+  private final Supplier<FluxSink<T>> sinkFactory;
 
   public RoundRobinFluxSinkSupplier(int size, Supplier<FluxSink<T>> sinkFactory) {
     final List<FluxSink<T>> sinks = new ArrayList<>(size);
@@ -37,6 +40,7 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
     }
     this.fluxSinks = sinks;
     this.update = (value) -> (value + 1) % size;
+    this.sinkFactory = sinkFactory;
   }
 
   private int nextIndex() {
@@ -50,7 +54,12 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
 
   @Override
   public FluxSink<T> get() {
-    return fluxSinks.get(nextIndex());
+    // Explanation here
+    if (isTransactionActive()) {
+      return sinkFactory.get();
+    } else {
+      return fluxSinks.get(nextIndex());
+    }
   }
 
 }
