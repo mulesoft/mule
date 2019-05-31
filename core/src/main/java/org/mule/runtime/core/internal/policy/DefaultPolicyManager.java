@@ -104,23 +104,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   private PolicyPointcutParametersManager policyPointcutParametersManager;
 
-  private void invalidateDisposedFlowFromCaches(String flowName) {
-    // Invalidate from outer "with policy cache"
-    sourcePolicyOuterCache.asMap().keySet().stream()
-        .filter(pair -> pair.getFirst().equals(flowName))
-        .forEach(matchingPair -> sourcePolicyOuterCache.invalidate(matchingPair));
-
-    // Invalidate from inner "with policy cache"
-    sourcePolicyInnerCache.asMap().keySet().stream()
-        .filter(pair -> pair.getFirst().equals(flowName))
-        .forEach(matchingPair -> sourcePolicyInnerCache.invalidate(matchingPair));
-
-    // Invalidate from "no policy cache"
-    noPolicySourceInstances.asMap().keySet().stream()
-        .filter(key -> key.equals(flowName))
-        .forEach(matchingPair -> noPolicySourceInstances.invalidate(matchingPair));
-  }
-
   @Override
   public SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
                                                  ReactiveProcessor flowExecutionProcessor,
@@ -134,7 +117,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
         return policy;
       }
 
-      return noPolicySourceInstances.get(source.getLocation().getRootContainerName(), k -> new NoSourcePolicy(flowExecutionProcessor));
+      return noPolicySourceInstances.get(source.getLocation().getRootContainerName(),
+                                         k -> new NoSourcePolicy(flowExecutionProcessor));
     }
 
     final PolicyPointcutParameters sourcePointcutParameters = ((InternalEvent) sourceEvent)
@@ -240,7 +224,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
       @Override
       public void onNotification(FlowConstructNotification notification) {
-
         if (Integer.parseInt(notification.getAction().getIdentifier()) == FLOW_CONSTRUCT_DISPOSED) {
           LOGGER.debug("Invalidating flow from caches named {}", notification.getResourceIdentifier());
           // Invalidate flow from caches
@@ -248,7 +231,23 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
         }
       }
     });
+  }
 
+  private void invalidateDisposedFlowFromCaches(String flowName) {
+    // Invalidate from outer "with policy cache"
+    sourcePolicyOuterCache.asMap().keySet().stream()
+        .filter(pair -> pair.getFirst().equals(flowName))
+        .forEach(matchingPair -> sourcePolicyOuterCache.invalidate(matchingPair));
+
+    // Invalidate from inner "with policy cache"
+    sourcePolicyInnerCache.asMap().keySet().stream()
+        .filter(pair -> pair.getFirst().equals(flowName))
+        .forEach(matchingPair -> sourcePolicyInnerCache.invalidate(matchingPair));
+
+    // Invalidate from "no policy cache"
+    noPolicySourceInstances.asMap().keySet().stream()
+        .filter(key -> key.equals(flowName))
+        .forEach(matchingPair -> noPolicySourceInstances.invalidate(matchingPair));
   }
 
   @Override
