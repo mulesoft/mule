@@ -12,13 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.test</groupId>
-            <artifactId>library-with-dependency-a</artifactId>
-            <version>1.0.0</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.test</groupId>
-            <artifactId>library-with-dependency-b</artifactId>
+            <artifactId>library-with-dependency</artifactId>
             <version>1.0.0</version>
             <type>pom</type>
         </dependency>

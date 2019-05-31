@@ -10,7 +10,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -107,12 +106,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
           .filter(dep -> dep.getDescriptor().equals(pluginBundleDescriptor)).findFirst()
           .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find required descriptor. Looking for: "
               + pluginBundleDescriptor + " in " + deployableArtifactDescriptorDependencies)));
-
-      //TODO: MU-1605 remove this fallback if this issue is resolved and MTF released.
-      //This is needed for when MTF is being used. If a dependency is declared as SYSTEM, it will not be considered as if it had a POM and then it wont have any transitive dependencies set.
-      if (!SYSTEM.equals(pluginDependencyInDeployableArtifact.getScope())) {
-        return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
-      }
+      return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
     }
     return super.resolveArtifactDependencies(artifactFile, attributes, artifactType);
   }
