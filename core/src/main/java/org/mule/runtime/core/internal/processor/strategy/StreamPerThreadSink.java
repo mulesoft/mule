@@ -96,10 +96,8 @@ public class StreamPerThreadSink implements Sink, Disposable {
     if (currentThread().isInterrupted()) {
       LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
                   flowConstruct.getName());
-      return;
-    }
-
-    if (!sinks.asMap().isEmpty()) {
+      sinks.invalidateAll();
+    } else if (!sinks.asMap().isEmpty()) {
       LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
                   shutdownTimeout);
       sinks.invalidateAll();
