@@ -59,7 +59,11 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
 
   @Override
   public FluxSink<T> get() {
-    // Explanation here
+    // In case of tx we need to ensure that in use of round robin there are no 2 threads trying to use the same sink.
+    // This could cause a race condition in which the second thread simply queues the event in the busy sink.
+    // So, this thread will not unbind the tx (causing an error next time it tries to bind one), and the first one will
+    // then process the queued event without having the tx bound (so it will process as if it wasn't a tx in the
+    // beginning).
     if (isTransactionActive()) {
       return sinks.get(currentThread(), t -> sinkFactory.get());
     } else {
