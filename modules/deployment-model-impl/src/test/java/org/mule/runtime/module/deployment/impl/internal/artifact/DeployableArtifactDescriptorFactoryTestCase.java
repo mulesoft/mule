@@ -37,8 +37,6 @@ import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
-import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
-import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.installArtifact;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -61,6 +59,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.BaseMatcher;
@@ -269,61 +268,6 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
-  public void classLoaderModelWithPluginDependencyWithTransitiveDependency() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
-
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependency");
-
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
-
-    final String expectedPluginArtifactId = "plugin-with-transitive-dependency";
-
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
-
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
-
-    ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
-
-    assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
-    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), hasItem(bundleDependency("library")));
-  }
-
-
-  @Test
-  public void classLoaderModelWithPluginDependencyWithMultipleTransitiveDependenciesLevels() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-with-dependency-a-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-with-dependency-b-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-2.0.0.pom"), new File(repositoryLocation.getValue()));
-
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependencies");
-
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
-
-    final String expectedPluginArtifactId = "plugin-with-transitive-dependencies";
-
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItem(bundleDependency(expectedPluginArtifactId)));
-
-    assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
-
-    ArtifactPluginDescriptor pluginDescriptor = desc.getPlugins().stream().findFirst().get();
-
-    assertThat(pluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(expectedPluginArtifactId));
-    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), hasItems(
-                                                                                  bundleDependency("library-with-dependency-a"),
-                                                                                  bundleDependency("library-with-dependency-b"),
-                                                                                  bundleDependency("library", "1.0.0")));
-    assertThat(pluginDescriptor.getClassLoaderModel().getDependencies(), not(hasItem(bundleDependency("library", "2.0.0"))));
-  }
-
-
-  @Test
   public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweight() throws Exception {
     assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight");
   }
@@ -360,19 +304,6 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getUrls().length, is(1));
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
-  }
-
-  @Test
-  public void appWithPluginAsSystemDependencyIsResolved() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-as-system");
-
-    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
-
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-
-    assertThat(classLoaderModel.getUrls().length, is(1));
   }
 
   @Test

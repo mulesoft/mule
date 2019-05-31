@@ -145,7 +145,6 @@ public class MavenUtils {
     Model model;
     try (FileReader artifactPomFileReader = new FileReader(artifactPom)) {
       model = reader.read(artifactPomFileReader);
-      model.setPomFile(artifactPom);
     } catch (IOException | XmlPullParserException e) {
       throw new ArtifactDescriptorCreateException(format("There was an issue reading '%s' for the artifact '%s'",
                                                          artifactPom.getName(), artifactFolder.getAbsolutePath()),
