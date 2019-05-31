@@ -214,7 +214,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
                                             registry.lookupAllByType(OperationPolicyPointcutParametersFactory.class));
 
     // Register flow disposal listener
-    LOGGER.error("Registering flow cache evitcter in defaultPolicyManager");
     muleContext.getNotificationManager().addListener(new FlowConstructNotificationListener<FlowConstructNotification>() {
 
       @Override
