@@ -6,26 +6,25 @@
  */
 package org.mule.runtime.core.privileged.transaction.xa;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.transaction.ExternalXaTransaction;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
-
-import javax.transaction.TransactionManager;
 
 /**
  * <code>XaTransactionFactory</code> Is used to create/retrieve a Transaction from a transaction manager configured on the
  * MuleManager.
  */
 @NoExtend
-public class XaTransactionFactory implements ExternalTransactionAwareTransactionFactory {
+public class XaTransactionFactory implements TransactionFactory {
 
   private int timeout;
 
+  @Override
   public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
     try {
       XaTransaction xat = new XaTransaction(muleContext);
@@ -33,24 +32,7 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
       xat.begin();
       return xat;
     } catch (Exception e) {
-      throw new TransactionException(CoreMessages.cannotStartTransaction("XA"), e);
-    }
-  }
-
-  /**
-   * Create a Mule transaction that represents a transaction started outside of Mule
-   */
-  public Transaction joinExternalTransaction(MuleContext muleContext) throws TransactionException {
-    try {
-      TransactionManager txManager = muleContext.getTransactionManager();
-      if (txManager.getTransaction() == null) {
-        return null;
-      }
-      XaTransaction xat = new ExternalXaTransaction(muleContext);
-      xat.begin();
-      return xat;
-    } catch (Exception e) {
-      throw new TransactionException(CoreMessages.cannotStartTransaction("XA"), e);
+      throw new TransactionException(cannotStartTransaction("XA"), e);
     }
   }
 
@@ -58,6 +40,7 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
    * Determines whether this transaction factory creates transactions that are really transacted or if they are being used to
    * simulate batch actions, such as using Jms Client Acknowledge.
    */
+  @Override
   public boolean isTransacted() {
     return true;
   }

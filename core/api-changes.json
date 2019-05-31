@@ -10,6 +10,23 @@
           "methodName": "duplicateFor",
           "elementKind": "method",
           "justification": "Each Error Handler ref needs a copy of every inner error handler"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory",
+          "package": "org.mule.runtime.core.api.transaction",
+          "classSimpleName": "ExternalTransactionAwareTransactionFactory",
+          "elementKind": "interface",
+          "justification": "External transactionas are not supported in Mule 4. Removing leftovers from Mule 3."
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory::joinExternalTransaction(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.tx.TransactionException",
+          "package": "org.mule.runtime.core.privileged.transaction.xa",
+          "classSimpleName": "XaTransactionFactory",
+          "methodName": "joinExternalTransaction",
+          "elementKind": "method",
+          "justification": "External transactionas are not supported in Mule 4. Removing leftovers from Mule 3."
         }
       ]
     }

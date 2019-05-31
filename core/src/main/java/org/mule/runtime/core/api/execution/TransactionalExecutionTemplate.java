@@ -14,7 +14,6 @@ import org.mule.runtime.core.internal.execution.BeginAndResolveTransactionInterc
 import org.mule.runtime.core.internal.execution.ExecuteCallbackInterceptor;
 import org.mule.runtime.core.internal.execution.ExecutionContext;
 import org.mule.runtime.core.internal.execution.ExecutionInterceptor;
-import org.mule.runtime.core.internal.execution.ExternalTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.IsolateCurrentTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.SuspendXaTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.ValidateTransactionalStateInterceptor;
@@ -63,8 +62,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                                      processTransactionOnException);
     tempExecutionInterceptor =
         new ValidateTransactionalStateInterceptor<>(tempExecutionInterceptor, transactionConfig, resolvePreviousTx);
-    tempExecutionInterceptor = new IsolateCurrentTransactionInterceptor(tempExecutionInterceptor, transactionConfig);
-    this.executionInterceptor = new ExternalTransactionInterceptor(tempExecutionInterceptor, transactionConfig, muleContext);
+    this.executionInterceptor = new IsolateCurrentTransactionInterceptor(tempExecutionInterceptor, transactionConfig);
   }
 
 
