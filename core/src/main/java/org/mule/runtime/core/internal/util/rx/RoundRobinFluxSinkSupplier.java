@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.mule.runtime.api.lifecycle.Disposable;
 
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
   // Saving update function to avoid creating the lambda every time
   private final IntUnaryOperator update;
   private final Supplier<FluxSink<T>> sinkFactory;
+  private final Cache<Thread, FluxSink<T>> sinks = Caffeine.newBuilder().weakKeys().build();
 
   public RoundRobinFluxSinkSupplier(int size, Supplier<FluxSink<T>> sinkFactory) {
     final List<FluxSink<T>> sinks = new ArrayList<>(size);
@@ -50,13 +54,14 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
   @Override
   public void dispose() {
     fluxSinks.forEach(FluxSink::complete);
+    sinks.asMap().forEach((t, sink) -> sink.complete());
   }
 
   @Override
   public FluxSink<T> get() {
     // Explanation here
     if (isTransactionActive()) {
-      return sinkFactory.get();
+      return sinks.get(currentThread(), t -> sinkFactory.get());
     } else {
       return fluxSinks.get(nextIndex());
     }
