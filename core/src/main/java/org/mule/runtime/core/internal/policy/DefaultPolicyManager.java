@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
@@ -17,6 +18,8 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.FlowConstructNotification;
+import org.mule.runtime.api.notification.FlowConstructNotificationListener;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -100,6 +103,23 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
 
   private PolicyPointcutParametersManager policyPointcutParametersManager;
+
+  private void invalidateDisposedFlowFromCaches(String flowName) {
+    // Invalidate from outer "with policy cache"
+    sourcePolicyOuterCache.asMap().keySet().stream()
+        .filter(pair -> pair.getFirst().startsWith(flowName))
+        .forEach(matchingPair -> sourcePolicyOuterCache.invalidate(matchingPair));
+
+    // Invalidate from inner "with policy cache"
+    sourcePolicyInnerCache.asMap().keySet().stream()
+        .filter(pair -> pair.getFirst().startsWith(flowName))
+        .forEach(matchingPair -> sourcePolicyInnerCache.invalidate(matchingPair));
+
+    // Invalidate from "no policy cache"
+    noPolicySourceInstances.asMap().keySet().stream()
+        .filter(key -> key.startsWith(flowName))
+        .forEach(matchingPair -> noPolicySourceInstances.invalidate(matchingPair));
+  }
 
   @Override
   public SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
@@ -190,6 +210,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   @Override
   public void initialise() throws InitialisationException {
+
     operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory();
     sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory();
 
@@ -207,6 +228,27 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     policyPointcutParametersManager =
         new PolicyPointcutParametersManager(registry.lookupAllByType(SourcePolicyPointcutParametersFactory.class),
                                             registry.lookupAllByType(OperationPolicyPointcutParametersFactory.class));
+
+    // Register flow disposal listener
+    LOGGER.error("Registering flow cache evitcter in defaultPolicyManager");
+    muleContext.getNotificationManager().addListener(new FlowConstructNotificationListener<FlowConstructNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return true;
+      }
+
+      @Override
+      public void onNotification(FlowConstructNotification notification) {
+
+        if (Integer.parseInt(notification.getAction().getIdentifier()) == FLOW_CONSTRUCT_DISPOSED) {
+          LOGGER.debug("Invalidating flow from caches named {}", notification.getResourceIdentifier());
+          // Invalidate flow from caches
+          invalidateDisposedFlowFromCaches(notification.getResourceIdentifier());
+        }
+      }
+    });
+
   }
 
   @Override
