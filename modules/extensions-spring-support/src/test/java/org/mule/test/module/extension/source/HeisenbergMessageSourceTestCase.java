@@ -23,6 +23,8 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
+import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
@@ -111,25 +113,34 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void sourceRestartedWithDynamicConfig() throws Exception {
-    Long gatheredMoney = HeisenbergSource.gatheredMoney;
+    final Long gatheredMoney = HeisenbergSource.gatheredMoney;
     startFlow("source");
 
-    Thread.sleep(TIME_WAIT_MILLIS);
-    // Check that money is gathered when flow started
-    assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoney));
+    check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
+          () -> {
+            assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoney));
+            return true;
+          });
 
     stopFlow("source");
 
-    gatheredMoney = HeisenbergSource.gatheredMoney;
-    Thread.sleep(TIME_WAIT_MILLIS);
+    final Long gatheredMoneyAfterStop = HeisenbergSource.gatheredMoney;
+
     // Check that money is NOT gathered while flow is stopped
-    assertThat(gatheredMoney, is(HeisenbergSource.gatheredMoney));
+    checkNot(TIME_WAIT_MILLIS, POLL_DELAY_MILLIS,
+             () -> {
+               assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoneyAfterStop));
+               return true;
+             });
 
     startFlow("source");
-    Thread.sleep(TIME_WAIT_MILLIS);
 
     // Check that money is gathered after flow is restarted
-    assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoney));
+    check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
+          () -> {
+            assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoneyAfterStop));
+            return true;
+          });
   }
 
   protected void assertSourceCompleted() {
