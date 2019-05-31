@@ -218,7 +218,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
       @Override
       public boolean isBlocking() {
-        return true;
+        return false;
       }
 
       @Override
