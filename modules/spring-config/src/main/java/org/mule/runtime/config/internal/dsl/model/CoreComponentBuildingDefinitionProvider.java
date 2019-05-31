@@ -734,19 +734,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(POOLING_PROFILE_ELEMENT_IDENTIFIER)
-        .withTypeDefinition(fromType(PoolingProfile.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("maxActive").withDefaultValue(DEFAULT_MAX_POOL_ACTIVE).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("maxIdle").withDefaultValue(DEFAULT_MAX_POOL_IDLE).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("maxWait", value -> Long.valueOf((String) value))
-            .withDefaultValue(valueOf(DEFAULT_MAX_POOL_WAIT)).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("exhaustedAction", POOL_EXHAUSTED_ACTIONS::get)
-            .withDefaultValue(valueOf(DEFAULT_POOL_EXHAUSTED_ACTION)).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("initialisationPolicy", POOL_INITIALISATION_POLICIES::get)
-            .withDefaultValue(valueOf(DEFAULT_POOL_INITIALISATION_POLICY)).build())
-        .withSetterParameterDefinition("disabled", fromSimpleParameter("disabled").build())
-        .build());
-
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(RAISE_ERROR).withTypeDefinition(fromType(RaiseErrorProcessor.class))
             .withSetterParameterDefinition("type", fromSimpleParameter("type").build())
