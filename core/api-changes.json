@@ -3,6 +3,24 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_AUTH_CODE_HANDLER",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_EXTENSION_AUTH_CODE_HANDLER",
+          "elementKind": "field",
+          "justification": "Critical new feature. Making a SEMVER exception"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER",
+          "elementKind": "field",
+          "justification": "Critical new feature. Making a SEMVER exception"
+        },
+        {
           "code": "java.method.finalMethodAddedToNonFinalClass",
           "new": "method java.lang.Object org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory::of(org.mule.runtime.api.event.EventContext, java.io.InputStream, org.mule.runtime.api.component.location.ComponentLocation)",
           "package": "org.mule.runtime.core.api.streaming.bytes.factory",
