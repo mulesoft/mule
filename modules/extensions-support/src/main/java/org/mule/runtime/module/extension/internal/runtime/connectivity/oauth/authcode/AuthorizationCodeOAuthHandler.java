@@ -4,22 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
@@ -27,20 +20,12 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -53,10 +38,11 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.ServerNotFoundException;
 import org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
-import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -65,42 +51,22 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of {@Link ExtensionsOAuthManager}
+ * {@link OAuthHandler} implementation for the authorization code grant type
  *
- * @since 4.0
+ * @since 4.2.1
  */
-public class DefaultExtensionsOAuthManager implements Initialisable, Startable, Stoppable, ExtensionsOAuthManager {
+public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCodeOAuthDancer> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionsOAuthManager.class);
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
-
-  @Inject
-  private MuleContext muleContext;
-
-  @Inject
-  private LockFactory lockFactory;
-
-  @Inject
-  @Named(OBJECT_STORE_MANAGER)
-  private ObjectStoreManager objectStoreManager;
-
-  @Inject
-  private MuleExpressionLanguage expressionEvaluator;
 
   @Inject
   private Registry registry;
@@ -108,81 +74,29 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
   // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<HttpService> httpService;
 
-  // TODO: MULE-10837 this should be a plain old @Inject
-  private LazyValue<OAuthService> oauthService;
-
-  private final Map<String, AuthorizationCodeOAuthDancer> dancers = new ConcurrentHashMap<>();
-  private boolean started = false;
-
-  @Override
-  public void initialise() throws InitialisationException {
-    httpService = new LazyLookup<>(HttpService.class, muleContext);
-    oauthService = new LazyLookup<>(OAuthService.class, muleContext);
-  }
-
-  @Override
-  public void start() throws MuleException {
-    for (AuthorizationCodeOAuthDancer dancer : dancers.values()) {
-      start(dancer);
-    }
-    started = true;
-  }
-
   /**
-   * {@inheritDoc}
+   * Becomes aware of the given {@code config} and makes sure that the access token callback
+   * and authorization endpoints are provisioned.
+   *
+   * @param config an {@link AuthorizationCodeConfig}
    */
-  @Override
-  public AuthorizationCodeOAuthDancer register(OAuthConfig config) throws MuleException {
+  public AuthorizationCodeOAuthDancer register(AuthorizationCodeConfig config) {
     return register(config, emptyList());
   }
 
-  @Override
-  public AuthorizationCodeOAuthDancer register(OAuthConfig config, List<AuthorizationCodeListener> listeners) {
+  public AuthorizationCodeOAuthDancer register(AuthorizationCodeConfig config, List<AuthorizationCodeListener> listeners) {
     return dancers.computeIfAbsent(config.getOwnerConfigName(),
                                    (CheckedFunction<String, AuthorizationCodeOAuthDancer>) k -> createDancer(config, listeners));
 
   }
 
   /**
-   * {@inheritDoc}
+   * Performs the refresh token flow
+   *
+   * @param ownerConfigName the name of the extension config which obtained the token
+   * @param resourceOwnerId the id of the user to be invalidated
    */
-  @Override
-  public void invalidate(String ownerConfigName, String resourceOwnerId) {
-    AuthorizationCodeOAuthDancer dancer = dancers.get(ownerConfigName);
-    if (dancer == null) {
-      return;
-    }
-
-    dancer.invalidateContext(resourceOwnerId);
-  }
-
-  private void disable(String ownerConfigName, AuthorizationCodeOAuthDancer dancer) {
-    try {
-      stopIfNeeded(dancer);
-    } catch (Exception e) {
-      LOGGER.warn("Found exception trying to Stop OAuth dancer for config " + ownerConfigName, e);
-    } finally {
-      disposeIfNeeded(dancer, LOGGER);
-    }
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    dancers.forEach((key, dancer) -> {
-      try {
-        disable(key, dancer);
-      } catch (Exception e) {
-        LOGGER.warn("Found exception while trying to stop OAuth callback for config " + key, e);
-      }
-    });
-    dancers.clear();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void refreshToken(String ownerConfigName, String resourceOwnerId, OAuthConnectionProviderWrapper connectionProvider) {
+  public void refreshToken(String ownerConfigName, String resourceOwnerId) {
     AuthorizationCodeOAuthDancer dancer = dancers.get(ownerConfigName);
 
     try {
@@ -196,17 +110,18 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
   }
 
   /**
-   * {@inheritDoc}
+   * @param config an {@link OAuthConfig}
+   * @return the {@link ResourceOwnerOAuthContext} for the given {@code config} or {@link Optional#empty()}
+   * if authorization hasn't yet taken place or has been invalidated
    */
-  @Override
-  public Optional<ResourceOwnerOAuthContext> getOAuthContext(OAuthConfig config) {
+  public Optional<ResourceOwnerOAuthContext> getOAuthContext(AuthorizationCodeConfig config) {
     AuthorizationCodeOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
     if (dancer == null) {
       return empty();
     }
 
     ResourceOwnerOAuthContext contextForResourceOwner =
-        dancer.getContextForResourceOwner(config.getAuthCodeConfig().getResourceOwnerId());
+        dancer.getContextForResourceOwner(config.getResourceOwnerId());
 
     if (contextForResourceOwner == null || contextForResourceOwner.getAccessToken() == null) {
       return empty();
@@ -215,29 +130,44 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     return of(contextForResourceOwner);
   }
 
-  private AuthorizationCodeOAuthDancer createDancer(OAuthConfig config, List<AuthorizationCodeListener> listeners)
+  /**
+   * Invalidates the OAuth information of a particular resourceOwnerId
+   *
+   * @param ownerConfigName the name of the extension config which obtained the token
+   * @param resourceOwnerId the id of the user to be invalidated
+   */
+  public void invalidate(String ownerConfigName, String resourceOwnerId) {
+    AuthorizationCodeOAuthDancer dancer = dancers.get(ownerConfigName);
+    if (dancer == null) {
+      return;
+    }
+
+    dancer.invalidateContext(resourceOwnerId);
+  }
+
+  private AuthorizationCodeOAuthDancer createDancer(AuthorizationCodeConfig config, List<AuthorizationCodeListener> listeners)
       throws MuleException {
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
         oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> lockFactory.createLock(lockId),
                                                                    new LazyObjectStoreToMapAdapter(
-                                                                                                   getObjectStoreSupplier(config)),
+                                                                                                   () -> objectStoreLocator
+                                                                                                       .apply(config)),
                                                                    expressionEvaluator);
-    final AuthCodeConfig authCodeConfig = config.getAuthCodeConfig();
     final AuthorizationCodeGrantType grantType = config.getGrantType();
     final OAuthCallbackConfig callbackConfig = config.getCallbackConfig();
 
     dancerBuilder
         .encoding(getDefaultEncoding(muleContext))
-        .clientCredentials(authCodeConfig.getConsumerKey(), authCodeConfig.getConsumerSecret())
-        .tokenUrl(authCodeConfig.getAccessTokenUrl())
+        .clientCredentials(config.getConsumerKey(), config.getConsumerSecret())
+        .tokenUrl(config.getAccessTokenUrl())
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseRefreshTokenExpr(grantType.getRefreshTokenExpr())
         .responseAccessTokenExpr(grantType.getAccessTokenExpr())
         .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName());
 
-    String scopes = authCodeConfig.getScope()
+    String scopes = config.getScope()
         .orElseGet(() -> grantType.getDefaultScope().orElse(null));
 
     if (scopes != null) {
@@ -258,7 +188,7 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     dancerBuilder
         .localCallback(httpServer, callbackConfig.getCallbackPath())
         .externalCallbackUrl(getExternalCallback(httpServer, callbackConfig))
-        .authorizationUrl(authCodeConfig.getAuthorizationUrl())
+        .authorizationUrl(config.getAuthorizationUrl())
         .localAuthorizationUrlPath(callbackConfig.getLocalAuthorizePath())
         .localAuthorizationUrlResourceOwnerId("#[attributes.queryParams.resourceOwnerId]")
         .state("#[attributes.queryParams.state]")
@@ -297,33 +227,12 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     });
   }
 
-  private void start(AuthorizationCodeOAuthDancer dancer) throws MuleException {
-    initialiseIfNeeded(dancer, muleContext);
-    startIfNeeded(dancer);
-  }
-
-  private Supplier<ObjectStore> getObjectStoreSupplier(OAuthConfig config) {
-    return () -> {
-      String storeName = config.getStoreConfig()
-          .map(OAuthObjectStoreConfig::getObjectStoreName)
-          .orElse(BASE_PERSISTENT_OBJECT_STORE_KEY);
-
-      return objectStoreManager.getObjectStore(storeName);
-    };
-  }
-
-  private Map<String, String> getParameterExtractors(OAuthConfig config) {
-    return config.getParameterExtractors().entrySet().stream()
-        .collect(toMap(entry -> entry.getKey().getName(), Map.Entry::getValue));
-  }
-
-  private Pair<Optional<Flow>, Optional<Flow>> getListenerFlows(OAuthConfig oauthConfig) {
-    AuthCodeConfig config = oauthConfig.getAuthCodeConfig();
+  private Pair<Optional<Flow>, Optional<Flow>> getListenerFlows(AuthorizationCodeConfig config) {
     try {
       return new Pair<>(lookupFlow(config.getBefore()), lookupFlow(config.getAfter()));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not obtain 'before' and 'after' OAuth flows defined by "
-          + "config " + oauthConfig.getOwnerConfigName(), e));
+          + "config " + config.getOwnerConfigName(), e));
     }
   }
 
@@ -336,7 +245,7 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
         .orElseThrow(() -> new IllegalArgumentException("Flow " + flowName + " doesn't exist"));
   }
 
-  private Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeCallback(OAuthConfig config,
+  private Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeCallback(AuthorizationCodeConfig config,
                                                                                                    Flow flow) {
     return (AuthorizationCodeRequest danceRequest) -> {
       final AuthCodeRequest request = new ImmutableAuthCodeRequest(danceRequest.getResourceOwnerId(),
@@ -349,8 +258,10 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     };
   }
 
-  private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(OAuthConfig config,
+  private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(
+                                                                                                     AuthorizationCodeConfig config,
                                                                                                      Flow flow) {
+
     return (callbackContext, oauthContext) -> {
       AuthorizationCodeState state = toAuthorizationCodeState(config, oauthContext);
       CoreEvent event = (CoreEvent) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)
@@ -371,8 +282,17 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
         processWithChildContext(event, flow, child((BaseEventContext) event.getContext(), of(flow.getLocation())));
     return from(childPublisher)
         .onErrorMap(MuleException.class,
-                    e -> new MuleRuntimeException(createStaticMessage(format("Error found while execution flow '%s' which is configured in the '%s' parameter "
-                        + "of the '%s' config", flow.getName(), callbackType, config.getOwnerConfigName()), e)))
+                    e -> new MuleRuntimeException(createStaticMessage(
+                                                                      format("Error found while execution flow '%s' which is configured in the '%s' parameter "
+                                                                          + "of the '%s' config", flow.getName(), callbackType,
+                                                                             config.getOwnerConfigName()),
+                                                                      e)))
         .block();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    httpService = new LazyLookup<>(HttpService.class, muleContext);
   }
 }

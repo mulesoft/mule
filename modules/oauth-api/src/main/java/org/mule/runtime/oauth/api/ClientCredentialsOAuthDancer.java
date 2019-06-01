@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.oauth.api;
 
+import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.oauth.api.builder.ClientCredentialsListener;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
@@ -16,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ClientCredentialsOAuthDancer {
 
   /**
@@ -47,5 +50,23 @@ public interface ClientCredentialsOAuthDancer {
    * @return oauth state
    */
   ResourceOwnerOAuthContext getContext();
+
+  /**
+   * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
+   *
+   * @param listener the {@link ClientCredentialsListener} to be added
+   * @throws IllegalArgumentException if the {@code listener} is {@code null}
+   * @since 4.2.1
+   */
+  void addListener(ClientCredentialsListener listener);
+
+  /**
+   * Removes the {@code listener}. Nothing happens if it wasn't part of {@code this} dancer.
+   *
+   * @param listener the {@link ClientCredentialsListener} to be removed
+   * @throws IllegalArgumentException if the {@code listener} is {@code null}
+   * @since 4.2.1
+   */
+  void removeListener(ClientCredentialsListener listener);
 
 }

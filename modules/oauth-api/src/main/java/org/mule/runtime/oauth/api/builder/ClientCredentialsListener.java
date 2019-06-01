@@ -9,19 +9,10 @@ package org.mule.runtime.oauth.api.builder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 /**
- * Allows to get notified about certain events related to an OAuth dance with Authorization Code grant type
- * @since 4.2.0
+ * Allows to get notified about certain events related to an OAuth dance with Client Credentials grant type
+ * @since 4.2.1
  */
-public interface AuthorizationCodeListener {
-
-  /**
-   * Invoked when an authorization dance has been completed.
-   *
-   * @param context the resulting {@link ResourceOwnerOAuthContext}
-   */
-  default void onAuthorizationCompleted(ResourceOwnerOAuthContext context) {
-
-  }
+public interface ClientCredentialsListener {
 
   /**
    * Invoked each time a refresh token operation has been completed successfully
