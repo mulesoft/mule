@@ -7,12 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
-
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
@@ -20,8 +18,11 @@ import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
@@ -34,11 +35,13 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Helper class for declaring connection providers through a {@link DefaultJavaModelLoaderDelegate}
+ *
  * @since 4.0
  */
 final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDelegate {
@@ -110,15 +113,28 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
   }
 
   private void parseOAuthGrantType(ConnectionProviderElement providerType, ConnectionProviderDeclarer providerDeclarer) {
+    List<OAuthGrantType> grantTypes = new LinkedList<>();
     providerType.getAnnotation(AuthorizationCode.class).ifPresent(a -> {
-      AuthorizationCodeGrantType grantType = new AuthorizationCodeGrantType(a.accessTokenUrl(),
-                                                                            a.authorizationUrl(),
-                                                                            a.accessTokenExpr(),
-                                                                            a.expirationExpr(),
-                                                                            a.refreshTokenExpr(),
-                                                                            a.defaultScopes());
+      grantTypes.add(new AuthorizationCodeGrantType(a.accessTokenUrl(),
+                                                    a.authorizationUrl(),
+                                                    a.accessTokenExpr(),
+                                                    a.expirationExpr(),
+                                                    a.refreshTokenExpr(),
+                                                    a.defaultScopes()));
 
-      providerDeclarer.withModelProperty(new OAuthModelProperty(asList(grantType)));
     });
+
+    providerType.getAnnotation(ClientCredentials.class).ifPresent(a -> {
+      grantTypes.add(new ClientCredentialsGrantType(a.tokenUrl(),
+                                                    a.accessTokenExpr(),
+                                                    a.expirationExpr(),
+                                                    a.defaultScopes(),
+                                                    a.credentialsPlacement()));
+
+    });
+
+    if (!grantTypes.isEmpty()) {
+      providerDeclarer.withModelProperty(new OAuthModelProperty(grantTypes));
+    }
   }
 }

@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -24,7 +23,6 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -47,7 +45,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected final ExpressionManager expressionManager;
   protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
-  protected final ExtensionsOAuthManager oauthManager;
   protected ConfigurationProvider configurationProvider;
 
   protected Map<String, ?> parameters;
@@ -76,7 +73,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.reflectionCache = reflectionCache;
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
-    this.oauthManager = registry.lookupByType(ExtensionsOAuthManager.class).get();
     this.expressionManager = expressionManager;
   }
 

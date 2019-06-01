@@ -152,7 +152,26 @@ public class MuleProperties {
   public static final String OBJECT_POLLING_CONTROLLER = "_mulePollingController";
   public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";
   public static final String OBJECT_EXTENSION_MANAGER = "_muleExtensionManager";
+
+  /**
+   * @deprecated since 4.2.1. This key doesn't exist anymore. Use {@link #OBJECT_EXTENSION_AUTH_CODE_HANDLER} or
+   * {@link #OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER} instead
+   */
+  @Deprecated
   public static final String OBJECT_EXTENSION_OAUTH_MANAGER = "extensions.oauth.manager";
+
+  /**
+   * Registry key for the {@code AuthorizationCodeOAuthHandler}
+   * @since 4.2.1
+   */
+  public static final String OBJECT_EXTENSION_AUTH_CODE_HANDLER = "extensions.authCode.handler";
+
+  /**
+   * Registry key for the {@code ClientCredentialsOAuthHandler}
+   * @since 4.2.1
+   */
+  public static final String OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER = "extensions.clientCredentials.handler";
+
   public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
   public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
   public static final String OBJECT_EXCEPTION_LOCATION_PROVIDER = "_muleExceptionLocationProvider";

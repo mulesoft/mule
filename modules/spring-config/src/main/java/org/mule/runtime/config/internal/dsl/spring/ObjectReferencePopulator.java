@@ -7,12 +7,12 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_AUTH_CODE_HANDLER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_OAUTH_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.time.TimeSupplier;
@@ -20,7 +20,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -41,7 +42,8 @@ class ObjectReferencePopulator {
           .put(TimeSupplier.class, OBJECT_TIME_SUPPLIER)
           .put(ExtensionManager.class, OBJECT_EXTENSION_MANAGER)
           .put(PolicyManager.class, OBJECT_POLICY_MANAGER)
-          .put(ExtensionsOAuthManager.class, OBJECT_EXTENSION_OAUTH_MANAGER)
+          .put(AuthorizationCodeOAuthHandler.class, OBJECT_EXTENSION_AUTH_CODE_HANDLER)
+          .put(ClientCredentialsOAuthHandler.class, OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER)
           .build();
 
 

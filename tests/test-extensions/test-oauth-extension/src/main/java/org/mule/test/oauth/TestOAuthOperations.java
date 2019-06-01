@@ -6,12 +6,10 @@
  */
 package org.mule.test.oauth;
 
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
-import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 
 public class TestOAuthOperations {
 
@@ -19,17 +17,14 @@ public class TestOAuthOperations {
     return connection;
   }
 
-  public void captureCallbackPayloads(@Config TestOAuthExtension config,
-                                      @Optional AuthCodeRequest request,
-                                      @Optional AuthorizationCodeState state) {
-    config.getCapturedAuthCodeRequests().add(request);
-    config.getCapturedAuthCodeStates().add(state);
-  }
-
   public void tokenExpired(@Connection TestOAuthConnection connection) {
-    final AuthorizationCodeState state = connection.getState().getState();
-    if (!state.getAccessToken().endsWith("refreshed")) {
-      throw new AccessTokenExpiredException(state.getResourceOwnerId());
+    final OAuthState state = connection.getState().getState();
+    if (state != null && !state.getAccessToken().endsWith("refreshed")) {
+      if (state instanceof AuthorizationCodeState) {
+        throw new AccessTokenExpiredException(((AuthorizationCodeState) state).getResourceOwnerId());
+      } else {
+        throw new AccessTokenExpiredException();
+      }
     }
   }
 }

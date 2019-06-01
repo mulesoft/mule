@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParamet
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 
 public class TestOAuthConnectionState {
 
@@ -71,7 +72,7 @@ public class TestOAuthConnectionState {
     return userId;
   }
 
-  public AuthorizationCodeState getState() {
+  public OAuthState getState() {
     return state;
   }
 }

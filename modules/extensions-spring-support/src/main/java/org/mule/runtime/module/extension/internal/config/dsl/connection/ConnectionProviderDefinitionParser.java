@@ -21,7 +21,8 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 
 /**
@@ -52,7 +53,8 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withObjectFactoryType(ConnectionProviderObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(providerModel).build())
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-        .withConstructorParameterDefinition(fromReferenceObject(ExtensionsOAuthManager.class).build())
+        .withConstructorParameterDefinition(fromReferenceObject(AuthorizationCodeOAuthHandler.class).build())
+        .withConstructorParameterDefinition(fromReferenceObject(ClientCredentialsOAuthHandler.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("reconnectionConfig",
                                        fromChildConfiguration(ReconnectionConfig.class).build())
