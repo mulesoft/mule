@@ -35,6 +35,9 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -85,6 +88,8 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       Set<Reference<ConnectionProviderDeclaration>> visitedProviders = new HashSet<>();
       Set<Reference<ConfigurationDeclaration>> oauthConfigs = new HashSet<>();
       Reference<Boolean> oauthGloballySupported = new Reference<>(false);
+      Reference<Boolean> supportsAuthCode = new Reference<>(false);
+      Reference<Boolean> supportsClientCredentials = new Reference<>(false);
 
       new DeclarationWalker() {
 
@@ -94,17 +99,29 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
             return;
           }
 
-          if (declaration.getModelProperty(OAuthModelProperty.class).isPresent()) {
+          declaration.getModelProperty(OAuthModelProperty.class).ifPresent(mp -> {
+            mp.getGrantTypes().forEach(grantType -> grantType.accept(new OAuthGrantTypeVisitor() {
+
+              @Override
+              public void visit(AuthorizationCodeGrantType grantType) {
+                supportsAuthCode.set(true);
+              }
+
+              @Override
+              public void visit(ClientCredentialsGrantType grantType) {
+                supportsClientCredentials.set(true);
+              }
+            }));
+
             if (owner instanceof ExtensionDeclaration) {
               oauthGloballySupported.set(true);
-              stop();
             } else if (owner instanceof ConfigurationDeclaration) {
               oauthConfigs.add(new Reference<>((ConfigurationDeclaration) owner));
             }
 
             enrichOAuthParameters(declaration);
             extractImplementingType(declaration).ifPresent(type -> enrichCallbackValues(declaration, type));
-          }
+          });
         }
       }.walk(extensionDeclaration);
 
@@ -115,7 +132,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
         configs = oauthConfigs.stream().map(Reference::get).collect(toList());
       }
 
-      OperationDeclaration unauthorize = buildUnauthorizeOperation();
+      OperationDeclaration unauthorize = buildUnauthorizeOperation(supportsAuthCode.get());
       configs.forEach(c -> c.addOperation(unauthorize));
     }
 
@@ -127,7 +144,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
             if (annotation != null) {
               validateExpressionSupport(declaration, p, field);
               p.setExpressionSupport(NOT_SUPPORTED);
-              p.addModelProperty(new OAuthParameterModelProperty(annotation.requestAlias()));
+              p.addModelProperty(new OAuthParameterModelProperty(annotation.requestAlias(), annotation.placement()));
             }
           }));
     }
@@ -156,7 +173,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       }
     }
 
-    private OperationDeclaration buildUnauthorizeOperation() {
+    private OperationDeclaration buildUnauthorizeOperation(boolean supportsAuthCode) {
       OperationDeclaration operation = new OperationDeclaration(UNAUTHORIZE_OPERATION_NAME);
       operation.setDescription("Deletes all the access token information of a given resource owner id so that it's impossible to "
           + "execute any operation for that user without doing the authorization dance again");
@@ -170,16 +187,20 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       operation
           .addModelProperty(new CompletableComponentExecutorModelProperty((model, params) -> new UnauthorizeOperationExecutor()));
 
-      ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
-      group.showInDsl(false);
-      ParameterDeclaration parameter = new ParameterDeclaration(RESOURCE_OWNER_ID_PARAMETER_NAME);
-      parameter.setDescription("The id of the resource owner which access should be invalidated");
-      parameter.setExpressionSupport(SUPPORTED);
-      parameter.setLayoutModel(LayoutModel.builder().build());
-      parameter.setRequired(false);
-      parameter.setParameterRole(BEHAVIOUR);
-      parameter.setType(stringType, false);
-      group.addParameter(parameter);
+      if (supportsAuthCode) {
+        ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
+        group.showInDsl(false);
+
+        ParameterDeclaration parameter = new ParameterDeclaration(RESOURCE_OWNER_ID_PARAMETER_NAME);
+        parameter.setDescription("The id of the resource owner which access should be invalidated");
+        parameter.setExpressionSupport(SUPPORTED);
+        parameter.setLayoutModel(LayoutModel.builder().build());
+        parameter.setRequired(false);
+        parameter.setParameterRole(BEHAVIOUR);
+        parameter.setType(stringType, false);
+
+        group.addParameter(parameter);
+      }
 
       return operation;
     }
