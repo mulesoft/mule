@@ -1,5 +1,5 @@
 {
-  "4.2.2": {
+  "4.2.1": {
     "revapi": {
       "ignore": [
         {
@@ -19,13 +19,7 @@
           "fieldName": "OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER",
           "elementKind": "field",
           "justification": "Critical new feature. Making a SEMVER exception"
-        }
-      ]
-    }
-  },
-  "4.2.1": {
-    "revapi": {
-      "ignore": [
+        },
         {
           "code": "java.method.abstractMethodAdded",
           "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
