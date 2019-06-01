@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -24,7 +24,7 @@ public class UpdatingAuthorizationCodeState implements AuthorizationCodeState {
 
   private AuthorizationCodeState delegate;
 
-  public UpdatingAuthorizationCodeState(OAuthConfig config,
+  public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {

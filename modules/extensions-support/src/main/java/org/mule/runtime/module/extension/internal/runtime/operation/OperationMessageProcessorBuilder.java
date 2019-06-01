@@ -51,7 +51,7 @@ public final class OperationMessageProcessorBuilder
     if (supportsOAuth(extensionModel)) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                                policyManager, reflectionCache, oauthManager);
+                                                policyManager, reflectionCache);
     }
     return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                          arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
