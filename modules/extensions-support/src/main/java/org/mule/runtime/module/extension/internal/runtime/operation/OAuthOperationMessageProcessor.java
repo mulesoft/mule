@@ -78,69 +78,68 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     return super.doProcess(event, operationContext)
         .onErrorResume(AccessTokenExpiredException.class, e -> {
-                         OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
-                         if (connectionProvider == null) {
-                           return error(e);
-                         }
+          OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
+          if (connectionProvider == null) {
+            return error(e);
+          }
 
-                         AccessTokenExpiredException expiredException = getTokenExpirationException(e);
-                         if (expiredException == null) {
-                           return error(e);
-                         }
+          AccessTokenExpiredException expiredException = getTokenExpirationException(e);
+          if (expiredException == null) {
+            return error(e);
+          }
 
-                         Reference<Optional<String>> resourceOwnerIdReference = new Reference<>(empty());
-                         connectionProvider.getGrantType().accept(new OAuthGrantTypeVisitor() {
+          Reference<Optional<String>> resourceOwnerIdReference = new Reference<>(empty());
+          connectionProvider.getGrantType().accept(new OAuthGrantTypeVisitor() {
 
-                           @Override
-                           public void visit(AuthorizationCodeGrantType grantType) {
-                             AuthorizationCodeConnectionProviderWrapper cp = (AuthorizationCodeConnectionProviderWrapper) connectionProvider;
-                             String rsId = cp.getResourceOwnerId();
-                             resourceOwnerIdReference.set(of(rsId));
+            @Override
+            public void visit(AuthorizationCodeGrantType grantType) {
+              AuthorizationCodeConnectionProviderWrapper cp = (AuthorizationCodeConnectionProviderWrapper) connectionProvider;
+              String rsId = cp.getResourceOwnerId();
+              resourceOwnerIdReference.set(of(rsId));
 
-                             if (LOGGER.isDebugEnabled()) {
-                               LOGGER.debug(format(
-                                   "AccessToken for resourceOwner '%s' expired while executing operation '%s:%s' using config '%s'. "
-                                       + "Will attempt to refresh token and retry operation",
-                                   rsId, getExtensionModel().getName(), operationContext.getComponentModel().getName(),
-                                   operationContext.getConfiguration().get().getName()));
-                             }
-                           }
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(format(
+                                    "AccessToken for resourceOwner '%s' expired while executing operation '%s:%s' using config '%s'. "
+                                        + "Will attempt to refresh token and retry operation",
+                                    rsId, getExtensionModel().getName(), operationContext.getComponentModel().getName(),
+                                    operationContext.getConfiguration().get().getName()));
+              }
+            }
 
-                           @Override
-                           public void visit(ClientCredentialsGrantType grantType) {
-                             if (LOGGER.isDebugEnabled()) {
-                               LOGGER.debug(format(
-                                   "AccessToken for expired while executing operation '%s:%s' using config '%s'. "
-                                       + "Will attempt to refresh token and retry operation",
-                                   getExtensionModel().getName(), operationContext.getComponentModel().getName(),
-                                   operationContext.getConfiguration().get().getName()));
-                             }
-                           }
-                         });
+            @Override
+            public void visit(ClientCredentialsGrantType grantType) {
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(format(
+                                    "AccessToken for expired while executing operation '%s:%s' using config '%s'. "
+                                        + "Will attempt to refresh token and retry operation",
+                                    getExtensionModel().getName(), operationContext.getComponentModel().getName(),
+                                    operationContext.getConfiguration().get().getName()));
+              }
+            }
+          });
 
-                         Optional<String> resourceOwnerId = resourceOwnerIdReference.get();
+          Optional<String> resourceOwnerId = resourceOwnerIdReference.get();
 
-                         try {
-                           connectionProvider.refreshToken(resourceOwnerId.orElse(""));
-                         } catch (Exception refreshException) {
-                           return error(new MuleRuntimeException(createStaticMessage(format(
-                               "AccessToken %s expired while executing operation '%s:%s' using config '%s'. Refresh token "
-                                   + "workflow was attempted but failed with the following exception",
-                               forResourceOwner(resourceOwnerId),
-                               getExtensionModel().getName(),
-                               operationContext.getComponentModel().getName(),
-                               operationContext.getConfiguration().get()
-                                   .getName())),
-                                                                 refreshException));
-                         }
-                         if (LOGGER.isDebugEnabled()) {
-                           LOGGER.debug(format("Access Token successfully refreshed %s on config '%s'",
-                                               forResourceOwner(resourceOwnerId), operationContext.getConfiguration().get().getName()));
-                         }
+          try {
+            connectionProvider.refreshToken(resourceOwnerId.orElse(""));
+          } catch (Exception refreshException) {
+            return error(new MuleRuntimeException(createStaticMessage(format(
+                                                                             "AccessToken %s expired while executing operation '%s:%s' using config '%s'. Refresh token "
+                                                                                 + "workflow was attempted but failed with the following exception",
+                                                                             forResourceOwner(resourceOwnerId),
+                                                                             getExtensionModel().getName(),
+                                                                             operationContext.getComponentModel().getName(),
+                                                                             operationContext.getConfiguration().get()
+                                                                                 .getName())),
+                                                  refreshException));
+          }
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(format("Access Token successfully refreshed %s on config '%s'",
+                                forResourceOwner(resourceOwnerId), operationContext.getConfiguration().get().getName()));
+          }
 
-                         return super.doProcess(event, operationContext);
-                       }
-        );
+          return super.doProcess(event, operationContext);
+        });
   }
 
   private AccessTokenExpiredException getTokenExpirationException(Exception e) {

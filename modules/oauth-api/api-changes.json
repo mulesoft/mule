@@ -72,6 +72,14 @@
           "classSimpleName": "OAuthClientCredentialsDancerBuilder",
           "elementKind": "interface",
           "justification": "Annotation was missing"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.oauth.api.builder.ClientCredentialsListener",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "ClientCredentialsListener",
+          "elementKind": "interface",
+          "justification": "Critical new feature. Adding SEMVER exception"
         }
       ]
     }
