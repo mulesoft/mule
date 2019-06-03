@@ -11,9 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -100,8 +98,7 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
   }
 
   private void handleException() {
-    Exception exception = spy(MuleException.class);
-    checkLogHandler.route(exception);
+    checkLogHandler.route();
   }
 
 }

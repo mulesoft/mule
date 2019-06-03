@@ -80,7 +80,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   @Test
-  public void testHandleExceptionWithNoConfig() throws Exception {
+  public void handleExceptionWithNoConfig() throws Exception {
     configureXaTransactionAndSingleResourceTransaction();
     when(mockException.handled()).thenReturn(true);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
@@ -96,7 +96,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   @Test
-  public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception {
+  public void handleExceptionWithConfiguredMessageProcessors() throws Exception {
     onErrorContinueHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
     initialiseIfNeeded(onErrorContinueHandler, muleContext);
@@ -111,7 +111,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   @Test
-  public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
+  public void handleExceptionWithMessageProcessorsChangingEvent() throws Exception {
     CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
     onErrorContinueHandler
         .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
@@ -133,7 +133,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
    * data.
    */
   @Test
-  public void testMessageToStringNotCalledOnFailure() throws Exception {
+  public void messageToStringNotCalledOnFailure() throws Exception {
     muleEvent = CoreEvent.builder(muleEvent).message(spy(of(""))).build();
     muleEvent = spy(muleEvent);
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);

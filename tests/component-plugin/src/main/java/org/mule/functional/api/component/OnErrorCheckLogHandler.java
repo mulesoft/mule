@@ -47,9 +47,11 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
   }
 
   @Override
-  protected Function<CoreEvent, Publisher<CoreEvent>> route(Exception exception) {
-    handledException = true;
-    return super.route(exception);
+  protected Function<CoreEvent, Publisher<CoreEvent>> route() {
+    return event -> {
+      handledException = true;
+      return super.route().apply(event);
+    };
   }
 
   /**
