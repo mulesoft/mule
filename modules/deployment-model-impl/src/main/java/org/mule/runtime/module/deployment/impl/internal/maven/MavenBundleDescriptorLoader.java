@@ -42,6 +42,7 @@ import org.apache.maven.model.Model;
 public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
 
   private static final String JAR = "jar";
+  public static final String OVERRIDE_ARTIFACT_ID_KEY = "override.artifactId";
 
   @Override
   public String getId() {
@@ -67,8 +68,9 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
 
       org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
 
+      String artifactId = overrideArtifactId(attributes, packagerClassLoaderModel.getArtifactCoordinates().getArtifactId());
       return new BundleDescriptor.Builder()
-          .setArtifactId(packagerClassLoaderModel.getArtifactCoordinates().getArtifactId())
+          .setArtifactId(artifactId)
           .setGroupId(packagerClassLoaderModel.getArtifactCoordinates().getGroupId())
           .setVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
           .setBaseVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
@@ -79,11 +81,19 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       if (attributes instanceof PluginExtendedBundleDescriptorAttributes) {
         return ((PluginExtendedBundleDescriptorAttributes) attributes).getPluginBundleDescriptor();
       }
-      return getBundleDescriptor(artifactFile, artifactType);
+      return getBundleDescriptor(artifactFile, artifactType, attributes);
     }
   }
 
-  private BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType) {
+  private String overrideArtifactId(Map<String, Object> attributes, String configuredValue) {
+    if (attributes.containsKey(OVERRIDE_ARTIFACT_ID_KEY)) {
+      return String.valueOf(attributes.get(OVERRIDE_ARTIFACT_ID_KEY));
+    } else {
+      return configuredValue;
+    }
+  }
+
+  private BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType, Map<String, Object> attributes) {
     BundleDescriptor.Builder builder = new BundleDescriptor.Builder();
 
     if (artifactType.equals(APP) || artifactType.equals(DOMAIN)) {
@@ -93,8 +103,10 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       } else {
         pomProperties = getPomPropertiesFromJar(artifactFile);
       }
+
+      String artifactId = overrideArtifactId(attributes, pomProperties.getProperty("artifactId"));
       return builder.setGroupId(pomProperties.getProperty("groupId"))
-          .setArtifactId(pomProperties.getProperty("artifactId"))
+          .setArtifactId(artifactId)
           .setVersion(pomProperties.getProperty("version"))
           .setClassifier(artifactType.equals(APP) ? MULE_APPLICATION_CLASSIFIER : MULE_DOMAIN_CLASSIFIER)
           .build();
@@ -106,8 +118,9 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
         model = getPomModelFromJar(artifactFile);
       }
 
+      String artifactId = overrideArtifactId(attributes, model.getArtifactId());
       return new BundleDescriptor.Builder()
-          .setArtifactId(model.getArtifactId())
+          .setArtifactId(artifactId)
           .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
           .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
           .setType(JAR)

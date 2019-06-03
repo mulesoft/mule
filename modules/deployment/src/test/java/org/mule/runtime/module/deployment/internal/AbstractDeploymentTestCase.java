@@ -62,6 +62,7 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.createBundleDescriptorFromName;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
@@ -124,6 +125,8 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.EmptyDomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
@@ -998,6 +1001,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected DefaultMuleDomain createDefaultDomain() {
     DomainDescriptor descriptor = new DomainDescriptor(DEFAULT_DOMAIN_NAME);
+    descriptor.setBundleDescriptor(createBundleDescriptorFromName(DEFAULT_DOMAIN_NAME));
     return new DefaultMuleDomain(descriptor,
                                  new DomainClassLoaderFactory(getClass().getClassLoader())
                                      .create("domain/" + DEFAULT_DOMAIN_NAME,

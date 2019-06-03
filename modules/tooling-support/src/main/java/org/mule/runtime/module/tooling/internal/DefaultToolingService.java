@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FOR
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.OVERRIDE_ARTIFACT_ID_KEY;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
 import org.mule.api.annotation.NoImplement;
 import org.mule.maven.client.api.MavenReactorResolver;
@@ -40,8 +41,10 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
@@ -206,20 +209,25 @@ public class DefaultToolingService implements ToolingService {
    */
   @Override
   public Domain createDomain(File domainLocation) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainLocation);
-    try {
-      return doCreateDomain(toolingDomainContent, empty());
-    } catch (Throwable t) {
-      deleteQuietly(toolingDomainContent);
-      throw t;
+    return createDomain(domainLocation, empty());
+  }
+
+  private static Optional<Properties> addDomainNameToDeploymentProperties(Optional<Properties> deploymentProperties, String domainName) {
+    if (!deploymentProperties.isPresent()) {
+      Properties newProperties = new Properties();
+      deploymentProperties = new Optional<>(newProperties);
     }
+    deploymentProperties.ifPresent(properties -> properties.setProperty(OVERRIDE_ARTIFACT_ID_KEY, domainName));
+    return deploymentProperties;
   }
 
   @Override
   public Domain createDomain(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainLocation);
+    String domainName = getUniqueIdString(DOMAIN);
+    File toolingDomainContent = artifactFileWriter.writeContent(domainName, domainLocation);
+
     try {
-      return doCreateDomain(toolingDomainContent, deploymentProperties);
+      return doCreateDomain(toolingDomainContent, addDomainNameToDeploymentProperties(deploymentProperties, domainName));
     } catch (Throwable t) {
       deleteQuietly(toolingDomainContent);
       throw t;
@@ -231,20 +239,15 @@ public class DefaultToolingService implements ToolingService {
    */
   @Override
   public Domain createDomain(byte[] domainContent) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainContent);
-    try {
-      return doCreateDomain(toolingDomainContent, empty());
-    } catch (Throwable t) {
-      deleteQuietly(toolingDomainContent);
-      throw t;
-    }
+    return createDomain(domainContent, empty());
   }
 
   @Override
   public Domain createDomain(byte[] domainContent, Optional<Properties> deploymentProperties) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainContent);
+    String domainName = getUniqueIdString(DOMAIN);
+    File toolingDomainContent = artifactFileWriter.writeContent(domainName, domainContent);
     try {
-      return doCreateDomain(toolingDomainContent, deploymentProperties);
+      return doCreateDomain(toolingDomainContent, addDomainNameToDeploymentProperties(deploymentProperties, domainName));
     } catch (Throwable t) {
       deleteQuietly(toolingDomainContent);
       throw t;

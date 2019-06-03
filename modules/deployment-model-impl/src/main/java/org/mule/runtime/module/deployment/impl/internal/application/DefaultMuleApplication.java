@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.createBundleDescriptorFromName;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -155,7 +156,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     if (descriptor.getDomainDescriptor().isPresent()) {
       return domainRepository.getDomain(descriptor.getDomainDescriptor().get());
     } else {
-      return domainRepository.getDomain(descriptor.getDomainName());
+      return domainRepository.getDomain(createBundleDescriptorFromName(descriptor.getDomainName()));
     }
   }
 
