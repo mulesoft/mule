@@ -23,9 +23,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,9 +31,12 @@ import java.util.StringTokenizer;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TransformerUtils {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(AbstractTransformer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTransformer.class);
   public static final String COMMA = ",";
 
   /**
