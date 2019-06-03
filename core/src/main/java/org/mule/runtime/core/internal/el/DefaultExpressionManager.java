@@ -61,7 +61,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular expressions should be used instead.");
 
-  private AtomicBoolean initialized = new AtomicBoolean();
+  private final AtomicBoolean initialized = new AtomicBoolean();
 
   private MuleContext muleContext;
   private StreamingManager streamingManager;
@@ -182,7 +182,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
     if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
       Object result = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
-          .transform(target.getValue());
+          .transform(target);
       return new TypedValue<>(result, outputType);
     } else {
       return target;
