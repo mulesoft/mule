@@ -81,6 +81,11 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
             txHandle.commit();
           }
         } catch (TransactionException e) {
+          try {
+            txHandle.rollback();
+          } catch (TransactionException e1) {
+            throw new RuntimeException(e1);
+          }
           throw new RuntimeException(e);
         }
       }
