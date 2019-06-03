@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
@@ -17,6 +18,8 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.FlowConstructNotification;
+import org.mule.runtime.api.notification.FlowConstructNotificationListener;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -108,20 +111,21 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     final ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
 
     if (!isPoliciesAvailable.get()) {
-      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getLocation().getLocation());
+      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getLocation().getRootContainerName());
 
       if (policy != null) {
         return policy;
       }
 
-      return noPolicySourceInstances.get(source.getLocation().getLocation(), k -> new NoSourcePolicy(flowExecutionProcessor));
+      return noPolicySourceInstances.get(source.getLocation().getRootContainerName(),
+                                         k -> new NoSourcePolicy(flowExecutionProcessor));
     }
 
     final PolicyPointcutParameters sourcePointcutParameters = ((InternalEvent) sourceEvent)
         .getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS);
 
     final Pair<String, PolicyPointcutParameters> policyKey =
-        new Pair<>(source.getLocation().getLocation(), sourcePointcutParameters);
+        new Pair<>(source.getLocation().getRootContainerName(), sourcePointcutParameters);
 
     final SourcePolicy policy = sourcePolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
@@ -129,7 +133,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     }
 
     return sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
-        .get(new Pair<>(source.getLocation().getLocation(),
+        .get(new Pair<>(source.getLocation().getRootContainerName(),
                         policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
              innerKey -> innerKey.getSecond().isEmpty()
                  ? new NoSourcePolicy(flowExecutionProcessor)
@@ -190,6 +194,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   @Override
   public void initialise() throws InitialisationException {
+
     operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory();
     sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory();
 
@@ -207,6 +212,40 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
     policyPointcutParametersManager =
         new PolicyPointcutParametersManager(registry.lookupAllByType(SourcePolicyPointcutParametersFactory.class),
                                             registry.lookupAllByType(OperationPolicyPointcutParametersFactory.class));
+
+    // Register flow disposal listener
+    muleContext.getNotificationManager().addListener(new FlowConstructNotificationListener<FlowConstructNotification>() {
+
+      @Override
+      public boolean isBlocking() {
+        return false;
+      }
+
+      @Override
+      public void onNotification(FlowConstructNotification notification) {
+        if (Integer.parseInt(notification.getAction().getIdentifier()) == FLOW_CONSTRUCT_DISPOSED) {
+          LOGGER.debug("Invalidating flow from caches named {}", notification.getResourceIdentifier());
+          // Invalidate flow from caches
+          invalidateDisposedFlowFromCaches(notification.getResourceIdentifier());
+        }
+      }
+    });
+  }
+
+  private void invalidateDisposedFlowFromCaches(String flowName) {
+    // Invalidate from "no policy cache"
+    noPolicySourceInstances.invalidate(flowName);
+
+    // Invalidate from outer "with policy cache"
+    sourcePolicyOuterCache.asMap().keySet().stream()
+        .filter(pair -> pair.getFirst().equals(flowName))
+        .forEach(matchingPair -> sourcePolicyOuterCache.invalidate(matchingPair));
+
+    // Invalidate from inner "with policy cache"
+    sourcePolicyInnerCache.asMap().keySet().stream()
+        .filter(pair -> pair.getFirst().equals(flowName))
+        .forEach(matchingPair -> sourcePolicyInnerCache.invalidate(matchingPair));
+
   }
 
   @Override
