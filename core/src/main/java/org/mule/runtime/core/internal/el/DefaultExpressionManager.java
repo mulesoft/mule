@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.isMelDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -65,7 +66,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular expressions should be used instead.");
 
-  private AtomicBoolean initialized = new AtomicBoolean();
+  private final AtomicBoolean initialized = new AtomicBoolean();
 
   private MuleContext muleContext;
   private StreamingManager streamingManager;
@@ -200,7 +201,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
     if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
       Object result = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
-          .transform(target.getValue());
+          .transform(target);
       return new TypedValue<>(result, outputType);
     } else {
       return target;

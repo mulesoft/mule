@@ -11,9 +11,6 @@ import static java.lang.String.format;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +18,9 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>TemplateParser</code> is a simple string parser that will substitute tokens in a string with values supplied in a Map.
@@ -35,6 +35,7 @@ public final class TemplateParser {
   private static final char START_EXPRESSION = '#';
   private static final char OPEN_EXPRESSION = '[';
   private static final char CLOSE_EXPRESSION = ']';
+  private static final Pattern ESCAPE_PATTERN = Pattern.compile("(^|[^\\\\])" + START_EXPRESSION);
   private static final String EXPRESSION_NOT_CLOSED_ERROR_MSG = "\tOpened expression (%c) at line %d, column %d is not closed\n";
   private static final String QUOTATION_NOT_CLOSED_ERROR_MSG =
       "\tQuotation (%c) at line %d, column %d is not closed. Remember to use backslash (\\) if you are trying to use that character as a literal";
@@ -205,7 +206,8 @@ public final class TemplateParser {
     if (original.contains("#")) {
       return processed;
     }
-    return processed.replaceAll("(^|[^\\\\])" + START_EXPRESSION, "$1\\\\" + START_EXPRESSION);
+
+    return ESCAPE_PATTERN.matcher(processed).replaceAll("$1\\\\" + START_EXPRESSION);
   }
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
