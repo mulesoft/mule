@@ -21,7 +21,9 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
+import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Map;
@@ -41,7 +43,7 @@ class CommonSourcePolicy {
   public static final String POLICY_SOURCE_PARAMETERS_PROCESSOR = "policy.source.parametersProcessor";
   public static final String POLICY_SOURCE_CALLER_SINK = "policy.source.callerSink";
 
-  private final RoundRobinFluxSinkSupplier<CoreEvent> policySink;
+  private final FluxSinkSupplier<CoreEvent> policySink;
   private final AtomicBoolean disposed;
   private final FunctionalReadWriteLock readWriteLock;
   private final Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
@@ -52,7 +54,9 @@ class CommonSourcePolicy {
 
   CommonSourcePolicy(Supplier<FluxSink<CoreEvent>> sinkFactory,
                      Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer) {
-    this.policySink = new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), sinkFactory);
+    this.policySink =
+        new TransactionAwareFluxSinkSupplier<>(sinkFactory,
+                                               new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), sinkFactory));
     this.sourcePolicyParametersTransformer = sourcePolicyParametersTransformer;
     this.readWriteLock = FunctionalReadWriteLock.readWriteLock();
     this.disposed = new AtomicBoolean(false);

@@ -26,7 +26,9 @@ import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
+import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -64,7 +66,7 @@ public class CompositeOperationPolicy
 
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
-  private final LoadingCache<String, RoundRobinFluxSinkSupplier<CoreEvent>> policySinks;
+  private final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks;
 
   private final AtomicBoolean disposed;
   private final FunctionalReadWriteLock readWriteLock;
@@ -90,11 +92,15 @@ public class CompositeOperationPolicy
     this.disposed = new AtomicBoolean(false);
     this.readWriteLock = readWriteLock();
     this.policySinks = newBuilder()
-        .removalListener((String key, RoundRobinFluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
+        .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
         })
-        .build(componentLocation -> new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
-                                                                     new OperationWithPoliciesFluxObjectFactory()));
+        .build(componentLocation -> {
+          Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory();
+          return new TransactionAwareFluxSinkSupplier<>(factory,
+                                                        new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
+                                                                                         factory));
+        });
   }
 
   private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
