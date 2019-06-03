@@ -10,8 +10,8 @@
     <object name="disposeListener" class="org.mule.test.policy.PolicyTestCase$DisposeListenerMessageProcessor"/>
 
     <flow name="main">
-        <values:value-emitting-source message="hello dog" times="1"/>
-        <logger level="ERROR" message="#[mel:payload]"/>
+        <values:value-emitting-source message="hello dog!" times="1"/>
+        <logger level="ERROR" message="#[payload]"/>
         <processor ref="disposeListener"/>
     </flow>
 

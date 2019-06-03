@@ -233,6 +233,9 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   }
 
   private void invalidateDisposedFlowFromCaches(String flowName) {
+    // Invalidate from "no policy cache"
+    noPolicySourceInstances.invalidate(flowName);
+
     // Invalidate from outer "with policy cache"
     sourcePolicyOuterCache.asMap().keySet().stream()
         .filter(pair -> pair.getFirst().equals(flowName))
@@ -243,10 +246,6 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
         .filter(pair -> pair.getFirst().equals(flowName))
         .forEach(matchingPair -> sourcePolicyInnerCache.invalidate(matchingPair));
 
-    // Invalidate from "no policy cache"
-    noPolicySourceInstances.asMap().keySet().stream()
-        .filter(key -> key.equals(flowName))
-        .forEach(matchingPair -> noPolicySourceInstances.invalidate(matchingPair));
   }
 
   @Override

@@ -10,6 +10,7 @@ package org.mule.test.policy;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -25,7 +26,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
@@ -33,17 +33,16 @@ import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
@@ -51,14 +50,12 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
   private static final String POLICY_ID = "policyId";
   private static final AtomicBoolean processorWasDisposed = new AtomicBoolean(false);
 
-  @Rule
-  public DynamicPort proxyPort = new DynamicPort("listenerPort");
-
   @Inject
   private PolicyProvider policyProvider;
 
   @Inject
   private SchedulerService schedulerService;
+  private CountDownLatch messageSentTimer;
 
   @Override
   protected String getConfigFile() {
@@ -75,7 +72,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     return new ConfigurationBuilder() {
 
       @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
+      public void configure(MuleContext muleContext) {
         final AtomicReference<Optional<PolicyInstance>> policyReference = new AtomicReference<>();
         muleContext.getCustomizationService().registerCustomServiceImpl("customPolicyProvider",
                                                                         new TestPolicyProvider(policyReference));
@@ -91,6 +88,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
   @Before
   public void setUp() {
     processorWasDisposed.set(false);
+    messageSentTimer = new CountDownLatch(1);
   }
 
   @Test
@@ -117,7 +115,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   @Test
   public void policyCacheEntryGetsEvictedOnFlowDisposal() throws Exception {
-    Thread.sleep(2000);
+    messageSentTimer.await(2, SECONDS);
     ((Flow) getFlowConstruct("main")).dispose();
     check(5000, 1000, () -> processorWasDisposed.get());
   }
