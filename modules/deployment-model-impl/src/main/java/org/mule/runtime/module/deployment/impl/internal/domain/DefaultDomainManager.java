@@ -22,7 +22,6 @@ import java.util.Map;
 public class DefaultDomainManager implements DomainRepository, DomainManager {
 
   private Map<BundleDescriptorWrapper, Domain> domainsByDescriptor = new HashMap<>();
-  private Map<String, BundleDescriptorWrapper> descriptorsByName = new HashMap<>();
 
   @Override
   public Domain getDomain(BundleDescriptor bundleDescriptor) throws DomainNotFoundException, IncompatibleDomainVersionException {
@@ -42,19 +41,6 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
   }
 
   @Override
-  public Domain getDomain(String domainName) throws DomainNotFoundException {
-    BundleDescriptorWrapper bundleDescriptorWrapper = descriptorsByName.get(domainName);
-    if (bundleDescriptorWrapper == null) {
-      throw new DomainNotFoundException(domainName, domainsByDescriptor.keySet());
-    }
-    Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
-    if (domain == null) {
-      throw new DomainNotFoundException(domainName, domainsByDescriptor.keySet());
-    }
-    return domain;
-  }
-
-  @Override
   public boolean contains(BundleDescriptor descriptor) {
     BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(descriptor);
     if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
@@ -64,15 +50,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
       return isCompatibleVersion(availableVersion, expectedVersion);
     }
 
-    return contains(descriptor.getArtifactFileName());
-  }
-
-  @Override
-  public boolean contains(String domainName) {
-    if (!descriptorsByName.containsKey(domainName)) {
-      return false;
-    }
-    return domainsByDescriptor.containsKey(descriptorsByName.get(domainName));
+    return false;
   }
 
   @Override
@@ -83,33 +61,12 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
       throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(getDomainName(domain), getDomainName(foundDomain)));
     }
     domainsByDescriptor.put(bundleDescriptorWrapper, domain);
-    addNameMappings(domain, bundleDescriptorWrapper);
   }
 
   @Override
   public void removeDomain(Domain domain) {
     final BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(domain.getDescriptor());
     domainsByDescriptor.remove(bundleDescriptorWrapper);
-    removeNameMappings(domain);
-  }
-
-  private void addNameMappings(Domain domain, BundleDescriptorWrapper bundleDescriptorWrapper) {
-    BundleDescriptor bundleDescriptor = domain.getDescriptor().getBundleDescriptor();
-    if (bundleDescriptor != null) {
-      String bundleName = bundleDescriptor.getArtifactId();
-      descriptorsByName.put(bundleName, bundleDescriptorWrapper);
-    }
-
-    String artifactName = domain.getArtifactName();
-    descriptorsByName.put(artifactName, bundleDescriptorWrapper);
-  }
-
-  private void removeNameMappings(Domain domain) {
-    BundleDescriptor bundleDescriptor = domain.getDescriptor().getBundleDescriptor();
-    if (bundleDescriptor != null) {
-      descriptorsByName.remove(bundleDescriptor.getArtifactId());
-    }
-    descriptorsByName.remove(domain.getArtifactName());
   }
 
   private static String getDomainName(Domain domain) {

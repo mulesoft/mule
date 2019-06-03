@@ -61,7 +61,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     when(pluginDependenciesResolver.resolve(argThat(is(emptySet())), anyList(), anyBoolean())).thenReturn(emptyList());
     domainManager = new DefaultDomainManager();
   }
@@ -120,35 +120,20 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
     domainManager.addDomain(domain1);
     assertThat(domainManager.contains(descriptor1), is(true));
-    assertThat(domainManager.contains(domainName1), is(true));
-    assertThat(domainManager.contains(domainCompleteName1), is(true));
     assertThat(domainManager.getDomain(descriptor1), is(domain1));
-    assertThat(domainManager.getDomain(domainName1), is(domain1));
-    assertThat(domainManager.getDomain(domainCompleteName1), is(domain1));
     assertThat(domainManager.contains(descriptor2), is(false));
-    assertThat(domainManager.contains(domainName2), is(false));
-    assertThat(domainManager.contains(domainCompleteName2), is(false));
 
     domainManager.addDomain(domain2);
     assertThat(domainManager.getDomain(descriptor1), is(domain1));
     assertThat(domainManager.getDomain(descriptor2), is(domain2));
-    assertThat(domainManager.getDomain(domainCompleteName1), is(domain1));
-    assertThat(domainManager.getDomain(domainCompleteName2), is(domain2));
 
     domainManager.removeDomain(domain1);
     assertThat(domainManager.contains(descriptor1), is(false));
-    assertThat(domainManager.contains(domainName1), is(false));
-    assertThat(domainManager.contains(domainCompleteName1), is(false));
     assertThat(domainManager.getDomain(descriptor2), is(domain2));
-    assertThat(domainManager.getDomain(domainCompleteName2), is(domain2));
 
     domainManager.removeDomain(domain2);
     assertThat(domainManager.contains(descriptor1), is(false));
-    assertThat(domainManager.contains(domainName1), is(false));
-    assertThat(domainManager.contains(domainCompleteName1), is(false));
     assertThat(domainManager.contains(descriptor2), is(false));
-    assertThat(domainManager.contains(domainName2), is(false));
-    assertThat(domainManager.contains(domainCompleteName2), is(false));
   }
 
   @Test
@@ -290,21 +275,39 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
   @Test
   public void domainUpgradeShouldBeDoneByRemovingThePreviousOne() throws IOException {
+    BundleDescriptor customDomainDescriptor1 = createBundleDescriptor("custom-domain", "1.1.0");
+    BundleDescriptor customDomainDescriptor2 = createBundleDescriptor("custom-domain", "1.2.0");
+    BundleDescriptor customDomainDescriptor3 = createBundleDescriptor("custom-domain", "1.3.0");
+
     Domain domain = createDomain("custom-domain", "1.1.0");
     domainManager.addDomain(domain);
-    assertThat(domainManager.contains("custom-domain"), is(true));
-    assertThat(domainManager.contains("custom-domain-1.1.0-mule-domain"), is(true));
-    assertThat(domainManager.contains("custom-domain-1.2.0-mule-domain"), is(false));
+    assertThat(domainManager.contains(customDomainDescriptor1), is(true));
+    assertThat(domainManager.contains(customDomainDescriptor2), is(false));
+    assertThat(domainManager.contains(customDomainDescriptor3), is(false));
 
     domain.dispose();
     domainManager.removeDomain(domain);
-    assertThat(domainManager.contains("custom-domain"), is(false));
-    assertThat(domainManager.contains("custom-domain-1.1.0-mule-domain"), is(false));
-    assertThat(domainManager.contains("custom-domain-1.2.0-mule-domain"), is(false));
+    assertThat(domainManager.contains(customDomainDescriptor1), is(false));
+    assertThat(domainManager.contains(customDomainDescriptor2), is(false));
+    assertThat(domainManager.contains(customDomainDescriptor3), is(false));
 
     domainManager.addDomain(createDomain("custom-domain", "1.2.0"));
-    assertThat(domainManager.contains("custom-domain"), is(true));
-    assertThat(domainManager.contains("custom-domain-1.1.0-mule-domain"), is(false));
-    assertThat(domainManager.contains("custom-domain-1.2.0-mule-domain"), is(true));
+    assertThat(domainManager.contains(customDomainDescriptor1), is(true));
+    assertThat(domainManager.contains(customDomainDescriptor2), is(true));
+    assertThat(domainManager.contains(customDomainDescriptor3), is(false));
+  }
+
+  @Test
+  public void addTheSameDomainWithDifferentBundleDescriptors() throws IOException {
+    Domain aDomain = createDomain("custom-domain", "1.1.0");
+    BundleDescriptor originalBundleDescriptor = aDomain.getDescriptor().getBundleDescriptor();
+    BundleDescriptor otherBundleDescriptor = createBundleDescriptor("other-name", "1.1.0");
+
+    domainManager.addDomain(aDomain);
+    domainManager.contains(originalBundleDescriptor);
+
+    aDomain.getDescriptor().setBundleDescriptor(otherBundleDescriptor);
+    domainManager.addDomain(aDomain);
+    domainManager.contains(otherBundleDescriptor);
   }
 }
