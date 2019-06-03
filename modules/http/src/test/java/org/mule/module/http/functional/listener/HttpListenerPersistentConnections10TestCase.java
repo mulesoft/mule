@@ -54,7 +54,7 @@ public class HttpListenerPersistentConnections10TestCase extends HttpListenerPer
     @Test
     public void persistentEchoCheckHeader() throws IOException
     {
-        // Echo sets the content-lenght at 0, so keep-alive is ok for 1.0
+        // Echo sets the content-length at 0, so keep-alive is ok for 1.0
         assertThat(performRequest(persistentStreamingPort.getNumber(), getHttpVersion(), true), is(KEEP_ALIVE));
     }
 
