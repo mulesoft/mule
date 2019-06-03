@@ -15,17 +15,19 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -61,6 +63,9 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
 
     final MuleContext muleContext = mock(MuleContext.class);
     when(muleContext.getArtifactType()).thenReturn(ArtifactType.APP);
+    ServerNotificationManager notificationManagerMock = mock(ServerNotificationManager.class);
+    doNothing().when(notificationManagerMock).addListener(any());
+    doReturn(notificationManagerMock).when(muleContext).getNotificationManager();
     policyManager.setMuleContext(muleContext);
 
     policyManager.initialise();
@@ -77,7 +82,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     when(operation1Component.getLocation()).thenReturn(fromSingleComponent("flow/processors/1"));
     operation2Component = mock(Component.class);
     when(operation2Component.getLocation()).thenReturn(fromSingleComponent("flow/processors/2"));
-
   }
 
   @After
