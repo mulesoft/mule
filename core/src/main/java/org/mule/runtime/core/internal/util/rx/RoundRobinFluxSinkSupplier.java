@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import static java.lang.Thread.currentThread;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import org.mule.runtime.api.lifecycle.Disposable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,14 +21,12 @@ import reactor.core.publisher.FluxSink;
  *
  * @since 4.2
  */
-public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Disposable {
+public class RoundRobinFluxSinkSupplier<T> implements FluxSinkSupplier {
 
   private final List<FluxSink<T>> fluxSinks;
   private final AtomicInteger index = new AtomicInteger(0);
   // Saving update function to avoid creating the lambda every time
   private final IntUnaryOperator update;
-  private final Supplier<FluxSink<T>> sinkFactory;
-  private final Cache<Thread, FluxSink<T>> sinks = Caffeine.newBuilder().weakKeys().build();
 
   public RoundRobinFluxSinkSupplier(int size, Supplier<FluxSink<T>> sinkFactory) {
     final List<FluxSink<T>> sinks = new ArrayList<>(size);
@@ -44,7 +35,6 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
     }
     this.fluxSinks = sinks;
     this.update = (value) -> (value + 1) % size;
-    this.sinkFactory = sinkFactory;
   }
 
   private int nextIndex() {
@@ -54,21 +44,11 @@ public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Dis
   @Override
   public void dispose() {
     fluxSinks.forEach(FluxSink::complete);
-    sinks.asMap().forEach((t, sink) -> sink.complete());
   }
 
   @Override
   public FluxSink<T> get() {
-    // In case of tx we need to ensure that in use of round robin there are no 2 threads trying to use the same sink.
-    // This could cause a race condition in which the second thread simply queues the event in the busy sink.
-    // So, this thread will not unbind the tx (causing an error next time it tries to bind one), and the first one will
-    // then process the queued event without having the tx bound (so it will process as if it wasn't a tx in the
-    // beginning).
-    if (isTransactionActive()) {
-      return sinks.get(currentThread(), t -> sinkFactory.get());
-    } else {
-      return fluxSinks.get(nextIndex());
-    }
+    return fluxSinks.get(nextIndex());
   }
 
 }
