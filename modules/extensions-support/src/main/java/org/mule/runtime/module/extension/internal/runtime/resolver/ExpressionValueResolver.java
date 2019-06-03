@@ -27,9 +27,9 @@ import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -58,6 +58,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
 
   private Boolean melDefault;
   private Boolean melAvailable;
+  private boolean isMelExpression;
 
   ExpressionValueResolver(String expression, DataType expectedDataType) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
@@ -75,6 +76,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
     this.expression = expression;
     this.evaluator = new AttributeEvaluator(expression);
+
   }
 
   void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
@@ -90,6 +92,12 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
 
     if (melAvailable == null) {
       melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
+    }
+
+    if (isMelAvailable() &&
+        (!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault)
+        || hasMelExpression(expression)) {
+      isMelExpression = true;
     }
   }
 
@@ -107,14 +115,14 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   }
 
   protected <V> TypedValue<V> resolveTypedValue(ValueResolvingContext context) {
-    if (context.getSession() == null
-        || (isMelAvailable()
-            && (!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault)
-            || hasMelExpression(expression))) {
-      // MEL requires an actual event, so in this case we may not optimize by using a session
+    if (isMelExpression) {
       return evaluator.resolveTypedValue(context.getEvent());
     } else {
-      return evaluator.resolveTypedValue(context.getSession());
+      if (context.getSession() != null) {
+        return evaluator.resolveTypedValue(context.getSession());
+      } else {
+        return evaluator.resolveTypedValue(context.getEvent());
+      }
     }
   }
 
