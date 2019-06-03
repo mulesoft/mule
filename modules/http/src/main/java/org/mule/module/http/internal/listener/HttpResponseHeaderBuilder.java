@@ -142,10 +142,10 @@ public class HttpResponseHeaderBuilder
         addSimpleValue(CONTENT_TYPE, multipartFormData);
     }
 
-    public void setContentLenght(String calculatedContentLenght)
+    public void setContentLength(String calculatedContentLength)
     {
         removeHeader(CONTENT_LENGTH);
-        addSimpleValue(CONTENT_LENGTH, calculatedContentLenght);
+        addSimpleValue(CONTENT_LENGTH, calculatedContentLength);
     }
 
     public Collection<String> getHeaderNames()
