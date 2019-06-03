@@ -230,13 +230,13 @@
         <muleMvelVersion>2.1.9-MULE-018</muleMvelVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.2.1-SNAPSHOT</muleDslApiVersion>
+        <muleDslApiVersion>1.2.0</muleDslApiVersion>
         <muleExtensionsApiVersion>1.2.1-SNAPSHOT</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.2.1-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.4.1-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.4.1-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.4.1-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.2.1-SNAPSHOT</mulePolicyApiVersion>
+        <muleHttpPolicyApiVersion>1.2.0</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.4.0</muleMavenClientApi>
+        <muleMavenClientImpl>1.4.0</muleMavenClientImpl>
+        <muleMavenClientTest>1.4.0</muleMavenClientTest>
+        <mulePolicyApiVersion>1.2.0</mulePolicyApiVersion>
         <muleApiVersion>1.2.1-SNAPSHOT</muleApiVersion>
         <muleMetadataModelVersion>1.2.1-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
@@ -274,13 +274,13 @@
         <maven.surefire.plugin.version>2.21.0</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.1.1-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.1.0</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.2.1-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.2.1-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.2.1-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleRevapiExtensionVersion>1.2.0</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.2.0</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.2.0</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
-        <mule.classloader.model.version>3.3.1-SNAPSHOT</mule.classloader.model.version>
+        <mule.classloader.model.version>3.3.1</mule.classloader.model.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
         <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
