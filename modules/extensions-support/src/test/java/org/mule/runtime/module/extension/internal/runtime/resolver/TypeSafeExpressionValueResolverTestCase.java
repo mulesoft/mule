@@ -59,16 +59,6 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   }
 
   @Test
-  public void resolvePayload() throws Exception {
-    String payload = "Dracaris";
-    ValueResolver<Object> resolver = getResolver("#[payload]", STRING);
-    ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of(payload)).build())
-        .withExpressionManager(expressionManager)
-        .build();
-    assertResolved(resolver.resolve(ctx), payload, times(1));
-  }
-
-  @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
     ValueResolver<Object> resolver = getResolver("#['Hello ' ++ payload]", STRING);
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of("World!")).build())
