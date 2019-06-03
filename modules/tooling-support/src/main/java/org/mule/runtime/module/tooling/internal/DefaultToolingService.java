@@ -21,6 +21,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
+import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.createBundleDescriptorFromName;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.OVERRIDE_ARTIFACT_ID_KEY;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
@@ -44,6 +45,7 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFact
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
 import org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
@@ -145,7 +147,7 @@ public class DefaultToolingService implements ToolingService {
     String domainName = mergedDeploymentProperties.get().getProperty(DEPLOYMENT_DOMAIN_NAME_REF);
     if (domainName != null) {
       try {
-        Domain domain = domainRepository.getDomain(domainName);
+        Domain domain = domainRepository.getDomain(createBundleDescriptorFromName(domainName));
         MuleArtifactLoaderDescriptor classLoaderModelDescriptorLoader =
             applicationArtifactModelBuilder.getClassLoaderModelDescriptorLoader();
         Map<String, Object> extendedAttributes = new HashMap<>(classLoaderModelDescriptorLoader.getAttributes());
@@ -162,6 +164,8 @@ public class DefaultToolingService implements ToolingService {
         return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptor));
       } catch (DomainNotFoundException e) {
         throw new IllegalArgumentException(format("Domain '%s' is expected to be deployed", domainName), e);
+      } catch (IncompatibleDomainVersionException e) {
+        throw new IllegalArgumentException("Incompatible domain found", e);
       }
     }
     return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptorFactory.create(toolingApplicationContent,
@@ -212,10 +216,11 @@ public class DefaultToolingService implements ToolingService {
     return createDomain(domainLocation, empty());
   }
 
-  private static Optional<Properties> addDomainNameToDeploymentProperties(Optional<Properties> deploymentProperties, String domainName) {
+  private static Optional<Properties> addDomainNameToDeploymentProperties(Optional<Properties> deploymentProperties,
+                                                                          String domainName) {
     if (!deploymentProperties.isPresent()) {
       Properties newProperties = new Properties();
-      deploymentProperties = new Optional<>(newProperties);
+      deploymentProperties = of(newProperties);
     }
     deploymentProperties.ifPresent(properties -> properties.setProperty(OVERRIDE_ARTIFACT_ID_KEY, domainName));
     return deploymentProperties;
