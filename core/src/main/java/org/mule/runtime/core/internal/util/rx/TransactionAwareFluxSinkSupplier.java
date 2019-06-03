@@ -23,7 +23,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
  *
  * @since 4.3
  */
-public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier {
+public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> {
 
   private final Supplier<FluxSink<T>> newSinkFactory;
   private final FluxSinkSupplier<T> delegate;
@@ -52,5 +52,6 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier {
   public void dispose() {
     delegate.dispose();
     sinks.asMap().forEach((t, sink) -> sink.complete());
+    sinks.invalidateAll();
   }
 }

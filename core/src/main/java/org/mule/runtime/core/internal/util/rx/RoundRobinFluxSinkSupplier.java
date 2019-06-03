@@ -21,7 +21,7 @@ import reactor.core.publisher.FluxSink;
  *
  * @since 4.2
  */
-public class RoundRobinFluxSinkSupplier<T> implements FluxSinkSupplier {
+public class RoundRobinFluxSinkSupplier<T> implements FluxSinkSupplier<T> {
 
   private final List<FluxSink<T>> fluxSinks;
   private final AtomicInteger index = new AtomicInteger(0);

@@ -13,6 +13,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static java.util.Collections.synchronizedSet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +66,7 @@ public class TransactionAwareFluxSinkSupplierTestCase {
   @Test
   public void newSinkPerThread() throws Exception {
     List<Thread> threads = new ArrayList<>();
-    Set<FluxSink> sinks = new HashSet<>();
+    Set<FluxSink> sinks = synchronizedSet(new HashSet<>());
     for (int i = 0; i < THREAD_TEST; i++) {
       Thread thread = new Thread(() -> {
         Transaction tx = mock(Transaction.class);
@@ -75,9 +76,7 @@ public class TransactionAwareFluxSinkSupplierTestCase {
             FluxSink sink = txSupplier.get();
             // Assert that supplied for same thread supplies same sink
             assertThat(txSupplier.get(), is(sink));
-            synchronized (sinks) {
-              sinks.add(sink);
-            }
+            sinks.add(sink);
           } finally {
             TransactionCoordination.getInstance().unbindTransaction(tx);
           }

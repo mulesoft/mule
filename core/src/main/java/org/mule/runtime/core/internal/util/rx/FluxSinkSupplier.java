@@ -11,5 +11,12 @@ import reactor.core.publisher.FluxSink;
 
 import java.util.function.Supplier;
 
+/**
+ * Supplier of {@link FluxSink}.
+ *
+ * @param <T> the value type
+ *
+ * @since 4.3
+ */
 public interface FluxSinkSupplier<T> extends Supplier<FluxSink<T>>, Disposable {
 }
