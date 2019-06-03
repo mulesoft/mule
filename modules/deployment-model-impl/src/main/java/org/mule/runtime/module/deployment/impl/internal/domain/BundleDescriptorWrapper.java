@@ -19,25 +19,23 @@ import com.vdurmont.semver4j.Semver;
 class BundleDescriptorWrapper {
 
   private final BundleDescriptor bundleDescriptor;
-  private final String domainName;
 
   BundleDescriptorWrapper(BundleDescriptor bundleDescriptor) {
     this.bundleDescriptor = bundleDescriptor;
-    this.domainName = bundleDescriptor.getArtifactId();
   }
 
   BundleDescriptorWrapper(DomainDescriptor domainDescriptor) {
     this.bundleDescriptor = domainDescriptor.getBundleDescriptor();
-    if (bundleDescriptor == null) {
-      this.domainName = domainDescriptor.getName();
-    } else {
-      this.domainName = bundleDescriptor.getArtifactId();
-    }
   }
 
   @Override
   public int hashCode() {
-    return domainName.hashCode();
+    Semver version = new Semver(bundleDescriptor.getVersion());
+    int result = bundleDescriptor.getGroupId().hashCode();
+    result = 31 * result + bundleDescriptor.getArtifactId().hashCode();
+    result = 31 * result + version.getMajor().hashCode();
+    result = 31 * result + bundleDescriptor.getType().hashCode();
+    return result;
   }
 
   @Override
@@ -51,14 +49,15 @@ class BundleDescriptorWrapper {
     }
 
     BundleDescriptorWrapper otherDescriptorWrapper = (BundleDescriptorWrapper) otherObject;
-    if (!this.domainName.equals(otherDescriptorWrapper.domainName)) {
-      return false;
-    }
 
     BundleDescriptor myBundleDescriptor = this.bundleDescriptor;
     BundleDescriptor otherBundleDescriptor = otherDescriptorWrapper.bundleDescriptor;
-    if (myBundleDescriptor == null || otherBundleDescriptor == null) {
+    if (myBundleDescriptor == null && otherBundleDescriptor == null) {
       return true;
+    }
+
+    if (myBundleDescriptor == null || otherBundleDescriptor == null) {
+      return false;
     }
 
     if (!myBundleDescriptor.getGroupId().equals(otherBundleDescriptor.getGroupId())) {
@@ -78,7 +77,8 @@ class BundleDescriptorWrapper {
     return mySemver.getMajor().equals(otherSemver.getMajor());
   }
 
+  @Override
   public String toString() {
-    return domainName;
+    return this.bundleDescriptor.toString();
   }
 }
