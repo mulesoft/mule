@@ -20,15 +20,13 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -37,6 +35,9 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.transform.stream.StreamSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractTransformer</code> is a base class for all transformers. Transformations transform one object into another.
@@ -228,7 +229,10 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
   public Object transform(Object src, Charset enc) throws TransformerException {
     Object payload = src;
     DataType sourceType;
-    if (src instanceof Message) {
+    if (src instanceof TypedValue) {
+      payload = ((TypedValue) src).getValue();
+      sourceType = ((TypedValue) src).getDataType();
+    } else if (src instanceof Message) {
       Message message = (Message) src;
       if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true) && !(this instanceof AbstractMessageTransformer))) {
         payload = message.getPayload().getValue();
