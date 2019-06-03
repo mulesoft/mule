@@ -230,7 +230,7 @@
         <muleMvelVersion>2.1.9-MULE-018</muleMvelVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.2.1-SNAPSHOT</muleDslApiVersion>
+        <muleDslApiVersion>1.2.0</muleDslApiVersion>
         <muleExtensionsApiVersion>1.2.1-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.2.1-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.4.1-SNAPSHOT</muleMavenClientApi>
