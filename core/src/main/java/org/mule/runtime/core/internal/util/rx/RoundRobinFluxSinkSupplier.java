@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import org.mule.runtime.api.lifecycle.Disposable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,7 +21,7 @@ import reactor.core.publisher.FluxSink;
  *
  * @since 4.2
  */
-public class RoundRobinFluxSinkSupplier<T> implements Supplier<FluxSink<T>>, Disposable {
+public class RoundRobinFluxSinkSupplier<T> implements FluxSinkSupplier<T> {
 
   private final List<FluxSink<T>> fluxSinks;
   private final AtomicInteger index = new AtomicInteger(0);
