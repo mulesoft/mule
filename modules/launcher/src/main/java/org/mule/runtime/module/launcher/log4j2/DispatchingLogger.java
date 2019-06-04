@@ -19,9 +19,6 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.apache.logging.log4j.Level;
@@ -59,10 +56,6 @@ abstract class DispatchingLogger extends Logger {
   private final Logger originalLogger;
   private final ContextSelector contextSelector;
   private final int ownerClassLoaderHash;
-  private final ReadWriteLock cacheReadWriteLock = new ReentrantReadWriteLock();
-  private final Lock cacheReadLock = cacheReadWriteLock.readLock();
-  private final Lock cacheWriteLock = cacheReadWriteLock.writeLock();
-  //private final Map<ClassLoader, Reference<Logger>> loggerCache = new WeakHashMap<>();
   private final LoadingCache<ClassLoader, Reference<Logger>> loggerCache = newBuilder()
       .weakKeys()
       .weakValues()
@@ -88,29 +81,21 @@ abstract class DispatchingLogger extends Logger {
       return originalLogger;
     }
 
-    cacheReadLock.lock();
-    try {
-      Reference<Logger> loggerReference = loggerCache.get(resolvedCtxClassLoader);
-      Logger logger = loggerReference.get();
-      if (logger == null) {
-        cacheReadLock.unlock();
-        cacheWriteLock.lock();
-        try {
-          logger = loggerReference.get();
-          if (logger == null) {
-            logger = resolveLogger(resolvedCtxClassLoader);
-            loggerReference.set(logger);
-          }
-          cacheReadLock.lock();
-        } finally {
-          cacheWriteLock.unlock();
+    // we need to cache reference objects and do this double lookup to avoid cyclic resolutions of the same classloader
+    // key which would result in an exception or a deadlock, depending on the cache implementation
+    Reference<Logger> loggerReference = loggerCache.get(resolvedCtxClassLoader);
+    Logger logger = loggerReference.get();
+    if (logger == null) {
+      synchronized (loggerReference) {
+        logger = loggerReference.get();
+        if (logger == null) {
+          logger = resolveLogger(resolvedCtxClassLoader);
+          loggerReference.set(logger);
         }
       }
-
-      return logger;
-    } finally {
-      cacheReadLock.unlock();
     }
+
+    return logger;
   }
 
   private Logger resolveLogger(ClassLoader resolvedCtxClassLoader) {
