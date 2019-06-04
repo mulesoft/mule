@@ -113,9 +113,12 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
    */
   @Override
   protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory) {
+    Logger logger = super.newInstance(ctx, name, messageFactory);
+    if (artifactClassloader || applicationClassloader) {
+      return logger;
+    }
 
-    return new DispatchingLogger(super.newInstance(ctx, name, messageFactory), ownerClassLoaderHash, this, contextSelector,
-                                 messageFactory) {
+    return new DispatchingLogger(logger, ownerClassLoaderHash, this, contextSelector, messageFactory) {
 
       // force the name due to log4j2's cyclic constructor dependencies
       // aren't a friend of the wrapper pattern
