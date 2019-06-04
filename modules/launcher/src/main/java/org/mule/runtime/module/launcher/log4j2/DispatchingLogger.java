@@ -6,12 +6,19 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Appender;
@@ -27,21 +34,16 @@ import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.apache.logging.log4j.util.MessageSupplier;
 import org.apache.logging.log4j.util.Supplier;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * Suppose that class X is used in applications Y and Z. If X holds a static reference to a logger L, then all the log events are
- * going to be added into the context {@link org.apache.logging.log4j.core.LoggerContext} on which L fast first initialized,
+ * going to be added into the context {@link LoggerContext} on which L fast first initialized,
  * regardless of which application generated the event.
  * <p/>
- * This class is a wrapper for {@link org.apache.logging.log4j.core.Logger} class which is capable of detecting that the log event
- * is being generated from an application which {@link org.apache.logging.log4j.core.LoggerContext} is different than L's, and
+ * This class is a wrapper for {@link Logger} class which is capable of detecting that the log event
+ * is being generated from an application which {@link LoggerContext} is different than L's, and
  * thus forward the event to the correct context.
  * <p/>
- * Because this class is a fix for issues in static loggers, it must not hold any reference to any {@link java.lang.ClassLoader}
+ * Because this class is a fix for issues in static loggers, it must not hold any reference to any {@link ClassLoader}
  * since otherwise that class loader would be GC unreachable. For that reason, it uses {@link #ownerClassLoaderHash} instead of
  * the real reference
  *
@@ -53,6 +55,11 @@ abstract class DispatchingLogger extends Logger {
   private Method updateConfigurationMethod = null;
   private final ContextSelector contextSelector;
   private final int ownerClassLoaderHash;
+
+  private final LoadingCache<ClassLoader, Logger> loggerCache = newBuilder()
+      .weakKeys()
+      .weakValues()
+      .build(this::resolveLogger);
 
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
                     MessageFactory messageFactory) {
@@ -72,6 +79,10 @@ abstract class DispatchingLogger extends Logger {
       return originalLogger;
     }
 
+    return loggerCache.get(resolvedCtxClassLoader);
+  }
+
+  private Logger resolveLogger(ClassLoader resolvedCtxClassLoader) {
     Logger logger;
     // trick - this is probably a logger declared in a static field
     // the classloader used to create it and the TCCL can be different
