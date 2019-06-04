@@ -13,10 +13,15 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
 
+import org.mule.runtime.api.util.Reference;
+
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.apache.logging.log4j.Level;
@@ -52,14 +57,18 @@ import org.apache.logging.log4j.util.Supplier;
 abstract class DispatchingLogger extends Logger {
 
   private final Logger originalLogger;
-  private Method updateConfigurationMethod = null;
   private final ContextSelector contextSelector;
   private final int ownerClassLoaderHash;
-
-  private final LoadingCache<ClassLoader, Logger> loggerCache = newBuilder()
+  private final ReadWriteLock cacheReadWriteLock = new ReentrantReadWriteLock();
+  private final Lock cacheReadLock = cacheReadWriteLock.readLock();
+  private final Lock cacheWriteLock = cacheReadWriteLock.writeLock();
+  //private final Map<ClassLoader, Reference<Logger>> loggerCache = new WeakHashMap<>();
+  private final LoadingCache<ClassLoader, Reference<Logger>> loggerCache = newBuilder()
       .weakKeys()
       .weakValues()
-      .build(this::resolveLogger);
+      .build(key -> new Reference<>());
+
+  private Method updateConfigurationMethod = null;
 
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
                     MessageFactory messageFactory) {
@@ -79,7 +88,29 @@ abstract class DispatchingLogger extends Logger {
       return originalLogger;
     }
 
-    return loggerCache.get(resolvedCtxClassLoader);
+    cacheReadLock.lock();
+    try {
+      Reference<Logger> loggerReference = loggerCache.get(resolvedCtxClassLoader);
+      Logger logger = loggerReference.get();
+      if (logger == null) {
+        cacheReadLock.unlock();
+        cacheWriteLock.lock();
+        try {
+          logger = loggerReference.get();
+          if (logger == null) {
+            logger = resolveLogger(resolvedCtxClassLoader);
+            loggerReference.set(logger);
+          }
+          cacheReadLock.lock();
+        } finally {
+          cacheWriteLock.unlock();
+        }
+      }
+
+      return logger;
+    } finally {
+      cacheReadLock.unlock();
+    }
   }
 
   private Logger resolveLogger(ClassLoader resolvedCtxClassLoader) {
@@ -104,7 +135,7 @@ abstract class DispatchingLogger extends Logger {
   /**
    * @param currentClassLoader execution classloader of the logging operation
    * @return true if the logger context associated with this instance must be used for logging, false if we still need to continue
-   *         searching for the right logger context
+   * searching for the right logger context
    */
   private boolean useThisLoggerContextClassLoader(ClassLoader currentClassLoader) {
     return currentClassLoader.hashCode() == ownerClassLoaderHash;
@@ -113,7 +144,7 @@ abstract class DispatchingLogger extends Logger {
   /**
    * This is workaround for the low visibility of the {@link Logger#updateConfiguration(Configuration)} method, which invokes it
    * on the {@code originalLogger}.
-   *
+   * <p>
    * Using a wrapper in the log4j package causes an {@link IllegalAccessError}.
    *
    * @param config
