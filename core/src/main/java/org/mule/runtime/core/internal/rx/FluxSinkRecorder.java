@@ -68,4 +68,20 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
       fluxSink.error(error);
     }
   }
+
+  public void complete() {
+    boolean present = true;
+    synchronized (this) {
+      if (fluxSink == null) {
+        present = false;
+        bufferedEvents.add(() -> {
+          fluxSink.complete();
+        });
+      }
+    }
+
+    if (present) {
+      fluxSink.complete();
+    }
+  }
 }
