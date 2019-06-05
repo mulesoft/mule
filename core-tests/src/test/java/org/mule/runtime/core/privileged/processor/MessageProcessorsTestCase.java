@@ -43,6 +43,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -60,6 +61,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
 
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -650,6 +652,22 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     thrown.expectCause((is(instanceOf(MessagingException.class))));
     thrown.expectCause(hasCause(is(exception)));
     from(responsePublisher).block();
+  }
+
+  @Test
+  @Issue("MULE-16952")
+  public void applyWithChildContextPublisherCompleted() {
+    AtomicBoolean fluxCompleted = new AtomicBoolean(false);
+
+    final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
+    Flux.create(emitter)
+        .transform(pub -> applyWithChildContext(pub, pubInner -> pubInner, Optional.empty()))
+        .subscribe(event -> {
+        }, e -> {
+        }, () -> fluxCompleted.set(true));
+    emitter.complete();
+
+    assertThat(fluxCompleted.get(), is(true));
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
