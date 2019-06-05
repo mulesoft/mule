@@ -68,14 +68,18 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     ExecutionTemplate<CoreEvent> executionTemplate =
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
-      TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
-      ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
-      transaction.setComponentLocation(getLocation());
+      if (isTransactionActive()) {
+        TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+        ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
+        transaction.setComponentLocation(getLocation());
 
-      try {
+        try {
+          return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
+        } finally {
+          transaction.setComponentLocation(lastLocation);
+        }
+      } else {
         return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
-      } finally {
-        transaction.setComponentLocation(lastLocation);
       }
     };
 
