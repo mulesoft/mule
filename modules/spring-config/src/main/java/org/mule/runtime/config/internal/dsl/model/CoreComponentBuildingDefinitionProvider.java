@@ -361,8 +361,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     Builder processorRefBuilder = baseDefinition
         .withTypeDefinition(fromType(AnnotatedProcessor.class))
-        .withObjectFactoryType(FlowRefFactoryBean.class)
-        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build());
+        .withObjectFactoryType(FlowRefFactoryBean.class);
 
     componentBuildingDefinitions.add(processorRefBuilder
         .withIdentifier(FLOW_REF)

@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.cre
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,6 +30,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -45,6 +47,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -223,6 +227,18 @@ public class DefaultFlowBuilder implements Builder {
       return processToApply(event, this);
     }
 
+    @Override
+    public ReactiveProcessor referenced() {
+      return pub -> from(pub)
+          .doOnNext(assertStarted())
+          .flatMap(flowWaitMapper()
+              // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism
+              .andThen(mapper -> mapper.onErrorResume(e -> Mono.empty())));
+    }
+
+    /**
+     * This implementation does not support {@link Flux}es, but because of backwards compatibility we cannot "improve" it.
+     */
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
