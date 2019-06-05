@@ -38,13 +38,13 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+
+import java.util.List;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
@@ -69,15 +69,22 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
       try {
-        TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
-        ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
-        transaction.setComponentLocation(getLocation());
-        CoreEvent e = processToApply(event,
-                                     p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
-                                                                                             ofNullable(getLocation()),
-                                                                                             messagingExceptionHandler)));
-        transaction.setComponentLocation(lastLocation);
-        return e;
+        if (isTransactionActive()) {
+          TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+          ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
+          transaction.setComponentLocation(getLocation());
+          CoreEvent e = processToApply(event,
+                                       p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
+                                                                                               ofNullable(getLocation()),
+                                                                                               messagingExceptionHandler)));
+          transaction.setComponentLocation(lastLocation);
+          return e;
+        } else {
+          return processToApply(event,
+                                p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
+                                                                                        ofNullable(getLocation()),
+                                                                                        messagingExceptionHandler)));
+        }
       } catch (Exception e) {
         throw e;
       }
