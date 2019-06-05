@@ -17,13 +17,12 @@ import org.mule.test.values.extension.config.ConfigWithValuesWithRequiredParamsF
 import org.mule.test.values.extension.config.ConfigWithValuesWithRequiredParamsFromShowInDslGroup;
 import org.mule.test.values.extension.config.SimpleConfig;
 import org.mule.test.values.extension.source.SimpleSource;
-import org.mule.test.values.extension.source.ValueEmittingSource;
 
 @Extension(name = "Values")
 @Configurations({SimpleConfig.class, ConfigWithValueParameter.class,
     ConfigWithValueAndRequiredParam.class, ConfigWithValuesWithRequiredParamsFromParamGroup.class,
     ConfigWithValuesWithRequiredParamsFromShowInDslGroup.class, ConfigWithFailureErrorProvider.class})
-@Sources({SimpleSource.class, ValueEmittingSource.class})
+@Sources({SimpleSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/values", prefix = "values")
 public class ValuesExtension {
 
