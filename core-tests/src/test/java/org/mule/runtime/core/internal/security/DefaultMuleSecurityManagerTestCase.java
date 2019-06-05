@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.security;
 
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
@@ -46,7 +47,7 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
   private Authentication authentication;
 
   @Rule
-  public ExpectedException expected = ExpectedException.none();
+  public ExpectedException expected = none();
 
   private SecurityManager manager;
 
@@ -63,11 +64,10 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
     when(provider.authenticate(authentication)).thenReturn(authentication);
     manager.addProvider(provider);
 
-    Optional<Authentication> optional = Optional.ofNullable(manager.authenticate(authentication));
+    Optional<Authentication> optional = ofNullable(manager.authenticate(authentication));
 
     verify(provider).authenticate(authentication);
 
-    assertThat(optional.isPresent(), is(true));
     assertThat(optional.get(), is(authentication));
   }
 
@@ -79,9 +79,11 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
 
     expected.expect(UnauthorisedException.class);
 
-    manager.authenticate(authentication);
-
-    verify(provider).authenticate(authentication);
+    try {
+      manager.authenticate(authentication);
+    } finally {
+      verify(provider).authenticate(authentication);
+    }
   }
 
   @Test
@@ -92,9 +94,11 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
 
     expected.expect(SecurityException.class);
 
-    manager.authenticate(authentication);
-
-    verify(provider).authenticate(authentication);
+    try {
+      manager.authenticate(authentication);
+    } finally {
+      verify(provider).authenticate(authentication);
+    }
   }
 
   @Test
@@ -102,11 +106,11 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
           throws SecurityException, SecurityProviderNotFoundException {
     expected.expect(SecurityProviderNotFoundException.class);
 
-    manager.authenticate(authentication);
-
-    verify(provider).authenticate(authentication);
-    verifyZeroInteractions(provider);
+    try {
+      manager.authenticate(authentication);
+    } finally {
+      verifyZeroInteractions(provider);
+    }
   }
-
 
 }
