@@ -115,6 +115,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   @Test
   public void policyCacheEntryGetsEvictedOnFlowDisposal() throws Exception {
+    ((Flow) getFlowConstruct("main")).start();
     messageSentTimer.await(2, SECONDS);
     ((Flow) getFlowConstruct("main")).dispose();
     check(5000, 1000, () -> processorWasDisposed.get());
