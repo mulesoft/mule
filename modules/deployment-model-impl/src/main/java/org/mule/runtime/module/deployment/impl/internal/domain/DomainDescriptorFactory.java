@@ -9,8 +9,12 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.OVERRIDE_ARTIFACT_ID_KEY;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.OVERRIDE_CLASSIFIER_KEY;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.OVERRIDE_GROUP_ID_KEY;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenBundleDescriptorLoader.OVERRIDE_VERSION_KEY;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
@@ -36,6 +40,9 @@ import java.util.Properties;
 public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory<MuleDomainModel, DomainDescriptor> {
 
   public static final String OVERRIDE_DOMAIN_ARTIFACT_ID = "domain.override.artifactId";
+  public static final String OVERRIDE_DOMAIN_VERSION = "domain.override.version";
+  public static final String OVERRIDE_DOMAIN_GROUP_ID = "domain.override.groupId";
+  public static final String OVERRIDE_DOMAIN_CLASSIFIER = "domain.override.classifier";
 
   public DomainDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                  DescriptorLoaderRepository descriptorLoaderRepository,
@@ -78,13 +85,22 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
       if (properties.containsKey(OVERRIDE_DOMAIN_ARTIFACT_ID)) {
         attributes.put(OVERRIDE_ARTIFACT_ID_KEY, properties.getProperty(OVERRIDE_DOMAIN_ARTIFACT_ID));
       }
+      if (properties.containsKey(OVERRIDE_DOMAIN_VERSION)) {
+        attributes.put(OVERRIDE_VERSION_KEY, properties.getProperty(OVERRIDE_DOMAIN_VERSION));
+      }
+      if (properties.containsKey(OVERRIDE_DOMAIN_GROUP_ID)) {
+        attributes.put(OVERRIDE_GROUP_ID_KEY, properties.getProperty(OVERRIDE_DOMAIN_GROUP_ID));
+      }
+      if (properties.containsKey(OVERRIDE_DOMAIN_CLASSIFIER)) {
+        attributes.put(OVERRIDE_CLASSIFIER_KEY, properties.getProperty(OVERRIDE_DOMAIN_CLASSIFIER));
+      }
     }
     return attributes;
   }
 
   public static BundleDescriptor createBundleDescriptorFromName(String domainName) {
     BundleDescriptor.Builder builder = new BundleDescriptor.Builder()
-        .setArtifactId(domainName)
+        .setArtifactId(domainName != null ? domainName : DEFAULT_DOMAIN_NAME)
         .setVersion(getProductVersion())
         .setGroupId("org.mule.runtime")
         .setClassifier(MULE_DOMAIN_CLASSIFIER);

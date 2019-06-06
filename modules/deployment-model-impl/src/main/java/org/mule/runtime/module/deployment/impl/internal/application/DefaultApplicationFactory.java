@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.createBundleDescriptorFromName;
@@ -172,18 +173,19 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   private Domain getApplicationDomain(ApplicationDescriptor descriptor) {
-    Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
     try {
-      if (domainBundleDescriptor.isPresent()) {
+      String domainName = descriptor.getDomainName();
+      Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
+      if (domainName.equals(DEFAULT_DOMAIN_NAME) && domainBundleDescriptor.isPresent()) {
         BundleDescriptor bundleDescriptor = domainBundleDescriptor.get();
         return domainRepository.getDomain(bundleDescriptor);
       } else {
-        BundleDescriptor bundleDescriptor = createBundleDescriptorFromName(descriptor.getDomainName());
+        BundleDescriptor bundleDescriptor = createBundleDescriptorFromName(domainName);
         return domainRepository.getDomain(bundleDescriptor);
       }
     } catch (DomainNotFoundException e) {
       throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
-                                                               descriptor.getDomainName(), descriptor.getName())),
+                                                               e.getDomainName(), descriptor.getName())),
                                     e);
     } catch (IncompatibleDomainVersionException e) {
       throw new DeploymentException(e.getI18nMessage(), e);

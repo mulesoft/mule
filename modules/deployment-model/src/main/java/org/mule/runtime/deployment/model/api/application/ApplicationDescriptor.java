@@ -67,10 +67,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   }
 
   public String getDomainName() {
-    if (domainName != null) {
-      return domainName;
-    }
-    return getDomainDescriptor().map(bundleDescriptor -> bundleDescriptor.getArtifactFileName()).orElse(DEFAULT_DOMAIN_NAME);
+    return domainName != null ? domainName : DEFAULT_DOMAIN_NAME;
   }
 
   /**

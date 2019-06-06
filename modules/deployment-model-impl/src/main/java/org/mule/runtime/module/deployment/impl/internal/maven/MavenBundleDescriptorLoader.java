@@ -43,6 +43,9 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
 
   private static final String JAR = "jar";
   public static final String OVERRIDE_ARTIFACT_ID_KEY = "override.artifactId";
+  public static final String OVERRIDE_VERSION_KEY = "override.version";
+  public static final String OVERRIDE_GROUP_ID_KEY = "override.groupId";
+  public static final String OVERRIDE_CLASSIFIER_KEY = "override.classifier";
 
   @Override
   public String getId() {
@@ -68,14 +71,17 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
 
       org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
 
-      String artifactId = overrideArtifactId(attributes, packagerClassLoaderModel.getArtifactCoordinates().getArtifactId());
+      String coordinatesArtifactId = packagerClassLoaderModel.getArtifactCoordinates().getArtifactId();
+      String coordinatesGroupId = packagerClassLoaderModel.getArtifactCoordinates().getGroupId();
+      String coordinatesVersion = packagerClassLoaderModel.getArtifactCoordinates().getVersion();
+      String coordinatesClassifier = packagerClassLoaderModel.getArtifactCoordinates().getClassifier();
       return new BundleDescriptor.Builder()
-          .setArtifactId(artifactId)
-          .setGroupId(packagerClassLoaderModel.getArtifactCoordinates().getGroupId())
-          .setVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
-          .setBaseVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
+          .setArtifactId(getOrDefault(attributes, coordinatesArtifactId, OVERRIDE_ARTIFACT_ID_KEY))
+          .setGroupId(getOrDefault(attributes, coordinatesGroupId, OVERRIDE_GROUP_ID_KEY))
+          .setVersion(getOrDefault(attributes, coordinatesVersion, OVERRIDE_VERSION_KEY))
+          .setBaseVersion(getOrDefault(attributes, coordinatesVersion, OVERRIDE_VERSION_KEY))
           .setType(packagerClassLoaderModel.getArtifactCoordinates().getType())
-          .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
+          .setClassifier(getOrDefault(attributes, coordinatesClassifier, OVERRIDE_CLASSIFIER_KEY))
           .build();
     } else {
       if (attributes instanceof PluginExtendedBundleDescriptorAttributes) {
@@ -85,12 +91,8 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
     }
   }
 
-  private String overrideArtifactId(Map<String, Object> attributes, String configuredValue) {
-    if (attributes.containsKey(OVERRIDE_ARTIFACT_ID_KEY)) {
-      return String.valueOf(attributes.get(OVERRIDE_ARTIFACT_ID_KEY));
-    } else {
-      return configuredValue;
-    }
+  private String getOrDefault(Map<String, Object> map, String defaultValue, String key) {
+    return (String) map.getOrDefault(key, defaultValue);
   }
 
   private BundleDescriptor getBundleDescriptor(File artifactFile, ArtifactType artifactType, Map<String, Object> attributes) {
@@ -104,11 +106,11 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
         pomProperties = getPomPropertiesFromJar(artifactFile);
       }
 
-      String artifactId = overrideArtifactId(attributes, pomProperties.getProperty("artifactId"));
-      return builder.setGroupId(pomProperties.getProperty("groupId"))
-          .setArtifactId(artifactId)
-          .setVersion(pomProperties.getProperty("version"))
-          .setClassifier(artifactType.equals(APP) ? MULE_APPLICATION_CLASSIFIER : MULE_DOMAIN_CLASSIFIER)
+      String defaultClassifier = artifactType.equals(APP) ? MULE_APPLICATION_CLASSIFIER : MULE_DOMAIN_CLASSIFIER;
+      return builder.setGroupId(getOrDefault(attributes, pomProperties.getProperty("groupId"), OVERRIDE_GROUP_ID_KEY))
+          .setArtifactId(getOrDefault(attributes, pomProperties.getProperty("artifactId"), OVERRIDE_ARTIFACT_ID_KEY))
+          .setVersion(getOrDefault(attributes, pomProperties.getProperty("version"), OVERRIDE_VERSION_KEY))
+          .setClassifier(getOrDefault(attributes, defaultClassifier, OVERRIDE_CLASSIFIER_KEY))
           .build();
     } else {
       Model model;
@@ -118,14 +120,16 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
         model = getPomModelFromJar(artifactFile);
       }
 
-      String artifactId = overrideArtifactId(attributes, model.getArtifactId());
+      String modelGroupId = model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId();
+      String modelVersion = model.getVersion() != null ? model.getVersion() : model.getParent().getVersion();
+      String modelClassifier = artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging();
       return new BundleDescriptor.Builder()
-          .setArtifactId(artifactId)
-          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
+          .setArtifactId(getOrDefault(attributes, model.getArtifactId(), OVERRIDE_ARTIFACT_ID_KEY))
+          .setGroupId(getOrDefault(attributes, modelGroupId, OVERRIDE_GROUP_ID_KEY))
+          .setVersion(getOrDefault(attributes, modelVersion, OVERRIDE_VERSION_KEY))
           .setType(JAR)
           // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
-          .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
+          .setClassifier(getOrDefault(attributes, modelClassifier, OVERRIDE_CLASSIFIER_KEY))
           .build();
     }
   }
