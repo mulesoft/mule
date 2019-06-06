@@ -8,6 +8,9 @@ package org.mule.test.some.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -24,7 +27,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 @MediaType(TEXT_PLAIN)
-public class SomeEmittingSource extends Source<String, String> {
+public class SomeEmittingSource extends Source<String, String> implements Initialisable, Disposable {
 
   private final Logger LOGGER = getLogger(SomeEmittingSource.class);
 
@@ -39,13 +42,12 @@ public class SomeEmittingSource extends Source<String, String> {
 
   @Parameter
   Integer times;
+  private Scheduler emitterScheduler;
 
   @Override
   public void onStart(SourceCallback<String, String> sourceCallback) {
     emissions.set(times);
-    launchedEmitterFuture = schedulerService.customScheduler(SchedulerConfig.config()
-        .withName("Value emitting scheduler")
-        .withMaxConcurrentTasks(1))
+    launchedEmitterFuture = emitterScheduler
         .submit(() -> {
           while (!Thread.currentThread().isInterrupted() && emissions.getAndDecrement() > 0) {
             LOGGER.info("Emitting an event through flow");
@@ -64,4 +66,15 @@ public class SomeEmittingSource extends Source<String, String> {
     launchedEmitterFuture.cancel(true);
   }
 
+  @Override
+  public void initialise() {
+    emitterScheduler = schedulerService.customScheduler(SchedulerConfig.config()
+        .withName("Value emitting scheduler")
+        .withMaxConcurrentTasks(1));
+  }
+
+  @Override
+  public void dispose() {
+    emitterScheduler.stop();
+  }
 }
