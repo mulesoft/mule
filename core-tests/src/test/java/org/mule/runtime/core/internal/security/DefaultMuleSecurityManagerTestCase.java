@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 
-
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
@@ -60,7 +59,7 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void authenticateCorrectly()
-          throws SecurityException, SecurityProviderNotFoundException {
+      throws SecurityException, SecurityProviderNotFoundException {
     when(provider.authenticate(authentication)).thenReturn(authentication);
     manager.addProvider(provider);
 
@@ -73,7 +72,7 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void authenticateWithWrongAuthentication()
-          throws SecurityException, SecurityProviderNotFoundException {
+      throws SecurityException, SecurityProviderNotFoundException {
     when(provider.authenticate(authentication)).thenThrow(UnauthorisedException.class);
     manager.addProvider(provider);
 
@@ -88,7 +87,7 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void authenticateWithFailedProvider()
-          throws SecurityException, SecurityProviderNotFoundException {
+      throws SecurityException, SecurityProviderNotFoundException {
     when(provider.authenticate(authentication)).thenThrow(SecurityException.class);
     manager.addProvider(provider);
 
@@ -103,7 +102,7 @@ public class DefaultMuleSecurityManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void authenticateWithoutProvider()
-          throws SecurityException, SecurityProviderNotFoundException {
+      throws SecurityException, SecurityProviderNotFoundException {
     expected.expect(SecurityProviderNotFoundException.class);
 
     try {
