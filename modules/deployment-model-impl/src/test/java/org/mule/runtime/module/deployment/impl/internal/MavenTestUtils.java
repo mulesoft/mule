@@ -7,16 +7,13 @@
 package org.mule.runtime.module.deployment.impl.internal;
 
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.apache.commons.lang3.ArrayUtils.toArray;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModel;
 import static org.mule.tck.ZipUtils.compress;
 
 import org.mule.tck.ZipUtils;
-import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -50,7 +47,7 @@ public class MavenTestUtils {
         + "-" + pomModel.getVersion()
         + (pomModel.getPackaging() != null ? "-" + pomModel.getPackaging() : "")
         + ".jar";
-    File compressedFile = new File(fileNameInRepo);
+    File compressedFile = new File(explodedArtifactFile, fileNameInRepo);
     compress(compressedFile, listFiles(explodedArtifactFile, null, true).stream()
         .map(f -> new ZipUtils.ZipResource(f.getAbsolutePath(),
                                            f.getAbsolutePath().substring(explodedArtifactFile.getAbsolutePath().length() + 1)))
