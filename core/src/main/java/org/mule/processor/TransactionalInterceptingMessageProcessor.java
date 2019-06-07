@@ -44,12 +44,25 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
+        boolean mustForceTransactionResolution = false;
+        
         if (next == null)
         {
             return event;
         }
         else
         {
+            // This is to handle the cases where new transactions created for this block should be resolved. For example:
+            // 1. A NEW transaction is created for this transactional block (a previous transaction is not joined)
+            // 2. This NEW transaction is suspended because a new transaction or an outbound endpoint with NONE as transactional action is reached
+            // 3. An error occurs in this nested transaction (or in the non-transactional outbound endpoint). As the transaction created for this
+            //    block was suspended, it was not resolved.
+            // To summarize, if no transactions are active till this point, no transactions must be active when exiting the `transactional` block.
+            if (TransactionCoordination.getInstance().getTransaction() == null)
+            {
+                mustForceTransactionResolution = true;
+            }
+            
             ExecutionTemplate<MuleEvent> executionTemplate = createScopeExecutionTemplate(muleContext, transactionConfig, exceptionListener);
             ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
             {
@@ -69,6 +82,13 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
                 else
                 {
                     // Reset the `transacted` flag of the event when exiting the `transactional` block
+                    if (mustForceTransactionResolution)
+                    {
+                        if (TransactionCoordination.getInstance().getTransaction() != null) {
+                            TransactionCoordination.getInstance().resolveTransaction();
+                        }
+                    }
+
                     return new DefaultMuleEvent(result, TransactionCoordination.getInstance().getTransaction() != null);
                 }
             }
