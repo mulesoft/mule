@@ -13,44 +13,47 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
-/**
- * A holder for a pair of MessageProcessor and an expression.
- */
-public class MessageProcessorExpressionPair extends AbstractComponent
-    implements MuleContextAware, Lifecycle {
+public class ProcessorRoute extends AbstractComponent implements MuleContextAware, Lifecycle {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(MessageProcessorExpressionPair.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
-  private final String expression;
   private final Processor messageProcessor;
+  private Flux<CoreEvent> publisher;
+  private LazyValue<FluxSink<CoreEvent>> sink;
 
   private MuleContext muleContext;
 
-  public MessageProcessorExpressionPair(String expression, Processor messageProcessor) {
-    requireNonNull(expression, "expression can't be null");
+  public ProcessorRoute(Processor messageProcessor) {
     requireNonNull(messageProcessor, "messageProcessor can't be null");
-    this.expression = expression;
     this.messageProcessor = messageProcessor;
-  }
-
-  public String getExpression() {
-    return expression;
   }
 
   public Processor getMessageProcessor() {
     return messageProcessor;
+  }
+
+  public Flux<CoreEvent> getPublisher() {
+    return publisher;
+  }
+
+  public FluxSink<CoreEvent> getSink() {
+    return sink.get();
   }
 
   @Override
@@ -72,6 +75,9 @@ public class MessageProcessorExpressionPair extends AbstractComponent
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(messageProcessor, muleContext);
+    FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
+    publisher = Flux.create(sinkRef).transform(messageProcessor);
+    sink = new LazyValue<>(() -> sinkRef.getFluxSink());
   }
 
   @Override
@@ -88,5 +94,4 @@ public class MessageProcessorExpressionPair extends AbstractComponent
   public void dispose() {
     disposeIfNeeded(messageProcessor, LOGGER);
   }
-
 }
