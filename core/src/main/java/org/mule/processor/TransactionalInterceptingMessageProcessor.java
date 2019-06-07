@@ -28,6 +28,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorPathElement;
+import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.NotificationUtils;
@@ -44,12 +45,25 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
+
         if (next == null)
         {
             return event;
         }
         else
         {
+            // This is to handle the cases where new transactions created for this block should be resolved. For
+            // example:
+            // 1. A NEW transaction is created for this transactional block (a previous transaction is not joined)
+            // 2. This NEW transaction is suspended because a new transaction or an outbound endpoint with NONE as
+            // transactional action is reached
+            // 3. An error occurs in this nested transaction (or in the non-transactional outbound endpoint). As the
+            // transaction created for this
+            // block was suspended, it was not resolved.
+            // To summarize, if no transactions are active till this point, no transactions must be active when exiting
+            // the `transactional` block.
+            boolean noPreviousTransactionToJoinOrSuspend = TransactionCoordination.getInstance().getTransaction() == null;
+
             ExecutionTemplate<MuleEvent> executionTemplate = createScopeExecutionTemplate(muleContext, transactionConfig, exceptionListener);
             ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
             {
@@ -62,14 +76,14 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
             try
             {
                 MuleEvent result = executionTemplate.execute(processingCallback);
-                if(result == null || VoidMuleEvent.getInstance() == result)
+                if (result == null || VoidMuleEvent.getInstance() == result)
                 {
                     return result;
                 }
                 else
                 {
                     // Reset the `transacted` flag of the event when exiting the `transactional` block
-                    return new DefaultMuleEvent(result, TransactionCoordination.getInstance().getTransaction() != null);
+                    return resetTransactedFlag(result, noPreviousTransactionToJoinOrSuspend);
                 }
             }
             catch (MuleException e)
@@ -81,6 +95,16 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
                 throw new DefaultMuleException(errorInvokingMessageProcessorWithinTransaction(next, transactionConfig), e);
             }
         }
+    }
+
+    protected MuleEvent resetTransactedFlag(MuleEvent result, boolean mustForceTransactionResolution) throws TransactionException
+    {
+        if (mustForceTransactionResolution && TransactionCoordination.getInstance().getTransaction() != null)
+        {
+            TransactionCoordination.getInstance().resolveTransaction();
+        }
+
+        return new DefaultMuleEvent(result, TransactionCoordination.getInstance().getTransaction() != null);
     }
 
     public void setExceptionListener(MessagingExceptionHandler exceptionListener)
