@@ -34,8 +34,8 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.util.NotificationUtils;
 
 /**
- * Wraps the invocation of the next {@link org.mule.api.processor.MessageProcessor} with a transaction. If the
- * {@link org.mule.api.transaction.TransactionConfig} is null then no transaction is used and the next
+ * Wraps the invocation of the next {@link org.mule.api.processor.MessageProcessor} with a transaction. If
+ * the {@link org.mule.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.api.processor.MessageProcessor} is invoked directly.
  */
 public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, MuleContextAware, FlowConstructAware
@@ -45,7 +45,6 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
-
 
         if (next == null)
         {
@@ -127,7 +126,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         if (this.exceptionListener instanceof Initialisable)
         {
-            ((Initialisable) (this.exceptionListener)).initialise();
+            ((Initialisable)(this.exceptionListener)).initialise();
         }
     }
 
@@ -136,7 +135,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     {
         if (this.exceptionListener instanceof Disposable)
         {
-            ((Disposable) this.exceptionListener).dispose();
+            ((Disposable)this.exceptionListener).dispose();
         }
     }
 
@@ -145,7 +144,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     {
         if (this.exceptionListener instanceof Startable)
         {
-            ((Startable) this.exceptionListener).start();
+            ((Startable)this.exceptionListener).start();
         }
     }
 
@@ -154,25 +153,25 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     {
         if (this.exceptionListener instanceof Stoppable)
         {
-            ((Stoppable) this.exceptionListener).stop();
+            ((Stoppable)this.exceptionListener).stop();
         }
     }
 
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        if (next instanceof MessageProcessorChain) // If this is no checked, the cast raises exception
+        if(next instanceof MessageProcessorChain) //If this is no checked, the cast raises exception
         {
             NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(), pathElement);
         }
     }
-
+    
     @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         if (this.exceptionListener != null && this.exceptionListener instanceof FlowConstructAware)
         {
-            ((FlowConstructAware) (this.exceptionListener)).setFlowConstruct(flowConstruct);
+            ((FlowConstructAware)(this.exceptionListener)).setFlowConstruct(flowConstruct);
         }
     }
 }
