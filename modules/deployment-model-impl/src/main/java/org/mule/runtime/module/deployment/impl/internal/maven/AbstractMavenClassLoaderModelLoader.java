@@ -134,18 +134,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         newHeavyWeightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
                                               packagerClassLoaderModel, attributes);
     classLoaderModelBuilder
-        .exportingPackages(new HashSet<>(
-
-                                         getAttribute(attributes, EXPORTED_PACKAGES)))
-        .
-
-        exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
-                                    new HashSet<>(
-
-                                                  getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
-        .
-
-        exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
+        .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
+        .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
+                                     new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
+        .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
 
     Set<BundleDependency> bundleDependencies;
     if (deployableArtifactRepositoryFolder.isPresent()) {
