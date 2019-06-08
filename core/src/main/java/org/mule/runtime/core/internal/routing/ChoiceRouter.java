@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.ListUtils.union;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -176,26 +177,11 @@ public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, 
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    //TODO: Remove all dynamic runtime modification code (check it's functionally unused) and set this up during initialization
+    List<ProcessorRoute> allRoutes = new ArrayList<>(routes);
+    allRoutes.add(defaultRoute);
     //TODO: check with Rodro issue with merge he solved
-    return Flux.merge(getPublishers(from(publisher).doOnNext(checkedConsumer(this::route))));
-  }
-
-  private List<Flux<CoreEvent>> getPublishers(Flux<CoreEvent> router) {
-    List<Flux<CoreEvent>> routes = this.routes.stream()
-        .map(ProcessorExpressionRoute::getPublisher)
-        .collect(toCollection(ArrayList::new));
-    routes.add(defaultRoute.getPublisher());
-    // Phantom publisher to guarantee the router subscription occurs after all route subscriptions and with the general context
-    routes.add(Flux.<CoreEvent>empty()
-        .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> router.subscriberContext(ctx).subscribe()))));
-    return routes;
-  }
-
-  protected void route(CoreEvent event) {
-    if (!selectProcessor(event)) {
-      defaultRoute.getSink().next(event);
-    }
+    return Flux.merge(new SinkRouter(publisher, allRoutes).getPublishers());
   }
 
   private Collection<?> getLifecycleManagedObjects() {
@@ -252,7 +238,7 @@ public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, 
   private void updateRoute(Processor processor, ChoiceRouter.RoutesUpdater routesUpdater) {
     synchronized (routes) {
       for (int i = 0; i < routes.size(); i++) {
-        if (routes.get(i).getMessageProcessor().equals(processor)) {
+        if (routes.get(i).getProcessor().equals(processor)) {
           routesUpdater.updateAt(i);
         }
       }
@@ -273,16 +259,50 @@ public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, 
     return format("%s [flow=%s, started=%s]", getClass().getSimpleName(), getLocation().getRootContainerName(), started);
   }
 
-  private boolean selectProcessor(CoreEvent event) {
-    try (ExpressionManagerSession emSession = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT)) {
-      for (ProcessorExpressionRoute cmp : routes) {
-        if (emSession.evaluateBoolean(cmp.getExpression(), false, true)) {
-          cmp.getSink().next(event);
-          return true;
-        }
-      }
-      return false;
+  /**
+   * Router that generates executable routes for each one configured and handles the logic of deciding which one will be
+   * executed when an event arrives. It also provides access to the routes publishers so they can be merged together.
+   */
+  private class SinkRouter {
+
+    private final Flux<CoreEvent> router;
+    private final List<ExecutableRoute> routes;
+
+    SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
+      this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
+      router = from(publisher).doOnNext(checkedConsumer(this::route));
     }
+
+    /**
+     * Decides which route should execute for an incoming event and executes it, purposely separating those actions so that a
+     * single {@link ExpressionManagerSession} can be used for all routes decision process.
+     *
+     * @param event the incoming event
+     */
+    private void route(CoreEvent event) {
+      ExecutableRoute selectedRoute;
+      try (ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT)) {
+        selectedRoute = routes.stream().filter(route -> route.shouldExecute(session)).findFirst().get();
+      }
+      selectedRoute.execute(event);
+      updateStatistics(selectedRoute.getProcessor());
+    }
+
+    /**
+     * @return the publishers of all routes so they can be merged and subscribed, including a phantom one to guarantee the
+     * subscription of the router occurs after all routes and with the general context.
+     */
+    private List<Flux<CoreEvent>> getPublishers() {
+      List<Flux<CoreEvent>> routes = this.routes.stream()
+          .map(ExecutableRoute::getPublisher)
+          .collect(toCollection(ArrayList::new));
+      //TODO: Extract the context set up logic so it can be reused by other components.
+      routes.add(Flux.<CoreEvent>empty()
+          .compose(eventPub -> subscriberContext()
+              .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> router.subscriberContext(ctx).subscribe()))));
+      return routes;
+    }
+
   }
 
 }

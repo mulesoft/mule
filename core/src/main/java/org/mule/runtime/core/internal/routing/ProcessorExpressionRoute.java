@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Objects.requireNonNull;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
@@ -26,4 +27,8 @@ public class ProcessorExpressionRoute extends ProcessorRoute {
     return expression;
   }
 
+  @Override
+  public boolean accepts(ExpressionManagerSession session) {
+    return session.evaluateBoolean(expression, false, true);
+  }
 }

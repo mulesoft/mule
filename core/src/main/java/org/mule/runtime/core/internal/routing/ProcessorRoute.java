@@ -17,43 +17,28 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 public class ProcessorRoute extends AbstractComponent implements MuleContextAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
-  private final Processor messageProcessor;
-  private Flux<CoreEvent> publisher;
-  private LazyValue<FluxSink<CoreEvent>> sink;
-
+  private final Processor processor;
   private MuleContext muleContext;
 
-  public ProcessorRoute(Processor messageProcessor) {
-    requireNonNull(messageProcessor, "messageProcessor can't be null");
-    this.messageProcessor = messageProcessor;
+  public ProcessorRoute(Processor processor) {
+    requireNonNull(processor, "processor can't be null");
+    this.processor = processor;
   }
 
-  public Processor getMessageProcessor() {
-    return messageProcessor;
-  }
-
-  public Flux<CoreEvent> getPublisher() {
-    return publisher;
-  }
-
-  public FluxSink<CoreEvent> getSink() {
-    return sink.get();
+  public Processor getProcessor() {
+    return processor;
   }
 
   @Override
@@ -67,31 +52,43 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-    if (messageProcessor instanceof MuleContextAware) {
-      ((MuleContextAware) messageProcessor).setMuleContext(context);
+    if (processor instanceof MuleContextAware) {
+      ((MuleContextAware) processor).setMuleContext(context);
     }
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(messageProcessor, muleContext);
-    FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
-    publisher = Flux.create(sinkRef).transform(messageProcessor);
-    sink = new LazyValue<>(() -> sinkRef.getFluxSink());
+    initialiseIfNeeded(processor, muleContext);
   }
 
   @Override
   public void start() throws MuleException {
-    startIfNeeded(messageProcessor);
+    startIfNeeded(processor);
+  }
+
+  /**
+   * @param session an {@link ExpressionManagerSession}
+   * @return whether this route can be taken given the context
+   */
+  public boolean accepts(ExpressionManagerSession session) {
+    return true;
+  }
+
+  /**
+   * @return an {@link ExecutableRoute} for this one.
+   */
+  ExecutableRoute toExecutableRoute() {
+    return new ExecutableRoute(this);
   }
 
   @Override
   public void stop() throws MuleException {
-    stopIfNeeded(messageProcessor);
+    stopIfNeeded(processor);
   }
 
   @Override
   public void dispose() {
-    disposeIfNeeded(messageProcessor, LOGGER);
+    disposeIfNeeded(processor, LOGGER);
   }
 }

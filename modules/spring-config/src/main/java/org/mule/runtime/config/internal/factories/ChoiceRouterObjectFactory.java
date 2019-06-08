@@ -34,7 +34,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
   }
 
   public void setDefaultRoute(ProcessorRoute conditionalProcessor) {
-    defaultProcessor = conditionalProcessor.getMessageProcessor();
+    defaultProcessor = conditionalProcessor.getProcessor();
   }
 
   public void setRoutes(Collection<ProcessorExpressionRoute> conditionalMessageProcessors) {
@@ -49,7 +49,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
     router.setMuleContext(muleContext);
 
     for (final ProcessorExpressionRoute mper : conditionalMessageProcessors) {
-      router.addRoute(mper.getExpression(), mper.getMessageProcessor());
+      router.addRoute(mper.getExpression(), mper.getProcessor());
     }
 
     return router;
