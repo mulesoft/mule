@@ -11,6 +11,7 @@ import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import org.mule.maven.client.api.model.Authentication;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
@@ -20,15 +21,15 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.globalconfig.api.exception.RuntimeGlobalConfigException;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigObject;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigObject;
 
 /**
  * Configuration builder for {@link MavenConfiguration} instances.
@@ -59,10 +60,16 @@ public class MavenConfigBuilder {
           mavenConfig.hasPath("forcePolicyUpdateNever")
               ? mavenConfig.getBoolean("forcePolicyUpdateNever")
               : false;
+      boolean forcePolicyUpdateAlways = forcePolicyUpdateNever
+          ? false
+          : (mavenConfig.hasPath("forcePolicyUpdateAlways")
+              ? mavenConfig.getBoolean("forcePolicyUpdateAlways")
+              : false);
 
       boolean offLineMode =
           mavenConfig.hasPath("offLineMode")
-              ? mavenConfig.getBoolean("offLineMode") : false;
+              ? mavenConfig.getBoolean("offLineMode")
+              : false;
 
       File globalSettingsFile = findResource(globalSettingsLocation);
       File userSettingsFile = findResource(userSettingsLocation);
@@ -82,6 +89,7 @@ public class MavenConfigBuilder {
               .localMavenRepositoryLocation(repositoryFolder)
               .ignoreArtifactDescriptorRepositories(ignoreArtifactDescriptorRepositories)
               .forcePolicyUpdateNever(forcePolicyUpdateNever)
+              .forcePolicyUpdateAlways(forcePolicyUpdateAlways)
               .offlineMode(offLineMode);
       if (globalSettingsFile != null) {
         mavenConfigurationBuilder.globalSettingsLocation(globalSettingsFile);
