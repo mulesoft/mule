@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
@@ -23,12 +24,15 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
+
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -61,8 +65,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void noRoute() throws Exception {
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    initialise();
 
     CoreEvent inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
@@ -71,8 +74,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void onlyDefaultRoute() throws Exception {
     choiceRouter.setDefaultRoute(newChain(empty(), new TestMessageProcessor("default")));
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    initialise();
 
     assertThat(process(choiceRouter, fooEvent()).getMessage().getPayload().getValue(), is("foo:default"));
   }
@@ -80,8 +82,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void noMatchingNorDefaultRoute() throws Exception {
     choiceRouter.addRoute(payloadZapExpression(), newChain(empty(), new TestMessageProcessor("bar")));
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    initialise();
 
     CoreEvent inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
@@ -91,8 +92,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   public void noMatchingRouteWithDefaultRoute() throws Exception {
     choiceRouter.addRoute(payloadZapExpression(), newChain(empty(), new TestMessageProcessor("bar")));
     choiceRouter.setDefaultRoute(newChain(empty(), new TestMessageProcessor("default")));
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    initialise();
 
     assertThat(process(choiceRouter, fooEvent()).getMessage().getPayload().getValue(), is("foo:default"));
   }
@@ -101,58 +101,30 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   public void matchingRouteWithDefaultRoute() throws Exception {
     choiceRouter.addRoute(payloadZapExpression(), newChain(empty(), new TestMessageProcessor("bar")));
     choiceRouter.setDefaultRoute(newChain(empty(), new TestMessageProcessor("default")));
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    initialise();
 
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
   @Test
   public void matchingRouteWithStatistics() throws Exception {
-    choiceRouter.addRoute(payloadZapExpression(), newChain(empty(), new TestMessageProcessor("bar")));
-    choiceRouter.setRouterStatistics(new RouterStatistics(TYPE_OUTBOUND));
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    TestMessageProcessor processor = new TestMessageProcessor("bar");
+    choiceRouter.addRoute(payloadZapExpression(), newChain(empty(), processor));
+    RouterStatistics routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
+    routerStatistics.setEnabled(true);
+    choiceRouter.setRouterStatistics(routerStatistics);
+    initialise();
 
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
-  }
-
-  @Test
-  public void addAndDeleteRoute() throws Exception {
-    MessageProcessorChain mp = newChain(empty(), new TestMessageProcessor("bar"));
-    choiceRouter.addRoute(payloadZapExpression(), mp);
-    choiceRouter.removeRoute(mp);
-    choiceRouter.setRouterStatistics(new RouterStatistics(TYPE_OUTBOUND));
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
-
-    CoreEvent inputEvent = zapEvent();
-    assertThat(process(choiceRouter, inputEvent), is(inputEvent));
-  }
-
-  @Test
-  public void updateRoute() throws Exception {
-    MessageProcessorChain mp = newChain(empty(), new TestMessageProcessor("bar"));
-    choiceRouter.addRoute(payloadPazExpression(), mp);
-    choiceRouter.updateRoute(payloadZapExpression(), mp);
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
-
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
-  }
-
-  @Test
-  public void removingUpdatingMissingRoutes() {
-    choiceRouter.updateRoute(payloadZapExpression(), newChain(empty(), new TestMessageProcessor("bar")));
-    choiceRouter.removeRoute(newChain(empty(), new TestMessageProcessor("rab")));
+    assertThat((Map<String, Long>) routerStatistics.getRouted(), hasEntry(containsString(processor.toString()), is((long) 2)));
   }
 
   @Test
   public void failingExpression() throws Exception {
     MessageProcessorChain mp = newChain(empty(), new TestMessageProcessor("bar"));
     choiceRouter.addRoute("wat", mp);
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    initialise();
 
     thrown.expectCause(instanceOf(ExpressionRuntimeException.class));
     thrown.expectCause(hasMessage(containsString("evaluating expression: \"wat\"")));
@@ -165,12 +137,16 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
       throw new DefaultMuleException("Oops");
     });
     choiceRouter.addRoute("wat", mp);
-    choiceRouter.setMuleContext(muleContext);
-    choiceRouter.initialise();
+    initialise();
 
     thrown.expectCause(instanceOf(ExpressionRuntimeException.class));
     thrown.expectCause(hasMessage(containsString("evaluating expression: \"wat\"")));
     process(choiceRouter, zapEvent());
+  }
+
+  private void initialise() throws InitialisationException {
+    choiceRouter.setMuleContext(muleContext);
+    choiceRouter.initialise();
   }
 
   private CoreEvent fooEvent() throws MuleException {
@@ -185,8 +161,5 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     return "payload == 'zap'";
   }
 
-  private String payloadPazExpression() {
-    return "payload == 'paz'";
-  }
 }
 

@@ -7,10 +7,8 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.ListUtils.union;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
@@ -20,13 +18,8 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -34,10 +27,10 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,16 +46,13 @@ import reactor.core.publisher.Flux;
  * If a default route has been configured and no match has been found, the default route will be used. Otherwise it continues the
  * execution through the next MP in the chain.
  */
-public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle,
+public class ChoiceRouter extends AbstractComponent implements Router, RouterStatisticsRecorder, Lifecycle,
     MuleContextAware {
 
-  private final AtomicBoolean initialised = new AtomicBoolean(false);
-  private final AtomicBoolean starting = new AtomicBoolean(false);
   private final AtomicBoolean started = new AtomicBoolean(false);
-  private final List<ProcessorExpressionRoute> routes = new ArrayList<>();
+  private final List<ProcessorRoute> routes = new ArrayList<>();
 
   private Processor defaultProcessor;
-  private ProcessorRoute defaultRoute;
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
@@ -86,39 +76,31 @@ public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, 
     if (defaultProcessor == null) {
       defaultProcessor = event -> event;
     }
-    defaultRoute = new ProcessorRoute(defaultProcessor);
+    routes.add(new ProcessorRoute(defaultProcessor));
 
     synchronized (routes) {
-      for (Object o : getLifecycleManagedObjects()) {
-        initialiseIfNeeded(o, muleContext);
+      for (ProcessorRoute route : routes) {
+        initialiseIfNeeded(route, muleContext);
       }
     }
-
-    initialised.set(true);
   }
 
   @Override
   public void start() throws MuleException {
     synchronized (routes) {
-      starting.set(true);
-      for (Object o : getLifecycleManagedObjects()) {
-        if (o instanceof Startable) {
-          ((Startable) o).start();
-        }
+      for (ProcessorRoute route : routes) {
+        route.start();
       }
 
       started.set(true);
-      starting.set(false);
     }
   }
 
   @Override
   public void stop() throws MuleException {
     synchronized (routes) {
-      for (Object o : getLifecycleManagedObjects()) {
-        if (o instanceof Stoppable) {
-          ((Stoppable) o).stop();
-        }
+      for (ProcessorRoute route : routes) {
+        route.stop();
       }
 
       started.set(false);
@@ -128,44 +110,18 @@ public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, 
   @Override
   public void dispose() {
     synchronized (routes) {
-      for (Object o : getLifecycleManagedObjects()) {
-        if (o instanceof Disposable) {
-          ((Disposable) o).dispose();
-        }
+      for (ProcessorRoute route : routes) {
+        route.dispose();
       }
     }
   }
 
-  @Override
   public void addRoute(final String expression, final Processor processor) {
     synchronized (routes) {
-      ProcessorExpressionRoute addedPair = new ProcessorExpressionRoute(expression, processor);
-      routes.add(transitionLifecycleManagedObjectForAddition(addedPair));
+      routes.add(new ProcessorExpressionRoute(expression, processor));
     }
   }
 
-  @Override
-  public void removeRoute(final Processor processor) {
-    updateRoute(processor, index -> {
-      ProcessorExpressionRoute removedPair = routes.remove(index);
-
-      transitionLifecycleManagedObjectForRemoval(removedPair);
-    });
-  }
-
-  @Override
-  public void updateRoute(final String expression, final Processor processor) {
-    updateRoute(processor, index -> {
-      ProcessorExpressionRoute addedPair = new ProcessorExpressionRoute(expression, processor);
-
-      ProcessorExpressionRoute removedPair =
-          routes.set(index, transitionLifecycleManagedObjectForAddition(addedPair));
-
-      transitionLifecycleManagedObjectForRemoval(removedPair);
-    });
-  }
-
-  @Override
   public void setDefaultRoute(final Processor processor) {
     defaultProcessor = processor;
   }
@@ -177,71 +133,13 @@ public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, 
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    //TODO: Remove all dynamic runtime modification code (check it's functionally unused) and set this up during initialization
-    List<ProcessorRoute> allRoutes = new ArrayList<>(routes);
-    allRoutes.add(defaultRoute);
     //TODO: check with Rodro issue with merge he solved
-    return Flux.merge(new SinkRouter(publisher, allRoutes).getPublishers());
-  }
-
-  private Collection<?> getLifecycleManagedObjects() {
-    return union(routes, singletonList(defaultRoute));
-  }
-
-  private <O> O transitionLifecycleManagedObjectForAddition(O managedObject) {
-    try {
-      if ((muleContext != null) && (managedObject instanceof MuleContextAware)) {
-        ((MuleContextAware) managedObject).setMuleContext(muleContext);
-      }
-
-      if ((initialised.get()) && (managedObject instanceof Initialisable)) {
-        ((Initialisable) managedObject).initialise();
-      }
-
-      if ((started.get()) && (managedObject instanceof Startable)) {
-        ((Startable) managedObject).start();
-      }
-    } catch (MuleException me) {
-      throw new MuleRuntimeException(me);
-    }
-
-    return managedObject;
-  }
-
-  private <O> O transitionLifecycleManagedObjectForRemoval(O managedObject) {
-    try {
-      if (managedObject instanceof Stoppable) {
-        ((Stoppable) managedObject).stop();
-      }
-
-      if (managedObject instanceof Disposable) {
-        ((Disposable) managedObject).dispose();
-      }
-    } catch (MuleException me) {
-      throw new MuleRuntimeException(me);
-    }
-
-    return managedObject;
+    return Flux.merge(new SinkRouter(publisher, routes).getPublishers());
   }
 
   public void updateStatistics(Processor processor) {
     if (getRouterStatistics() != null && getRouterStatistics().isEnabled()) {
       getRouterStatistics().incrementRoutedMessage(processor);
-    }
-  }
-
-  private interface RoutesUpdater {
-
-    void updateAt(int index);
-  }
-
-  private void updateRoute(Processor processor, ChoiceRouter.RoutesUpdater routesUpdater) {
-    synchronized (routes) {
-      for (int i = 0; i < routes.size(); i++) {
-        if (routes.get(i).getProcessor().equals(processor)) {
-          routesUpdater.updateAt(i);
-        }
-      }
     }
   }
 
@@ -296,7 +194,7 @@ public class ChoiceRouter extends AbstractComponent implements SelectiveRouter, 
       List<Flux<CoreEvent>> routes = this.routes.stream()
           .map(ExecutableRoute::getPublisher)
           .collect(toCollection(ArrayList::new));
-      //TODO: Extract the context set up logic so it can be reused by other components.
+      //TODO: Extract the context set up logic so it can be reused by other components and analyse how to avoid the phantom flux.
       routes.add(Flux.<CoreEvent>empty()
           .compose(eventPub -> subscriberContext()
               .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> router.subscriberContext(ctx).subscribe()))));
