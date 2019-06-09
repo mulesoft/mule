@@ -46,8 +46,7 @@ import reactor.core.publisher.Flux;
  * If a default route has been configured and no match has been found, the default route will be used. Otherwise it continues the
  * execution through the next MP in the chain.
  */
-public class ChoiceRouter extends AbstractComponent implements Router, RouterStatisticsRecorder, Lifecycle,
-    MuleContextAware {
+public class ChoiceRouter extends AbstractComponent implements Router, RouterStatisticsRecorder, Lifecycle, MuleContextAware {
 
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final List<ProcessorRoute> routes = new ArrayList<>();
@@ -78,48 +77,38 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     }
     routes.add(new ProcessorRoute(defaultProcessor));
 
-    synchronized (routes) {
-      for (ProcessorRoute route : routes) {
-        initialiseIfNeeded(route, muleContext);
-      }
+    for (ProcessorRoute route : routes) {
+      initialiseIfNeeded(route, muleContext);
     }
   }
 
   @Override
   public void start() throws MuleException {
-    synchronized (routes) {
-      for (ProcessorRoute route : routes) {
-        route.start();
-      }
-
-      started.set(true);
+    for (ProcessorRoute route : routes) {
+      route.start();
     }
+
+    started.set(true);
   }
 
   @Override
   public void stop() throws MuleException {
-    synchronized (routes) {
-      for (ProcessorRoute route : routes) {
-        route.stop();
-      }
-
-      started.set(false);
+    for (ProcessorRoute route : routes) {
+      route.stop();
     }
+
+    started.set(false);
   }
 
   @Override
   public void dispose() {
-    synchronized (routes) {
-      for (ProcessorRoute route : routes) {
-        route.dispose();
-      }
+    for (ProcessorRoute route : routes) {
+      route.dispose();
     }
   }
 
   public void addRoute(final String expression, final Processor processor) {
-    synchronized (routes) {
-      routes.add(new ProcessorExpressionRoute(expression, processor));
-    }
+    routes.add(new ProcessorExpressionRoute(expression, processor));
   }
 
   public void setDefaultRoute(final Processor processor) {

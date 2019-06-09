@@ -11,7 +11,8 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * A holder for a pair of MessageProcessor and an expression.
+ * Represents a route with the {@link Processor} it leads to, along with an expression that should be true for the route to be
+ * taken.
  */
 public class ProcessorExpressionRoute extends ProcessorRoute {
 

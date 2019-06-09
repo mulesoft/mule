@@ -25,6 +25,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents a simple route with the {@link Processor} it leads to.
+ */
 public class ProcessorRoute extends AbstractComponent implements MuleContextAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
@@ -45,9 +48,6 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   public String toString() {
     return reflectionToString(this, SHORT_PREFIX_STYLE);
   }
-
-  // This class being just a logic-less tuple, it directly delegates lifecyle
-  // events to its members, without any control.
 
   @Override
   public void setMuleContext(MuleContext context) {
