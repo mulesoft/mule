@@ -15,8 +15,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.MavenGlobalConfiguration.MAVEN_GLOBAL_CONFIGURATION_STORY;
 import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.RUNTIME_GLOBAL_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.MavenGlobalConfiguration.MAVEN_GLOBAL_CONFIGURATION_STORY;
+
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
@@ -30,13 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(RUNTIME_GLOBAL_CONFIGURATION)
 @Story(MAVEN_GLOBAL_CONFIGURATION_STORY)
@@ -224,6 +226,19 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
       GlobalConfigLoader.reset();
       MavenConfiguration mavenConfig = getMavenConfig();
       assertThat(mavenConfig.getForcePolicyUpdateNever(), is(true));
+    });
+  }
+
+  @Description("Loads the forcePolicyUpdateAlways flag from system properties")
+  @Test
+  public void loadForcePolicyUpdateAlways() throws Exception {
+    Map<String, String> properties = new HashMap<>();
+    properties.put("muleRuntimeConfig.maven.forcePolicyUpdateAlways", "true");
+
+    testWithSystemProperties(properties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      assertThat(mavenConfig.getForcePolicyUpdateAlways(), is(true));
     });
   }
 
