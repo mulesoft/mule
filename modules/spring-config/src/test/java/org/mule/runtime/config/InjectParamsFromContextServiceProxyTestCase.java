@@ -27,14 +27,14 @@ import org.mule.runtime.core.internal.config.preferred.Preferred;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.lang.reflect.Method;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleContextTestCase {
@@ -170,6 +170,18 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
+  public void overloadedAugmentedInvocation3() throws Exception {
+    BaseOverloadedService2 service = new OverloadedAugmentedMethodService2();
+
+    final BaseOverloadedService2 serviceProxy =
+        (BaseOverloadedService2) createInjectProviderParamsServiceProxy(service, registry);
+
+    serviceProxy.augmented(muleContext, 1);
+
+    assertThat(augmentedParam, sameInstance(muleContext));
+  }
+
+  @Test
   public void ambiguousAugmentedInvocation() throws Exception {
     BaseService service = new AmbiguousAugmetedMethodService();
 
@@ -221,6 +233,13 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public interface BaseOverloadedService extends BaseService {
 
     void augmented(int i);
+  }
+
+  public interface BaseOverloadedService2 extends BaseService {
+
+    void augmented(MuleContext context);
+
+    void augmented(MuleContext context, int i);
   }
 
   public class BasicService implements BaseService {
@@ -373,6 +392,28 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     public void augmented(int i, MuleContext context) {
       augmentedParam = context;
     }
+  }
+
+  public class OverloadedAugmentedMethodService2 implements BaseOverloadedService2 {
+
+    @Override
+    public String getName() {
+      return "OverloadedAugmentedMethodService2";
+    }
+
+    @Override
+    public void augmented() {}
+
+    @Override
+    @Inject
+    public void augmented(MuleContext context) {}
+
+    @Override
+    @Inject
+    public void augmented(MuleContext context, int i) {
+      augmentedParam = context;
+    }
+
   }
 
   public class AmbiguousAugmetedMethodService implements BaseService {
