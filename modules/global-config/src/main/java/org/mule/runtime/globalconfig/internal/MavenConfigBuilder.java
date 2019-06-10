@@ -57,19 +57,12 @@ public class MavenConfigBuilder {
               ? mavenConfig.getBoolean("ignoreArtifactDescriptorRepositories")
               : true;
       boolean forcePolicyUpdateNever =
-          mavenConfig.hasPath("forcePolicyUpdateNever")
-              ? mavenConfig.getBoolean("forcePolicyUpdateNever")
-              : false;
-      boolean forcePolicyUpdateAlways = forcePolicyUpdateNever
-          ? false
-          : (mavenConfig.hasPath("forcePolicyUpdateAlways")
-              ? mavenConfig.getBoolean("forcePolicyUpdateAlways")
-              : false);
+          mavenConfig.hasPath("forcePolicyUpdateNever") && mavenConfig.getBoolean("forcePolicyUpdateNever");
 
-      boolean offLineMode =
-          mavenConfig.hasPath("offLineMode")
-              ? mavenConfig.getBoolean("offLineMode")
-              : false;
+      boolean forcePolicyUpdateAlways = !forcePolicyUpdateNever
+          && mavenConfig.hasPath("forcePolicyUpdateAlways") && mavenConfig.getBoolean("forcePolicyUpdateAlways");
+
+      boolean offLineMode = mavenConfig.hasPath("offLineMode") && mavenConfig.getBoolean("offLineMode");
 
       File globalSettingsFile = findResource(globalSettingsLocation);
       File userSettingsFile = findResource(userSettingsLocation);
