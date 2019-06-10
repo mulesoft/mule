@@ -94,7 +94,7 @@ public class TransactionalOperations {
     throw new RuntimeException("you better rollback!");
   }
 
-  public void connectionException(@Connection TestTransactionalConnection connection) throws ConnectionException{
+  public void connectionException(@Connection TestTransactionalConnection connection) throws ConnectionException {
     throw new ConnectionException(String.valueOf(connectionExceptions.incrementAndGet()));
   }
 }
