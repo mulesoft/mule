@@ -122,7 +122,6 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    //TODO: check with Rodro issue with merge he solved
     return Flux.merge(new SinkRouter(publisher, routes).getPublishers());
   }
 
@@ -147,8 +146,8 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   }
 
   /**
-   * Router that generates executable routes for each one configured and handles the logic of deciding which one will be
-   * executed when an event arrives. It also provides access to the routes publishers so they can be merged together.
+   * Router that generates executable routes for each one configured and handles the logic of deciding which one will be executed
+   * when an event arrives. It also provides access to the routes publishers so they can be merged together.
    */
   private class SinkRouter {
 
@@ -157,7 +156,10 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
       this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
-      router = from(publisher).doOnNext(checkedConsumer(this::route));
+      router = from(publisher)
+          .doOnNext(checkedConsumer(this::route))
+          .doOnComplete(() -> this.routes.stream()
+              .forEach(executableRoute -> executableRoute.complete()));
     }
 
     /**
@@ -183,13 +185,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
       List<Flux<CoreEvent>> routes = this.routes.stream()
           .map(ExecutableRoute::getPublisher)
           .collect(toCollection(ArrayList::new));
-      //TODO: Extract the context set up logic so it can be reused by other components and analyse how to avoid the phantom flux.
+      // TODO: Extract the context set up logic so it can be reused by other components and analyse how to avoid the phantom flux.
       routes.add(Flux.<CoreEvent>empty()
           .compose(eventPub -> subscriberContext()
               .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> router.subscriberContext(ctx).subscribe()))));
       return routes;
     }
-
   }
-
 }

@@ -50,6 +50,10 @@ public class ExecutableRoute {
     sink.get().next(event);
   }
 
+  public void complete() {
+    sink.get().complete();
+  }
+
   public Flux<CoreEvent> getPublisher() {
     return publisher;
   }
