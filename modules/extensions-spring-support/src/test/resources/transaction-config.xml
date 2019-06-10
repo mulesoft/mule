@@ -104,4 +104,13 @@
             </try>
         </try>
     </flow>
+
+    <flow name="doNotRetryOnTxReconnection">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx:verify-transaction-begun config-ref="localTx1"/>
+            <tx:connection-exception config-ref="localTx1">
+                <reconnect count="5" frequency="10" />
+            </tx:connection-exception>
+        </try>
+    </flow>
 </mule>

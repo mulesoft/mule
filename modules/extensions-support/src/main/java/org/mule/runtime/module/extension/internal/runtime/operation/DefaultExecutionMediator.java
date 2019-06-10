@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -26,6 +27,8 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -37,10 +40,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -49,6 +49,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 /**
@@ -151,7 +154,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         })
         .transform(pub -> from(getRetryPolicyTemplate(context)
             .applyPolicy(pub,
-                         e -> extractConnectionException(e).isPresent(),
+                         e -> shouldRetry(e, context),
                          e -> stats.ifPresent(s -> s.discountInflightOperation()),
                          identity(),
                          context.getCurrentScheduler())));
@@ -163,6 +166,20 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     e = onError(context, e, interceptors);
 
     return e;
+  }
+
+  private boolean shouldRetry(Throwable t, ExecutionContextAdapter<T> context) {
+    if (!extractConnectionException(t).isPresent()) {
+      return false;
+    }
+
+    if (isTransactionActive()) {
+      Transaction tx = TransactionCoordination.getInstance().getTransaction();
+
+      return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
+    }
+
+    return true;
   }
 
   InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {

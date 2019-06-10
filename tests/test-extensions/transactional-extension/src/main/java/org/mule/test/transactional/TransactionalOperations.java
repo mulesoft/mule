@@ -12,6 +12,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -22,8 +24,11 @@ import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TransactionalOperations {
+
+  private AtomicInteger connectionExceptions = new AtomicInteger(0);
 
   @OutputResolver(output = TransactionalMetadataResolver.class)
   public TestTransactionalConnection getConnection(@Connection TestTransactionalConnection connection) {
@@ -87,5 +92,9 @@ public class TransactionalOperations {
 
   public void fail() {
     throw new RuntimeException("you better rollback!");
+  }
+
+  public void connectionException(@Connection TestTransactionalConnection connection) throws ConnectionException {
+    throw new ConnectionException(String.valueOf(connectionExceptions.incrementAndGet()));
   }
 }
