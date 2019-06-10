@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
@@ -110,5 +111,12 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   @Test
   public void operationJoinsAlreadyCreatedTx() throws Exception {
     flowRunner("operationJoinsAlreadyCreatedTx").run();
+  }
+
+  @Test
+  public void doNotRetryOnTxReconnection() throws Exception {
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("1");
+    flowRunner("doNotRetryOnTxReconnection").run();
   }
 }
