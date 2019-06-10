@@ -13,9 +13,9 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
+import static org.mule.runtime.core.internal.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.subscriberContext;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -179,17 +179,16 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
 
     /**
      * @return the publishers of all routes so they can be merged and subscribed, including a phantom one to guarantee the
-     * subscription of the router occurs after all routes and with the general context.
+     *         subscription of the router occurs after all routes and with the general context.
      */
     private List<Flux<CoreEvent>> getPublishers() {
       List<Flux<CoreEvent>> routes = this.routes.stream()
           .map(ExecutableRoute::getPublisher)
           .collect(toCollection(ArrayList::new));
       // TODO: Extract the context set up logic so it can be reused by other components and analyse how to avoid the phantom flux.
-      routes.add(Flux.<CoreEvent>empty()
-          .compose(eventPub -> subscriberContext()
-              .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> router.subscriberContext(ctx).subscribe()))));
+      routes.add(subscribeFluxOnPublisherSubscription(Flux.empty(), router));
       return routes;
     }
+
   }
 }
