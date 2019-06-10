@@ -14,6 +14,7 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.internal.MetadataInvocationHandler;
@@ -107,7 +108,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
   private boolean equivalentParams(Parameter[] invocationParams, Parameter[] serviceImplParams) {
     int i = 0;
     for (Parameter invocationParam : invocationParams) {
-      if (!serviceImplParams[i].getType().equals(invocationParam.getType())) {
+      if (i >= serviceImplParams.length || !serviceImplParams[i].getType().equals(invocationParam.getType())) {
         return false;
       }
       ++i;
