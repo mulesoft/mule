@@ -473,6 +473,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         }).orElseGet(() -> extensionManager.getConfiguration(extensionModel, componentModel, event));
   }
 
+  protected boolean usesDynamicConfiguration() {
+    return isConfigurationSpecified() && configurationProvider.get().isDynamic();
+  }
+
   /**
    * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProvider} is static. Otherwise,
    * returns an empty value.

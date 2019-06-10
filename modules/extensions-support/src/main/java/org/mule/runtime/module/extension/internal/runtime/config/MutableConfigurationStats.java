@@ -35,4 +35,20 @@ public interface MutableConfigurationStats extends ConfigurationStats {
    * @return the new value
    */
   int discountInflightOperation();
+
+  /**
+   * Increments the return value of {@link #getRunningSources()} by one
+   *
+   * @return the new value
+   * @since 4.1.6 4.2.2 4.3.0
+   */
+  int addRunningSource();
+
+  /**
+   * Decrements the return value of {@link #getRunningSources()} by one
+   *
+   * @return the new value
+   * @since 4.1.6 4.2.2 4.3.0
+   */
+  int discountRunningSource();
 }
