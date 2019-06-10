@@ -9,15 +9,17 @@ package org.mule.runtime.core.internal.connection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -119,6 +121,29 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
     reset(connectionProvider);
     stubConnectionProvider();
     getConnection();
+  }
+
+  @Test
+  public void concurrentInvalidate() throws Exception {
+    for (int i = 0; i < 50; i++) {
+      reset(connectionProvider);
+      getConnection();
+      Latch latch = new Latch();
+
+      new Thread(() -> {
+        try {
+          latch.await();
+          managedConnection.invalidate();
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      }).start();
+
+      latch.release();
+      managedConnection.invalidate();
+
+      verify(connectionProvider).disconnect(any());
+    }
   }
 
   @Test
