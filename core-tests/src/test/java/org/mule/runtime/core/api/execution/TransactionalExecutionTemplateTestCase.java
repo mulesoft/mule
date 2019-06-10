@@ -9,16 +9,15 @@ package org.mule.runtime.core.api.execution;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -58,9 +57,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   @Spy
   protected TestTransaction mockNewTransaction = new TestTransaction(mockMuleContext);
-
-  @Mock
-  protected ExternalTransactionAwareTransactionFactory mockExternalTransactionFactory;
 
   @Mock(lenient = true)
   protected MessagingException mockMessagingException;
@@ -156,45 +152,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     verify(mockTransaction).resume();
     verify(mockTransaction, never()).commit();
     verify(mockTransaction, never()).rollback();
-  }
-
-
-  @Test
-  public void testActionNoneAndWithExternalTransactionWithNoTx() throws Exception {
-    MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-    config.setInteractWithExternal(true);
-    mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
-    config.setFactory(mockExternalTransactionFactory);
-    when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenAnswer(invocationOnMock -> {
-      TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-      return mockTransaction;
-    });
-    mockTransaction.setXA(true);
-    ExecutionTemplate executionTemplate = createExecutionTemplate(config);
-    Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat(result, is(RETURN_VALUE));
-    verify(mockTransaction).suspend();
-    verify(mockTransaction).resume();
-    verify(mockTransaction, never()).commit();
-    verify(mockTransaction, never()).rollback();
-    assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
-  }
-
-  @Test
-  public void testActionNoneAndWithExternalTransactionWithTx() throws Exception {
-    TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
-    config.setInteractWithExternal(true);
-    mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
-    config.setFactory(mockExternalTransactionFactory);
-    Transaction externalTransaction = mock(Transaction.class);
-    when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenReturn(externalTransaction);
-    ExecutionTemplate executionTemplate = createExecutionTemplate(config);
-    Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat(result, is(RETURN_VALUE));
-    verify(mockTransaction, never()).rollback();
-    verify(mockTransaction, never()).commit();
-    assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>notNullValue());
   }
 
   @Test

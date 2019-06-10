@@ -7,11 +7,13 @@
 package org.mule.test.transactional;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
@@ -23,6 +25,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.test.transactional.connection.DummyXaResource;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 import org.mule.test.transactional.connection.TestXaTransactionalConnection;
@@ -52,9 +55,10 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
   @Override
   public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) throws MuleException {
-    connectExecutor = newFixedThreadPool(1);
+    connectExecutor = newFixedThreadPool(1, new NamedThreadFactory(TransactionalSource.class.getName()));
     connectExecutor.execute(() -> {
       SourceCallbackContext ctx = sourceCallback.createContext();
+      TransactionHandle txHandle = null;
       try {
         TestTransactionalConnection connection = connectionProvider.connect();
 
@@ -65,12 +69,27 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
         }
 
         ctx.addVariable(IS_XA, isXa);
-        ctx.bindConnection(connection);
+        txHandle = ctx.bindConnection(connection);
         sourceCallback.handle(Result.<TestTransactionalConnection, Object>builder().output(connection).build(), ctx);
       } catch (ConnectionException e) {
         sourceCallback.onConnectionException(e);
       } catch (Exception e) {
         throw new RuntimeException(e);
+      } finally {
+        try {
+          if (txHandle != null) {
+            txHandle.commit();
+          }
+        } catch (TransactionException e) {
+          try {
+            txHandle.rollback();
+          } catch (TransactionException e1) {
+            final RuntimeException rollbackException = new RuntimeException(e1);
+            rollbackException.addSuppressed(e);
+            throw rollbackException;
+          }
+          throw new RuntimeException(e);
+        }
       }
     });
   }

@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.internal.transaction.xa.AbstractTransactionContext;
 import org.mule.runtime.core.internal.transaction.xa.AbstractXAResourceManager;
-import org.mule.runtime.core.internal.transaction.xa.AbstractXaTransactionContext;
-import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import javax.transaction.xa.XAResource;
 
-public class QueueXaResourceManager extends AbstractXAResourceManager {
+public class QueueXaResourceManager extends AbstractXAResourceManager<XaQueueTypeTransactionContextAdapter> {
 
   @Override
   protected void doBegin(AbstractTransactionContext context) {
@@ -21,7 +20,7 @@ public class QueueXaResourceManager extends AbstractXAResourceManager {
   }
 
   @Override
-  protected int doPrepare(AbstractXaTransactionContext context) throws ResourceManagerException {
+  protected int doPrepare(XaQueueTypeTransactionContextAdapter context) throws ResourceManagerException {
     context.doPrepare();
     return XAResource.XA_OK;
   }
