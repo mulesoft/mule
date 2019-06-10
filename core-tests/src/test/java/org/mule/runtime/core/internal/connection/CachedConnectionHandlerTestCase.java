@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -130,19 +131,25 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
       getConnection();
       Latch latch = new Latch();
 
-      new Thread(() -> {
+      Thread t = new Thread(() -> {
         try {
           latch.await();
           managedConnection.invalidate();
         } catch (InterruptedException e) {
+          currentThread().interrupt();
           throw new RuntimeException(e);
         }
-      }).start();
+      });
 
-      latch.release();
-      managedConnection.invalidate();
+      t.start();
+      try {
+        latch.release();
+        managedConnection.invalidate();
 
-      verify(connectionProvider).disconnect(any());
+        verify(connectionProvider).disconnect(any());
+      } finally {
+        t.join();
+      }
     }
   }
 
