@@ -7,13 +7,18 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
+import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +38,14 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
   private final ConnectionProvider<C> connectionProvider;
   private final MuleContext muleContext;
+  private final Lock connectionLock = new ReentrantLock();
   private LazyValue<C> connection;
 
   /**
    * Creates a new instance
    *
    * @param connectionProvider the {@link ConnectionProvider} to be used to managed the connection
-   * @param muleContext the owning {@link MuleContext}
+   * @param muleContext        the owning {@link MuleContext}
    */
   public CachedConnectionHandler(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
     this.connectionProvider = connectionProvider;
@@ -54,7 +60,7 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    * Following invocations simply return the same connection.
    *
    * @return a {@code Connection}
-   * @throws ConnectionException if a {@code Connection} could not be obtained
+   * @throws ConnectionException   if a {@code Connection} could not be obtained
    * @throws IllegalStateException if the first invocation is executed while the {@link #muleContext} is stopping or stopped
    */
   @Override
@@ -96,8 +102,10 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
   @Override
   public void invalidate() {
-    disconnectAndCleanConnection();
-    lazyConnect();
+    withLock(connectionLock, () -> {
+      disconnectAndCleanConnection();
+      lazyConnect();
+    });
   }
 
   /**
@@ -109,16 +117,18 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   }
 
   private void disconnectAndCleanConnection() {
-    connection.ifComputed(c -> {
-      try {
-        connectionProvider.disconnect(c);
-      } catch (Exception e) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(String.format("Error disconnecting cached connection %s. %s", c, e.getMessage()), e);
+    withLock(connectionLock, () -> {
+      connection.ifComputed(c -> {
+        try {
+          connectionProvider.disconnect(c);
+        } catch (Exception e) {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("Error disconnecting cached connection %s. %s", c, e.getMessage()), e);
+          }
+        } finally {
+          connection = null;
         }
-      } finally {
-        connection = null;
-      }
+      });
     });
   }
 
