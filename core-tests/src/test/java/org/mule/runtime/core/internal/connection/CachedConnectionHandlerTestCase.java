@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
@@ -117,6 +120,35 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
     reset(connectionProvider);
     stubConnectionProvider();
     getConnection();
+  }
+
+  @Test
+  public void concurrentInvalidate() throws Exception {
+    for (int i = 0; i < 50; i++) {
+      reset(connectionProvider);
+      getConnection();
+      Latch latch = new Latch();
+
+      Thread t = new Thread(() -> {
+        try {
+          latch.await();
+          managedConnection.invalidate();
+        } catch (InterruptedException e) {
+          currentThread().interrupt();
+          throw new RuntimeException(e);
+        }
+      });
+
+      t.start();
+      try {
+        latch.release();
+        managedConnection.invalidate();
+
+        verify(connectionProvider).disconnect(any());
+      } finally {
+        t.join();
+      }
+    }
   }
 
   @Test
