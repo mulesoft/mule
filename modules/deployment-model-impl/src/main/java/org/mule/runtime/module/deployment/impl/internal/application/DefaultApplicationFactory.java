@@ -13,7 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
-import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.createBundleDescriptorFromName;
+import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -33,7 +33,6 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeploya
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.domain.EmptyDomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
@@ -176,7 +175,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     try {
       String domainName = descriptor.getDomainName();
       Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
-      if (domainName.equals(DEFAULT_DOMAIN_NAME) && domainBundleDescriptor.isPresent()) {
+      if (domainBundleDescriptor.isPresent()) {
         BundleDescriptor bundleDescriptor = domainBundleDescriptor.get();
         return domainRepository.getDomain(bundleDescriptor);
       } else {

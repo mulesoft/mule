@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.util.Collections.emptySet;
-import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.createBundleDescriptorFromName;
+import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 
 import java.io.File;

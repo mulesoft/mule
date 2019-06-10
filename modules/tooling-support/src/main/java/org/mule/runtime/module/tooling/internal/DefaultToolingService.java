@@ -21,12 +21,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.OVERRIDE_DOMAIN_ARTIFACT_ID;
-import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.OVERRIDE_DOMAIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.OVERRIDE_DOMAIN_GROUP_ID;
-import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.OVERRIDE_DOMAIN_VERSION;
-import static org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory.createBundleDescriptorFromName;
+import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
 import org.mule.api.annotation.NoImplement;
@@ -221,12 +216,9 @@ public class DefaultToolingService implements ToolingService {
   @Override
   public Domain createDomain(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
     String domainName = getUniqueIdString(DOMAIN);
-    Optional<Properties> deploymentPropertiesWithDomainDescriptor =
-        addDomainPropertiesToDeploymentProperties(deploymentProperties, domainName);
-
     File toolingDomainContent = artifactFileWriter.writeContent(domainName, domainLocation);
     try {
-      return doCreateDomain(toolingDomainContent, deploymentPropertiesWithDomainDescriptor);
+      return doCreateDomain(toolingDomainContent, deploymentProperties);
     } catch (Throwable t) {
       deleteQuietly(toolingDomainContent);
       throw t;
@@ -244,32 +236,13 @@ public class DefaultToolingService implements ToolingService {
   @Override
   public Domain createDomain(byte[] domainContent, Optional<Properties> deploymentProperties) throws IOException {
     String domainName = getUniqueIdString(DOMAIN);
-    Optional<Properties> deploymentPropertiesWithDomainDescriptor =
-        addDomainPropertiesToDeploymentProperties(deploymentProperties, domainName);
-
     File toolingDomainContent = artifactFileWriter.writeContent(domainName, domainContent);
     try {
-      return doCreateDomain(toolingDomainContent, deploymentPropertiesWithDomainDescriptor);
+      return doCreateDomain(toolingDomainContent, deploymentProperties);
     } catch (Throwable t) {
       deleteQuietly(toolingDomainContent);
       throw t;
     }
-  }
-
-  private static Optional<Properties> addDomainPropertiesToDeploymentProperties(Optional<Properties> deploymentProperties,
-                                                                                String domainName) {
-    if (!deploymentProperties.isPresent()) {
-      Properties newProperties = new Properties();
-      deploymentProperties = of(newProperties);
-    }
-    BundleDescriptor domainBundleDescriptor = createBundleDescriptorFromName(domainName);
-    deploymentProperties.ifPresent(properties -> {
-      properties.setProperty(OVERRIDE_DOMAIN_ARTIFACT_ID, domainBundleDescriptor.getArtifactId());
-      properties.setProperty(OVERRIDE_DOMAIN_VERSION, domainBundleDescriptor.getVersion());
-      properties.setProperty(OVERRIDE_DOMAIN_GROUP_ID, domainBundleDescriptor.getGroupId());
-      properties.setProperty(OVERRIDE_DOMAIN_CLASSIFIER, domainBundleDescriptor.getClassifier().orElse(MULE_DOMAIN_CLASSIFIER));
-    });
-    return deploymentProperties;
   }
 
   private Domain doCreateDomain(File toolingDomainContent, Optional<Properties> deploymentProperties) throws IOException {

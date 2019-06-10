@@ -7,6 +7,9 @@
 package org.mule.runtime.deployment.model.internal.artifact;
 
 import static java.lang.String.format;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -34,4 +37,12 @@ public class ArtifactUtils {
                   artifactVersion.getMinor());
   }
 
+  public static BundleDescriptor createBundleDescriptorFromName(String domainName) {
+    BundleDescriptor.Builder builder = new BundleDescriptor.Builder()
+        .setArtifactId(domainName != null ? domainName : DEFAULT_DOMAIN_NAME)
+        .setVersion(getProductVersion())
+        .setGroupId("org.mule.runtime")
+        .setClassifier(MULE_DOMAIN_CLASSIFIER);
+    return builder.build();
+  }
 }

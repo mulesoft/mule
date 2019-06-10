@@ -8,8 +8,10 @@
 package org.mule.runtime.deployment.model.api.application;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
 
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -35,7 +37,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   private Map<String, String> appProperties = new HashMap<>();
   private ArtifactDeclaration artifactDeclaration;
   private volatile Optional<BundleDescriptor> domainDescriptor;
-  private String domainName;
 
   /**
    * Creates a new application descriptor
@@ -67,7 +68,13 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   }
 
   public String getDomainName() {
-    return domainName != null ? domainName : DEFAULT_DOMAIN_NAME;
+    if (domainDescriptor != null) {
+      if (domainDescriptor.isPresent()) {
+        BundleDescriptor bundleDescriptor = domainDescriptor.get();
+        return bundleDescriptor.getArtifactFileName();
+      }
+    }
+    return DEFAULT_DOMAIN_NAME;
   }
 
   /**
@@ -93,7 +100,9 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   }
 
   public void setDomainName(String domainName) {
-    this.domainName = domainName;
+    synchronized (this) {
+      this.domainDescriptor = of(createBundleDescriptorFromName(domainName));
+    }
   }
 
   /**
