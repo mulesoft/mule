@@ -209,7 +209,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   private boolean isRootProcessorScope(ComponentModel componentModel) {
     ComponentIdentifier identifier = componentModel.getIdentifier();
     return identifier.equals(FLOW_IDENTIFIER) || identifier.equals(MUNIT_BEFORE_SUITE_IDENTIFIER)
-        || identifier.equals(SUBFLOW_IDENTIFIER) ||
+        || identifier.equals(SUBFLOW_IDENTIFIER) || identifier.equals(CHOICE_WHEN_COMPONENT_IDENTIFIER)
+        || identifier.equals(CHOICE_OTHERWISE_COMPONENT_IDENTIFIER) ||
         identifier.equals(MUNIT_BEFORE_TEST_IDENTIFIER) || identifier.equals(MUNIT_AFTER_SUITE_IDENTIFIER) ||
         identifier.equals(MUNIT_AFTER_TEST_IDENTIFIER);
   }
