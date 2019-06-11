@@ -192,8 +192,6 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
   @Override
   public boolean checkBackpressureEmitting(CoreEvent event) {
-    // TODO: This should check somehow whether the sink#emit will fail or not, but that cannot be extracted so straighforwadly
-    // from it.
     return checkCapacity(event);
   }
 

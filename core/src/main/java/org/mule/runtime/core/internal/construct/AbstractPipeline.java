@@ -226,7 +226,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       try {
         // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
         // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
-        // default
+        // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
         if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
           sink.accept(event);
         } else {
