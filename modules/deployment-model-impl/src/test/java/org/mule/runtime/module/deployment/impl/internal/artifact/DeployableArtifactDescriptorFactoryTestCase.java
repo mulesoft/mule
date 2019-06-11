@@ -329,6 +329,11 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
+  public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesLightweighUseLocalRepository() throws Exception {
+    assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight-local-repository");
+  }
+
+  @Test
   public void classLoaderModelWithPluginDependencyAndAdditionalDependenciesHeavyweight() throws Exception {
     assertClassLoaderModelWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
   }
