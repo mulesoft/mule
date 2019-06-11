@@ -96,6 +96,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hamcrest.Matcher;
@@ -554,15 +555,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       case SOURCE:
         try {
           return just(event)
-              .doOnNext(innerEvent -> flow.checkBackpressure(innerEvent))
+              .doOnNext(flow::checkBackpressure)
               .onErrorMap(FlowBackPressureException.class,
-                          backpressureException -> {
-                            try {
-                              return new MessagingException(newEvent(), backpressureException);
-                            } catch (MuleException e) {
-                              throw propagate(e);
-                            }
-                          })
+                          backPressureExceptionMapper())
               .transform(triggerableMessageSource.getListener())
               .block();
         } catch (Throwable throwable) {
@@ -571,6 +566,16 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       default:
         return null;
     }
+  }
+
+  private Function<FlowBackPressureException, Throwable> backPressureExceptionMapper() {
+    return backpressureException -> {
+      try {
+        return new MessagingException(newEvent(), backpressureException);
+      } catch (MuleException e) {
+        throw propagate(e);
+      }
+    };
   }
 
   protected void dispatchFlow(CoreEvent event, Consumer<CoreEvent> onSuccess,
@@ -648,15 +653,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       for (int i = 0; i < STREAM_ITERATIONS; i++) {
         cachedThreadPool.submit(() -> Flux.just(newEvent())
             .cast(CoreEvent.class)
-            .doOnNext(event -> flow.checkBackpressure(event))
+            .doOnNext(flow::checkBackpressure)
             .onErrorMap(FlowBackPressureException.class,
-                        backpressureException -> {
-                          try {
-                            return new MessagingException(newEvent(), backpressureException);
-                          } catch (MuleException e) {
-                            throw propagate(e);
-                          }
-                        })
+                        backPressureExceptionMapper())
             .transform(triggerableMessageSource.getListener())
             .doOnNext(event -> processed.getAndIncrement())
             .doOnError(e -> rejected.getAndIncrement())
