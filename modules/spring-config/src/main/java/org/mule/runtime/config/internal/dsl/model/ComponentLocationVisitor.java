@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
@@ -110,7 +111,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                        componentModel.getConfigFileName(),
                                                        componentModel.getLineNumber(),
                                                        componentModel.getStartColumn());
-      } else if (isRootProcessorScope(parentComponentModel)) {
+      } else if (isRootProcessorScope(parentComponentModel) || isRoute(parentComponentModel)
+          || isScopeProcessor(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isMunitFlowIdentifier(parentComponentModel)) {
         componentLocation = parentComponentLocation.appendRoutePart()
@@ -183,6 +185,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     componentModel.setComponentLocation(componentLocation);
   }
 
+  private boolean isScopeProcessor(ComponentModel componentModel) {
+    return componentModel.getComponentType().map(type -> type.equals(SCOPE)).orElse(false);
+  }
+
   private boolean isBatchAggregator(ComponentModel componentModel) {
     return BATCH_AGGREGATOR_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier());
   }
@@ -209,8 +215,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   private boolean isRootProcessorScope(ComponentModel componentModel) {
     ComponentIdentifier identifier = componentModel.getIdentifier();
     return identifier.equals(FLOW_IDENTIFIER) || identifier.equals(MUNIT_BEFORE_SUITE_IDENTIFIER)
-        || identifier.equals(SUBFLOW_IDENTIFIER) || identifier.equals(CHOICE_WHEN_COMPONENT_IDENTIFIER)
-        || identifier.equals(CHOICE_OTHERWISE_COMPONENT_IDENTIFIER) ||
+        || identifier.equals(SUBFLOW_IDENTIFIER)
         identifier.equals(MUNIT_BEFORE_TEST_IDENTIFIER) || identifier.equals(MUNIT_AFTER_SUITE_IDENTIFIER) ||
         identifier.equals(MUNIT_AFTER_TEST_IDENTIFIER);
   }
