@@ -43,16 +43,6 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
     this.connectionProvider = connectionProvider;
   }
 
-  /**
-   * On the first invocation to this method, a connection is established using the provided {@link #connectionProvider}. That
-   * connection is cached and returned.
-   * <p/>
-   * Following invocations simply return the same connection.
-   *
-   * @return a {@code Connection}
-   * @throws ConnectionException   if a {@code Connection} could not be obtained
-   * @throws IllegalStateException if the first invocation is executed while the {@link #muleContext} is stopping or stopped
-   */
   @Override
   public C getConnection() throws ConnectionException {
     return connection;
