@@ -6,11 +6,23 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
+import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.slf4j.Logger;
 
 /**
  * A {@link ConnectionManagementStrategy} which lazily creates and caches connections, so that the same instance is returned each
@@ -24,17 +36,20 @@ import org.mule.runtime.api.exception.MuleException;
  */
 final class CachedConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C> {
 
-  private final ConnectionHandlerAdapter<C> connection;
+  private static final Logger LOGGER = getLogger(CachedConnectionManagementStrategy.class);
+
+  private final Lock connectionLock = new ReentrantLock();
+  private LazyValue<ConnectionHandlerAdapter<C>> connectionHandler;
 
   /**
    * Creates a new instance
    *
    * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
-   * @param muleContext the owning {@link MuleContext}
+   * @param muleContext        the owning {@link MuleContext}
    */
   CachedConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
     super(connectionProvider, muleContext);
-    connection = new CachedConnectionHandler<>(connectionProvider, muleContext);
+    lazyConnect();
   }
 
   /**
@@ -45,7 +60,16 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
    */
   @Override
   public ConnectionHandler<C> getConnectionHandler() throws ConnectionException {
-    return connection;
+    try {
+      return connectionHandler.get();
+    } catch (Throwable t) {
+      t = unwrap(t);
+      if (t instanceof ConnectionException) {
+        throw (ConnectionException) t;
+      }
+
+      throw new ConnectionException(t.getMessage(), t);
+    }
   }
 
   /**
@@ -55,6 +79,33 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
    */
   @Override
   public void close() throws MuleException {
-    connection.close();
+    connectionHandler.ifComputed(this::close);
+  }
+
+  private synchronized void lazyConnect() {
+    withLock(connectionLock, () -> {
+      connectionHandler = new LazyValue<>((CheckedSupplier<ConnectionHandlerAdapter<C>>) this::createConnection);
+    });
+  }
+
+  private ConnectionHandlerAdapter<C> createConnection() throws ConnectionException {
+    assertNotStopping(muleContext, "Mule is shutting down... Cannot establish new connections");
+    return new CachedConnectionHandler<>(connectionProvider.connect(), this::invalidate, connectionProvider);
+  }
+
+  private void close(ConnectionHandlerAdapter<C> connectionHandler) {
+    try {
+      connectionHandler.close();
+    } catch (Exception e) {
+      LOGGER.warn("Error closing cached connection", e);
+    }
+  }
+
+  private void invalidate(ConnectionHandlerAdapter<C> connection) {
+    try {
+      close(connection);
+    } finally {
+      withLock(connectionLock, () -> lazyConnect());
+    }
   }
 }
