@@ -95,7 +95,6 @@ import reactor.core.publisher.Mono;
 public class ModuleFlowProcessingPhase
     extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> implements Initialisable {
 
-  private static final String FLOW_BACK_PRESSURE_ERROR_TYPE_NOT_FOUND = "FLOW_BACK_PRESSURE error type not found";
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
@@ -164,7 +163,7 @@ public class ModuleFlowProcessingPhase
         just(templateEvent)
             .doOnNext(onMessageReceived(template, messageProcessContext, flowConstruct))
             // Check backpressure against source dependant strategy
-            .doOnNext(event -> flowConstruct.checkBackpressure(event))
+            .doOnNext(flowConstruct::checkBackpressure)
             // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when
             // complete.
             .flatMap(request -> from(policy.process(request, template)))
@@ -193,13 +192,16 @@ public class ModuleFlowProcessingPhase
   }
 
   /**
+   * Notifies the {@link FlowConstruct} response listenting party of the backpressure signal raised when trying to inject the
+   * event for processing into the {@link org.mule.runtime.core.api.processor.strategy.ProcessingStrategy}.
+   * 
    * By wrapping the thrown backpressure exception in an {@link Either} which contains the {@link SourcePolicyFailureResult}, one
    * can consider as if the backpressure signal was fired from inside the policy + flow execution chain, and reuse all handling
    * logic.
    *
    * @param template the processing template being used
    * @param event the event that caused the backpressure signal to be fired
-   * @return
+   * @return an exception mapper that notifies the {@link FlowConstruct} response listener of the backpressure signal
    */
   protected Function<FlowBackPressureException, Mono<? extends Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>> mapBackPressureExceptionToPolicyFailureResult(ModuleFlowProcessingPhaseTemplate template,
                                                                                                                                                                             CoreEvent event) {
@@ -213,7 +215,7 @@ public class ModuleFlowProcessingPhase
                   .build())
               .build();
 
-      // Since the decision whether the event is handled by the source onError or onBackPressure callback's is made in
+      // Since the decision whether the event is handled by the source onError or onBackPressure callback is made in
       // SourceAdapter by checking the ErrorType, the exception is wrapped
       SourcePolicyFailureResult result =
           new SourcePolicyFailureResult(new MessagingException(errorEvent, exception),
