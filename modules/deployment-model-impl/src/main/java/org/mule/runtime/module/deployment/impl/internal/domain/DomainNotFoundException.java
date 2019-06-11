@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public final class DomainNotFoundException extends MuleException {
 
-  private String domainName;
+  private final String domainName;
 
   public DomainNotFoundException(String domainName, Set<BundleDescriptorWrapper> availableDomains) {
     super(createStaticMessage(format("The domain '%s' was not found. Available domains: [%s]", domainName,

@@ -69,9 +69,10 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   public String getDomainName() {
     if (domainDescriptor != null) {
-      if (domainDescriptor.isPresent()) {
-        BundleDescriptor bundleDescriptor = domainDescriptor.get();
-        return bundleDescriptor.getArtifactFileName();
+      synchronized (this) {
+        if (domainDescriptor != null) {
+          return domainDescriptor.map(BundleDescriptor::getArtifactFileName).orElse(DEFAULT_DOMAIN_NAME);
+        }
       }
     }
     return DEFAULT_DOMAIN_NAME;
