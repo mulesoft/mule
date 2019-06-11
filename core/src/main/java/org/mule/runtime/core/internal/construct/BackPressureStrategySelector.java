@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static java.lang.Thread.interrupted;
+import static java.lang.Thread.sleep;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -16,12 +19,14 @@ import java.util.concurrent.RejectedExecutionException;
  * Implements the different backpressure handling strategies, and checks against a
  * {@link org.mule.runtime.core.api.processor.strategy.ProcessingStrategy} whether or not backpressure is fired, before and event
  * being processing.
+ *
+ * @Since 4.3
  */
 public class BackPressureStrategySelector {
 
   private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
-  private AbstractPipeline abstractPipeline;
+  private final AbstractPipeline abstractPipeline;
   private final MessagingExceptionResolver exceptionResolver;
 
   public BackPressureStrategySelector(AbstractPipeline abstractPipeline) {
@@ -45,17 +50,18 @@ public class BackPressureStrategySelector {
       } catch (RejectedExecutionException ree) {
         // TODO MULE-16106 Add a callback for WAIT back pressure applied on the source
         try {
-          Thread.sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+          sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
-          FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName(), ree);
-          throw exception;
+          // Clear interrupt flag on thread
+          interrupted();
+          throw new FlowBackPressureException(abstractPipeline.getName(), ree);
         }
       }
     }
   }
 
   /**
-   * Drop backpressure strategy. If backpressure is fired on the incoming event, it get's dropped from processing.
+   * Drop backpressure strategy. If backpressure is fired on the incoming event, it gets dropped from processing.
    *
    * @param event the event about to begin processing
    * @throws FlowBackPressureException
@@ -63,8 +69,7 @@ public class BackPressureStrategySelector {
   protected void checkWithFailDropStrategy(CoreEvent event)
       throws FlowBackPressureException {
     if (!abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event)) {
-      FlowBackPressureException exception = new FlowBackPressureException(abstractPipeline.getName());
-      throw exception;
+      throw new FlowBackPressureException(abstractPipeline.getName());
     }
   }
 
@@ -77,7 +82,7 @@ public class BackPressureStrategySelector {
    */
   public void check(CoreEvent event)
       throws FlowBackPressureException {
-    if (abstractPipeline.getSource().getBackPressureStrategy() == MessageSource.BackPressureStrategy.WAIT) {
+    if (abstractPipeline.getSource().getBackPressureStrategy() == WAIT) {
       checkWithWaitStrategy(event);
     } else {
       checkWithFailDropStrategy(event);

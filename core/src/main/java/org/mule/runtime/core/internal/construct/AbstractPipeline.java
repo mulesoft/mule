@@ -85,7 +85,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private Sink sink;
   private final int maxConcurrency;
   private final ComponentInitialStateManager componentInitialStateManager;
-  private BackPressureStrategySelector backpressureStrategySelector;
+  private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
@@ -235,9 +235,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           }
         }
       } catch (RejectedExecutionException e) {
-        // Wrap actual cause in a backpressure exception
-        FlowBackPressureException wrappedException = new FlowBackPressureException(this.getName(), e);
         // Handle the case in which the event execution is rejected from the scheduler.
+        FlowBackPressureException wrappedException = new FlowBackPressureException(this.getName(), e);
         notifyBackpressureException(event, wrappedException);
       }
 
