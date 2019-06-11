@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.connection.ConnectionHandlerAdapter;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
@@ -97,12 +99,10 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
   }
 
   private void forceRollback() throws TransactionException {
-    if (!resource.isTransactionResolved()) {
-      try {
-        resource.rollback();
-      } catch (Exception e) {
-        throw new TransactionException(e);
-      }
+    try {
+      TransactionCoordination.getInstance().rollbackCurrentTransaction();
+    } catch (Exception e) {
+      throw new TransactionException(e);
     }
   }
 }
