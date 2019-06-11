@@ -50,6 +50,9 @@ public class ExecutableRoute {
     sink.get().next(event);
   }
 
+  /**
+   * Triggers the underlying {@link Flux} completion signal.
+   */
   public void complete() {
     sink.get().complete();
   }

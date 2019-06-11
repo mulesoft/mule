@@ -122,7 +122,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return Flux.merge(new SinkRouter(publisher, routes).getPublishers());
+    return Flux.merge(new SinkRouter(publisher, routes).collectPublishers());
   }
 
   public void updateStatistics(Processor processor) {
@@ -181,12 +181,13 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
      * @return the publishers of all routes so they can be merged and subscribed, including a phantom one to guarantee the
      *         subscription of the router occurs after all routes and with the general context.
      */
-    private List<Flux<CoreEvent>> getPublishers() {
+    private List<Flux<CoreEvent>> collectPublishers() {
       List<Flux<CoreEvent>> routes = this.routes.stream()
           .map(ExecutableRoute::getPublisher)
           .collect(toCollection(ArrayList::new));
-      // TODO: Extract the context set up logic so it can be reused by other components and analyse how to avoid the phantom flux.
-      routes.add(subscribeFluxOnPublisherSubscription(Flux.empty(), router));
+      // Decorate last route publisher to trigger 'router' subscription
+      Integer lastRouteIndex = routes.size() - 1;
+      routes.set(lastRouteIndex, subscribeFluxOnPublisherSubscription(routes.get(lastRouteIndex), router));
       return routes;
     }
 
