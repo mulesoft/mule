@@ -22,7 +22,7 @@ import java.util.concurrent.RejectedExecutionException;
  *
  * @Since 4.3
  */
-public class BackPressureStrategySelector {
+class BackPressureStrategySelector {
 
   private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
