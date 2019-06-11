@@ -15,16 +15,18 @@ import com.vdurmont.semver4j.Semver;
 /**
  * Two instances of this class wrapping instances of {@link BundleDescriptor} that matches in all parameters but the minor and
  * the patch versions are equals and have the same hash.
+ *
+ * @since 4.2.2
  */
-class BundleDescriptorWrapper {
+class SemVerBundleDescriptorWrapper {
 
   private final BundleDescriptor bundleDescriptor;
 
-  BundleDescriptorWrapper(BundleDescriptor bundleDescriptor) {
+  SemVerBundleDescriptorWrapper(BundleDescriptor bundleDescriptor) {
     this.bundleDescriptor = bundleDescriptor;
   }
 
-  BundleDescriptorWrapper(DomainDescriptor domainDescriptor) {
+  SemVerBundleDescriptorWrapper(DomainDescriptor domainDescriptor) {
     this.bundleDescriptor = domainDescriptor.getBundleDescriptor();
   }
 
@@ -44,11 +46,11 @@ class BundleDescriptorWrapper {
       return true;
     }
 
-    if (!(otherObject instanceof BundleDescriptorWrapper)) {
+    if (!(otherObject instanceof SemVerBundleDescriptorWrapper)) {
       return false;
     }
 
-    BundleDescriptorWrapper otherDescriptorWrapper = (BundleDescriptorWrapper) otherObject;
+    SemVerBundleDescriptorWrapper otherDescriptorWrapper = (SemVerBundleDescriptorWrapper) otherObject;
 
     BundleDescriptor myBundleDescriptor = this.bundleDescriptor;
     BundleDescriptor otherBundleDescriptor = otherDescriptorWrapper.bundleDescriptor;

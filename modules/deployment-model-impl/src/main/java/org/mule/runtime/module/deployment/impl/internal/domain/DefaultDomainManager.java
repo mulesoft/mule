@@ -21,11 +21,11 @@ import java.util.Map;
  */
 public class DefaultDomainManager implements DomainRepository, DomainManager {
 
-  private Map<BundleDescriptorWrapper, Domain> domainsByDescriptor = new HashMap<>();
+  private Map<SemVerBundleDescriptorWrapper, Domain> domainsByDescriptor = new HashMap<>();
 
   @Override
   public Domain getDomain(BundleDescriptor bundleDescriptor) throws DomainNotFoundException, IncompatibleDomainVersionException {
-    BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(bundleDescriptor);
+    SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(bundleDescriptor);
     Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
     if (domain == null) {
       throw new DomainNotFoundException(bundleDescriptor.getArtifactFileName(), domainsByDescriptor.keySet());
@@ -42,7 +42,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
 
   @Override
   public boolean contains(BundleDescriptor descriptor) {
-    BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(descriptor);
+    SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(descriptor);
     if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
       Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
       String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
@@ -55,7 +55,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
 
   @Override
   public void addDomain(Domain domain) {
-    final BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(domain.getDescriptor());
+    final SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(domain.getDescriptor());
     Domain foundDomain = domainsByDescriptor.get(bundleDescriptorWrapper);
     if (foundDomain != null) {
       throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(getDomainName(domain), getDomainName(foundDomain)));
@@ -65,7 +65,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
 
   @Override
   public void removeDomain(Domain domain) {
-    final BundleDescriptorWrapper bundleDescriptorWrapper = new BundleDescriptorWrapper(domain.getDescriptor());
+    final SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(domain.getDescriptor());
     domainsByDescriptor.remove(bundleDescriptorWrapper);
   }
 
