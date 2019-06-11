@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 /**
  * Composition of a {@link ProcessorRoute} and everything required to convert it into a reactor executable chain.
@@ -22,13 +20,12 @@ public class ExecutableRoute {
 
   private ProcessorRoute route;
   private Flux<CoreEvent> publisher;
-  private LazyValue<FluxSink<CoreEvent>> sink;
+  private final FluxSinkRecorder<CoreEvent> sinkRecorder;
 
   ExecutableRoute(ProcessorRoute route) {
     this.route = route;
-    FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
-    publisher = Flux.create(sinkRef).transform(route.getProcessor());
-    sink = new LazyValue<>(() -> sinkRef.getFluxSink());
+    sinkRecorder = new FluxSinkRecorder<>();
+    publisher = Flux.create(sinkRecorder).transform(route.getProcessor());
   }
 
   /**
@@ -47,14 +44,14 @@ public class ExecutableRoute {
    * @param event the {@link CoreEvent} to process
    */
   void execute(CoreEvent event) {
-    sink.get().next(event);
+    sinkRecorder.next(event);
   }
 
   /**
    * Triggers the underlying {@link Flux} completion signal.
    */
   public void complete() {
-    sink.get().complete();
+    sinkRecorder.complete();
   }
 
   public Flux<CoreEvent> getPublisher() {
