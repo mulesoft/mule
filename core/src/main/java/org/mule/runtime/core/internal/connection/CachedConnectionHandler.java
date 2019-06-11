@@ -43,6 +43,7 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
     this.connectionProvider = connectionProvider;
   }
 
+  @Override
   public C getConnection() throws ConnectionException {
     return connection;
   }
