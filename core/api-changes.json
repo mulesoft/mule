@@ -177,6 +177,15 @@
           "methodName": "setLazyInit",
           "elementKind": "method",
           "justification": "Allow lazy init to modify configurations during different initializations"
+        },
+        {
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.core.privileged.transaction.AbstractTransaction.logger",
+          "package": "org.mule.runtime.core.privileged.transaction",
+          "classSimpleName": "AbstractTransaction",
+          "fieldName": "logger",
+          "elementKind": "field",
+          "justification": "This was wrong"
         }
       ]
     }

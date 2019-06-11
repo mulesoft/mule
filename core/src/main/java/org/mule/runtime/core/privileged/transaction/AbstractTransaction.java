@@ -13,6 +13,7 @@ import static org.mule.runtime.api.notification.TransactionNotification.TRANSACT
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -27,18 +28,17 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.MessageFormat;
 import java.util.Optional;
+
+import org.slf4j.Logger;
 
 /**
  * This base class provides low level features for transactions.
  */
 public abstract class AbstractTransaction implements TransactionAdapter {
 
-  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(AbstractTransaction.class);
 
   protected String id = UUID.getUUID();
 
@@ -81,7 +81,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
 
   @Override
   public void begin() throws TransactionException {
-    logger.debug("Beginning transaction " + identityHashCode(this));
+    LOGGER.debug("Beginning transaction {}@{}", this.getClass().getName(), identityHashCode(this));
     doBegin();
     TransactionCoordination.getInstance().bindTransaction(this);
     fireNotification(new TransactionNotification(getId(), TRANSACTION_BEGAN, getApplicationName()));
@@ -90,7 +90,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   @Override
   public void commit() throws TransactionException {
     try {
-      logger.debug("Committing transaction " + identityHashCode(this));
+      LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
 
       if (isRollbackOnly()) {
         throw new IllegalTransactionStateException(transactionMarkedForRollback());
@@ -106,7 +106,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   @Override
   public void rollback() throws TransactionException {
     try {
-      logger.debug("Rolling back transaction " + identityHashCode(this));
+      LOGGER.debug("Rolling back transaction {}@{}", this.getClass().getName(), identityHashCode(this));
       setRollbackOnly();
       doRollback();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_ROLLEDBACK, getApplicationName()));
