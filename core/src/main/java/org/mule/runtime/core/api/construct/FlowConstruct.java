@@ -18,8 +18,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 
-import java.util.concurrent.RejectedExecutionException;
-
 /**
  * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct through which messages are
  * processed using {@link MessageSource} and {@link Processor} building blocks.
@@ -60,10 +58,13 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Compo
   }
 
   /**
-   * Check if backpressure will be fired in the {@link ProcessingStrategy} upon emitting an event
+   * Check if backpressure will be fired in the {@link ProcessingStrategy} upon emitting an event. First, the backpressure
+   * handling strategy is decided based on some condition (the current implementation takes into account just the
+   * {@link MessageSource}, but since this remains decoupled, it's easily extensible). Then, an attempt is made to inject the
+   * {@link CoreEvent} into the {@link ProcessingStrategy}, handling the failure with the selected strategy.
    *
    * @param event the event about to be processed
-   * @throws RejectedExecutionException
+   * @throws RuntimeException
    */
   default void checkBackpressure(CoreEvent event) throws RuntimeException {}
 

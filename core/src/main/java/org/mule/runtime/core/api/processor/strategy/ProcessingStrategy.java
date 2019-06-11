@@ -60,16 +60,20 @@ public interface ProcessingStrategy {
   }
 
   /**
-   * Checks whether backpressure will be fired for a new accepted {@link org.mule.runtime.api.event.Event} to be processed.
+   * Checks whether backpressure will be fired for a new accepted {@link org.mule.runtime.api.event.Event} to be processed. The
+   * event is attempted to be accepted for processing into the flow. If it succeeds, processing begins with the corresponding
+   * {@link ProcessingStrategy}. If not, a backpressure signal is raised, and a {@link RejectedExecutionException} is thrown.
    *
    * @throws RejectedExecutionException
    */
   default void checkBackpressureAccepting(CoreEvent event) throws RejectedExecutionException {}
 
   /**
-   * Checks whether backpressure will be fired for a new emitted {@link org.mule.runtime.api.event.Event} to be processed.
+   * Checks whether backpressure will be fired for a new accepted {@link org.mule.runtime.api.event.Event} to be processed. The
+   * event is attempted to be accepted for processing into the flow. If it succeeds, processing begins with the corresponding
+   * {@link ProcessingStrategy}. If not, a backpressure signal is raised, and the function returns false.
    *
-   * @throws RejectedExecutionException
+   * @return true if the event is accepted by the {@link ProcessingStrategy}. False if not.
    */
   default boolean checkBackpressureEmitting(CoreEvent event) {
     return true;
