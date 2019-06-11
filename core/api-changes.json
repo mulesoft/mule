@@ -27,6 +27,15 @@
           "methodName": "joinExternalTransaction",
           "elementKind": "method",
           "justification": "External transactionas are not supported in Mule 4. Removing leftovers from Mule 3."
+        },
+        {
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.core.privileged.transaction.AbstractTransaction.logger",
+          "package": "org.mule.runtime.core.privileged.transaction",
+          "classSimpleName": "AbstractTransaction",
+          "fieldName": "logger",
+          "elementKind": "field",
+          "justification": "This was wrong"
         }
       ]
     }

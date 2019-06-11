@@ -6,8 +6,15 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noJtaTransactionAvailable;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCommitFailed;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionResourceAlreadyListedForKey;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.util.Preconditions;
@@ -32,11 +39,15 @@ import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 
+import org.slf4j.Logger;
+
 /**
  * <code>XaTransaction</code> represents an XA transaction in Mule.
  */
 @NoExtend
 public class XaTransaction extends AbstractTransaction {
+
+  private static final Logger LOGGER = getLogger(XaTransaction.class);
 
   /**
    * The inner JTA transaction
@@ -46,7 +57,7 @@ public class XaTransaction extends AbstractTransaction {
   /**
    * Map of enlisted resources
    */
-  private Map<ResourceKey, Object> resources = new HashMap<>();
+  private final Map<ResourceKey, Object> resources = new HashMap<>();
 
   protected TransactionManager txManager;
 
@@ -55,6 +66,7 @@ public class XaTransaction extends AbstractTransaction {
     this.txManager = context.getTransactionManager();
   }
 
+  @Override
   protected void doBegin() throws TransactionException {
     if (txManager == null) {
       throw new IllegalStateException(CoreMessages
@@ -68,22 +80,23 @@ public class XaTransaction extends AbstractTransaction {
         transaction = txManager.getTransaction();
       }
     } catch (Exception e) {
-      throw new TransactionException(CoreMessages.cannotStartTransaction("XA"), e);
+      throw new TransactionException(cannotStartTransaction("XA"), e);
     }
   }
 
+  @Override
   protected synchronized void doCommit() throws TransactionException {
     try {
       /*
        * JTA spec quotes (parts highlighted by AP), the same applies to both TransactionManager and UserTransaction:
-       * 
+       *
        * 3.2.2 Completing a Transaction The TransactionManager.commit method completes the transaction currently associated with
        * the calling thread.
        ****
-       * 
+       *
        * After the commit method returns, the calling thread is not associated with a transaction.
        ****
-       * 
+       *
        * If the commit method is called when the thread is not associated with any transaction context, the TM throws an
        * exception. In some implementations, the commit operation is restricted to the transaction originator only. If the calling
        * thread is not allowed to commit the transaction, the TM throws an exception. The TransactionManager.rollback method rolls
@@ -91,14 +104,14 @@ public class XaTransaction extends AbstractTransaction {
        ****
        * After the rollback method completes, the thread is associated with no transaction.
        ****
-       * 
+       *
        * And the following block about Transaction (note there's no thread-tx disassociation clause)
-       * 
+       *
        * 3.3.3 Transaction Completion The Transaction.commit and Transaction.rollback methods allow the target object to be
        * comitted or rolled back. The calling thread is not required to have the same transaction associated with the thread. If
        * the calling thread is not allowed to commit the transaction, the transaction manager throws an exception.
-       * 
-       * 
+       *
+       *
        * So what it meant was that one can't use Transaction.commit()/rollback(), as it doesn't properly disassociate the thread
        * of execution from the current transaction. There's no JTA API-way to do that after the call, so the thread's transaction
        * is subject to manual recovery process. Instead TransactionManager or UserTransaction must be used.
@@ -106,14 +119,14 @@ public class XaTransaction extends AbstractTransaction {
       delistResources();
       txManager.commit();
     } catch (RollbackException | HeuristicRollbackException e) {
-      throw new TransactionRollbackException(CoreMessages.transactionMarkedForRollback(), e);
+      throw new TransactionRollbackException(transactionMarkedForRollback(), e);
     } catch (Exception e) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionCommitFailed(), e);
+      throw new IllegalTransactionStateException(transactionCommitFailed(), e);
     } finally {
       /*
        * MUST nullify XA ref here, otherwise Transaction.getStatus() doesn't match javax.transaction.Transaction.getStatus(). Must
        * return STATUS_NO_TRANSACTION and not STATUS_COMMITTED.
-       * 
+       *
        * TransactionCoordination unbinds the association immediately on this method's exit.
        */
       this.transaction = null;
@@ -121,18 +134,19 @@ public class XaTransaction extends AbstractTransaction {
     }
   }
 
+  @Override
   protected void doRollback() throws TransactionRollbackException {
     try {
       /*
        * JTA spec quotes (parts highlighted by AP), the same applies to both TransactionManager and UserTransaction:
-       * 
+       *
        * 3.2.2 Completing a Transaction The TransactionManager.commit method completes the transaction currently associated with
        * the calling thread.
        ****
-       * 
+       *
        * After the commit method returns, the calling thread is not associated with a transaction.
        ****
-       * 
+       *
        * If the commit method is called when the thread is not associated with any transaction context, the TM throws an
        * exception. In some implementations, the commit operation is restricted to the transaction originator only. If the calling
        * thread is not allowed to commit the transaction, the TM throws an exception. The TransactionManager.rollback method rolls
@@ -140,14 +154,14 @@ public class XaTransaction extends AbstractTransaction {
        ****
        * After the rollback method completes, the thread is associated with no transaction.
        ****
-       * 
+       *
        * And the following block about Transaction (note there's no thread-tx disassociation clause)
-       * 
+       *
        * 3.3.3 Transaction Completion The Transaction.commit and Transaction.rollback methods allow the target object to be
        * comitted or rolled back. The calling thread is not required to have the same transaction associated with the thread. If
        * the calling thread is not allowed to commit the transaction, the transaction manager throws an exception.
-       * 
-       * 
+       *
+       *
        * So what it meant was that one can't use Transaction.commit()/rollback(), as it doesn't properly disassociate the thread
        * of execution from the current transaction. There's no JTA API-way to do that after the call, so the thread's transaction
        * is subject to manual recovery process. Instead TransactionManager or UserTransaction must be used.
@@ -160,7 +174,7 @@ public class XaTransaction extends AbstractTransaction {
       /*
        * MUST nullify XA ref here, otherwise Transaction.getStatus() doesn't match javax.transaction.Transaction.getStatus(). Must
        * return STATUS_NO_TRANSACTION and not STATUS_COMMITTED.
-       * 
+       *
        * TransactionCoordination unbinds the association immediately on this method's exit.
        */
       this.transaction = null;
@@ -168,6 +182,7 @@ public class XaTransaction extends AbstractTransaction {
     }
   }
 
+  @Override
   public synchronized int getStatus() throws TransactionStatusException {
     if (transaction == null) {
       return STATUS_NO_TRANSACTION;
@@ -180,6 +195,7 @@ public class XaTransaction extends AbstractTransaction {
     }
   }
 
+  @Override
   public void setRollbackOnly() {
     if (transaction == null) {
       throw new IllegalStateException("Current thread is not associated with a transaction.");
@@ -195,11 +211,13 @@ public class XaTransaction extends AbstractTransaction {
     }
   }
 
+  @Override
   public synchronized Object getResource(Object key) {
     ResourceKey normalizedKey = getResourceEntry(key);
     return resources.get(normalizedKey);
   }
 
+  @Override
   public synchronized boolean hasResource(Object key) {
     ResourceKey normalizedKey = getResourceEntry(key);
     return resources.containsKey(normalizedKey);
@@ -214,16 +232,17 @@ public class XaTransaction extends AbstractTransaction {
    *        {@link MuleXaObject}
    * @throws TransactionException
    */
+  @Override
   public synchronized void bindResource(Object key, Object resource) throws TransactionException {
     ResourceKey normalizedKey = getResourceEntry(key, resource);
     if (resources.containsKey(key)) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionResourceAlreadyListedForKey(key));
+      throw new IllegalTransactionStateException(transactionResourceAlreadyListedForKey(key));
     }
 
     resources.put(normalizedKey, resource);
 
     if (key == null) {
-      logger.error("Key for bound resource " + resource + " is null");
+      LOGGER.error("Key for bound resource " + resource + " is null");
     }
 
     if (resource instanceof MuleXaObject) {
@@ -232,7 +251,7 @@ public class XaTransaction extends AbstractTransaction {
     } else if (resource instanceof XAResource) {
       enlistResource((XAResource) resource);
     } else {
-      logger.error("Bound resource " + resource + " is neither a MuleXaObject nor XAResource");
+      LOGGER.error("Bound resource " + resource + " is neither a MuleXaObject nor XAResource");
     }
   }
 
@@ -242,7 +261,7 @@ public class XaTransaction extends AbstractTransaction {
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
-        throw new TransactionException(I18nMessageFactory.createStaticMessage("XATransaction is null"));
+        throw new TransactionException(createStaticMessage("XATransaction is null"));
       }
       resource.setTransactionTimeout(getTimeoutInSeconds());
       return jtaTransaction.enlistResource(resource);
@@ -261,7 +280,7 @@ public class XaTransaction extends AbstractTransaction {
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
-        throw new TransactionException(CoreMessages.noJtaTransactionAvailable(Thread.currentThread()));
+        throw new TransactionException(noJtaTransactionAvailable(Thread.currentThread()));
       }
       return jtaTransaction.delistResource(resource, tmflag);
     } catch (SystemException e) {
@@ -270,6 +289,7 @@ public class XaTransaction extends AbstractTransaction {
   }
 
 
+  @Override
   public String toString() {
     return transaction == null ? " <n/a>" : transaction.toString();
   }
@@ -278,10 +298,12 @@ public class XaTransaction extends AbstractTransaction {
     return transaction;
   }
 
+  @Override
   public boolean isXA() {
     return true;
   }
 
+  @Override
   public void resume() throws TransactionException {
     TransactionManager txManager = muleContext.getTransactionManager();
 
@@ -296,6 +318,7 @@ public class XaTransaction extends AbstractTransaction {
     }
   }
 
+  @Override
   public Transaction suspend() throws TransactionException {
     TransactionManager txManager = muleContext.getTransactionManager();
 
@@ -311,7 +334,7 @@ public class XaTransaction extends AbstractTransaction {
     return transaction;
   }
 
-  protected void delistResources() {
+  protected synchronized void delistResources() {
     for (Object o : resources.entrySet()) {
       Map.Entry entry = (Map.Entry) o;
       final Object xaObject = entry.getValue();
@@ -320,13 +343,15 @@ public class XaTransaction extends AbstractTransaction {
         try {
           ((MuleXaObject) xaObject).delist();
         } catch (Exception e) {
-          logger.error("Failed to delist resource " + xaObject, e);
+          LOGGER.error("Failed to delist resource " + xaObject, e);
         }
       }
     }
   }
 
-  protected void closeResources() {
+  protected synchronized void closeResources() {
+    LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), toString());
+
     Iterator i = resources.entrySet().iterator();
     while (i.hasNext()) {
       Map.Entry entry = (Map.Entry) i.next();
@@ -334,13 +359,18 @@ public class XaTransaction extends AbstractTransaction {
       if (value instanceof MuleXaObject) {
         MuleXaObject xaObject = (MuleXaObject) value;
         if (!xaObject.isReuseObject()) {
+          LOGGER.debug("About to close resource {}...", xaObject);
           try {
             xaObject.close();
             i.remove();
           } catch (Exception e) {
-            logger.error("Failed to close resource " + xaObject, e);
+            LOGGER.error("Failed to close resource " + xaObject, e);
           }
+        } else {
+          LOGGER.debug("Not closing reusable object {}", xaObject);
         }
+      } else {
+        LOGGER.debug("Not closing non-MuleXaObject object {}", value);
       }
     }
   }
@@ -368,7 +398,7 @@ public class XaTransaction extends AbstractTransaction {
    */
   private static class ResourceKey {
 
-    private Object resourceFactory;
+    private final Object resourceFactory;
     private Object resource;
 
     public ResourceKey(Object resourceFactory) {
