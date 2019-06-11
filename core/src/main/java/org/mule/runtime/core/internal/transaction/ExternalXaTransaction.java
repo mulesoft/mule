@@ -6,26 +6,33 @@
  */
 package org.mule.runtime.core.internal.transaction;
 
-import org.mule.runtime.core.api.MuleContext;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.text.MessageFormat;
 
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.slf4j.Logger;
+
 /**
  * <code>ExternalXaTransaction</code> represents an external XA transaction in Mule.
  */
 public class ExternalXaTransaction extends XaTransaction {
 
+  private static final Logger LOGGER = getLogger(ExternalXaTransaction.class);
+
   public ExternalXaTransaction(MuleContext muleContext) {
     super(muleContext);
   }
 
+  @Override
   protected void doBegin() throws TransactionException {
     if (txManager == null) {
       throw new IllegalStateException(CoreMessages
@@ -52,9 +59,11 @@ public class ExternalXaTransaction extends XaTransaction {
     }
 
     /** Nothing to do */
+    @Override
     public void beforeCompletion() {}
 
     /** Clean up mule resources */
+    @Override
     public void afterCompletion(int status) {
       boolean commit = status == Status.STATUS_COMMITTED;
 
@@ -65,7 +74,7 @@ public class ExternalXaTransaction extends XaTransaction {
           rollback();
         }
       } catch (TransactionException ex) {
-        logger.warn(MessageFormat.format("Exception while {0} an external transaction {1}",
+        LOGGER.warn(MessageFormat.format("Exception while {0} an external transaction {1}",
                                          commit ? "committing" : "rolling back", this),
                     ex);
       }
@@ -97,14 +106,17 @@ public class ExternalXaTransaction extends XaTransaction {
       return ExternalXaTransaction.this.isRollbackOnly();
     }
 
+    @Override
     public int getStatus() throws TransactionException {
       return ExternalXaTransaction.this.getStatus();
     }
 
+    @Override
     public Object getResource(Object key) {
       return ExternalXaTransaction.this.getResource(key);
     }
 
+    @Override
     public boolean hasResource(Object key) {
       return ExternalXaTransaction.this.hasResource(key);
     }
@@ -114,8 +126,10 @@ public class ExternalXaTransaction extends XaTransaction {
       return ExternalXaTransaction.this.supports(key, resource);
     }
 
+    @Override
     public void bindResource(Object key, Object resource) throws TransactionException {}
 
+    @Override
     public void setRollbackOnly() throws TransactionException {}
   }
 }

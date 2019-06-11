@@ -34,6 +34,15 @@
           "methodName": "duplicateFor",
           "elementKind": "method",
           "justification": "Each Error Handler ref needs a copy of every inner error handler"
+        },
+        {
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.core.privileged.transaction.AbstractTransaction.logger",
+          "package": "org.mule.runtime.core.privileged.transaction",
+          "classSimpleName": "AbstractTransaction",
+          "fieldName": "logger",
+          "elementKind": "field",
+          "justification": "This was wrong"
         }
       ]
     }
