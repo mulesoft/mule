@@ -6,20 +6,27 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
+import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindNullResource;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindToNullKey;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionSingleResourceOnly;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.transaction.Status;
+
+import org.slf4j.Logger;
 
 /**
  * This abstract class can be used as a base class for transactions that can enlist only one resource (such as a JMS session or
@@ -27,12 +34,14 @@ import javax.transaction.Status;
  */
 public abstract class AbstractSingleResourceTransaction extends AbstractTransaction {
 
+  private static final Logger LOGGER = getLogger(AbstractSingleResourceTransaction.class);
+
   /**
    * TX status code to human-readable string mappings.
    *
    * @see javax.transaction.Status
    */
-  protected static Map<Integer, String> txStatusMappings = new HashMap<Integer, String>(10); // populated later
+  protected static Map<Integer, String> txStatusMappings = new HashMap<>(10); // populated later
 
   protected volatile Object key;
   protected volatile Object resource;
@@ -52,28 +61,32 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
       }
     }
 
-    txStatusMappings = Collections.unmodifiableMap(txStatusMappings);
+    txStatusMappings = unmodifiableMap(txStatusMappings);
   }
 
   protected AbstractSingleResourceTransaction(MuleContext muleContext) {
     super(muleContext);
   }
 
+  @Override
   public void begin() throws TransactionException {
     super.begin();
     started.compareAndSet(false, true);
   }
 
+  @Override
   public void commit() throws TransactionException {
     super.commit();
     committed.compareAndSet(false, true);
   }
 
+  @Override
   public void rollback() throws TransactionException {
     super.rollback();
     rolledBack.compareAndSet(false, true);
   }
 
+  @Override
   public int getStatus() throws TransactionStatusException {
     if (rolledBack.get()) {
       return STATUS_ROLLEDBACK;
@@ -90,33 +103,35 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     return STATUS_NO_TRANSACTION;
   }
 
+  @Override
   public Object getResource(Object key) {
     return key != null && this.key == key ? this.resource : null;
   }
 
+  @Override
   public boolean hasResource(Object key) {
     return key != null && this.key == key;
   }
 
+  @Override
   public void bindResource(Object key, Object resource) throws TransactionException {
     if (key == null) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindToNullKey());
+      throw new IllegalTransactionStateException(transactionCannotBindToNullKey());
     }
     if (resource == null) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindNullResource());
+      throw new IllegalTransactionStateException(transactionCannotBindNullResource());
     }
     if (this.key != null) {
-      throw new IllegalTransactionStateException(CoreMessages.transactionSingleResourceOnly());
+      throw new IllegalTransactionStateException(transactionSingleResourceOnly());
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Binding " + resource + " to " + key);
-    }
+    LOGGER.debug("Binding {} to {}", resource, key);
 
     this.key = key;
     this.resource = resource;
   }
 
+  @Override
   public void setRollbackOnly() {
     rollbackOnly.set(true);
   }
