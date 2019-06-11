@@ -64,12 +64,10 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
-import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -79,7 +77,6 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -156,9 +153,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       CoreEvent initialiserEvent = null;
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
-        Optional<ConfigurationInstance> configurationInstance = startUsingConfiguration(initialiserEvent);
         sourceAdapter =
-            sourceAdapterFactory.createAdapter(configurationInstance,
+            sourceAdapterFactory.createAdapter(getConfiguration(initialiserEvent),
                                                createSourceCallbackFactory(),
                                                this,
                                                sourceConnectionManager,
@@ -196,12 +192,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void stopSource() throws MuleException {
     if (sourceAdapter != null) {
       try {
-        CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
-        stopUsingConfiguration(initialiserEvent);
         sourceAdapter.stop();
-        if (usesDynamicConfiguration()) {
-          disposeSource();
-        }
       } catch (Exception e) {
         throw new DefaultMuleException(format("Found exception stopping source '%s' of root component '%s'",
                                               sourceAdapter.getName(),
@@ -601,26 +592,4 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   public LifecycleState getLifecycleState() {
     return lifecycleManager.getState();
   }
-
-  private Optional<ConfigurationInstance> startUsingConfiguration(CoreEvent event) {
-    return getConfigurationAndTryToMutateStats(event,
-                                               (mutableConfigurationStats -> mutableConfigurationStats.addRunningSource()));
-  }
-
-  private void stopUsingConfiguration(CoreEvent event) {
-    getConfigurationAndTryToMutateStats(event, (mutableConfigurationStats -> mutableConfigurationStats.discountRunningSource()));
-  }
-
-  private Optional<ConfigurationInstance> getConfigurationAndTryToMutateStats(CoreEvent event,
-                                                                              Consumer<MutableConfigurationStats> mutableConfigurationStatsConsumer) {
-    Optional<ConfigurationInstance> configurationInstanceOptional = getConfiguration(event);
-    configurationInstanceOptional.ifPresent(configurationInstance -> {
-      ConfigurationStats configurationStats = configurationInstance.getStatistics();
-      if (configurationStats instanceof MutableConfigurationStats) {
-        mutableConfigurationStatsConsumer.accept((MutableConfigurationStats) configurationStats);
-      }
-    });
-    return configurationInstanceOptional;
-  }
-
 }

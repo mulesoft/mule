@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
@@ -23,8 +22,6 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
-import static org.mule.tck.probe.PollingProber.check;
-import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
@@ -60,7 +57,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   public static final int TIMEOUT_MILLIS = 50000;
   public static final int POLL_DELAY_MILLIS = 100;
-  public static final int TIME_WAIT_MILLIS = 3000;
 
   private static final String OUT = "out";
 
@@ -109,38 +105,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("source");
 
     assertSourceCompleted();
-  }
-
-  @Test
-  public void sourceRestartedWithDynamicConfig() throws Exception {
-    final Long gatheredMoney = HeisenbergSource.gatheredMoney;
-    startFlow("source");
-
-    check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> {
-            assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoney));
-            return true;
-          });
-
-    stopFlow("source");
-
-    final Long gatheredMoneyAfterStop = HeisenbergSource.gatheredMoney;
-
-    // Check that money is NOT gathered while flow is stopped
-    checkNot(TIME_WAIT_MILLIS, POLL_DELAY_MILLIS,
-             () -> {
-               assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoneyAfterStop));
-               return true;
-             });
-
-    startFlow("source");
-
-    // Check that money is gathered after flow is restarted
-    check(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> {
-            assertThat(HeisenbergSource.gatheredMoney, greaterThan(gatheredMoneyAfterStop));
-            return true;
-          });
   }
 
   protected void assertSourceCompleted() {
@@ -330,11 +294,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   protected void startFlow(String flowName) throws Exception {
     flow = (Flow) getFlowConstruct(flowName);
     flow.start();
-  }
-
-  protected void stopFlow(String flowName) throws Exception {
-    flow = (Flow) getFlowConstruct(flowName);
-    flow.stop();
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {

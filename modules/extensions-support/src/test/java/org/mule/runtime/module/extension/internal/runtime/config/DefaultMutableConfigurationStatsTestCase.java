@@ -45,13 +45,4 @@ public class DefaultMutableConfigurationStatsTestCase extends AbstractMuleTestCa
     assertThat(stats.discountInflightOperation(), is(0));
     assertThat(stats.getInflightOperations(), is(0));
   }
-
-  @Test
-  public void runningSources() {
-    assertThat(stats.getRunningSources(), is(0));
-    assertThat(stats.addRunningSource(), is(1));
-    assertThat(stats.getRunningSources(), is(1));
-    assertThat(stats.discountRunningSource(), is(0));
-    assertThat(stats.getRunningSources(), is(0));
-  }
 }
