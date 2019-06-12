@@ -8,7 +8,10 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,23 +21,65 @@ import java.util.Map;
  */
 public class DefaultDomainManager implements DomainRepository, DomainManager {
 
-  private Map<String, Domain> domains = new HashMap();
+  private Map<SemVerBundleDescriptorWrapper, Domain> domainsByDescriptor = new HashMap<>();
 
   @Override
-  public Domain getDomain(String name) {
-    return domains.get(name);
+  public Domain getDomain(BundleDescriptor bundleDescriptor) throws DomainNotFoundException, IncompatibleDomainVersionException {
+    SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(bundleDescriptor);
+    Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
+    if (domain == null) {
+      throw new DomainNotFoundException(bundleDescriptor.getArtifactFileName(), domainsByDescriptor.keySet());
+    }
+
+    String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
+    String expectedVersion = bundleDescriptor.getVersion();
+    if (isCompatibleVersion(availableVersion, expectedVersion)) {
+      return domain;
+    } else {
+      throw new IncompatibleDomainVersionException(bundleDescriptor.getArtifactFileName(), availableVersion);
+    }
+  }
+
+  @Override
+  public boolean contains(BundleDescriptor descriptor) {
+    SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(descriptor);
+    if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
+      Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
+      String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
+      String expectedVersion = descriptor.getVersion();
+      return isCompatibleVersion(availableVersion, expectedVersion);
+    }
+
+    return false;
   }
 
   @Override
   public void addDomain(Domain domain) {
-    if (domains.containsKey(domain.getArtifactName())) {
-      throw new IllegalArgumentException(format("Domain '%s' already exists", domain.getArtifactName()));
+    final SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(domain.getDescriptor());
+    Domain foundDomain = domainsByDescriptor.get(bundleDescriptorWrapper);
+    if (foundDomain != null) {
+      throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(getDomainName(domain), getDomainName(foundDomain)));
     }
-    domains.put(domain.getArtifactName(), domain);
+    domainsByDescriptor.put(bundleDescriptorWrapper, domain);
   }
 
   @Override
-  public void removeDomain(String name) {
-    domains.remove(name);
+  public void removeDomain(Domain domain) {
+    final SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(domain.getDescriptor());
+    domainsByDescriptor.remove(bundleDescriptorWrapper);
+  }
+
+  private static String getDomainName(Domain domain) {
+    DomainDescriptor domainDescriptor = domain.getDescriptor();
+    BundleDescriptor bundleDescriptor = domainDescriptor.getBundleDescriptor();
+    if (bundleDescriptor == null) {
+      return domainDescriptor.getName();
+    } else {
+      return bundleDescriptor.getArtifactFileName();
+    }
+  }
+
+  private static String getDomainAlreadyExistsErrorMessage(String requestedDomainName, String foundDomainName) {
+    return format("Trying to add domain '%s', but a domain named '%s' was found", requestedDomainName, foundDomainName);
   }
 }

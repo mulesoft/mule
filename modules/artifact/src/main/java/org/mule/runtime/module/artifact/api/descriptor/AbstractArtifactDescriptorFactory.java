@@ -206,7 +206,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
         .put(BundleDescriptor.class.getName(), bundleDescriptor).build();
   }
 
-  private BundleDescriptor getBundleDescriptor(File appFolder, M artifactModel, Optional<Properties> deploymentProperties) {
+  protected BundleDescriptor getBundleDescriptor(File appFolder, M artifactModel, Optional<Properties> deploymentProperties) {
     BundleDescriptorLoader bundleDescriptorLoader;
     try {
       bundleDescriptorLoader =
