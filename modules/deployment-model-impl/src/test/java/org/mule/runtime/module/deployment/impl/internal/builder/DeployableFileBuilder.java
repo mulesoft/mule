@@ -17,6 +17,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
+
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
@@ -38,9 +39,10 @@ import java.util.Properties;
 public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> extends AbstractArtifactFileBuilder<T> {
 
   protected Properties deployProperties = new Properties();
-  private Map<PluginAdditionalDependenciesKey, List<JarFileBuilder>> additionalPluginDependencies = new HashMap<>();
+  private final Map<PluginAdditionalDependenciesKey, List<JarFileBuilder>> additionalPluginDependencies = new HashMap<>();
 
   private boolean useHeavyPackage = true;
+  private String classloaderModelVersion = "1.0";
 
   public DeployableFileBuilder(String artifactId, boolean upperCaseInExtension) {
     super(artifactId, upperCaseInExtension);
@@ -94,6 +96,11 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     return getThis();
   }
 
+  public T withClassloaderModelVersion(String classloaderModelVersion) {
+    this.classloaderModelVersion = classloaderModelVersion;
+    return getThis();
+  }
+
   @Override
   protected final List<ZipUtils.ZipResource> getCustomResources() {
     final List<ZipUtils.ZipResource> customResources = new LinkedList<>();
@@ -139,12 +146,12 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
         new ArtifactCoordinates(dependencyFileBuilder.getGroupId(), dependencyFileBuilder.getArtifactId(),
                                 dependencyFileBuilder.getVersion(), dependencyFileBuilder.getType(),
                                 dependencyFileBuilder.getClassifier());
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel("1.0", artifactCoordinates);
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel(classloaderModelVersion, artifactCoordinates);
 
     List<Artifact> artifactDependencies = new LinkedList<>();
     List<AbstractDependencyFileBuilder> dependencies = dependencyFileBuilder.getDependencies();
     for (AbstractDependencyFileBuilder fileBuilderDependency : dependencies) {
-      artifactDependencies.add(getArtifact(fileBuilderDependency));
+      artifactDependencies.add(getArtifact(fileBuilderDependency, isShared(fileBuilderDependency)));
     }
 
     classLoaderModel.setDependencies(artifactDependencies);
@@ -163,11 +170,11 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
   private File getClassLoaderModelFile() {
     ArtifactCoordinates artifactCoordinates = new ArtifactCoordinates(getGroupId(), getArtifactId(), getVersion());
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel("1.0", artifactCoordinates);
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel(classloaderModelVersion, artifactCoordinates);
 
     List<Artifact> artifactDependencies = new LinkedList<>();
     for (AbstractDependencyFileBuilder fileBuilderDependency : getDependencies()) {
-      artifactDependencies.add(getArtifact(fileBuilderDependency));
+      artifactDependencies.add(getArtifact(fileBuilderDependency, isShared(fileBuilderDependency)));
     }
 
     classLoaderModel.setDependencies(artifactDependencies);
@@ -180,19 +187,21 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     return serializeToFile(classLoaderModel, destinationFolder);
   }
 
-  private Artifact getArtifact(AbstractDependencyFileBuilder builder) {
+  private Artifact getArtifact(AbstractDependencyFileBuilder builder, boolean shared) {
     ArtifactCoordinates artifactCoordinates =
         new ArtifactCoordinates(builder.getGroupId(), builder.getArtifactId(), builder.getVersion(), builder.getType(),
                                 builder.getClassifier());
-    return new Artifact(artifactCoordinates, builder.getArtifactFile().toURI());
+    final Artifact artifact = new Artifact(artifactCoordinates, builder.getArtifactFile().toURI());
+    artifact.setShared(shared);
+    return artifact;
   }
 
   protected abstract List<ZipUtils.ZipResource> doGetCustomResources();
 
   private class PluginAdditionalDependenciesKey {
 
-    private String groupId;
-    private String artifactId;
+    private final String groupId;
+    private final String artifactId;
 
     public PluginAdditionalDependenciesKey(String groupId, String artifactId) {
       this.groupId = groupId;
