@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.Thread.interrupted;
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -52,8 +52,7 @@ class BackPressureStrategySelector {
         try {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
-          // Clear interrupt flag on thread
-          interrupted();
+          currentThread().interrupt();
           throw new FlowBackPressureException(abstractPipeline.getName(), ree);
         }
       }
