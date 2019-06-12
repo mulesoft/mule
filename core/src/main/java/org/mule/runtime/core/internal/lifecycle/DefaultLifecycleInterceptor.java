@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
-import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
+import static com.google.common.cache.CacheBuilder.newBuilder;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
 
+import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +26,8 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLifecycleInterceptor.class);
 
-  private Map<Object, Object> trackingPhaseFailureObjects = new WeakHashMap<>();
-  private Map<Object, Object> processedObjects = new WeakHashMap<>();
+  private Map<Object, Object> trackingPhaseFailureObjects = newBuilder().weakKeys().weakValues().<Object, Object>build().asMap();
+  private Map<Object, Object> processedObjects = newBuilder().weakKeys().weakValues().<Object, Object>build().asMap();
 
   private final String initialPhase;
   private final String finalPhase;
