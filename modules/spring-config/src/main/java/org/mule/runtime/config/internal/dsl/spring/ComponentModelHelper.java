@@ -15,7 +15,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINUE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
 import org.mule.runtime.api.component.Component;
@@ -28,8 +28,8 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
-import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.Router;
 
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class ComponentModelHelper {
    */
   public static TypedComponentIdentifier.ComponentType resolveComponentType(ComponentModel componentModel,
                                                                             ExtensionModelHelper extensionModelHelper) {
-    if (componentModel.getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
+    if (componentModel.getIdentifier().equals(ON_ERROR_CONTINUE_IDENTIFIER)
         || componentModel.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
       return ON_ERROR;
     }
