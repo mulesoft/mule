@@ -21,6 +21,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
+import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
 import org.mule.api.annotation.NoImplement;
@@ -40,7 +41,9 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
@@ -140,29 +143,27 @@ public class DefaultToolingService implements ToolingService {
         applicationDescriptorFactory.createArtifactModelBuilder(toolingApplicationContent);
     String domainName = mergedDeploymentProperties.get().getProperty(DEPLOYMENT_DOMAIN_NAME_REF);
     if (domainName != null) {
-      Domain domain = domainRepository.getDomain(domainName);
-      if (domain == null) {
-        throw new IllegalArgumentException(format("Domain '%s' is expected to be deployed", domainName));
+      try {
+        Domain domain = domainRepository.getDomain(createBundleDescriptorFromName(domainName));
+        MuleArtifactLoaderDescriptor classLoaderModelDescriptorLoader =
+            applicationArtifactModelBuilder.getClassLoaderModelDescriptorLoader();
+        Map<String, Object> extendedAttributes = new HashMap<>(classLoaderModelDescriptorLoader.getAttributes());
+        extendedAttributes.put(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER,
+                               new DomainMavenReactorResolver(domain.getLocation(),
+                                                              domain.getDescriptor().getBundleDescriptor()));
+        applicationArtifactModelBuilder
+            .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(classLoaderModelDescriptorLoader.getId(),
+                                                                                   extendedAttributes));
+        ApplicationDescriptor applicationDescriptor =
+            applicationDescriptorFactory.createArtifact(toolingApplicationContent, mergedDeploymentProperties,
+                                                        applicationArtifactModelBuilder.build());
+        applicationDescriptor.setDomainName(domain.getArtifactName());
+        return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptor));
+      } catch (DomainNotFoundException e) {
+        throw new IllegalArgumentException(format("Domain '%s' is expected to be deployed", domainName), e);
+      } catch (IncompatibleDomainVersionException e) {
+        throw new IllegalArgumentException("Incompatible domain found", e);
       }
-
-      MuleArtifactLoaderDescriptor classLoaderModelDescriptorLoader =
-          applicationArtifactModelBuilder.getClassLoaderModelDescriptorLoader();
-      Map<String, Object> extendedAttributes = new HashMap<>(classLoaderModelDescriptorLoader.getAttributes());
-      extendedAttributes.put(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER,
-                             new DomainMavenReactorResolver(
-                                                            domain
-                                                                .getLocation(),
-                                                            domain
-                                                                .getDescriptor()
-                                                                .getBundleDescriptor()));
-      applicationArtifactModelBuilder
-          .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(classLoaderModelDescriptorLoader.getId(),
-                                                                                 extendedAttributes));
-      ApplicationDescriptor applicationDescriptor =
-          applicationDescriptorFactory.createArtifact(toolingApplicationContent, mergedDeploymentProperties,
-                                                      applicationArtifactModelBuilder.build());
-      applicationDescriptor.setDomainName(domain.getArtifactName());
-      return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptor));
     }
     return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptorFactory.create(toolingApplicationContent,
                                                                                                  mergedDeploymentProperties)));
@@ -209,18 +210,13 @@ public class DefaultToolingService implements ToolingService {
    */
   @Override
   public Domain createDomain(File domainLocation) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainLocation);
-    try {
-      return doCreateDomain(toolingDomainContent, empty());
-    } catch (Throwable t) {
-      deleteQuietly(toolingDomainContent);
-      throw t;
-    }
+    return createDomain(domainLocation, empty());
   }
 
   @Override
   public Domain createDomain(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainLocation);
+    String domainName = getUniqueIdString(DOMAIN);
+    File toolingDomainContent = artifactFileWriter.writeContent(domainName, domainLocation);
     try {
       return doCreateDomain(toolingDomainContent, deploymentProperties);
     } catch (Throwable t) {
@@ -234,18 +230,13 @@ public class DefaultToolingService implements ToolingService {
    */
   @Override
   public Domain createDomain(byte[] domainContent) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainContent);
-    try {
-      return doCreateDomain(toolingDomainContent, empty());
-    } catch (Throwable t) {
-      deleteQuietly(toolingDomainContent);
-      throw t;
-    }
+    return createDomain(domainContent, empty());
   }
 
   @Override
   public Domain createDomain(byte[] domainContent, Optional<Properties> deploymentProperties) throws IOException {
-    File toolingDomainContent = artifactFileWriter.writeContent(getUniqueIdString(DOMAIN), domainContent);
+    String domainName = getUniqueIdString(DOMAIN);
+    File toolingDomainContent = artifactFileWriter.writeContent(domainName, domainContent);
     try {
       return doCreateDomain(toolingDomainContent, deploymentProperties);
     } catch (Throwable t) {
