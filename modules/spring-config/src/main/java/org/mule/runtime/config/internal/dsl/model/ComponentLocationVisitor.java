@@ -110,7 +110,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                        componentModel.getConfigFileName(),
                                                        componentModel.getLineNumber(),
                                                        componentModel.getStartColumn());
-      } else if (isRootProcessorScope(parentComponentModel) || isRoute(parentComponentModel) || isScopeProcessor(parentComponentModel)) {
+      } else if (isRootProcessorScope(parentComponentModel) || isRoute(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isMunitFlowIdentifier(parentComponentModel)) {
         componentLocation = parentComponentLocation.appendRoutePart()
@@ -145,12 +145,20 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                          componentModel.getStartColumn());
         }
       } else if (isProcessor(componentModel)) {
-        if (isModuleOperation(componentModel.getParent())) {
+        if (isModuleOperation(parentComponentModel) || isScopeProcessor(parentComponentModel)) {
           final Optional<TypedComponentIdentifier> operationTypedIdentifier =
               MODULE_OPERATION_CHAIN.equals(typedComponentIdentifier.get().getIdentifier())
                   ? getModuleOperationTypeComponentIdentifier(componentModel)
                   : typedComponentIdentifier;
-          componentLocation = processModuleOperationChildren(componentModel, operationTypedIdentifier);
+
+          if (isModuleOperation(parentComponentModel)) {
+            componentLocation = processModuleOperationChildren(componentModel, operationTypedIdentifier);
+          } else {
+            componentLocation =
+                parentComponentLocation.appendLocationPart(findProcessorPath(componentModel), operationTypedIdentifier,
+                                                           componentModel.getConfigFileName(), componentModel.getLineNumber(),
+                                                           componentModel.getStartColumn());
+          }
         } else {
           componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
                                                                                                 typedComponentIdentifier,

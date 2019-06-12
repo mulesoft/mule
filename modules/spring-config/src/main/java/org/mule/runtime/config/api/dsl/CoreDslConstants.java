@@ -32,6 +32,9 @@ public interface CoreDslConstants {
   String ON_ERROR_PROPAGATE = "on-error-propagate";
   String CONFIGURATION_ELEMENT = "configuration";
   String NAME_ATTRIBUTE_NAME = "name";
+  String CHOICE_ELEMENT = "choice";
+  String ROUTE_ELEMENT = "route";
+  String UNTIL_SUCCESSFUL_ELEMENT = "until-successful";
 
   ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();
@@ -55,4 +58,10 @@ public interface CoreDslConstants {
       builder().namespace(CORE_PREFIX).name(SUBFLOW_ELEMENT).build();
   ComponentIdentifier CONFIGURATION_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_ELEMENT).build();
+  ComponentIdentifier CHOICE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(CHOICE_ELEMENT).build();
+  ComponentIdentifier ROUTE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(ROUTE_ELEMENT).build();
+  ComponentIdentifier UNTIL_SUCCESSFUL_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(UNTIL_SUCCESSFUL_ELEMENT).build();
 }
