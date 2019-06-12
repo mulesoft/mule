@@ -11,12 +11,14 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
 
 /**
  * Extension for testing purposes
  */
 @Extension(name = "Privileged")
 @Operations({PrivilegedOperation.class})
+@DeclarationEnrichers({})
 public class PrivilegedExtension {
 
   @Parameter

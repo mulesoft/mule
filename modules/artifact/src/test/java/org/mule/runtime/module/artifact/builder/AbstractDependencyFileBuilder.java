@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;
@@ -48,7 +49,7 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   private final List<AbstractDependencyFileBuilder> sharedLibraries = new ArrayList<>();
   private String groupId = "org.mule.test";
   private String version = "1.0.0";
-  private String type = "jar";
+  private final String type = "jar";
   private String classifier;
   private File artifactPomFile;
   private File artifactPomPropertiesFile;
@@ -328,4 +329,9 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
     }
     return new ArrayList<>(allCompileDependencies);
   }
+
+  protected boolean isShared(AbstractDependencyFileBuilder dependencyFileBuilder) {
+    return this.sharedLibraries.contains(dependencyFileBuilder);
+  }
+
 }

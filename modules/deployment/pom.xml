@@ -214,6 +214,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <testComponentPlugin>${org.mule.tests.plugin:mule-tests-component-plugin:jar:mule-plugin}</testComponentPlugin>
+                        <extensionsApiLib>${org.mule.runtime:mule-extensions-api:jar}</extensionsApiLib>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
