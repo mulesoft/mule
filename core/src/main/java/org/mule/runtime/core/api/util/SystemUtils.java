@@ -63,12 +63,12 @@ public class SystemUtils {
   }
 
   public static boolean isSunJDK() {
-    return JAVA_VM_VENDOR.toUpperCase().contains("sun")
-        || JAVA_VM_VENDOR.toUpperCase().contains("oracle");
+    return JAVA_VM_VENDOR.toLowerCase().contains("sun")
+        || JAVA_VM_VENDOR.toLowerCase().contains("oracle");
   }
 
   public static boolean isAppleJDK() {
-    return JAVA_VM_VENDOR.toUpperCase().contains("apple");
+    return JAVA_VM_VENDOR.toLowerCase().contains("apple");
   }
 
   public static boolean isIbmJDK() {
