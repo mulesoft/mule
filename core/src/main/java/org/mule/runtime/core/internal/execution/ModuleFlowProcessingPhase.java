@@ -194,7 +194,7 @@ public class ModuleFlowProcessingPhase
   /**
    * Notifies the {@link FlowConstruct} response listenting party of the backpressure signal raised when trying to inject the
    * event for processing into the {@link org.mule.runtime.core.api.processor.strategy.ProcessingStrategy}.
-   * 
+   * <p>
    * By wrapping the thrown backpressure exception in an {@link Either} which contains the {@link SourcePolicyFailureResult}, one
    * can consider as if the backpressure signal was fired from inside the policy + flow execution chain, and reuse all handling
    * logic.
