@@ -43,7 +43,7 @@ import java.util.Properties;
  */
 public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFileBuilder> {
 
-  private Properties properties = new Properties();
+  private final Properties properties = new Properties();
 
   /**
    * Creates a new builder
