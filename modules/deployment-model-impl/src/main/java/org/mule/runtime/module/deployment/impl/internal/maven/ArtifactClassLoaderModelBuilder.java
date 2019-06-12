@@ -24,6 +24,8 @@ import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -48,6 +50,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
 
 /**
  * ClassLoaderModelBuilder that adds the concept of Shared Library for the configured dependencies.
@@ -55,6 +58,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @since 4.2.0
  */
 public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
+
+  private static final Logger LOGGER = getLogger(ArtifactClassLoaderModelBuilder.class);
 
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
@@ -78,7 +83,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   /**
    * Sets a flag to export the configured shared libraries when building the ClassLoaderModel
-   * 
+   *
    * @return this builder
    * @since 4.2.0
    */
@@ -89,7 +94,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   /**
    * Sets a flag to include additional dependencies for each plugin if the deployable artifact defines them.
-   * 
+   *
    * @since 4.2.0
    */
   public ClassLoaderModel.ClassLoaderModelBuilder additionalPluginLibraries() {
@@ -217,10 +222,25 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
           for (Xpp3Dom sharedLibrary : sharedLibraries) {
             String groupId = getAttribute(sharedLibrary, GROUP_ID);
             String artifactId = getAttribute(sharedLibrary, ARTIFACT_ID);
-            findAndExportSharedLibrary(groupId, artifactId);
+
+            if (!validateMuleRuntimeSharedLibrary(groupId, artifactId)) {
+              findAndExportSharedLibrary(groupId, artifactId);
+            }
           }
         }
       }
+    }
+  }
+
+  protected final boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId) {
+    if ("org.mule.runtime".equals(groupId)
+        || "com.mulesoft.mule.runtime.modules".equals(groupId)) {
+      LOGGER
+          .warn("Shared library '{}:{}' is a Mule Runtime dependency. It will not be shared by the app in order to avoid classloading issues. Please consider removing it, or at least not putting it as a sharedLibrary.",
+                groupId, artifactId);
+      return true;
+    } else {
+      return false;
     }
   }
 
