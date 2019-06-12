@@ -94,6 +94,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -143,27 +144,17 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     });
   }
 
-  private final String classloaderModelVersion;
+  private String classloaderModelVersion = "1.1.0";
 
   // Application artifact builders
-  private final ApplicationFileBuilder incompleteAppFileBuilder =
-      appFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
-  private final ApplicationFileBuilder brokenAppFileBuilder = appFileBuilder("broken-app").corrupted();
-  private final ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder =
-      appFileBuilder("broken-app+", brokenAppFileBuilder);
-  private final ApplicationFileBuilder waitAppFileBuilder =
-      appFileBuilder("wait-app").definedBy("wait-app-config.xml");
-  private final ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder = appFileBuilder(
-                                                                                               "dummy-app-with-props")
-                                                                                                   .definedBy("dummy-app-with-props-config.xml")
-                                                                                                   .containingClass(echoTestClassFile,
-                                                                                                                    "org/foo/EchoTest.class");
+  private ApplicationFileBuilder incompleteAppFileBuilder;
+  private ApplicationFileBuilder brokenAppFileBuilder;
+  private ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder;
+  private ApplicationFileBuilder waitAppFileBuilder;
+  private ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
 
   // Application plugin artifact builders
-  private final ArtifactPluginFileBuilder echoPluginWithLib1 =
-      new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-          .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
-          .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+  private ArtifactPluginFileBuilder echoPluginWithLib1;
 
   @BeforeClass
   public static void compileTestClasses() throws Exception {
@@ -181,6 +172,23 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   public ApplicationDeploymentTestCase(boolean parallelDeployment, String classloaderModelVersion) {
     super(parallelDeployment);
     this.classloaderModelVersion = classloaderModelVersion;
+  }
+
+  @Before
+  public void before() {
+    incompleteAppFileBuilder = appFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
+    brokenAppFileBuilder = appFileBuilder("broken-app").corrupted();
+    brokenAppWithFunkyNameAppFileBuilder = appFileBuilder("broken-app+", brokenAppFileBuilder);
+    waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
+    dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
+        .definedBy("dummy-app-with-props-config.xml")
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
+
+    // Application plugin artifact builders
+    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
 
   @Test
@@ -1574,8 +1582,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     startDeployment();
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    //final assertion is to guarantee the DWL file can be accessed in the app classloader (cannot evaluate the expression as the
-    //test uses a mocked expression evaluator
+    // final assertion is to guarantee the DWL file can be accessed in the app classloader (cannot evaluate the expression as the
+    // test uses a mocked expression evaluator
     final ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
     final URL appDwlResource = appClassLoader.getResource(dwExportedFile);
     assertThat(appDwlResource, not(nullValue()));
@@ -2013,7 +2021,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   @Issue("MULE-16995")
-  @Description("This test covers an scenario where an app declares extensiuons-api as a shared library while using a privileged extension.")
+  @Description("This test covers an scenario where an app declares extensions-api as a shared library while using a privileged extension.")
   public void appWithUnneededExtensionsApiDepDeploys() throws Exception {
     final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("privilegedPluginApp")
         .definedBy(APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG)
@@ -2033,7 +2041,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   protected ApplicationFileBuilder appFileBuilder(String artifactId, ApplicationFileBuilder source) {
-    return new ApplicationFileBuilder(artifactId)
+    return new ApplicationFileBuilder(artifactId, source)
         .withClassloaderModelVersion(classloaderModelVersion);
   }
 
@@ -2052,7 +2060,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final File preRedeploymentMetaFolder = getAppMetaFolder(app);
 
-    //Add test files to check if any of them was deleted
+    // Add test files to check if any of them was deleted
     final File preRedeploymentMetaTestFile = new File(preRedeploymentMetaFolder, TEST_FILE_NAME);
     preRedeploymentMetaTestFile.createNewFile();
 
@@ -2060,8 +2068,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     reset(applicationDeploymentListener);
 
-    //file.lastModified() has seconds precision(it truncates the milliseconds timestamp, adding 3 zeroes at the end).
-    //This forces the first none-zero digit (from the right) to be different and trigger redeployment.
+    // file.lastModified() has seconds precision(it truncates the milliseconds timestamp, adding 3 zeroes at the end).
+    // This forces the first none-zero digit (from the right) to be different and trigger redeployment.
     Thread.sleep(1000);
 
 
