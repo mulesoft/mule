@@ -110,7 +110,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                        componentModel.getConfigFileName(),
                                                        componentModel.getLineNumber(),
                                                        componentModel.getStartColumn());
-      } else if (isRootProcessorScope(parentComponentModel) || isRoute(parentComponentModel)) {
+      } else if (isRootProcessorScope(parentComponentModel) || isRoute(parentComponentModel) || isScopeProcessor(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isMunitFlowIdentifier(parentComponentModel)) {
         componentLocation = parentComponentLocation.appendRoutePart()
@@ -124,9 +124,11 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         componentLocation = processOnErrorModel(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (parentComponentIsRouter(componentModel)) {
         if (isRoute(componentModel)) {
+          TypedComponentIdentifier partIdentifier = TypedComponentIdentifier.builder().type(SCOPE)
+              .identifier(ROUTE_COMPONENT_IDENTIFIER).build();
+
           componentLocation = parentComponentLocation.appendRoutePart()
-              .appendLocationPart(findRoutePath(componentModel), of(TypedComponentIdentifier.builder().type(SCOPE)
-                  .identifier(ROUTE_COMPONENT_IDENTIFIER).build()), componentModel.getConfigFileName(),
+              .appendLocationPart(findRoutePath(componentModel), of(partIdentifier), componentModel.getConfigFileName(),
                                   componentModel.getLineNumber(), componentModel.getStartColumn());
         } else if (isProcessor(componentModel)) {
           // this is the case of the routes directly inside the router as with scatter-gather
@@ -181,6 +183,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getStartColumn());
     }
     componentModel.setComponentLocation(componentLocation);
+  }
+
+  private Boolean isScopeProcessor(ComponentModel componentModel) {
+    return componentModel.getComponentType().map(componentType -> componentType == SCOPE).orElse(false);
   }
 
   private boolean isBatchAggregator(ComponentModel componentModel) {
