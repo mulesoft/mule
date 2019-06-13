@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.processor.Processor;
 /**
  * Represents a route with the {@link Processor} it leads to, along with an expression that should be true for the route to be
  * taken.
+ *
+ * @Since 4.3.0
  */
 public class ProcessorExpressionRoute extends ProcessorRoute {
 
@@ -20,8 +22,7 @@ public class ProcessorExpressionRoute extends ProcessorRoute {
 
   public ProcessorExpressionRoute(String expression, Processor processor) {
     super(processor);
-    requireNonNull(expression, "expression can't be null");
-    this.expression = expression;
+    this.expression = requireNonNull(expression, "expression can't be null");
   }
 
   public String getExpression() {

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -31,6 +30,7 @@ import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -182,12 +182,17 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
      *         subscription of the router occurs after all routes and with the general context.
      */
     private List<Flux<CoreEvent>> collectPublishers() {
-      List<Flux<CoreEvent>> routes = this.routes.stream()
-          .map(ExecutableRoute::getPublisher)
-          .collect(toCollection(ArrayList::new));
-      // Decorate last route publisher to trigger 'router' subscription
-      Integer lastRouteIndex = routes.size() - 1;
-      routes.set(lastRouteIndex, subscribeFluxOnPublisherSubscription(routes.get(lastRouteIndex), router));
+      List<Flux<CoreEvent>> routes = new ArrayList<>();
+      for (Iterator routesIterator = this.routes.iterator(); routesIterator.hasNext();) {
+        ExecutableRoute nextRoute = (ExecutableRoute) routesIterator.next();
+        if (routesIterator.hasNext()) {
+          routes.add(nextRoute.getPublisher());
+        } else {
+          // If it's the last route, this will be trigger for the whole inbound chain of the router to be subscribed.
+          // Since there's always at least one route, the default one, one route will always be decorated.
+          routes.add(subscribeFluxOnPublisherSubscription(nextRoute.getPublisher(), router));
+        }
+      }
       return routes;
     }
 

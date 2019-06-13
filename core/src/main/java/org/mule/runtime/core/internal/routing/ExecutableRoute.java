@@ -15,11 +15,13 @@ import reactor.core.publisher.Flux;
 
 /**
  * Composition of a {@link ProcessorRoute} and everything required to convert it into a reactor executable chain.
+ * 
+ * @Since 4.3.0
  */
-public class ExecutableRoute {
+class ExecutableRoute {
 
-  private ProcessorRoute route;
-  private Flux<CoreEvent> publisher;
+  private final ProcessorRoute route;
+  private final Flux<CoreEvent> publisher;
   private final FluxSinkRecorder<CoreEvent> sinkRecorder;
 
   ExecutableRoute(ProcessorRoute route) {
