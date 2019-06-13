@@ -22,6 +22,7 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -245,6 +246,27 @@ public class MavenUtils {
     }
   }
 
+  /**
+   * Creates the pom properties file for a deployable artifact inside the artifact exploded folder
+   *
+   * @param artifactFolder the deployable artifact folder
+   * @param model          the pom model
+   */
+  public static void createDeployablePomProperties(File artifactFolder, Model model) {
+    Properties pomProperties = new Properties();
+    pomProperties.setProperty("groupId", model.getGroupId());
+    pomProperties.setProperty("artifactId", model.getArtifactId());
+    pomProperties.setProperty("version", model.getVersion());
+
+    File pomPropertiesFileLocation =
+        new File(artifactFolder,
+                 Paths.get("META-INF", "maven", model.getGroupId(), model.getArtifactId(), MULE_POM_PROPERTIES).toString());
+    try (FileWriter fileWriter = new FileWriter(pomPropertiesFileLocation)) {
+      pomProperties.store(fileWriter, "Writing pom.properties");
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
 
   public static File lookupPomFromMavenLocation(File artifactFolder) {
     File artifactPomFile = null;
