@@ -11,7 +11,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
@@ -20,23 +19,24 @@ import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
-
-import org.reactivestreams.Publisher;
+import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 
 import java.util.List;
 import java.util.Map;
 
+import org.reactivestreams.Publisher;
+
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
-  private final Message message;
+  private final SourceResultAdapter sourceMessage;
   private final Processor messageProcessor;
   private final List<NotificationFunction> notificationFunctions;
   private final SourceCompletionHandler completionHandler;
 
-  ModuleFlowProcessingTemplate(Message message,
+  ModuleFlowProcessingTemplate(SourceResultAdapter sourceMessage,
                                Processor messageProcessor,
                                List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
-    this.message = message;
+    this.sourceMessage = sourceMessage;
     this.messageProcessor = messageProcessor;
     this.notificationFunctions = notificationFunctions;
     this.completionHandler = completionHandler;
@@ -53,8 +53,8 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public Message getMessage() {
-    return message;
+  public SourceResultAdapter getSourceMessage() {
+    return sourceMessage;
   }
 
   @Override

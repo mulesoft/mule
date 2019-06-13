@@ -302,50 +302,39 @@ public class ModuleFlowProcessingPhase
 
   private CoreEvent createEvent(ModuleFlowProcessingPhaseTemplate template, MessageSource source,
                                 CompletableFuture<Void> responseCompletion, FlowConstruct flowConstruct) {
-    Message message = template.getMessage();
-    Builder eventBuilder;
 
-    if (message.getPayload().getValue() instanceof SourceResultAdapter) {
-      SourceResultAdapter adapter = (SourceResultAdapter) message.getPayload().getValue();
-      eventBuilder =
-          createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, adapter.getCorrelationId().orElse(null),
-                             message);
+    SourceResultAdapter adapter = template.getSourceMessage();
+    Builder eventBuilder =
+        createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, adapter.getCorrelationId().orElse(null));
 
-      return eventBuilder.message(eventCtx -> {
-        final Result<?, ?> result = adapter.getResult();
-        final Object resultValue = result.getOutput();
+    return eventBuilder.message(eventCtx -> {
+      final Result<?, ?> result = adapter.getResult();
+      final Object resultValue = result.getOutput();
 
-        Message eventMessage;
-        if (resultValue instanceof Collection && adapter.isCollection()) {
-          eventMessage = toMessage(Result.<Collection<Message>, TypedValue>builder()
-              .output(toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
-                                                                                 adapter.getPayloadMediaTypeResolver()),
-                                          adapter.getCursorProviderFactory(),
-                                          ((BaseEventContext) eventCtx).getRootContext()))
-              .mediaType(result.getMediaType().orElse(ANY))
-              .build());
-        } else {
-          eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
-                                   ((BaseEventContext) eventCtx).getRootContext());
-        }
+      Message eventMessage;
+      if (resultValue instanceof Collection && adapter.isCollection()) {
+        eventMessage = toMessage(Result.<Collection<Message>, TypedValue>builder()
+            .output(toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
+                                                                               adapter.getPayloadMediaTypeResolver()),
+                                        adapter.getCursorProviderFactory(),
+                                        ((BaseEventContext) eventCtx).getRootContext()))
+            .mediaType(result.getMediaType().orElse(ANY))
+            .build());
+      } else {
+        eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
+                                 ((BaseEventContext) eventCtx).getRootContext());
+      }
 
-        policyManager.addSourcePointcutParametersIntoEvent(source, eventMessage.getAttributes(), eventBuilder);
-        return eventMessage;
-      }).build();
-    } else {
-      eventBuilder = createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, null, message);
-      policyManager.addSourcePointcutParametersIntoEvent(source, message.getAttributes(), eventBuilder);
-    }
-
-    return eventBuilder.build();
+      policyManager.addSourcePointcutParametersIntoEvent(source, eventMessage.getAttributes(), eventBuilder);
+      return eventMessage;
+    }).build();
   }
 
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
-                                     FlowConstruct flowConstruct, String correlationId, Message message) {
+                                     FlowConstruct flowConstruct, String correlationId) {
     return InternalEvent
         .builder(create(flowConstruct, NullExceptionHandler.getInstance(), sourceLocation, correlationId,
-                        Optional.of(responseCompletion)))
-        .message(message);
+                        Optional.of(responseCompletion)));
   }
 
   /**
