@@ -23,7 +23,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -39,7 +38,6 @@ import java.util.function.LongUnaryOperator;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.retry.BackoffDelay;
 
@@ -158,6 +156,45 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
           ? v
           : MIN_VALUE;
 
+  /**
+   * Check the capacity of the processing strategy to process events at the moment.
+   *
+   * @param event the event about to be processed
+   * @return true if the event can be accepted for processing
+   */
+  private boolean checkCapacity(CoreEvent event) {
+    if (lastRetryTimestamp.get() != MIN_VALUE) {
+      if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
+        return false;
+      }
+    }
+
+    if (maxConcurrencyEagerCheck) {
+      if (inFlightEvents.incrementAndGet() > maxConcurrency) {
+        inFlightEvents.decrementAndGet();
+        return false;
+      }
+
+      // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
+      // an async, for instance)
+      ((BaseEventContext) event.getContext()).onResponse(IN_FLIGHT_DECREMENT_CALLBACK);
+    }
+
+    return true;
+  }
+
+  @Override
+  public void checkBackpressureAccepting(CoreEvent event) throws RejectedExecutionException {
+    if (!checkCapacity(event)) {
+      throw new RejectedExecutionException();
+    }
+  }
+
+  @Override
+  public boolean checkBackpressureEmitting(CoreEvent event) {
+    return checkCapacity(event);
+  }
+
   protected final class ProactorSinkWrapper<E> implements ReactorSink<E> {
 
     private final ReactorSink<E> innerSink;
@@ -168,37 +205,12 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
     @Override
     public final void accept(CoreEvent event) {
-      if (!checkCapacity(event)) {
-        throw new RejectedExecutionException();
-      }
-
       innerSink.accept(event);
     }
 
     @Override
     public final boolean emit(CoreEvent event) {
-      return checkCapacity(event) && innerSink.emit(event);
-    }
-
-    private boolean checkCapacity(CoreEvent event) {
-      if (lastRetryTimestamp.get() != MIN_VALUE) {
-        if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
-          return false;
-        }
-      }
-
-      if (maxConcurrencyEagerCheck) {
-        if (inFlightEvents.incrementAndGet() > maxConcurrency) {
-          inFlightEvents.decrementAndGet();
-          return false;
-        }
-
-        // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
-        // an async, for instance)
-        ((BaseEventContext) event.getContext()).onResponse(IN_FLIGHT_DECREMENT_CALLBACK);
-      }
-
-      return true;
+      return innerSink.emit(event);
     }
 
     @Override

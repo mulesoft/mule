@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -228,56 +227,9 @@ public class DefaultFlowBuilder implements Builder {
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .doOnNext(assertStarted())
-          .flatMap(flowWaitMapper())
+          .flatMap(routeThroughProcessingStrategy())
           // Don't handle errors, these will be handled by parent flow
           .onErrorStop();
-    }
-
-    @Override
-    protected Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper() {
-      return event -> {
-        Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
-
-        boolean accepted = false;
-        while (!accepted) {
-          try {
-            // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
-            // response publisher to operate of the result of flow processing before returning
-            getSink().accept(event);
-            accepted = true;
-          } catch (RejectedExecutionException ree) {
-            // TODO MULE-16106 Add a callback for WAIT back pressure applied on the source
-            try {
-              Thread.sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-            } catch (InterruptedException e) {
-              handleOverload(event, new FlowBackPressureException(getName(), ree));
-            }
-          }
-        }
-
-        return flowResponse(responsePublisher);
-      };
-    }
-
-    @Override
-    protected Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper() {
-      return event -> {
-        Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
-
-        try {
-          if (getSink().emit(event)) {
-            return flowResponse(responsePublisher);
-          } else {
-            // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with a FLOW_BACK_PRESSURE
-            // error.
-            handleOverload(event, new FlowBackPressureException(getName()));
-            return flowResponse(responsePublisher);
-          }
-        } catch (RejectedExecutionException ree) {
-          handleOverload(event, new FlowBackPressureException(getName(), ree));
-          return flowResponse(responsePublisher);
-        }
-      };
     }
 
     private void handleOverload(CoreEvent request, Throwable overloadException) {
