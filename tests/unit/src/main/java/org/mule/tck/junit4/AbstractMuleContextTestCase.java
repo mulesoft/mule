@@ -230,6 +230,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected MuleContext createMuleContext() throws Exception {
+    return createMuleContext(this.getClass().getSimpleName() + "#" + name.getMethodName());
+  }
+
+  protected MuleContext createMuleContext(String contextConfigurationId) throws Exception {
     // Should we set up the manager for every method?
     MuleContext context;
     if (isDisposeContextPerClass() && muleContext != null) {
@@ -251,7 +255,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
         LOGGER.info("Using working directory for test: " + workingDirectory);
         muleConfiguration.setWorkingDirectory(workingDirectory);
-        muleConfiguration.setId(this.getClass().getSimpleName() + "#" + name.getMethodName());
+        muleConfiguration.setId(contextConfigurationId);
         contextBuilder.setMuleConfiguration(muleConfiguration);
         contextBuilder.setExecutionClassLoader(executionClassLoader);
         contextBuilder.setObjectSerializer(getObjectSerializer());
