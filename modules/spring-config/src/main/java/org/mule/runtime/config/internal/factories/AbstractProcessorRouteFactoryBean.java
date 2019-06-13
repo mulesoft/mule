@@ -8,20 +8,19 @@ package org.mule.runtime.config.internal.factories;
 
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-public class MessageProcessorFilterPairFactoryBean extends AbstractComponentFactory<MessageProcessorExpressionPair> {
+public abstract class AbstractProcessorRouteFactoryBean<T> extends AbstractComponentFactory<T> {
 
   @Inject
   private MuleContext muleContext;
@@ -29,19 +28,14 @@ public class MessageProcessorFilterPairFactoryBean extends AbstractComponentFact
   @Inject
   protected ConfigurationComponentLocator locator;
 
-  private String expression = "true";
   private List<Processor> messageProcessors;
-
-  public void setExpression(String expression) {
-    this.expression = expression;
-  }
 
   public void setMessageProcessors(List<Processor> messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
   @Override
-  public MessageProcessorExpressionPair doGetObject() throws Exception {
+  public T doGetObject() throws Exception {
     final DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {
@@ -52,13 +46,13 @@ public class MessageProcessorFilterPairFactoryBean extends AbstractComponentFact
         throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessors or MessageProcessorBuilders configured");
       }
     }
-    MessageProcessorExpressionPair filterPair = new MessageProcessorExpressionPair(expression,
-                                                                                   newLazyProcessorChainBuilder(builder,
-                                                                                                                muleContext,
-                                                                                                                () -> getProcessingStrategy(locator,
-                                                                                                                                            getRootContainerLocation())
-                                                                                                                                                .orElse(null)));
-    return filterPair;
+    MessageProcessorChain chain = newLazyProcessorChainBuilder(builder, muleContext,
+                                                               () -> getProcessingStrategy(locator,
+                                                                                           getRootContainerLocation())
+                                                                                               .orElse(null));
+    return getProcessorRoute(chain);
   }
+
+  protected abstract T getProcessorRoute(MessageProcessorChain chain);
 
 }

@@ -28,8 +28,8 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
+import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
-import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.privileged.processor.Router;
 
 import java.util.HashMap;
@@ -140,7 +140,7 @@ public class ComponentModelHelper {
   }
 
   public static boolean isRouter(ComponentModel componentModel) {
-    return isOfType(componentModel, Router.class) || isOfType(componentModel, AbstractSelectiveRouter.class)
+    return isOfType(componentModel, Router.class) || isOfType(componentModel, ChoiceRouter.class)
         || ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
         || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
         || componentModel.getComponentType().map(type -> type.equals(ROUTER)).orElse(false);

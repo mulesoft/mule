@@ -8,17 +8,9 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
-import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
-import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -59,13 +51,11 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -90,9 +80,10 @@ import org.mule.runtime.config.internal.factories.DynamicConfigExpirationObjectF
 import org.mule.runtime.config.internal.factories.ErrorHandlerFactoryBean;
 import org.mule.runtime.config.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
-import org.mule.runtime.config.internal.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.factories.OnErrorFactoryBean;
+import org.mule.runtime.config.internal.factories.ProcessorExpressionRouteFactoryBean;
+import org.mule.runtime.config.internal.factories.ProcessorRouteFactoryBean;
 import org.mule.runtime.config.internal.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.internal.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.factories.TryProcessorFactoryBean;
@@ -150,8 +141,9 @@ import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.IdempotentMessageValidator;
-import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
 import org.mule.runtime.core.internal.routing.ParallelForEach;
+import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
+import org.mule.runtime.core.internal.routing.ProcessorRoute;
 import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
@@ -457,20 +449,20 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CHOICE).withTypeDefinition(fromType(ChoiceRouter.class))
         .withObjectFactoryType(ChoiceRouterObjectFactory.class)
-        .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorExpressionPair.class).build())
-        .withSetterParameterDefinition("defaultRoute", fromChildConfiguration(MessageProcessorExpressionPair.class).build())
+        .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(ProcessorExpressionRoute.class).build())
+        .withSetterParameterDefinition("defaultRoute", fromChildConfiguration(ProcessorRoute.class).build())
         .build());
     componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(WHEN).withTypeDefinition(fromType(MessageProcessorExpressionPair.class))
-            .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
+        .add(baseDefinition.withIdentifier(WHEN).withTypeDefinition(fromType(ProcessorExpressionRoute.class))
+            .withObjectFactoryType(ProcessorExpressionRouteFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition("expression", fromSimpleParameter("expression").withDefaultValue("true").build())
             .build());
     componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(OTHERWISE).withTypeDefinition(fromType(MessageProcessorExpressionPair.class))
-            .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
+        .add(baseDefinition.withIdentifier(OTHERWISE).withTypeDefinition(fromType(ProcessorRoute.class))
+            .withObjectFactoryType(ProcessorRouteFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .withSetterParameterDefinition("expression", fromFixedValue("true").build()).build());
+            .build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier(SCHEDULER)
