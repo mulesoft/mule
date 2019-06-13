@@ -13,44 +13,37 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A holder for a pair of MessageProcessor and an expression.
+ * Represents a simple route with the {@link Processor} it leads to.
+ * 
+ * @Since 4.3.0
  */
-public class MessageProcessorExpressionPair extends AbstractComponent
-    implements MuleContextAware, Lifecycle {
+public class ProcessorRoute extends AbstractComponent implements MuleContextAware, Lifecycle {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(MessageProcessorExpressionPair.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
-  private final String expression;
-  private final Processor messageProcessor;
-
+  private final Processor processor;
   private MuleContext muleContext;
 
-  public MessageProcessorExpressionPair(String expression, Processor messageProcessor) {
-    requireNonNull(expression, "expression can't be null");
-    requireNonNull(messageProcessor, "messageProcessor can't be null");
-    this.expression = expression;
-    this.messageProcessor = messageProcessor;
+  public ProcessorRoute(Processor processor) {
+    requireNonNull(processor, "processor can't be null");
+    this.processor = processor;
   }
 
-  public String getExpression() {
-    return expression;
-  }
-
-  public Processor getMessageProcessor() {
-    return messageProcessor;
+  public Processor getProcessor() {
+    return processor;
   }
 
   @Override
@@ -58,35 +51,46 @@ public class MessageProcessorExpressionPair extends AbstractComponent
     return reflectionToString(this, SHORT_PREFIX_STYLE);
   }
 
-  // This class being just a logic-less tuple, it directly delegates lifecyle
-  // events to its members, without any control.
-
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-    if (messageProcessor instanceof MuleContextAware) {
-      ((MuleContextAware) messageProcessor).setMuleContext(context);
+    if (processor instanceof MuleContextAware) {
+      ((MuleContextAware) processor).setMuleContext(context);
     }
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(messageProcessor, muleContext);
+    initialiseIfNeeded(processor, muleContext);
   }
 
   @Override
   public void start() throws MuleException {
-    startIfNeeded(messageProcessor);
+    startIfNeeded(processor);
+  }
+
+  /**
+   * @param session an {@link ExpressionManagerSession}
+   * @return whether this route can be taken given the context
+   */
+  public boolean accepts(ExpressionManagerSession session) {
+    return true;
+  }
+
+  /**
+   * @return an {@link ExecutableRoute} for this one.
+   */
+  ExecutableRoute toExecutableRoute() {
+    return new ExecutableRoute(this);
   }
 
   @Override
   public void stop() throws MuleException {
-    stopIfNeeded(messageProcessor);
+    stopIfNeeded(processor);
   }
 
   @Override
   public void dispose() {
-    disposeIfNeeded(messageProcessor, LOGGER);
+    disposeIfNeeded(processor, LOGGER);
   }
-
 }
