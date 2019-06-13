@@ -22,6 +22,9 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.source.scheduler.CronScheduler;
+import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
+import org.mule.runtime.core.api.source.scheduler.RunNowCronSchedulerWrapper;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -51,6 +54,7 @@ public final class SourceConfigurer {
   private final ExpressionManager expressionManager;
   private final ConfigurationProperties properties;
   private final MuleContext muleContext;
+  private final Boolean isRestart;
 
   /**
    * Create a new instance
@@ -63,13 +67,15 @@ public final class SourceConfigurer {
    * @param muleContext       the current {@link MuleContext}
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
-                          ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext) {
+                          ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext,
+                          Boolean isRestart) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
     this.expressionManager = expressionManager;
     this.properties = properties;
     this.muleContext = muleContext;
+    this.isRestart = isRestart;
   }
 
   /**
@@ -116,6 +122,14 @@ public final class SourceConfigurer {
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
+          if (isRestart) {
+            if (scheduler instanceof FixedFrequencyScheduler) {
+              ((FixedFrequencyScheduler) scheduler).setStartDelay(0);
+            } else if (scheduler instanceof CronScheduler) {
+              RunNowCronSchedulerWrapper schedulerWrapper = new RunNowCronSchedulerWrapper((CronScheduler) scheduler);
+              scheduler = schedulerWrapper;
+            }
+          }
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }

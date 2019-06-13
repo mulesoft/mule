@@ -50,6 +50,7 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -157,7 +158,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
 
-  private synchronized void createSource() throws Exception {
+  private synchronized void createSource(Boolean isRestart) throws Exception {
     if (sourceAdapter == null) {
       CoreEvent initialiserEvent = null;
       try {
@@ -168,7 +169,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                                createSourceCallbackFactory(),
                                                this,
                                                sourceConnectionManager,
-                                               new MessagingExceptionResolver(this));
+                                               new MessagingExceptionResolver(this),
+                                               isRestart);
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
         initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
@@ -180,9 +182,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource() throws MuleException {
+  private void startSource(Boolean isRestart) throws MuleException {
     try {
-      retryPolicyTemplate.execute(new StartSourceCallback(), retryScheduler);
+      retryPolicyTemplate.execute(new StartSourceCallback(isRestart), retryScheduler);
     } catch (Throwable e) {
       if (e instanceof MuleException) {
         throw (MuleException) e;
@@ -295,7 +297,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       if (started.get()) {
         stopSource();
         disposeSource();
-        startSource();
+        startSource(true);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
@@ -322,7 +324,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       }
 
       synchronized (started) {
-        startSource();
+        startSource(false);
         started.set(true);
       }
     }));
@@ -478,10 +480,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private class StartSourceCallback implements RetryCallback {
 
+    Boolean isRestart;
+
+    StartSourceCallback(Boolean isRestart) {
+      this.isRestart = isRestart;
+    }
+
     @Override
     public void doWork(RetryContext context) throws Exception {
       try {
-        createSource();
+        createSource(isRestart);
         initialiseIfNeeded(sourceAdapter);
         sourceAdapter.start();
         reconnecting.set(false);
@@ -561,7 +569,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         sourceConnectionManager = new SourceConnectionManager(connectionManager);
 
         try {
-          createSource();
+          createSource(false);
           initialiseIfNeeded(sourceAdapter);
         } catch (Exception e) {
           throw new InitialisationException(e, this);

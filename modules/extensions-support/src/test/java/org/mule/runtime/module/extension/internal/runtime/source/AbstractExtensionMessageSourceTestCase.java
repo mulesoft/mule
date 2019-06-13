@@ -214,7 +214,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     sourceAdapter = createSourceAdapter();
 
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
     when(sourceAdapterFactory.getSourceParameters()).thenReturn(new ResolverSet(muleContext));
 
     mockExceptionEnricher(sourceModel, null);
