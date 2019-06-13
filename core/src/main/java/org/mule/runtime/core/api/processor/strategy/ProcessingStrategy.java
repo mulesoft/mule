@@ -14,6 +14,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 
+import java.util.concurrent.RejectedExecutionException;
+
 /**
  * Determines how a list of message processors should processed.
  */
@@ -21,8 +23,8 @@ import org.mule.runtime.core.api.processor.Sink;
 public interface ProcessingStrategy {
 
   /**
-   * Creates instances of {@link Sink} to be used for emitting {@link CoreEvent}'s to be processed. Each {@link Sink} should be used
-   * independent streams that implement the {@link Pipeline}.
+   * Creates instances of {@link Sink} to be used for emitting {@link CoreEvent}'s to be processed. Each {@link Sink} should be
+   * used independent streams that implement the {@link Pipeline}.
    *
    * @param flowConstruct pipeline instance.
    * @param pipeline function representing the pipeline.
@@ -57,4 +59,23 @@ public interface ProcessingStrategy {
     return false;
   }
 
+  /**
+   * Checks whether backpressure will be fired for a new accepted {@link org.mule.runtime.api.event.Event} to be processed. The
+   * event is attempted to be accepted for processing into the flow. If it succeeds, processing begins with the corresponding
+   * {@link ProcessingStrategy}. If not, a backpressure signal is raised, and a {@link RejectedExecutionException} is thrown.
+   *
+   * @throws RejectedExecutionException
+   */
+  default void checkBackpressureAccepting(CoreEvent event) throws RejectedExecutionException {}
+
+  /**
+   * Checks whether backpressure will be fired for a new accepted {@link org.mule.runtime.api.event.Event} to be processed. The
+   * event is attempted to be accepted for processing into the flow. If it succeeds, processing begins with the corresponding
+   * {@link ProcessingStrategy}. If not, a backpressure signal is raised, and the function returns false.
+   *
+   * @return true if the event is accepted by the {@link ProcessingStrategy}. False if not.
+   */
+  default boolean checkBackpressureEmitting(CoreEvent event) {
+    return true;
+  }
 }
