@@ -669,15 +669,19 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        ParameterListValue.Builder listBuilder = ElementDeclarer.newListValue();
-        config.getChildren()
-            .forEach(item -> arrayType.getType().accept(
-                                                        getParameterDeclarerVisitor(item,
-                                                                                    paramDsl.getGeneric(arrayType.getType())
-                                                                                        .get(),
-                                                                                    listBuilder::withValue)));
-
-        valueConsumer.accept(listBuilder.build());
+        if (config.getChildren().isEmpty() && config.getTextContent() != null) {
+          valueConsumer.accept(isCData(config) ? createParameterSimpleCdataValue(config.getTextContent(), arrayType)
+              : createParameterSimpleValue(config.getTextContent(), arrayType));
+        } else {
+          ParameterListValue.Builder listBuilder = ElementDeclarer.newListValue();
+          config.getChildren()
+              .forEach(item -> arrayType.getType().accept(
+                                                          getParameterDeclarerVisitor(item,
+                                                                                      paramDsl.getGeneric(arrayType.getType())
+                                                                                          .get(),
+                                                                                      listBuilder::withValue)));
+          valueConsumer.accept(listBuilder.build());
+        }
       }
 
       @Override
