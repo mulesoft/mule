@@ -19,12 +19,12 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -45,6 +46,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
@@ -60,7 +62,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -84,6 +85,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private Sink sink;
   private final int maxConcurrency;
   private final ComponentInitialStateManager componentInitialStateManager;
+  private final BackPressureStrategySelector backpressureStrategySelector;
+  private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
@@ -112,6 +115,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     processingStrategy = this.processingStrategyFactory.create(muleContext, getName());
+    backpressureStrategySelector = new BackPressureStrategySelector(this);
+    FLOW_BACKPRESSURE_ERROR_TYPE = muleContext.getErrorTypeRepository()
+        .getErrorType(Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE).get();
   }
 
   /**
@@ -210,18 +216,52 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
-        .flatMap(source.getBackPressureStrategy() == WAIT ? flowWaitMapper() : flowFailDropMapper());
+        .flatMap(routeThroughProcessingStrategy());
+  }
+
+  protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy() {
+    return event -> {
+      // Retrieve response publisher before error is communicated
+      Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
+      try {
+        // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
+        // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
+        // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
+        if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
+          sink.accept(event);
+        } else {
+          if (!sink.emit(event)) {
+            notifyBackpressureException(event, new FlowBackPressureException(this.getName()));
+          }
+        }
+      } catch (RejectedExecutionException e) {
+        // Handle the case in which the event execution is rejected from the scheduler.
+        FlowBackPressureException wrappedException = new FlowBackPressureException(this.getName(), e);
+        notifyBackpressureException(event, wrappedException);
+      }
+
+      // Subscribe the rest of reactor chain to response publisher, through which errors and responses will be emitted
+      return Mono.from(responsePublisher);
+    };
   }
 
   /**
-   * If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
+   * Builds an error event and communicates it through the {@link BaseEventContext}
+   *
+   * @param event the event for which an error was caused
+   * @param wrappedException the wrapped inside a {@link FlowBackPressureException} cause exception
    */
-  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper();
-
-  /**
-   * If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
-   */
-  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper();
+  private void notifyBackpressureException(CoreEvent event, FlowBackPressureException wrappedException) {
+    // Build error event
+    CoreEvent errorEvent =
+        CoreEvent.builder(event)
+            .error(ErrorBuilder.builder(wrappedException)
+                .errorType(FLOW_BACKPRESSURE_ERROR_TYPE)
+                .build())
+            .build();
+    // Notify error in event context
+    ((BaseEventContext) event.getContext()).error(new MessagingException(errorEvent, wrappedException));
+  }
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
@@ -404,5 +444,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   public ProcessingStrategyFactory getProcessingStrategyFactory() {
     return processingStrategyFactory;
+  }
+
+  @Override
+  public void checkBackpressure(CoreEvent event) throws RuntimeException {
+    try {
+      backpressureStrategySelector.check(event);
+    } catch (FlowBackPressureException e) {
+      throw propagate(e);
+    }
   }
 }
