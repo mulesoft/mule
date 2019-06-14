@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import static java.lang.Boolean.*;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.util.SystemUtils;
 
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public class JdkVersionUtils {
 
   public static final String JAVA_VERSION_PROPERTY = "java.version";
+  private static final String MULE_JDK_DEBUG = SYSTEM_PROPERTY_PREFIX + "jdkDebug";
 
 
   public static class JdkVersion implements Comparable<JdkVersion> {
@@ -296,7 +298,7 @@ public class JdkVersionUtils {
     if (!isSupportedJdkVendor()) {
       logger.info("You're executing with a JDK made by a vendor that is not on the recommended list of vendors. Vendor: "
           + JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
-    } else if (getBoolean("mule.jdkDebug")) {
+    } else if (getBoolean(MULE_JDK_DEBUG)) {
       logger.info("You're executing with a JDK made by a recommended vendor.");
     }
   }
