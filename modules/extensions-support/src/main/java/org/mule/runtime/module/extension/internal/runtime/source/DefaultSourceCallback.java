@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -21,7 +19,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
@@ -41,7 +38,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
 import java.nio.charset.Charset;
@@ -69,7 +65,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     private Builder() {}
 
-    private DefaultSourceCallback<T, A> product = new DefaultSourceCallback();
+    private final DefaultSourceCallback<T, A> product = new DefaultSourceCallback();
 
     public Builder<T, A> setSourceModel(SourceModel sourceModel) {
       product.sourceModel = sourceModel;
@@ -186,7 +182,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
   private DefaultSourceCallback() {}
 
-  private RunOnce resolveInitializationParams = Once.of(() -> {
+  private final RunOnce resolveInitializationParams = Once.of(() -> {
     defaultEncoding = getDefaultEncoding(muleContext);
 
     Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
@@ -226,9 +222,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver);
-    Message message = of(resultAdapter);
 
-    executeFlow(context, messageProcessContext, message);
+    executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();
   }
 
@@ -240,10 +235,11 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     });
   }
 
-  private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext, Message message) {
+  private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext,
+                           SourceResultAdapter resultAdapter) {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     messageProcessingManager.processMessage(
-                                            new ModuleFlowProcessingTemplate(message, listener,
+                                            new ModuleFlowProcessingTemplate(resultAdapter, listener,
                                                                              contextAdapter.getNotificationsFunctions(),
                                                                              completionHandlerFactory
                                                                                  .createCompletionHandler(contextAdapter)),
