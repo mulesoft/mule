@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.api.client.proxy;
 
+import static java.util.Objects.hash;
+
 import java.util.Objects;
 
 /**
@@ -27,10 +29,7 @@ class DefaultNtlmProxyConfig extends DefaultProxyConfig implements ProxyConfig.N
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((ntlmDomain == null) ? 0 : ntlmDomain.hashCode());
-    return result;
+    return hash(getHost(), getPort(), getPassword(), getUsername(), getNonProxyHosts(), ntlmDomain);
   }
 
   @Override
