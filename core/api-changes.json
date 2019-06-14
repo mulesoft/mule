@@ -19,6 +19,33 @@
           "fieldName": "OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER",
           "elementKind": "field",
           "justification": "Critical new feature. Making a SEMVER exception"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.core.api.construct.FlowConstruct::checkBackpressure(org.mule.runtime.core.api.event.CoreEvent) throws java.lang.RuntimeException",
+          "package": "org.mule.runtime.core.api.construct",
+          "classSimpleName": "FlowConstruct",
+          "methodName": "checkBackpressure",
+          "elementKind": "method",
+          "justification": "not used by others"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.core.api.processor.strategy.ProcessingStrategy::checkBackpressureAccepting(org.mule.runtime.core.api.event.CoreEvent) throws java.util.concurrent.RejectedExecutionException",
+          "package": "org.mule.runtime.core.api.processor.strategy",
+          "classSimpleName": "ProcessingStrategy",
+          "methodName": "checkBackpressureAccepting",
+          "elementKind": "method",
+          "justification": "not used by others"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.processor.strategy.ProcessingStrategy::checkBackpressureEmitting(org.mule.runtime.core.api.event.CoreEvent)",
+          "package": "org.mule.runtime.core.api.processor.strategy",
+          "classSimpleName": "ProcessingStrategy",
+          "methodName": "checkBackpressureEmitting",
+          "elementKind": "method",
+          "justification": "not used by others"
         }
       ]
     }
