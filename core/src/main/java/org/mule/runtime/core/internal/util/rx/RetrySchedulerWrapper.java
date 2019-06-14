@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Reference;
 
@@ -17,8 +19,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Wrapper for a {@code Scheduler} that retries to submit a task if a {@link RejectedExecutionException} is thrown, applying
@@ -116,6 +118,7 @@ public class RetrySchedulerWrapper implements Scheduler {
         try {
           Thread.sleep(retryTime);
         } catch (InterruptedException e) {
+          currentThread().interrupt();
           throw new RejectedExecutionException();
         }
       }

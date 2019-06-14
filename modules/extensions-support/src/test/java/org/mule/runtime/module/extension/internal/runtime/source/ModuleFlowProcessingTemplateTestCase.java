@@ -19,11 +19,12 @@ import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-import org.mule.runtime.api.message.Message;
+
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -35,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -42,7 +44,7 @@ import reactor.core.publisher.Mono;
 public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   @Mock
-  private Message message;
+  private SourceResultAdapter message;
 
   @Mock
   private CoreEvent event;
@@ -59,7 +61,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
   @Mock
   private Map<String, Object> mockParameters;
 
-  private RuntimeException runtimeException = new RuntimeException();
+  private final RuntimeException runtimeException = new RuntimeException();
 
   private ModuleFlowProcessingTemplate template;
 
@@ -72,7 +74,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getMuleEvent() throws Exception {
-    assertThat(template.getMessage(), is(sameInstance(message)));
+    assertThat(template.getSourceMessage(), is(sameInstance(message)));
   }
 
   @Test
