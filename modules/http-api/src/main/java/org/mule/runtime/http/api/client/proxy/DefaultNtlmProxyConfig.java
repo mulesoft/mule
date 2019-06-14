@@ -29,7 +29,7 @@ class DefaultNtlmProxyConfig extends DefaultProxyConfig implements ProxyConfig.N
 
   @Override
   public int hashCode() {
-    return hash(getHost(), getPort(), getPassword(), getUsername(), getNonProxyHosts(), ntlmDomain);
+    return hash(super.hashCode(), ntlmDomain);
   }
 
   @Override
