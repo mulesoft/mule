@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
@@ -43,7 +44,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -61,19 +61,20 @@ import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
-
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
@@ -86,6 +87,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   private FlowConstruct flow;
   private MessageProcessContext context;
+  private SourceResultAdapter resultAdapter;
   private ModuleFlowProcessingPhaseTemplate template;
   private PhaseResultNotifier notifier;
 
@@ -158,7 +160,11 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(muleContext.getConfigurationComponentLocator().find(any(Location.class))).thenReturn(of(flow));
 
     template = mock(ModuleFlowProcessingPhaseTemplate.class);
-    when(template.getMessage()).thenReturn(Message.of(null));
+    resultAdapter = mock(SourceResultAdapter.class);
+    when(resultAdapter.getResult()).thenReturn(Result.builder().build());
+    when(resultAdapter.getMediaType()).thenReturn(ANY);
+
+    when(template.getSourceMessage()).thenReturn(resultAdapter);
     when(template.getNotificationFunctions()).thenReturn(emptyList());
     when(template.sendResponseToClient(any(), any())).thenAnswer(invocation -> Mono.empty());
     when(template.sendFailureResponseToClient(any(), any())).thenAnswer(invocation -> Mono.empty());
@@ -276,7 +282,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     Reference<MonoSink> sinkReference = new Reference<>();
 
     reset(template);
-    when(template.getMessage()).thenReturn(Message.of(null));
+    when(template.getSourceMessage()).thenReturn(resultAdapter);
     when(template.getNotificationFunctions()).thenReturn(emptyList());
     when(template.sendFailureResponseToClient(any(), any())).thenAnswer(invocation -> create(sinkReference::set));
 
