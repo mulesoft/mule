@@ -16,6 +16,11 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 
+/**
+ * Defines a common base class for flow-ref processors.
+ *
+ * @Since 4.3.0
+ */
 abstract class FlowRefMessageProcessor extends AbstractComponent implements AnnotatedProcessor, Stoppable, Disposable {
 
   private final FlowRefFactoryBean owner;
