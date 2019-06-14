@@ -1,6 +1,7 @@
 {
   "title": "Person",
   "type": "object",
+  "id": "http://example.com/example.json",
   "properties": {
     "firstName": {
       "type": "string"
