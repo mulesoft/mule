@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.lang.Boolean.*;
+import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
-
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.util.SystemUtils;
 
@@ -221,7 +222,7 @@ public class JdkVersionUtils {
   }
 
   public static JdkVersion getJdkVersion() {
-    return new JdkVersion(System.getProperty(JAVA_VERSION_PROPERTY));
+    return new JdkVersion(getProperty(JAVA_VERSION_PROPERTY));
   }
 
   public static String getSupportedJdks() {
@@ -295,6 +296,8 @@ public class JdkVersionUtils {
     if (!isSupportedJdkVendor()) {
       logger.info("You're executing with a JDK made by a vendor that is not on the recommended list of vendors. Vendor: "
           + JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
+    } else if (getBoolean(getProperty("mule.jdkDebug"))) {
+      logger.info("You're executing with a JDK made by a recommended vendor.");
     }
   }
 }
