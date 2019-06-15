@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.http.api.client.proxy;
 
+import static java.util.Objects.hash;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import java.util.Objects;
 
 /**
  * Basic implementation of a {@link ProxyConfig}. Instances can only be obtained through a {@link ProxyConfigBuilder}.
@@ -15,11 +18,11 @@ class DefaultProxyConfig implements ProxyConfig {
 
   private static final int MAXIMUM_PORT_NUMBER = 65535;
 
-  private String host;
-  private int port;
-  private String username;
-  private String password;
-  private String nonProxyHosts;
+  private final String host;
+  private final int port;
+  private final String username;
+  private final String password;
+  private final String nonProxyHosts;
 
   DefaultProxyConfig(String host, int port, String username, String password, String nonProxyHosts) {
     checkArgument(host != null, "Host must be not null");
@@ -55,6 +58,32 @@ class DefaultProxyConfig implements ProxyConfig {
   @Override
   public String getNonProxyHosts() {
     return nonProxyHosts;
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(host, port, password, username, nonProxyHosts);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    DefaultProxyConfig that = (DefaultProxyConfig) obj;
+
+    return Objects.equals(this.host, that.host)
+        && Objects.equals(this.port, that.port)
+        && Objects.equals(this.password, that.password)
+        && Objects.equals(this.username, that.username)
+        && Objects.equals(this.nonProxyHosts, that.nonProxyHosts);
   }
 
 }
