@@ -439,7 +439,8 @@ public class MessageProcessors {
         .doOnError(e -> {
           ((BaseEventContext) event.getContext()).error(e);
         })
-        .doOnError(MessagingException.class, me -> me.setProcessedEvent(quickCopy(eventChildCtx.getContext(), me.getEvent())));
+        .onErrorMap(MessagingException.class,
+                    me -> new MessagingException(quickCopy(eventChildCtx.getContext(), me.getEvent()), me));
   }
 
   private static Publisher<CoreEvent> internalApplyWithChildContext(Publisher<CoreEvent> eventChildCtxPub,
