@@ -11,11 +11,10 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -38,7 +37,6 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -69,7 +67,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       throw new InitialisationException(createStaticMessage("One message processor must be configured within 'until-successful'."),
                                         this);
     }
-    this.nestedChain = newChain(getProcessingStrategy(locator, getRootContainerLocation()), processors);
+    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
     timer = schedulerService.cpuLightScheduler();
     policyTemplate =
@@ -123,7 +121,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   }
 
   /**
-   *
    * @param maxRetries the number of retries to process the route when failing. Default value is 5.
    */
   public void setMaxRetries(final int maxRetries) {

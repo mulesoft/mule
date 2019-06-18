@@ -104,13 +104,19 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     } else if (existsWithinRootContainer(componentModel)) {
       ComponentModel parentComponentModel = componentModel.getParent();
       DefaultComponentLocation parentComponentLocation = parentComponentModel.getComponentLocation();
+
+      if (isModuleOperation(componentModel)) {
+        // just point to the correct typed component operation identifier
+        typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
+      }
+
       if (isHttpProxyPart(componentModel)) {
         componentLocation =
             parentComponentLocation.appendLocationPart(componentModel.getIdentifier().getName(), typedComponentIdentifier,
                                                        componentModel.getConfigFileName(),
                                                        componentModel.getLineNumber(),
                                                        componentModel.getStartColumn());
-      } else if (isRootProcessorScope(parentComponentModel) || isRoute(parentComponentModel)) {
+      } else if (isRootProcessorScope(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isMunitFlowIdentifier(parentComponentModel)) {
         componentLocation = parentComponentLocation.appendRoutePart()
@@ -145,21 +151,14 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                          componentModel.getStartColumn());
         }
       } else if (isProcessor(componentModel)) {
-        if (isModuleOperation(parentComponentModel) || isScopeProcessor(parentComponentModel)) {
+        if (isModuleOperation(parentComponentModel)) {
           final Optional<TypedComponentIdentifier> operationTypedIdentifier =
               MODULE_OPERATION_CHAIN.equals(typedComponentIdentifier.get().getIdentifier())
                   ? getModuleOperationTypeComponentIdentifier(componentModel)
                   : typedComponentIdentifier;
 
-          if(isModuleOperation(parentComponentModel)) {
-            componentLocation = processModuleOperationChildren(componentModel, operationTypedIdentifier);
-          } else {
-            componentLocation =
-                parentComponentLocation.appendLocationPart(findProcessorPath(componentModel), operationTypedIdentifier,
-                                                           componentModel.getConfigFileName(), componentModel.getLineNumber(),
-                                                           componentModel.getStartColumn());
-          }
-        } else{
+          componentLocation = processModuleOperationChildren(componentModel, operationTypedIdentifier);
+        } else {
           componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
                                                                                                 typedComponentIdentifier,
                                                                                                 componentModel
@@ -191,10 +190,6 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getStartColumn());
     }
     componentModel.setComponentLocation(componentLocation);
-  }
-
-  private Boolean isScopeProcessor(ComponentModel componentModel) {
-    return componentModel.getComponentType().map(componentType -> componentType == SCOPE).orElse(false);
   }
 
   private boolean isBatchAggregator(ComponentModel componentModel) {
@@ -298,10 +293,6 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(),
                                                      componentModel.getLineNumber(), componentModel.getStartColumn());
     } else if (isProcessor(componentModel)) {
-      if (isModuleOperation(componentModel)) {
-        // just point to the correct typed component operation identifier
-        typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
-      }
       componentLocation = parentComponentLocation
           .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty(), empty())
           .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier, componentModel.getConfigFileName(),

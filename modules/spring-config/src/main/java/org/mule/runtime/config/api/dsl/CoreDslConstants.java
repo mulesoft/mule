@@ -38,7 +38,7 @@ public interface CoreDslConstants {
 
   ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();
-  ComponentIdentifier ON_ERROR_CONTINUE_IDENTIFIER =
+  ComponentIdentifier ON_ERROR_CONTINE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
   ComponentIdentifier ON_ERROR_PROPAGATE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();

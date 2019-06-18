@@ -15,7 +15,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINUE_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
 import org.mule.runtime.api.component.Component;
@@ -52,7 +52,7 @@ public class ComponentModelHelper {
    */
   public static TypedComponentIdentifier.ComponentType resolveComponentType(ComponentModel componentModel,
                                                                             ExtensionModelHelper extensionModelHelper) {
-    if (componentModel.getIdentifier().equals(ON_ERROR_CONTINUE_IDENTIFIER)
+    if (componentModel.getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
         || componentModel.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
       return ON_ERROR;
     }
