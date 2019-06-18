@@ -211,6 +211,16 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   }
 
   @Test
+  public void failOnExceptionAndAdapterIsCreatedWithRestartParameterTrue() throws Exception {
+      messageSource.initialise();
+      messageSource.start();
+      messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+
+      verify(source, times(2)).onStart(sourceCallback);
+      verify(source, times(1)).onStop();
+  }
+
+  @Test
   public void startFailsWithRandomException() throws Exception {
     Exception e = new RuntimeException();
     doThrow(e).when(source).onStart(sourceCallback);
