@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
@@ -29,21 +33,17 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.internal.rx.MonoSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -271,23 +271,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
       assertThat(t.getCause(), is(exception));
       assertThat(((MessagingException) t).getEvent().getContext(), sameInstance(input.getContext()));
     }
-  }
-
-  @Test
-  public void processWithChildContextErrorInChainRegainsParentContext() throws Exception {
-    Reference<EventContext> contextReference = new Reference<>();
-    from(processWithChildContext(input, createChain(error), Optional.empty()))
-        .doOnError(e -> {
-          if (e instanceof MessagingException) {
-            contextReference.set(((MessagingException) e).getEvent().getContext());
-          }
-        })
-        .subscribe();
-
-    assertThat(contextReference.get(), notNullValue());
-    assertThat(contextReference.get(), is(not(input.getContext())));
-    BaseEventContext context = (BaseEventContext) contextReference.get();
-    assertThat(context.getParentContext().get(), is(input.getContext()));
   }
 
   @Test
@@ -678,41 +661,13 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
     Flux.create(emitter)
-        .transform(pub -> {
-          return applyWithChildContext(pub, pubInner -> pubInner, Optional.empty());
-        })
+        .transform(pub -> applyWithChildContext(pub, pubInner -> pubInner, Optional.empty()))
         .subscribe(event -> {
         }, e -> {
         }, () -> fluxCompleted.set(true));
     emitter.complete();
 
     assertThat(fluxCompleted.get(), is(true));
-  }
-
-  @Test
-  @Issue("MULE-16892")
-  public void processWithChildContextPublisherCompleted() throws Exception {
-    AtomicBoolean fluxCompleted = new AtomicBoolean(false);
-    Reference<Throwable> exceptionReference = new Reference<>();
-
-    final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
-    Flux.create(emitter)
-        .transform(pub -> {
-          return from(pub).flatMap(event -> {
-            return Mono.from(processWithChildContext(event, error, Optional.empty()));
-          });
-        })
-        .subscribe(event -> {
-        }, e -> {
-          exceptionReference.set(e);
-        }, () -> {
-          fluxCompleted.set(true);
-        });
-    emitter.complete();
-
-    assertThat(fluxCompleted.get(), is(true));
-    assertThat(exceptionReference, is(notNullValue()));
-    assertThat(exceptionReference, instanceOf(MessagingException.class));
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
