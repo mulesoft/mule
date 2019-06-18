@@ -254,7 +254,7 @@
         <muleVeganExtensionTestVersion>4.1.7-SNAPSHOT</muleVeganExtensionTestVersion>
         <muleHeisenbergExtensionTestVersion>4.1.7-SNAPSHOT</muleHeisenbergExtensionTestVersion>
         <muleMarvelExtensionTestVersion>4.1.7-SNAPSHOT</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.1.6-SNAPSHOT</mulePetstoreExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.1.7-SNAPSHOT</mulePetstoreExtensionTestVersion>
         <muleSubtypesExtensionTestVersion>4.1.6-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
