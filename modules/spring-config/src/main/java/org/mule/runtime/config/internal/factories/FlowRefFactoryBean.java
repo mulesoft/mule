@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.factories;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -20,7 +21,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -38,11 +38,19 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -54,12 +62,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -260,6 +262,29 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
   }
 
+  private class SinkAndPublisherPair {
+
+    private final Publisher<CoreEvent> publisher;
+    private final FluxSinkRecorder recorder;
+
+    SinkAndPublisherPair(Processor processor) {
+      recorder = new FluxSinkRecorder();
+      publisher = applyWithChildContext(Flux.create(recorder), processor, ofNullable(getLocation()));
+    }
+
+    public void execute(CoreEvent event) {
+      recorder.next(event);
+    }
+
+    public void complete() {
+      recorder.complete();
+    }
+
+    public Publisher<CoreEvent> getPublisher() {
+      return publisher;
+    }
+  }
+
   private class DynamicFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
     private LoadingCache<String, Processor> cache;
@@ -279,10 +304,36 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      // TODO: This is a horrible way of looking for the registered subFlows. CHANGE ME!
+      List<String> subFlowNames = Arrays
+          .asList(FlowRefFactoryBean.this.applicationContext.getBeanNamesForType(SubflowMessageProcessorChainFactoryBean.class))
+          .stream()
+          .map(aName -> aName.startsWith("&") ? aName.substring(1) : aName)
+          .collect(toList());
+
+      Map<String, SinkAndPublisherPair> subFlowRouter = new HashMap<>();
+
+      subFlowNames.stream().forEach(subFlowName -> {
+        try {
+          Processor subFlowProcessor = getReferencedFlow(subFlowName, this);
+          subFlowRouter.put(subFlowName, new SinkAndPublisherPair(subFlowProcessor));
+        } catch (MuleException e) {
+          e.printStackTrace();
+        }
+      });
+
       return from(publisher).flatMap(event -> {
         ReactiveProcessor resolvedReferencedProcessor;
+        String resolvedName = resolveTargetFlowName(event);
+
+        if (subFlowRouter.keySet().contains(resolvedName)) {
+          SinkAndPublisherPair resolvedPair = subFlowRouter.get(resolvedName);
+          resolvedPair.execute(event);
+          return resolvedPair.getPublisher();
+        }
+
         try {
-          resolvedReferencedProcessor = resolveReferencedProcessor(event);
+          resolvedReferencedProcessor = resolveReferencedProcessor(resolvedName);
         } catch (MuleException e) {
           return error(e);
         }
@@ -300,12 +351,16 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
         return (target != null)
             ? pub.map(outputToTarget(event, target, targetValue, expressionManager))
             : pub;
-      });
+      }).doOnComplete(() -> subFlowRouter.values().stream().forEach(sinkAndPublisherPair -> sinkAndPublisherPair.complete()));
     }
 
-    protected Processor resolveReferencedProcessor(CoreEvent event) throws MuleException {
+    protected String resolveTargetFlowName(CoreEvent event) {
+      return (String) expressionManager.evaluate(refName, event, getLocation()).getValue();
+    }
+
+    protected Processor resolveReferencedProcessor(String targetFlowName) throws MuleException {
       try {
-        return cache.getUnchecked((String) expressionManager.evaluate(refName, event, getLocation()).getValue());
+        return cache.getUnchecked(targetFlowName);
 
       } catch (UncheckedExecutionException e) {
         if (e.getCause() instanceof MuleRuntimeException) {
