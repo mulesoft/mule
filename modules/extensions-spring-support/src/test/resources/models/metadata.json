@@ -16909,61 +16909,7 @@
       "output": {
         "type": {
           "format": "json",
-          "type": "Object",
-          "annotations": {
-            "label": "Person",
-            "classInformation": {
-              "classname": "java.io.InputStream",
-              "hasDefaultConstructor": true,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": true,
-              "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Closeable"
-              ],
-              "parent": "",
-              "genericTypes": [],
-              "isMap": false
-            }
-          },
-          "open": {
-            "type": "Any"
-          },
-          "fields": [
-            {
-              "key": {
-                "name": "firstName",
-                "required": "true"
-              },
-              "model": {
-                "type": "String"
-              }
-            },
-            {
-              "key": {
-                "name": "lastName",
-                "required": "true"
-              },
-              "model": {
-                "type": "String"
-              }
-            },
-            {
-              "key": {
-                "name": "age"
-              },
-              "model": {
-                "type": "Number",
-                "annotations": {
-                  "range": {
-                    "from": 0
-                  },
-                  "int": {}
-                }
-              }
-            }
-          ]
+          "type": "@ref:http://example.com/example.json"
         },
         "hasDynamicType": false,
         "description": "",
@@ -18474,61 +18420,7 @@
       "outputAttributes": {
         "type": {
           "format": "json",
-          "type": "Object",
-          "annotations": {
-            "label": "Person",
-            "classInformation": {
-              "classname": "java.io.InputStream",
-              "hasDefaultConstructor": true,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": true,
-              "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Closeable"
-              ],
-              "parent": "",
-              "genericTypes": [],
-              "isMap": false
-            }
-          },
-          "open": {
-            "type": "Any"
-          },
-          "fields": [
-            {
-              "key": {
-                "name": "firstName",
-                "required": "true"
-              },
-              "model": {
-                "type": "String"
-              }
-            },
-            {
-              "key": {
-                "name": "lastName",
-                "required": "true"
-              },
-              "model": {
-                "type": "String"
-              }
-            },
-            {
-              "key": {
-                "name": "age"
-              },
-              "model": {
-                "type": "Number",
-                "annotations": {
-                  "range": {
-                    "from": 0
-                  },
-                  "int": {}
-                }
-              }
-            }
-          ]
+          "type": "@ref:http://example.com/example.json"
         },
         "hasDynamicType": false,
         "description": "",
@@ -18697,59 +18589,7 @@
             {
               "type": {
                 "format": "json",
-                "type": "Object",
-                "annotations": {
-                  "label": "Person",
-                  "classInformation": {
-                    "classname": "java.util.Map",
-                    "hasDefaultConstructor": false,
-                    "isInterface": true,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": true
-                  }
-                },
-                "open": {
-                  "type": "Any"
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "firstName",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "lastName",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "age"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "range": {
-                          "from": 0
-                        },
-                        "int": {}
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:http://example.com/example.json"
               },
               "hasDynamicType": false,
               "required": true,
@@ -18915,61 +18755,7 @@
             {
               "type": {
                 "format": "json",
-                "type": "Object",
-                "annotations": {
-                  "label": "Person",
-                  "classInformation": {
-                    "classname": "java.io.InputStream",
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Closeable"
-                    ],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": false
-                  }
-                },
-                "open": {
-                  "type": "Any"
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "firstName",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "lastName",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "age"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "range": {
-                          "from": 0
-                        },
-                        "int": {}
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:http://example.com/example.json"
               },
               "hasDynamicType": false,
               "required": true,
@@ -19096,61 +18882,7 @@
       "output": {
         "type": {
           "format": "json",
-          "type": "Object",
-          "annotations": {
-            "label": "Person",
-            "classInformation": {
-              "classname": "java.io.InputStream",
-              "hasDefaultConstructor": true,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": true,
-              "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Closeable"
-              ],
-              "parent": "",
-              "genericTypes": [],
-              "isMap": false
-            }
-          },
-          "open": {
-            "type": "Any"
-          },
-          "fields": [
-            {
-              "key": {
-                "name": "firstName",
-                "required": "true"
-              },
-              "model": {
-                "type": "String"
-              }
-            },
-            {
-              "key": {
-                "name": "lastName",
-                "required": "true"
-              },
-              "model": {
-                "type": "String"
-              }
-            },
-            {
-              "key": {
-                "name": "age"
-              },
-              "model": {
-                "type": "Number",
-                "annotations": {
-                  "range": {
-                    "from": 0
-                  },
-                  "int": {}
-                }
-              }
-            }
-          ]
+          "type": "@ref:http://example.com/example.json"
         },
         "hasDynamicType": false,
         "description": "",
@@ -19492,50 +19224,11 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "typeId": "http://example.com/example.json"
           },
           "item": {
-            "type": "Object",
-            "annotations": {
-              "label": "Person"
-            },
-            "open": {
-              "type": "Any"
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "firstName",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "String"
-                }
-              },
-              {
-                "key": {
-                  "name": "lastName",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "String"
-                }
-              },
-              {
-                "key": {
-                  "name": "age"
-                },
-                "model": {
-                  "type": "Number",
-                  "annotations": {
-                    "range": {
-                      "from": 0
-                    },
-                    "int": {}
-                  }
-                }
-              }
-            ]
+            "type": "@ref:http://example.com/example.json"
           }
         },
         "hasDynamicType": false,
@@ -23796,61 +23489,7 @@
               {
                 "type": {
                   "format": "json",
-                  "type": "Object",
-                  "annotations": {
-                    "label": "Person",
-                    "classInformation": {
-                      "classname": "java.io.InputStream",
-                      "hasDefaultConstructor": true,
-                      "isInterface": false,
-                      "isInstantiable": false,
-                      "isAbstract": true,
-                      "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.io.Closeable"
-                      ],
-                      "parent": "",
-                      "genericTypes": [],
-                      "isMap": false
-                    }
-                  },
-                  "open": {
-                    "type": "Any"
-                  },
-                  "fields": [
-                    {
-                      "key": {
-                        "name": "firstName",
-                        "required": "true"
-                      },
-                      "model": {
-                        "type": "String"
-                      }
-                    },
-                    {
-                      "key": {
-                        "name": "lastName",
-                        "required": "true"
-                      },
-                      "model": {
-                        "type": "String"
-                      }
-                    },
-                    {
-                      "key": {
-                        "name": "age"
-                      },
-                      "model": {
-                        "type": "Number",
-                        "annotations": {
-                          "range": {
-                            "from": 0
-                          },
-                          "int": {}
-                        }
-                      }
-                    }
-                  ]
+                  "type": "@ref:http://example.com/example.json"
                 },
                 "hasDynamicType": false,
                 "required": true,
@@ -24787,6 +24426,65 @@
         }
       },
       "fields": []
+    },
+    {
+      "format": "json",
+      "type": "Object",
+      "annotations": {
+        "typeId": "http://example.com/example.json",
+        "label": "Person",
+        "classInformation": {
+          "classname": "java.io.InputStream",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "java.io.Closeable"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "open": {
+        "type": "Any"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "firstName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "lastName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "age"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "range": {
+                "from": 0
+              },
+              "int": {}
+            }
+          }
+        }
+      ]
     },
     {
       "format": "json",
