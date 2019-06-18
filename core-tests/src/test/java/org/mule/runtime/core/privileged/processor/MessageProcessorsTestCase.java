@@ -9,6 +9,8 @@ package org.mule.runtime.core.privileged.processor;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -33,9 +35,11 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -271,6 +275,59 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
       assertThat(t.getCause(), is(exception));
       assertThat(((MessagingException) t).getEvent().getContext(), sameInstance(input.getContext()));
     }
+  }
+
+  @Test
+  @Issue("MULE-16892")
+  public void processWithChildContextErrorInChainMantainsChildContext() throws Exception {
+    Reference<EventContext> contextReference = new Reference<>();
+    from(processWithChildContext(input, createChain(error), Optional.empty()))
+        .doOnError(e -> {
+          if (e instanceof MessagingException) {
+            contextReference.set(((MessagingException) e).getEvent().getContext());
+          }
+        })
+        .subscribe();
+
+    assertThat(contextReference.get(), notNullValue());
+    assertThat(contextReference.get(), is(not(input.getContext())));
+    BaseEventContext context = (BaseEventContext) contextReference.get();
+    assertThat(context.getParentContext().get(), is(input.getContext()));
+  }
+
+  @Test
+  @Issue("MULE-16892")
+  public void processWithChildContextDontCompleteErrorInChainRegainsParentContext() throws Exception {
+    Reference<EventContext> contextReference = new Reference<>();
+    from(processWithChildContextDontComplete(input, createChain(error), Optional.empty()))
+        .doOnError(e -> {
+          if (e instanceof MessagingException) {
+            contextReference.set(((MessagingException) e).getEvent().getContext());
+          }
+        })
+        .subscribe();
+
+    assertThat(contextReference.get(), notNullValue());
+    assertThat(contextReference.get(), is(input.getContext()));
+  }
+
+
+  @Test
+  @Issue("MULE-16892")
+  public void applyWithChildContextErrorInChainRegainsParentContext() throws Exception {
+    Reference<EventContext> contextReference = new Reference<>();
+
+    Processor errorProcessor = createChain(error);
+    just(input).transform(inputPub -> from(applyWithChildContext(inputPub, errorProcessor, Optional.empty()))
+        .doOnError(e -> {
+          if (e instanceof MessagingException) {
+            contextReference.set(((MessagingException) e).getEvent().getContext());
+          }
+        }))
+        .subscribe();
+
+    assertThat(contextReference.get(), notNullValue());
+    assertThat(contextReference.get(), is(input.getContext()));
   }
 
   @Test
