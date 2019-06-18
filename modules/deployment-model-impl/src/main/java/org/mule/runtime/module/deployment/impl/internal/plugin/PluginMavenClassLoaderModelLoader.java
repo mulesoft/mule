@@ -83,9 +83,9 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       // mule-plugin has been found as a dependency from another mule-plugin and not present in the deployable dependency graph (system scope dependencies)
       if (rootFolder != null) {
         Path muleArtifactJson =
-                get(rootFolder.getAbsolutePath(), META_INF, MULE_ARTIFACT, pluginBundleDescriptor.getGroupId(),
-                    pluginBundleDescriptor.getArtifactId(), pluginBundleDescriptor.getBaseVersion(),
-                    CLASSLOADER_MODEL_JSON_DESCRIPTOR);
+            get(rootFolder.getAbsolutePath(), META_INF, MULE_ARTIFACT, pluginBundleDescriptor.getGroupId(),
+                pluginBundleDescriptor.getArtifactId(), pluginBundleDescriptor.getBaseVersion(),
+                CLASSLOADER_MODEL_JSON_DESCRIPTOR);
         if (muleArtifactJson.toFile().exists()) {
           return createHeavyPackageClassLoaderModel(artifactFile, muleArtifactJson.toFile(), attributes, empty());
         }
@@ -161,32 +161,38 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       if (SYSTEM.equals(pluginDependencyInDeployableArtifact.getScope())) {
         if (logger.isWarnEnabled()) {
           logger.warn(format(
-                  "Resolving a mule-plugin '%s' with system scope in order to resolve it class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
-                  pluginDependencyInDeployableArtifact.getDescriptor()));
+                             "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
+                             pluginDependencyInDeployableArtifact.getDescriptor()));
         }
 
         try (MuleSystemPluginMavenReactorResolver reactor =
-                     new MuleSystemPluginMavenReactorResolver(artifactFile, pluginBundleDescriptor)) {
+            new MuleSystemPluginMavenReactorResolver(artifactFile, pluginBundleDescriptor)) {
 
           Optional<File> mavenRepository = ofNullable(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation());
           if (!mavenRepository.isPresent()) {
             throw new MuleRuntimeException(createStaticMessage(
-                    format("Missing Maven local repository configuration while trying to resolve class loader model for lightweight artifact: %s",
-                           artifactFile.getName())));
+                                                               format("Missing Maven local repository configuration while trying to resolve class loader model for lightweight artifact: %s",
+                                                                      artifactFile.getName())));
           }
 
           org.mule.maven.client.api.model.BundleDescriptor mavenClientBundleDescriptor =
-                  toMavenClientBundleDescriptor(pluginBundleDescriptor);
+              toMavenClientBundleDescriptor(pluginBundleDescriptor);
           List<org.mule.maven.client.api.model.BundleDependency> dependencies =
-                  mavenClient.resolveArtifactDependencies(mavenClientBundleDescriptor, ImmutableList.of(mavenClientBundleDescriptor),
-                                                          mavenRepository,
-                                                          of(reactor));
+              mavenClient.resolveArtifactDependencies(mavenClientBundleDescriptor, ImmutableList.of(mavenClientBundleDescriptor),
+                                                      mavenRepository,
+                                                      of(reactor));
           DependencyConverter dependencyConverter = new DependencyConverter();
           return dependencies.stream().map(dependencyConverter::convert).collect(toSet());
         }
       }
+      if (logger.isWarnEnabled()) {
+        logger.warn(format(
+                           "Resolving a mule-plugin '%s' without the deployable context in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered",
+                           pluginDependencyInDeployableArtifact.getDescriptor()));
+      }
       return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
     }
+
     return super.resolveArtifactDependencies(artifactFile, attributes, artifactType);
   }
 
@@ -211,8 +217,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       if (checkArtifact(bundleDescriptor)) {
         if (bundleDescriptor.getType().equals("pom")) {
           return pomFile;
-        }
-        else {
+        } else {
           return artifactFile;
         }
       }
@@ -229,8 +234,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
     private boolean checkArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
       return this.bundleDescriptor.getGroupId().equals(bundleDescriptor.getGroupId())
-             && this.bundleDescriptor.getArtifactId().equals(bundleDescriptor.getArtifactId())
-             && this.bundleDescriptor.getVersion().equals(bundleDescriptor.getVersion());
+          && this.bundleDescriptor.getArtifactId().equals(bundleDescriptor.getArtifactId())
+          && this.bundleDescriptor.getVersion().equals(bundleDescriptor.getVersion());
     }
 
     @Override
@@ -241,11 +246,11 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   private org.mule.maven.client.api.model.BundleDescriptor toMavenClientBundleDescriptor(BundleDescriptor descriptor) {
     return new org.mule.maven.client.api.model.BundleDescriptor.Builder()
-            .setGroupId(descriptor.getGroupId())
-            .setArtifactId(descriptor.getArtifactId())
-            .setVersion(descriptor.getVersion())
-            .setClassifier(descriptor.getClassifier().orElse(null))
-            .build();
+        .setGroupId(descriptor.getGroupId())
+        .setArtifactId(descriptor.getArtifactId())
+        .setVersion(descriptor.getVersion())
+        .setClassifier(descriptor.getClassifier().orElse(null))
+        .build();
   }
 
   private Set<BundleDependency> collectTransitiveDependencies(BundleDependency rootDependency) {
