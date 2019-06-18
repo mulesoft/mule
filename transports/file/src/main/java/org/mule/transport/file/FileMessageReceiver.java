@@ -63,9 +63,11 @@ import org.apache.commons.collections.comparators.ReverseComparator;
 public class FileMessageReceiver extends AbstractPollingMessageReceiver
 {
 
+    private static final String RECENTLY_PROCESSED_SUFFIX = "_recently_processed";
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
     public static final String MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE = "mule.transport.file.singlepollinstance";
+    public static final String MULE_NOT_PROCESSING_RECENTLY_FILES_PERIOD = "mule.transport.file.not.recently.files.processing.period";
     public static final String IGNORE_EMPTY_FILES_PROPERTY = SYSTEM_PROPERTY_PREFIX + "transport.file.ignoreEmptyFiles";
 
     private final Boolean ignoreEmptyFiles = getBoolean(IGNORE_EMPTY_FILES_PROPERTY);
@@ -82,7 +84,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private boolean forceSync;
     private LockFactory lockFactory;
     private boolean poolOnPrimaryInstanceOnly;
+    private Integer notProcessingRecentlyFilesPeriod;
     private ObjectStore<String> filesBeingProcessingObjectStore;
+    private ObjectStore<String> filesRecentlyProcessed;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -144,11 +148,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         boolean synchronousProcessing = false;
         if (getFlowConstruct() instanceof Flow)
         {
-            synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
+            synchronousProcessing = ((Flow) getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
         }
-        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty(MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"false")) || !synchronousProcessing;
+        this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty(MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE, "false")) || !synchronousProcessing;
+        this.notProcessingRecentlyFilesPeriod = Integer.valueOf(System.getProperty(MULE_NOT_PROCESSING_RECENTLY_FILES_PERIOD, "-1"));
         ObjectStoreManager objectStoreManager = getEndpoint().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
-        filesBeingProcessingObjectStore = objectStoreManager.getObjectStore(getEndpoint().getName(),false,1000,60000,20000);
+        filesBeingProcessingObjectStore = objectStoreManager.getObjectStore(getEndpoint().getName(), false, 1000, 60000, 20000);
+        filesRecentlyProcessed = objectStoreManager.getObjectStore(getEndpoint().getName() + RECENTLY_PROCESSED_SUFFIX, false, -1, notProcessingRecentlyFilesPeriod, 20000);
     }
 
     @Override
@@ -218,7 +224,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         try
                         {
-                            //Skipping empty files
+                            String fileAbsolutePath = file.getAbsolutePath();
+
+                            if (notProcessingRecentlyFilesPeriod != -1 && isFileRecentlyProcessed(fileAbsolutePath))
+                            {
+                                continue;
+                            }
+
+                            // Skipping empty files
                             if (ignoreEmptyFiles && file.length() == 0)
                             {
                                 if (logger.isDebugEnabled())
@@ -227,7 +240,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                                 }
                                 continue;
                             }
-                            String fileAbsolutePath = file.getAbsolutePath();
+
                             try
                             {
                                 filesBeingProcessingObjectStore.store(fileAbsolutePath, fileAbsolutePath);
@@ -262,6 +275,26 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
+    }
+
+    protected boolean isFileRecentlyProcessed(String fileAbsolutePath) throws ObjectStoreException
+    {
+        try
+        {
+            filesRecentlyProcessed.store(fileAbsolutePath, fileAbsolutePath);
+        }
+        catch (ObjectAlreadyExistsException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("File '%s' recently processed. Skipping file.", fileAbsolutePath));
+            }
+
+            return true;
+
+        }
+
+        return false;
     }
 
     @Override
