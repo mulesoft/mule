@@ -241,7 +241,7 @@
         <muleDslApiVersion>1.1.7-SNAPSHOT</muleDslApiVersion>
         <muleExtensionsApiVersion>1.1.8-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.1.4-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.2.3-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientApi>1.2.4-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.2.3-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.2.3-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.1.4-SNAPSHOT</mulePolicyApiVersion>
