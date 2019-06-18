@@ -19224,7 +19224,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "typeId": "http://example.com/example.json"
           },
           "item": {
             "type": "@ref:http://example.com/example.json"
