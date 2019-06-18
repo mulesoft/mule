@@ -21,7 +21,7 @@ public class RunNowCronSchedulerWrapper extends PeriodicScheduler {
 
   @Override
   protected ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job) {
-    ScheduledFuture<?> future = executor.schedule(job, 0, TimeUnit.SECONDS);
+    executor.schedule(job, 0, TimeUnit.SECONDS);
     return cronScheduler.doSchedule(executor, job);
   }
 }
