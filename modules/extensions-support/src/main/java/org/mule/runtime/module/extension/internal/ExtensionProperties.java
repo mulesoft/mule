@@ -24,6 +24,12 @@ public class ExtensionProperties {
   public static final String CONNECTION_PARAM = PROPERTY_PREFIX + "CONNECTION_PARAM";
 
   /**
+   * Hackish property to abort retry in transactional cases. This property is no longer needed in 4.3+ thanks to MULE-16731
+   * @since 4.1.6 - 4.2.1
+   */
+  public static final String DO_NOT_RETRY = PROPERTY_PREFIX + "DO_NOT_RETRY";
+
+  /**
    * The key of an execution context variable on which a {@link SourceCallbackContext} was set
    */
   public static final String SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "SOURCE_CALLBACK_CONTEXT_PARAM";
