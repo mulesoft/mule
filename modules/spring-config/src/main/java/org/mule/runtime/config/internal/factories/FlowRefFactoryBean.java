@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -38,7 +39,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -48,7 +48,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -262,29 +261,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
   }
 
-  private class SinkAndPublisherPair {
-
-    private final Publisher<CoreEvent> publisher;
-    private final FluxSinkRecorder recorder;
-
-    SinkAndPublisherPair(Processor processor) {
-      recorder = new FluxSinkRecorder();
-      publisher = applyWithChildContext(Flux.create(recorder), processor, ofNullable(getLocation()));
-    }
-
-    public void execute(CoreEvent event) {
-      recorder.next(event);
-    }
-
-    public void complete() {
-      recorder.complete();
-    }
-
-    public Publisher<CoreEvent> getPublisher() {
-      return publisher;
-    }
-  }
-
   private class DynamicFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
     private LoadingCache<String, Processor> cache;
@@ -305,53 +281,48 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       // TODO: This is a horrible way of looking for the registered subFlows. CHANGE ME!
-      List<String> subFlowNames = Arrays
-          .asList(FlowRefFactoryBean.this.applicationContext.getBeanNamesForType(SubflowMessageProcessorChainFactoryBean.class))
-          .stream()
-          .map(aName -> aName.startsWith("&") ? aName.substring(1) : aName)
-          .collect(toList());
+      List<String> subFlowNames =
+          asList(FlowRefFactoryBean.this.applicationContext.getBeanNamesForType(SubflowMessageProcessorChainFactoryBean.class))
+              .stream()
+              .map(aName -> aName.startsWith("&") ? aName.substring(1) : aName)
+              .collect(toList());
 
-      Map<String, SinkAndPublisherPair> subFlowRouter = new HashMap<>();
+      Map<String, ExecutableSubFlow> subFlowRouter = new HashMap<>();
 
       subFlowNames.stream().forEach(subFlowName -> {
         try {
           Processor subFlowProcessor = getReferencedFlow(subFlowName, this);
-          subFlowRouter.put(subFlowName, new SinkAndPublisherPair(subFlowProcessor));
+          subFlowRouter.put(subFlowName, new ExecutableSubFlow(subFlowProcessor, getLocation()));
         } catch (MuleException e) {
-          e.printStackTrace();
+          LOGGER.error("An exception was raised while creating subFlow executable routes: ", e);
         }
       });
 
       return from(publisher).flatMap(event -> {
         ReactiveProcessor resolvedReferencedProcessor;
+        Publisher<CoreEvent> pub;
         String resolvedName = resolveTargetFlowName(event);
 
         if (subFlowRouter.keySet().contains(resolvedName)) {
-          SinkAndPublisherPair resolvedPair = subFlowRouter.get(resolvedName);
+          ExecutableSubFlow resolvedPair = subFlowRouter.get(resolvedName);
           resolvedPair.execute(event);
-          return resolvedPair.getPublisher();
-        }
-
-        try {
-          resolvedReferencedProcessor = resolveReferencedProcessor(resolvedName);
-        } catch (MuleException e) {
-          return error(e);
-        }
-
-        Mono<CoreEvent> pub;
-        if (resolvedReferencedProcessor instanceof Flow) {
-          pub = Mono.from(processWithChildContext(event, ((Flow) resolvedReferencedProcessor).referenced(),
-                                                  ofNullable(getLocation()),
-                                                  ((Flow) resolvedReferencedProcessor).getExceptionListener()));
+          pub = resolvedPair.getPublisher();
         } else {
-          pub = Mono.from(processWithChildContext(event, resolvedReferencedProcessor,
-                                                  ofNullable(getLocation())));
+          try {
+            resolvedReferencedProcessor = resolveReferencedProcessor(resolvedName);
+            pub = Mono.from(processWithChildContext(event, ((Flow) resolvedReferencedProcessor).referenced(),
+                                                    ofNullable(getLocation()),
+                                                    ((Flow) resolvedReferencedProcessor).getExceptionListener()));
+          } catch (MuleException e) {
+            return error(e);
+          }
         }
 
         return (target != null)
-            ? pub.map(outputToTarget(event, target, targetValue, expressionManager))
+            // TODO: If it's a subflow, this is a Mono.from(Flux<CoreEvent>). Opinions?
+            ? Mono.from(pub).map(outputToTarget(event, target, targetValue, expressionManager))
             : pub;
-      }).doOnComplete(() -> subFlowRouter.values().stream().forEach(sinkAndPublisherPair -> sinkAndPublisherPair.complete()));
+      }).doOnComplete(() -> subFlowRouter.values().stream().forEach(executableSubFlow -> executableSubFlow.complete()));
     }
 
     protected String resolveTargetFlowName(CoreEvent event) {
