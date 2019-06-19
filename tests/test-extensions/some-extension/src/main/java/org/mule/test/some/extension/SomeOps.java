@@ -7,12 +7,25 @@
 
 package org.mule.test.some.extension;
 
-import org.mule.runtime.extension.api.annotation.param.Connection;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+
+import java.io.InputStream;
+
+import org.slf4j.Logger;
 
 public class SomeOps {
 
-  public void someOp(@Connection String conn, @Config SomeExtension ext) {
+  private final Logger LOGGER = getLogger(SomeOps.class);
 
+  public void someOp(@Connection String conn, @Config SomeExtension ext) {}
+
+  public Result<InputStream, Object> inputStreamConsumingOperation(@Content TypedValue<InputStream> value) {
+    LOGGER.info("A new message is passing through 'inputStreamConsumingOperation': {}", value.getValue());
+    return Result.<InputStream, Object>builder().output(value.getValue()).attributes(null).build();
   }
 }
