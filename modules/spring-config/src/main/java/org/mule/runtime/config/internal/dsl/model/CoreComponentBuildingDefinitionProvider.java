@@ -143,14 +143,13 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.IdempotentMessageValidator;
 import org.mule.runtime.core.internal.routing.MessageChunkAggregator;
 import org.mule.runtime.core.internal.routing.MessageChunkSplitter;
-import org.mule.runtime.core.internal.routing.Resequencer;
 import org.mule.runtime.core.internal.routing.ParallelForEach;
 import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
 import org.mule.runtime.core.internal.routing.ProcessorRoute;
+import org.mule.runtime.core.internal.routing.Resequencer;
 import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.SimpleCollectionAggregator;
-import org.mule.runtime.core.internal.routing.ParallelForEach;
 import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
@@ -468,7 +467,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.withIdentifier(OTHERWISE).withTypeDefinition(fromType(ProcessorRoute.class))
             .withObjectFactoryType(ProcessorRouteFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .withSetterParameterDefinition("expression", fromFixedValue("true").build()).build());
+            .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("message-chunk-splitter")
         .withTypeDefinition(fromType(MessageChunkSplitter.class))
         .withSetterParameterDefinition("messageSize", fromSimpleParameter("messageSize").build()).build());
