@@ -84,10 +84,15 @@ public class MessageProcessors {
     if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
-      DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
-      processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
-      return defaultMessageProcessorChainBuilder.chain(processors).build();
+      return buildNewChainWithListOfProcessors(processingStrategy, processors);
     }
+  }
+
+  public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
+                                                                        List<Processor> processors) {
+    DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
+    processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
+    return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
   /**

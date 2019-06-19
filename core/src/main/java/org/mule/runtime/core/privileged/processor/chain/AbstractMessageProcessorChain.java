@@ -26,7 +26,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Operators.lift;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -52,10 +51,6 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -68,6 +63,9 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
+import org.slf4j.Logger;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -101,7 +99,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
           .loadClass("org.mule.runtime.deployment.model.api.application.ApplicationClassLoader");
     } catch (ClassNotFoundException e) {
-      LOGGER.debug("ApplicationClassLoader interface not avialable in current context", e);
+      LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
     }
 
   }
