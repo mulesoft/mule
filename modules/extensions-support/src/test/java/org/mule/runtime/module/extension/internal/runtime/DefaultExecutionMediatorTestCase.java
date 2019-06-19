@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doThrow;
@@ -60,6 +61,11 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,13 +75,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.verification.VerificationMode;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -153,6 +152,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getTransactionConfig()).thenReturn(empty());
     when(operationContext.getRetryPolicyTemplate()).thenReturn(empty());
     when(operationContext.getCurrentScheduler()).thenReturn(IMMEDIATE_SCHEDULER);
+    when(operationContext.getVariable(anyString())).thenReturn(null);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
