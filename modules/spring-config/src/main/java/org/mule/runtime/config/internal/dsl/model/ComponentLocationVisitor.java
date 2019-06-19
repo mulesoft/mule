@@ -156,6 +156,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
               MODULE_OPERATION_CHAIN.equals(typedComponentIdentifier.get().getIdentifier())
                   ? getModuleOperationTypeComponentIdentifier(componentModel)
                   : typedComponentIdentifier;
+
           componentLocation = processModuleOperationChildren(componentModel, operationTypedIdentifier);
         } else {
           componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
