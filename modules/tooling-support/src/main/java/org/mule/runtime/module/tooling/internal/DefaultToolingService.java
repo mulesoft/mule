@@ -21,9 +21,12 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
@@ -148,9 +151,15 @@ public class DefaultToolingService implements ToolingService {
         MuleArtifactLoaderDescriptor classLoaderModelDescriptorLoader =
             applicationArtifactModelBuilder.getClassLoaderModelDescriptorLoader();
         Map<String, Object> extendedAttributes = new HashMap<>(classLoaderModelDescriptorLoader.getAttributes());
+        Properties pomProperties = getPomPropertiesFolder(domain.getLocation());
         extendedAttributes.put(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER,
                                new DomainMavenReactorResolver(domain.getLocation(),
-                                                              domain.getDescriptor().getBundleDescriptor()));
+                                                              new BundleDescriptor.Builder()
+                                                                  .setGroupId(pomProperties.getProperty("groupId"))
+                                                                  .setArtifactId(pomProperties.getProperty("artifactId"))
+                                                                  .setVersion(pomProperties.getProperty("version"))
+                                                                  .setClassifier(MULE_DOMAIN_CLASSIFIER)
+                                                                  .build()));
         applicationArtifactModelBuilder
             .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(classLoaderModelDescriptorLoader.getId(),
                                                                                    extendedAttributes));

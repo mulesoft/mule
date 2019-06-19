@@ -185,14 +185,14 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
           return dependencies.stream().map(dependencyConverter::convert).collect(toSet());
         }
       }
-      if (logger.isWarnEnabled()) {
-        logger.warn(format(
-                           "Resolving a mule-plugin '%s' without the deployable context in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered",
-                           pluginDependencyInDeployableArtifact.getDescriptor()));
-      }
       return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
     }
 
+    if (logger.isWarnEnabled()) {
+      logger.warn(format(
+                         "Resolving a mule-plugin from '%s' without the deployable context in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered",
+                         artifactFile));
+    }
     return super.resolveArtifactDependencies(artifactFile, attributes, artifactType);
   }
 
