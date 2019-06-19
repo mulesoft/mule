@@ -38,6 +38,7 @@ public interface CoreDslConstants {
   String TRY_ELEMENT = "try";
   String FOREACH_ELEMENT = "foreach";
   String PARALLEL_FOREACH_ELEMENT = "parallel-" + FOREACH_ELEMENT;
+  String SCATTER_GATHER_ELEMENT = "scatter-gather";
 
   ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();
@@ -73,4 +74,6 @@ public interface CoreDslConstants {
       builder().namespace(CORE_PREFIX).name(FOREACH_ELEMENT).build();
   ComponentIdentifier PARALLEL_FOREACH_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(PARALLEL_FOREACH_ELEMENT).build();
+  ComponentIdentifier SCATTER_GATHER_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(SCATTER_GATHER_ELEMENT).build();
 }
