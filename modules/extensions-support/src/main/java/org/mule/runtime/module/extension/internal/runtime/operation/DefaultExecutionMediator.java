@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
@@ -169,7 +170,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   }
 
   private boolean shouldRetry(Throwable t, ExecutionContextAdapter<T> context) {
-    if (!extractConnectionException(t).isPresent()) {
+    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !extractConnectionException(t).isPresent()) {
       return false;
     }
 
