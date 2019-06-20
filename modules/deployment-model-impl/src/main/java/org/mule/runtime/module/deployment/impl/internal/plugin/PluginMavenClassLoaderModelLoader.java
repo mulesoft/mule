@@ -19,6 +19,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import org.mule.maven.client.api.MavenClient;
@@ -155,8 +156,27 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
           .filter(dep -> dep.getDescriptor().equals(pluginBundleDescriptor)).findFirst()
           .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find required descriptor. Looking for: "
               + pluginBundleDescriptor + " in " + deployableArtifactDescriptorDependencies)));
+
+      // MTF/MUnit declares the mule-plugin being tested as system scope therefore its transitive dependencies
+      // will not be included in the dependency graph of the deployable artifact and we need to use Mule Maven Client
+      // to resolve its dependencies
+      if (SYSTEM.equals(pluginDependencyInDeployableArtifact.getScope())) {
+        if (logger.isWarnEnabled()) {
+          logger.warn(format(
+                             "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
+                             pluginDependencyInDeployableArtifact.getDescriptor()));
+        }
+        return resolveArtifactDependenciesUsingMavenClient(artifactFile);
+      }
+
       return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
     }
+
+    // Backward compatible resolution for resolving dependencies for a mule-plugin with Mule Maven Client
+    return resolveArtifactDependenciesUsingMavenClient(artifactFile);
+  }
+
+  private Set<BundleDependency> resolveArtifactDependenciesUsingMavenClient(File artifactFile) {
     if (logger.isWarnEnabled()) {
       logger.warn(format(
                          "Resolving a mule-plugin from '%s' without the deployable resolution context in order to resolve its class loader model. "
