@@ -8,7 +8,6 @@ package org.mule.test.functional;
 
 
 import static org.mule.tck.probe.PollingProber.check;
-import static org.mule.test.functional.ByteArrayToInputStreamSdkTestCase.EventRecorder.countCapturedEvents;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -22,9 +21,9 @@ import org.junit.Test;
 
 public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTestCase {
 
-  private static final int POLL_DELAY_MILLIS = 1000;
   private static final int POLL_TIMEOUT_MILLIS = 5000;
-  private static final int EXPECTED_CAPTURED_EVENTS = 1;
+  private static final int POLL_DELAY_MILLIS = 1000;
+  private static final int EXPECTED_EVENT_COUNT = 1;
 
   @Override
   protected String getConfigFile() {
@@ -33,7 +32,7 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
 
   @Test
   public void byteArrayToInputStreamTransformationIsSuccessful() {
-    check(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> countCapturedEvents() == EXPECTED_CAPTURED_EVENTS);
+    check(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> EventRecorder.countCapturedEvents() == EXPECTED_EVENT_COUNT);
   }
 
   public static class EventRecorder implements Processor, Startable {
@@ -43,13 +42,13 @@ public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTes
     public EventRecorder() {}
 
     @Override
-    public CoreEvent process(CoreEvent event) {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       capturedEvents.add(event);
       return event;
     }
 
     @Override
-    public void start() {
+    public void start() throws MuleException {
       capturedEvents.clear();
     }
 
