@@ -19,6 +19,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -38,8 +39,8 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.ServerNotFoundException;
 import org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
@@ -159,6 +160,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     final OAuthCallbackConfig callbackConfig = config.getCallbackConfig();
 
     dancerBuilder
+        .name(config.getOwnerConfigName())
         .encoding(getDefaultEncoding(muleContext))
         .clientCredentials(config.getConsumerKey(), config.getConsumerSecret())
         .tokenUrl(config.getAccessTokenUrl())

@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.oauth.api.state;
 
+import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.lock.LockFactory;
+
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 /**
  * OAuth state for a particular resource owner, which typically represents an user.
- * 
+ *
  * @since 4.0
  */
+@NoImplement
 public interface ResourceOwnerOAuthContext {
 
   String DEFAULT_RESOURCE_OWNER_ID = "default";
@@ -46,5 +51,27 @@ public interface ResourceOwnerOAuthContext {
    * @return id for the oauth state.
    */
   String getResourceOwnerId();
+
+  /**
+   * @return the state of the dance for the resource owner of this context.
+   */
+  DancerState getDancerState();
+
+  /**
+   * @param lockNamePrefix a prefix to uniquely identify the locks in the provided {@code lockFactory}.
+   * @param lockFactory the object to get the locks from. This will ensure that the same lock instance is used after
+   *        serialization/deserialization of this context.
+   * @return a lock that can be used to avoid concurrency problems trying to update oauth context.
+   */
+  Lock getRefreshUserOAuthContextLock(String lockNamePrefix, LockFactory lockFactory);
+
+  /**
+   * Represents the possible states that the owner object may be in relative to the Dancer.
+   */
+  public static enum DancerState {
+
+    NO_TOKEN, REFRESHING_TOKEN, HAS_TOKEN
+
+  }
 
 }

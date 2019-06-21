@@ -22,9 +22,17 @@ import java.util.function.Function;
 public interface OAuthDancerBuilder<D> {
 
   /**
+   * @param name the name for this dancer to use for ids generation
+   * @return this builder
+   */
+  default OAuthDancerBuilder<D> name(String name) {
+    return this;
+  }
+
+  /**
    * @param clientId the application identifier as defined in the OAuth authentication server.
    * @param clientSecret the application secret as defined in the OAuth authentication server.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> clientCredentials(String clientId, String clientSecret);
@@ -44,9 +52,9 @@ public interface OAuthDancerBuilder<D> {
   /**
    * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
    * access token.
-   * 
+   *
    * @param tokenUrl The OAuth authentication server url to get access to the token.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> tokenUrl(String tokenUrl);
@@ -54,10 +62,10 @@ public interface OAuthDancerBuilder<D> {
   /**
    * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
    * access token.
-   * 
+   *
    * @param httpClient the {@link HttpClient} that will be used to do the HTTP request for the token during the OAuth dance.
    * @param tokenUrl The OAuth authentication server url to get access to the token.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> tokenUrl(HttpClient httpClient, String tokenUrl);
@@ -65,10 +73,10 @@ public interface OAuthDancerBuilder<D> {
   /**
    * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
    * access token.
-   * 
+   *
    * @param tokenUrl The OAuth authentication server url to get access to the token.
    * @param tlsContextFactory References a TLS config that will be used to do HTTP request during the OAuth dance.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> tokenUrl(String tokenUrl, TlsContextFactory tlsContextFactory);
@@ -101,16 +109,16 @@ public interface OAuthDancerBuilder<D> {
 
   /**
    * Scopes define permissions over resources.
-   * 
+   *
    * @param scopes required by this application to execute.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> scopes(String scopes);
 
   /**
    * @param encoding the encoding to use when processing the incoming requests and responses of the OAuth dance.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> encoding(Charset encoding);
@@ -125,7 +133,7 @@ public interface OAuthDancerBuilder<D> {
   /**
    * @param responseRefreshTokenExpr an expression to extract the {@code refresh token} parameter from the response of the call to
    *        {@link #tokenUrl(String) token-url}.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> responseRefreshTokenExpr(String responseRefreshTokenExpr);
@@ -133,7 +141,7 @@ public interface OAuthDancerBuilder<D> {
   /**
    * @param responseExpiresInExpr an expression to extract the {@code expiresIn} parameter from the response of the call to
    *        {@link #tokenUrl(String) token-url}.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> responseExpiresInExpr(String responseExpiresInExpr);
@@ -142,7 +150,7 @@ public interface OAuthDancerBuilder<D> {
   /**
    * @param customParamsExtractorsExprs a map of {@code paramName} to an expression to extract the custom parameters from the
    *        response of the call to {@link #tokenUrl(String) token-url}.
-   * 
+   *
    * @return this builder
    */
   OAuthDancerBuilder<D> customParametersExtractorsExprs(Map<String, String> customParamsExtractorsExprs);
@@ -156,7 +164,7 @@ public interface OAuthDancerBuilder<D> {
    * {@code tokensStore} and the name of the locks generated from the {@code lockProvider} The un-transformed value still has to
    * be used when calling dancer methods that receive the {@code resourceOwnerId} as a parameter, and will be used when sending
    * data out as part of the OAuth dance or the token refresh.
-   * 
+   *
    * @param resourceOwnerIdTransformer a transformer to apply to the {@code resourceOwnerId} before using it to access the
    *        provided {@code tokensStore}.
    * @return this builder
@@ -165,7 +173,7 @@ public interface OAuthDancerBuilder<D> {
 
   /**
    * Uses the configuration provided to this builder to create a new dancer.
-   * 
+   *
    * @return a fresh instance of a dancer.
    */
   D build();

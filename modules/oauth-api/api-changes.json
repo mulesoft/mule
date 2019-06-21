@@ -72,7 +72,18 @@
           "classSimpleName": "OAuthClientCredentialsDancerBuilder",
           "elementKind": "interface",
           "justification": "Annotation was missing"
-        }
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "new": "interface org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "ResourceOwnerOAuthContext",
+          "elementKind": "interface",
+          "justification": "Annotation was missing"
+        }        
       ]
     }
   },

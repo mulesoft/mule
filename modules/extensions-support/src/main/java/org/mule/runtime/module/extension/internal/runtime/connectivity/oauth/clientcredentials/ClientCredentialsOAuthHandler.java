@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -127,6 +128,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     final ClientCredentialsGrantType grantType = config.getGrantType();
 
     dancerBuilder
+        .name(config.getOwnerConfigName())
         .encoding(getDefaultEncoding(muleContext))
         .clientCredentials(config.getClientId(), config.getClientSecret())
         .tokenUrl(config.getTokenUrl())
