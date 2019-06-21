@@ -20,6 +20,7 @@
         <module>unit</module>
         <module>component-plugin</module>
         <module>core-deprecated-schema</module>
+        <module>core-functional-tests</module>
         <module>functional</module>
         <module>infrastructure</module>
         <module>performance</module>
