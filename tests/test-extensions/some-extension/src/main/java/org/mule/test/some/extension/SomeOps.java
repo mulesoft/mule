@@ -18,12 +18,21 @@ import java.io.InputStream;
 
 import org.slf4j.Logger;
 
+/**
+ * Some operations
+ */
 public class SomeOps {
 
   private final Logger LOGGER = getLogger(SomeOps.class);
 
   public void someOp(@Connection String conn, @Config SomeExtension ext) {}
 
+  /**
+   * An operation to test the ByteArray to InputStream value transformation.
+   * 
+   * @param value the value for the operation to consume
+   * @return a byte array representation of <it>value</it>
+   */
   public Result<InputStream, Object> inputStreamConsumingOperation(@Content TypedValue<InputStream> value) {
     LOGGER.info("A new message is passing through 'inputStreamConsumingOperation': {}", value.getValue());
     return Result.<InputStream, Object>builder().output(value.getValue()).attributes(null).build();
