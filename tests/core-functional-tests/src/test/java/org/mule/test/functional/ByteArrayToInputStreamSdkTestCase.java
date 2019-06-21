@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.policy;
+package org.mule.test.functional;
 
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
