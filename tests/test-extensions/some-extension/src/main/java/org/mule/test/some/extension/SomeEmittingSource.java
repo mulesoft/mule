@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 @MediaType(TEXT_PLAIN)
-public class SomeEmittingSource extends Source<String, String> implements Initialisable, Disposable {
+public class SomeEmittingSource extends Source<byte[], Object> implements Initialisable, Disposable {
 
   private final Logger LOGGER = getLogger(SomeEmittingSource.class);
 
@@ -45,13 +45,13 @@ public class SomeEmittingSource extends Source<String, String> implements Initia
   private Scheduler emitterScheduler;
 
   @Override
-  public void onStart(SourceCallback<String, String> sourceCallback) {
+  public void onStart(SourceCallback<byte[], Object> sourceCallback) {
     emissions.set(times);
     launchedEmitterFuture = emitterScheduler
         .submit(() -> {
           while (!Thread.currentThread().isInterrupted() && emissions.getAndDecrement() > 0) {
             LOGGER.info("Emitting an event through flow");
-            sourceCallback.handle(Result.<String, String>builder().output(message).build());
+            sourceCallback.handle(Result.<byte[], Object>builder().output(message.getBytes()).build());
             try {
               Thread.sleep(1000);
             } catch (InterruptedException e) {

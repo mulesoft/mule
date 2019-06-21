@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test-policy="http://www.mulesoft.org/schema/mule/test-policy"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <object name="event-recorder" class="org.mule.test.functional.ByteArrayToInputStreamSdkTestCase$EventRecorder"/>
+
+    <flow name="main">
+        <some:some-emitting-source message="hello dog!" times="1"/>
+        <logger level="ERROR" message="#[payload]"/>
+        <some:input-stream-consuming-operation />
+        <processor ref="event-recorder"/>
+    </flow>
+</mule>
