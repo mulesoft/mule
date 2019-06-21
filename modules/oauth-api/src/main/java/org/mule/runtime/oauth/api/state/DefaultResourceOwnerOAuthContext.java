@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.oauth.api.state;
 
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DancerState.HAS_TOKEN;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DancerState.NO_TOKEN;
 
 import org.mule.runtime.api.lock.LockFactory;
@@ -115,7 +116,7 @@ public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAut
 
   @Override
   public DancerState getDancerState() {
-    return dancerState;
+    return dancerState != null ? dancerState : HAS_TOKEN;
   }
 
   public void setDancerState(DancerState dancerState) {
