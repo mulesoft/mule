@@ -10,6 +10,7 @@ package org.mule.test.some.extension;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.test.heisenberg.extension.HeisenbergErrors;
@@ -19,6 +20,7 @@ import org.mule.test.heisenberg.extension.HeisenbergErrors;
 @ErrorTypes(HeisenbergErrors.class)
 @Operations(SomeOps.class)
 @Export(classes = CustomConnectionException.class)
+@Sources({SomeEmittingSource.class})
 public class SomeExtension {
 
 }
