@@ -151,7 +151,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
-        oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> lockFactory.createLock(lockId),
+        oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockFactory,
                                                                    new LazyObjectStoreToMapAdapter(
                                                                                                    () -> objectStoreLocator
                                                                                                        .apply(config)),

@@ -119,7 +119,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthClientCredentialsDancerBuilder dancerBuilder =
-        oauthService.get().clientCredentialsGrantTypeDancerBuilder(lockId -> lockFactory.createLock(lockId),
+        oauthService.get().clientCredentialsGrantTypeDancerBuilder(lockFactory,
                                                                    new LazyObjectStoreToMapAdapter(
                                                                                                    () -> objectStoreLocator
                                                                                                        .apply(config)),
