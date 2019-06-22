@@ -65,26 +65,26 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   @Override
   protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
     List<org.mule.maven.client.api.model.BundleDependency> resolvedAdditionalDependencies =
-            mavenClient.resolveArtifactDependencies(
-                    bundleDependency.getAdditionalDependencies().stream()
-                            .map(additionalDependency -> toMavenClientBundleDescriptor(additionalDependency
-                                                                                               .getDescriptor()))
-                            .collect(toList()),
-                    of(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation()),
-                    empty());
+        mavenClient.resolveArtifactDependencies(
+                                                bundleDependency.getAdditionalDependencies().stream()
+                                                    .map(additionalDependency -> toMavenClientBundleDescriptor(additionalDependency
+                                                        .getDescriptor()))
+                                                    .collect(toList()),
+                                                of(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation()),
+                                                empty());
     return resolvedAdditionalDependencies.stream()
-            .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri)
-            .collect(toList());
+        .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri)
+        .collect(toList());
   }
 
   private static org.mule.maven.client.api.model.BundleDescriptor toMavenClientBundleDescriptor(BundleDescriptor descriptor) {
     return new org.mule.maven.client.api.model.BundleDescriptor.Builder()
-            .setGroupId(descriptor.getGroupId())
-            .setArtifactId(descriptor.getArtifactId())
-            .setVersion(descriptor.getVersion())
-            .setType(descriptor.getType())
-            .setClassifier(descriptor.getClassifier().orElse(null))
-            .build();
+        .setGroupId(descriptor.getGroupId())
+        .setArtifactId(descriptor.getArtifactId())
+        .setVersion(descriptor.getVersion())
+        .setType(descriptor.getType())
+        .setClassifier(descriptor.getClassifier().orElse(null))
+        .build();
   }
 
   @Override

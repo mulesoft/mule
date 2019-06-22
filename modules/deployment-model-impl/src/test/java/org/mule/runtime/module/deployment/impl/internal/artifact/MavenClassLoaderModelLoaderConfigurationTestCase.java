@@ -13,16 +13,15 @@ import static java.util.stream.IntStream.range;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
+
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -30,7 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.aether.collection.DependencyCollectionException;
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
     Map<String, String> properties = getMuleFreeSystemProperties();
     properties.put(repositoryLocation.getName(), repositoryLocation.getValue());
     expectedException.expect(RuntimeException.class);
-    expectedException.expectCause(instanceOf(DependencyCollectionException.class));
+    expectedException.expectCause(instanceOf(DependencyResolutionException.class));
     testWithSystemProperties(properties, () -> {
       GlobalConfigLoader.reset(); //Change local repository path
       mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);

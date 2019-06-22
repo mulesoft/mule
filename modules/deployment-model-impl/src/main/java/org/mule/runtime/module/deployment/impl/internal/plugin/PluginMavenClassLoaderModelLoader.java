@@ -207,7 +207,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       // It will collect the dependencies of the mule-plugin following the same rules that we have when it is declared
       // as compile in a mule-application or mule-domain, without provided and test scope dependencies.
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
-          mavenClient.resolveArtifactDependencies(mavenClientBundleDescriptor, ImmutableList.of(mavenClientBundleDescriptor),
+          mavenClient.resolveArtifactDependencies(ImmutableList.of(mavenClientBundleDescriptor),
                                                   mavenRepository,
                                                   of(reactor));
       // The result will only have one dependency and that dependency will be same mule-plugin with its transitive dependencies.
