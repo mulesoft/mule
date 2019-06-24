@@ -65,6 +65,7 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
 
   @Override
   public Throwable onError(ExecutionContext<ComponentModel> executionContext, Throwable exception) {
+    setCloseCommand(executionContext, () -> release(executionContext));
     extractConnectionException(exception).ifPresent(
                                                     e -> setCloseCommand(executionContext,
                                                                          () -> withConnection(executionContext,
