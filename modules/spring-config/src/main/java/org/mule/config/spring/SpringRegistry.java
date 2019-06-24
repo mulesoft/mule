@@ -204,6 +204,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 return null;
             }
 
+            if (isNullBean(object))
+            {
+                return null;
+            }
+
             if (applyLifecycle && !applicationContext.isSingleton(key))
             {
                 try
@@ -218,6 +223,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
             return object;
         }
+    }
+
+    private boolean isNullBean(Object bean)
+    {
+        return bean != null && "org.springframework.beans.factory.support.NullBean".equals(bean.getClass().getName());
     }
 
     @Override
