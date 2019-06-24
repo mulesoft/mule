@@ -76,6 +76,10 @@ public class DefaultToolingService implements ToolingService {
   private static final String APPLICATION = "application";
   private static final String DOMAIN = "domain";
 
+  private static final String GROUP_ID = "groupId";
+  private static final String ARTIFACT_ID = "artifactId";
+  private static final String VERSION = "version";
+
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final DomainRepository domainRepository;
@@ -155,9 +159,9 @@ public class DefaultToolingService implements ToolingService {
         extendedAttributes.put(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER,
                                new DomainMavenReactorResolver(domain.getLocation(),
                                                               new BundleDescriptor.Builder()
-                                                                  .setGroupId(pomProperties.getProperty("groupId"))
-                                                                  .setArtifactId(pomProperties.getProperty("artifactId"))
-                                                                  .setVersion(pomProperties.getProperty("version"))
+                                                                  .setGroupId(pomProperties.getProperty(GROUP_ID))
+                                                                  .setArtifactId(pomProperties.getProperty(ARTIFACT_ID))
+                                                                  .setVersion(pomProperties.getProperty(VERSION))
                                                                   .setClassifier(MULE_DOMAIN_CLASSIFIER)
                                                                   .build()));
         applicationArtifactModelBuilder

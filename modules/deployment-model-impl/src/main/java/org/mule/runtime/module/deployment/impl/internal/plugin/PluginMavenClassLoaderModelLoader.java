@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static com.google.common.io.Files.createTempDir;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
@@ -46,7 +47,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Files;
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +62,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private static final String JAR = "jar";
+  private static final String POM = "pom";
 
   public PluginMavenClassLoaderModelLoader(MavenClient mavenClient) {
     super(mavenClient);
@@ -217,7 +218,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   private class MuleSystemPluginMavenReactorResolver implements MavenReactorResolver, AutoCloseable {
 
-    private File temporaryFolder = Files.createTempDir();
+    private File temporaryFolder = createTempDir();
 
     private Model effectiveModel;
 
@@ -238,7 +239,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
     @Override
     public File findArtifact(org.mule.maven.client.api.model.BundleDescriptor bundleDescriptor) {
       if (checkArtifact(bundleDescriptor)) {
-        if (bundleDescriptor.getType().equals("pom")) {
+        if (bundleDescriptor.getType().equals(POM)) {
           return pomFile;
         } else {
           return artifactFile;
