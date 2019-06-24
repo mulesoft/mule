@@ -161,18 +161,16 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       // MTF/MUnit declares the mule-plugin being tested as system scope therefore its transitive dependencies
       // will not be included in the dependency graph of the deployable artifact and we need to use Mule Maven Client
       // to resolve its dependencies
-      if (SYSTEM.equals(pluginDependencyInDeployableArtifact.getScope())) {
+      if (!SYSTEM.equals(pluginDependencyInDeployableArtifact.getScope())) {
+        return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
+      } else {
         if (logger.isWarnEnabled()) {
           logger.warn(format(
                              "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader model. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
                              pluginDependencyInDeployableArtifact.getDescriptor()));
         }
-        return resolveArtifactDependenciesUsingMavenClient(artifactFile);
       }
-
-      return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
     }
-
     // Backward compatible resolution for resolving dependencies for a mule-plugin with Mule Maven Client
     return resolveArtifactDependenciesUsingMavenClient(artifactFile);
   }
