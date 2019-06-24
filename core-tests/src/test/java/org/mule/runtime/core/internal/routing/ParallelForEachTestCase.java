@@ -13,7 +13,6 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -26,19 +25,9 @@ import static org.mule.runtime.api.component.location.ConfigurationComponentLoca
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ParallelForEachStory.PARALLEL_FOR_EACH;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static reactor.core.publisher.Flux.from;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -57,11 +46,19 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import javax.management.DescriptorKey;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(ROUTERS)
 @Story(PARALLEL_FOR_EACH)
@@ -99,10 +96,8 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
     assertThat(routingPairs, hasSize(2));
     assertThat(routingPairs.get(0).getEvent().getMessage().getPayload().getValue(),
                equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(0)));
-    assertThat(routingPairs.get(0).getRoute(), sameInstance(nested));
     assertThat(routingPairs.get(1).getEvent().getMessage().getPayload().getValue(),
                equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1)));
-    assertThat(routingPairs.get(1).getRoute(), sameInstance(nested));
   }
 
   @Test
