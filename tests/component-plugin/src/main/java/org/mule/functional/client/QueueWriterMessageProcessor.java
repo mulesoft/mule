@@ -15,6 +15,8 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -26,10 +28,12 @@ import javax.inject.Inject;
 /**
  * Writes {@link CoreEvent} to a test connector's queue.
  */
-public class QueueWriterMessageProcessor extends AbstractComponent implements Processor, Initialisable {
+public class QueueWriterMessageProcessor extends AbstractComponent implements Processor, Initialisable, Startable, Stoppable {
 
   @Inject
   private ExtendedExpressionManager expressionManager;
+
+  private volatile boolean started = false;
 
   private String name;
   private AttributeEvaluator attributeEvaluator;
@@ -42,6 +46,10 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
+    if (!this.started) {
+      throw new IllegalStateException("`test:queue` component not started.");
+    }
+
     CoreEvent copy;
     if (attributeEvaluator == null) {
       copy = CoreEvent.builder(event)
@@ -92,4 +100,15 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
     attributeEvaluator.initialize(expressionManager);
     queueHandler = new TestConnectorQueueHandler(registry);
   }
+
+  @Override
+  public synchronized void start() throws MuleException {
+    this.started = true;
+  }
+
+  @Override
+  public synchronized void stop() throws MuleException {
+    this.started = false;
+  }
+
 }
