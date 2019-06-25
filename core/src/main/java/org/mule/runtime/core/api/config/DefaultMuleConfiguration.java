@@ -789,7 +789,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     initialiseAndValidateDefaultErrorHandler();
   }
 
-  private void initialiseAndValidateDefaultErrorHandler() {
+  private void initialiseAndValidateDefaultErrorHandler() throws InitialisationException {
     String defaultErrorHandler = getDefaultErrorHandlerName();
     if (defaultErrorHandler != null) {
       FlowExceptionHandler messagingExceptionHandler = registry.<FlowExceptionHandler>lookupByName(defaultErrorHandler)
@@ -799,7 +799,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
             (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
         if (!messagingExceptionHandlerAcceptor.acceptsAll()) {
-          throw new MuleRuntimeException(createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
+          throw new InitialisationException(createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."),
+                                            this);
         }
       }
     }
