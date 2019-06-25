@@ -51,10 +51,12 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>test-dependant-plugin</artifactId>
-            <version>4.2.0-SNAPSHOT</version>
+            <version>${mule.project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>system</scope>
-            <systemPath>${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-system-scope-lightweight/local-repository/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/test-dependant-plugin-4.2.0-SNAPSHOT-mule-plugin.jar</systemPath>
+            <systemPath>
+                ${settings.localRepository}/org/mule/tests/test-dependant-plugin/${mule.project.version}/test-dependant-plugin-${mule.project.version}-mule-plugin.jar
+            </systemPath>
         </dependency>
     </dependencies>
 </project>
