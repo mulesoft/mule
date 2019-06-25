@@ -76,7 +76,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private MavenClient mavenClient;
+  protected MavenClient mavenClient;
 
   public AbstractMavenClassLoaderModelLoader(MavenClient mavenClient) {
     this.mavenClient = mavenClient;

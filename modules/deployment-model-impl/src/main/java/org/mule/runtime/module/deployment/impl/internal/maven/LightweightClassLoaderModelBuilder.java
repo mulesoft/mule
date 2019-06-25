@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -23,12 +24,9 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
-import com.vdurmont.semver4j.Semver;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -49,7 +48,6 @@ import org.apache.maven.model.Plugin;
  */
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
-  private static final String POM = "pom";
   private MavenClient mavenClient;
   private Set<BundleDependency> nonProvidedDependencies;
   private File temporaryFolder;
@@ -66,34 +64,27 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
-    return resolveDependencies(bundleDependency.getAdditionalDependencies()).stream()
-        .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri).collect(toList());
+    List<org.mule.maven.client.api.model.BundleDependency> resolvedAdditionalDependencies =
+        mavenClient.resolveArtifactDependencies(
+                                                bundleDependency.getAdditionalDependencies().stream()
+                                                    .map(additionalDependency -> toMavenClientBundleDescriptor(additionalDependency
+                                                        .getDescriptor()))
+                                                    .collect(toList()),
+                                                of(mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation()),
+                                                empty());
+    return resolvedAdditionalDependencies.stream()
+        .map(org.mule.maven.client.api.model.BundleDependency::getBundleUri)
+        .collect(toList());
   }
 
-  // TODO: MULE-15768
-  // TODO: MULE-16026 all the following logic is duplicated from the mule-packager.
-  private List<org.mule.maven.client.api.model.BundleDependency> resolveDependencies(Set<BundleDependency> additionalDependencies) {
-    List<org.mule.maven.client.api.model.BundleDependency> resolvedAdditionalDependencies = new ArrayList<>();
-    additionalDependencies.stream()
-        .map(BundleDependency::getDescriptor)
-        .map(descriptor -> new org.mule.maven.client.api.model.BundleDescriptor.Builder()
-            .setGroupId(descriptor.getGroupId())
-            .setArtifactId(descriptor.getArtifactId())
-            .setVersion(descriptor.getVersion())
-            .setType(descriptor.getType())
-            .setClassifier(descriptor.getClassifier().orElse(null)).build())
-        .forEach(bundleDescriptor -> {
-          resolveDependency(bundleDescriptor)
-              .forEach(additionalDep -> updateAdditionalDependencyOrFail(resolvedAdditionalDependencies, additionalDep));
-        });
-    return resolvedAdditionalDependencies;
-  }
-
-  private List<org.mule.maven.client.api.model.BundleDependency> resolveDependency(org.mule.maven.client.api.model.BundleDescriptor dependencyBundleDescriptor) {
-    List<org.mule.maven.client.api.model.BundleDependency> resolvedDependencies = new ArrayList<>();
-    resolvedDependencies.add(mavenClient.resolveBundleDescriptor(dependencyBundleDescriptor));
-    resolvedDependencies.addAll(mavenClient.resolveBundleDescriptorDependencies(false, false, dependencyBundleDescriptor));
-    return resolvedDependencies;
+  private static org.mule.maven.client.api.model.BundleDescriptor toMavenClientBundleDescriptor(BundleDescriptor descriptor) {
+    return new org.mule.maven.client.api.model.BundleDescriptor.Builder()
+        .setGroupId(descriptor.getGroupId())
+        .setArtifactId(descriptor.getArtifactId())
+        .setVersion(descriptor.getVersion())
+        .setType(descriptor.getType())
+        .setClassifier(descriptor.getClassifier().orElse(null))
+        .build();
   }
 
   @Override
