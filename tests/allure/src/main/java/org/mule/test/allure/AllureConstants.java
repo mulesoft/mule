@@ -41,11 +41,11 @@ public interface AllureConstants {
 
     interface ConfigurationComponentLocationStory {
 
-      String COMPONENT_LOCATION = "Component location";
+      String CONFIGURATION_COMPONENT_LOCATION = "Configuration component location";
 
       interface LazyConnectionsStory {
 
-        String COMPONENT_LOCATION_STORY = "Component location Story";
+        String COMPONENT_LOCATION = "Component location";
 
       }
     }
