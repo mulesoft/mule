@@ -191,13 +191,14 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void stop() throws MuleException {
     super.stop();
     stopIfNeeded(delegate);
+
+    disposeIfNeeded(sink, logger);
+    sink = null;
+
     if (reactorScheduler != null) {
       reactorScheduler.dispose();
       reactorScheduler = null;
     }
-
-    disposeIfNeeded(sink, logger);
-    sink = null;
 
     stopIfNeeded(processingStrategy);
   }
