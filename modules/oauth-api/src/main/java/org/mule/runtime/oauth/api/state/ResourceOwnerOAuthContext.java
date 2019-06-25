@@ -58,12 +58,14 @@ public interface ResourceOwnerOAuthContext {
   DancerState getDancerState();
 
   /**
+   * Obtains a lock to avoid triggering a refresh of the context more than once simultaneously.
+   *
    * @param lockNamePrefix a prefix to uniquely identify the locks in the provided {@code lockFactory}.
    * @param lockFactory the object to get the locks from. This will ensure that the same lock instance is used after
    *        serialization/deserialization of this context.
    * @return a lock that can be used to avoid concurrency problems trying to update oauth context.
    */
-  Lock getRefreshUserOAuthContextLock(String lockNamePrefix, LockFactory lockFactory);
+  Lock getRefreshOAuthContextLock(String lockNamePrefix, LockFactory lockFactory);
 
   /**
    * Represents the possible states that the owner object may be in relative to the Dancer.
