@@ -20,6 +20,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -94,6 +95,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           LegacyConnector.class,
           SecurityManager.class,
           FlowConstruct.class,
+          MuleConfiguration.class,
           Initialisable.class
       });
 
