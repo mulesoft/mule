@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -93,6 +94,13 @@ import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -101,13 +109,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import reactor.core.publisher.Flux;
 
@@ -123,34 +124,52 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   private final RuntimeException illegalStateException = new IllegalStateException();
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
-  @Parameterized.Parameters(name = "{0}, {1}")
+  @Parameterized.Parameters(name = "{0}, {2}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
-        {new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
-        {new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), BLOCKING},
-        {new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
-        {new ReactorProcessingStrategyFactory(), BLOCKING},
-        {new ProactorStreamWorkQueueProcessingStrategyFactory(), BLOCKING},
-        {new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
-        {new WorkQueueProcessingStrategyFactory(), BLOCKING},
-        {new BlockingProcessingStrategyFactory(), BLOCKING},
-        {new DirectProcessingStrategyFactory(), BLOCKING},
-        {new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), NON_BLOCKING},
-        {new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
-        {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
-        {new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
-        {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new BlockingProcessingStrategyFactory(), NON_BLOCKING},
-        {new DirectProcessingStrategyFactory(), NON_BLOCKING}});
+        {"TransactionAwareWorkQueueProcessingStrategyFactory",
+            new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
+        {"TransactionAwareWorkQueueStreamProcessingStrategyFactory",
+            new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), BLOCKING},
+        {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
+            new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
+        {"ReactorProcessingStrategyFactory",
+            new ReactorProcessingStrategyFactory(), BLOCKING},
+        {"ProactorStreamWorkQueueProcessingStrategyFactory",
+            new ProactorStreamWorkQueueProcessingStrategyFactory(), BLOCKING},
+        {"ProactorStreamEmitterProcessingStrategyFactory",
+            new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
+        {"WorkQueueProcessingStrategyFactory",
+            new WorkQueueProcessingStrategyFactory(), BLOCKING},
+        {"BlockingProcessingStrategyFactory",
+            new BlockingProcessingStrategyFactory(), BLOCKING},
+        {"DirectProcessingStrategyFactory",
+            new DirectProcessingStrategyFactory(), BLOCKING},
+        {"TransactionAwareWorkQueueProcessingStrategyFactory",
+            new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {"TransactionAwareWorkQueueStreamProcessingStrategyFactory",
+            new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), NON_BLOCKING},
+        {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
+            new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
+        {"ReactorProcessingStrategyFactory",
+            new ReactorProcessingStrategyFactory(), NON_BLOCKING},
+        {"ProactorStreamWorkQueueProcessingStrategyFactory",
+            new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {"ProactorStreamEmitterProcessingStrategyFactory",
+            new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
+        {"WorkQueueProcessingStrategyFactory",
+            new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {"BlockingProcessingStrategyFactory",
+            new BlockingProcessingStrategyFactory(), NON_BLOCKING},
+        {"DirectProcessingStrategyFactory",
+            new DirectProcessingStrategyFactory(), NON_BLOCKING}});
   }
 
   private Flow flow;
 
-  public DefaultMessageProcessorChainTestCase(ProcessingStrategyFactory processingStrategyFactory, Mode mode) {
+  public DefaultMessageProcessorChainTestCase(String psName, ProcessingStrategyFactory processingStrategyFactory, Mode mode) {
     super(mode);
     this.processingStrategyFactory = processingStrategyFactory;
   }

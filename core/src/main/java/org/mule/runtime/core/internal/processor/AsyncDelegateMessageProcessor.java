@@ -34,7 +34,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.AsyncMessageNotification;
-import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -94,7 +94,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private final MessageProcessorChainBuilder delegateBuilder;
   protected MessageProcessorChain delegate;
-  private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
   protected String name;
   private Integer maxConcurrency;
@@ -114,7 +113,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     if (rootContainer != null && !Objects.equals(((Component) rootContainer).getLocation().getLocation(),
                                                  this.getLocation().getRootContainerName())) {
       // This is for the case of the async inside a sub-flow
-      processingStrategy = defaultProcessingStrategy().create(muleContext, getLocation().getLocation());
+      processingStrategy = defaultProcessingStrategy().create(getMuleContext(), getLocation().getLocation());
     } else if (rootContainer instanceof FlowConstruct) {
       if (maxConcurrency != null && rootContainer instanceof Pipeline) {
         ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
@@ -126,14 +125,14 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         } else {
           logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());
         }
-        processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
+        processingStrategy = flowPsFactory.create(getMuleContext(), getLocation().getLocation());
       } else {
         ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
         if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
           // TODO MULE-16194 Review how backpressure should be handled for async
           ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrencyEagerCheck(false);
         }
-        processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
+        processingStrategy = flowPsFactory.create(getMuleContext(), getLocation().getLocation());
       }
     } else {
       processingStrategy = createDefaultProcessingStrategyFactory().create(getMuleContext(), getLocation().getLocation());
@@ -144,7 +143,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
     delegate = delegateBuilder.build();
-    initialiseIfNeeded(delegate, muleContext);
+    initialiseIfNeeded(delegate, getMuleContext());
 
     super.initialise();
   }
@@ -178,14 +177,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
                     processAsyncChainFunction());
 
-    if (processingStrategy.isSynchronous()) {
-      scheduler = schedulerService
-          .ioScheduler(muleContext.getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation()));
-    } else {
-      scheduler = schedulerService
-          .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation()));
-    }
-    reactorScheduler = fromExecutorService(scheduler);
+    final SchedulerConfig schedulerConfig =
+        getMuleContext().getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation());
+    reactorScheduler = fromExecutorService(processingStrategy.isSynchronous()
+        ? schedulerService.ioScheduler(schedulerConfig)
+        : schedulerService.cpuLightScheduler(schedulerConfig));
 
     startIfNeeded(delegate);
     super.start();
@@ -195,17 +191,14 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void stop() throws MuleException {
     super.stop();
     stopIfNeeded(delegate);
-    if (scheduler != null) {
-      scheduler.stop();
-      scheduler = null;
-    }
+
+    disposeIfNeeded(sink, logger);
+    sink = null;
+
     if (reactorScheduler != null) {
       reactorScheduler.dispose();
       reactorScheduler = null;
     }
-
-    disposeIfNeeded(sink, logger);
-    sink = null;
 
     stopIfNeeded(processingStrategy);
   }

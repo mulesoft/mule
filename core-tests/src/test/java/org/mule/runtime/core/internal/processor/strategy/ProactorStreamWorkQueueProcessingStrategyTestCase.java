@@ -20,12 +20,15 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -57,9 +60,6 @@ import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueue
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import org.apache.commons.io.input.NullInputStream;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
@@ -67,8 +67,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.io.input.NullInputStream;
+import org.junit.Test;
+import org.mockito.InOrder;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
@@ -657,4 +662,22 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
     }
   }
 
+  @Test
+  @Issue("MULE-17048")
+  @Description("Verify that the event loop scheduler (cpu lite) is stopped before the others. Otherwise, an interrupted event may resume processing on ")
+  public void schedulersStoppedInOrder() throws MuleException {
+    cpuLight = spy(cpuLight);
+    blocking = spy(blocking);
+    cpuIntensive = spy(cpuIntensive);
+
+    final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
+
+    startIfNeeded(ps);
+    stopIfNeeded(ps);
+
+    final InOrder inOrder = inOrder(cpuLight, cpuIntensive, blocking);
+    inOrder.verify(cpuLight).stop();
+    inOrder.verify(blocking).stop();
+    inOrder.verify(cpuIntensive).stop();
+  }
 }

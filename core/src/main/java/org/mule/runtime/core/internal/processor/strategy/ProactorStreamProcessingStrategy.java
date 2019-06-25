@@ -23,6 +23,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -38,6 +39,7 @@ import java.util.function.LongUnaryOperator;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.retry.BackoffDelay;
 
@@ -85,13 +87,13 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
   @Override
   public void stop() throws MuleException {
+    super.stop();
     if (blockingScheduler != null) {
       blockingScheduler.stop();
     }
     if (cpuIntensiveScheduler != null) {
       cpuIntensiveScheduler.stop();
     }
-    super.stop();
   }
 
   @Override
