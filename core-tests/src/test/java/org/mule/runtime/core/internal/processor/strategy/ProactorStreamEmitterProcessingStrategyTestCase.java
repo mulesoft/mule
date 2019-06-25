@@ -20,12 +20,15 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -40,8 +43,6 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -59,9 +60,6 @@ import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterPr
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import org.apache.commons.io.input.NullInputStream;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
@@ -71,8 +69,15 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.io.input.NullInputStream;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.InOrder;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
@@ -668,7 +673,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     final Scheduler cpuLightBusy = new TestScheduler(2, CPU_LIGHT, true) {
 
-      private AtomicInteger countdown = new AtomicInteger(0);
+      private final AtomicInteger countdown = new AtomicInteger(0);
 
       private void countAndThrow() {
         int v = countdown.getAndIncrement();
@@ -715,4 +720,22 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     }
   }
 
+  @Test
+  @Issue("MULE-17048")
+  @Description("Verify that the event loop scheduler (cpu lite) is stopped before the others. Otherwise, an interrupted event may resume processing on ")
+  public void schedulersStoppedInOrder() throws MuleException {
+    cpuLight = spy(cpuLight);
+    blocking = spy(blocking);
+    cpuIntensive = spy(cpuIntensive);
+
+    final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
+
+    startIfNeeded(ps);
+    stopIfNeeded(ps);
+
+    final InOrder inOrder = inOrder(cpuLight, cpuIntensive, blocking);
+    inOrder.verify(cpuLight).stop();
+    inOrder.verify(blocking).stop();
+    inOrder.verify(cpuIntensive).stop();
+  }
 }

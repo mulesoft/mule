@@ -126,32 +126,50 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  @Parameterized.Parameters(name = "{0}, {1}")
+  @Parameterized.Parameters(name = "{0}, {2}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
-        {new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
-        {new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), BLOCKING},
-        {new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
-        {new ReactorProcessingStrategyFactory(), BLOCKING},
-        {new ProactorStreamWorkQueueProcessingStrategyFactory(), BLOCKING},
-        {new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
-        {new WorkQueueProcessingStrategyFactory(), BLOCKING},
-        {new BlockingProcessingStrategyFactory(), BLOCKING},
-        {new DirectProcessingStrategyFactory(), BLOCKING},
-        {new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), NON_BLOCKING},
-        {new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
-        {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
-        {new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
-        {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new BlockingProcessingStrategyFactory(), NON_BLOCKING},
-        {new DirectProcessingStrategyFactory(), NON_BLOCKING}});
+        {"TransactionAwareWorkQueueProcessingStrategyFactory",
+        new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
+        {"TransactionAwareWorkQueueStreamProcessingStrategyFactory",
+        new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), BLOCKING},
+        {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
+        new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
+        {"ReactorProcessingStrategyFactory",
+         new ReactorProcessingStrategyFactory(), BLOCKING},
+        {"ProactorStreamWorkQueueProcessingStrategyFactory",
+        new ProactorStreamWorkQueueProcessingStrategyFactory(), BLOCKING},
+        {"ProactorStreamEmitterProcessingStrategyFactory", 
+        new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
+        {"WorkQueueProcessingStrategyFactory",
+        new WorkQueueProcessingStrategyFactory(), BLOCKING},
+        {"BlockingProcessingStrategyFactory",
+        new BlockingProcessingStrategyFactory(), BLOCKING},
+        {"DirectProcessingStrategyFactory",
+        new DirectProcessingStrategyFactory(), BLOCKING},
+        {"TransactionAwareWorkQueueProcessingStrategyFactory",
+        new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {"TransactionAwareWorkQueueStreamProcessingStrategyFactory",
+        new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), NON_BLOCKING},
+        {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
+        new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
+        {"ReactorProcessingStrategyFactory",
+        new ReactorProcessingStrategyFactory(), NON_BLOCKING},
+        {"ProactorStreamWorkQueueProcessingStrategyFactory",
+        new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {"ProactorStreamEmitterProcessingStrategyFactory",
+        new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
+        {"WorkQueueProcessingStrategyFactory",
+        new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {"BlockingProcessingStrategyFactory",
+        new BlockingProcessingStrategyFactory(), NON_BLOCKING},
+        {"DirectProcessingStrategyFactory",
+        new DirectProcessingStrategyFactory(), NON_BLOCKING}});
   }
 
   private Flow flow;
 
-  public DefaultMessageProcessorChainTestCase(ProcessingStrategyFactory processingStrategyFactory, Mode mode) {
+  public DefaultMessageProcessorChainTestCase(String psName, ProcessingStrategyFactory processingStrategyFactory, Mode mode) {
     super(mode);
     this.processingStrategyFactory = processingStrategyFactory;
   }

@@ -89,13 +89,13 @@ public abstract class ProactorStreamProcessingStrategy
 
   @Override
   public void stop() throws MuleException {
+    super.stop();
     if (blockingScheduler != null) {
       blockingScheduler.stop();
     }
     if (cpuIntensiveScheduler != null) {
       cpuIntensiveScheduler.stop();
     }
-    super.stop();
   }
 
   @Override
