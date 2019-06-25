@@ -7,15 +7,14 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -30,6 +29,7 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorF
 import org.mule.runtime.module.deployment.impl.internal.domain.TestDomainWrapper;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
@@ -38,8 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
-
-import org.mockito.Mockito;
 
 public class TestDomainFactory extends DefaultDomainFactory {
 

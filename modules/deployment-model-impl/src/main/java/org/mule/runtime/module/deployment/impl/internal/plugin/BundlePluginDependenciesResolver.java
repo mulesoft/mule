@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.plugin;
+package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -13,14 +13,16 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.plugin.DuplicateExportedPackageException;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.io.File;
 import java.net.URL;
@@ -32,8 +34,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,8 +229,17 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                                          .build()))
                         .build());
                   } else {
+                    if (logger.isDebugEnabled()) {
+                      logger.debug(format(
+                                          "Resolving mule-plugin '%s' as transitive dependency ['%s' -> '%s]'",
+                                          dependency.getDescriptor(), pluginDescriptor.getBundleDescriptor(),
+                                          dependency.getDescriptor()));
+                    }
                     ArtifactPluginDescriptor artifactPluginDescriptor =
-                        artifactDescriptorFactory.create(mulePluginLocation, empty());
+                        artifactDescriptorFactory
+                            .create(mulePluginLocation,
+                                    of(new PluginExtendedDeploymentProperties(new Properties(), dependency.getDescriptor(),
+                                                                              pluginDescriptor)));
                     artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
                     foundDependencies.add(artifactPluginDescriptor);
                     visited.add(dependency.getDescriptor());

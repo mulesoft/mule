@@ -9,11 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
-
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil;
@@ -21,7 +16,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory;
@@ -36,8 +30,14 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Creates a {@link DefaultApplicationFactory} that returns {@link TestApplicationWrapper} instances in order to simulate errors
