@@ -61,31 +61,6 @@ public class CxfProxyServiceTestCase extends FunctionalTestCase
         assertThat(parsedResponse.getDocumentElement().getTagName(), is(ENVELOPE_TAG_NAME));
     }
 
-    @Test
-    public void test() throws Exception
-    {
-        String soapRequestBody = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:test=\"http://test.Pablo.name/\">"
-                                 + "<soapenv:Header/>"
-                                 + "<soapenv:Body>"
-                                 + "<test:Hi/>"
-                                 + "</soapenv:Body>"
-                                 + "</soapenv:Envelope>";
-
-        HttpClient client = new HttpClient();
-        HttpClientParams clientParams = new HttpClientParams();
-        clientParams.setSoTimeout(CLIENT_TIMEOUT);
-        client.setParams(clientParams);
-
-        PostMethod soapRequestPostMethod = new PostMethod("http://localhost:" + listenerPort.getNumber() + "/perro");
-        StringRequestEntity soapPayload = new StringRequestEntity(soapRequestBody, "application/xml", "UTF-8");
-        soapRequestPostMethod.setRequestEntity(soapPayload);
-
-        client.executeMethod(soapRequestPostMethod);
-        String response = soapRequestPostMethod.getResponseBodyAsString();
-        Document parsedResponse = parseXMLDocumentFromString(response);
-        assertThat(parsedResponse.getDocumentElement().getTagName(), is(ENVELOPE_TAG_NAME));
-    }
-
     private String makeSOAPRequest() throws IOException
     {
         String soapRequestBody = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:test=\"http://test.Pablo.name/\">"
