@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+              http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+              http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <configuration defaultProcessingStrategy="non-blocking"/>
+
+    <http:listener-config name="http-listener-config" host="localhost" port="${listenerPort}" protocol="HTTP"/>
+
+    <flow name="testProxy">
+        <http:listener config-ref="http-listener-config" path="/proxy" parseRequest="false"/>
+        <cxf:proxy-service port="HelloServicePort"
+                           namespace="http://test.Pablo.name/"
+                           service="HelloServiceService"
+                           payload="envelope" enableMuleSoapHeaders="false"
+                           wsdlLocation="classpath:${wsdl.uri}">
+            <cxf:inInterceptors>
+                <spring:bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
+            </cxf:inInterceptors>
+        </cxf:proxy-service>
+    </flow>
+</mule>
