@@ -19,30 +19,33 @@ import org.mule.module.cxf.support.ProxyWSDLQueryHandler;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
+import org.mule.module.cxf.support.SAAJEnvelopeCorrectionInterceptor;
 import org.mule.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.BareOutInterceptor;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transports.http.QueryHandler;
 
 /**
- * Creates an inbound proxy based on a specially configure CXF Server.
- * This allows you to send raw XML to your MessageProcessor and have it sent
- * through CXF for SOAP processing, WS-Security, etc.
+ * Creates an inbound proxy based on a specially configure CXF Server. This allows you to send raw XML to your
+ * MessageProcessor and have it sent through CXF for SOAP processing, WS-Security, etc.
  * <p>
- * The input to the resulting MessageProcessor can be either a SOAP Body
- * or a SOAP Envelope depending on how the payload attribute is configured.
- * Valid values are "body" or "envelope". 
+ * The input to the resulting MessageProcessor can be either a SOAP Body or a SOAP Envelope depending on how the payload
+ * attribute is configured. Valid values are "body" or "envelope".
  */
 public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageProcessorBuilder
 {
+
     private String payload;
 
     @Override
@@ -85,13 +88,13 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), MustUnderstandInterceptor.class.getName());
 
         server.getEndpoint().getBinding().getInInterceptors().add(new ProxyAddBindingOperationInfoInterceptor());
-        
+
         replaceRPCInterceptors(server);
 
         if (isValidationEnabled())
         {
             server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), server.getEndpoint(),
-                    server.getEndpoint().getService().getServiceInfos().get(0)));
+                                                                                                server.getEndpoint().getService().getServiceInfos().get(0)));
         }
     }
 
@@ -101,8 +104,8 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     private void replaceRPCInterceptors(Server server)
     {
         CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), RPCInInterceptor.class.getName());
-        
-        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
+
+        if (CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
         {
             server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
         }
@@ -128,7 +131,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         /* Even if the payload is body, if validation is enabled, then we need to use a ReversibleXMLStreamReader to
          * avoid the message from being consumed during schema validation.
          */
-        else if(isValidationEnabled())
+        else if (isValidationEnabled())
         {
             sfb.getInInterceptors().add(new ReversibleValidatingInterceptor());
             sfb.getInInterceptors().add(new ResetStaxInterceptor());
@@ -156,4 +159,12 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         return MimeTypes.XML;
     }
 
+    @Override
+    protected void addInInterceptorCorrectingInterceptors(ServerFactoryBean sfb)
+    {
+        if (isProxy() && isProxyEnvelope() && CxfUtils.interceptorOfClassIsPresent(sfb.getInInterceptors(), SAAJInInterceptor.class))
+        {
+            sfb.getInInterceptors().add(new SAAJEnvelopeCorrectionInterceptor());
+        }
+    }
 }

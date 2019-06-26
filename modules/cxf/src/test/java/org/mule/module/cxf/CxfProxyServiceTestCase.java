@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 public class CxfProxyServiceTestCase extends FunctionalTestCase
 {
 
-    public static final int CLIENT_TIMEOUT = 5000;
+    public static final int CLIENT_TIMEOUT = 3600000;
     private static final String ENVELOPE_TAG_NAME = "soapenv:Envelope";
     private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 

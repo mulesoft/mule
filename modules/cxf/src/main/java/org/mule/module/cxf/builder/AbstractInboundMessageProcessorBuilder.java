@@ -52,13 +52,13 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
- * An abstract builder for CXF services. It handles all common operations such
- * as interceptor configuration, mule header enabling, etc. Subclasses can extend
- * this and control how the Server is created and how the {@link CxfInboundMessageProcessor}
- * is configured.
+ * An abstract builder for CXF services. It handles all common operations such as interceptor configuration, mule header
+ * enabling, etc. Subclasses can extend this and control how the Server is created and how the {@link
+ * CxfInboundMessageProcessor} is configured.
  */
 public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnnotatedObject implements MuleContextAware, MessageProcessorBuilder
 {
+
     private CxfConfiguration configuration;
     private Server server;
     private boolean enableMuleSoapHeaders = true;
@@ -75,7 +75,7 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
     private List<Interceptor<? extends Message>> outFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
     protected MuleContext muleContext;
     private String port;
-    private Map<String,Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<String, Object>();
     private boolean validationEnabled;
     private List<String> schemaLocations;
     private WsSecurity wsSecurity;
@@ -129,6 +129,9 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
         {
             sfb.getInInterceptors().addAll(inInterceptors);
         }
+
+        // If some correcting measure needs to be taken due to user-defined in-interceptors
+        addInInterceptorCorrectingInterceptors(sfb);
 
         if (inFaultInterceptors != null)
         {
@@ -190,11 +193,11 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
         }
 
         // If there's a soapVersion defined then the corresponding bindingId will be set
-        if(soapVersion != null)
+        if (soapVersion != null)
         {
             sfb.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
         }
-        
+
         sfb.setProperties(properties);
         sfb.setInvoker(createInvoker(processor));
 
@@ -210,6 +213,11 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
         processor.setMimeType(getMimeType());
 
         return processor;
+    }
+
+    protected void addInInterceptorCorrectingInterceptors(ServerFactoryBean sfb)
+    {
+        // Default implementation does nothing.
     }
 
     protected String getMimeType()
@@ -283,20 +291,20 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
 
     private void setSecurityConfig(ServerFactoryBean sfb)
     {
-        if(wsSecurity != null)
+        if (wsSecurity != null)
         {
-            if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
+            if (wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
             {
-                for(Map.Entry<String, Object> entry : wsSecurity.getCustomValidator().entrySet())
+                for (Map.Entry<String, Object> entry : wsSecurity.getCustomValidator().entrySet())
                 {
                     properties.put(entry.getKey(), entry.getValue());
                 }
             }
-            if(wsSecurity.getSecurityManager() != null)
+            if (wsSecurity.getSecurityManager() != null)
             {
                 properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, wsSecurity.getSecurityManager());
             }
-            if(wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
+            if (wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
             {
                 sfb.getInInterceptors().add(new WSS4JInInterceptor(wsSecurity.getConfigProperties()));
 
@@ -449,7 +457,7 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
     {
         this.outFaultInterceptors = outFaultInterceptors;
     }
-    
+
     @Override
     public void setMuleContext(MuleContext muleContext)
     {
