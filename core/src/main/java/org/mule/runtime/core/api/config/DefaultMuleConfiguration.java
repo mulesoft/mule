@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.config;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
@@ -15,7 +16,10 @@ import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleH
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,6 +27,7 @@ import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.FatalException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -31,6 +36,12 @@ import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
+import org.slf4j.Logger;
+
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -41,16 +52,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
-
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext. TODO
  * MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 @NoExtend
-public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
+public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent, Initialisable {
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
@@ -180,6 +187,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * @since 3.9.0
    */
   private int maxQueueTransactionFilesSizeInMegabytes = 500;
+
+  /**
+   * Mule Registry to initialize this configuration
+   */
+  @Inject
+  private Registry registry;
 
   private DynamicConfigExpiration dynamicConfigExpiration =
       DynamicConfigExpiration.getDefault();
@@ -771,4 +784,26 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     return true;
   }
 
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseAndValidateDefaultErrorHandler();
+  }
+
+  private void initialiseAndValidateDefaultErrorHandler() throws InitialisationException {
+    String defaultErrorHandler = getDefaultErrorHandlerName();
+    if (defaultErrorHandler != null) {
+      FlowExceptionHandler messagingExceptionHandler = registry.<FlowExceptionHandler>lookupByName(defaultErrorHandler)
+          .orElseThrow(() -> new InitialisationException(createStaticMessage(format("No global error handler defined with name '%s'.",
+                                                                                    defaultErrorHandler)),
+                                                         this));
+      if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
+        MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
+            (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
+        if (!messagingExceptionHandlerAcceptor.acceptsAll()) {
+          throw new InitialisationException(createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."),
+                                            this);
+        }
+      }
+    }
+  }
 }
