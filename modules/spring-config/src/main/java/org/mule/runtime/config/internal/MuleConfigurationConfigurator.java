@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -20,9 +18,7 @@ import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
@@ -60,22 +56,6 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   @Override
   public boolean isPrototype() {
     return false;
-  }
-
-  private void validateDefaultErrorHandler() {
-    String defaultErrorHandler = config.getDefaultErrorHandlerName();
-    if (defaultErrorHandler != null) {
-      FlowExceptionHandler messagingExceptionHandler = registry.<FlowExceptionHandler>lookupByName(defaultErrorHandler)
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No global error handler defined with name '%s'.",
-                                                                                 defaultErrorHandler))));
-      if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
-        MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
-            (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
-        if (!messagingExceptionHandlerAcceptor.acceptsAll()) {
-          throw new MuleRuntimeException(createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
-        }
-      }
-    }
   }
 
   private void applyDefaultIfNoObjectSerializerSet(DefaultMuleConfiguration configuration) {
@@ -150,7 +130,6 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
       defaultConfig.setDynamicConfigExpiration(config.getDynamicConfigExpiration());
-      validateDefaultErrorHandler();
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
       return configuration;
