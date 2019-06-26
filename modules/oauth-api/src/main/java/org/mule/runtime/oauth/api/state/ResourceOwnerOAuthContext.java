@@ -58,6 +58,16 @@ public interface ResourceOwnerOAuthContext {
   DancerState getDancerState();
 
   /**
+   * Updates the state of the dancer for this context.
+   * <p>
+   * Note that calling this just updates the internal state of this object. Calling this method does not persist this change in
+   * any store. That has to be done explicitly after calling this method.
+   *
+   * @param dancerState the state of the dance for the resource owner of this context.
+   */
+  void setDancerState(DancerState dancerState);
+
+  /**
    * Obtains a lock to avoid triggering a refresh of the context more than once simultaneously.
    *
    * @param lockNamePrefix a prefix to uniquely identify the locks in the provided {@code lockFactory}.
