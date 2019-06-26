@@ -39,7 +39,7 @@ public final class CxfUtils
 
     /**
      * Clear observer contexts if needed
-     * 
+     *
      * @param client observer to be cleared in case it needed
      */
     public static void clearClientContextIfNeeded(MessageObserver client)
@@ -50,7 +50,7 @@ public final class CxfUtils
             ((ClientImpl) client).getResponseContext().clear();
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public static boolean removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name)
     {
@@ -69,6 +69,18 @@ public final class CxfUtils
             }
         }
 
+        return false;
+    }
+
+    public static boolean interceptorOfClassIsPresent(List<Interceptor<? extends Message>> interceptors, Class interceptorClass)
+    {
+        for (Interceptor<? extends Message> interceptor : interceptors)
+        {
+            if (interceptor.getClass().equals(interceptorClass))
+            {
+                return true;
+            }
+        }
         return false;
     }
 
