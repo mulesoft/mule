@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -39,13 +38,13 @@ import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -67,7 +66,6 @@ public class PolicyChain extends AbstractComponent
   private List<Processor> processors;
   private MessageProcessorChain processorChain;
 
-  private ReactiveProcessor chainWithMPs;
   private PolicyNotificationHelper notificationHelper;
 
   private boolean propagateMessageTransformations;
@@ -81,7 +79,6 @@ public class PolicyChain extends AbstractComponent
   @Override
   public final void initialise() throws InitialisationException {
     processorChain = newChain(ofNullable(processingStrategy), processors);
-    chainWithMPs = processingStrategy.onPipeline(processorChain);
     initialiseIfNeeded(processorChain, muleContext);
 
     notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);
@@ -114,7 +111,7 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    return processToApply(event, chainWithMPs);
+    return processToApply(event, processorChain);
   }
 
   @Override
@@ -124,7 +121,8 @@ public class PolicyChain extends AbstractComponent
             .andThen(req -> ((BaseEventContext) req.getContext())
                 .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
             .andThen(notificationHelper.notification(PROCESS_START)))
-        .compose(eventPub -> applyWithChildContext(eventPub, chainWithMPs, ofNullable(getLocation()),
+        .compose(eventPub -> applyWithChildContext(eventPub, processorChain,
+                                                   ofNullable(getLocation()),
                                                    policyChainErrorHandler()))
         .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
   }
