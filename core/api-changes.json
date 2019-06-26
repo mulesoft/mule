@@ -1,4 +1,19 @@
 {
+  "4.1.7": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "buildNewChainWithListOfProcessors",
+          "elementKind": "method",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        }
+      ]
+    }
+  },
   "4.1.6": {
     "revapi": {
       "ignore": [
