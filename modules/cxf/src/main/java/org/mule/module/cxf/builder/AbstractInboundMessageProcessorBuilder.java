@@ -130,6 +130,9 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
             sfb.getInInterceptors().addAll(inInterceptors);
         }
 
+        // If some correcting measure needs to be taken due to user-defined in-interceptors
+        addInInterceptorCorrectingInterceptors(sfb);
+
         if (inFaultInterceptors != null)
         {
             sfb.getInFaultInterceptors().addAll(inFaultInterceptors);
@@ -194,7 +197,7 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
         {
             sfb.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
         }
-        
+
         sfb.setProperties(properties);
         sfb.setInvoker(createInvoker(processor));
 
@@ -210,6 +213,11 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
         processor.setMimeType(getMimeType());
 
         return processor;
+    }
+
+    protected void addInInterceptorCorrectingInterceptors(ServerFactoryBean sfb)
+    {
+        // Default implementation does nothing.
     }
 
     protected String getMimeType()
@@ -449,7 +457,7 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
     {
         this.outFaultInterceptors = outFaultInterceptors;
     }
-    
+
     @Override
     public void setMuleContext(MuleContext muleContext)
     {

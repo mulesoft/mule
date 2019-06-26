@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.builder;
 
+import static org.mule.module.cxf.support.CxfUtils.interceptorOfClassIsPresent;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
@@ -19,17 +20,21 @@ import org.mule.module.cxf.support.ProxyWSDLQueryHandler;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
+import org.mule.module.cxf.support.SAAJEnvelopeCorrectionInterceptor;
 import org.mule.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.BareOutInterceptor;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transports.http.QueryHandler;
 
 /**
@@ -39,7 +44,7 @@ import org.apache.cxf.transports.http.QueryHandler;
  * <p>
  * The input to the resulting MessageProcessor can be either a SOAP Body
  * or a SOAP Envelope depending on how the payload attribute is configured.
- * Valid values are "body" or "envelope". 
+ * Valid values are "body" or "envelope".
  */
 public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageProcessorBuilder
 {
@@ -85,7 +90,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), MustUnderstandInterceptor.class.getName());
 
         server.getEndpoint().getBinding().getInInterceptors().add(new ProxyAddBindingOperationInfoInterceptor());
-        
+
         replaceRPCInterceptors(server);
 
         if (isValidationEnabled())
@@ -101,7 +106,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     private void replaceRPCInterceptors(Server server)
     {
         CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), RPCInInterceptor.class.getName());
-        
+
         if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
         {
             server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
@@ -156,4 +161,12 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         return MimeTypes.XML;
     }
 
+    @Override
+    protected void addInInterceptorCorrectingInterceptors(ServerFactoryBean sfb)
+    {
+        if (isProxy() && isProxyEnvelope() && interceptorOfClassIsPresent(sfb.getInInterceptors(), SAAJInInterceptor.class))
+        {
+            sfb.getInInterceptors().add(new SAAJEnvelopeCorrectionInterceptor());
+        }
+    }
 }
