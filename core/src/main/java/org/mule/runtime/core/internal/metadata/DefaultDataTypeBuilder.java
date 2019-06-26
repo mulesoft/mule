@@ -24,11 +24,9 @@ import org.mule.runtime.api.metadata.FunctionDataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.util.ClassUtils;
-
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -47,6 +45,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Provides a way to build immutable {@link DataType} objects.
@@ -580,6 +581,7 @@ public class DefaultDataTypeBuilder
     consumableClasses.add(InputStream.class);
     consumableClasses.add(Reader.class);
     consumableClasses.add(Iterator.class);
+    consumableClasses.add(CursorProvider.class);
   }
 
   private static void addToConsumableClasses(String className) {
