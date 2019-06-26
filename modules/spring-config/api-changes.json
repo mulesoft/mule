@@ -3,6 +3,132 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.CHOICE_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "CHOICE_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.CHOICE_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "CHOICE_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.FOREACH_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "FOREACH_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.FOREACH_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "FOREACH_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "PARALLEL_FOREACH_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "PARALLEL_FOREACH_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.ROUTE_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "ROUTE_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.ROUTE_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "ROUTE_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "SCATTER_GATHER_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "SCATTER_GATHER_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "TRY_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "TRY_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.UNTIL_SUCCESSFUL_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "UNTIL_SUCCESSFUL_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.UNTIL_SUCCESSFUL_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "UNTIL_SUCCESSFUL_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
           "code": "java.method.added",
           "new": "method org.mule.runtime.config.api.dsl.processor.ConfigLine.Builder org.mule.runtime.config.api.dsl.processor.ConfigLine.Builder::setStartColumn(int)",
           "package": "org.mule.runtime.config.api.dsl.processor",
