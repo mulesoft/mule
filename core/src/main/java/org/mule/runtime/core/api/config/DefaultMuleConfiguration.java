@@ -793,7 +793,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     String defaultErrorHandler = getDefaultErrorHandlerName();
     if (defaultErrorHandler != null) {
       FlowExceptionHandler messagingExceptionHandler = registry.<FlowExceptionHandler>lookupByName(defaultErrorHandler)
-          .orElseThrow(() -> new InitialisationException(createStaticMessage(format("No global error handler defined with name '%s'.", defaultErrorHandler)), this));
+          .orElseThrow(() -> new InitialisationException(createStaticMessage(format("No global error handler defined with name '%s'.",
+                                                                                    defaultErrorHandler)),
+                                                         this));
       if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
         MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
             (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
