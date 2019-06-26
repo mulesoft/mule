@@ -41,13 +41,8 @@ public interface AllureConstants {
 
     interface ConfigurationComponentLocationStory {
 
-      String CONFIGURATION_COMPONENT_LOCATION = "Configuration component location";
+      String COMPONENT_LOCATION = "Component location";
 
-      interface LazyConnectionsStory {
-
-        String COMPONENT_LOCATION = "Component location";
-
-      }
     }
 
     interface MUnitComponentLocatorStory {
