@@ -256,14 +256,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                 artifactFile.getName())));
     }
 
-    boolean includeProvidedDependencies = includeProvidedDependencies(artifactType);
     Optional<MavenReactorResolver> mavenReactorResolver = ofNullable((MavenReactorResolver) attributes
         .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
     Optional<File> temporaryDirectory = of(createTempDir());
     try {
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
-                                                  includeProvidedDependencies, mavenRepository,
+                                                  false, mavenRepository,
                                                   mavenReactorResolver,
                                                   temporaryDirectory);
       DependencyConverter dependencyConverter = new DependencyConverter();
@@ -308,11 +307,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                               BundleDescriptor artifactBundleDescriptor,
                                                                                               org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                                                               Map<String, Object> attributes);
-
-
-  protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
-
-
 
   /**
    * Loads the URLs of the class loader for this artifact.
