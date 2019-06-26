@@ -13,12 +13,6 @@
 
     <flow name="testProxy">
         <http:listener config-ref="http-listener-config" path="/proxy" parseRequest="false"/>
-        <logger message="#['Payload BEFORE proxy-service: ' + message.payloadAs(java.lang.String)]"
-                level="INFO"></logger>
-        <response>
-            <logger message="#['Payload in RESPONSE proxy-service: ' + message.payloadAs(java.lang.String)]"
-                    level="INFO"/>
-        </response>
         <cxf:proxy-service port="HelloServicePort"
                            namespace="http://test.Pablo.name/"
                            service="HelloServiceService"
@@ -28,7 +22,5 @@
                 <spring:bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
             </cxf:inInterceptors>
         </cxf:proxy-service>
-        <logger message="#['Payload AFTER proxy-service: ' + message.payloadAs(java.lang.String)]"
-                level="INFO"></logger>
     </flow>
 </mule>

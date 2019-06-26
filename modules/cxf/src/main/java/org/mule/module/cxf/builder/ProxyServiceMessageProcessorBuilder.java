@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.builder;
 
+import static org.mule.module.cxf.support.CxfUtils.interceptorOfClassIsPresent;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
@@ -163,7 +164,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     @Override
     protected void addInInterceptorCorrectingInterceptors(ServerFactoryBean sfb)
     {
-        if (isProxy() && isProxyEnvelope() && CxfUtils.interceptorOfClassIsPresent(sfb.getInInterceptors(), SAAJInInterceptor.class))
+        if (isProxy() && isProxyEnvelope() && interceptorOfClassIsPresent(sfb.getInInterceptors(), SAAJInInterceptor.class))
         {
             sfb.getInInterceptors().add(new SAAJEnvelopeCorrectionInterceptor());
         }
