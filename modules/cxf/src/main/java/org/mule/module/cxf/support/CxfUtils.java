@@ -59,7 +59,7 @@ public final class CxfUtils
         {
             if (i instanceof PhaseInterceptor)
             {
-                PhaseInterceptor<Message> p = (PhaseInterceptor<Message>) i;
+                PhaseInterceptor<Message> p = (PhaseInterceptor<Message>)i;
 
                 if (p.getId().equals(name))
                 {
@@ -86,7 +86,7 @@ public final class CxfUtils
 
 
     public static Endpoint getEndpoint(DestinationFactory df, String uri)
-            throws IOException, EndpointNotFoundException
+        throws IOException, EndpointNotFoundException
     {
         int idx = uri.indexOf('?');
         if (idx != -1)
@@ -117,10 +117,10 @@ public final class CxfUtils
     public static String getBindingIdForSoapVersion(String version)
     {
         Iterator<SoapVersion> soapVersions = SoapVersionFactory.getInstance().getVersions();
-        while (soapVersions.hasNext())
+        while(soapVersions.hasNext())
         {
             SoapVersion soapVersion = soapVersions.next();
-            if (Double.toString(soapVersion.getVersion()).equals(version))
+            if(Double.toString(soapVersion.getVersion()).equals(version))
             {
                 return soapVersion.getBindingId();
             }
@@ -131,7 +131,7 @@ public final class CxfUtils
     public static String mapUnsupportedSchemas(String url)
     {
         //hack for CXF to work correctly with servlet and jetty urls
-        if (url != null)
+        if(url != null)
         {
             url = url.replace("servlet://", "http://");
             url = url.replace("jetty://", "http://");

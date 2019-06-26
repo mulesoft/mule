@@ -37,15 +37,16 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transports.http.QueryHandler;
 
 /**
- * Creates an inbound proxy based on a specially configure CXF Server. This allows you to send raw XML to your
- * MessageProcessor and have it sent through CXF for SOAP processing, WS-Security, etc.
+ * Creates an inbound proxy based on a specially configure CXF Server.
+ * This allows you to send raw XML to your MessageProcessor and have it sent
+ * through CXF for SOAP processing, WS-Security, etc.
  * <p>
- * The input to the resulting MessageProcessor can be either a SOAP Body or a SOAP Envelope depending on how the payload
- * attribute is configured. Valid values are "body" or "envelope".
+ * The input to the resulting MessageProcessor can be either a SOAP Body
+ * or a SOAP Envelope depending on how the payload attribute is configured.
+ * Valid values are "body" or "envelope".
  */
 public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageProcessorBuilder
 {
-
     private String payload;
 
     @Override
@@ -94,7 +95,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         if (isValidationEnabled())
         {
             server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), server.getEndpoint(),
-                                                                                                server.getEndpoint().getService().getServiceInfos().get(0)));
+                    server.getEndpoint().getService().getServiceInfos().get(0)));
         }
     }
 
@@ -105,7 +106,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     {
         CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), RPCInInterceptor.class.getName());
 
-        if (CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
+        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
         {
             server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
         }
@@ -131,7 +132,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         /* Even if the payload is body, if validation is enabled, then we need to use a ReversibleXMLStreamReader to
          * avoid the message from being consumed during schema validation.
          */
-        else if (isValidationEnabled())
+        else if(isValidationEnabled())
         {
             sfb.getInInterceptors().add(new ReversibleValidatingInterceptor());
             sfb.getInInterceptors().add(new ResetStaxInterceptor());
