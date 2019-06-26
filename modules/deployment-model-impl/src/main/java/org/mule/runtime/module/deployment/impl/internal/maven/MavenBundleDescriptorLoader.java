@@ -21,6 +21,7 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -93,9 +94,11 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
       } else {
         pomProperties = getPomPropertiesFromJar(artifactFile);
       }
+      String version = pomProperties.getProperty("version");
       return builder.setGroupId(pomProperties.getProperty("groupId"))
           .setArtifactId(pomProperties.getProperty("artifactId"))
-          .setVersion(pomProperties.getProperty("version"))
+          .setVersion(version)
+          .setBaseVersion(version)
           .setClassifier(artifactType.equals(APP) ? MULE_APPLICATION_CLASSIFIER : MULE_DOMAIN_CLASSIFIER)
           .build();
     } else {
@@ -106,10 +109,12 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
         model = getPomModelFromJar(artifactFile);
       }
 
+      String version = model.getVersion() != null ? model.getVersion() : model.getParent().getVersion();
       return new BundleDescriptor.Builder()
           .setArtifactId(model.getArtifactId())
           .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
+          .setVersion(version)
+          .setBaseVersion(version)
           .setType(JAR)
           // Handle manually the packaging for mule plugin as the mule plugin maven plugin defines the packaging as mule-extension
           .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
