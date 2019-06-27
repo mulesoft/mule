@@ -126,4 +126,13 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
     interceptor.after(operationContext, null);
     verify(connectionHandler).release();
   }
+
+  @Test
+  public void onNonConnectionExceptionWithSupport() throws Exception {
+    when(operationModel.supportsStreaming()).thenReturn(true);
+    interceptor.before(operationContext);
+    interceptor.onError(operationContext, new Exception());
+    interceptor.after(operationContext, null);
+    verify(connectionHandler).release();
+  }
 }
