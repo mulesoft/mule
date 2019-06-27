@@ -32,7 +32,7 @@ import org.apache.commons.collections.Predicate;
 public final class AggregationContext
 {
 
-    private static final Predicate failedEventsPredicate = new Predicate()
+    private final Predicate failedEventsPredicate = new Predicate()
     {
 
         @Override
@@ -45,7 +45,10 @@ public final class AggregationContext
 
             MuleEvent event = (MuleEvent) object;
             ExceptionPayload ep = event.getMessage().getExceptionPayload();
-            return ep != null && ep.getException() != null;
+            ExceptionPayload originalEP = originalEvent.getMessage().getExceptionPayload();
+
+            boolean isSameExceptionAsOriginalEvent = originalEP.getException() != null && ep.getException() == originalEP.getException();
+            return ep != null && !isSameExceptionAsOriginalEvent && ep.getException() != null;
         }
     };
 
