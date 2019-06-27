@@ -11,6 +11,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -64,6 +65,22 @@ public class IronManOperations implements Initialisable, Disposable {
 
     // it takes the missile some time to reach target. Don't block while you kill
     executorService.schedule(launch, MISSILE_TRAVEL_TIME, MILLISECONDS);
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public void fireMissileEpicShot(@Config IronMan ironMan,
+                                  @Connection Missile missile,
+                                  Villain at,
+                                  CompletionCallback<String, Void> callback) {
+    // the last missile being fired in the movie has the hero looking at the missile going forward to its target. Doesn't look
+    // epic if he's doing something else.
+    try {
+      ironMan.track(missile);
+      callback.success(Result.<String, Void>builder()
+          .output(missile.fireAt(at)).build());
+    } catch (Exception e) {
+      callback.error(e);
+    }
   }
 
   @MediaType(TEXT_PLAIN)
