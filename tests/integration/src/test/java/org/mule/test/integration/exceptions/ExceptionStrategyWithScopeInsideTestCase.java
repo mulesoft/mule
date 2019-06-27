@@ -20,8 +20,14 @@ public class ExceptionStrategyWithScopeInsideTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void withScatterGatherRouter() throws Exception
+    public void exceptionHandlerWithScatterGatherRouterIgnoresFlowException() throws Exception
     {
-        runFlowWithPayloadAndExpect("error-handler-with-scatter-gather-router", "hello dog", "hello goat");
+        runFlowWithPayloadAndExpect("error-handler-with-scatter-gather-router-should-ignore-previous-exception", "hello dog", "hello goat");
+    }
+
+    @Test(expected = Exception.class)
+    public void exceptionHandlerWithScatterGatherRouterFailOnScopeException() throws Exception
+    {
+        runFlow("error-handler-with-scatter-gather-router-should-fail-on-scope-generate-exception", "hello walrus");
     }
 }

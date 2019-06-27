@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
-    <flow name="error-handler-with-scatter-gather-router">
+    <flow name="error-handler-with-scatter-gather-router-should-ignore-previous-exception">
         <scripting:transformer>
             <scripting:script engine="Groovy"><![CDATA[throw new Exception("BOOM!")]]></scripting:script>
         </scripting:transformer>
@@ -12,6 +12,25 @@
             <scatter-gather>
                 <logger message="I'm route 1" level="INFO"/>
                 <logger message="I'm route 2" level="INFO"/>
+            </scatter-gather>
+            <set-payload value="hello dog"></set-payload>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="error-handler-with-scatter-gather-router-should-fail-on-scope-generate-exception">
+        <scripting:transformer>
+            <scripting:script engine="Groovy"><![CDATA[throw new Exception("BOOM!")]]></scripting:script>
+        </scripting:transformer>
+        <catch-exception-strategy logException="false">
+            <scatter-gather>
+                <processor-chain>
+                    <logger message="I'm just a good-old logger" level="INFO"/>
+                </processor-chain>
+                <processor-chain>
+                    <scripting:transformer>
+                        <scripting:script engine="Groovy"><![CDATA[throw new Exception("KA-BOOM!")]]></scripting:script>
+                    </scripting:transformer>
+                </processor-chain>
             </scatter-gather>
             <set-payload value="hello dog"></set-payload>
         </catch-exception-strategy>
