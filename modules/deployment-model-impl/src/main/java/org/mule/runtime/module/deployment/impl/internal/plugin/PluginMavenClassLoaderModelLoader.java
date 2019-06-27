@@ -112,6 +112,11 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   }
 
   @Override
+  protected boolean includeProvidedDependencies(ArtifactType artifactType) {
+    return false;
+  }
+
+  @Override
   protected File getClassLoaderModelDescriptor(File artifactFile) {
     return new File(artifactFile.getParent(), CLASSLOADER_MODEL_JSON_DESCRIPTOR);
   }
