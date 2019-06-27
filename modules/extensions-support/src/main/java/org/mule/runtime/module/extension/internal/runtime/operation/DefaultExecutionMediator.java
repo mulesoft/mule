@@ -15,7 +15,9 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -73,7 +75,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class DefaultExecutionMediator<M extends ComponentModel, T, A> implements ExecutionMediator<M> {
+public final class DefaultExecutionMediator<M extends ComponentModel> implements ExecutionMediator<M> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
 
@@ -206,7 +208,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel, T, A> impl
   }
 
   private boolean shouldRetry(Throwable t, ExecutionContextAdapter<M> context) {
-    if (!extractConnectionException(t).isPresent()) {
+    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !extractConnectionException(t).isPresent()) {
       return false;
     }
 
