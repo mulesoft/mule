@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.SYSTEM_PROPERTY_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
 
@@ -108,18 +107,10 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   }
 
   private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-    return publisher -> from(publisher).flatMap(event -> {
-      if (processor.getProcessingType() == IO_RW && !scheduleIoRwEvent(event)) {
-        // If payload is not a stream o length is < STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD (default 16KB) perform processing on
-        // current thread in stead of scheduling using IO pool.
-        return just(event)
-            .transform(processor)
-            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
-      } else {
-        return withRetry(scheduleProcessor(processor, scheduler, event)
-            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler);
-      }
-    }, max(maxConcurrency / (getParallelism() * subscribers), 1));
+    return publisher -> from(publisher)
+        .flatMap(event -> withRetry(scheduleProcessor(processor, scheduler, event)
+            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler),
+                 max(maxConcurrency / (getParallelism() * subscribers), 1));
   }
 
   protected boolean scheduleIoRwEvent(CoreEvent event) {
