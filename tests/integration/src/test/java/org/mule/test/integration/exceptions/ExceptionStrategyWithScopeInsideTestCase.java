@@ -6,7 +6,12 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.routing.CompositeRoutingException;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 import org.junit.Test;
 
@@ -22,12 +27,19 @@ public class ExceptionStrategyWithScopeInsideTestCase extends FunctionalTestCase
     @Test
     public void exceptionHandlerWithScatterGatherRouterIgnoresFlowException() throws Exception
     {
-        runFlowWithPayloadAndExpect("error-handler-with-scatter-gather-router-should-ignore-previous-exception", "hello dog", "hello goat");
+        runFlowWithPayloadAndExpect("scatter-gather-in-catch-es", "hello dog", "hello goat");
     }
 
-    @Test(expected = Exception.class)
+    @Test()
     public void exceptionHandlerWithScatterGatherRouterFailOnScopeException() throws Exception
     {
-        runFlow("error-handler-with-scatter-gather-router-should-fail-on-scope-generate-exception", "hello walrus");
+        try
+        {
+            runFlow("scatter-gather-in-default-es", "hello walrus");
+        }
+        catch (Exception e)
+        {
+            assertThat(ExceptionUtils.getRootCause(e).getMessage(), is("KA-BOOM!"));
+        }
     }
 }
