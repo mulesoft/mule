@@ -52,14 +52,6 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
     return managedCursor;
   }
 
-  public final void onClose(Cursor cursor) {
-    if (cursors.remove(cursor)) {
-      if (isClosed() && cursors.isEmpty()) {
-        releaseResources();
-      }
-    }
-  }
-
   /**
    * Returns a managed version of the {@code cursor}. How will that cursor be managed depends on each
    * implementation. Although it is possible that the same input {@code cursor} is returned, the assumption
