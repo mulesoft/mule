@@ -87,6 +87,11 @@ public class PetStoreOperations {
     return new ByteArrayInputStream(signature.getBytes());
   }
 
+  @MediaType(TEXT_PLAIN)
+  public InputStream getStreamedSignatureWithError(@Connection PetStoreClient petStoreClient, String signature) {
+    throw new IllegalStateException("The operation failed!");
+  }
+
   public List<String> getPetsWithIntermitentConnectionProblemAndClosingStream(@Connection PetStoreClient client,
                                                                               @Config PetStoreConnector config,
                                                                               String ownerName,
