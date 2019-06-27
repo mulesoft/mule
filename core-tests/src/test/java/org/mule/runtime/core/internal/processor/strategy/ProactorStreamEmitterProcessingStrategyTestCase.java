@@ -24,9 +24,6 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.mule.runtime.api.util.DataUnit.KB;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -45,11 +42,8 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -61,14 +55,12 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalLong;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.io.input.NullInputStream;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -430,54 +422,14 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
-  @Description("If the processing type is IO_RW and the payload is not a stream processing occurs in CPU_LIGHT thread.")
-  public void singleIOWRWString() throws Exception {
-    super.singleIORW(() -> testEvent(), contains(CPU_LIGHT));
-    assertThat(threads, hasSize(equalTo(1)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-    assertThat(threads, not(hasItem(startsWith(IO))));
-    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
-    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
-  }
-
-  @Test
-  @Description("If the processing type is IO_RW and the payload is a stream with unknown length then processing occurs in BLOCKING thread.")
-  public void singleIOWRWUnkownLengthStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.empty()), contains(IO));
+  @Description("If the processing type is IO_RW then processing occurs in BLOCKING thread.")
+  public void singleIOWRW() throws Exception {
+    super.singleIORW(() -> testEvent(), contains(IO));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
-  }
-
-  @Test
-  @Description("If the processing type is IO_RW and the payload is a stream shorter that 16KB in length then processing occurs in CPU_LIGHT thread.")
-  public void singleIOWRWSmallStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(10))), contains(CPU_LIGHT));
-    assertThat(threads, hasSize(equalTo(1)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-    assertThat(threads, not(hasItem(startsWith(IO))));
-    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
-    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
-  }
-
-  @Test
-  @Description("If the processing type is IO_RW and the payload is a longer than 16KB in length then processing occurs in BLOCKING thread.")
-  public void singleIOWRWLargeStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(20))), contains(IO));
-    assertThat(threads, hasSize(equalTo(1)));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
-    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
-    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
-    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
-  }
-
-  private CoreEvent createStreamPayloadEventWithLength(OptionalLong length) throws MuleException {
-    return builder(testEvent())
-        .message(Message.builder().payload(new TypedValue(new NullInputStream(length.orElse(-1l)), INPUT_STREAM, length))
-            .build())
-        .build();
   }
 
   @Test
