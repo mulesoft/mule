@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+    <flow name="error-handler-with-scatter-gather-router">
+        <scripting:transformer>
+            <scripting:script engine="Groovy"><![CDATA[throw new Exception("BOOM!")]]></scripting:script>
+        </scripting:transformer>
+        <catch-exception-strategy logException="false">
+            <scatter-gather>
+                <logger message="I'm route 1" level="INFO"/>
+                <logger message="I'm route 2" level="INFO"/>
+            </scatter-gather>
+            <set-payload value="hello dog"></set-payload>
+        </catch-exception-strategy>
+    </flow>
+</mule>
