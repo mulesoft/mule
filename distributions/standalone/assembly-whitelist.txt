@@ -318,7 +318,6 @@
 /mule-standalone-${productVersion}/lib/opt/FastInfoset-1.2.15.jar
 /mule-standalone-${productVersion}/lib/opt/istack-commons-runtime-3.0.7.jar
 /mule-standalone-${productVersion}/lib/opt/istack-commons-tools-3.0.7.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-api-2.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
@@ -393,7 +392,8 @@
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v1-3.8.8-+
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-3.8.8-+
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.30.jar
+/mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.29.jar
+/mule-standalone-${productVersion}/lib/opt/mailapi-1.5.4.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.35.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
