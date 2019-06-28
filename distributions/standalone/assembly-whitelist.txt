@@ -287,13 +287,13 @@
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/j2objc-annotations-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.9.0.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.8.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.14-MULE-002.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.8.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.14-MULE-002.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.9.8.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-xc-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-el-6.0.53.jar
