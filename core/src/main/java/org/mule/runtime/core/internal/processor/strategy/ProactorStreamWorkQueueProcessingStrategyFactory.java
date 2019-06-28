@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -127,7 +126,7 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
         @Override
         protected <E> ReactorSink<E> buildSink(FluxSink<E> fluxSink, Disposable disposable, Consumer<CoreEvent> onEventConsumer,
                                                int bufferSize) {
-          return new ProactorSinkWrapper<E>(super.buildSink(fluxSink, disposable, onEventConsumer, bufferSize));
+          return new ProactorSinkWrapper<>(super.buildSink(fluxSink, disposable, onEventConsumer, bufferSize));
         }
       };
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
@@ -168,15 +167,16 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     }
 
     @Override
-    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
+                                                Flux<CoreEvent> eventFlux) {
       reactor.core.scheduler.Scheduler eventLoopScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-      return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, event);
+      return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, eventFlux);
     }
 
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, reactor.core.scheduler.Scheduler eventLoopScheduler,
-                                                Scheduler processorScheduler, CoreEvent event) {
+                                                Scheduler processorScheduler, Flux<CoreEvent> eventFlux) {
       if (isThreadLoggingEnabled) {
-        return just(event)
+        return eventFlux
             .flatMap(e -> Mono.subscriberContext()
                 .flatMap(ctx -> Mono.just(e).transform(processor)
                     .publishOn(eventLoopScheduler)
@@ -184,10 +184,10 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
                         .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
                                                                                                e.getContext().getId())))));
       } else {
-        return just(event)
+        return eventFlux
+            .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
             .transform(processor)
-            .publishOn(eventLoopScheduler)
-            .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)));
+            .publishOn(eventLoopScheduler);
       }
     }
 

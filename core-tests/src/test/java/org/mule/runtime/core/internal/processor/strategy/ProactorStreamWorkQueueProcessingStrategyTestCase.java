@@ -15,9 +15,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
@@ -336,6 +338,8 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   @Description("If max concurrency is 1, only 1 thread is used for BLOCKING processors and further requests blocks. When " +
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
+    assumeThat(mode, is(SOURCE));
+
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                                       DEFAULT_BUFFER_SIZE,
@@ -358,6 +362,8 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   @Test
   @Description("If max concurrency is 2, only 2 threads are used for BLOCKING processors and further requests blocks.")
   public void singleBlockingConcurrentMaxConcurrency2() throws Exception {
+    assumeThat(mode, is(SOURCE));
+
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamWorkQueueProcessingStrategy(() -> ringBuffer,
                                                                                                       DEFAULT_BUFFER_SIZE,
@@ -443,169 +449,169 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
   @Test
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
-    if (mode.equals(SOURCE)) {
-      MultipleInvocationLatchedProcessor latchedProcessor =
-          new MultipleInvocationLatchedProcessor(ProcessingType.CPU_INTENSIVE, 4);
+    assumeThat(mode, is(SOURCE));
 
-      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+    MultipleInvocationLatchedProcessor latchedProcessor =
+        new MultipleInvocationLatchedProcessor(ProcessingType.CPU_INTENSIVE, 4);
 
-      flow = flowBuilder.get()
-          .source(triggerableMessageSource)
-          .processors(cpuLightProcessor, latchedProcessor).build();
-      flow.initialise();
-      flow.start();
+    triggerableMessageSource = new TriggerableMessageSource(FAIL);
 
-      List<Future> futures = new ArrayList<>();
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(cpuLightProcessor, latchedProcessor).build();
+    flow.initialise();
+    flow.start();
 
-      try {
-        // Fill the threads, the queue and an extra one to keep retrying
-        for (int i = 0; i < (2 * 2) + 1; ++i) {
-          futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
-        }
+    List<Future> futures = new ArrayList<>();
 
-        // Give time for the extra dispatch to get to the point where it starts retrying
-        Thread.sleep(500);
-
-        expectedException.expectCause(instanceOf(FlowBackPressureException.class));
-        processFlow(newEvent());
-      } finally {
-        latchedProcessor.release();
-        latchedProcessor.getAllLatchedLatch().await();
-
-        futures.forEach(f -> {
-          try {
-            f.get(RECEIVE_TIMEOUT, MILLISECONDS);
-          } catch (Exception e) {
-            throw new MuleRuntimeException(e);
-          }
-        });
+    try {
+      // Fill the threads, the queue and an extra one to keep retrying
+      for (int i = 0; i < (2 * 2) + 1; ++i) {
+        futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
       }
+
+      // Give time for the extra dispatch to get to the point where it starts retrying
+      Thread.sleep(500);
+
+      expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+      processFlow(newEvent());
+    } finally {
+      latchedProcessor.release();
+      latchedProcessor.getAllLatchedLatch().await();
+
+      futures.forEach(f -> {
+        try {
+          f.get(RECEIVE_TIMEOUT, MILLISECONDS);
+        } catch (Exception e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
     }
   }
 
   @Test
   public void backpressureOnInnerCpuIntensiveSchedulerBusyRecovery() throws Exception {
-    if (mode.equals(SOURCE)) {
-      MultipleInvocationLatchedProcessor latchedProcessor =
-          new MultipleInvocationLatchedProcessor(ProcessingType.CPU_INTENSIVE, 5);
+    assumeThat(mode, is(SOURCE));
 
-      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+    MultipleInvocationLatchedProcessor latchedProcessor =
+        new MultipleInvocationLatchedProcessor(ProcessingType.CPU_INTENSIVE, 5);
 
-      flow = flowBuilder.get()
-          .source(triggerableMessageSource)
-          .processors(cpuLightProcessor, latchedProcessor).build();
-      flow.initialise();
-      flow.start();
+    triggerableMessageSource = new TriggerableMessageSource(FAIL);
 
-      List<Future> futures = new ArrayList<>();
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(cpuLightProcessor, latchedProcessor).build();
+    flow.initialise();
+    flow.start();
 
-      try {
-        // Fill the threads, the queue and an extra one to keep retrying
-        for (int i = 0; i < (2 * 2) + 1; ++i) {
-          futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
-        }
+    List<Future> futures = new ArrayList<>();
 
-        // Give time for the extra dispatch to get to the point where it starts retrying
-        Thread.sleep(500);
-
-        latchedProcessor.release();
-
-        Thread.sleep(500);
-        processFlow(newEvent());
-      } finally {
-        futures.forEach(f -> {
-          try {
-            f.get(RECEIVE_TIMEOUT, MILLISECONDS);
-          } catch (Exception e) {
-            throw new MuleRuntimeException(e);
-          }
-        });
+    try {
+      // Fill the threads, the queue and an extra one to keep retrying
+      for (int i = 0; i < (2 * 2) + 1; ++i) {
+        futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
       }
+
+      // Give time for the extra dispatch to get to the point where it starts retrying
+      Thread.sleep(500);
+
+      latchedProcessor.release();
+
+      Thread.sleep(500);
+      processFlow(newEvent());
+    } finally {
+      futures.forEach(f -> {
+        try {
+          f.get(RECEIVE_TIMEOUT, MILLISECONDS);
+        } catch (Exception e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
     }
   }
 
   @Test
   public void eagerBackpressureOnMaxConcurrencyHit() throws Exception {
-    if (mode.equals(SOURCE)) {
-      MultipleInvocationLatchedProcessor latchedProcessor =
-          new MultipleInvocationLatchedProcessor(CPU_LITE, 1);
+    assumeThat(mode, is(SOURCE));
 
-      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+    MultipleInvocationLatchedProcessor latchedProcessor =
+        new MultipleInvocationLatchedProcessor(CPU_LITE, 1);
 
-      flow = flowBuilder.get()
-          .source(triggerableMessageSource)
-          .processors(latchedProcessor)
-          .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
-          .build();
+    triggerableMessageSource = new TriggerableMessageSource(FAIL);
 
-      flow.initialise();
-      flow.start();
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(latchedProcessor)
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
+        .build();
 
-      List<Future> futures = new ArrayList<>();
+    flow.initialise();
+    flow.start();
 
-      try {
-        futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
+    List<Future> futures = new ArrayList<>();
 
-        // Give time for the dispatch to get to the capacity check
-        Thread.sleep(500);
+    try {
+      futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
 
-        expectedException.expectCause(instanceOf(FlowBackPressureException.class));
-        processFlow(newEvent());
-      } finally {
-        latchedProcessor.release();
-        latchedProcessor.getAllLatchedLatch().await();
+      // Give time for the dispatch to get to the capacity check
+      Thread.sleep(500);
 
-        futures.forEach(f -> {
-          try {
-            f.get(RECEIVE_TIMEOUT, MILLISECONDS);
-          } catch (Exception e) {
-            throw new MuleRuntimeException(e);
-          }
-        });
-      }
+      expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+      processFlow(newEvent());
+    } finally {
+      latchedProcessor.release();
+      latchedProcessor.getAllLatchedLatch().await();
+
+      futures.forEach(f -> {
+        try {
+          f.get(RECEIVE_TIMEOUT, MILLISECONDS);
+        } catch (Exception e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
     }
   }
 
   @Test
   public void eagerBackpressureOnMaxConcurrencyHitRecovery() throws Exception {
-    if (mode.equals(SOURCE)) {
-      MultipleInvocationLatchedProcessor latchedProcessor =
-          new MultipleInvocationLatchedProcessor(CPU_LITE, 1);
+    assumeThat(mode, is(SOURCE));
 
-      triggerableMessageSource = new TriggerableMessageSource(FAIL);
+    MultipleInvocationLatchedProcessor latchedProcessor =
+        new MultipleInvocationLatchedProcessor(CPU_LITE, 1);
 
-      flow = flowBuilder.get()
-          .source(triggerableMessageSource)
-          .processors(latchedProcessor)
-          .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
-          .build();
+    triggerableMessageSource = new TriggerableMessageSource(FAIL);
 
-      flow.initialise();
-      flow.start();
+    flow = flowBuilder.get()
+        .source(triggerableMessageSource)
+        .processors(latchedProcessor)
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
+        .build();
 
-      List<Future> futures = new ArrayList<>();
+    flow.initialise();
+    flow.start();
 
-      try {
-        futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
+    List<Future> futures = new ArrayList<>();
 
-        // Give time for the dispatch to get to the capacity check
-        Thread.sleep(500);
-        latchedProcessor.release();
-        Thread.sleep(500);
+    try {
+      futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
 
-        // expectedException.expectCause(instanceOf(FlowBackPressureException.class));
-        processFlow(newEvent());
-      } finally {
-        latchedProcessor.getAllLatchedLatch().await();
+      // Give time for the dispatch to get to the capacity check
+      Thread.sleep(500);
+      latchedProcessor.release();
+      Thread.sleep(500);
 
-        futures.forEach(f -> {
-          try {
-            f.get(RECEIVE_TIMEOUT, MILLISECONDS);
-          } catch (Exception e) {
-            throw new MuleRuntimeException(e);
-          }
-        });
-      }
+      // expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+      processFlow(newEvent());
+    } finally {
+      latchedProcessor.getAllLatchedLatch().await();
+
+      futures.forEach(f -> {
+        try {
+          f.get(RECEIVE_TIMEOUT, MILLISECONDS);
+        } catch (Exception e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
     }
   }
 

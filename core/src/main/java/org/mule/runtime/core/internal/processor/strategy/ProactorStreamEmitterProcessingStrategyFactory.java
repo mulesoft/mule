@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -158,22 +157,24 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     @Override
-    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
-      return scheduleWithLogging(processor, processorScheduler, event);
+    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
+                                                Flux<CoreEvent> eventFlux) {
+      return scheduleWithLogging(processor, processorScheduler, eventFlux);
     }
 
-    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler, CoreEvent event) {
+    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler,
+                                                Flux<CoreEvent> eventFlux) {
       if (isThreadLoggingEnabled) {
-        return just(event)
+        return eventFlux
             .flatMap(e -> subscriberContext()
                 .flatMap(ctx -> Mono.just(e).transform(processor)
                     .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
                         .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
                                                                                                e.getContext().getId())))));
       } else {
-        return just(event)
-            .transform(processor)
-            .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)));
+        return eventFlux
+            .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
+            .transform(processor);
       }
     }
 
