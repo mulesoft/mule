@@ -10,14 +10,11 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -69,9 +66,6 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
   @Override
   public Throwable onError(ExecutionContext<ComponentModel> executionContext, Throwable exception) {
     if (extractConnectionException(exception).isPresent()) {
-      if (TransactionCoordination.isTransactionActive()) {
-        ((ExecutionContextAdapter<ComponentModel>) executionContext).setVariable(DO_NOT_RETRY, "true");
-      }
       setCloseCommand(executionContext, () -> withConnection(executionContext, ConnectionHandler::invalidate));
     } else {
       setCloseCommand(executionContext, () -> release(executionContext));
