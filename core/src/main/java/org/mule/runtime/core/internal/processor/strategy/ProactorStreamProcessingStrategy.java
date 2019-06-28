@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.getInteger;
-import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
 import static java.lang.Math.max;
 import static java.lang.System.nanoTime;
@@ -56,6 +55,8 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   private Scheduler cpuIntensiveScheduler;
 
   private final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
+
+  private boolean policyMode;
 
   public ProactorStreamProcessingStrategy(int subscriberCount,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
@@ -107,19 +108,28 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   }
 
   private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-    return publisher -> from(publisher)
-        .flatMap(event -> withRetry(scheduleProcessor(processor, scheduler, event)
-            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler),
-                 max(maxConcurrency / (getParallelism() * subscribers), 1));
+    // TODO MULE-17079 Remove this policyMode flag.
+    // This is to avoid the performance degradation introduced by MULE-17060 when using CPU_INTENSIVE processors in policies,
+    // until MULE-17079 is done.
+    if (policyMode) {
+      return publisher -> withRetry(scheduleProcessor(processor, scheduler, from(publisher))
+          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler);
+    } else {
+      return publisher -> from(publisher)
+          .flatMap(event -> withRetry(scheduleProcessor(processor, scheduler, Flux.just(event))
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler),
+                   // no concurrency on FlatMap, breaks async (AsyncTestCase in integration-tests)
+                   max(maxConcurrency / (getParallelism() * subscribers), 1));
+    }
   }
 
-  protected boolean scheduleIoRwEvent(CoreEvent event) {
-    return event.getMessage().getPayload().getDataType().isStreamType()
-        && event.getMessage().getPayload().getByteLength().orElse(MAX_VALUE) > STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD;
+  // TODO MULE-17079 Remove this policyMode flag.
+  public void setPolicyMode(boolean policyMode) {
+    this.policyMode = policyMode;
   }
 
   protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
-                                                       CoreEvent event);
+                                                       Flux<CoreEvent> eventFlux);
 
   private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
     return scheduledFlux.retryWhen(onlyIf(ctx -> {
