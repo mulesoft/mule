@@ -8,12 +8,15 @@ package org.mule.runtime.core.internal.util.queue;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.sleep;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -41,7 +44,6 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.stubbing.Answer;
 
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase {
@@ -78,7 +80,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   private LocalTxQueueTransactionContext createLocalTxContext(LocalTxQueueTransactionJournal txLog, QueueProvider provider)
       throws InterruptedException {
     Lock lock = mock(Lock.class);
-    when(lock.tryLock(anyLong(), eq(TimeUnit.MILLISECONDS))).thenAnswer((Answer<Boolean>) invocationOnMock -> {
+    when(lock.tryLock(anyLong(), eq(MILLISECONDS))).thenAnswer((Answer<Boolean>) invocationOnMock -> {
       sleep(invocationOnMock.getArgument(0, Long.class) / 2);
       return true;
     });
@@ -220,10 +222,14 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     Serializable polledValue = persistentTransactionContext.poll(inQueue, timeout);
     long timeAfterPoll = currentTimeMillis();
 
+    double timeoutSeconds = ((double) timeout) / 1000;
+    double elapsedSeconds = ((double) (timeAfterPoll - timeBeforePoll)) / 1000;
+    double toleranceSeconds = 0.005;
+
     // Then the value is null
     assertThat(polledValue, nullValue());
     // And it waited at least for the given timeout
-    assertThat(timeAfterPoll - timeBeforePoll, greaterThanOrEqualTo(timeout));
+    assertThat(elapsedSeconds, anyOf(greaterThanOrEqualTo(timeoutSeconds), closeTo(timeoutSeconds, toleranceSeconds)));
   }
 
   @Test

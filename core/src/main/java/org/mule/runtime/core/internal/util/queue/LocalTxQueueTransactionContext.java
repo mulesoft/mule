@@ -7,12 +7,12 @@
 package org.mule.runtime.core.internal.util.queue;
 
 import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.transaction.xa.AbstractTransactionContext;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -63,7 +63,7 @@ public class LocalTxQueueTransactionContext extends AbstractTransactionContext
   @Override
   public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
     long beginMillis = currentTimeMillis();
-    final boolean lockAcquired = transactionContextAccessLock.tryLock(offerTimeout, TimeUnit.MILLISECONDS);
+    final boolean lockAcquired = transactionContextAccessLock.tryLock(offerTimeout, MILLISECONDS);
     if (lockAcquired) {
       try {
         long remainingTimeout = getRemainingTimeout(offerTimeout, beginMillis);
@@ -100,7 +100,7 @@ public class LocalTxQueueTransactionContext extends AbstractTransactionContext
   @Override
   public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
     long beginMillis = currentTimeMillis();
-    final boolean lockAcquired = transactionContextAccessLock.tryLock(pollTimeout, TimeUnit.MILLISECONDS);
+    final boolean lockAcquired = transactionContextAccessLock.tryLock(pollTimeout, MILLISECONDS);
     if (lockAcquired) {
       try {
         long remainingTimeout = getRemainingTimeout(pollTimeout, beginMillis);
