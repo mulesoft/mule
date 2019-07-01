@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.oauth.api.state;
 
-import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DancerState.HAS_TOKEN;
-import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DancerState.NO_TOKEN;
+import static org.mule.runtime.oauth.api.state.DancerState.HAS_TOKEN;
+import static org.mule.runtime.oauth.api.state.DancerState.NO_TOKEN;
 
 import org.mule.runtime.api.lock.LockFactory;
 

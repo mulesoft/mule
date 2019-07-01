@@ -77,13 +77,4 @@ public interface ResourceOwnerOAuthContext {
    */
   Lock getRefreshOAuthContextLock(String lockNamePrefix, LockFactory lockFactory);
 
-  /**
-   * Represents the possible states that the owner object may be in relative to the Dancer.
-   */
-  public static enum DancerState {
-
-    NO_TOKEN, REFRESHING_TOKEN, HAS_TOKEN
-
-  }
-
 }
