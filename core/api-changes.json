@@ -37,7 +37,89 @@
           "fieldName": "logger",
           "elementKind": "field",
           "justification": "This was wrong"
-        }
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "methodName": "initialise",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.config.DefaultMuleConfiguration::isLazyInit()",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "methodName": "isLazyInit",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setLazyInit(boolean)",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "methodName": "setLazyInit",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.class.nowImplementsInterface",
+          "old": "class org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+          "new": "class org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+          "interface": "org.mule.runtime.api.lifecycle.Initialisable",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "DefaultMuleConfiguration",
+          "elementKind": "class",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isAdoptOpenJDK()",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "isAdoptOpenJDK",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.flowLocation",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "fieldName": "flowLocation",
+          "elementKind": "field",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFlowLocation(org.mule.runtime.api.component.location.Location)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "setFlowLocation",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::processWithChildContextDontComplete(org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.processor.ReactiveProcessor, java.util.Optional<org.mule.runtime.api.component.location.ComponentLocation>)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "processWithChildContextDontComplete",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::processWithChildContextDontComplete(org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.processor.ReactiveProcessor, java.util.Optional<org.mule.runtime.api.component.location.ComponentLocation>, org.mule.runtime.core.api.exception.FlowExceptionHandler)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "processWithChildContextDontComplete",
+          "elementKind": "method",
+          "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
+        },
       ]
     }
   },
