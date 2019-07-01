@@ -141,6 +141,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
     }
 
+    // TODO MULE-17020 Interception API: Smart connectors inside async are not skipped properly
     delegateBuilder.setProcessingStrategy(processingStrategy);
     delegate = delegateBuilder.build();
     initialiseIfNeeded(delegate, getMuleContext());

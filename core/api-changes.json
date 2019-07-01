@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+        "code": "java.method.added",
+        "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>)",
+        "package": "org.mule.runtime.core.privileged.processor",
+        "classSimpleName": "MessageProcessors",
+        "methodName": "buildNewChainWithListOfProcessors",
+        "elementKind": "method",
+        "justification": "MULE-16984 - Interception API: Smart connectors inside scopes are not skipped properly"
+        },
+        {
           "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
           "package": "org.mule.runtime.core.api.config",

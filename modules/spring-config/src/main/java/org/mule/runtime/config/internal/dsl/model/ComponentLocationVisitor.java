@@ -39,7 +39,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
@@ -68,6 +67,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   private static final ComponentIdentifier BATCH_AGGREGATOR_COMPONENT_IDENTIFIER =
       buildFromStringRepresentation("batch:aggregator");
   private static final String PROCESSORS_PART_NAME = "processors";
+  private static final String SOURCE_PART_NAME = "source";
   private static final ComponentIdentifier ROUTE_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:route");
   private static final ComponentIdentifier CHOICE_WHEN_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:when");
   private static final ComponentIdentifier CHOICE_OTHERWISE_COMPONENT_IDENTIFIER =
@@ -104,6 +104,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     } else if (existsWithinRootContainer(componentModel)) {
       ComponentModel parentComponentModel = componentModel.getParent();
       DefaultComponentLocation parentComponentLocation = parentComponentModel.getComponentLocation();
+      if (isModuleOperation(componentModel)) {
+        // just point to the correct typed component operation identifier
+        typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
+      }
       if (isHttpProxyPart(componentModel)) {
         componentLocation =
             parentComponentLocation.appendLocationPart(componentModel.getIdentifier().getName(), typedComponentIdentifier,
@@ -143,9 +147,9 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                          componentModel.getStartColumn());
         }
       } else if (isProcessor(componentModel)) {
-        if (isModuleOperation(componentModel.getParent())) {
+        if (isModuleOperation(parentComponentModel)) {
           final Optional<TypedComponentIdentifier> operationTypedIdentifier =
-              ApplicationModel.MODULE_OPERATION_CHAIN.equals(typedComponentIdentifier.get().getIdentifier())
+              MODULE_OPERATION_CHAIN.equals(typedComponentIdentifier.get().getIdentifier())
                   ? getModuleOperationTypeComponentIdentifier(componentModel)
                   : typedComponentIdentifier;
           componentLocation = processModuleOperationChildren(componentModel, operationTypedIdentifier);
@@ -280,13 +284,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     DefaultComponentLocation componentLocation;
     if (isMessageSource(componentModel)) {
       componentLocation =
-          parentComponentLocation.appendLocationPart("source", typedComponentIdentifier, componentModel.getConfigFileName(),
+          parentComponentLocation.appendLocationPart(SOURCE_PART_NAME, typedComponentIdentifier,
+                                                     componentModel.getConfigFileName(),
                                                      componentModel.getLineNumber(), componentModel.getStartColumn());
     } else if (isProcessor(componentModel)) {
-      if (isModuleOperation(componentModel)) {
-        // just point to the correct typed component operation identifier
-        typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
-      }
       componentLocation = parentComponentLocation
           .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty(), empty())
           .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier, componentModel.getConfigFileName(),

@@ -8,12 +8,12 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static reactor.core.publisher.Flux.fromIterable;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -22,11 +22,10 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
+
+import org.reactivestreams.Publisher;
 
 /**
  * <p>
@@ -52,7 +51,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
 
   @Override
   public void initialise() throws InitialisationException {
-    nestedChain = newChain(Optional.of(resolveProcessingStrategy()), messageProcessors);
+    nestedChain = buildNewChainWithListOfProcessors(of(resolveProcessingStrategy()), messageProcessors);
     nestedChain.setMuleContext(muleContext);
     splittingStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), collectionExpression);
     super.initialise();

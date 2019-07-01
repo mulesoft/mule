@@ -32,6 +32,13 @@ public interface CoreDslConstants {
   String ON_ERROR_PROPAGATE = "on-error-propagate";
   String CONFIGURATION_ELEMENT = "configuration";
   String NAME_ATTRIBUTE_NAME = "name";
+  String CHOICE_ELEMENT = "choice";
+  String ROUTE_ELEMENT = "route";
+  String UNTIL_SUCCESSFUL_ELEMENT = "until-successful";
+  String TRY_ELEMENT = "try";
+  String FOREACH_ELEMENT = "foreach";
+  String PARALLEL_FOREACH_ELEMENT = "parallel-" + FOREACH_ELEMENT;
+  String SCATTER_GATHER_ELEMENT = "scatter-gather";
 
   ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();
@@ -55,4 +62,18 @@ public interface CoreDslConstants {
       builder().namespace(CORE_PREFIX).name(SUBFLOW_ELEMENT).build();
   ComponentIdentifier CONFIGURATION_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_ELEMENT).build();
+  ComponentIdentifier CHOICE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(CHOICE_ELEMENT).build();
+  ComponentIdentifier ROUTE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(ROUTE_ELEMENT).build();
+  ComponentIdentifier UNTIL_SUCCESSFUL_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(UNTIL_SUCCESSFUL_ELEMENT).build();
+  ComponentIdentifier TRY_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(TRY_ELEMENT).build();
+  ComponentIdentifier FOREACH_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(FOREACH_ELEMENT).build();
+  ComponentIdentifier PARALLEL_FOREACH_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(PARALLEL_FOREACH_ELEMENT).build();
+  ComponentIdentifier SCATTER_GATHER_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(SCATTER_GATHER_ELEMENT).build();
 }
