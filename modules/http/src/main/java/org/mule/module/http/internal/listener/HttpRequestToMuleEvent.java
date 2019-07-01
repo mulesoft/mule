@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestToMuleEvent
 {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(HttpMessagePropertiesResolver.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(HttpRequestToMuleEvent.class);
     public static final BackwardsCompatibilityPropertyChecker
       IGNORE_CORRELATION_ID = new BackwardsCompatibilityPropertyChecker(COMPATIBILITY_IGNORE_CORRELATION_ID);
 
