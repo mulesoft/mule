@@ -19,7 +19,10 @@ import java.util.concurrent.locks.Lock;
  * OAuth state for a particular resource owner which typically represents an user.
  *
  * @since 4.0, was ResourceOwnerOAuthContext in previous versions
+ *
+ * @deprecated Use {@link ResourceOwnerOAuthContextWithRefreshState} instead.
  */
+@Deprecated
 public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAuthContext, Serializable {
 
   private static final long serialVersionUID = -4260965520423792113L;
