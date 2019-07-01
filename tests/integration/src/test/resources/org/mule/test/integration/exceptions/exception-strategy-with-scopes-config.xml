@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns="http://www.mulesoft.org/schema/mule/core"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+    <custom-processor name="testMessageProcessor" class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
+
     <flow name="scatter-gather-in-catch-es">
         <scripting:transformer>
             <scripting:script engine="Groovy"><![CDATA[throw new Exception("BOOM!")]]></scripting:script>
         </scripting:transformer>
         <catch-exception-strategy logException="false">
             <scatter-gather>
-                <logger message="I'm route 1" level="INFO"/>
-                <logger message="I'm route 2" level="INFO"/>
+                <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
+                <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
             </scatter-gather>
             <set-payload value="hello dog"></set-payload>
         </catch-exception-strategy>
@@ -24,10 +27,10 @@
         <default-exception-strategy logException="false">
             <scatter-gather>
                 <processor-chain>
-                    <logger message="I'm just a good-old logger" level="INFO"/>
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
                 </processor-chain>
                 <processor-chain>
-                    <logger message="STOP" level="ERROR"></logger>
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
                     <scripting:transformer>
                         <scripting:script engine="Groovy"><![CDATA[throw new Exception("KA-BOOM!")]]></scripting:script>
                     </scripting:transformer>

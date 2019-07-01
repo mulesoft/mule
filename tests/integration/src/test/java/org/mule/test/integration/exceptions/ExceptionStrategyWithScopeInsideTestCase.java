@@ -8,8 +8,6 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.routing.CompositeRoutingException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
@@ -39,7 +37,7 @@ public class ExceptionStrategyWithScopeInsideTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertThat(ExceptionUtils.getRootCause(e).getMessage(), is("KA-BOOM!"));
+            assertThat(ExceptionUtils.getRootCause(e).getMessage(), is("BOOM!"));
         }
     }
 }
