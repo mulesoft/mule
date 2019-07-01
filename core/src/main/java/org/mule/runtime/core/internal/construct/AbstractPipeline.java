@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -62,6 +63,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -71,6 +73,8 @@ import reactor.core.publisher.Mono;
  * If no message processors are configured then the source message is simply returned.
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
+
+  private final Logger LOGGER = getLogger(AbstractPipeline.class);
 
   private final NotificationDispatcher notificationFirer;
 
@@ -231,6 +235,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           sink.accept(event);
         } else {
           if (!sink.emit(event)) {
+            LOGGER.error("Failed to emit event with correlationId {} through processing strategy", event.getCorrelationId());
             notifyBackpressureException(event, new FlowBackPressureException(this.getName()));
           }
         }

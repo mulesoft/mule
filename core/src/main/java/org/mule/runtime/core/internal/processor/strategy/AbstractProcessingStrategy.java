@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -28,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.FluxSink;
 
 /**
@@ -96,10 +98,13 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
    */
   static class DefaultReactorSink<E> implements ReactorSink<E> {
 
+    private final Logger LOGGER = getLogger(DefaultReactorSink.class);
+
     private final FluxSink<E> fluxSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
     private final int bufferSize;
+    private final int TOTAL_PROCESSING_ROOM_SIZE;
 
     DefaultReactorSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
                        Consumer<CoreEvent> onEventConsumer, int bufferSize) {
@@ -107,6 +112,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
       this.bufferSize = bufferSize;
+      this.TOTAL_PROCESSING_ROOM_SIZE = bufferSize > CORES * 4 ? CORES : 0;
     }
 
     @Override
@@ -121,21 +127,24 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
       // Optimization to avoid using synchronized block for all emissions.
       // See: https://github.com/reactor/reactor-core/issues/1037
       long remainingCapacity = fluxSink.requestedFromDownstream();
+      LOGGER.error("RemainingCap: {}. TOTAL_PROCESSING_ROOM_SIZE: {}", remainingCapacity, TOTAL_PROCESSING_ROOM_SIZE);
       if (remainingCapacity == 0) {
         return false;
-      } else if (remainingCapacity > (bufferSize > CORES * 4 ? CORES : 0)) {
-        // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
-        // emit without synchronized block.
-        fluxSink.next(intoSink(event));
-        return true;
       } else {
-        // If there is very little room in buffer also emit but synchronized.
-        synchronized (fluxSink) {
-          if (remainingCapacity > 0) {
-            fluxSink.next(intoSink(event));
-            return true;
-          } else {
-            return false;
+        if (remainingCapacity > TOTAL_PROCESSING_ROOM_SIZE) {
+          // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
+          // emit without synchronized block.
+          fluxSink.next(intoSink(event));
+          return true;
+        } else {
+          // If there is very little room in buffer also emit but synchronized.
+          synchronized (fluxSink) {
+            if (remainingCapacity > 0) {
+              fluxSink.next(intoSink(event));
+              return true;
+            } else {
+              return false;
+            }
           }
         }
       }
