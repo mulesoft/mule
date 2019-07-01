@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
  * <b>EIP Reference:</b> <a
  * href="http://www.eaipatterns.com/BroadcastAggregate.html"<a/>
  * </p>
- * 
+ *
  * @since 3.5.0
  */
 public class ScatterGatherRouter extends AbstractMessageProcessorOwner implements MessageRouter
@@ -207,7 +207,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
                     response = DefaultMuleEvent.copy(event);
                 }
 
-                if (response.getMessage().getExceptionPayload() == null)
+                if (shouldOverwriteExceptionPayload(event, response))
                 {
                     response.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
                 }
@@ -225,6 +225,12 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         }
 
         return aggregationStrategy.aggregate(new AggregationContext(event, responses));
+    }
+
+    private boolean shouldOverwriteExceptionPayload(MuleEvent originalEvent, MuleEvent responseEvent)
+    {
+        Throwable originalException = originalEvent.getMessage().getExceptionPayload() != null ? originalEvent.getMessage().getExceptionPayload().getException() : null;
+        return responseEvent.getMessage().getExceptionPayload() == null || responseEvent.getMessage().getExceptionPayload().getException() == originalException;
     }
 
     private Exception wrapInDispatchException(MuleEvent event, int routeIndex, MessageProcessor route, Exception e)
@@ -323,7 +329,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws IllegalStateException if invoked after {@link #initialise()} is
      *             completed
      */
@@ -336,7 +342,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws IllegalStateException if invoked after {@link #initialise()} is
      *             completed
      */
