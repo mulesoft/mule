@@ -28,7 +28,7 @@ public class ExceptionStrategyWithScopeInsideTestCase extends FunctionalTestCase
         runFlowWithPayloadAndExpect("scatter-gather-in-catch-es", "hello dog", "hello goat");
     }
 
-    @Test()
+    @Test
     public void exceptionHandlerWithScatterGatherRouterFailOnScopeException() throws Exception
     {
         try

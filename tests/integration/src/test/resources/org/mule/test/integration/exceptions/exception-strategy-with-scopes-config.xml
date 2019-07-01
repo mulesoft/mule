@@ -2,38 +2,33 @@
 
 <mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+            http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <custom-processor name="testMessageProcessor" class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
 
     <flow name="scatter-gather-in-catch-es">
-        <scripting:transformer>
-            <scripting:script engine="Groovy"><![CDATA[throw new Exception("BOOM!")]]></scripting:script>
-        </scripting:transformer>
+        <test:component throwException="true" exceptionToThrow="java.lang.Exception" exceptionText="BOOM!"/>
         <catch-exception-strategy logException="false">
             <scatter-gather>
-                <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
-                <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
+                <test:component/>
+                <test:component/>
             </scatter-gather>
             <set-payload value="hello dog"></set-payload>
         </catch-exception-strategy>
     </flow>
 
     <flow name="scatter-gather-in-default-es">
-        <scripting:transformer>
-            <scripting:script engine="Groovy"><![CDATA[throw new Exception("BOOM!")]]></scripting:script>
-        </scripting:transformer>
+        <test:component throwException="true" exceptionToThrow="java.lang.Exception" exceptionText="BOOM!"/>
         <default-exception-strategy logException="false">
             <scatter-gather>
                 <processor-chain>
-                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
+                    <test:component/>
                 </processor-chain>
                 <processor-chain>
-                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor"/>
-                    <scripting:transformer>
-                        <scripting:script engine="Groovy"><![CDATA[throw new Exception("KA-BOOM!")]]></scripting:script>
-                    </scripting:transformer>
+                    <test:component throwException="true" exceptionToThrow="java.lang.Exception" exceptionText="KA-BOOM!"/>
                 </processor-chain>
             </scatter-gather>
         </default-exception-strategy>
