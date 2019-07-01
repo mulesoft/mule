@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,5 +117,11 @@ public class TlsProperties
         result = 31 * result + (enabledProtocols != null ? Arrays.hashCode(enabledProtocols) : 0);
         result = 31 * result + (defaultProtocol != null ? defaultProtocol.hashCode() : 0);
         return result;
+    }
+
+    public void overrideEnabledCipherSuites(String[] enabledCipherSuites)
+    {
+        this.enabledCipherSuites = enabledCipherSuites;
+        
     }
 }

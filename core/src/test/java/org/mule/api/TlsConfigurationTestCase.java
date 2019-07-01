@@ -120,10 +120,21 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
 
 
     @Test
+    public void cipherSuitesFromEnabledProtocols() throws Exception
+    {
+        TlsConfiguration tlsConfiguration = new TlsConfiguration(DEFAULT_KEYSTORE);
+        tlsConfiguration.initialise(true, JSSE_NAMESPACE);
+        testPropertiesFrom(createDefaultConfigFile(true), tlsConfiguration.getSslContext().getSupportedSSLParameters().getCipherSuites());
+    }
+
+    @Test
     public void cipherSuitesFromConfigFile() throws Exception
     {
-        File configFile = createDefaultConfigFile();
+        testPropertiesFrom(createDefaultConfigFile(false), new String[] {SUPPORTED_CIPHER_SUITE});
+    }
 
+    public void testPropertiesFrom(File configFile, String[] supportedCipherSuites) throws Exception
+    {
         try
         {
             TlsConfiguration tlsConfiguration = new TlsConfiguration(DEFAULT_KEYSTORE);
@@ -132,8 +143,8 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
             SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
 
-            assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, socket.getEnabledCipherSuites());
-            assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, serverSocket.getEnabledCipherSuites());
+            assertArrayEquals(supportedCipherSuites, socket.getEnabledCipherSuites());
+            assertArrayEquals(supportedCipherSuites, serverSocket.getEnabledCipherSuites());
         }
         finally
         {
@@ -144,7 +155,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void protocolsFromConfigFile() throws Exception
     {
-        File configFile = createDefaultConfigFile();
+        File configFile = createDefaultConfigFile(false);
 
         try
         {
@@ -199,10 +210,10 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
 
             assertThat(socketFactory.getDefaultCipherSuites(), arrayWithSize(protocolSocketFactory.getDefaultCipherSuites().length));
             assertThat(socketFactory.getDefaultCipherSuites(),
-                       is(arrayContainingInAnyOrder(protocolSocketFactory.getDefaultCipherSuites())));
+                    is(arrayContainingInAnyOrder(protocolSocketFactory.getDefaultCipherSuites())));
             assertThat(serverSocketFactory.getDefaultCipherSuites(), arrayWithSize(protocolServerSocketFactory.getDefaultCipherSuites().length));
             assertThat(serverSocketFactory.getDefaultCipherSuites(),
-                       is(arrayContainingInAnyOrder(protocolServerSocketFactory.getDefaultCipherSuites())));
+                    is(arrayContainingInAnyOrder(protocolServerSocketFactory.getDefaultCipherSuites())));
         }
         finally
         {
@@ -262,10 +273,20 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         return createConfigFile(DEFAULT_SECURITY_MODEL, format("defaultProtocol=%s", SUPPORTED_PROTOCOL));
     }
 
-    private File createDefaultConfigFile() throws IOException
+    private File createDefaultConfigFile(boolean onlyEnabledProtocols) throws IOException
     {
-        String contents = format("enabledCipherSuites=UNSUPPORTED,%s\n" +
-                                        "enabledProtocols=UNSUPPORTED,%s", SUPPORTED_CIPHER_SUITE, SUPPORTED_PROTOCOL);
+        String contents;
+        if (onlyEnabledProtocols)
+        {
+            contents = format("enabledProtocols=%s", SUPPORTED_PROTOCOL);
+        }
+        else
+        {
+            contents = format("enabledCipherSuites=UNSUPPORTED,%s\n" +
+                              "enabledProtocols=UNSUPPORTED,%s",
+                    SUPPORTED_CIPHER_SUITE, SUPPORTED_PROTOCOL);
+        }
+
 
         return createConfigFile(DEFAULT_SECURITY_MODEL, contents);
     }
