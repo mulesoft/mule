@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="simpleNtlmConfig" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="#[flowVars.password]"/>
+    </http:request-config>
+
+    <flow name="correctLoginNtlmFlow">
+        <set-payload value="Test Message" />
+        <set-variable variableName="password" value="Beeblebrox"></set-variable>
+        <http:request config-ref="simpleNtlmConfig" path="" method="POST"/>
+        <http:request config-ref="simpleNtlmConfig" path="" method="POST"/>
+    </flow>
+
+
+    <http:request-config name="dynamicPasswordNtlmConfig" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="#[flowVars.password]"/>
+        <tcp:client-socket-properties keepAlive="false"/>
+    </http:request-config>
+
+    <flow name="dynamicPasswordShouldUseVolatileNtlmSession">
+        <set-payload value="Test Message" />
+        <!-- Successful login -->
+        <set-variable variableName="password" value="Beeblebrox"></set-variable>
+        <logger message="#['About to make ntlm auth-ed request with password:' + flowVars.password]" level="ERROR"></logger>
+        <http:request config-ref="dynamicPasswordNtlmConfig" path="" method="post"/>
+        <!-- Erroneous login -->
+        <set-variable variableName="password" value="Zorg"></set-variable>
+        <logger message="#['About to make ntlm auth-ed request with password:' + flowVars.password]" level="ERROR"></logger>
+        <http:request config-ref="dynamicPasswordNtlmConfig" path="" method="post"/>
+    </flow>
+
+</mule>
