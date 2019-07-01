@@ -55,12 +55,11 @@ public class PersistentQueueTransactionContext implements LocalQueueTransactionC
 
   public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
     synchronized (queue) {
-      Serializable value = queue.peek();
-      if (value == null) {
-        return null;
+      Serializable value = queue.poll(pollTimeout);
+      if (value != null) {
+        this.transactionJournal.logRemove(txId, queue, value);
       }
-      this.transactionJournal.logRemove(txId, queue, value);
-      return queue.poll(pollTimeout);
+      return value;
     }
   }
 
