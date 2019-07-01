@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static java.lang.System.currentTimeMillis;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.transaction.xa.AbstractTransactionContext;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
@@ -61,16 +62,19 @@ public class LocalTxQueueTransactionContext extends AbstractTransactionContext
 
   @Override
   public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
+    long beginMillis = currentTimeMillis();
     final boolean lockAcquired = transactionContextAccessLock.tryLock(offerTimeout, TimeUnit.MILLISECONDS);
     if (lockAcquired) {
       try {
-        return delegate.offer(queue, item, offerTimeout);
+        long remainingTimeout = getRemainingTimeout(offerTimeout, beginMillis);
+        if (remainingTimeout >= 0) {
+          return delegate.offer(queue, item, remainingTimeout);
+        }
       } finally {
         transactionContextAccessLock.unlock();
       }
-    } else {
-      return false;
     }
+    return false;
   }
 
   @Override
@@ -95,10 +99,14 @@ public class LocalTxQueueTransactionContext extends AbstractTransactionContext
 
   @Override
   public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
+    long beginMillis = currentTimeMillis();
     final boolean lockAcquired = transactionContextAccessLock.tryLock(pollTimeout, TimeUnit.MILLISECONDS);
     if (lockAcquired) {
       try {
-        return delegate.poll(queue, pollTimeout);
+        long remainingTimeout = getRemainingTimeout(pollTimeout, beginMillis);
+        if (remainingTimeout >= 0) {
+          return delegate.poll(queue, remainingTimeout);
+        }
       } finally {
         transactionContextAccessLock.unlock();
       }
@@ -124,5 +132,14 @@ public class LocalTxQueueTransactionContext extends AbstractTransactionContext
     } finally {
       transactionContextAccessLock.unlock();
     }
+  }
+
+  private long getRemainingTimeout(long originalTimeout, long beginMillis) {
+    if (originalTimeout == 0) {
+      // Zero may have special behavior in some implementation of queue methods, like disable the timeout or return immediately
+      return 0;
+    }
+    long elapsedMillis = currentTimeMillis() - beginMillis;
+    return originalTimeout - elapsedMillis;
   }
 }
