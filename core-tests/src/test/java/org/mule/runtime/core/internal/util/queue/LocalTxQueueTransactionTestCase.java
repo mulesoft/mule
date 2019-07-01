@@ -222,14 +222,11 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     Serializable polledValue = persistentTransactionContext.poll(inQueue, timeout);
     long timeAfterPoll = currentTimeMillis();
 
-    double timeoutSeconds = ((double) timeout) / 1000;
-    double elapsedSeconds = ((double) (timeAfterPoll - timeBeforePoll)) / 1000;
-    double toleranceSeconds = 0.005;
-
     // Then the value is null
     assertThat(polledValue, nullValue());
     // And it waited at least for the given timeout
-    assertThat(elapsedSeconds, anyOf(greaterThanOrEqualTo(timeoutSeconds), closeTo(timeoutSeconds, toleranceSeconds)));
+    assertThat((double) (timeAfterPoll - timeBeforePoll),
+               anyOf(greaterThanOrEqualTo((double) timeout), closeTo((double) timeout, 20)));
   }
 
   @Test
