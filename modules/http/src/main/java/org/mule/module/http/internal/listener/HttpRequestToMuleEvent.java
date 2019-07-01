@@ -177,7 +177,7 @@ public class HttpRequestToMuleEvent
         {
             if (xCorrelationId != null)
             {
-                LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'MULE_CORRELATION_ID' will be used.",
+                LOGGER.debug("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'MULE_CORRELATION_ID' will be used.",
                             xCorrelationId, muleCorrelationId);
             }
             defaultMuleMessage.setCorrelationId(muleCorrelationId);
