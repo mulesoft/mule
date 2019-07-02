@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.streaming.DefaultStreamingManager::manage(java.io.Closeable, org.mule.runtime.api.event.EventContext)",
+          "package": "org.mule.runtime.core.api.streaming",
+          "classSimpleName": "DefaultStreamingManager",
+          "methodName": "manage",
+          "elementKind": "method",
+          "justification": "Necessary to fix a bug"
+        },
+        {
           "code": "java.annotation.added",
           "old": "interface org.mule.runtime.core.api.lifecycle.LifecycleManager",
           "new": "interface org.mule.runtime.core.api.lifecycle.LifecycleManager",
