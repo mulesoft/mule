@@ -1,4 +1,73 @@
 {
+  "4.2.2": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::name(java.lang.String)",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "name",
+          "elementKind": "method",
+          "justification": "MULE-17010: Transparent changes to support concurrent token refreshes"
+        },
+        {
+          "code": "java.class.added",
+          "new": "enum org.mule.runtime.oauth.api.state.DancerState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DancerState",
+          "elementKind": "enum",
+          "justification": "MULE-17010: Transparent changes to support concurrent token refreshes"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.oauth.api.state.DancerState org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::getDancerState()",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DefaultResourceOwnerOAuthContext",
+          "methodName": "getDancerState",
+          "elementKind": "method",
+          "justification": "MULE-17010: Transparent changes to support concurrent token refreshes"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.concurrent.locks.Lock org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::getRefreshOAuthContextLock(java.lang.String, org.mule.runtime.api.lock.LockFactory)",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DefaultResourceOwnerOAuthContext",
+          "methodName": "getRefreshOAuthContextLock",
+          "elementKind": "method",
+          "justification": "MULE-17010: Transparent changes to support concurrent token refreshes"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::setDancerState(org.mule.runtime.oauth.api.state.DancerState)",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DefaultResourceOwnerOAuthContext",
+          "methodName": "setDancerState",
+          "elementKind": "method",
+          "justification": "MULE-17010: Transparent changes to support concurrent token refreshes"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContextWithRefreshState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "ResourceOwnerOAuthContextWithRefreshState",
+          "elementKind": "class",
+          "justification": "MULE-17010: Transparent changes to support concurrent token refreshes"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "new": "interface org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "ResourceOwnerOAuthContext",
+          "elementKind": "interface",
+          "justification": "Annotation was missing"
+        }
+      ]
+    }
+  },
   "4.2.1": {
     "revapi": {
       "ignore": [
