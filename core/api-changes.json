@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.streaming.DefaultStreamingManager::manage(java.io.Closeable, org.mule.runtime.api.event.EventContext)",
+          "package": "org.mule.runtime.core.api.streaming",
+          "classSimpleName": "DefaultStreamingManager",
+          "methodName": "manage",
+          "elementKind": "method",
+          "justification": "Necessary to fix a bug"
+        },
+        {
+          "code": "java.method.added",
           "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>)",
           "package": "org.mule.runtime.core.privileged.processor",
           "classSimpleName": "MessageProcessors",
