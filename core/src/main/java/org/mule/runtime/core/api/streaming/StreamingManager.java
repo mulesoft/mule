@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 
+import java.io.Closeable;
 import java.io.InputStream;
 
 /**
@@ -57,22 +58,36 @@ public interface StreamingManager {
    * @param provider the provider to be tracked
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorProvider}
-   * @deprecated Use {@link #manage(InputStream, EventContext)} instead.
+   * @deprecated Use {@link #manage(CursorProvider, EventContext)} instead.
    */
   @Deprecated
   CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent);
 
   /**
    * Becomes aware of the given {@code inputStream} and makes sure it is closed
-   * by the time the given {@code creatorEvent} (and all its parent events) are completed.
+   * by the time the given {@code creatorRootEventContext} (and all its parent events) are completed.
    * <p>
    * If {@code inputStream} is a {@link Cursor} then nothing happens. Use
    * {@link #manage(CursorProvider, CoreEvent)} for those cases.
    *
    * @param inputStream  the stream to track
    * @param creatorRootEventContext the event context on which the stream was created
+   * @deprecated since 4.2.2 - 4.3.0. Use {@link #manage(Closeable, EventContext)} instead
    */
+  @Deprecated
   void manage(InputStream inputStream, EventContext creatorRootEventContext);
+
+  /**
+   * Becomes aware of the given {@code closeable} stream and makes sure it is closed
+   * by the time the given {@code creatorRootEventContext} (and all its parent events) are completed.
+   * <p>
+   * If {@code closeable} is a {@link Cursor} then nothing happens. Use
+   * {@link #manage(CursorProvider, CoreEvent)} for those cases.
+   *
+   * @param closeable  a closeable stream to be tracked
+   * @param creatorRootEventContext the event context on which the stream was created
+   */
+  void manage(Closeable closeable, EventContext creatorRootEventContext);
 
   /**
    * Becomes aware of the given {@code inputStream} and makes sure it is closed by the time the given {@code creatorEvent} (and

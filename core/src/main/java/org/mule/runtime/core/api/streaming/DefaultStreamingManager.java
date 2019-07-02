@@ -38,6 +38,7 @@ import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.io.Closeable;
 import java.io.InputStream;
 
 import javax.inject.Inject;
@@ -149,11 +150,16 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
    */
   @Override
   public void manage(InputStream stream, EventContext creatorEventContext) {
-    if (stream instanceof Cursor) {
+    manage((Closeable) stream, creatorEventContext);
+  }
+
+  @Override
+  public void manage(Closeable closeable, EventContext creatorEventContext) {
+    if (closeable instanceof Cursor) {
       return;
     }
 
-    ((BaseEventContext) creatorEventContext).onTerminated((response, throwable) -> closeQuietly(stream));
+    ((BaseEventContext) creatorEventContext).onTerminated((response, throwable) -> closeQuietly(closeable));
   }
 
   /**

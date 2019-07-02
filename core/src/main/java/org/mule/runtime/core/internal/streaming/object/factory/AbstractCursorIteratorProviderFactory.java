@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
+import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Iterator;
@@ -27,7 +28,7 @@ import java.util.Iterator;
  */
 public abstract class AbstractCursorIteratorProviderFactory implements CursorIteratorProviderFactory {
 
-  private final StreamingManager streamingManager;
+  protected final StreamingManager streamingManager;
 
   public AbstractCursorIteratorProviderFactory(StreamingManager streamingManager) {
     this.streamingManager = streamingManager;
