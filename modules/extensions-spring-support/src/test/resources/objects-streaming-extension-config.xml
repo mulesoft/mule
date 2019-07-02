@@ -31,9 +31,7 @@
         </marvel:say-magic-words>
 
         <flow-ref name="assertPayloadIsNotStreamProvider"/>
-        <marvel:read-object-stream />
     </flow>
-
 
     <flow name="getStreamInTx">
         <try transactionalAction="BEGIN_OR_JOIN">
