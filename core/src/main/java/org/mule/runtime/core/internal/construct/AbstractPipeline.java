@@ -302,6 +302,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
       BaseEventContext baseEventContext = ((BaseEventContext) event.getContext());
       baseEventContext.onComplete((response, throwable) -> {
+        // Here (response == null) XOR (throwable == null)
+
         MessagingException messagingException = null;
         if (throwable != null) {
           if (throwable instanceof MessagingException) {
@@ -309,6 +311,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           } else {
             messagingException = new MessagingException(event, throwable, AbstractPipeline.this);
           }
+          response = messagingException.getEvent();
         }
         fireCompleteNotification(response, messagingException);
         baseEventContext.getProcessingTime().ifPresent(time -> time.addFlowExecutionBranchTime(startTime));

@@ -209,7 +209,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
     verify(notificationFirer, times(1))
-        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, event)));
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_START, true, event)));
     verify(notificationFirer, times(1))
