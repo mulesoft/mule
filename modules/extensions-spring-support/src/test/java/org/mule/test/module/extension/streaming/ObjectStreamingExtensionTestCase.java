@@ -11,19 +11,28 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
+
+import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.apache.commons.collections.IteratorUtils;
+import org.hamcrest.BaseMatcher;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
@@ -32,6 +41,9 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   private static final int DATA_SIZE = 100;
   private static final String MY_STREAM_VAR = "myStreamVar";
   private List<String> data;
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Override
   protected void doSetUp() throws Exception {
@@ -50,7 +62,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Test
   @Description("Consume an object stream")
   public void getObjectStream() throws Exception {
-    assertStreamMatchesData("getStream");
+    assertStreamMatchesData("getStreamWithoutStreaming");
   }
 
   @Test
@@ -79,6 +91,30 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   }
 
   @Test
+  @Description("Operation is configured not to stream and stream gets closed automatically even if not consumed")
+  public void nonRepeatableStreamIsManaged() throws Exception {
+    Object stream = getObjectStream("getStreamWithoutStreaming", false);
+    assertThat(stream, is(instanceOf(ConsumerStreamingIterator.class)));
+
+    ConsumerStreamingIterator streamingIterator = (ConsumerStreamingIterator) stream;
+    assertThat(streamingIterator.hasNext(), is(false));
+    expectedException.expect(new BaseMatcher<Throwable>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return o.getClass().getName().equals("org.mule.runtime.core.internal.streaming.object.iterator.ClosedConsumerException");
+      }
+
+      @Override
+      public void describeTo(org.hamcrest.Description description) {
+        description.appendText("Exception was not a ClosedConsumerException");
+      }
+    });
+
+    streamingIterator.next();
+  }
+
+  @Test
   @Description("Consume a stream generated in a transaction")
   public void getStreamInTx() throws Exception {
     assertStreamMatchesData("getStreamInTx");
@@ -96,16 +132,33 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
     flowRunner("crashCarTx").withPayload(data).run();
   }
 
-  private List<String> getStream(String flowName) throws Exception {
-    CoreEvent result = flowRunner(flowName)
-        .withPayload(data)
-        .run();
+  private Object getObjectStream(String flowName, boolean keepStreamsOpen) throws Exception {
+    FlowRunner flowRunner = flowRunner(flowName).withPayload(data);
 
-    return (List<String>) result.getMessage().getPayload().getValue();
+    if (keepStreamsOpen) {
+      flowRunner.keepStreamsOpen();
+    }
+
+    return flowRunner.run().getMessage().getPayload().getValue();
+  }
+
+  private List<String> consumeObjectStream(String flowName, boolean keepStreamsOpen) throws Exception {
+    Object stream = getObjectStream(flowName, keepStreamsOpen);
+    if (stream instanceof Iterator) {
+      Iterator<String> it = (Iterator<String>) stream;
+      List<String> list = new LinkedList<>();
+      it.forEachRemaining(list::add);
+
+      return list;
+    } else if (stream instanceof List) {
+      return (List<String>) stream;
+    }
+
+    throw new IllegalStateException("Stream of unknown type: " + stream.getClass());
   }
 
   private void assertStreamMatchesData(String flowName) throws Exception {
-    List<String> actual = getStream(flowName);
+    List<String> actual = consumeObjectStream(flowName, true);
     assertThat(actual, equalTo(data));
   }
 
