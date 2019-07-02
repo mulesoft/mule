@@ -86,7 +86,6 @@ public interface StreamingManager {
    *
    * @param closeable  a closeable stream to be tracked
    * @param creatorRootEventContext the event context on which the stream was created
-   * @deprecated since 4.2.2 - 4.3.0. Use {@link #manage(Closeable, EventContext)} instead
    */
   void manage(Closeable closeable, EventContext creatorRootEventContext);
 
