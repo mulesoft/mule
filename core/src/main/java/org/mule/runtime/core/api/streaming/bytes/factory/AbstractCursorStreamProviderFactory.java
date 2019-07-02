@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.InputStream;
@@ -72,19 +73,18 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
   /**
    * Implementations should use this method to actually create the output value
    *
-   * @param inputStream
-   * @param eventContext
-   * @return
+   * @param inputStream  a stream
+   * @param eventContext the context of the event on which the stream was opened
+   * @return a resolved value
    */
   protected abstract Object resolve(InputStream inputStream, EventContext eventContext);
 
   /**
    * Implementations should use this method to actually create the output value
    *
-   * @param inputStream
-   * @param creatorRootEventContext
-   * @return
-   *
+   * @param inputStream a stream
+   * @param event       the event on which the stream was opened
+   * @return a resolved value
    * @deprecated Use {@link #resolve(InputStream, EventContext)} instead.
    */
   @Deprecated
