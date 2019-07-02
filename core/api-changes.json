@@ -12,25 +12,6 @@
         "justification": "MULE-16984 - Interception API: Smart connectors inside scopes are not skipped properly"
         },
         {
-          "code": "java.method.added",
-          "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
-          "package": "org.mule.runtime.core.api.config",
-          "classSimpleName": "DefaultMuleConfiguration",
-          "methodName": "initialise",
-          "elementKind": "method",
-          "justification": "Mule configuration should be initialized"
-        },
-        {
-          "code": "java.class.nowImplementsInterface",
-          "old": "class org.mule.runtime.core.api.config.DefaultMuleConfiguration",
-          "new": "class org.mule.runtime.core.api.config.DefaultMuleConfiguration",
-          "interface": "org.mule.runtime.api.lifecycle.Initialisable",
-          "package": "org.mule.runtime.core.api.config",
-          "classSimpleName": "DefaultMuleConfiguration",
-          "elementKind": "class",
-          "justification": "Mule configuration should be initialized"
-        },
-        {
           "code": "java.field.addedStaticField",
           "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_AUTH_CODE_HANDLER",
           "package": "org.mule.runtime.core.api.config",
@@ -106,7 +87,7 @@
           "classSimpleName": "DefaultMuleConfiguration",
           "methodName": "initialise",
           "elementKind": "method",
-          "justification": "MULE-17051: Default Error Handler should be looked up after initialization"
+          "justification": "Mule configuration should be initialized - MULE-17051: Default Error Handler should be looked up after initialization"
         },
         {
           "code": "java.class.nowImplementsInterface",
@@ -116,7 +97,7 @@
           "package": "org.mule.runtime.core.api.config",
           "classSimpleName": "DefaultMuleConfiguration",
           "elementKind": "class",
-          "justification": "MULE-17051: Default Error Handler should be looked up after initialization"
+          "justification": "Mule configuration should be initialized - MULE-17051: Default Error Handler should be looked up after initialization"
         },
         {
           "code": "java.method.added",
