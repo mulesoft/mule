@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.io.Closeable;
 import java.io.InputStream;
 
 /**
@@ -38,7 +39,7 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
    */
   @Override
   protected Object resolve(InputStream inputStream, EventContext creatorRootEventContext) {
-    streamingManager.manage(inputStream, creatorRootEventContext);
+    streamingManager.manage((Closeable) inputStream, creatorRootEventContext);
     return inputStream;
   }
 
