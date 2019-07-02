@@ -37,14 +37,14 @@ import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransaction
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionRecoverer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.io.Serializable;
+import java.util.concurrent.locks.Lock;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.stubbing.Answer;
-
-import java.io.Serializable;
-import java.util.concurrent.locks.Lock;
 
 public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase {
 
