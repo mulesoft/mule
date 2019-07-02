@@ -12,6 +12,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -78,6 +79,8 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
 
   @Override
   public void dispose() {
+    LOGGER.debug("Disposing MuleObjectStoreManager: {}", this);
+
     for (Scheduler scheduler : expirationSchedulers.values()) {
       scheduler.stop();
     }
@@ -122,6 +125,8 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
           stores.containsKey(name)) {
         throw new IllegalArgumentException("An Object Store was already defined for name " + name);
       }
+
+      LOGGER.debug("Creating OS '{}' in MuleObjectStoreManager: {}", name, this);
 
       T store = doCreateObjectStore(name, settings);
       stores.put(name, store);
@@ -228,6 +233,8 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
     if (basePersistentStoreKey.equals(name) || baseTransientStoreKey.equals(name)) {
       return;
     }
+
+    LOGGER.debug("Disposing OS '{}' from MuleObjectStoreManager: {}", name, this);
 
     ObjectStore store = stores.remove(name);
     if (store == null) {
