@@ -86,7 +86,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     });
     return new LocalTxQueueTransactionContext(txLog, provider, lock);
   }
-  
+
   @Override
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {
     DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();

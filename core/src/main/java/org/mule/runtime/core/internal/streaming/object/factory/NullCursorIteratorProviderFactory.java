@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.streaming.object.factory;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
+import java.io.Closeable;
 import java.util.Iterator;
 
 public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorProviderFactory {
@@ -19,6 +20,10 @@ public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorPro
 
   @Override
   protected Object resolve(Iterator iterator, EventContext eventContext) {
+    if (iterator instanceof Closeable) {
+      streamingManager.manage((Closeable) iterator, eventContext);
+    }
+
     return iterator;
   }
 }
