@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.oauth.api.state;
 
+import static org.mule.runtime.oauth.api.state.DancerState.HAS_TOKEN;
+import static org.mule.runtime.oauth.api.state.DancerState.NO_TOKEN;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContextWithRefreshState.createRefreshOAuthContextLock;
 
 import org.mule.runtime.api.lock.LockFactory;
@@ -29,11 +31,13 @@ public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAut
 
   private final String resourceOwnerId;
   private transient Lock refreshUserOAuthContextLock;
+  private transient DancerState dancerState;
   private String accessToken;
   private String refreshToken;
   private String state;
   private String expiresIn;
   private Map<String, Object> tokenResponseParameters = new HashMap<>();
+
 
   public DefaultResourceOwnerOAuthContext(final Lock refreshUserOAuthContextLock, final String resourceOwnerId) {
     this.refreshUserOAuthContextLock = refreshUserOAuthContextLock;
@@ -103,12 +107,14 @@ public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAut
 
   @Override
   public DancerState getDancerState() {
-    return null;
+    return this.dancerState != null
+        ? dancerState
+        : accessToken == null ? NO_TOKEN : HAS_TOKEN;
   }
 
   @Override
   public void setDancerState(DancerState dancerState) {
-    // Nothing to do
+    this.dancerState = dancerState;
   }
 
   @Override

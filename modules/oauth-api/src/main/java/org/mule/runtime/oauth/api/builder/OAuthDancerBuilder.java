@@ -24,6 +24,8 @@ public interface OAuthDancerBuilder<D> {
   /**
    * @param name the name for this dancer to use for ids generation
    * @return this builder
+   *
+   * @since 4.3.0, 4.2.2
    */
   default OAuthDancerBuilder<D> name(String name) {
     return this;
