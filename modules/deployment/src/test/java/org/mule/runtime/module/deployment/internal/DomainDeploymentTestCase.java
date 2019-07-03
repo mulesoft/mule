@@ -54,9 +54,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.util.CompilerUtils;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,6 +64,9 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Properties;
+
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Contains test for domain deployment
@@ -543,12 +543,12 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         .dependingOn(loadsAppResourceCallbackPlugin);
 
     ApplicationFileBuilder nonExposingAppFileBuilder = new ApplicationFileBuilder("exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
         .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class")
-        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 

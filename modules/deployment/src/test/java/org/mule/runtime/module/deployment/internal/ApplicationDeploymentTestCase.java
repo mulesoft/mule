@@ -1315,11 +1315,11 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class");
 
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
         .dependingOn(loadsAppResourcePlugin);
@@ -1338,12 +1338,12 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Description("Tests that code called form application's Processor can access internal resources/packages of the application")
   public void deploysAppWithNotExportedPackage() throws Exception {
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
         .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class")
-        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 
@@ -1374,11 +1374,11 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                                 "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties");
 
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-plugin-bootstrap.xml")
-        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
         .dependingOn(loadsAppResourceInterceptorPlugin);
@@ -1402,13 +1402,13 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptor.java"));
 
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-interceptor.xml")
         .containingClass(loadsOwnResourceInterceptorFactoryClassFile, "org/foo/LoadsOwnResourceInterceptorFactory.class")
         .containingClass(loadsOwnResourceInterceptorClassFile, "org/foo/LoadsOwnResourceInterceptor.class")
-        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 
@@ -2033,6 +2033,25 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  @Description("If a plugin uses a library and the application sets another version of that library as a sharedLib, the plugin internally uses its own version of the lib and not the app's. "
+      + "Similar to deploysAppWithLibDifferentThanPlugin, but the bar2 dep in the app is shared in this case")
+  public void pluginWithDependencyAndConflictingVersionSharedByapp() throws Exception {
+    final ApplicationFileBuilder differentLibPluginAppFileBuilder = appFileBuilder("appWithLibDifferentThanPlugin")
+        .definedBy("app-plugin-different-lib-config.xml")
+        .dependingOn(echoPluginWithLib1)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
+        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class");
+
+    addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, differentLibPluginAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {

@@ -13,6 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -140,7 +141,15 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
       }
     }
 
-    return baseLookupPolicy.extend(pluginsLookupPolicies);
+    Map<String, LookupStrategy> pluginNotImportedPolicies = new HashMap<>();
+    for (String notImportedPackage : descriptor.getClassLoaderModel().getNotImportedPackages()) {
+      pluginNotImportedPolicies.put(notImportedPackage, CHILD_ONLY);
+    }
+    for (String notImportedResource : descriptor.getClassLoaderModel().getNotImportedResources()) {
+      pluginNotImportedPolicies.put(notImportedResource, CHILD_ONLY);
+    }
+
+    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginNotImportedPolicies, true);
   }
 
   private List<ArtifactPluginDescriptor> getPluginDescriptors(ArtifactPluginDescriptor descriptor,

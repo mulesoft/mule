@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
@@ -17,6 +19,7 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
@@ -63,6 +66,11 @@ public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
       public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
         return null;
       }
+
+      @Override
+      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
+        return null;
+      }
     };
   }
 
@@ -80,14 +88,15 @@ public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testMySqlDriverCleanupThreadClassIsFound() throws ClassNotFoundException {
-    MuleArtifactClassLoader artifactClassLoader =
-        (new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                     new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
-                                     Thread.currentThread().getContextClassLoader(), testLookupPolicy));
+  public void testMySqlDriverCleanupThreadClassIsFound() throws ClassNotFoundException, IOException {
+    try (MuleArtifactClassLoader artifactClassLoader =
+        new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
+                                    new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
+                                    currentThread().getContextClassLoader(), testLookupPolicy)) {
+      artifactClassLoader.setResourceReleaserClassLocation(MYSQL_RESOURCE_RELEASER_CLASS_LOCATION);
+      artifactClassLoader.dispose();
+      assertThat(foundClassname, is(classnameBeingTested));
+    }
 
-    artifactClassLoader.setResourceReleaserClassLocation(MYSQL_RESOURCE_RELEASER_CLASS_LOCATION);
-    artifactClassLoader.dispose();
-    assertThat(foundClassname, is(classnameBeingTested));
   }
 }

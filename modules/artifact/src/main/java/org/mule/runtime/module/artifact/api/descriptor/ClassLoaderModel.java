@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -27,23 +29,27 @@ public final class ClassLoaderModel {
    * Defines a {@link ClassLoaderModel} with empty configuration
    */
   public static final ClassLoaderModel NULL_CLASSLOADER_MODEL =
-      new ClassLoaderModel(new URL[0], new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
-                           false);
+      new ClassLoaderModel(new URL[0], emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), emptySet(), false);
 
   private final URL[] urls;
   private final Set<String> exportedPackages;
   private final Set<String> exportedResources;
+  private final Set<String> notImportedPackages;
+  private final Set<String> notImportedResources;
   private final Set<BundleDependency> dependencies;
   private final Set<String> privilegedExportedPackages;
   private final Set<String> privilegedArtifacts;
   private final boolean includeTestDependencies;
 
   private ClassLoaderModel(URL[] urls, Set<String> exportedPackages, Set<String> exportedResources,
+                           Set<String> notImportedPackages, Set<String> notImportedResources,
                            Set<BundleDependency> dependencies, Set<String> privilegedExportedPackages,
                            Set<String> privilegedArtifacts, boolean includeTestDependencies) {
     this.urls = urls;
     this.exportedPackages = exportedPackages;
     this.exportedResources = exportedResources;
+    this.notImportedPackages = notImportedPackages;
+    this.notImportedResources = notImportedResources;
     this.dependencies = dependencies;
     this.privilegedExportedPackages = privilegedExportedPackages;
     this.privilegedArtifacts = privilegedArtifacts;
@@ -65,10 +71,25 @@ public final class ClassLoaderModel {
   }
 
   /**
-   * @return the resource packages to be exported on the {@link ClassLoader}. Non null
+   * @return the resources to be exported on the {@link ClassLoader}. Non null
    */
   public Set<String> getExportedResources() {
     return exportedResources;
+  }
+
+  /**
+   * @return the Java packages to be loaded from the artifact itself, even if some other artifact in the region exports it. Non
+   *         null
+   */
+  public Set<String> getNotImportedPackages() {
+    return notImportedPackages;
+  }
+
+  /**
+   * @return the resources to be loaded from the artifact itself, even if some other artifact in the region exports it. Non null
+   */
+  public Set<String> getNotImportedResources() {
+    return notImportedResources;
   }
 
   /**
@@ -104,12 +125,14 @@ public final class ClassLoaderModel {
    */
   public static class ClassLoaderModelBuilder {
 
-    private Set<String> packages = new HashSet<>();
-    private Set<String> resources = new HashSet<>();
+    private final Set<String> packages = new HashSet<>();
+    private final Set<String> resources = new HashSet<>();
+    private final Set<String> notImportedPackages = new HashSet<>();
+    private final Set<String> notImportedResources = new HashSet<>();
     private List<URL> urls = new ArrayList<>();
     protected Set<BundleDependency> dependencies = new HashSet<>();
-    private Set<String> privilegedExportedPackages = new HashSet<>();
-    private Set<String> privilegedArtifacts = new HashSet<>();
+    private final Set<String> privilegedExportedPackages = new HashSet<>();
+    private final Set<String> privilegedArtifacts = new HashSet<>();
     private Boolean includeTestDependencies = FALSE;
 
     /**
@@ -127,6 +150,8 @@ public final class ClassLoaderModel {
 
       this.packages.addAll(source.exportedPackages);
       this.resources.addAll(source.exportedResources);
+      this.notImportedPackages.addAll(source.notImportedPackages);
+      this.notImportedResources.addAll(source.notImportedResources);
       this.urls = new ArrayList<>(asList(source.urls));
       this.dependencies.addAll(source.dependencies);
       this.privilegedExportedPackages.addAll(source.privilegedExportedPackages);
@@ -136,7 +161,7 @@ public final class ClassLoaderModel {
     /**
      * Indicates which package are exported on the model.
      *
-     * @param packages packages to export. No null.
+     * @param packages packages to export. Non null.
      * @return same builder instance.
      */
     public ClassLoaderModelBuilder exportingPackages(Set<String> packages) {
@@ -148,7 +173,7 @@ public final class ClassLoaderModel {
     /**
      * Indicates which resource are exported on the model.
      *
-     * @param resources resources to export. No null.
+     * @param resources resources to export. Non null.
      * @return same builder instance.
      */
     public ClassLoaderModelBuilder exportingResources(Set<String> resources) {
@@ -158,9 +183,33 @@ public final class ClassLoaderModel {
     }
 
     /**
+     * Indicates which Java packages are loaded from the artifact itself, even if some other artifact in the region exports it.
+     *
+     * @param packages packages to not import. Non null.
+     * @return same builder instance.
+     */
+    public ClassLoaderModelBuilder notImportingPackages(Set<String> packages) {
+      checkArgument(packages != null, "packages cannot be null");
+      this.packages.addAll(packages);
+      return this;
+    }
+
+    /**
+     * Indicates which resources are loaded from the artifact itself, even if some other artifact in the region exports it.
+     *
+     * @param resources resources to not import. Non null.
+     * @return same builder instance.
+     */
+    public ClassLoaderModelBuilder notImportingResources(Set<String> resources) {
+      checkArgument(resources != null, "resources cannot be null");
+      resources.stream().forEach(r -> this.resources.add(separatorsToUnix(r)));
+      return this;
+    }
+
+    /**
      * Indicates which Java packages are exported as privileged API on the model.
      *
-     * @param packages Java packages names to export. No null.
+     * @param packages Java packages names to export. Non null.
      * @param artifactIds artifact IDs that have access to the privileged API. No null.
      * @return same builder instance.
      */
@@ -216,8 +265,12 @@ public final class ClassLoaderModel {
      * @return a non null {@link ClassLoaderModel}
      */
     public ClassLoaderModel build() {
-      return new ClassLoaderModel(urls.toArray(new URL[0]), packages, resources, dependencies, privilegedExportedPackages,
-                                  privilegedArtifacts, includeTestDependencies);
+      return new ClassLoaderModel(urls.toArray(new URL[0]),
+                                  unmodifiableSet(packages), unmodifiableSet(resources),
+                                  unmodifiableSet(notImportedPackages), unmodifiableSet(notImportedResources),
+                                  unmodifiableSet(dependencies),
+                                  unmodifiableSet(privilegedExportedPackages), unmodifiableSet(privilegedArtifacts),
+                                  includeTestDependencies);
     }
   }
 }

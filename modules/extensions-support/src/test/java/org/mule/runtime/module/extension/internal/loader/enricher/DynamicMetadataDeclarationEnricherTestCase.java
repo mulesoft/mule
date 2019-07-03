@@ -67,8 +67,10 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
