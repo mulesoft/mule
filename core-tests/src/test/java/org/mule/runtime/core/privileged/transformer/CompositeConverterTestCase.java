@@ -7,7 +7,8 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
