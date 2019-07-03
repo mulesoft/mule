@@ -7,8 +7,7 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -23,10 +22,15 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
+
+import org.mule.runtime.core.internal.transformer.simple.ByteArrayToInputStream;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -166,5 +170,43 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
     verify(transformationService, times(1)).applyTransformers(eq(testEvent().getMessage()), eq(testEvent()),
                                                               eq(compositeConverter));
+  }
+
+  @Test
+  public void equalsReturnsTrueOnCompositeConvertersWithSameNameAndSameTransformationChain(){
+    Converter byteArrayToObjectConverter = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+
+    assertTrue(compositeConverterA.equals(compositeConverterB));
+    assertTrue(compositeConverterB.equals(compositeConverterA));
+  }
+
+
+  @Test
+  public void equalsReturnsFalseOnCompositeConvertersWithDifferentTransformationChain(){
+    Converter byteArrayToObjectConverter = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter);
+
+    assertFalse(compositeConverterA.equals(compositeConverterB));
+    assertFalse(compositeConverterB.equals(compositeConverterA));
+  }
+
+  @Test
+  public void listContainsReturnsTrueWithEqualCompositeConverters(){
+    Converter byteArrayToObjectConverter = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+    Converter byteArrayToInputSerializableConverter = new ByteArrayToSerializable();
+    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter);
+    CompositeConverter compositeConverterC = new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToInputSerializableConverter);
+    List<Converter> aListOfCompositeConverters = Arrays.asList(compositeConverterA, compositeConverterB);
+
+    assertTrue(aListOfCompositeConverters.contains(compositeConverterA));
+    assertTrue(aListOfCompositeConverters.contains(compositeConverterB));
+    assertFalse(aListOfCompositeConverters.contains(compositeConverterC));
   }
 }

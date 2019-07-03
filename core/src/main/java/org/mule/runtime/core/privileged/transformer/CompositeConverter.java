@@ -182,4 +182,29 @@ public final class CompositeConverter extends AbstractComponent implements Conve
   public String toString() {
     return this.getClass().getSimpleName() + "[name: " + getName() + "; chain: " + getConverters().toString() + "]";
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    try {
+      CompositeConverter compositeConverter = (CompositeConverter) o;
+      if (!this.getName().equals(compositeConverter.getName())) {
+        return false;
+      }
+      List<Converter> converterList = compositeConverter.getConverters();
+      if (this.chain.size() != converterList.size()) {
+        return false;
+      }
+      for (int i = 0; i < this.chain.size(); i++) {
+        if (this.chain.get(i) != converterList.get(i) && !this.chain.get(i).equals(converterList.get(i))) {
+          return false;
+        }
+      }
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
 }

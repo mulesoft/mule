@@ -71,7 +71,7 @@ public class TransformationGraphLookupStrategy {
 
   private List<Converter> createConverters(List<List<TransformationEdge>> transformationPaths) {
     //Using a set instead of a list for when a path of just one converter is found multiple times.
-    Set<Converter> converters = new HashSet<>();
+    List<Converter> converters = new ArrayList<>();
 
     for (List<TransformationEdge> transformationPath : transformationPaths) {
       Converter[] pathConverters = new Converter[transformationPath.size()];
@@ -87,10 +87,12 @@ public class TransformationGraphLookupStrategy {
       } else {
         converter = new CompositeConverter(pathConverters);
       }
-      converters.add(converter);
+      if (!converters.contains(converter)) {
+        converters.add(converter);
+      }
     }
 
-    return new ArrayList<>(converters);
+    return converters;
   }
 
   private List<List<TransformationEdge>> findTransformationPaths(DataType source, DataType target, Set<DataType> visited) {
