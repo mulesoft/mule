@@ -14,25 +14,18 @@
         <set-payload value="Test Message" />
         <set-variable variableName="password" value="Beeblebrox"></set-variable>
         <http:request config-ref="simpleNtlmConfig" path="" method="POST"/>
-        <http:request config-ref="simpleNtlmConfig" path="" method="POST"/>
+<!--        <http:request config-ref="simpleNtlmConfig" path="" method="POST"/>-->
     </flow>
 
 
-    <http:request-config name="dynamicPasswordNtlmConfig" host="localhost" port="${httpPort}">
-        <http:ntlm-authentication username="Zaphod" password="#[flowVars.password]"/>
-        <tcp:client-socket-properties keepAlive="false"/>
+    <http:request-config name="dynamicPasswordNtlmConfig" host="10.250.1.107" port="5959">
+        <http:ntlm-authentication username="ntlm" password="#[flowVars.password]"/>
     </http:request-config>
 
     <flow name="dynamicPasswordShouldUseVolatileNtlmSession">
-        <set-payload value="Test Message" />
-        <!-- Successful login -->
-        <set-variable variableName="password" value="Beeblebrox"></set-variable>
+        <set-variable variableName="password" value="#[payload]"></set-variable>
         <logger message="#['About to make ntlm auth-ed request with password:' + flowVars.password]" level="ERROR"></logger>
-        <http:request config-ref="dynamicPasswordNtlmConfig" path="" method="post"/>
-        <!-- Erroneous login -->
-        <set-variable variableName="password" value="Zorg"></set-variable>
-        <logger message="#['About to make ntlm auth-ed request with password:' + flowVars.password]" level="ERROR"></logger>
-        <http:request config-ref="dynamicPasswordNtlmConfig" path="" method="post"/>
+        <http:request config-ref="dynamicPasswordNtlmConfig" path="" method="get"/>
     </flow>
 
 </mule>
