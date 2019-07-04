@@ -10,7 +10,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.hamcrest.core.Every.everyItem;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,12 +29,12 @@ import org.mule.runtime.core.api.transformer.Converter;
 
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToInputStream;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -196,5 +196,30 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
     assertThat(compositeConverterA, not(equalTo(compositeConverterB)));
     assertThat(compositeConverterB, not(equalTo(compositeConverterA)));
+  }
+
+  @Test
+  public void hashCodeForCompositeConvertersChangesWithDifferentTransformationChain() {
+    Converter byteArrayToObjectConverter = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+
+    Converter byteArrayToObjectConverter2 = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter2 = new ByteArrayToInputStream();
+    Converter byteArrayToSerializableConverter = new ByteArrayToSerializable();
+
+    int hashCodeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+
+    int hashCodeConverterAClone = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+    int hashCodeConverterAnotherClone =
+        new CompositeConverter(byteArrayToObjectConverter2, byteArrayToInputStreamConverter2).hashCode();
+
+    int hashCodeConverterReverseClone =
+        new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter).hashCode();
+    int hashCodeConverterNotAClone =
+        new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToSerializableConverter).hashCode();
+
+    assertThat(Arrays.asList(hashCodeConverterAClone, hashCodeConverterAnotherClone), everyItem(equalTo(hashCodeConverterA)));
+    assertThat(Arrays.asList(hashCodeConverterReverseClone, hashCodeConverterNotAClone),
+               everyItem(not(equalTo(hashCodeConverterA))));
   }
 }
