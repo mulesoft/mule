@@ -24,6 +24,8 @@ import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLo
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
 
 import java.io.File;
+import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,9 +69,11 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   }
 
   @Override
-  protected void addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
+  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
     classLoaderModelBuilder.exportingSharedLibraries();
     classLoaderModelBuilder.additionalPluginLibraries();
+
+    return super.addArtifactSpecificClassloaderConfiguration(classLoaderModelBuilder);
   }
 
   @Override

@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static com.google.common.io.Files.createTempDir;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
@@ -161,14 +162,15 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .collect(toSet());
     }
 
-    loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
+    final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
+
     classLoaderModelBuilder.dependingOn(bundleDependencies);
 
     return classLoaderModelBuilder.build();
   }
 
   /**
-   * Template method to deserialize a classloader-model.json into the expected
+   * Template method to deserialize a {@code classloader-model.json} into the expected
    * {@link org.mule.tools.api.classloader.model.ClassLoaderModel} implementation
    *
    * @param classLoaderModelDescriptor
@@ -321,12 +323,18 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    * @param classLoaderModelBuilder the builder of the {@link ClassLoaderModel}
    * @param dependencies the dependencies resolved for this artifact.
    */
-  private void loadUrls(File artifactFile, ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
-                        Set<BundleDependency> dependencies) {
-    classLoaderModelBuilder.containing(getUrl(artifactFile, artifactFile));
+  private List<URL> loadUrls(File artifactFile, ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
+                             Set<BundleDependency> dependencies) {
+    final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
-    addArtifactSpecificClassloaderConfiguration(classLoaderModelBuilder);
-    addDependenciesToClasspathUrls(classLoaderModelBuilder, dependencies);
+    final URL artifactFileUrl = getUrl(artifactFile, artifactFile);
+    classLoaderModelBuilder.containing(artifactFileUrl);
+    dependenciesArtifactsUrls.add(artifactFileUrl);
+
+    dependenciesArtifactsUrls.addAll(addArtifactSpecificClassloaderConfiguration(classLoaderModelBuilder));
+    dependenciesArtifactsUrls.addAll(addDependenciesToClasspathUrls(classLoaderModelBuilder, dependencies));
+
+    return dependenciesArtifactsUrls;
   }
 
   private URL getUrl(File artifactFile, File file) {
@@ -339,18 +347,25 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
   }
 
-  private void addDependenciesToClasspathUrls(ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder,
-                                              Set<BundleDependency> dependencies) {
+  private List<URL> addDependenciesToClasspathUrls(ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder,
+                                                   Set<BundleDependency> dependencies) {
+    final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
+
     dependencies.stream()
         .filter(dependency -> !MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null)))
         .filter(dependency -> dependency.getBundleUri() != null)
         .forEach(dependency -> {
+          final URL dependencyArtifactUrl;
           try {
-            classLoaderModelBuilder.containing(dependency.getBundleUri().toURL());
+            dependencyArtifactUrl = dependency.getBundleUri().toURL();
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }
+          classLoaderModelBuilder.containing(dependencyArtifactUrl);
+          dependenciesArtifactsUrls.add(dependencyArtifactUrl);
         });
+
+    return dependenciesArtifactsUrls;
   }
 
   private List<String> getAttribute(Map<String, Object> attributes, String attribute) {
@@ -378,8 +393,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    *
    * @param classLoaderModelBuilder the builder used to generate {@link ClassLoaderModel} of the artifact.
    */
-  protected void addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
-
+  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
+    return emptyList();
   }
 
 }
