@@ -29,10 +29,15 @@ import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.SecurityUtils;
 
+import junit.framework.Assert;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -143,8 +148,8 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
             SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
 
-            assertArrayEquals(supportedCipherSuites, socket.getEnabledCipherSuites());
-            assertArrayEquals(supportedCipherSuites, serverSocket.getEnabledCipherSuites());
+            Assert.assertEquals(new HashSet<String>(Arrays.asList(supportedCipherSuites)), new HashSet<String>(Arrays.asList(socket.getEnabledCipherSuites())));
+            Assert.assertEquals(new HashSet<String>(Arrays.asList(supportedCipherSuites)), new HashSet<String>(Arrays.asList(socket.getEnabledCipherSuites())));
         }
         finally
         {
