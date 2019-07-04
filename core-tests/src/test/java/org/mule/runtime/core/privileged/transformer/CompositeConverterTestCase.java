@@ -183,7 +183,6 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
 
     assertThat(compositeConverterA, equalTo(compositeConverterB));
-    assertThat(compositeConverterB, equalTo(compositeConverterA));
   }
 
 
@@ -195,7 +194,6 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter);
 
     assertThat(compositeConverterA, not(equalTo(compositeConverterB)));
-    assertThat(compositeConverterB, not(equalTo(compositeConverterA)));
   }
 
   @Test
