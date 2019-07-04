@@ -41,6 +41,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.Artifact;
 
@@ -167,7 +168,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .collect(toSet());
     }
 
-    final FileJarExplorer fileJarExplorer = new FileJarExplorer();
+    final JarExplorer fileJarExplorer = buildJarExplorer();
     final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
     for (URL dependencyArtifactUrl : dependenciesArtifactsUrls) {
       try {
@@ -189,6 +190,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     classLoaderModelBuilder.dependingOn(bundleDependencies);
 
     return classLoaderModelBuilder.build();
+  }
+
+  protected JarExplorer buildJarExplorer() {
+    return new FileJarExplorer();
   }
 
   /**
