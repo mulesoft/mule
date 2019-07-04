@@ -37,9 +37,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Resolves plugin dependencies considering the plugin name only.
@@ -289,7 +290,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         .dependingOn(originalClassLoaderModel.getDependencies())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources());
+        .exportingResources(originalClassLoaderModel.getExportedResources())
+        .notImportingPackages(originalClassLoaderModel.getNotImportedPackages())
+        .notImportingResources(originalClassLoaderModel.getNotImportedResources());
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }
@@ -305,7 +308,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         .exportingPackages(originalClassLoaderModel.getExportedPackages())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources());
+        .exportingResources(originalClassLoaderModel.getExportedResources())
+        .notImportingPackages(originalClassLoaderModel.getNotImportedPackages())
+        .notImportingResources(originalClassLoaderModel.getNotImportedResources());
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }

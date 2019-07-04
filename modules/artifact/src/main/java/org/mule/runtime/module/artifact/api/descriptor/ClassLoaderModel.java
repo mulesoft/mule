@@ -190,7 +190,7 @@ public final class ClassLoaderModel {
      */
     public ClassLoaderModelBuilder notImportingPackages(Set<String> packages) {
       checkArgument(packages != null, "packages cannot be null");
-      this.packages.addAll(packages);
+      this.notImportedPackages.addAll(packages);
       return this;
     }
 
@@ -202,7 +202,7 @@ public final class ClassLoaderModel {
      */
     public ClassLoaderModelBuilder notImportingResources(Set<String> resources) {
       checkArgument(resources != null, "resources cannot be null");
-      resources.stream().forEach(r -> this.resources.add(separatorsToUnix(r)));
+      resources.stream().forEach(r -> this.notImportedResources.add(separatorsToUnix(r)));
       return this;
     }
 

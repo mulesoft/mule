@@ -40,11 +40,14 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -134,11 +137,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     final ArtifactClassLoaderModelBuilder classLoaderModelBuilder =
         newHeavyWeightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
                                               packagerClassLoaderModel, attributes);
+    final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
+    final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
     classLoaderModelBuilder
-        .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
+        .exportingPackages(exportedPackages)
         .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
                                      new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
-        .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
+        .exportingResources(exportedResources);
 
     Set<BundleDependency> bundleDependencies;
     if (deployableArtifactRepositoryFolder.isPresent()) {
@@ -162,7 +167,24 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .collect(toSet());
     }
 
+    final FileJarExplorer fileJarExplorer = new FileJarExplorer();
     final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
+    for (URL dependencyArtifactUrl : dependenciesArtifactsUrls) {
+      try {
+        final JarInfo exploredJar = fileJarExplorer.explore(dependencyArtifactUrl.toURI());
+
+        final Set<String> notImportedPackages = new HashSet<>(exploredJar.getPackages());
+        notImportedPackages.removeAll(exportedPackages);
+        classLoaderModelBuilder.notImportingPackages(notImportedPackages);
+
+        final Set<String> notImportedResources = new HashSet<>(exploredJar.getResources());
+        notImportedResources.removeAll(exportedResources);
+        classLoaderModelBuilder.notImportingResources(notImportedResources);
+
+      } catch (URISyntaxException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
 
     classLoaderModelBuilder.dependingOn(bundleDependencies);
 
