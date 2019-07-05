@@ -7,21 +7,12 @@
 package org.mule.api.security.tls;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.config.i18n.CoreMessages.failedToLoad;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.Preconditions.checkArgument;
-
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.security.TlsDirectKeyStore;
-import org.mule.api.security.TlsDirectTrustStore;
-import org.mule.api.security.TlsIndirectKeyStore;
-import org.mule.util.ArrayUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.SecurityUtils;
-import org.mule.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,76 +45,83 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.lifecycle.CreateException;
+import org.mule.api.security.TlsDirectKeyStore;
+import org.mule.api.security.TlsDirectTrustStore;
+import org.mule.api.security.TlsIndirectKeyStore;
+import org.mule.util.ArrayUtils;
+import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
+import org.mule.util.SecurityUtils;
+import org.mule.util.StringUtils;
 
 /**
  * Support for configuring TLS/SSL connections.
  * <p/>
  * <h2>Introduction</h2>
  * <p/>
- * This class was introduced to centralise the work of TLS/SSL configuration.  It is intended
- * to be backwards compatible with earlier code (as much as possible) and so is perhaps more
- * complex than would be necessary if starting from zero - the main source of confusion is the
- * distinction between direct and indirect creation of sockets and stores.
+ * This class was introduced to centralise the work of TLS/SSL configuration. It is intended to be backwards compatible
+ * with earlier code (as much as possible) and so is perhaps more complex than would be necessary if starting from zero
+ * - the main source of confusion is the distinction between direct and indirect creation of sockets and stores.
  * <p/>
  * <h2>Configuration</h2>
  * <p/>
- * The documentation in this class is intended more for programmers than end uses.  If you are
- * configuring a connector the interfaces {@link org.mule.api.security.TlsIndirectTrustStore},
- * {@link TlsDirectTrustStore},
- * {@link TlsDirectKeyStore} and {@link TlsIndirectKeyStore} should provide guidance to individual
- * properties.  In addition you should check the documentation for the specific protocol / connector
- * used and may also need to read the discussion on direct and indirect socket and store creation
- * below (or, more simply, just use whichever key store interface your connector implements!).
+ * The documentation in this class is intended more for programmers than end uses. If you are configuring a connector
+ * the interfaces {@link org.mule.api.security.TlsIndirectTrustStore}, {@link TlsDirectTrustStore},
+ * {@link TlsDirectKeyStore} and {@link TlsIndirectKeyStore} should provide guidance to individual properties. In
+ * addition you should check the documentation for the specific protocol / connector used and may also need to read the
+ * discussion on direct and indirect socket and store creation below (or, more simply, just use whichever key store
+ * interface your connector implements!).
  * <p/>
  * <h2>Programming</h2>
  * <p/>
- * This class is intended to be used as a delegate as we typically want to add security to an
- * already existing connector (so we inherit from that connector, implement the appropriate
- * interfaces from {@link org.mule.api.security.TlsIndirectTrustStore}, {@link TlsDirectTrustStore},
- * {@link TlsDirectKeyStore} and {@link TlsIndirectKeyStore}, and then forward calls to the
- * interfaces to an instance of this class).
+ * This class is intended to be used as a delegate as we typically want to add security to an already existing connector
+ * (so we inherit from that connector, implement the appropriate interfaces from
+ * {@link org.mule.api.security.TlsIndirectTrustStore}, {@link TlsDirectTrustStore}, {@link TlsDirectKeyStore} and
+ * {@link TlsIndirectKeyStore}, and then forward calls to the interfaces to an instance of this class).
  * <p/>
- * <p>For setting System properties (and reading them) use {@link TlsPropertiesMapper}.  This
- * can take a "namespace" which can then be used by {@link TlsPropertiesSocketFactory} to
- * construct an appropriate socket factory.  This approach (storing to properties and then
- * retrieving that information later in a socket factory) lets us pass TLS/SSL configuration
- * into libraries that are configured by specifying on the socket factory class.</p>
+ * <p>
+ * For setting System properties (and reading them) use {@link TlsPropertiesMapper}. This can take a "namespace" which
+ * can then be used by {@link TlsPropertiesSocketFactory} to construct an appropriate socket factory. This approach
+ * (storing to properties and then retrieving that information later in a socket factory) lets us pass TLS/SSL
+ * configuration into libraries that are configured by specifying on the socket factory class.
+ * </p>
  * <p/>
  * <h2>Direct and Indirect Socket and Store Creation</h2>
  * <p/>
- * For the SSL transport, which historically defined parameters for many different secure
- * transports, the configuration interfaces worked as follows:
+ * For the SSL transport, which historically defined parameters for many different secure transports, the configuration
+ * interfaces worked as follows:
  * <p/>
  * <dl>
- * <dt>{@link TlsDirectTrustStore}</dt><dd>Used to generate trust store directly and indirectly
- * for all TLS/SSL conections via System properties</dd>
- * <dt>{@link TlsDirectKeyStore}</dt><dd>Used to generate key store directly</dd>
- * <dt>{@link TlsIndirectKeyStore}</dt><dd>Used to generate key store indirectly for all
- * TLS/SSL conections via System properties</dd>
+ * <dt>{@link TlsDirectTrustStore}</dt>
+ * <dd>Used to generate trust store directly and indirectly for all TLS/SSL conections via System properties</dd>
+ * <dt>{@link TlsDirectKeyStore}</dt>
+ * <dd>Used to generate key store directly</dd>
+ * <dt>{@link TlsIndirectKeyStore}</dt>
+ * <dd>Used to generate key store indirectly for all TLS/SSL conections via System properties</dd>
  * </dl>
  * <p/>
- * Historically, many other transports relied on the indirect configurations defined above.
- * So they implemented {@link org.mule.api.security.TlsIndirectTrustStore}
- * (a superclass of {@link TlsDirectTrustStore})
- * and relied on {@link TlsIndirectKeyStore} from the SSL configuration.  For continuity these
- * interfaces continue to be used, even though
- * the configurations are now typically (see individual connector/protocol documentation) specific
- * to a protocol or connector.  <em>Note - these interfaces are new, but the original code had
- * those methods, used as described.  The new interfaces only make things explicit.</em>
+ * Historically, many other transports relied on the indirect configurations defined above. So they implemented
+ * {@link org.mule.api.security.TlsIndirectTrustStore} (a superclass of {@link TlsDirectTrustStore}) and relied on
+ * {@link TlsIndirectKeyStore} from the SSL configuration. For continuity these interfaces continue to be used, even
+ * though the configurations are now typically (see individual connector/protocol documentation) specific to a protocol
+ * or connector. <em>Note - these interfaces are new, but the original code had those methods, used as described. The
+ * new interfaces only make things explicit.</em>
  * <p/>
- * <p><em>Note for programmers</em> One way to understand the above is to see that many
- * protocols are handled by libraries that are configured by providing either properties or
- * a socket factory.  In both cases (the latter via {@link TlsPropertiesSocketFactory}) we
- * continue to use properties and the "indirect" interface.  Note also that the mapping
- * in {@link TlsPropertiesMapper} correctly handles the asymmetry, so an initial call to
- * {@link TlsConfiguration} uses the keystore defined via {@link TlsDirectKeyStore}, but
- * when a {@link TlsConfiguration} is retrieved from System proerties using
- * {@link TlsPropertiesMapper#readFromProperties(TlsConfiguration,java.util.Properties)}
- * the "indirect" properties are supplied as "direct" values, meaning that the "indirect"
- * socket factory can be retrieved from {@link #getKeyManagerFactory()}.  It just works.</p>
+ * <p>
+ * <em>Note for programmers</em> One way to understand the above is to see that many protocols are handled by libraries
+ * that are configured by providing either properties or a socket factory. In both cases (the latter via
+ * {@link TlsPropertiesSocketFactory}) we continue to use properties and the "indirect" interface. Note also that the
+ * mapping in {@link TlsPropertiesMapper} correctly handles the asymmetry, so an initial call to
+ * {@link TlsConfiguration} uses the keystore defined via {@link TlsDirectKeyStore}, but when a {@link TlsConfiguration}
+ * is retrieved from System proerties using
+ * {@link TlsPropertiesMapper#readFromProperties(TlsConfiguration,java.util.Properties)} the "indirect" properties are
+ * supplied as "direct" values, meaning that the "indirect" socket factory can be retrieved from
+ * {@link #getKeyManagerFactory()}. It just works.
+ * </p>
  */
 public final class TlsConfiguration
-        implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore
+    implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore
 {
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
@@ -197,11 +195,11 @@ public final class TlsConfiguration
     }
 
     // note - in what follows i'm using "raw" variables rather than accessors because
-    // i think the names are clearer.  the API names for the accessors are historical
+    // i think the names are clearer. the API names for the accessors are historical
     // and not a close fit to actual use (imho).
 
     /**
-     * @param anon      If the connection is anonymous then we don't care about client keys
+     * @param anon If the connection is anonymous then we don't care about client keys
      * @param namespace Namespace to use for global properties (for JSSE use JSSE_NAMESPACE)
      * @throws CreateException ON initialisation problems
      */
@@ -235,6 +233,37 @@ public final class TlsConfiguration
         if (sslType == null)
         {
             sslType = resolveSslType();
+        }
+
+        resolveEnabledCipherSuites();
+    }
+
+    private void resolveEnabledCipherSuites()
+    {
+        if (tlsProperties.getEnabledCipherSuites() == null && tlsProperties.getEnabledProtocols() != null)
+        {
+            Set<String> enabledCipherSuites = new HashSet<String>();
+
+            for (String enabledProtocol : tlsProperties.getEnabledProtocols())
+            {
+                try
+                {
+                    SSLContext context = getSslContext(enabledProtocol);
+                    enabledCipherSuites.addAll(asList(context.getSupportedSSLParameters().getCipherSuites()));
+                }
+                catch (Exception e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Skipping invalid protocol on resolving default cipher suites: " + enabledProtocol);
+                    }
+                }
+            }
+
+            if (!enabledCipherSuites.isEmpty())
+            {
+                tlsProperties.overrideEnabledCipherSuites(enabledCipherSuites.toArray(new String[enabledCipherSuites.size()]));
+            }
         }
     }
 
@@ -291,7 +320,7 @@ public final class TlsConfiguration
         }
     }
 
-    protected  KeyStore loadKeyStore() throws GeneralSecurityException, IOException
+    protected KeyStore loadKeyStore() throws GeneralSecurityException, IOException
     {
         KeyStore tempKeyStore = KeyStore.getInstance(keystoreType);
 
@@ -299,7 +328,7 @@ public final class TlsConfiguration
         if (null == is)
         {
             throw new FileNotFoundException(
-                cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+                    cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
         }
 
         tempKeyStore.load(is, keyStorePassword.toCharArray());
@@ -377,7 +406,7 @@ public final class TlsConfiguration
         }
     }
 
-    public static String formatInvalidCrlAlgorithm (String givenAlgorithm)
+    public static String formatInvalidCrlAlgorithm(String givenAlgorithm)
     {
         return format(INVALID_CRL_ALGORITHM, REVOCATION_KEYSTORE_ALGORITHM, givenAlgorithm);
     }
@@ -412,12 +441,12 @@ public final class TlsConfiguration
     {
         TrustManagerFactory trustManagerFactory =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init((KeyStore)null);
+        trustManagerFactory.init((KeyStore) null);
 
         List<Certificate> x509Certificates = new ArrayList<>();
         for (TrustManager tm : trustManagerFactory.getTrustManagers())
         {
-            x509Certificates.addAll(Arrays.asList(((X509TrustManager)tm).getAcceptedIssuers()));
+            x509Certificates.addAll(Arrays.asList(((X509TrustManager) tm).getAcceptedIssuers()));
         }
 
         Set<TrustAnchor> trustAnchors = new HashSet<>();
@@ -463,15 +492,20 @@ public final class TlsConfiguration
         return tlsProperties.getEnabledProtocols();
     }
 
-    public SSLContext getSslContext() throws NoSuchAlgorithmException, KeyManagementException
+    public SSLContext getSslContext(String sslType) throws NoSuchAlgorithmException, KeyManagementException
     {
         TrustManager[] trustManagers =
                 null == getTrustManagerFactory() ? null : getTrustManagerFactory().getTrustManagers();
 
-        return getSslContext(trustManagers);
+        return getSslContext(trustManagers, sslType);
     }
 
-    public SSLContext getSslContext(TrustManager[] trustManagers) throws NoSuchAlgorithmException, KeyManagementException
+    public SSLContext getSslContext() throws NoSuchAlgorithmException, KeyManagementException
+    {
+        return getSslContext(getSslType());
+    }
+
+    public SSLContext getSslContext(TrustManager[] trustManagers, String sslType) throws NoSuchAlgorithmException, KeyManagementException
     {
         KeyManager[] keyManagers =
                 null == getKeyManagerFactory() ? null : getKeyManagerFactory().getKeyManagers();
