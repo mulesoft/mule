@@ -208,16 +208,16 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     int hashCodeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
 
     int hashCodeConverterAClone = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
-    int hashCodeConverterAnotherClone =
-        new CompositeConverter(byteArrayToObjectConverter2, byteArrayToInputStreamConverter2).hashCode();
 
+    int hashCodeConverterAFakeClone =
+        new CompositeConverter(byteArrayToObjectConverter2, byteArrayToInputStreamConverter2).hashCode();
     int hashCodeConverterReverseClone =
         new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter).hashCode();
     int hashCodeConverterNotAClone =
         new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToSerializableConverter).hashCode();
 
-    assertThat(Arrays.asList(hashCodeConverterAClone, hashCodeConverterAnotherClone), everyItem(equalTo(hashCodeConverterA)));
-    assertThat(Arrays.asList(hashCodeConverterReverseClone, hashCodeConverterNotAClone),
+    assertThat(Arrays.asList(hashCodeConverterAClone), everyItem(equalTo(hashCodeConverterA)));
+    assertThat(Arrays.asList(hashCodeConverterReverseClone, hashCodeConverterNotAClone, hashCodeConverterAFakeClone),
                everyItem(not(equalTo(hashCodeConverterA))));
   }
 }
