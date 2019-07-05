@@ -6,17 +6,30 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.ast.api.ComponentAst.PostVisitAction.STOP;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.model.ComponentModel;
+
+import java.util.Optional;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
 /**
  * Specialization of {@link ComponentModel} that keeps references to a Spring bean specification.
- * 
+ *
  * @since 4.0
  */
-public class SpringComponentModel extends ComponentModel {
+public class SpringComponentModel extends ComponentModel implements ComponentAst {
 
   // TODO MULE-9688 Remove this attributes since should not be part of this class. This class should be immutable.
   private BeanReference beanReference;
@@ -50,4 +63,106 @@ public class SpringComponentModel extends ComponentModel {
     return beanReference;
   }
 
+  @Override
+  public ComponentLocation getLocation() {
+    return getComponentLocation();
+  }
+
+  @Override
+  public Optional<String> getName() {
+    return ofNullable(getParameters().get(NAME_ATTRIBUTE_NAME));
+  }
+
+  @Override
+  public Optional<String> getRawParameterValue(String paramName) {
+    return ofNullable(getParameters().get(paramName));
+  }
+
+  @Override
+  public void visitRecursively(ComponentAstVisitor visitor) {
+    if (STOP == visitor.visit(this)) {
+      return;
+    }
+
+    getInnerComponents().forEach(c -> ((ComponentAst) c).visitRecursively(visitor));
+  }
+
+  @Override
+  public Stream<ComponentAst> recursiveStream() {
+    return StreamSupport.stream(recursiveSpliterator(), false);
+  }
+
+  @Override
+  public Predicate<? super ComponentAst> directChildrenPredicate() {
+    // different components may have the same definition in a same AST. That's why identity is used here rather than equality.
+    return comp -> getInnerComponents().stream().anyMatch(inner -> inner == comp);
+  }
+
+  @Override
+  public Spliterator<ComponentAst> recursiveSpliterator() {
+    return new Spliterator<ComponentAst>() {
+
+      private boolean rootProcessed = false;
+
+      private Spliterator<ComponentAst> currentChildSpliterator;
+
+      private Spliterator<ComponentAst> innerSpliterator;
+
+      @Override
+      public boolean tryAdvance(Consumer<? super ComponentAst> action) {
+        return doTryAdvance(action);
+      }
+
+      protected boolean doTryAdvance(Consumer<? super ComponentAst> action) {
+        if (!rootProcessed) {
+          rootProcessed = true;
+          action.accept(SpringComponentModel.this);
+          return true;
+        }
+
+        if (innerSpliterator == null) {
+          innerSpliterator = getInnerComponents().stream().map(ic -> (ComponentAst) ic).spliterator();
+        }
+
+        if (currentChildSpliterator != null) {
+          if (currentChildSpliterator.tryAdvance(action)) {
+            return true;
+          } else {
+            currentChildSpliterator = null;
+            return doTryAdvance(action);
+          }
+        } else {
+          if (innerSpliterator.tryAdvance(cm -> {
+            currentChildSpliterator = cm.recursiveSpliterator();
+          })) {
+            return doTryAdvance(action);
+          } else {
+            return false;
+          }
+        }
+      }
+
+      @Override
+      public Spliterator<ComponentAst> trySplit() {
+        if (innerSpliterator == null) {
+          innerSpliterator = getInnerComponents().stream().map(ic -> (ComponentAst) ic).spliterator();
+        }
+        // return innerSpliterator.trySplit();
+        return null;
+      }
+
+      @Override
+      public long estimateSize() {
+        return 1 + getInnerComponents().stream()
+            .mapToLong(inner -> ((ComponentAst) inner).recursiveSpliterator().estimateSize())
+            .sum();
+      }
+
+      @Override
+      public int characteristics() {
+        return ORDERED | DISTINCT | SIZED | NONNULL | IMMUTABLE | SUBSIZED;
+      }
+
+    };
+  }
 }
