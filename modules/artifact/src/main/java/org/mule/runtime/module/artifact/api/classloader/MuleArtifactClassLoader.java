@@ -15,10 +15,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -33,6 +29,11 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.mule.module.artifact.classloader.soft.buster.ComposedSoftReferenceBuster;
+import org.mule.module.artifact.classloader.soft.buster.ThreadGroupContextClassLoaderSoftReferenceBuster;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.slf4j.Logger;
 
 /**
@@ -112,6 +113,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
+    ComposedSoftReferenceBuster.registerBuster(this, new ThreadGroupContextClassLoaderSoftReferenceBuster(this));
   }
 
   @Override
@@ -277,7 +279,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       LOGGER.error("Cannot create resource releaser instance", e);
     }
     super.dispose();
+
     shutdownListeners();
+    ComposedSoftReferenceBuster.getInstance().bustSoftReferences(this);
   }
 
   void reportPossibleLeak(Exception e, String artifactId) {
