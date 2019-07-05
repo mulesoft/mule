@@ -18,6 +18,7 @@ import org.mule.api.transformer.TransformerMessagingException;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Composes many converters to behave as a single one.
@@ -265,5 +266,26 @@ public class CompositeConverter implements Converter
     public String toString()
     {
         return this.getClass().getSimpleName() + "[name: " + getName() + "; chain: " + getConverters().toString() + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        try {
+            CompositeConverter compositeConverter = (CompositeConverter) o;
+            if (!this.getName().equals(compositeConverter.getName())) {
+                return false;
+            }
+            return this.getConverters().equals(compositeConverter.getConverters());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.getConverters());
     }
 }
