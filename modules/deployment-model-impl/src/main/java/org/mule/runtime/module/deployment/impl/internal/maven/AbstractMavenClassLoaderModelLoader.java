@@ -166,7 +166,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .collect(toSet());
     }
 
-    // TODO MULE-17114 retriev this data from the json if present, if not then call this
+    // TODO MULE-17114 retrieve this data from the json if present, if not then call this
     populateNotImportingPackages(artifactFile, classLoaderModelBuilder, bundleDependencies);
 
     classLoaderModelBuilder.dependingOn(bundleDependencies);
