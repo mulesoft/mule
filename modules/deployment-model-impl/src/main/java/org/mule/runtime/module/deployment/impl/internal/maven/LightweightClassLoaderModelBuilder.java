@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -19,7 +17,6 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
@@ -35,8 +32,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.vdurmont.semver4j.Semver;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 
@@ -123,59 +118,6 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     this.exportingResources(jarInfo.getResources());
     resolvedBundleDependency.getTransitiveDependencies()
         .forEach(this::exportBundleDependencyAndTransitiveDependencies);
-  }
-
-  private void updateAdditionalDependencyOrFail(List<org.mule.maven.client.api.model.BundleDependency> additionalDependencies,
-                                                org.mule.maven.client.api.model.BundleDependency bundleDependency) {
-    Reference<org.mule.maven.client.api.model.BundleDependency> replace = new Reference<>();
-    additionalDependencies.stream()
-        .filter(additionalBundleDependency -> StringUtils.equals(additionalBundleDependency.getDescriptor().getGroupId(),
-                                                                 bundleDependency.getDescriptor().getGroupId())
-            &&
-            StringUtils.equals(additionalBundleDependency.getDescriptor().getArtifactId(),
-                               bundleDependency.getDescriptor().getArtifactId()))
-        .findFirst()
-        .map(additionalBundleDependency -> {
-          String additionalBundleDependencyVersion = additionalBundleDependency.getDescriptor().getVersion();
-          String bundleDependencyVersion = bundleDependency.getDescriptor().getVersion();
-          if (areSameMajor(bundleDependencyVersion, additionalBundleDependencyVersion)) {
-            if (isNewerVersion(bundleDependencyVersion, additionalBundleDependencyVersion)) {
-              replace.set(additionalBundleDependency);
-            }
-          } else {
-            throw new MuleRuntimeException(createStaticMessage("Attempting to add different major versions of the same dependency as additional plugin dependency. If this is not explicitly defined, check transitive dependencies."
-                +
-                lineSeparator() +
-                "These are: " +
-                lineSeparator() +
-                additionalBundleDependency.toString() +
-                lineSeparator() +
-                bundleDependency.toString()));
-          }
-          return true;
-        }).orElseGet(
-                     () -> additionalDependencies.add(bundleDependency));
-    if (replace.get() != null) {
-      additionalDependencies.remove(replace.get());
-      additionalDependencies.add(bundleDependency);
-    }
-  }
-
-  private boolean isNewerVersion(String dependencyA, String dependencyB) {
-    try {
-      return new Semver(dependencyA, LOOSE).isGreaterThan(new Semver(dependencyB, LOOSE));
-    } catch (IllegalArgumentException e) {
-      // If not using semver lets just compare the strings.
-      return dependencyA.compareTo(dependencyB) > 0;
-    }
-  }
-
-  private boolean areSameMajor(String dependencyA, String dependencyB) {
-    try {
-      return new Semver(dependencyA, LOOSE).getMajor().equals(new Semver(dependencyB, LOOSE).getMajor());
-    } catch (IllegalArgumentException e) {
-      return false;
-    }
   }
 
   @Override
