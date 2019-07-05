@@ -202,6 +202,6 @@ public final class CompositeConverter extends AbstractComponent implements Conve
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(this.getConverters());
+    return Objects.hash(this.getConverters(), this.getName());
   }
 }
