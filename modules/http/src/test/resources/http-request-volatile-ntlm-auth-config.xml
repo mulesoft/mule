@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="staticNtlm" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="Beeblebrox"/>
+    </http:request-config>
+
+    <flow name="staticConfiguredNtlmAuth">
+        <set-payload value="Test Message" />
+        <http:request config-ref="staticNtlm" path="" method="POST"/>
+    </flow>
+
+
+    <http:request-config name="dynamicNtlm" host="localhost" port="${httpPort}">
+        <http:ntlm-authentication username="Zaphod" password="#[flowVars.password]"/>
+    </http:request-config>
+
+    <flow name="dynamicConfiguredNtlmAuth">
+        <set-variable variableName="password" value="#[payload]"></set-variable>
+        <http:request config-ref="dynamicNtlm" path="" method="POST"/>
+    </flow>
+
+</mule>
