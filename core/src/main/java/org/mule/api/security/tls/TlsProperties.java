@@ -122,6 +122,5 @@ public class TlsProperties
     public void overrideEnabledCipherSuites(String[] enabledCipherSuites)
     {
         this.enabledCipherSuites = enabledCipherSuites;
-        
     }
 }

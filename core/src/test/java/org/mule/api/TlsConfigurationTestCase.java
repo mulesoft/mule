@@ -7,14 +7,13 @@
 package org.mule.api;
 
 import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.api.config.MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY;
 import static org.mule.api.security.tls.TlsConfiguration.DEFAULT_KEYSTORE;
@@ -29,8 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashSet;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -43,8 +40,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.SecurityUtils;
-
-import junit.framework.Assert;
 
 public class TlsConfigurationTestCase extends AbstractMuleTestCase
 {
@@ -147,8 +142,8 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
             SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
 
-            Assert.assertEquals(new HashSet<String>(Arrays.asList(supportedCipherSuites)), new HashSet<String>(Arrays.asList(socket.getEnabledCipherSuites())));
-            Assert.assertEquals(new HashSet<String>(Arrays.asList(supportedCipherSuites)), new HashSet<String>(Arrays.asList(socket.getEnabledCipherSuites())));
+            assertThat(socket.getEnabledCipherSuites(), arrayContainingInAnyOrder(supportedCipherSuites));
+            assertThat(serverSocket.getEnabledCipherSuites(), arrayContainingInAnyOrder(supportedCipherSuites));
         }
         finally
         {
@@ -169,8 +164,8 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
             SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
 
-            assertThat(new String[] {SUPPORTED_PROTOCOL}, equalTo(socket.getEnabledProtocols()));
-            assertThat(new String[] {SUPPORTED_PROTOCOL}, equalTo(serverSocket.getEnabledProtocols()));
+            assertThat(socket.getEnabledProtocols(), arrayContainingInAnyOrder(new String[] {SUPPORTED_PROTOCOL}));
+            assertThat(serverSocket.getEnabledProtocols(), arrayContainingInAnyOrder(new String[] {SUPPORTED_PROTOCOL}));
         }
         finally
         {
@@ -212,10 +207,10 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             SSLSocketFactory protocolSocketFactory = sslContext.getSocketFactory();
             SSLServerSocketFactory protocolServerSocketFactory = sslContext.getServerSocketFactory();
 
-            assertThat(socketFactory.getDefaultCipherSuites(), arrayContainingInAnyOrder(protocolSocketFactory.getDefaultCipherSuites()));
+            assertThat(socketFactory.getDefaultCipherSuites(), arrayWithSize(protocolSocketFactory.getDefaultCipherSuites().length));
             assertThat(socketFactory.getDefaultCipherSuites(),
                     is(arrayContainingInAnyOrder(protocolSocketFactory.getDefaultCipherSuites())));
-            assertThat(serverSocketFactory.getDefaultCipherSuites(), arrayContainingInAnyOrder(protocolServerSocketFactory.getDefaultCipherSuites()));
+            assertThat(serverSocketFactory.getDefaultCipherSuites(), arrayWithSize(protocolServerSocketFactory.getDefaultCipherSuites().length));
             assertThat(serverSocketFactory.getDefaultCipherSuites(),
                     is(arrayContainingInAnyOrder(protocolServerSocketFactory.getDefaultCipherSuites())));
         }
@@ -263,7 +258,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             TlsConfiguration tlsConfiguration = new TlsConfiguration(DEFAULT_KEYSTORE);
             tlsConfiguration.initialise(true, JSSE_NAMESPACE);
 
-            assertThat(new String[] {"TEST"}, arrayContainingInAnyOrder(tlsConfiguration.getEnabledCipherSuites()));
+            assertThat(tlsConfiguration.getEnabledCipherSuites(), arrayContainingInAnyOrder(new String[] {"TEST"}));
         }
         finally
         {
