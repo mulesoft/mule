@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 
 import java.net.URI;
 import java.util.Set;
@@ -28,7 +29,7 @@ public final class BundleDependency {
   private BundleDependency() {}
 
   public BundleScope getScope() {
-    return scope;
+    return scope != null ? scope : COMPILE;
   }
 
   public BundleDescriptor getDescriptor() {
@@ -66,7 +67,7 @@ public final class BundleDependency {
     private static final String BUNDLE_DESCRIPTOR = "bundle descriptor";
     private static final String REQUIRED_FIELD_IS_NULL = "bundle cannot be created with null %s";
 
-    private BundleDependency bundleDependency = new BundleDependency();
+    private final BundleDependency bundleDependency = new BundleDependency();
 
     public Builder() {}
 

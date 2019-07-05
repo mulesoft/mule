@@ -68,6 +68,9 @@ import java.util.Properties;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+
 /**
  * Contains test for domain deployment
  */
@@ -208,7 +211,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   public void deploysDomainWithSharedLibPrecedenceOverApplicationPluginLib() throws Exception {
     final String domainId = "shared-lib";
     final ArtifactPluginFileBuilder pluginFileBuilder =
-        new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
             .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
             .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
 
@@ -226,6 +229,39 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("MULE-17112")
+  @Description("If a plugin uses a library and the domain sets another version of that library as a sharedLib, the plugin internally uses its own version of the lib and not the domain's.")
+  public void pluginWithDependencyAndConflictingVersionSharedByApp() throws Exception {
+    ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+
+    final String domainId = "shared-lib";
+    final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
+        .definedBy("empty-domain-config.xml");
+
+    final ApplicationFileBuilder differentLibPluginAppFileBuilder =
+        new ApplicationFileBuilder("appInDomainWithLibDifferentThanPlugin")
+            .definedBy("app-plugin-different-lib-config.xml")
+            .dependingOn(echoPluginWithLib1)
+            .dependingOn(domainFileBuilder)
+            .containingClass(new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
+                .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java")), "org/foo/echo/Plugin2Echo.class");
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, differentLibPluginAppFileBuilder.getId());
 
     executeApplicationFlow("main");
   }

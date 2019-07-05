@@ -186,7 +186,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                          "org/foo/EchoTest.class");
 
     // Application plugin artifact builders
-    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
         .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
         .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
@@ -1287,7 +1288,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   public void deploysAppWithExportedPackagePrecedenceOverPlugin() throws Exception {
     // Defines a plugin that contains org.bar package, which is also exported on the application
     ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
         .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
         .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
 
@@ -1302,6 +1303,55 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppFileBuilder.getId());
     assertAppsDir(NONE, new String[] {sharedLibPluginAppFileBuilder.getId()}, true);
     assertApplicationAnchorFileExists(sharedLibPluginAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("MULE-17112")
+  @Description("If a plugin uses a library and the application sets another version of that library as a sharedLib, the plugin internally uses its own version of the lib and not the app's. "
+      + "Similar to deploysAppWithLibDifferentThanPlugin, but the bar2 dep in the app is shared in this case")
+  public void pluginWithDependencyAndConflictingVersionSharedByApp() throws Exception {
+    final ApplicationFileBuilder differentLibPluginAppFileBuilder = appFileBuilder("appWithLibDifferentThanPlugin")
+        .definedBy("app-plugin-different-lib-config.xml")
+        .dependingOn(echoPluginWithLib1)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
+        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class");
+
+    addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, differentLibPluginAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Description("Ensure that when a plugin2 depends on plugin1, when using something exported from plugin1, that is used")
+  public void pluginDependingAndExportingFromOtherPlugin() throws Exception {
+    ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
+        .dependingOn(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+
+    // this plugin depends on a version of bar but will actually use the one from the dependant plugin
+    ArtifactPluginFileBuilder echoPluginWithLib2 = new ArtifactPluginFileBuilder("echoPlugin2")
+        // org.foo and org.bar are exported because plugin1 exports them.
+        // Similar to how the dependency beteween http and sockets work.
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo,org.foo,org.bar")
+        .dependingOn(echoPluginWithLib1)
+        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class");
+
+    final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin3")
+        .definedBy("app-with-echo2-plugin-config.xml")
+        .dependingOn(echoPluginWithLib2);
+
+    addPackedAppFromBuilder(usesPlugin2);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, usesPlugin2.getId());
 
     executeApplicationFlow("main");
   }
@@ -2033,25 +2083,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-  }
-
-  @Test
-  @Description("If a plugin uses a library and the application sets another version of that library as a sharedLib, the plugin internally uses its own version of the lib and not the app's. "
-      + "Similar to deploysAppWithLibDifferentThanPlugin, but the bar2 dep in the app is shared in this case")
-  public void pluginWithDependencyAndConflictingVersionSharedByapp() throws Exception {
-    final ApplicationFileBuilder differentLibPluginAppFileBuilder = appFileBuilder("appWithLibDifferentThanPlugin")
-        .definedBy("app-plugin-different-lib-config.xml")
-        .dependingOn(echoPluginWithLib1)
-        .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
-        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class");
-
-    addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
-
-    startDeployment();
-
-    assertDeploymentSuccess(applicationDeploymentListener, differentLibPluginAppFileBuilder.getId());
-
-    executeApplicationFlow("main");
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
