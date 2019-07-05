@@ -503,7 +503,7 @@ public class GrizzlyHttpClient implements HttpClient
                                                                               .setPrincipal(authentication.getUsername())
                                                                               .setPassword(authentication.getPassword())
                                                                               .setUsePreemptiveAuth(authentication.isPreemptive())
-                                                                              .setCredentialsMayVary(authentication.credentialsMayVary());
+                                                                              .setForceConnectionClose(authentication.credentialsMayVary());
 
 
                     if (authentication.getType() == HttpAuthenticationType.BASIC)
