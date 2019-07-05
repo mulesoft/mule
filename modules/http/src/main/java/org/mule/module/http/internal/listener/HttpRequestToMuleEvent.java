@@ -54,6 +54,8 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestToMuleEvent
 {
 
+    private static final String REPEATED_HEADERS_LOG_FORMAT =
+      "'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'MULE_CORRELATION_ID' will be used.";
     private static Logger LOGGER = LoggerFactory.getLogger(HttpMessagePropertiesResolver.class);
     public static final BackwardsCompatibilityPropertyChecker
       IGNORE_CORRELATION_ID = new BackwardsCompatibilityPropertyChecker(COMPATIBILITY_IGNORE_CORRELATION_ID);
@@ -177,8 +179,11 @@ public class HttpRequestToMuleEvent
         {
             if (xCorrelationId != null)
             {
-                LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'MULE_CORRELATION_ID' will be used.",
-                            xCorrelationId, muleCorrelationId);
+                if (muleCorrelationId.equals(xCorrelationId)) {
+                    LOGGER.debug(REPEATED_HEADERS_LOG_FORMAT, xCorrelationId, muleCorrelationId);
+                } else {
+                    LOGGER.warn(REPEATED_HEADERS_LOG_FORMAT, xCorrelationId, muleCorrelationId);
+                }
             }
             defaultMuleMessage.setCorrelationId(muleCorrelationId);
         }
