@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -378,6 +379,7 @@ public abstract class ComponentModel {
     public Builder setTextContent(String textContent) {
       checkIsNotBuildingFromRootComponentModel("textComponent");
       this.model.textContent = textContent;
+      this.model.parameters.put(BODY_RAW_PARAM_NAME, textContent);
       return this;
     }
 
