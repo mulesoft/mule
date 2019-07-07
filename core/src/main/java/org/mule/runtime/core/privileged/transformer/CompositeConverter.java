@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Composes many converters to behave as a single one.
@@ -181,5 +182,26 @@ public final class CompositeConverter extends AbstractComponent implements Conve
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + "[name: " + getName() + "; chain: " + getConverters().toString() + "]";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    try {
+      CompositeConverter compositeConverter = (CompositeConverter) o;
+      if (!this.getName().equals(compositeConverter.getName())) {
+        return false;
+      }
+      return this.getConverters().equals(compositeConverter.getConverters());
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.getConverters(), this.getName());
   }
 }
