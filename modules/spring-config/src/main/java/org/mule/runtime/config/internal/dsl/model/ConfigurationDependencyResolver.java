@@ -18,11 +18,9 @@ import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.UNNAMED_TOP_LEVEL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -44,8 +42,8 @@ public class ConfigurationDependencyResolver {
 
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
-  private final List<DependencyNode> missingElementNames = new ArrayList<>();
-  private final Set<DependencyNode> alwaysEnabledComponents = newHashSet();
+  private List<DependencyNode> missingElementNames = new ArrayList<>();
+  private Set<DependencyNode> alwaysEnabledComponents = newHashSet();
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -62,16 +60,15 @@ public class ConfigurationDependencyResolver {
     fillAlwaysEnabledComponents();
   }
 
-  private Set<DependencyNode> resolveComponentModelDependencies(ComponentAst componentModel) {
+  private Set<DependencyNode> resolveComponentModelDependencies(ComponentModel componentModel) {
     final Set<DependencyNode> otherRequiredGlobalComponents = resolveComponentDependencies(componentModel);
     return findComponentModelsDependencies(otherRequiredGlobalComponents);
   }
 
-  protected Set<DependencyNode> resolveComponentDependencies(ComponentAst requestedComponentModel) {
+  protected Set<DependencyNode> resolveComponentDependencies(ComponentModel requestedComponentModel) {
     Set<DependencyNode> otherDependencies = new HashSet<>();
-    ((ComponentModel) requestedComponentModel).getInnerComponents()
-        .stream()
-        .forEach(childComponent -> otherDependencies.addAll(resolveComponentDependencies((ComponentAst) childComponent)));
+    requestedComponentModel.getInnerComponents()
+        .stream().forEach(childComponent -> otherDependencies.addAll(resolveComponentDependencies(childComponent)));
     final Set<String> parametersReferencingDependencies = new HashSet<>();
     componentBuildingDefinitionRegistry.getBuildingDefinition(requestedComponentModel.getIdentifier())
         .ifPresent(buildingDefinition -> buildingDefinition.getAttributesDefinitions()
@@ -97,8 +94,8 @@ public class ConfigurationDependencyResolver {
                 @Override
                 public void onReferenceConfigurationParameter(String parameterName, Object defaultValue,
                                                               Optional<TypeConverter> typeConverter) {
-                  if (requestedComponentModel.getRawParameterValue(parameterName).isPresent()
-                      && !isExpression(requestedComponentModel.getRawParameterValue(parameterName).orElse(null))) {
+                  if (requestedComponentModel.getParameters().containsKey(parameterName)
+                      && !isExpression(requestedComponentModel.getParameters().get(parameterName))) {
                     parametersReferencingDependencies.add(parameterName);
                   }
                 }
@@ -107,7 +104,7 @@ public class ConfigurationDependencyResolver {
             }));
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
-      if (requestedComponentModel.getRawParameterValue(parametersReferencingDependency).isPresent()) {
+      if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
         appendTopLevelDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
       }
     }
@@ -117,7 +114,7 @@ public class ConfigurationDependencyResolver {
       appendTopLevelDependency(otherDependencies, requestedComponentModel, "name");
     } else if (isAggregatorComponent(requestedComponentModel, "aggregatorName")) {
       // TODO (MULE-14429): use extensionModel to get the dependencies instead of ComponentBuildingDefinition to solve cases like this (flow-ref)
-      String name = requestedComponentModel.getRawParameterValue("aggregatorName").orElse(null);
+      String name = requestedComponentModel.getParameters().get("aggregatorName");
       DependencyNode dependency = new DependencyNode(name, INNER);
       if (applicationModel.findNamedElement(name).isPresent()) {
         otherDependencies.add(dependency);
@@ -149,10 +146,10 @@ public class ConfigurationDependencyResolver {
     return foundDependencies;
   }
 
-  private void appendTopLevelDependency(Set<DependencyNode> otherDependencies, ComponentAst requestedComponentModel,
+  private void appendTopLevelDependency(Set<DependencyNode> otherDependencies, ComponentModel requestedComponentModel,
                                         String parametersReferencingDependency) {
     DependencyNode dependency =
-        new DependencyNode(requestedComponentModel.getRawParameterValue(parametersReferencingDependency).orElse(null), TOP_LEVEL);
+        new DependencyNode(requestedComponentModel.getParameters().get(parametersReferencingDependency), TOP_LEVEL);
     if (applicationModel.findTopLevelNamedComponent(dependency.getComponentName()).isPresent()) {
       otherDependencies.add(dependency);
     } else {
@@ -164,13 +161,13 @@ public class ConfigurationDependencyResolver {
     return componentIdentifier.getNamespace().equals(CORE_PREFIX) && componentIdentifier.getName().equals(name);
   }
 
-  private boolean isAggregatorComponent(ComponentAst componentModel, String referenceNameParameter) {
+  private boolean isAggregatorComponent(ComponentModel componentModel, String referenceNameParameter) {
     return componentModel.getIdentifier().getNamespace().equals("aggregators")
-        && componentModel.getRawParameterValue(referenceNameParameter).isPresent();
+        && componentModel.getParameters().containsKey(referenceNameParameter);
   }
 
-  private ComponentAst findRequiredComponentModel(String name) {
-    return (ComponentAst) applicationModel.findNamedElement(name)
+  private ComponentModel findRequiredComponentModel(String name) {
+    return applicationModel.findNamedElement(name)
         .orElseThrow(() -> new NoSuchComponentModelException(createStaticMessage("No named component with name " + name)));
   }
 
@@ -206,7 +203,7 @@ public class ConfigurationDependencyResolver {
   //TODO (MULE-14453: When creating ApplicationModel and ComponentModels inner beans should have a name so they can be later retrieved)
   public Collection<String> resolveComponentDependencies(String componentName) {
     try {
-      ComponentAst requiredComponentModel = findRequiredComponentModel(componentName);
+      ComponentModel requiredComponentModel = findRequiredComponentModel(componentName);
       return resolveComponentModelDependencies(requiredComponentModel)
           .stream()
           .filter(dependencyNode -> dependencyNode.isTopLevel())
@@ -221,11 +218,11 @@ public class ConfigurationDependencyResolver {
     return applicationModel;
   }
 
-  public List<ComponentAst> findRequiredComponentModels(Predicate<ComponentAst> predicate) {
-    List<ComponentAst> components = new ArrayList<>();
+  public List<ComponentModel> findRequiredComponentModels(Predicate<ComponentModel> predicate) {
+    List<ComponentModel> components = new ArrayList<>();
     applicationModel.executeOnEveryComponentTree(componentModel -> {
-      if (predicate.test((ComponentAst) componentModel)) {
-        components.add((ComponentAst) componentModel);
+      if (predicate.test(componentModel)) {
+        components.add(componentModel);
       }
     });
     return components;
