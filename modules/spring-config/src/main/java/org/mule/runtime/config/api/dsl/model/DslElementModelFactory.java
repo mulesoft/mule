@@ -9,13 +9,14 @@ package org.mule.runtime.config.api.dsl.model;
 import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.app.declaration.api.ElementDeclaration;
-import org.mule.runtime.config.internal.dsl.model.DefaultDslElementModelFactory;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.internal.dsl.model.DefaultDslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
 import java.util.Optional;
@@ -73,7 +74,27 @@ public interface DslElementModelFactory {
    *         on the {@link ExtensionModel extensions} provided as resolution context, or {@link Optional#empty} if no
    *         {@link DslElementModel} could be created for the given {@code applicationElement} with the current extensions
    *         context.
+   *
+   * @deprecated Use {@link #create(ComponentAst)} instead.
    */
+  @Deprecated
   <T> Optional<DslElementModel<T>> create(ComponentConfiguration componentConfiguration);
+
+  /**
+   * Resolves the {@link DslElementModel} for the given {@link ComponentAst applicationElement}, providing an element with all the
+   * required information for representing this {@code applicationElement} element in the DSL and binding it to its
+   * {@link ExtensionModel model} component or {@link MetadataType}. This resolution can only be performed from DSL
+   * top-level-elements, which have global representations in the {@link ExtensionModel}, so this method will return an
+   * {@link Optional#empty} result if the given {@code applicationElement} does not identify either a {@link ConfigurationModel},
+   * {@link OperationModel}, {@link SourceModel} or an {@link ObjectType} than can be expressed as an explicit top level element.
+   *
+   * @param componentConfiguration the {@link ComponentAst} for which its {@link DslElementModel} representation is required.
+   * @param <T> the expected model type of the {@link DslElementModel element}
+   * @return a {@link DslElementModel} representation of the {@link ComponentAst} if one is possible to be built based on the
+   *         {@link ExtensionModel extensions} provided as resolution context, or {@link Optional#empty} if no
+   *         {@link DslElementModel} could be created for the given {@code applicationElement} with the current extensions
+   *         context.
+   */
+  <T> Optional<DslElementModel<T>> create(ComponentAst componentConfiguration);
 
 }
