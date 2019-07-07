@@ -7,8 +7,11 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.Every.everyItem;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -23,6 +26,11 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
+
+import org.mule.runtime.core.internal.transformer.simple.ByteArrayToInputStream;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -46,8 +54,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     Converter converter = mock(Converter.class);
     when(converter.isSourceDataTypeSupported(DataType.STRING)).thenReturn(true);
     CompositeConverter chain = new CompositeConverter(converter);
-
-    assertTrue(chain.isSourceDataTypeSupported(DataType.STRING));
+    assertThat(chain.isSourceDataTypeSupported(DataType.STRING), equalTo(true));
   }
 
   @Test
@@ -57,7 +64,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     when(converter.getSourceDataTypes()).thenReturn(Arrays.asList(dataTypes));
     CompositeConverter chain = new CompositeConverter(converter);
 
-    assertEquals(DataType.STRING, chain.getSourceDataTypes().get(0));
+    assertThat(DataType.STRING, equalTo(chain.getSourceDataTypes().get(0)));
   }
 
   @Test
@@ -66,7 +73,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     when(converter.isAcceptNull()).thenReturn(true);
     CompositeConverter chain = new CompositeConverter(converter);
 
-    assertTrue(chain.isAcceptNull());
+    assertThat(chain.isAcceptNull(), equalTo(true));
   }
 
   @Test
@@ -75,7 +82,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     when(converter.isIgnoreBadInput()).thenReturn(true);
     CompositeConverter chain = new CompositeConverter(converter);
 
-    assertTrue(chain.isIgnoreBadInput());
+    assertThat(chain.isIgnoreBadInput(), equalTo(true));
   }
 
   @Test
@@ -92,7 +99,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     doReturn(DataType.STRING).when(mockConverterB).getReturnDataType();
     CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-    assertEquals(DataType.STRING, compositeConverter.getReturnDataType());
+    assertThat(DataType.STRING, equalTo(compositeConverter.getReturnDataType()));
   }
 
   @Test
@@ -103,7 +110,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
     int priorityWeighting = compositeConverter.getPriorityWeighting();
 
-    assertEquals(3, priorityWeighting);
+    assertThat(3, equalTo(priorityWeighting));
   }
 
   @Test
@@ -149,7 +156,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
     verify(mockConverterA, times(1)).transform("MyInput");
     verify(mockConverterB, times(1)).transform("MyOutput1", UTF_8);
-    assertEquals("MyOutput2", output);
+    assertThat("MyOutput2", equalTo(output));
   }
 
   @Test
@@ -166,5 +173,43 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
     verify(transformationService, times(1)).applyTransformers(eq(testEvent().getMessage()), eq(testEvent()),
                                                               eq(compositeConverter));
+  }
+
+  @Test
+  public void equalsReturnsTrueOnCompositeConvertersWithSameNameAndSameTransformationChain() {
+    Converter byteArrayToObjectConverter = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+
+    assertThat(compositeConverterA, equalTo(compositeConverterB));
+  }
+
+
+  @Test
+  public void equalsReturnsFalseOnCompositeConvertersWithDifferentTransformationChain() {
+    Converter byteArrayToObjectConverter = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter);
+
+    assertThat(compositeConverterA, not(equalTo(compositeConverterB)));
+  }
+
+  @Test
+  public void hashCodeForCompositeConvertersChangesWithDifferentTransformationChain() {
+    Converter byteArrayToObjectConverter = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+
+    Converter byteArrayToObjectConverter2 = new ByteArrayToObject();
+    Converter byteArrayToInputStreamConverter2 = new ByteArrayToInputStream();
+
+    int hashCodeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+
+    int hashCodeConverterAClone = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+    int hashCodeConverterAnotherClone =
+        new CompositeConverter(byteArrayToObjectConverter2, byteArrayToInputStreamConverter2).hashCode();
+
+    assertThat(Arrays.asList(hashCodeConverterAClone, hashCodeConverterAnotherClone), everyItem(equalTo(hashCodeConverterA)));
   }
 }
