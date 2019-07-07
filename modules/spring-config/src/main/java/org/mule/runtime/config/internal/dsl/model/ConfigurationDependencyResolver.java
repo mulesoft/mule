@@ -18,9 +18,11 @@ import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.UNNAMED_TOP_LEVEL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -42,8 +44,8 @@ public class ConfigurationDependencyResolver {
 
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
-  private List<DependencyNode> missingElementNames = new ArrayList<>();
-  private Set<DependencyNode> alwaysEnabledComponents = newHashSet();
+  private final List<DependencyNode> missingElementNames = new ArrayList<>();
+  private final Set<DependencyNode> alwaysEnabledComponents = newHashSet();
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -218,11 +220,11 @@ public class ConfigurationDependencyResolver {
     return applicationModel;
   }
 
-  public List<ComponentModel> findRequiredComponentModels(Predicate<ComponentModel> predicate) {
-    List<ComponentModel> components = new ArrayList<>();
+  public List<ComponentAst> findRequiredComponentModels(Predicate<ComponentAst> predicate) {
+    List<ComponentAst> components = new ArrayList<>();
     applicationModel.executeOnEveryComponentTree(componentModel -> {
-      if (predicate.test(componentModel)) {
-        components.add(componentModel);
+      if (predicate.test((ComponentAst) componentModel)) {
+        components.add((ComponentAst) componentModel);
       }
     });
     return components;

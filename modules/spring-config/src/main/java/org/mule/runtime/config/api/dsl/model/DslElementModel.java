@@ -9,10 +9,13 @@ package org.mule.runtime.config.api.dsl.model;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
@@ -89,6 +92,10 @@ public class DslElementModel<T> {
    */
   public Optional<ComponentConfiguration> getConfiguration() {
     return Optional.ofNullable(configuration);
+  }
+
+  public Optional<ComponentAst> getComponentModel() {
+    return configuration.getProperty(ComponentModel.COMPONENT_MODEL_KEY).map(cm -> (ComponentAst) cm);
   }
 
   /**
@@ -172,7 +179,7 @@ public class DslElementModel<T> {
     private String value;
     private DslElementSyntax dsl;
     private ComponentConfiguration configuration;
-    private Set<DslElementModel> contained = new LinkedHashSet<>();
+    private final Set<DslElementModel> contained = new LinkedHashSet<>();
     private boolean explicitInDsl = true;
 
     private Builder() {}
