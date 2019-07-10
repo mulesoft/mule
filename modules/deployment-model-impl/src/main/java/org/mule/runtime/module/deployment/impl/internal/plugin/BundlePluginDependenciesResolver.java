@@ -291,8 +291,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
         .exportingResources(originalClassLoaderModel.getExportedResources())
-        .notImportingPackages(originalClassLoaderModel.getNotImportedPackages())
-        .notImportingResources(originalClassLoaderModel.getNotImportedResources());
+        .withLocalPackages(originalClassLoaderModel.getLocalPackages())
+        .withLocalResources(originalClassLoaderModel.getLocalResources());
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }
@@ -309,8 +309,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
         .exportingResources(originalClassLoaderModel.getExportedResources())
-        .notImportingPackages(originalClassLoaderModel.getNotImportedPackages())
-        .notImportingResources(originalClassLoaderModel.getNotImportedResources());
+        .withLocalPackages(originalClassLoaderModel.getLocalPackages())
+        .withLocalResources(originalClassLoaderModel.getLocalResources());
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }

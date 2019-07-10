@@ -167,14 +167,14 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
 
     // TODO MULE-17114 retrieve this data from the json if present, if not then call this
-    populateNotImportingPackages(artifactFile, classLoaderModelBuilder, bundleDependencies);
+    populateLocalPackages(artifactFile, classLoaderModelBuilder, bundleDependencies);
 
     classLoaderModelBuilder.dependingOn(bundleDependencies);
 
     return classLoaderModelBuilder.build();
   }
 
-  protected void populateNotImportingPackages(File artifactFile, final ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
+  protected void populateLocalPackages(File artifactFile, final ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
                                               Set<BundleDependency> bundleDependencies) {
     final JarExplorer fileJarExplorer = buildJarExplorer();
 
@@ -191,8 +191,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
       final JarInfo exploredJar = fileJarExplorer.explore(dependencyArtifactUri);
 
-      classLoaderModelBuilder.notImportingPackages(exploredJar.getPackages());
-      classLoaderModelBuilder.notImportingResources(exploredJar.getResources());
+      classLoaderModelBuilder.withLocalPackages(exploredJar.getPackages());
+      classLoaderModelBuilder.withLocalResources(exploredJar.getResources());
     }
   }
 

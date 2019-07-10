@@ -34,22 +34,22 @@ public final class ClassLoaderModel {
   private final URL[] urls;
   private final Set<String> exportedPackages;
   private final Set<String> exportedResources;
-  private final Set<String> notImportedPackages;
-  private final Set<String> notImportedResources;
+  private final Set<String> localPackages;
+  private final Set<String> localResources;
   private final Set<BundleDependency> dependencies;
   private final Set<String> privilegedExportedPackages;
   private final Set<String> privilegedArtifacts;
   private final boolean includeTestDependencies;
 
   private ClassLoaderModel(URL[] urls, Set<String> exportedPackages, Set<String> exportedResources,
-                           Set<String> notImportedPackages, Set<String> notImportedResources,
+                           Set<String> localPackages, Set<String> localResources,
                            Set<BundleDependency> dependencies, Set<String> privilegedExportedPackages,
                            Set<String> privilegedArtifacts, boolean includeTestDependencies) {
     this.urls = urls;
     this.exportedPackages = exportedPackages;
     this.exportedResources = exportedResources;
-    this.notImportedPackages = notImportedPackages;
-    this.notImportedResources = notImportedResources;
+    this.localPackages = localPackages;
+    this.localResources = localResources;
     this.dependencies = dependencies;
     this.privilegedExportedPackages = privilegedExportedPackages;
     this.privilegedArtifacts = privilegedArtifacts;
@@ -81,15 +81,15 @@ public final class ClassLoaderModel {
    * @return the Java packages to be loaded from the artifact itself, even if some other artifact in the region exports it. Non
    *         null
    */
-  public Set<String> getNotImportedPackages() {
-    return notImportedPackages;
+  public Set<String> getLocalPackages() {
+    return localPackages;
   }
 
   /**
    * @return the resources to be loaded from the artifact itself, even if some other artifact in the region exports it. Non null
    */
-  public Set<String> getNotImportedResources() {
-    return notImportedResources;
+  public Set<String> getLocalResources() {
+    return localResources;
   }
 
   /**
@@ -127,8 +127,8 @@ public final class ClassLoaderModel {
 
     private final Set<String> packages = new HashSet<>();
     private final Set<String> resources = new HashSet<>();
-    private final Set<String> notImportedPackages = new HashSet<>();
-    private final Set<String> notImportedResources = new HashSet<>();
+    private final Set<String> localPackages = new HashSet<>();
+    private final Set<String> localResources = new HashSet<>();
     private List<URL> urls = new ArrayList<>();
     protected Set<BundleDependency> dependencies = new HashSet<>();
     private final Set<String> privilegedExportedPackages = new HashSet<>();
@@ -150,8 +150,8 @@ public final class ClassLoaderModel {
 
       this.packages.addAll(source.exportedPackages);
       this.resources.addAll(source.exportedResources);
-      this.notImportedPackages.addAll(source.notImportedPackages);
-      this.notImportedResources.addAll(source.notImportedResources);
+      this.localPackages.addAll(source.localPackages);
+      this.localResources.addAll(source.localResources);
       this.urls = new ArrayList<>(asList(source.urls));
       this.dependencies.addAll(source.dependencies);
       this.privilegedExportedPackages.addAll(source.privilegedExportedPackages);
@@ -188,9 +188,9 @@ public final class ClassLoaderModel {
      * @param packages packages to not import. Non null.
      * @return same builder instance.
      */
-    public ClassLoaderModelBuilder notImportingPackages(Set<String> packages) {
+    public ClassLoaderModelBuilder withLocalPackages(Set<String> packages) {
       checkArgument(packages != null, "packages cannot be null");
-      this.notImportedPackages.addAll(packages);
+      this.localPackages.addAll(packages);
       return this;
     }
 
@@ -200,9 +200,9 @@ public final class ClassLoaderModel {
      * @param resources resources to not import. Non null.
      * @return same builder instance.
      */
-    public ClassLoaderModelBuilder notImportingResources(Set<String> resources) {
+    public ClassLoaderModelBuilder withLocalResources(Set<String> resources) {
       checkArgument(resources != null, "resources cannot be null");
-      resources.stream().forEach(r -> this.notImportedResources.add(separatorsToUnix(r)));
+      resources.stream().forEach(r -> this.localResources.add(separatorsToUnix(r)));
       return this;
     }
 
@@ -267,7 +267,7 @@ public final class ClassLoaderModel {
     public ClassLoaderModel build() {
       return new ClassLoaderModel(urls.toArray(new URL[0]),
                                   unmodifiableSet(packages), unmodifiableSet(resources),
-                                  unmodifiableSet(notImportedPackages), unmodifiableSet(notImportedResources),
+                                  unmodifiableSet(localPackages), unmodifiableSet(localResources),
                                   unmodifiableSet(dependencies),
                                   unmodifiableSet(privilegedExportedPackages), unmodifiableSet(privilegedArtifacts),
                                   includeTestDependencies);

@@ -141,15 +141,15 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
       }
     }
 
-    Map<String, LookupStrategy> pluginNotImportedPolicies = new HashMap<>();
-    for (String notImportedPackage : descriptor.getClassLoaderModel().getNotImportedPackages()) {
-      pluginNotImportedPolicies.put(notImportedPackage, CHILD_ONLY);
+    Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
+    for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
+      pluginLocalPolicies.put(localPackage, CHILD_ONLY);
     }
-    for (String notImportedResource : descriptor.getClassLoaderModel().getNotImportedResources()) {
-      pluginNotImportedPolicies.put(notImportedResource, CHILD_ONLY);
+    for (String localResource : descriptor.getClassLoaderModel().getLocalResources()) {
+      pluginLocalPolicies.put(localResource, CHILD_ONLY);
     }
 
-    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginNotImportedPolicies, true);
+    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies, true);
   }
 
   private List<ArtifactPluginDescriptor> getPluginDescriptors(ArtifactPluginDescriptor descriptor,
