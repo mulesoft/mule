@@ -10,6 +10,7 @@ import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.transformer.CompositeConverter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class TransformationGraphLookupStrategy
 
     private List<Converter> createConverters(List<List<TransformationEdge>> transformationPaths)
     {
-        List<Converter> converters = new LinkedList<Converter>();
+        Set<Converter> converters = new HashSet<>();
 
         for (List<TransformationEdge> transformationPath : transformationPaths)
         {
@@ -90,7 +91,7 @@ public class TransformationGraphLookupStrategy
             converters.add(converter);
         }
 
-        return converters;
+        return new ArrayList<>(converters);
     }
 
     private List<List<TransformationEdge>> findTransformationPaths(DataType<?> source, DataType<?> target, Set<DataType<?>> visited)

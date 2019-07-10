@@ -8,6 +8,10 @@ package org.mule.transformer;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Every.everyItem;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -25,6 +29,9 @@ import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.MimeTypes;
+import org.mule.transformer.simple.ByteArrayToObject;
+import org.mule.transformer.simple.ByteArrayToSerializable;
+import org.mule.transformer.simple.ObjectToString;
 
 import java.util.Arrays;
 
@@ -259,5 +266,51 @@ public class CompositeConverterTestCase
         compositeConverter.process(event);
 
         verify(message, times(1)).applyTransformers(event, compositeConverter);
+    }
+
+    @Test
+    public void equalsReturnsTrueOnCompositeConvertersWithSameNameAndSameTransformationChain() {
+        Converter byteArrayToObjectConverter = new ByteArrayToObject();
+        Converter byteArrayToInputStreamConverter = new ObjectToString();
+        CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+        CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+
+        assertThat(compositeConverterA, equalTo(compositeConverterB));
+    }
+
+
+    @Test
+    public void equalsReturnsFalseOnCompositeConvertersWithDifferentTransformationChain() {
+        Converter byteArrayToObjectConverter = new ByteArrayToObject();
+        Converter byteArrayToInputStreamConverter = new ObjectToString();
+        CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+        CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter);
+
+        assertThat(compositeConverterA, not(equalTo(compositeConverterB)));
+    }
+
+    @Test
+    public void hashCodeForCompositeConvertersChangesWithDifferentTransformationChain() {
+        Converter byteArrayToObjectConverter = new ByteArrayToObject();
+        Converter byteArrayToInputStreamConverter = new ObjectToString();
+
+        Converter byteArrayToObjectConverter2 = new ByteArrayToObject();
+        Converter byteArrayToInputStreamConverter2 = new ObjectToString();
+        Converter byteArrayToSerializableConverter = new ByteArrayToSerializable();
+
+        int hashCodeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+
+        int hashCodeConverterAClone = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+        int hashCodeConverterAnotherClone =
+                new CompositeConverter(byteArrayToObjectConverter2, byteArrayToInputStreamConverter2).hashCode();
+
+        int hashCodeConverterReverseClone =
+                new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter).hashCode();
+        int hashCodeConverterNotAClone =
+                new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToSerializableConverter).hashCode();
+
+        assertThat(Arrays.asList(hashCodeConverterAClone), everyItem(equalTo(hashCodeConverterA)));
+        assertThat(Arrays.asList(hashCodeConverterReverseClone, hashCodeConverterNotAClone, hashCodeConverterAnotherClone),
+                everyItem(not(equalTo(hashCodeConverterA))));
     }
 }
