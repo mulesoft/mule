@@ -8,7 +8,7 @@ package org.mule.runtime.core.api;
 
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
-import org.mule.runtime.core.internal.secutiry.tls.TlsPropertiesSocketFactory;
+import org.mule.runtime.core.internal.security.tls.TlsPropertiesSocketFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

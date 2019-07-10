@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.privileged.security;
 
-import org.mule.runtime.core.internal.secutiry.tls.TlsPropertiesMapper;
-import org.mule.runtime.core.internal.secutiry.tls.TlsPropertiesSocketFactory;
+import org.mule.runtime.core.internal.security.tls.TlsPropertiesMapper;
+import org.mule.runtime.core.internal.security.tls.TlsPropertiesSocketFactory;
 import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
 
 import java.io.IOException;
