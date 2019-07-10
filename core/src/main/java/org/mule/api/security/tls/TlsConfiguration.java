@@ -456,6 +456,11 @@ public final class TlsConfiguration
         context.init(keyManagers, trustManagers, null);
         return context;
     }
+    
+    public SSLContext getSslContext(TrustManager[] trustManagers) throws NoSuchAlgorithmException, KeyManagementException
+    {
+        return getSslContext(trustManagers, getSslType());
+    }
 
     public String getSslType()
     {
