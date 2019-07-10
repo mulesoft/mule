@@ -149,7 +149,7 @@
 
         <asmVersion>6.2</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
-        <asyncHttpClientVersion>1.14-MULE-009</asyncHttpClientVersion>
+        <asyncHttpClientVersion>1.14-MULE-010</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.60</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
@@ -183,7 +183,7 @@
         <hamcrestVersion>1.3</hamcrestVersion>
         <hk2Version>2.3.0-b05</hk2Version>
         <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
-        <jackson2Version>2.9.8</jackson2Version>
+        <jackson2Version>2.9.9</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
