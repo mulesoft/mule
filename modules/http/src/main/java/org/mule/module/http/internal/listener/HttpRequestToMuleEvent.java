@@ -54,9 +54,9 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestToMuleEvent
 {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(HttpRequestToMuleEvent.class);
     private static final String REPEATED_HEADERS_LOG_FORMAT =
       "'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'MULE_CORRELATION_ID' will be used.";
-    private static Logger LOGGER = LoggerFactory.getLogger(HttpMessagePropertiesResolver.class);
     public static final BackwardsCompatibilityPropertyChecker
       IGNORE_CORRELATION_ID = new BackwardsCompatibilityPropertyChecker(COMPATIBILITY_IGNORE_CORRELATION_ID);
 
