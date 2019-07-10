@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.ast.api.ComponentAst.PostVisitAction.STOP;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -17,7 +16,6 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -75,27 +73,16 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
 
   @Override
   public Optional<String> getRawParameterValue(String paramName) {
-    return ofNullable(getParameters().get(paramName));
-  }
-
-  @Override
-  public void visitRecursively(ComponentAstVisitor visitor) {
-    if (STOP == visitor.visit(this)) {
-      return;
+    if (paramName.equals(BODY_RAW_PARAM_NAME)) {
+      return ofNullable(getTextContent());
+    } else {
+      return ofNullable(getParameters().get(paramName));
     }
-
-    getInnerComponents().forEach(c -> ((ComponentAst) c).visitRecursively(visitor));
   }
 
   @Override
   public Stream<ComponentAst> recursiveStream() {
     return StreamSupport.stream(recursiveSpliterator(), false);
-  }
-
-  @Override
-  public Predicate<? super ComponentAst> directChildrenPredicate() {
-    // different components may have the same definition in a same AST. That's why identity is used here rather than equality.
-    return comp -> getInnerComponents().stream().anyMatch(inner -> inner == comp);
   }
 
   @Override
@@ -164,5 +151,16 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
       }
 
     };
+  }
+
+  @Override
+  public Stream<ComponentAst> directChildrenStream() {
+    return getInnerComponents().stream()
+        .map(cm -> (ComponentAst) cm);
+  }
+
+  @Override
+  public Spliterator<ComponentAst> directChildrenSpliterator() {
+    return directChildrenStream().spliterator();
   }
 }

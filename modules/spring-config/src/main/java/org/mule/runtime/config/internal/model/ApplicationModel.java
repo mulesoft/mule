@@ -53,6 +53,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
@@ -95,9 +97,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
 
@@ -118,7 +122,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @since 4.0
  */
-public class ApplicationModel {
+public class ApplicationModel implements ArtifactAst {
 
   private static final Logger LOGGER = getLogger(ApplicationModel.class);
 
@@ -1133,5 +1137,30 @@ public class ApplicationModel {
       });
     }
   }
+
+  @Override
+  public Stream<ComponentAst> recursiveStream() {
+    return muleComponentModels.stream()
+        .map(cm -> (ComponentAst) cm)
+        .flatMap(cm -> cm.recursiveStream());
+  }
+
+  @Override
+  public Spliterator<ComponentAst> recursiveSpliterator() {
+    return recursiveStream().spliterator();
+  }
+
+  @Override
+  public Stream<ComponentAst> topLevelComponentsStream() {
+    return muleComponentModels.stream()
+        .map(cm -> (ComponentAst) cm)
+        .flatMap(cm -> cm.directChildrenStream());
+  }
+
+  @Override
+  public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
+    return topLevelComponentsStream().spliterator();
+  }
+
 }
 

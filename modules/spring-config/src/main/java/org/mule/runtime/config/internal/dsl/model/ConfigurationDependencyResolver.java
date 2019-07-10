@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
@@ -55,9 +56,9 @@ public class ConfigurationDependencyResolver {
    *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s associated to each {@link ComponentModel} that
    *        must be resolved.
    */
-  public ConfigurationDependencyResolver(ApplicationModel applicationModel,
+  public ConfigurationDependencyResolver(ArtifactAst applicationModel,
                                          ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
-    this.applicationModel = applicationModel;
+    this.applicationModel = (ApplicationModel) applicationModel;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     fillAlwaysEnabledComponents();
   }

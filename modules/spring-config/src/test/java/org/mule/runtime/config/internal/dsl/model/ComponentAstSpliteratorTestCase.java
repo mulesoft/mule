@@ -106,8 +106,7 @@ public class ComponentAstSpliteratorTestCase extends AbstractMuleTestCase {
     final ComponentModel root = rootBuilder.build();
 
     final List<Object> visitedComponents = new ArrayList<>();
-    ((ComponentAst) root).recursiveStream()
-        .filter(((ComponentAst) root).directChildrenPredicate())
+    ((ComponentAst) root).directChildrenStream()
         .forEach(c -> {
           visitedComponents.add(c);
         });
@@ -141,8 +140,7 @@ public class ComponentAstSpliteratorTestCase extends AbstractMuleTestCase {
     final ComponentModel root = rootBuilder.build();
 
     final List<Object> visitedComponents = new ArrayList<>();
-    ((ComponentAst) root).recursiveStream()
-        .filter(((ComponentAst) root).directChildrenPredicate())
+    ((ComponentAst) root).directChildrenStream()
         .forEach(c -> {
           visitedComponents.add(c);
         });
@@ -165,8 +163,7 @@ public class ComponentAstSpliteratorTestCase extends AbstractMuleTestCase {
     final ComponentModel root = rootBuilder.build();
 
     final List<Object> visitedComponents = new ArrayList<>();
-    ((ComponentAst) root).recursiveStream()
-        .filter(((ComponentAst) root).directChildrenPredicate())
+    ((ComponentAst) root).directChildrenStream()
         .forEach(c -> {
           visitedComponents.add(c);
         });

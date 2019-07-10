@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
+import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
+
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.repeat;
-import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
-
-import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
 /**
  * Internal object responsible to traverse the entire XMl of a given application to read the {@link ComponentModel} to
@@ -36,11 +35,7 @@ class ComponentModelReaderHelper {
   static private String toXml(ComponentModel cm, int tab) {
     final String spaces = repeat(" ", tab * 3);
     final StringBuilder sb = new StringBuilder(spaces).append("<").append(cm.getIdentifier().toString());
-    cm.getParameters().forEach((id, value) -> {
-      if (!BODY_RAW_PARAM_NAME.equals(id)) {
-        sb.append(" ").append(id).append("=\"").append(value).append("\"");
-      }
-    });
+    cm.getParameters().forEach((id, value) -> sb.append(" ").append(id).append("=\"").append(value).append("\""));
     if (cm.getInnerComponents().isEmpty() && isBlank(cm.getTextContent())) {
       sb.append("/>");
     } else {

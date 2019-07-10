@@ -204,6 +204,11 @@ public class DslElementModel<T> {
       return this;
     }
 
+    public Builder<M> withConfig(ComponentAst element) {
+      this.configuration = ((ComponentModel) element).getConfiguration();
+      return this;
+    }
+
     public Builder<M> withValue(String value) {
       this.value = value;
       return this;
