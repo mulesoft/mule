@@ -15,7 +15,9 @@ import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.touch;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -38,6 +40,7 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 
+import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -65,6 +68,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -75,6 +79,10 @@ import io.qameta.allure.Issue;
  * Contains test for domain deployment
  */
 public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
+
+  private static File pluginForbiddenJavaEchoTestClassFile;
+  private static File pluginForbiddenMuleContainerEchoTestClassFile;
+  private static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
 
   // Domain artifacts builders
   private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -113,6 +121,18 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     super(parallelDeployment);
   }
 
+  @BeforeClass
+  public static void compileTestClasses() throws Exception {
+    pluginForbiddenJavaEchoTestClassFile =
+        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
+            .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
+    pluginForbiddenMuleContainerEchoTestClassFile =
+        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile)
+            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
+    pluginForbiddenMuleThirdPartyEchoTestClassFile =
+        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
+            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
+  }
 
   @Test
   @Ignore("MULE-12255 Add the test plugin as a plugin of the domain")
@@ -1523,6 +1543,94 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     deploysDomain();
 
     doRedeployBrokenDomainAfterFixedDomain();
+  }
+
+  @Test
+  public void domainIncludingForbiddenJavaClass() throws Exception {
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("forbidden-domain")
+        .definedBy("empty-domain-config.xml")
+        .containingClass(pluginForbiddenJavaEchoTestClassFile, "org/foo/echo/PluginForbiddenJavaEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", barUtilsForbiddenJavaJarFile));
+
+    final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
+        .definedBy("app-with-forbidden-java-echo-plugin-config.xml")
+        .dependingOn(domainFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(forbidden);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, forbidden.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("java/lang/BarUtils"));
+    }
+  }
+
+  @Test
+  public void domainIncludingForbiddenMuleContainerClass() throws Exception {
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("forbidden-domain")
+        .definedBy("empty-domain-config.xml")
+        .containingClass(pluginForbiddenMuleContainerEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleContainerEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleContainerJarFile", barUtilsForbiddenMuleContainerJarFile));
+
+    final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
+        .definedBy("app-with-forbidden-mule-echo-plugin-config.xml")
+        .dependingOn(domainFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(forbidden);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, forbidden.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/mule/runtime/api/util/BarUtils"));
+    }
+  }
+
+  @Test
+  public void domainIncludingForbiddenMuleContainerThirdParty() throws Exception {
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("forbidden-domain")
+        .definedBy("empty-domain-config.xml")
+        .containingClass(pluginForbiddenMuleThirdPartyEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleThirdPartyEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleThirdPartyJarFile", barUtilsForbiddenMuleThirdPartyJarFile));
+
+    final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
+        .definedBy("app-with-forbidden-mule3rd-echo-plugin-config.xml")
+        .dependingOn(domainFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(forbidden);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, forbidden.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/slf4j/BarUtils"));
+    }
+  }
+
+  protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
+    return new ApplicationFileBuilder(artifactId);
   }
 
   private void doSynchronizedDomainDeploymentActionTest(final Action deploymentAction, final Action assertAction)

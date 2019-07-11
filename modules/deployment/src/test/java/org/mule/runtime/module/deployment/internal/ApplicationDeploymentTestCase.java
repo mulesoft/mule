@@ -132,6 +132,9 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   // Classes and JAR resources
   private static File pluginEcho3TestClassFile;
   private static File pluginEcho2TestClassFile;
+  private static File pluginForbiddenJavaEchoTestClassFile;
+  private static File pluginForbiddenMuleContainerEchoTestClassFile;
+  private static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
   private static File privilegedExtensionV1JarFile;
 
   @Parameterized.Parameters(name = "Parallel: {0}; classloaderModelVersion: {1}")
@@ -162,6 +165,15 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
             .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
     pluginEcho3TestClassFile = new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
+    pluginForbiddenJavaEchoTestClassFile =
+        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
+            .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
+    pluginForbiddenMuleContainerEchoTestClassFile =
+        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile)
+            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
+    pluginForbiddenMuleThirdPartyEchoTestClassFile =
+        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
+            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
 
     privilegedExtensionV1JarFile =
         new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
@@ -2083,6 +2095,156 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void appIncludingForbiddenJavaClass() throws Exception {
+    final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
+        .definedBy("app-with-forbidden-java-echo-plugin-config.xml")
+        .containingClass(pluginForbiddenJavaEchoTestClassFile, "org/foo/echo/PluginForbiddenJavaEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", barUtilsForbiddenJavaJarFile));
+
+    addPackedAppFromBuilder(forbidden);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, forbidden.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("java/lang/BarUtils"));
+    }
+  }
+
+  @Test
+  public void appIncludingForbiddenMuleContainerClass() throws Exception {
+    final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
+        .definedBy("app-with-forbidden-mule-echo-plugin-config.xml")
+        .containingClass(pluginForbiddenMuleContainerEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleContainerEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleContainerJarFile", barUtilsForbiddenMuleContainerJarFile));
+
+    addPackedAppFromBuilder(forbidden);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, forbidden.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/mule/runtime/api/util/BarUtils"));
+    }
+  }
+
+  @Test
+  public void appIncludingForbiddenMuleContainerThirdParty() throws Exception {
+    final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
+        .definedBy("app-with-forbidden-mule3rd-echo-plugin-config.xml")
+        .containingClass(pluginForbiddenMuleThirdPartyEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleThirdPartyEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleThirdPartyJarFile", barUtilsForbiddenMuleThirdPartyJarFile));
+
+    addPackedAppFromBuilder(forbidden);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, forbidden.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/slf4j/BarUtils"));
+    }
+  }
+
+  @Test
+  public void pluginIncludingForbiddenJavaClass() throws Exception {
+    ArtifactPluginFileBuilder echoPluginWithLib = new ArtifactPluginFileBuilder("echoPlugin2")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+        .containingClass(pluginForbiddenJavaEchoTestClassFile, "org/foo/echo/PluginForbiddenJavaEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", barUtilsForbiddenJavaJarFile));
+
+    final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin2")
+        .definedBy("app-with-forbidden-java-echo-plugin-config.xml")
+        .dependingOn(echoPluginWithLib);
+
+    addPackedAppFromBuilder(usesPlugin2);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, usesPlugin2.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("java/lang/BarUtils"));
+    }
+  }
+
+  @Test
+  public void pluginIncludingForbiddenMuleContainerClass() throws Exception {
+    ArtifactPluginFileBuilder echoPluginWithLib = new ArtifactPluginFileBuilder("echoPlugin2")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+        .containingClass(pluginForbiddenMuleContainerEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleContainerEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleContainerJarFile", barUtilsForbiddenMuleContainerJarFile));
+
+    final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin2")
+        .definedBy("app-with-forbidden-mule-echo-plugin-config.xml")
+        .dependingOn(echoPluginWithLib);
+
+    addPackedAppFromBuilder(usesPlugin2);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, usesPlugin2.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/mule/runtime/api/util/BarUtils"));
+    }
+  }
+
+  @Test
+  public void pluginIncludingForbiddenMuleContainerThirdParty() throws Exception {
+    ArtifactPluginFileBuilder echoPluginWithLib = new ArtifactPluginFileBuilder("echoPlugin2")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+        .containingClass(pluginForbiddenMuleThirdPartyEchoTestClassFile, "org/foo/echo/PluginForbiddenMuleThirdPartyEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleThirdPartyJarFile", barUtilsForbiddenMuleThirdPartyJarFile));
+
+    final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin2")
+        .definedBy("app-with-forbidden-mule3rd-echo-plugin-config.xml")
+        .dependingOn(echoPluginWithLib);
+
+    addPackedAppFromBuilder(usesPlugin2);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, usesPlugin2.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (Exception e) {
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/slf4j/BarUtils"));
+    }
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {

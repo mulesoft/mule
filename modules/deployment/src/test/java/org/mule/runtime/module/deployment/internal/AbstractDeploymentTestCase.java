@@ -232,6 +232,15 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File barUtils2ClassFile;
   protected static File barUtils2_0JarFile;
 
+  protected static File barUtilsForbiddenJavaClassFile;
+  protected static File barUtilsForbiddenJavaJarFile;
+
+  protected static File barUtilsForbiddenMuleContainerClassFile;
+  protected static File barUtilsForbiddenMuleContainerJarFile;
+
+  protected static File barUtilsForbiddenMuleThirdPartyClassFile;
+  protected static File barUtilsForbiddenMuleThirdPartyJarFile;
+
   protected static File echoTestClassFile;
   protected static File echoTestJarFile;
 
