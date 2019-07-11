@@ -33,6 +33,7 @@ import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.BareOutInterceptor;
+import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transports.http.QueryHandler;
@@ -97,6 +98,8 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         {
             server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), server.getEndpoint(),
                     server.getEndpoint().getService().getServiceInfos().get(0)));
+            
+            server.getEndpoint().getBinding().getInInterceptors().add(new DocLiteralInInterceptor());
         }
     }
 

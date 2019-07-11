@@ -45,13 +45,27 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
             "</ns1:echo>" +
             "</soap:Body></soap:Envelope>";
 
+    private String msgIncorrectLiteral =
+            "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
+                                         "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">" +
+                                         "<textIncorrectLiteral>echo</textIncorrectLiteral>" +
+                                         "</ns1:echo>" +
+                                         "</soap:Body></soap:Envelope>";
+
     private static final String ANOTHER_VALUE = "another value";
     private String responseMsg =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
-            "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.module.mule.org/\">" +
-                "<text>another value</text>" +
-            "</ns2:echoResponse>" +
-        "</soap:Body></soap:Envelope>";
+            "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
+                                 "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.module.mule.org/\">" +
+                                 "<text>another value</text>" +
+                                 "</ns2:echoResponse>" +
+                                 "</soap:Body></soap:Envelope>";
+
+    private String responseMsgIncorrectLiteral =
+            "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
+                                                 "<soap:Fault><faultcode>soap:Client</faultcode><faultstring>" +
+                                                 "Schema validation error on message from client: tag name \"textIncorrectLiteral\" is not allowed. " +
+                                                 "Possible tag names are: &lt;text>.</faultstring></soap:Fault></soap:Body></soap:Envelope>";
+
 
     private boolean gotEvent = false;
     Object payload;
@@ -130,6 +144,17 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
 
     @Test
     public void inboundWithValidationEnabled() throws Exception
+    {
+        inboundWithValidation(msg, responseMsg);
+    }
+
+    @Test
+    public void inboundWithValidationEnabledIncorrectLiteral() throws Exception
+    {
+        inboundWithValidation(msgIncorrectLiteral, responseMsgIncorrectLiteral);
+    }
+
+    protected void inboundWithValidation(String msg, String responseMsg) throws MuleException, Exception
     {
         CxfInboundMessageProcessor processor = createMessageProcessorWithValidationEnabled();
 
