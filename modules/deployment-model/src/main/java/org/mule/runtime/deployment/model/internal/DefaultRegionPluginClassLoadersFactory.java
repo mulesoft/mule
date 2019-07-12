@@ -32,12 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Creates the class loaders for plugins that are contained in a given region
  *
  * @since 4.0
  */
 public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClassLoadersFactory {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRegionPluginClassLoadersFactory.class);
 
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
 
@@ -143,10 +148,12 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
 
     Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
     for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
-      pluginLocalPolicies.put(localPackage, CHILD_ONLY);
-    }
-    for (String localResource : descriptor.getClassLoaderModel().getLocalResources()) {
-      pluginLocalPolicies.put(localResource, CHILD_ONLY);
+      if (!(baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy)) {
+        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
+      } else {
+        LOGGER.warn("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
+            + "', but it will be ignored since it is already available from the container.");
+      }
     }
 
     return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies, true);
