@@ -49,6 +49,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-artifact-ast</artifactId>
+            <version>${muleAstVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-oauth-api</artifactId>
             <version>${project.version}</version>
         </dependency>

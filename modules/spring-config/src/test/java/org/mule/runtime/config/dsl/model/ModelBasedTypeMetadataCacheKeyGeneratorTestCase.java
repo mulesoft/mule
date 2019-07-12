@@ -21,6 +21,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -29,7 +30,6 @@ import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,13 +37,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDslModelTestCase {
@@ -344,7 +345,7 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
 
   protected MetadataCacheId getIdForComponentOutputMetadata(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
-    ComponentConfiguration component = new Locator(app)
+    ComponentAst component = new Locator(app)
         .get(Location.builderFromStringRepresentation(location).build())
         .get();
     return createGenerator(app).getIdForComponentOutputMetadata(component).get();
@@ -353,7 +354,7 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
   protected MetadataCacheId getIdForComponentAttributesMetadata(ArtifactDeclaration declaration, String location)
       throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
-    ComponentConfiguration component = new Locator(app)
+    ComponentAst component = new Locator(app)
         .get(Location.builderFromStringRepresentation(location).build())
         .get();
     return createGenerator(app).getIdForComponentAttributesMetadata(component).get();
@@ -362,7 +363,7 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
   protected MetadataCacheId getIdForComponentInputMetadata(ArtifactDeclaration declaration, String location, String parameterName)
       throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
-    ComponentConfiguration component = new Locator(app)
+    ComponentAst component = new Locator(app)
         .get(Location.builderFromStringRepresentation(location).build())
         .get();
     return createGenerator(app).getIdForComponentInputMetadata(component, parameterName).get();
@@ -426,21 +427,21 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
                                 false, uri -> getClass().getResourceAsStream(uri));
   }
 
-  private MetadataCacheIdGenerator<ComponentConfiguration> createGenerator(ApplicationModel app) {
+  private MetadataCacheIdGenerator<ComponentAst> createGenerator(ApplicationModel app) {
     return new ModelBasedMetadataCacheIdGeneratorFactory().create(dslResolvingContext, new Locator(app));
   }
 
-  private static class Locator implements MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentConfiguration> {
+  private static class Locator implements MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentAst> {
 
-    private Map<Location, ComponentModel> components = new HashMap<>();
+    private final Map<Location, ComponentModel> components = new HashMap<>();
 
     Locator(ApplicationModel app) {
       app.getRootComponentModel().getInnerComponents().forEach(this::addComponent);
     }
 
     @Override
-    public Optional<ComponentConfiguration> get(Location location) {
-      return Optional.ofNullable(components.get(location).getConfiguration());
+    public Optional<ComponentAst> get(Location location) {
+      return Optional.ofNullable(components.get(location)).map(cm -> (ComponentAst) cm);
     }
 
     private Location getLocation(ComponentModel component) {
