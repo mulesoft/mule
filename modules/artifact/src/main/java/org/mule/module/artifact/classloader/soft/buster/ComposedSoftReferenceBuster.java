@@ -12,32 +12,34 @@ import java.util.WeakHashMap;
 
 public class ComposedSoftReferenceBuster implements SoftReferenceBuster {
 
+  private static final ComposedSoftReferenceBuster INSTANCE = new ComposedSoftReferenceBuster();
+
   private static WeakHashMap<ClassLoader, List<SoftReferenceBuster>> busters =
       new WeakHashMap<ClassLoader, List<SoftReferenceBuster>>();
-  private static ComposedSoftReferenceBuster INSTANCE;
+
 
   @Override
   public void bustSoftReferences(ClassLoader loader) {
-    busters.values().stream().forEach(busterList -> busterList.stream().forEach(buster -> buster.bustSoftReferences(loader)));
-    busters.remove(loader);
+    synchronized (busters) {
+      busters.values().stream().forEach(busterList -> busterList.stream().forEach(buster -> buster.bustSoftReferences(loader)));
+      busters.remove(loader);
+    }
   }
 
   public static void registerBuster(ClassLoader classLoader, SoftReferenceBuster buster) {
-    List<SoftReferenceBuster> bustersList;
-    if (!busters.containsKey(classLoader)) {
-      bustersList = new ArrayList<SoftReferenceBuster>();
-      busters.put(classLoader, bustersList);
-    } else {
-      bustersList = busters.get(classLoader);
+    synchronized (busters) {
+      List<SoftReferenceBuster> bustersList;
+      if (!busters.containsKey(classLoader)) {
+        bustersList = new ArrayList<SoftReferenceBuster>();
+        busters.put(classLoader, bustersList);
+      } else {
+        bustersList = busters.get(classLoader);
+      }
+      bustersList.add(buster);
     }
-    bustersList.add(buster);
   }
 
   public static ComposedSoftReferenceBuster getInstance() {
-    if (INSTANCE == null) {
-      INSTANCE = new ComposedSoftReferenceBuster();
-    }
-
     return INSTANCE;
   }
 

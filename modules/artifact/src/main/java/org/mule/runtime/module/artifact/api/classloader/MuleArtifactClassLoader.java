@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.module.artifact.classloader.soft.buster.ComposedSoftReferenceBuster.registerBuster;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -31,6 +34,7 @@ import java.util.regex.Pattern;
 
 import org.mule.module.artifact.classloader.soft.buster.ComposedSoftReferenceBuster;
 import org.mule.module.artifact.classloader.soft.buster.ThreadGroupContextClassLoaderSoftReferenceBuster;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -46,6 +50,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
+
+  private static final String MULE_LEAK_PREVENTION = SYSTEM_PROPERTY_PREFIX + "leak.prevention";;
+
+  public static final boolean leakPrevention = getBoolean(MULE_LEAK_PREVENTION);
+
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
 
@@ -113,7 +122,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
-    ComposedSoftReferenceBuster.registerBuster(this, new ThreadGroupContextClassLoaderSoftReferenceBuster(this));
+    if (leakPrevention) {
+      registerBuster(this, new ThreadGroupContextClassLoaderSoftReferenceBuster(this));
+    }
   }
 
   @Override
@@ -281,7 +292,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     super.dispose();
 
     shutdownListeners();
-    ComposedSoftReferenceBuster.getInstance().bustSoftReferences(this);
+
+    if (leakPrevention) {
+      ComposedSoftReferenceBuster.getInstance().bustSoftReferences(this);
+    }
   }
 
   void reportPossibleLeak(Exception e, String artifactId) {

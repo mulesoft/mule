@@ -10,14 +10,19 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.module.artifact.classloader.soft.buster.ComposedSoftReferenceBuster.registerBuster;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.leakPrevention;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,6 +38,7 @@ import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -45,6 +51,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.util.ConcurrentReferenceHashMap;
 
 public class SpringRegistry extends AbstractRegistry implements Injector {
 
@@ -75,7 +82,24 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     super(REGISTRY_ID, muleContext, lifecycleInterceptor);
     setApplicationContext(applicationContext);
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
-    registerBuster(muleContext.getExecutionClassLoader(), new SpringSoftReferenceBuster());
+    if (leakPrevention) {
+      registerBuster(muleContext.getExecutionClassLoader(), new SpringSoftReferenceBuster());
+    }
+    changeDefaultReferenceType();
+  }
+
+  private void changeDefaultReferenceType() {
+    try {
+      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
+      Field modifiersField = Field.class.getDeclaredField("modifiers");
+      modifiersField.setAccessible(true);
+      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+      field.set(null, WEAK);
+    } catch (Throwable e) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Error while setting the ConcurrentReferenceHashMap default scope of references to WEAK");
+      }
+    }
   }
 
   private void setApplicationContext(ApplicationContext applicationContext) {

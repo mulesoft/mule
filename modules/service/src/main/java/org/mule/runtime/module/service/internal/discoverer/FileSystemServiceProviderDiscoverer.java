@@ -145,6 +145,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
             .forContract(contract.getContractClassName())
             .build();
 
+        assembly.getClassLoader();
         assemblies.add(assembly);
       }
     }
