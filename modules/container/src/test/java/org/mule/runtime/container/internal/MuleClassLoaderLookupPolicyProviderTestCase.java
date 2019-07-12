@@ -111,7 +111,7 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void maintainsOriginalLookupStrategy2() {
+  public void maintainsOriginalLookupStrategyExplicitNotOverwrite() {
     ClassLoaderLookupPolicy lookupPolicy =
         new MuleClassLoaderLookupPolicy(singletonMap(FOO_PACKAGE,
                                                      new ContainerOnlyLookupStrategy(getClass().getClassLoader())),

@@ -272,6 +272,22 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     barUtils2ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar2/BarUtils.java"));
     barUtils2_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
 
+    barUtilsForbiddenJavaClassFile = new SingleClassCompiler().compile(getResourceFile("/java/lang/BarUtils.java"));
+    barUtilsForbiddenJavaJarFile =
+        new JarCompiler().compiling(getResourceFile("/java/lang/BarUtils.java")).compile("bar-javaForbidden.jar");
+
+    barUtilsForbiddenMuleContainerClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"));
+    barUtilsForbiddenMuleContainerJarFile =
+        new JarCompiler().compiling(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"))
+            .compile("bar-muleContainerForbidden.jar");
+
+    barUtilsForbiddenMuleThirdPartyClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/slf4j/BarUtils.java"));
+    barUtilsForbiddenMuleThirdPartyJarFile =
+        new JarCompiler().compiling(getResourceFile("/org/slf4j/BarUtils.java"))
+            .compile("bar-muleThirdPartyForbidden.jar");
+
     echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 

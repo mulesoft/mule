@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.maven.ArtifactClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder;
@@ -28,6 +29,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,10 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient) {
     super(mavenClient);
+  }
+
+  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
+    super(mavenClient, jarExplorerFactory);
   }
 
   @Override

@@ -1369,9 +1369,37 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Description("Similar to pluginDependingAndExportingFromOtherPlugin, but for the case when there is no dependency between plugins. When plugin2 wants to use something local that is also exported by plugin1, the dependency local to plugin2 is used")
+  public void pluginNotDependingAndExportingFromOtherPlugin() throws Exception {
+    ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
+
+    // this plugin depends on a version of bar but will actually use the one from the dependant plugin
+    ArtifactPluginFileBuilder echoPluginWithLib2 = new ArtifactPluginFileBuilder("echoPlugin2")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+        .dependingOn(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
+        .containingClass(pluginEcho2TestClassFile, "org/foo/echo/Plugin2Echo.class");
+
+    final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin3")
+        .definedBy("app-with-echo2-plugin-config.xml")
+        .dependingOn(echoPluginWithLib1)
+        .dependingOn(echoPluginWithLib2);
+
+    addPackedAppFromBuilder(usesPlugin2);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, usesPlugin2.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
   @Issue("MULE-13756")
   @Description("Tests that code called form plugin's Processor cannot access internal resources/packages of the application")
-  public void deploysAppWithNotExportedPackageAndPlugin() throws Exception {
+  public void deploysAppWithLocalPackageAndPlugin() throws Exception {
     ArtifactPluginFileBuilder loadsAppResourcePlugin = new ArtifactPluginFileBuilder("loadsAppResourcePlugin")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
         .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class");
@@ -1398,7 +1426,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   @Issue("MULE-13756")
   @Description("Tests that code called form application's Processor can access internal resources/packages of the application")
-  public void deploysAppWithNotExportedPackage() throws Exception {
+  public void deploysAppWithLocalPackage() throws Exception {
     ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
         .configuredWith(EXPORTED_PACKAGES, "org.bar")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
@@ -1421,7 +1449,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   @Issue("MULE-13756")
   @Description("Tests that code called form plugin's ProcessorInterceptor cannot access internal resources/packages of the application")
-  public void deploysAppWithNotExportedPackageAndPluginWithInterceptors() throws Exception {
+  public void deploysAppWithLocalPackageAndPluginWithInterceptors() throws Exception {
     File loadsAppResourceInterceptorFactoryClassFile =
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptorFactory.java"));
     File loadsAppResourceInterceptorClassFile =
@@ -1457,7 +1485,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   @Issue("MULE-13756")
   @Description("Tests that code called form application's ProcessorInterceptor can access internal resources/packages of the application")
-  public void deploysAppWithInterceptorsAndNotExportedPackage() throws Exception {
+  public void deploysAppWithInterceptorsAndLocalPackage() throws Exception {
     File loadsOwnResourceInterceptorFactoryClassFile =
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptorFactory.java"));
     File loadsOwnResourceInterceptorClassFile =

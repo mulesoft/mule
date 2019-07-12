@@ -20,7 +20,6 @@
         <!-- Mule classes -->
         <AsyncLogger name="org.mule" level="WARN"/>
         <AsyncLogger name="com.mulesoft" level="WARN"/>
-<!--         <AsyncLogger name="org.mule.runtime.module.artifact" level="DEBUG"/> -->
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>

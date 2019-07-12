@@ -184,6 +184,9 @@ public final class ClassLoaderModel {
 
     /**
      * Indicates which Java packages are loaded from the artifact itself, even if some other artifact in the region exports it.
+     * <p>
+     * The reason to use this is a that if a plugin internally uses a certain version of a lib, providing certain packages,
+     * another plugin exporting some of those packages must not modify the inner implementation used by the first plugin.
      *
      * @param packages packages to not import. Non null.
      * @return same builder instance.
@@ -196,6 +199,9 @@ public final class ClassLoaderModel {
 
     /**
      * Indicates which resources are loaded from the artifact itself, even if some other artifact in the region exports it.
+     * <p>
+     * The reason to use this is a that if a plugin internally uses a certain version of a lib, providing certain packages,
+     * another plugin exporting some of those packages must not modify the inner implementation used by the first plugin.
      *
      * @param resources resources to not import. Non null.
      * @return same builder instance.

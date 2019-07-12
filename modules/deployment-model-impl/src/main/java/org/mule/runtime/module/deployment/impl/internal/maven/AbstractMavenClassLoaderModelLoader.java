@@ -58,6 +58,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -82,9 +83,15 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
   protected MavenClient mavenClient;
+  private final Supplier<JarExplorer> jarExplorerFactory;
 
   public AbstractMavenClassLoaderModelLoader(MavenClient mavenClient) {
+    this(mavenClient, () -> new FileJarExplorer());
+  }
+
+  public AbstractMavenClassLoaderModelLoader(MavenClient mavenClient, Supplier<JarExplorer> jarExplorerFactory) {
     this.mavenClient = mavenClient;
+    this.jarExplorerFactory = jarExplorerFactory;
   }
 
   @Override
@@ -175,9 +182,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   }
 
   protected void populateLocalPackages(File artifactFile, final ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
-                                              Set<BundleDependency> bundleDependencies) {
-    final JarExplorer fileJarExplorer = buildJarExplorer();
-
+                                       Set<BundleDependency> bundleDependencies) {
     // This is already filtering out mule-plugin dependencies,
     // since for this case we explicitly need to consume the exported API from the plugin.
     final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
@@ -189,15 +194,11 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         throw new MuleRuntimeException(e);
       }
 
-      final JarInfo exploredJar = fileJarExplorer.explore(dependencyArtifactUri);
+      final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
 
       classLoaderModelBuilder.withLocalPackages(exploredJar.getPackages());
       classLoaderModelBuilder.withLocalResources(exploredJar.getResources());
     }
-  }
-
-  protected JarExplorer buildJarExplorer() {
-    return new FileJarExplorer();
   }
 
   /**
