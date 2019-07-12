@@ -48,7 +48,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
 
   private static final Logger logger = LoggerFactory.getLogger(BundlePluginDependenciesResolver.class);
   protected static final String MULE_HTTP_CONNECTOR_ARTIFACT_ID = "mule-http-connector";
-  protected static final String MULE_HTTP_CONNECTOR_GROUP_ID = "org.mule.modules";
+  protected static final String MULE_HTTP_CONNECTOR_GROUP_ID = "org.mule.connectors";
 
   private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
 
