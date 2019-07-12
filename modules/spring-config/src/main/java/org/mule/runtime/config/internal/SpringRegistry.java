@@ -38,6 +38,8 @@ import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
@@ -84,6 +86,14 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
     if (leakPrevention) {
       registerBuster(muleContext.getExecutionClassLoader(), new SpringSoftReferenceBuster());
+
+      if (muleContext.getExecutionClassLoader() instanceof MuleApplicationClassLoader) {
+        MuleApplicationClassLoader applicationClassLoader = (MuleApplicationClassLoader) muleContext.getExecutionClassLoader();
+        for (ArtifactClassLoader classLoader : applicationClassLoader.getArtifactPluginClassLoaders()) {
+          registerBuster((ClassLoader) classLoader, new SpringSoftReferenceBuster());
+        }
+      }
+
     }
     changeDefaultReferenceType();
   }

@@ -64,6 +64,7 @@ public class ThreadGroupContextClassLoaderSoftReferenceBuster implements SoftRef
                     }
 
                     try {
+                      clearBeanInfoCache.setAccessible(true);
                       clearBeanInfoCache.invoke(context);
                     } catch (Throwable e) {
 

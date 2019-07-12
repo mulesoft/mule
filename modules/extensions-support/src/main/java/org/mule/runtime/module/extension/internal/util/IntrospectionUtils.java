@@ -34,7 +34,44 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.springframework.core.ResolvableType.NONE;
+import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -96,6 +133,7 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -110,45 +148,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.TypeVariable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-
-import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
+import org.springframework.util.ConcurrentReferenceHashMap;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -161,7 +165,25 @@ public final class IntrospectionUtils {
   private static final ArrayType ANY_ARRAY_TYPE = typeBuilder().arrayType().of(ANY_TYPE).build();
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
 
-  private IntrospectionUtils() {}
+  static {
+
+    if (MuleArtifactClassLoader.leakPrevention) {
+      try {
+        Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        field.set(null, WEAK);
+      } catch (Throwable e) {
+
+      }
+    }
+  }
+
+  private IntrospectionUtils() {
+
+
+  }
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
@@ -257,6 +279,7 @@ public final class IntrospectionUtils {
 
   /**
    * Based on a {@link ExtensionModel}, determines if this one has been created using the Java AST.
+   * 
    * @param model Extension model to introspect
    * @return a boolean indicating whether the {@link ExtensionModel} was created using the Java AST or using compiled classes
    */
@@ -267,6 +290,7 @@ public final class IntrospectionUtils {
 
   /**
    * Based on a {@link BaseDeclaration}, determines if this one has been created using the Java AST.
+   * 
    * @param model Base Declaration to introspect
    * @return a boolean indicating whether the {@link BaseDeclaration} was created using the Java AST or using compiled classes
    */

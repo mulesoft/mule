@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 
 import org.mule.module.artifact.classloader.soft.buster.ComposedSoftReferenceBuster;
 import org.mule.module.artifact.classloader.soft.buster.ThreadGroupContextClassLoaderSoftReferenceBuster;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -51,7 +50,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
 
-  private static final String MULE_LEAK_PREVENTION = SYSTEM_PROPERTY_PREFIX + "leak.prevention";;
+  private static final String MULE_LEAK_PREVENTION = SYSTEM_PROPERTY_PREFIX + "leak.prevention";
 
   public static final boolean leakPrevention = getBoolean(MULE_LEAK_PREVENTION);
 
