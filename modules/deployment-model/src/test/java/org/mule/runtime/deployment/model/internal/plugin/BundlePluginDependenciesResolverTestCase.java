@@ -421,7 +421,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     expectedException.expect(IllegalStateException.class);
     expectedException
-        .expectMessage("Incompatible version of plugin 'HTTP' (org.mule.modules:mule-http-connector) found. Artifact requires version '1.1.0' but context provides version '1.0.0'");
+        .expectMessage("Incompatible version of plugin 'HTTP' (org.mule.connectors:mule-http-connector) found. Artifact requires version '1.1.0' but context provides version '1.0.0'");
     dependenciesResolver.resolve(ImmutableSet.of(httpPluginDescriptor1_0), ImmutableList.of(httpPluginDescriptor1_1), false);
   }
 
