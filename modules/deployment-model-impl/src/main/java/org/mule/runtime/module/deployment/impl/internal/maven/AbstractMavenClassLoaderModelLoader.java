@@ -145,8 +145,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     final ArtifactClassLoaderModelBuilder classLoaderModelBuilder =
         newHeavyWeightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
                                               packagerClassLoaderModel, attributes);
-    final HashSet<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
-    final HashSet<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
+    final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
+    final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
 
     classLoaderModelBuilder
         .exportingPackages(exportedPackages)
@@ -176,39 +176,16 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           .collect(toSet());
     }
 
+    // This is already filtering out mule-plugin dependencies,
+    // since for this case we explicitly need to consume the exported API from the plugin.
+    final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
+
     // TODO MULE-17114 retrieve this data from the json if present, if not then call this
-    populateLocalPackages(artifactFile, classLoaderModelBuilder, bundleDependencies, exportedPackages, exportedResources);
+    populateLocalPackages(artifactFile, classLoaderModelBuilder, dependenciesArtifactsUrls, exportedPackages, exportedResources);
 
     classLoaderModelBuilder.dependingOn(bundleDependencies);
 
     return classLoaderModelBuilder.build();
-  }
-
-  protected void populateLocalPackages(File artifactFile, final ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
-                                       Set<BundleDependency> bundleDependencies,
-                                       Set<String> exportedPackages, Set<String> exportedResources) {
-    // This is already filtering out mule-plugin dependencies,
-    // since for this case we explicitly need to consume the exported API from the plugin.
-    final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
-    for (URL dependencyArtifactUrl : dependenciesArtifactsUrls) {
-      final URI dependencyArtifactUri;
-      try {
-        dependencyArtifactUri = dependencyArtifactUrl.toURI();
-      } catch (URISyntaxException e) {
-        throw new MuleRuntimeException(e);
-      }
-
-      final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
-
-      final Set<String> localPackages = new HashSet<>(exploredJar.getPackages());
-      localPackages.removeAll(exportedPackages);
-
-      final Set<String> localResources = new HashSet<>(exploredJar.getResources());
-      localResources.removeAll(exportedResources);
-
-      classLoaderModelBuilder.withLocalPackages(localPackages);
-      classLoaderModelBuilder.withLocalResources(localResources);
-    }
   }
 
   /**
@@ -329,14 +306,24 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
         newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
                                               mavenClient, attributes, nonProvidedDependencies);
+
+    final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
+    final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
+
     classLoaderModelBuilder
-        .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
+        .exportingPackages(exportedPackages)
+        .exportingResources(exportedResources)
         .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
                                      new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
-        .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
         .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
 
-    loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies);
+    // This is already filtering out mule-plugin dependencies,
+    // since for this case we explicitly need to consume the exported API from the plugin.
+    final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies);
+
+    // TODO MULE-17114 retrieve this data from the json if present, if not then call this
+    populateLocalPackages(artifactFile, classLoaderModelBuilder, dependenciesArtifactsUrls, exportedPackages, exportedResources);
+
     classLoaderModelBuilder.dependingOn(resolvedDependencies);
 
     return classLoaderModelBuilder.build();
@@ -352,6 +339,30 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                               BundleDescriptor artifactBundleDescriptor,
                                                                                               org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                                                               Map<String, Object> attributes);
+
+  protected void populateLocalPackages(File artifactFile, final ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
+                                       List<URL> dependenciesArtifactsUrls,
+                                       Set<String> exportedPackages, Set<String> exportedResources) {
+    for (URL dependencyArtifactUrl : dependenciesArtifactsUrls) {
+      final URI dependencyArtifactUri;
+      try {
+        dependencyArtifactUri = dependencyArtifactUrl.toURI();
+      } catch (URISyntaxException e) {
+        throw new MuleRuntimeException(e);
+      }
+
+      final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
+
+      final Set<String> localPackages = new HashSet<>(exploredJar.getPackages());
+      localPackages.removeAll(exportedPackages);
+
+      final Set<String> localResources = new HashSet<>(exploredJar.getResources());
+      localResources.removeAll(exportedResources);
+
+      classLoaderModelBuilder.withLocalPackages(localPackages);
+      classLoaderModelBuilder.withLocalResources(localResources);
+    }
+  }
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
 
