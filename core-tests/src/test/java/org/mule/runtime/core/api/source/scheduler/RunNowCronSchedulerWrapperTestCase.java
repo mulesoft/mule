@@ -26,24 +26,25 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
 @SmallTest
 public class RunNowCronSchedulerWrapperTestCase {
 
-  private Integer count;
+  private AtomicInteger count;
 
   @Test
-  public void wrapperRunsTwice() throws Exception {
-    count = 0;
+  public void wrapperAddsAnExtraTask() throws Exception {
+    count = new AtomicInteger(0);
     CronScheduler cronScheduler = new CronScheduler();
     cronScheduler.setExpression("0/30 0/1 * 1/1 * ? *");
     cronScheduler.setTimeZone("GMT");
     RunNowCronSchedulerWrapper schedulerWrapper = new RunNowCronSchedulerWrapper(cronScheduler);
     Scheduler executor = new TestScheduler(1, "custom", true);
     schedulerWrapper.doSchedule(executor, () -> {
-      count++;
+      count.getAndAdd(1);
     });
     executor.shutdown();
     if (executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {

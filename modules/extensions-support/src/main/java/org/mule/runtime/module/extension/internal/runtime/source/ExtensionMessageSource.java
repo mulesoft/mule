@@ -157,7 +157,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
 
-  private synchronized void createSource(Boolean isRestart) throws Exception {
+  private synchronized void createSource(Boolean restarting) throws Exception {
     if (sourceAdapter == null) {
       CoreEvent initialiserEvent = null;
       try {
@@ -169,7 +169,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                                this,
                                                sourceConnectionManager,
                                                new MessagingExceptionResolver(this),
-                                               isRestart);
+                                               restarting);
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
         initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
@@ -181,9 +181,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(Boolean isRestart) throws MuleException {
+  private void startSource(Boolean restarting) throws MuleException {
     try {
-      retryPolicyTemplate.execute(new StartSourceCallback(isRestart), retryScheduler);
+      retryPolicyTemplate.execute(new StartSourceCallback(restarting), retryScheduler);
     } catch (Throwable e) {
       if (e instanceof MuleException) {
         throw (MuleException) e;
@@ -479,16 +479,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private class StartSourceCallback implements RetryCallback {
 
-    Boolean isRestart;
+    Boolean restarting;
 
-    StartSourceCallback(Boolean isRestart) {
-      this.isRestart = isRestart;
+    StartSourceCallback(Boolean restarting) {
+      this.restarting = restarting;
     }
 
     @Override
     public void doWork(RetryContext context) throws Exception {
       try {
-        createSource(isRestart);
+        createSource(restarting);
         initialiseIfNeeded(sourceAdapter);
         sourceAdapter.start();
         reconnecting.set(false);

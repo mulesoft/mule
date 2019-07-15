@@ -82,11 +82,11 @@ public class SourceAdapterFactory {
                                      Component component,
                                      SourceConnectionManager connectionManager,
                                      MessagingExceptionResolver exceptionResolver,
-                                     Boolean isRestart) {
+                                     Boolean restarting) {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
       SourceConfigurer sourceConfigurer = new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters,
-                                                               expressionManager, properties, muleContext, isRestart);
+                                                               expressionManager, properties, muleContext, restarting);
       source = sourceConfigurer.configure(source, configurationInstance);
       return new SourceAdapter(extensionModel,
                                sourceModel,

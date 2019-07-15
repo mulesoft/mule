@@ -54,7 +54,7 @@ public final class SourceConfigurer {
   private final ExpressionManager expressionManager;
   private final ConfigurationProperties properties;
   private final MuleContext muleContext;
-  private final Boolean isRestart;
+  private final Boolean restarting;
 
   /**
    * Create a new instance
@@ -68,14 +68,14 @@ public final class SourceConfigurer {
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
                           ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext,
-                          Boolean isRestart) {
+                          Boolean restarting) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
     this.expressionManager = expressionManager;
     this.properties = properties;
     this.muleContext = muleContext;
-    this.isRestart = isRestart;
+    this.restarting = restarting;
   }
 
   /**
@@ -121,15 +121,7 @@ public final class SourceConfigurer {
           }
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
-          Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
-          if (isRestart) {
-            if (scheduler instanceof FixedFrequencyScheduler) {
-              ((FixedFrequencyScheduler) scheduler).setStartDelay(0);
-            } else if (scheduler instanceof CronScheduler) {
-              RunNowCronSchedulerWrapper schedulerWrapper = new RunNowCronSchedulerWrapper((CronScheduler) scheduler);
-              scheduler = schedulerWrapper;
-            }
-          }
+          Scheduler scheduler = getScheduler(context, valueResolver, restarting);
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }
@@ -152,4 +144,18 @@ public final class SourceConfigurer {
     return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
 
+  private Scheduler getScheduler(ValueResolvingContext context, ValueResolver valueResolver, Boolean restarting)
+      throws MuleException {
+    Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
+    if (restarting) {
+      if (scheduler instanceof FixedFrequencyScheduler) {
+        ((FixedFrequencyScheduler) scheduler).setStartDelay(0);
+      } else if (scheduler instanceof CronScheduler) {
+        RunNowCronSchedulerWrapper schedulerWrapper = new RunNowCronSchedulerWrapper((CronScheduler) scheduler);
+        scheduler = schedulerWrapper;
+        return scheduler;
+      }
+    }
+    return scheduler;
+  }
 }
