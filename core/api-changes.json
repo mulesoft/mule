@@ -19,6 +19,15 @@
           "methodName": "buildNewChainWithListOfProcessors",
           "elementKind": "method",
           "justification": "MULE-16984 - Interception API: Smart connectors inside a choice router are not skipped properly"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setStreamingManager(org.mule.runtime.core.api.streaming.StreamingManager)",
+          "package": "org.mule.runtime.core.privileged.processor.simple",
+          "classSimpleName": "AbstractAddVariablePropertyProcessor",
+          "methodName": "setStreamingManager",
+          "elementKind": "method",
+          "justification": "class in internal"
         }
       ]
     }
@@ -210,6 +219,15 @@
           "fieldName": "logger",
           "elementKind": "field",
           "justification": "This was wrong"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setStreamingManager(org.mule.runtime.core.api.streaming.StreamingManager)",
+          "package": "org.mule.runtime.core.privileged.processor.simple",
+          "classSimpleName": "AbstractAddVariablePropertyProcessor",
+          "methodName": "setStreamingManager",
+          "elementKind": "method",
+          "justification": "class in internal"
         }
       ]
     }
