@@ -1,4 +1,46 @@
 {
+  "4.2.2": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::withLocalPackages(java.util.Set<java.lang.String>)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "withLocalPackages",
+          "elementKind": "method",
+          "justification": "MULE-17112: Add support for local plugin classes/resources"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder::withLocalResources(java.util.Set<java.lang.String>)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModelBuilder",
+          "methodName": "withLocalResources",
+          "elementKind": "method",
+          "justification": "MULE-17112: Add support for local plugin classes/resources"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Set<java.lang.String> org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel::getLocalPackages()",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModel",
+          "methodName": "getLocalPackages",
+          "elementKind": "method",
+          "justification": "MULE-17112: Add support for local plugin classes/resources"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Set<java.lang.String> org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel::getLocalResources()",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModel",
+          "methodName": "getLocalResources",
+          "elementKind": "method",
+          "justification": "MULE-17112: Add support for local plugin classes/resources"
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [

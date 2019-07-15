@@ -29,12 +29,12 @@ public final class LoadsOwnResourceInterceptor implements ProcessorInterceptor {
     }
 
     try {
-      tccl.loadClass("org.bar1.BarUtils");
+      tccl.loadClass("org.bar.BarUtils");
     } catch (ClassNotFoundException e) {
       throw new AssertionError("Couldn't load exported class", e);
     }
     try {
-      tccl.loadClass("org.bar2.BarUtils");
+      tccl.loadClass("org.bar.BarUtils");
     } catch (ClassNotFoundException e) {
       throw new AssertionError("Couldn't load exported class", e);
     }

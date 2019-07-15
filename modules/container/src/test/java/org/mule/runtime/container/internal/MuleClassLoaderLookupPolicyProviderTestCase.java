@@ -24,6 +24,7 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupS
 import org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -110,7 +111,35 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void normalizesLookupStrategies() throws Exception {
+  public void maintainsOriginalLookupStrategyExplicitNotOverwrite() {
+    ClassLoaderLookupPolicy lookupPolicy =
+        new MuleClassLoaderLookupPolicy(singletonMap(FOO_PACKAGE,
+                                                     new ContainerOnlyLookupStrategy(getClass().getClassLoader())),
+                                        emptySet());
+
+    final ClassLoaderLookupPolicy extendedPolicy =
+        lookupPolicy.extend(singletonMap(FOO_PACKAGE, PARENT_FIRST), false);
+
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS).getClassLoaders(getClass().getClassLoader()),
+               hasItem(getClass().getClassLoader()));
+  }
+
+  @Test
+  public void overwritesOriginalLookupStrategy() {
+    ClassLoaderLookupPolicy lookupPolicy =
+        new MuleClassLoaderLookupPolicy(singletonMap(FOO_PACKAGE,
+                                                     new ContainerOnlyLookupStrategy(getClass().getClassLoader())),
+                                        emptySet());
+
+    final ClassLoaderLookupPolicy extendedPolicy =
+        lookupPolicy.extend(singletonMap(FOO_PACKAGE, PARENT_FIRST), true);
+
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS), instanceOf(ParentFirstLookupStrategy.class));
+  }
+
+  @Test
+  public void normalizesLookupStrategies() {
     ClassLoaderLookupPolicy lookupPolicy =
         new MuleClassLoaderLookupPolicy(singletonMap(FOO_PACKAGE,
                                                      new ContainerOnlyLookupStrategy(getClass().getClassLoader())),

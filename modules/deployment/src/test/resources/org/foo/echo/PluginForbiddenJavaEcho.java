@@ -5,17 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.foo;
+package org.foo.echo;
 
 import org.mule.functional.api.component.EventCallback;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.MuleContext;
 
-import org.bar.BarUtils;
+import java.lang.BarUtils;
 
-public class Plugin1Echo implements EventCallback {
+public class PluginForbiddenJavaEcho implements EventCallback{
 
   public void eventReceived(CoreEvent event, Object component, MuleContext muleContext) throws Exception {
-    new BarUtils().doStuff(event.getMessage().getPayload().getValue().toString());
+    new BarUtils().doStuff("");
   }
 }
