@@ -11,9 +11,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.CURSOR_STREAM_PROVIDER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -22,26 +26,31 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.nio.charset.Charset;
 
 import javax.activation.MimeTypeParseException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public abstract class AbstractAddVariablePropertyProcessorTestCase extends AbstractMuleContextTestCase {
@@ -57,9 +66,11 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   private CoreEvent event;
   private Message message;
   private MuleContext mockMuleContext = mock(MuleContext.class);
+  private StreamingManager streamingManager = mock(StreamingManager.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
   private TypedValue typedValue;
   private AbstractAddVariablePropertyProcessor addVariableProcessor;
+  private CheckedRunnable afterAssertions;
 
   public AbstractAddVariablePropertyProcessorTestCase(AbstractAddVariablePropertyProcessor abstractAddVariableProcessor) {
     addVariableProcessor = abstractAddVariableProcessor;
@@ -73,10 +84,23 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     when(mockExpressionManager.evaluate(eq(EXPRESSION), eq(STRING), any(), any(CoreEvent.class))).thenReturn(typedValue);
     when(mockExpressionManager.evaluate(eq(EXPRESSION), any(CoreEvent.class))).thenReturn(typedValue);
     addVariableProcessor.setMuleContext(mockMuleContext);
+    addVariableProcessor.setStreamingManager(streamingManager);
+
+    when(streamingManager.manage(any(CursorProvider.class), any(EventContext.class))).thenAnswer(inv -> inv.getArguments()[0]);
 
     message = of("");
     event = createTestEvent(message);
+    afterAssertions = () -> verify(streamingManager, never()).manage(any(CursorProvider.class), any(EventContext.class));
   }
+
+
+  @After
+  public void after() {
+    if (afterAssertions != null) {
+      afterAssertions.run();
+    }
+  }
+
 
   protected CoreEvent createTestEvent(Message message) throws MuleException {
     return eventBuilder(muleContext).message(message).build();
@@ -192,7 +216,26 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     verifyRemoved(event, PLAIN_STRING_KEY);
   }
 
-  protected abstract void verifyAdded(CoreEvent event, String key, String value);
+  @Test
+  public void testCursorProvidersAreManaged() throws MuleException {
+    CursorProvider cursorProvider = mock(CursorProvider.class);
+    typedValue = new TypedValue(cursorProvider, CURSOR_STREAM_PROVIDER);
+
+    when(mockExpressionManager.evaluate(eq(EXPRESSION), eq(STRING), any(), any(CoreEvent.class))).thenReturn(typedValue);
+    when(mockExpressionManager.evaluate(eq(EXPRESSION), any(CoreEvent.class))).thenReturn(typedValue);
+
+    addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
+    addVariableProcessor.setValue(EXPRESSION);
+    addVariableProcessor.initialise();
+    event = addVariableProcessor.process(event);
+
+    verifyAdded(event, PLAIN_STRING_KEY, cursorProvider);
+    verify(streamingManager).manage(same(cursorProvider), any(EventContext.class));
+
+    afterAssertions = null;
+  }
+
+  protected abstract <T> void verifyAdded(CoreEvent event, String key, T value);
 
   protected abstract void verifyNotAdded(CoreEvent mockEvent);
 
