@@ -134,7 +134,6 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
         if (innerSpliterator == null) {
           innerSpliterator = getInnerComponents().stream().map(ic -> (ComponentAst) ic).spliterator();
         }
-        // return innerSpliterator.trySplit();
         return null;
       }
 

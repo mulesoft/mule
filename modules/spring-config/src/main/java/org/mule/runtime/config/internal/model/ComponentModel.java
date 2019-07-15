@@ -53,7 +53,6 @@ public abstract class ComponentModel {
 
   private boolean root = false;
   private ComponentIdentifier identifier;
-  // private final Map<String, Object> customAttributes = new HashMap<>();
   private final Map<String, String> parameters = new HashMap<>();
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
@@ -378,10 +377,6 @@ public abstract class ComponentModel {
     public Builder setTextContent(String textContent) {
       checkIsNotBuildingFromRootComponentModel("textComponent");
       this.model.textContent = textContent;
-      // if (textContent != null && !StringUtils.isBlank(textContent.trim())) {
-      // this.model.parameters.put(BODY_RAW_PARAM_NAME, textContent);
-      // }
-
       return this;
     }
 
