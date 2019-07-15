@@ -92,6 +92,18 @@ public interface HttpAuthentication {
   boolean isPreemptive();
 
   /**
+   * Returns true if any of the provided credentials for authentications is an expression, meaning it could vary between different
+   * evaluations.
+   *
+   * @return whether the authentication credentials may vary.
+   *
+   * @since 4.3
+   */
+  default boolean forceConnectionClose() {
+    return false;
+  }
+
+  /**
    * Represents an HTTP request's NTLM based authentication.
    *
    * @since 4.0

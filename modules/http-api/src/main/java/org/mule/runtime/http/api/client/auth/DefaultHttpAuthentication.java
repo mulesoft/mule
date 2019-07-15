@@ -21,12 +21,13 @@ final class DefaultHttpAuthentication implements HttpAuthentication, HttpNtlmAut
   private final String username;
   private final String password;
   private final boolean preemptive;
+  private boolean forceConnectionClose;
 
   private final String domain;
   private final String workstation;
 
-  DefaultHttpAuthentication(HttpAuthenticationType type, String username, String password, boolean preemptive, String domain,
-                            String workstation) {
+  DefaultHttpAuthentication(HttpAuthenticationType type, String username, String password, boolean preemptive,
+                            boolean doCredentialsVary, String domain, String workstation) {
     checkArgument(type != null, "An authentication type must be declared.");
     checkArgument(username != null, "A username must be provided.");
     checkArgument(password != null, "A password must be provided.");
@@ -34,6 +35,7 @@ final class DefaultHttpAuthentication implements HttpAuthentication, HttpNtlmAut
     this.username = username;
     this.password = password;
     this.preemptive = preemptive;
+    this.forceConnectionClose = doCredentialsVary;
     this.domain = domain;
     this.workstation = workstation;
   }
@@ -68,4 +70,8 @@ final class DefaultHttpAuthentication implements HttpAuthentication, HttpNtlmAut
     return workstation;
   }
 
+  @Override
+  public boolean forceConnectionClose() {
+    return forceConnectionClose;
+  }
 }

@@ -22,6 +22,7 @@ final class DefaultHttpAuthenticationBuilder implements HttpAuthenticationBuilde
   private String username;
   private String password;
   private boolean preemptive = true;
+  private boolean forceConnectionClose = false;
   private String domain;
   private String workstation;
 
@@ -54,6 +55,12 @@ final class DefaultHttpAuthenticationBuilder implements HttpAuthenticationBuilde
   }
 
   @Override
+  public HttpAuthenticationBuilder forceConnectionClose(boolean shouldForceConnectionClose) {
+    this.forceConnectionClose = shouldForceConnectionClose;
+    return this;
+  }
+
+  @Override
   public HttpNtlmAuthenticationBuilder domain(String domain) {
     this.domain = domain;
     return this;
@@ -67,7 +74,7 @@ final class DefaultHttpAuthenticationBuilder implements HttpAuthenticationBuilde
 
   @Override
   public HttpNtlmAuthentication build() {
-    return new DefaultHttpAuthentication(type, username, password, preemptive, domain, workstation);
+    return new DefaultHttpAuthentication(type, username, password, preemptive, forceConnectionClose, domain, workstation);
   }
 
 }

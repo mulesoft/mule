@@ -48,6 +48,12 @@ public interface HttpAuthenticationBuilder {
    */
   HttpAuthenticationBuilder preemptive(boolean preemptive);
 
+    /**
+     * @param shouldForceConnectionClose whether or not to enforce the Connection: close header after the auth handshake.
+     * @return true if the Connection:close header enforcement is needed.
+     */
+  HttpAuthenticationBuilder forceConnectionClose(boolean shouldForceConnectionClose);
+
   /**
    * Creates the {@link HttpAuthentication} as configured.
    *
