@@ -9,9 +9,10 @@ package org.mule.module.artifact.classloader.soft.buster;
 /**
  * Interface to perform cleaning necessary to avoid soft reference directly or indirectly retaining mule classloaders
  * 
- * @since 4.2.3
+ * @since 4.2.2
  */
 public interface SoftReferenceBuster {
 
   void bustSoftReferences(ClassLoader classLoader);
+
 }

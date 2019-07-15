@@ -260,6 +260,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static Latch undeployLatch = new Latch();
 
+  private boolean useMockedListeners = true;
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
@@ -466,11 +467,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                       muleArtifactResourcesRegistry.getApplicationFactory(),
                                                       () -> findSchedulerService(serviceManager));
-    deploymentService.addDeploymentListener(applicationDeploymentListener);
-    deploymentService.addDomainDeploymentListener(domainDeploymentListener);
-    deploymentService.addDeploymentListener(testDeploymentListener);
-    deploymentService.addDomainDeploymentListener(testDeploymentListener);
-    deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
+
+    if (useMockedListeners) {
+      deploymentService.addDeploymentListener(applicationDeploymentListener);
+      deploymentService.addDomainDeploymentListener(domainDeploymentListener);
+      deploymentService.addDeploymentListener(testDeploymentListener);
+      deploymentService.addDomainDeploymentListener(testDeploymentListener);
+      deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
+    }
+
+
 
     policyManager = new TestPolicyManager(deploymentService,
                                           new PolicyTemplateDescriptorFactory(
@@ -1579,6 +1585,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void resetUndeployLatch() {
     undeployLatch = new Latch();
+  }
+
+  public void setUseMockedListeners(boolean useMockedListeners) {
+    this.useMockedListeners = useMockedListeners;
   }
 
   private static class TestMuleDeploymentService extends MuleDeploymentService {

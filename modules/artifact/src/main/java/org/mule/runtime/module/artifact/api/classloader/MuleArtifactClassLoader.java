@@ -50,7 +50,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
 
-  private static final String MULE_LEAK_PREVENTION = SYSTEM_PROPERTY_PREFIX + "leak.prevention";
+  public static final String MULE_LEAK_PREVENTION = SYSTEM_PROPERTY_PREFIX + "leak.prevention";
 
   public static final boolean leakPrevention = getBoolean(MULE_LEAK_PREVENTION);
 
@@ -294,6 +294,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     if (leakPrevention) {
       ComposedSoftReferenceBuster.getInstance().bustSoftReferences(this);
+      // This is needed to force a gc if possible. Sometimes
+      // the gc is not performed because the heap has low levels and activity
+      // so the metadata keeps growing till the gc.
+      System.gc();
     }
   }
 

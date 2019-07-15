@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal;
 
 import static java.beans.Introspector.flushCaches;
-import static org.springframework.beans.CachedIntrospectionResults.clearClassLoader;
 
 import org.mule.module.artifact.classloader.soft.buster.SoftReferenceBuster;
 
