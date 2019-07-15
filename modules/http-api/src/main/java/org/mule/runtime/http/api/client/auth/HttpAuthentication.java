@@ -122,8 +122,8 @@ public interface HttpAuthentication {
     String getWorkstation();
 
     /**
-     * Whether or not the Connection close header should be enforced after the authentication. Useful with the auth credentials
-     * may vary, to guarantee a clean state on each request.
+     * Whether or not the Connection close header should be enforced after the authentication. Useful when with the auth
+     * credentials may vary, to guarantee a clean state on each request.
      *
      * @return whether the authentication credentials may vary.
      *
