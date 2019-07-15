@@ -93,22 +93,6 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
           registerBuster((ClassLoader) classLoader, new SpringSoftReferenceBuster());
         }
       }
-
-    }
-    changeDefaultReferenceType();
-  }
-
-  private void changeDefaultReferenceType() {
-    try {
-      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
-      Field modifiersField = Field.class.getDeclaredField("modifiers");
-      modifiersField.setAccessible(true);
-      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      field.set(null, WEAK);
-    } catch (Throwable e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Error while setting the ConcurrentReferenceHashMap default scope of references to WEAK");
-      }
     }
   }
 
