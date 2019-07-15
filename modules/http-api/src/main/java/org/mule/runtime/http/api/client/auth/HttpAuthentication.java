@@ -92,18 +92,6 @@ public interface HttpAuthentication {
   boolean isPreemptive();
 
   /**
-   * Returns true if any of the provided credentials for authentications is an expression, meaning it could vary between different
-   * evaluations.
-   *
-   * @return whether the authentication credentials may vary.
-   *
-   * @since 4.3
-   */
-  default boolean forceConnectionClose() {
-    return false;
-  }
-
-  /**
    * Represents an HTTP request's NTLM based authentication.
    *
    * @since 4.0
@@ -133,5 +121,16 @@ public interface HttpAuthentication {
      */
     String getWorkstation();
 
+    /**
+     * Whether or not the Connection close header should be enforced after the authentication. Useful with the auth credentials
+     * may vary, to guarantee a clean state on each request.
+     *
+     * @return whether the authentication credentials may vary.
+     *
+     * @since 4.3
+     */
+    default boolean forceConnectionClose() {
+      return false;
+    }
   }
 }

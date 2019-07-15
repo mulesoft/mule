@@ -40,19 +40,13 @@ public interface HttpAuthenticationBuilder {
   HttpAuthenticationBuilder password(String password);
 
   /**
-   * Defines whether or not the authentication should be done from the first request. Default value is {@code true}, if {@code false}
-   * the request will be done awaiting a 401 response with authentication details to start the process.
+   * Defines whether or not the authentication should be done from the first request. Default value is {@code true}, if
+   * {@code false} the request will be done awaiting a 401 response with authentication details to start the process.
    *
    * @param preemptive whether or not the authentication process should be started at once
    * @return this builder
    */
   HttpAuthenticationBuilder preemptive(boolean preemptive);
-
-    /**
-     * @param shouldForceConnectionClose whether or not to enforce the Connection: close header after the auth handshake.
-     * @return true if the Connection:close header enforcement is needed.
-     */
-  HttpAuthenticationBuilder forceConnectionClose(boolean shouldForceConnectionClose);
 
   /**
    * Creates the {@link HttpAuthentication} as configured.
@@ -95,6 +89,12 @@ public interface HttpAuthenticationBuilder {
      * @return this builder
      */
     HttpNtlmAuthenticationBuilder workstation(String workstation);
+
+    /**
+     * @param shouldForceConnectionClose whether or not to enforce the Connection: close header after the auth handshake.
+     * @return true if the Connection:close header enforcement is needed.
+     */
+    HttpNtlmAuthenticationBuilder forceConnectionClose(boolean shouldForceConnectionClose);
 
     @Override
     HttpNtlmAuthentication build();

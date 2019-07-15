@@ -55,7 +55,7 @@ final class DefaultHttpAuthenticationBuilder implements HttpAuthenticationBuilde
   }
 
   @Override
-  public HttpAuthenticationBuilder forceConnectionClose(boolean shouldForceConnectionClose) {
+  public HttpNtlmAuthenticationBuilder forceConnectionClose(boolean shouldForceConnectionClose) {
     this.forceConnectionClose = shouldForceConnectionClose;
     return this;
   }

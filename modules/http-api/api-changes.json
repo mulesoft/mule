@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.http.api.client.auth.HttpAuthenticationBuilder.HttpNtlmAuthenticationBuilder org.mule.runtime.http.api.client.auth.HttpAuthenticationBuilder.HttpNtlmAuthenticationBuilder::forceConnectionClose(boolean)",
+          "package": "org.mule.runtime.http.api.client.auth",
+          "classSimpleName": "HttpNtlmAuthenticationBuilder",
+          "methodName": "forceConnectionClose",
+          "elementKind": "method",
+          "justification": "Connection close enforcement of NTLM authenticated requesters."
+        },
+        {
           "code": "java.class.nonFinalClassInheritsFromNewClass",
           "old": "class org.mule.runtime.http.api.domain.OptimizedCaseInsensitiveMapWrapper<T extends java.lang.Object>",
           "new": "class org.mule.runtime.http.api.domain.OptimizedCaseInsensitiveMapWrapper<T extends java.lang.Object>",
