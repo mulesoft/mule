@@ -118,11 +118,16 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
 
   @Override
   public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
+    return extend(lookupStrategies, false);
+  }
+
+  @Override
+  public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
     validateLookupPolicies(lookupStrategies);
     final Map<String, LookupStrategy> newLookupStrategies = new HashMap<>(this.configuredLookupStrategies);
 
     for (String packageName : lookupStrategies.keySet()) {
-      if (!newLookupStrategies.containsKey(normalizePackageName(packageName))) {
+      if (overwrite || !newLookupStrategies.containsKey(normalizePackageName(packageName))) {
         newLookupStrategies.put(packageName, lookupStrategies.get(packageName));
       }
     }

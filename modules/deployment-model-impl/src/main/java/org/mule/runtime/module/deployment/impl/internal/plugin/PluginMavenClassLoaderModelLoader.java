@@ -20,11 +20,18 @@ import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLo
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
 
 import java.io.File;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -46,8 +53,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   }
 
   @Override
-  protected void addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
-    classLoaderModelBuilder.includeAdditionalPluginDependencies();
+  protected List<URL> addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
+    return classLoaderModelBuilder.includeAdditionalPluginDependencies();
   }
 
   @Override

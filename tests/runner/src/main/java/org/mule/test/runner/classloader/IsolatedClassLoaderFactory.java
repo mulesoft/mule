@@ -224,7 +224,7 @@ public class IsolatedClassLoaderFactory {
       }
     }
 
-    return new JarInfo(packages, resources);
+    return new JarInfo(packages, resources, emptyList());
   }
 
   private void createTestRunnerPlugin(ArtifactsUrlClassification artifactsUrlClassification,
@@ -291,7 +291,7 @@ public class IsolatedClassLoaderFactory {
                                                                         exportedResources.addAll(jarInfo.getResources());
                                                                       });
 
-    return new JarInfo(exportedPackages, exportedResources);
+    return new JarInfo(exportedPackages, exportedResources, emptyList());
   }
 
   private ClassLoaderLookupPolicy extendLookupPolicyForPrivilegedAccess(ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
@@ -366,7 +366,7 @@ public class IsolatedClassLoaderFactory {
 
     Set<String> testPackages = sanitizeTestExportedPackages(productionPackages, testJarInfo.getPackages());
 
-    return new JarInfo(testPackages, testJarInfo.getResources());
+    return new JarInfo(testPackages, testJarInfo.getResources(), emptyList());
   }
 
   /**

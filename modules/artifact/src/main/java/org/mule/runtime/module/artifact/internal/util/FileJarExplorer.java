@@ -9,20 +9,27 @@ package org.mule.runtime.module.artifact.internal.util;
 
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
+import static java.util.regex.Pattern.compile;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
-import static org.apache.commons.lang3.ClassUtils.getPackageName;
+
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 /**
  * Discovers Java packages from files and folders
@@ -30,11 +37,16 @@ import java.util.zip.ZipInputStream;
 public class FileJarExplorer implements JarExplorer {
 
   protected static final String CLASS_EXTENSION = ".class";
+  private static final String META_INF_SERVICES_PATH = "META-INF/services/";
+
+  private static final Pattern SLASH_PATTERN = compile("/");
+  private static final Pattern SEPARATOR_PATTERN = compile(separator);
 
   @Override
   public JarInfo explore(URI library) {
     Set<String> packages = new TreeSet<>();
     Set<String> resources = new TreeSet<>();
+    List<ExportedService> services = new ArrayList<>();
 
     try {
       final File libraryFile = new File(library);
@@ -46,33 +58,44 @@ public class FileJarExplorer implements JarExplorer {
         for (File classFile : files) {
           final String relativePath = classFile.getAbsolutePath().substring(libraryFile.getAbsolutePath().length() + 1);
           if (relativePath.endsWith(CLASS_EXTENSION)) {
-            final String packageName =
-                getPackageName(relativePath.substring(0, relativePath.length() - CLASS_EXTENSION.length()).replace(separator,
-                                                                                                                   "."));
-            packages.add(packageName);
+            packages.add(SEPARATOR_PATTERN
+                .matcher(relativePath.substring(0, relativePath.lastIndexOf(separatorChar)))
+                .replaceAll("."));
           } else {
             if (separatorChar == '/') {
               resources.add(relativePath);
             } else {
-              resources.add(relativePath.replace(separator, "/"));
+              resources.add(SEPARATOR_PATTERN.matcher(relativePath).replaceAll("/"));
             }
           }
         }
       } else {
         if (libraryFile.getName().toLowerCase().endsWith(".jar")) {
 
-          try (ZipInputStream zip = new ZipInputStream(new FileInputStream(libraryFile))) {
-            for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+          try (final ZipFile zipFile = new ZipFile(libraryFile)) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+              final ZipEntry entry = entries.nextElement();
+              final String name = entry.getName();
+
               if (entry.isDirectory()) {
                 continue;
-              }
-              if (entry.getName().endsWith(CLASS_EXTENSION)) {
-                final String packageName = getPackageName(entry.getName()
-                    .substring(0, entry.getName().length() - CLASS_EXTENSION.length())
-                    .replace("/", "."));
-                packages.add(packageName);
+              } else if (name.startsWith(META_INF_SERVICES_PATH)) {
+                String serviceInterface = name.substring(META_INF_SERVICES_PATH.length());
+                URL resource = getServiceResourceUrl(libraryFile.toURI().toURL(), name);
+
+                services.add(new ExportedService(serviceInterface, resource));
+              } else if (name.endsWith(CLASS_EXTENSION)) {
+                if (name.lastIndexOf('/') < 0) {
+                  // skip default package
+                  continue;
+                }
+
+                packages.add(SLASH_PATTERN
+                    .matcher(name.substring(0, name.lastIndexOf('/')))
+                    .replaceAll("."));
               } else {
-                resources.add(entry.getName());
+                resources.add(name);
               }
             }
           }
@@ -82,6 +105,10 @@ public class FileJarExplorer implements JarExplorer {
       throw new IllegalStateException("Cannot explore URL: " + library, e);
     }
 
-    return new JarInfo(packages, resources);
+    return new JarInfo(packages, resources, services);
+  }
+
+  public static URL getServiceResourceUrl(URL resource, String serviceInterface) throws MalformedURLException {
+    return new URL("jar:" + resource + "!/" + serviceInterface);
   }
 }
