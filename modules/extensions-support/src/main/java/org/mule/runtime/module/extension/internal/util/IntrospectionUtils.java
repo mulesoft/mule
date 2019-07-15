@@ -30,6 +30,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.leakPrevention;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -133,7 +134,6 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -148,7 +148,10 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
@@ -164,10 +167,11 @@ public final class IntrospectionUtils {
   private static final AnyType ANY_TYPE = typeBuilder().anyType().build();
   private static final ArrayType ANY_ARRAY_TYPE = typeBuilder().arrayType().of(ANY_TYPE).build();
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
+  private static final Logger LOGGER = LoggerFactory.getLogger(IntrospectionUtils.class);
 
   static {
 
-    if (MuleArtifactClassLoader.leakPrevention) {
+    if (leakPrevention) {
       try {
         Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
         Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -175,7 +179,9 @@ public final class IntrospectionUtils {
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         field.set(null, WEAK);
       } catch (Throwable e) {
-
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes: {}", e.getMessage());
+        }
       }
     }
   }
