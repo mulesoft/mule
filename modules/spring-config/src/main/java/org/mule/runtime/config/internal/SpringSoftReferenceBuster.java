@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.beans.Introspector.flushCaches;
 import static org.springframework.beans.CachedIntrospectionResults.clearClassLoader;
 
 import org.mule.module.artifact.classloader.soft.buster.SoftReferenceBuster;
@@ -13,14 +14,13 @@ import org.mule.module.artifact.classloader.soft.buster.SoftReferenceBuster;
 /**
  * Reference buster to flush caches used by spring introspection of classes
  * 
- * @since 4.2.3
+ * @since 4.2.2
  */
 public class SpringSoftReferenceBuster implements SoftReferenceBuster {
 
   @Override
   public void bustSoftReferences(ClassLoader classLoader) {
-    java.beans.Introspector.flushCaches();
-    clearClassLoader(classLoader);
+    flushCaches();
   }
 
 }

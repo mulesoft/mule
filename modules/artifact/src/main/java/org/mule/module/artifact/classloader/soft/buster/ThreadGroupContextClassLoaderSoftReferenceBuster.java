@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 /**
  * Reference buster to remove soft reference in thread group context
  * 
- * @since 4.2.3
+ * @since 4.2.2
  */
 public class ThreadGroupContextClassLoaderSoftReferenceBuster implements SoftReferenceBuster {
 
