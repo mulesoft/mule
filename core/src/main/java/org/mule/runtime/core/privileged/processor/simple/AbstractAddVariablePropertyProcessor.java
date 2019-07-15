@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -20,15 +21,18 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
@@ -38,6 +42,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   private String value;
   private AttributeEvaluator valueEvaluator;
   private Optional<DataType> returnType = empty();
+
+  private StreamingManager streamingManager;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -64,6 +70,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
         }
         return removeProperty((PrivilegedEvent) event, key);
       } else {
+        typedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
+
         return addProperty((PrivilegedEvent) event, key, typedValue
             .getValue(), DataType.builder().type(typedValue.getDataType().getType())
                 .mediaType(getMediaType(typedValue)).charset(resolveEncoding(typedValue)).build());
@@ -128,5 +136,10 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   public DataType getReturnDataType() {
     return returnType.orElse(DataType.OBJECT);
+  }
+
+  @Inject
+  public void setStreamingManager(StreamingManager streamingManager) {
+    this.streamingManager = streamingManager;
   }
 }
