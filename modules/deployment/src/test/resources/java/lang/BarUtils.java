@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.bar;
+package java.lang;
 
 public class BarUtils {
     public BarUtils() {
     }
 
-    public String doStuff() {
-        return "doStuff emtpy";
+    public String doStuff(String data) {
+        return "doStuff with data: " + data;
     }
 }

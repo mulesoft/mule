@@ -7,6 +7,7 @@
 
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -14,6 +15,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mule.runtime.container.internal.ExportedServiceMatcher.like;
 
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.CompilerUtils;
@@ -23,7 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,7 +83,7 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
     File innerFooJar = new File(libFolder, FOO_JAR_FILENAME);
     copyFile(fooJar, innerFooJar);
 
-    List<String> paths = Collections.singletonList(libFolder.getAbsolutePath());
+    List<String> paths = singletonList(libFolder.getAbsolutePath());
 
     Set<String> packages = new HashSet<>();
     Set<String> resources = new HashSet<>();
@@ -102,7 +103,7 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
     File innerFooJar = new File(subFolder, FOO_JAR_FILENAME);
     copyFile(fooJar, innerFooJar);
 
-    List<String> paths = Collections.singletonList(libFolder.getAbsolutePath());
+    List<String> paths = singletonList(libFolder.getAbsolutePath());
 
     Set<String> packages = new HashSet<>();
     Set<String> resources = new HashSet<>();
@@ -123,7 +124,7 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
     File innerBarJar = new File(subFolder, BAR_JAR_FILENAMEß);
     copyFile(barJar, innerBarJar);
 
-    List<String> paths = Collections.singletonList(libFolder.getAbsolutePath());
+    List<String> paths = singletonList(libFolder.getAbsolutePath());
 
     Set<String> packages = new HashSet<>();
     Set<String> resources = new HashSet<>();
@@ -137,6 +138,6 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
   }
 
   private URL getServiceResourceUrl(File resourceFile, String serviceInterface) throws MalformedURLException {
-    return JreExplorer.getServiceResourceUrl(resourceFile.toURI().toURL(), serviceInterface);
+    return FileJarExplorer.getServiceResourceUrl(resourceFile.toURI().toURL(), serviceInterface);
   }
 }

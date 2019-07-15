@@ -39,6 +39,8 @@ import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -278,7 +280,9 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
         .findFirst();
   }
 
-  public void includeAdditionalPluginDependencies() {
+  public List<URL> includeAdditionalPluginDependencies() {
+    final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
+
     if (deployableArtifactDescriptor != null) {
       deployableArtifactDescriptor.getClassLoaderModel().getDependencies().stream()
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().isPlugin())
@@ -287,20 +291,23 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
               && bundleDescriptor.getDescriptor().getArtifactId().equals(this.artifactBundleDescriptor.getArtifactId()))
           .filter(bundleDependency -> bundleDependency.getAdditionalDependencies() != null
               && !bundleDependency.getAdditionalDependencies().isEmpty())
-          .forEach(
-                   bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency)
-                       .forEach(uri -> {
-                         try {
-                           containing(uri.toURL());
-                         } catch (MalformedURLException e) {
-                           throw new ArtifactDescriptorCreateException(
-                                                                       format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
-                                                                              artifactFolder.getAbsolutePath(),
-                                                                              uri),
-                                                                       e);
-                         }
-                       }));
+          .forEach(bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency)
+              .forEach(uri -> {
+                final URL dependencyArtifactUrl;
+                try {
+                  dependencyArtifactUrl = uri.toURL();
+                } catch (MalformedURLException e) {
+                  throw new ArtifactDescriptorCreateException(format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
+                                                                     artifactFolder.getAbsolutePath(),
+                                                                     uri),
+                                                              e);
+                }
+                containing(dependencyArtifactUrl);
+                dependenciesArtifactsUrls.add(dependencyArtifactUrl);
+              }));
     }
+
+    return dependenciesArtifactsUrls;
   }
 
   protected abstract List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency);

@@ -13,6 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -31,12 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Creates the class loaders for plugins that are contained in a given region
  *
  * @since 4.0
  */
 public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClassLoadersFactory {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRegionPluginClassLoadersFactory.class);
 
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
 
@@ -140,7 +146,17 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
       }
     }
 
-    return baseLookupPolicy.extend(pluginsLookupPolicies);
+    Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
+    for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
+      if (!(baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy)) {
+        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
+      } else {
+        LOGGER.warn("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
+            + "', but it will be ignored since it is already available from the container.");
+      }
+    }
+
+    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies, true);
   }
 
   private List<ArtifactPluginDescriptor> getPluginDescriptors(ArtifactPluginDescriptor descriptor,
