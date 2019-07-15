@@ -125,8 +125,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
-import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.domain.EmptyDomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
@@ -234,6 +232,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File barUtils2ClassFile;
   protected static File barUtils2_0JarFile;
 
+  protected static File barUtilsForbiddenJavaClassFile;
+  protected static File barUtilsForbiddenJavaJarFile;
+
+  protected static File barUtilsForbiddenMuleContainerClassFile;
+  protected static File barUtilsForbiddenMuleContainerJarFile;
+
+  protected static File barUtilsForbiddenMuleThirdPartyClassFile;
+  protected static File barUtilsForbiddenMuleThirdPartyJarFile;
+
+  protected static File echoTestClassFile;
   protected static File echoTestJarFile;
 
   private static File defaulServiceEchoJarFile;
@@ -243,8 +251,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File helloExtensionV1JarFile;
 
   private static File helloExtensionV2JarFile;
-
-  protected static File echoTestClassFile;
 
   protected static File loadsAppResourceCallbackClassFile;
   protected static File loadsAppResourceCallbackJarFile;
@@ -266,6 +272,23 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     barUtils2ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar2/BarUtils.java"));
     barUtils2_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
 
+    barUtilsForbiddenJavaClassFile = new SingleClassCompiler().compile(getResourceFile("/java/lang/BarUtils.java"));
+    barUtilsForbiddenJavaJarFile =
+        new JarCompiler().compiling(getResourceFile("/java/lang/BarUtils.java")).compile("bar-javaForbidden.jar");
+
+    barUtilsForbiddenMuleContainerClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"));
+    barUtilsForbiddenMuleContainerJarFile =
+        new JarCompiler().compiling(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"))
+            .compile("bar-muleContainerForbidden.jar");
+
+    barUtilsForbiddenMuleThirdPartyClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/slf4j/BarUtils.java"));
+    barUtilsForbiddenMuleThirdPartyJarFile =
+        new JarCompiler().compiling(getResourceFile("/org/slf4j/BarUtils.java"))
+            .compile("bar-muleThirdPartyForbidden.jar");
+
+    echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
     defaulServiceEchoJarFile = new JarCompiler()
@@ -288,8 +311,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
         .compile("mule-module-hello-2.0.0.jar", "2.0.0");
-
-    echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
 
     loadsAppResourceCallbackClassFile =
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));

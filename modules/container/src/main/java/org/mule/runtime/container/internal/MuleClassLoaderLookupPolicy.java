@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
+
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
@@ -117,11 +118,16 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
 
   @Override
   public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
+    return extend(lookupStrategies, false);
+  }
+
+  @Override
+  public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
     validateLookupPolicies(lookupStrategies);
     final Map<String, LookupStrategy> newLookupStrategies = new HashMap<>(this.configuredLookupStrategies);
 
     for (String packageName : lookupStrategies.keySet()) {
-      if (!newLookupStrategies.containsKey(normalizePackageName(packageName))) {
+      if (overwrite || !newLookupStrategies.containsKey(normalizePackageName(packageName))) {
         newLookupStrategies.put(packageName, lookupStrategies.get(packageName));
       }
     }
