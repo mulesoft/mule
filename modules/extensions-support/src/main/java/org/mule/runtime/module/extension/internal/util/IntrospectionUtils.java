@@ -176,19 +176,21 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * T
+   * Set caches in spring so that they are weakly (and not softly) referenced by default.
+   * 
+   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is
+   * used.
    */
   private static void setWeakHashCaches() {
     try {
-      // This is needed to avoid classloaders to be retained on undeploy of an app. 
       Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
       Field modifiersField = Field.class.getDeclaredField("modifiers");
       modifiersField.setAccessible(true);
       modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
       field.set(null, WEAK);
-    } catch (Throwable e) {
+    } catch (Exception e) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes: {}", e.getMessage());
+        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes.", e);
       }
     }
   }
