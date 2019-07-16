@@ -1094,7 +1094,7 @@
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-module-artifact-ast</artifactId>
+                <artifactId>mule-artifact-ast</artifactId>
                 <version>${muleAstVersion}</version>
             </dependency>
             <dependency>
