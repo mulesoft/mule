@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
@@ -27,10 +28,10 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getId;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_MULE_LEAK_PREVENTION;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -163,6 +164,8 @@ import com.google.common.collect.ImmutableList;
  */
 public final class IntrospectionUtils {
 
+  private static final boolean DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY = getBoolean(DISABLE_MULE_LEAK_PREVENTION);
+
   private static final AnyType ANY_TYPE = typeBuilder().anyType().build();
   private static final ArrayType ANY_ARRAY_TYPE = typeBuilder().arrayType().of(ANY_TYPE).build();
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
@@ -178,8 +181,7 @@ public final class IntrospectionUtils {
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
    * 
-   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is
-   * used.
+   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
    */
   private static void setWeakHashCaches() {
     try {

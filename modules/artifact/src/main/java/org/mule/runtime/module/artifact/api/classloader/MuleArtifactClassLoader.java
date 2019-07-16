@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +33,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.slf4j.Logger;
 
 /**
@@ -46,11 +45,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
-
-  public static final String DISABLE_MULE_LEAK_PREVENTION = SYSTEM_PROPERTY_PREFIX + "disable.leak.prevention";
-
-  public static final boolean DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY = getBoolean(DISABLE_MULE_LEAK_PREVENTION);
-
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
 
@@ -283,7 +277,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       LOGGER.error("Cannot create resource releaser instance", e);
     }
     super.dispose();
-
     shutdownListeners();
   }
 

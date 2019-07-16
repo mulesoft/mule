@@ -7,12 +7,13 @@
 package org.mule.module.artifact.classloader;
 
 import static java.beans.Introspector.flushCaches;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
-import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_MULE_LEAK_PREVENTION;
 import static org.mule.runtime.module.artifact.api.classloader.ThreadGroupContextClassLoaderSoftReferenceBuster.bustSoftReferences;
 
 import java.lang.reflect.Field;
@@ -44,6 +45,8 @@ import org.slf4j.LoggerFactory;
  * a class to be loaded from the container.
  */
 public class DefaultResourceReleaser implements ResourceReleaser {
+  
+  private static final boolean DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY = getBoolean(DISABLE_MULE_LEAK_PREVENTION);
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
