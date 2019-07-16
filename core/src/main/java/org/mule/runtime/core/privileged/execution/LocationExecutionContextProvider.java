@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.ComponentLocationProvider;
@@ -43,7 +44,10 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    * @param beanAnnotations the map with annotations to populate
    * @param sourceCode the source code representation of the element definition.
    * @param customAttributes the custom attributes of the element definition.
+   *
+   * @deprecated Use {@link #addMetadataAnnotationsFromDocAttributes(Map, String, Map)} instead
    */
+  @Deprecated
   public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String sourceCode,
                                                    Map<String, Object> customAttributes) {
     if (sourceCode != null) {
@@ -57,6 +61,30 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
     }
     customAttributes.forEach((key, value) -> {
       if (!key.equals(NAME_ANNOTATION_KEY.toString())) {
+        beanAnnotations.put(QName.valueOf(key), value);
+      }
+    });
+  }
+
+  /**
+   * Populates the passed beanAnnotations with the other passed parameters.
+   *
+   * @param beanAnnotations the map with annotations to populate
+   * @param sourceCode the source code representation of the element definition.
+   * @param docAttributes the doc attributes of the element definition.
+   */
+  public static void addMetadataAnnotationsFromDocAttributes(Map<QName, Object> beanAnnotations, String sourceCode,
+                                                             Map<String, String> docAttributes) {
+    if (sourceCode != null) {
+      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
+    }
+
+    String documentationName = docAttributes.get("name");
+    if (documentationName != null) {
+      beanAnnotations.put(NAME_ANNOTATION_KEY, documentationName);
+    }
+    docAttributes.forEach((key, value) -> {
+      if (!key.equals("name")) {
         beanAnnotations.put(QName.valueOf(key), value);
       }
     });

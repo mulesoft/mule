@@ -19,7 +19,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATION
 import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
+import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromDocAttributes;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -163,8 +163,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
    *        name of the flow.
    */
   private void processMacroExpandedAnnotations(ComponentModel componentModel, Map<QName, Object> annotations) {
-    if (componentModel.getCustomAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
-      final Object flowName = componentModel.getCustomAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
+    if (componentModel.getMetadata().getParserAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
+      final Object flowName = componentModel.getMetadata().getParserAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
       annotations.put(AbstractComponent.ROOT_CONTAINER_NAME_KEY, flowName);
     }
   }
@@ -175,7 +175,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       return annotations;
     } else {
       if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
-        addMetadataAnnotationsFromXml(annotations, componentModel.getSourceCode(), componentModel.getCustomAttributes());
+        addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getSourceCode(),
+                                                componentModel.getMetadata().getDocAttributes());
         builder.getBeanDefinition().getPropertyValues().addPropertyValue("annotations", annotations);
       }
 

@@ -123,7 +123,8 @@ public abstract class ComponentModel {
     Map<String, Object> attrs = new HashMap<>();
 
     attrs.putAll(componentMetadata.getParserAttributes());
-    attrs.putAll(componentMetadata.getDocAttributes());
+    componentMetadata.getDocAttributes()
+        .forEach((k, v) -> attrs.put("{http://www.mulesoft.org/schema/mule/documentation}" + k, v));
 
     return attrs;
   }
@@ -258,7 +259,7 @@ public abstract class ComponentModel {
 
     parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
-    getCustomAttributes().forEach(builder::withProperty);
+    getMetadata().getParserAttributes().forEach(builder::withProperty);
     builder.withComponentLocation(this.componentLocation);
     builder.withProperty(COMPONENT_MODEL_KEY, this);
 

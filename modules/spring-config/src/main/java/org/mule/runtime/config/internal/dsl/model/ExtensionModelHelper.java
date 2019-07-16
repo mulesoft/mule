@@ -22,6 +22,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -44,16 +45,16 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
@@ -69,9 +70,9 @@ import java.util.stream.Stream;
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
-  private Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
+  private final Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
       CacheBuilder.newBuilder().build();
-  private Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
+  private final Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
       CacheBuilder.newBuilder().build();
 
   /**
@@ -89,8 +90,8 @@ public class ExtensionModelHelper {
    * @return the {@link DslElementModel} associated with the configuration or an {@link Optional#empty()} if there isn't one.
    */
   public TypedComponentIdentifier.ComponentType findComponentType(ComponentModel componentModel) {
-    ComponentIdentifier componentId = componentModel.getCustomAttributes().containsKey(ORIGINAL_IDENTIFIER)
-        ? (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER)
+    ComponentIdentifier componentId = componentModel.getMetadata().getParserAttributes().containsKey(ORIGINAL_IDENTIFIER)
+        ? (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER)
         : componentModel.getIdentifier();
     Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> extensionComponentModelOptional =
         findComponentModel(componentId);
@@ -247,7 +248,7 @@ public class ExtensionModelHelper {
 
   static class IsRouteVisitor implements NestableElementModelVisitor {
 
-    private Reference<TypedComponentIdentifier.ComponentType> reference;
+    private final Reference<TypedComponentIdentifier.ComponentType> reference;
 
     public IsRouteVisitor(Reference<TypedComponentIdentifier.ComponentType> reference) {
       this.reference = reference;
@@ -272,7 +273,7 @@ public class ExtensionModelHelper {
    */
   static class NestedComponentVisitor implements NestableElementModelVisitor {
 
-    private Reference<TypedComponentIdentifier.ComponentType> reference;
+    private final Reference<TypedComponentIdentifier.ComponentType> reference;
 
     public NestedComponentVisitor(Reference<TypedComponentIdentifier.ComponentType> reference) {
       this.reference = reference;
