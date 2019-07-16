@@ -8,10 +8,14 @@ package org.mule.runtime.config.internal.model;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
@@ -49,45 +53,45 @@ public abstract class ComponentModel {
 
   private boolean root = false;
   private ComponentIdentifier identifier;
-  private Map<String, Object> customAttributes = new HashMap<>();
-  private Map<String, String> parameters = new HashMap<>();
-  private Set<String> schemaValueParameter = new HashSet<>();
+  private final Map<String, String> parameters = new HashMap<>();
+  private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
   private ComponentModel parent;
-  private List<ComponentModel> innerComponents = new ArrayList<>();
+  private final List<ComponentModel> innerComponents = new ArrayList<>();
   private String textContent;
   private DefaultComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
 
+  private ComponentMetadataAst componentMetadata;
+
   private Object objectInstance;
   private Class<?> type;
-  private Integer lineNumber;
-  private Integer startColumn;
-  private String configFileName;
-  private String sourceCode;
   private boolean enabled = true;
 
   /**
    * @return the line number in which the component was defined in the configuration file. It may be empty if the component was
    *         created pragmatically.
    */
+  @Deprecated
   public Optional<Integer> getLineNumber() {
-    return ofNullable(lineNumber);
+    return componentMetadata.getStartLine().isPresent() ? of(componentMetadata.getStartLine().getAsInt()) : empty();
   }
 
   /**
    * @return the start column in which the component was defined in the configuration file. It may be empty if the component was
    *         created pragmatically.
    */
+  @Deprecated
   public Optional<Integer> getStartColumn() {
-    return ofNullable(startColumn);
+    return componentMetadata.getStartColumn().isPresent() ? of(componentMetadata.getStartColumn().getAsInt()) : empty();
   }
 
   /**
    * @return the config file name in which the component was defined. It may be empty if the component was created pragmatically.
    */
+  @Deprecated
   public Optional<String> getConfigFileName() {
-    return ofNullable(configFileName);
+    return componentMetadata.getFileName();
   }
 
   /**
@@ -114,8 +118,14 @@ public abstract class ComponentModel {
   /**
    * @return a {@code java.util.Map} with all the custom attributes.
    */
+  @Deprecated
   public Map<String, Object> getCustomAttributes() {
-    return customAttributes;
+    Map<String, Object> attrs = new HashMap<>();
+
+    attrs.putAll(componentMetadata.getParserAttributes());
+    attrs.putAll(componentMetadata.getDocAttributes());
+
+    return attrs;
   }
 
   /**
@@ -155,19 +165,15 @@ public abstract class ComponentModel {
   }
 
   /**
-   * @return the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be created when
-   *         processing this {@code ComponentModel}.
-   */
-  public Optional<TypedComponentIdentifier.ComponentType> getComponentType() {
-    return ofNullable(componentType);
-  }
-
-  /**
    * @param componentType the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be
    *        created when processing this {@code ComponentModel}.
    */
   public void setComponentType(TypedComponentIdentifier.ComponentType componentType) {
     this.componentType = componentType;
+  }
+
+  public TypedComponentIdentifier.ComponentType getComponentType() {
+    return componentType != null ? componentType : TypedComponentIdentifier.ComponentType.UNKNOWN;
   }
 
   /**
@@ -227,7 +233,7 @@ public abstract class ComponentModel {
    * Setter used for components that should be created eagerly without going through spring. This is the case of models
    * contributing to IoC {@link org.mule.runtime.api.ioc.ObjectProvider} interface that require to be created before the
    * application components so they can be referenced.
-   * 
+   *
    * @param objectInstance the object instance created from this model.
    */
   public void setObjectInstance(Object objectInstance) {
@@ -244,6 +250,7 @@ public abstract class ComponentModel {
   }
 
   // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
+  @Deprecated
   public ComponentConfiguration getConfiguration() {
     InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
         .withIdentifier(this.getIdentifier())
@@ -251,7 +258,7 @@ public abstract class ComponentModel {
 
     parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
-    customAttributes.forEach(builder::withProperty);
+    getCustomAttributes().forEach(builder::withProperty);
     builder.withComponentLocation(this.componentLocation);
     builder.withProperty(COMPONENT_MODEL_KEY, this);
 
@@ -289,8 +296,13 @@ public abstract class ComponentModel {
   /**
    * @return the source code associated with this component.
    */
+  @Deprecated
   public String getSourceCode() {
-    return sourceCode;
+    return componentMetadata.getSourceCode().orElse(null);
+  }
+
+  public ComponentMetadataAst getMetadata() {
+    return componentMetadata;
   }
 
   /**
@@ -298,8 +310,10 @@ public abstract class ComponentModel {
    */
   public static class Builder {
 
-    private ComponentModel model = new SpringComponentModel();
+    private final ComponentModel model = new SpringComponentModel();
     private ComponentModel root;
+
+    private final org.mule.runtime.ast.api.ComponentMetadataAst.Builder metadataBuilder = ComponentMetadataAst.builder();
 
     /**
      * Default constructor for this builder.
@@ -309,7 +323,7 @@ public abstract class ComponentModel {
     /**
      * Creates an instance of the Builder which will allow to merge other root component models to the given one. The root
      * component model provided here will be modified instead of cloned.
-     * 
+     *
      * @param root {@link ComponentModel} to be used as root. It will be modified.
      */
     public Builder(ComponentModel root) {
@@ -387,7 +401,7 @@ public abstract class ComponentModel {
      */
     public Builder addCustomAttribute(String name, Object value) {
       checkIsNotBuildingFromRootComponentModel("customAttributes");
-      this.model.customAttributes.put(name, value);
+      this.metadataBuilder.putParserAttribute(name, value);
       return this;
     }
 
@@ -397,7 +411,7 @@ public abstract class ComponentModel {
      */
     public Builder setConfigFileName(String configFileName) {
       checkIsNotBuildingFromRootComponentModel("configFileName");
-      this.model.configFileName = configFileName;
+      this.metadataBuilder.setFileName(configFileName);
       return this;
     }
 
@@ -407,7 +421,8 @@ public abstract class ComponentModel {
      */
     public Builder setLineNumber(int lineNumber) {
       checkIsNotBuildingFromRootComponentModel("lineNumber");
-      this.model.lineNumber = lineNumber;
+      this.metadataBuilder.setStartLine(lineNumber);
+      this.metadataBuilder.setEndLine(lineNumber);
       return this;
     }
 
@@ -417,7 +432,8 @@ public abstract class ComponentModel {
      */
     public Builder setStartColumn(int startColumn) {
       checkIsNotBuildingFromRootComponentModel("startColumn");
-      this.model.startColumn = startColumn;
+      this.metadataBuilder.setStartColumn(startColumn);
+      this.metadataBuilder.setEndColumn(startColumn);
       return this;
     }
 
@@ -427,19 +443,20 @@ public abstract class ComponentModel {
      */
     public Builder setSourceCode(String sourceCode) {
       checkIsNotBuildingFromRootComponentModel("sourceCode");
-      this.model.sourceCode = sourceCode;
+      this.metadataBuilder.setSourceCode(sourceCode);
       return this;
     }
 
     /**
      * Given the following root component it will merge its customAttributes, parameters and schemaValueParameters to the root
      * component model.
-     * 
+     *
      * @param otherRootComponentModel another component model created as root to be merged.
      * @return the builder.
      */
     public Builder merge(ComponentModel otherRootComponentModel) {
-      this.root.customAttributes.putAll(otherRootComponentModel.customAttributes);
+      ((ComponentAst) otherRootComponentModel).getMetadata().getParserAttributes()
+          .forEach((k, v) -> this.metadataBuilder.putParserAttribute(k, v));
       this.root.parameters.putAll(otherRootComponentModel.parameters);
       this.root.schemaValueParameter.addAll(otherRootComponentModel.schemaValueParameter);
 
@@ -455,6 +472,7 @@ public abstract class ComponentModel {
         return root;
       }
       checkState(model.identifier != null, "An identifier must be provided");
+      model.componentMetadata = metadataBuilder.build();
       return model;
     }
 

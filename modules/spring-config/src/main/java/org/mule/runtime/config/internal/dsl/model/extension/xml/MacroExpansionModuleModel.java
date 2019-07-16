@@ -326,15 +326,17 @@ public class MacroExpansionModuleModel {
       processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
     }
     processorChainBuilder.addCustomAttribute(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME, containerName);
-    ComponentModel processorChainModel = processorChainBuilder.build();
-    for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
-      processorChainModelChild.setParent(processorChainModel);
-    }
 
     operationRefModel.getConfigFileName().ifPresent(processorChainBuilder::setConfigFileName);
     operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
     operationRefModel.getStartColumn().ifPresent(processorChainBuilder::setStartColumn);
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
+
+    ComponentModel processorChainModel = processorChainBuilder.build();
+    for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
+      processorChainModelChild.setParent(processorChainModel);
+    }
+
     return processorChainModel;
   }
 

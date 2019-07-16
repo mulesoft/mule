@@ -231,6 +231,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.3.0-SNAPSHOT</muleDslApiVersion>
+        <muleAstVersion>0.8.0-SNAPSHOT</muleAstVersion>
         <muleExtensionsApiVersion>1.3.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.3.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.5.0-SNAPSHOT</muleMavenClientApi>
@@ -1090,6 +1091,11 @@
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-module-dsl-api</artifactId>
                 <version>${muleDslApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-artifact-ast</artifactId>
+                <version>${muleAstVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>

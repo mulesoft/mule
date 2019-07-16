@@ -49,6 +49,7 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -65,7 +66,6 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFac
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.util.TemplateParser;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -83,9 +83,6 @@ import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessag
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -93,6 +90,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -145,9 +145,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   protected ReflectionCache reflectionCache;
 
-  private MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
+  private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
-  protected MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
+  protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
 
   protected ExtensionComponent(ExtensionModel extensionModel,
@@ -378,7 +378,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private MetadataCacheId getMetadataCacheId() {
-    return cacheIdGenerator.getIdForGlobalMetadata((ComponentConfiguration) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
+    return cacheIdGenerator.getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
         .map(id -> {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(id.getParts().toString());
@@ -388,7 +388,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         .orElseThrow(() -> new IllegalStateException(
                                                      format("Missing information to obtain the MetadataCache for the component '%s'. "
                                                          +
-                                                         "Expected to have the ComponentConfiguration information in the '%s' annotation but none was found.",
+                                                         "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
                                                             this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
@@ -533,9 +533,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   private void setCacheIdGenerator() {
     DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
-    MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentConfiguration> configLocator = location -> componentLocator
+    MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentAst> configLocator = location -> componentLocator
         .find(location)
-        .map(component -> (ComponentConfiguration) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
+        .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
 
     this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
   }
@@ -555,7 +555,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Inject
-  public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory) {
+  public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory) {
     this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
   }
 }
