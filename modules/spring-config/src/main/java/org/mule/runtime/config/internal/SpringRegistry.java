@@ -8,9 +8,7 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.module.artifact.classloader.soft.buster.ComposedSoftReferenceBuster.registerBuster;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.leakPrevention;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import java.util.Collection;
@@ -34,8 +32,6 @@ import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -78,16 +74,6 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     super(REGISTRY_ID, muleContext, lifecycleInterceptor);
     setApplicationContext(applicationContext);
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
-    if (leakPrevention) {
-      registerBuster(muleContext.getExecutionClassLoader(), new SpringSoftReferenceBuster());
-
-      if (muleContext.getExecutionClassLoader() instanceof MuleApplicationClassLoader) {
-        MuleApplicationClassLoader applicationClassLoader = (MuleApplicationClassLoader) muleContext.getExecutionClassLoader();
-        for (ArtifactClassLoader classLoader : applicationClassLoader.getArtifactPluginClassLoaders()) {
-          registerBuster((ClassLoader) classLoader, new SpringSoftReferenceBuster());
-        }
-      }
-    }
   }
 
   private void setApplicationContext(ApplicationContext applicationContext) {

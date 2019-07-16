@@ -30,7 +30,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.leakPrevention;
+import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -170,17 +170,25 @@ public final class IntrospectionUtils {
 
   static {
 
-    if (leakPrevention) {
-      try {
-        Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        field.set(null, WEAK);
-      } catch (Throwable e) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes: {}", e.getMessage());
-        }
+    if (!DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY) {
+      setWeakHashCaches();
+    }
+  }
+
+  /**
+   * T
+   */
+  private static void setWeakHashCaches() {
+    try {
+      // This is needed to avoid classloaders to be retained on undeploy of an app. 
+      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
+      Field modifiersField = Field.class.getDeclaredField("modifiers");
+      modifiersField.setAccessible(true);
+      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+      field.set(null, WEAK);
+    } catch (Throwable e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes: {}", e.getMessage());
       }
     }
   }

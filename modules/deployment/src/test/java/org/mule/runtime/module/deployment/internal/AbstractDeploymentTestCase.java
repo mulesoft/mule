@@ -260,8 +260,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static Latch undeployLatch = new Latch();
 
-  private boolean useMockedListeners = true;
-
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -467,16 +465,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                       muleArtifactResourcesRegistry.getApplicationFactory(),
                                                       () -> findSchedulerService(serviceManager));
-
-    if (useMockedListeners) {
-      deploymentService.addDeploymentListener(applicationDeploymentListener);
-      deploymentService.addDomainDeploymentListener(domainDeploymentListener);
-      deploymentService.addDeploymentListener(testDeploymentListener);
-      deploymentService.addDomainDeploymentListener(testDeploymentListener);
-      deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
-    }
-
-
+    configureDeploymentService();
 
     policyManager = new TestPolicyManager(deploymentService,
                                           new PolicyTemplateDescriptorFactory(
@@ -487,6 +476,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     // Reset test component state
     invocationCount = 0;
     policyParametrization = "";
+  }
+
+  protected void configureDeploymentService() {
+    deploymentService.addDeploymentListener(applicationDeploymentListener);
+    deploymentService.addDomainDeploymentListener(domainDeploymentListener);
+    deploymentService.addDeploymentListener(testDeploymentListener);
+    deploymentService.addDomainDeploymentListener(testDeploymentListener);
+    deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
   }
 
   /**
@@ -1585,10 +1582,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void resetUndeployLatch() {
     undeployLatch = new Latch();
-  }
-
-  public void setUseMockedListeners(boolean useMockedListeners) {
-    this.useMockedListeners = useMockedListeners;
   }
 
   private static class TestMuleDeploymentService extends MuleDeploymentService {

@@ -6,12 +6,14 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static java.beans.Introspector.flushCaches;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
-import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
+import static org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader.DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY;
+import static org.mule.runtime.module.artifact.api.classloader.ThreadGroupContextClassLoaderSoftReferenceBuster.bustSoftReferences;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -30,6 +32,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +57,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     shutdownAwsIdleConnectionReaperThread();
 
     cleanUpResourceBundle();
+
+    clearClassLoaderSoftkeys();
   }
 
   private void cleanUpResourceBundle() {
@@ -61,6 +66,18 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       ResourceBundle.clearCache(this.getClass().getClassLoader());
     } catch (Exception e) {
       logger.warn("Couldn't clean up ResourceBundle. This can cause a memory leak.", e);
+    }
+  }
+
+  private void clearClassLoaderSoftkeys() {
+    if (!DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY) {
+      try {
+        flushCaches();
+        bustSoftReferences(getClass().getClassLoader());
+        System.gc();
+      } catch (Exception e) {
+
+      }
     }
   }
 
