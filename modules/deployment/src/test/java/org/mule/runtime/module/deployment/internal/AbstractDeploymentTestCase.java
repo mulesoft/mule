@@ -260,7 +260,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static Latch undeployLatch = new Latch();
 
-
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -466,11 +465,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                       muleArtifactResourcesRegistry.getApplicationFactory(),
                                                       () -> findSchedulerService(serviceManager));
-    deploymentService.addDeploymentListener(applicationDeploymentListener);
-    deploymentService.addDomainDeploymentListener(domainDeploymentListener);
-    deploymentService.addDeploymentListener(testDeploymentListener);
-    deploymentService.addDomainDeploymentListener(testDeploymentListener);
-    deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
+    configureDeploymentService();
 
     policyManager = new TestPolicyManager(deploymentService,
                                           new PolicyTemplateDescriptorFactory(
@@ -481,6 +476,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     // Reset test component state
     invocationCount = 0;
     policyParametrization = "";
+  }
+
+  protected void configureDeploymentService() {
+    deploymentService.addDeploymentListener(applicationDeploymentListener);
+    deploymentService.addDomainDeploymentListener(domainDeploymentListener);
+    deploymentService.addDeploymentListener(testDeploymentListener);
+    deploymentService.addDomainDeploymentListener(testDeploymentListener);
+    deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
   }
 
   /**
