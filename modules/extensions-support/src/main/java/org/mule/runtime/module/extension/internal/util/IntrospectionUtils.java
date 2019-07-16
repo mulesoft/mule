@@ -197,10 +197,7 @@ public final class IntrospectionUtils {
     }
   }
 
-  private IntrospectionUtils() {
-
-
-  }
+  private IntrospectionUtils() {}
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.

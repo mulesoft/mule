@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * a class to be loaded from the container.
  */
 public class DefaultResourceReleaser implements ResourceReleaser {
-  
+
   private static final boolean DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY = getBoolean(DISABLE_MULE_LEAK_PREVENTION);
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
