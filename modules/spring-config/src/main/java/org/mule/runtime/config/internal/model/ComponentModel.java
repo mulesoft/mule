@@ -401,7 +401,12 @@ public abstract class ComponentModel {
      */
     public Builder addCustomAttribute(String name, Object value) {
       checkIsNotBuildingFromRootComponentModel("customAttributes");
-      this.metadataBuilder.putParserAttribute(name, value);
+      if (name.startsWith("{http://www.mulesoft.org/schema/mule/documentation}")) {
+        this.metadataBuilder.putDocAttribute(name.substring("{http://www.mulesoft.org/schema/mule/documentation}".length()),
+                                             value.toString());
+      } else {
+        this.metadataBuilder.putParserAttribute(name, value);
+      }
       return this;
     }
 
@@ -457,6 +462,8 @@ public abstract class ComponentModel {
     public Builder merge(ComponentModel otherRootComponentModel) {
       ((ComponentAst) otherRootComponentModel).getMetadata().getParserAttributes()
           .forEach((k, v) -> this.metadataBuilder.putParserAttribute(k, v));
+      ((ComponentAst) otherRootComponentModel).getMetadata().getDocAttributes()
+          .forEach((k, v) -> this.metadataBuilder.putDocAttribute(k, v));
       this.root.parameters.putAll(otherRootComponentModel.parameters);
       this.root.schemaValueParameter.addAll(otherRootComponentModel.schemaValueParameter);
 
