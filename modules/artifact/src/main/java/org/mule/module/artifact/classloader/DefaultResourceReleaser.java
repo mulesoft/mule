@@ -74,9 +74,11 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       try {
         flushCaches();
         bustSoftReferences(getClass().getClassLoader());
+        // This is added to prompt a gc in the JVM if possible
+        // to release the softkeys recently cleared in the caches.
         System.gc();
       } catch (Exception e) {
-
+        logger.warn("Couldn't clear soft keys in caches. This can cause a classloader memory leak.", e);
       }
     }
   }
