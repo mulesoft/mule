@@ -8,6 +8,7 @@ package org.mule.functional.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -244,13 +245,13 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     addVariableProcessor.initialise();
     event = addVariableProcessor.process(event);
 
-    verifyAdded(event, PLAIN_STRING_KEY, cursorProvider);
+    assertThat(event.getVariables().get(PLAIN_STRING_KEY).getValue(), is(cursorProvider));
     verify(streamingManager).manage(same(cursorProvider), any(EventContext.class));
 
     afterAssertions = null;
   }
 
-  protected abstract <T> void verifyAdded(CoreEvent event, String key, T value);
+  protected abstract void verifyAdded(CoreEvent event, String key, String value);
 
   protected abstract void verifyNotAdded(CoreEvent mockEvent);
 
