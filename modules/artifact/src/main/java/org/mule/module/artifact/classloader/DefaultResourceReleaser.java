@@ -7,13 +7,11 @@
 package org.mule.module.artifact.classloader;
 
 import static java.beans.Introspector.flushCaches;
-import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
-import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_MULE_LEAK_PREVENTION;
 import static org.mule.runtime.module.artifact.api.classloader.ThreadGroupContextClassLoaderSoftReferenceBuster.bustSoftReferences;
 
 import java.lang.reflect.Field;
@@ -46,8 +44,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultResourceReleaser implements ResourceReleaser {
 
-  private static final boolean DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY = getBoolean(DISABLE_MULE_LEAK_PREVENTION);
-
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
@@ -73,16 +69,14 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   }
 
   private void clearClassLoaderSoftkeys() {
-    if (!DISABLE_MULE_LEAK_PREVENTION_ON_UNDEPLOY) {
-      try {
-        flushCaches();
-        bustSoftReferences(getClass().getClassLoader());
-        // This is added to prompt a gc in the JVM if possible
-        // to release the softkeys recently cleared in the caches.
-        System.gc();
-      } catch (Exception e) {
-        logger.warn("Couldn't clear soft keys in caches. This can cause a classloader memory leak.", e);
-      }
+    try {
+      flushCaches();
+      bustSoftReferences(getClass().getClassLoader());
+      // This is added to prompt a gc in the JVM if possible
+      // to release the softkeys recently cleared in the caches.
+      System.gc();
+    } catch (Exception e) {
+      logger.warn("Couldn't clear soft keys in caches. This can cause a classloader memory leak.", e);
     }
   }
 
