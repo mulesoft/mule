@@ -306,7 +306,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
 
   private Optional<TypedComponentIdentifier> getModuleOperationTypeComponentIdentifier(ComponentModel componentModel) {
     final ComponentIdentifier originalIdentifier =
-        (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER);
+        (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER);
 
     final String namespace = originalIdentifier.getNamespace();
     final String operationName = originalIdentifier.getName();

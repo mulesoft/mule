@@ -123,7 +123,8 @@ public abstract class ComponentModel {
     Map<String, Object> attrs = new HashMap<>();
 
     attrs.putAll(componentMetadata.getParserAttributes());
-    attrs.putAll(componentMetadata.getDocAttributes());
+    componentMetadata.getDocAttributes()
+        .forEach((k, v) -> attrs.put("{http://www.mulesoft.org/schema/mule/documentation}" + k, v));
 
     return attrs;
   }
@@ -258,7 +259,7 @@ public abstract class ComponentModel {
 
     parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
-    getCustomAttributes().forEach(builder::withProperty);
+    getMetadata().getParserAttributes().forEach(builder::withProperty);
     builder.withComponentLocation(this.componentLocation);
     builder.withProperty(COMPONENT_MODEL_KEY, this);
 
@@ -401,7 +402,12 @@ public abstract class ComponentModel {
      */
     public Builder addCustomAttribute(String name, Object value) {
       checkIsNotBuildingFromRootComponentModel("customAttributes");
-      this.metadataBuilder.putParserAttribute(name, value);
+      if (name.startsWith("{http://www.mulesoft.org/schema/mule/documentation}")) {
+        this.metadataBuilder.putDocAttribute(name.substring("{http://www.mulesoft.org/schema/mule/documentation}".length()),
+                                             value.toString());
+      } else {
+        this.metadataBuilder.putParserAttribute(name, value);
+      }
       return this;
     }
 
@@ -457,6 +463,8 @@ public abstract class ComponentModel {
     public Builder merge(ComponentModel otherRootComponentModel) {
       ((ComponentAst) otherRootComponentModel).getMetadata().getParserAttributes()
           .forEach((k, v) -> this.metadataBuilder.putParserAttribute(k, v));
+      ((ComponentAst) otherRootComponentModel).getMetadata().getDocAttributes()
+          .forEach((k, v) -> this.metadataBuilder.putDocAttribute(k, v));
       this.root.parameters.putAll(otherRootComponentModel.parameters);
       this.root.schemaValueParameter.addAll(otherRootComponentModel.schemaValueParameter);
 
