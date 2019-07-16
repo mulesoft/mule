@@ -96,7 +96,7 @@ public class ThreadGroupContextClassLoaderSoftReferenceBuster {
       threadGroupClass = forName(className);
     } catch (ClassNotFoundException e1) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Class {} was not found while cleaning ThreadGroupContext on undeploy", className);
+        LOGGER.debug("Class {} was not found while cleaning ThreadGroupContext on undeployment", className);
       }
     }
     return threadGroupClass;

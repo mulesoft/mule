@@ -20,7 +20,7 @@ public class MuleSoftReferenceBusterException extends MuleException {
 
   private static final long serialVersionUID = 3114378370421458490L;
 
-  public static final String EXCEPTION_MESSAGE = "Error on busting references for {}: {}";
+  public static final String EXCEPTION_MESSAGE = "Error on busting references for '%s': '%s'";
 
   public MuleSoftReferenceBusterException(ClassLoader classLoader, Exception e) {
     this(createStaticMessage(EXCEPTION_MESSAGE, classLoader.getClass().getName(), e.getMessage()));
