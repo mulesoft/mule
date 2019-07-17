@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static com.google.common.io.Files.createTempDir;
 import static java.lang.String.format;
-import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -40,18 +39,16 @@ import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLo
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -86,16 +83,26 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
       File rootFolder = pluginExtendedClassLoaderModelAttributes.getDeployableArtifactDescriptor().getRootFolder();
       // mule-plugin has been found as a dependency from another mule-plugin and not present in the deployable dependency graph (system scope dependencies)
       if (rootFolder != null) {
-        Path muleArtifactJson =
-            get(rootFolder.getAbsolutePath(), META_INF, MULE_ARTIFACT, pluginBundleDescriptor.getGroupId(),
-                pluginBundleDescriptor.getArtifactId(), pluginBundleDescriptor.getBaseVersion(),
-                CLASSLOADER_MODEL_JSON_DESCRIPTOR);
-        if (muleArtifactJson.toFile().exists()) {
-          return createHeavyPackageClassLoaderModel(artifactFile, muleArtifactJson.toFile(), attributes, empty());
+        File muleArtifactJson =
+            new File(rootFolder.getAbsolutePath(), getPathForMuleArtifactJson(pluginBundleDescriptor));
+        if (muleArtifactJson.exists()) {
+          return createHeavyPackageClassLoaderModel(artifactFile, muleArtifactJson, attributes, empty());
         }
       }
     }
     return createLightPackageClassLoaderModel(artifactFile, attributes, artifactType);
+  }
+
+  private String getPathForMuleArtifactJson(BundleDescriptor pluginBundleDescriptor) {
+    StringBuilder path = new StringBuilder(128);
+    char slashChar = '/';
+    path.append(META_INF).append(slashChar);
+    path.append(MULE_ARTIFACT).append(slashChar);
+    path.append(pluginBundleDescriptor.getGroupId().replace('.', slashChar)).append(slashChar);
+    path.append(pluginBundleDescriptor.getArtifactId()).append(slashChar);
+    path.append(pluginBundleDescriptor.getBaseVersion()).append(slashChar);
+    path.append(CLASSLOADER_MODEL_JSON_DESCRIPTOR);
+    return path.toString();
   }
 
   @Override
