@@ -104,4 +104,25 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
   public void setMelAvailable(Boolean melAvailable) {
     this.melAvailable = melAvailable;
   }
+
+  @Override
+  public int hashCode() {
+    try {
+      initialise();
+    } catch (InitialisationException e) {
+      // TODO: Add sth here.
+      // TODO: Add some kind of already initialized checking?
+      System.out.println("An error occurred initializing parameter resolver");
+    }
+    return this.resolve().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ExpressionBasedParameterResolver) {
+      ExpressionBasedParameterResolver other = (ExpressionBasedParameterResolver) obj;
+      return this.resolve().equals(other.resolve());
+    }
+    return false;
+  }
 }
