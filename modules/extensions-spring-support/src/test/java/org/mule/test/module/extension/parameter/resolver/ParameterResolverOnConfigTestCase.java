@@ -11,6 +11,7 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -61,5 +62,23 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
   @Test
   public void sourceWithLiteral() {
     assertThat(SomeSource.literalString.getLiteralValue().get(), equalTo("#[literal]"));
+  }
+
+  @Test
+  public void parameterResolverCacheReturnsSameInstanceWhenExpressionResolvesToSameValue() throws Exception {
+    ParameterResolverConfig firstConfig =
+        (ParameterResolverConfig) flowRunner("configurationWithDynamicParameterResolversAndCustomPayload")
+            .withPayload("first resolved config").run().getMessage().getPayload().getValue();
+
+    ParameterResolverConfig differentConfig =
+        (ParameterResolverConfig) flowRunner("configurationWithDynamicParameterResolversAndCustomPayload")
+            .withPayload("second resolved config").run().getMessage().getPayload().getValue();
+
+    ParameterResolverConfig sameAsFirstConfig =
+        (ParameterResolverConfig) flowRunner("configurationWithDynamicParameterResolversAndCustomPayload")
+            .withPayload("first resolved config").run().getMessage().getPayload().getValue();
+
+    assertThat(firstConfig, not(is(differentConfig)));
+    assertThat(firstConfig, is(sameAsFirstConfig));
   }
 }

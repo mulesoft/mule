@@ -27,6 +27,10 @@
         <parameter-resolver:config-operation config-ref="config-with-dynamic-parameter-resolvers"/>
     </flow>
 
+    <flow name="configurationWithDynamicParameterResolversAndCustomPayload">
+        <parameter-resolver:config-operation config-ref="config-with-dynamic-parameter-resolvers"/>
+    </flow>
+
     <flow name="configurationWithDynamicParameterResolversWithDynamicPojo">
         <set-payload value="this is the payload"/>
         <parameter-resolver:config-operation config-ref="config-with-dynamic-parameter-resolvers-with-dynamic-pojo"/>
