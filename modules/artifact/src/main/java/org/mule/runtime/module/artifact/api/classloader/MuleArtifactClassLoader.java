@@ -326,7 +326,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    */
   protected ResourceReleaser createResourceReleaserInstance() {
     if (resourceReleaserInstance == null) {
-      // These classes are needed so that the resource releases find them in the
+      // These classes are needed so that the resource releaser finds them in the
       // classpath.
       createClass(threadGroupContextClassLoaderSoftReferenceBusterLocation);
       createClass(muleSoftReferenceBusterExceptionLocation);

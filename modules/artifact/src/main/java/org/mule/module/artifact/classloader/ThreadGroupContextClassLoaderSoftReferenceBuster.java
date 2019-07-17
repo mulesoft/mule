@@ -7,6 +7,7 @@
 package org.mule.module.artifact.classloader;
 
 import static java.lang.Class.forName;
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.lang.ref.WeakReference;
@@ -99,7 +100,7 @@ public class ThreadGroupContextClassLoaderSoftReferenceBuster {
     try {
       threadGroupClass = forName(className);
     } catch (ClassNotFoundException e1) {
-      LOGGER.debug(String.format("Class {} was not found while cleaning ThreadGroupContext on undeployment", className));
+      LOGGER.debug(format("Class {} was not found while cleaning ThreadGroupContext on undeployment", className));
     }
     return threadGroupClass;
   }
