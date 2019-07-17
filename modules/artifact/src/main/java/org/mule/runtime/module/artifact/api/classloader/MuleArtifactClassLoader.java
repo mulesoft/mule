@@ -44,8 +44,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
+
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
+
+  private static final String THREAD_GROUP_CONTEXT_CLASSLOADER_SOFT_REFERENCE_BUSTER_CLASS_LOCATION =
+      "/org/mule/module/artifact/classloader/ThreadGroupContextClassLoaderSoftReferenceBuster.class";
+
+  private static final String MULE_SOFT_REFERENCE_BUSTER_EXCEPTION_CLASS_LOCATION =
+      "/org/mule/module/artifact/classloader/MuleSoftReferenceBusterException.class";
 
   static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
   static final String PATH_SEPARATOR = "/";
@@ -90,6 +97,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
+  private String threadGroupContextClassLoaderSoftReferenceBusterLocation =
+      THREAD_GROUP_CONTEXT_CLASSLOADER_SOFT_REFERENCE_BUSTER_CLASS_LOCATION;
+  private String muleSoftReferenceBusterExceptionLocation = MULE_SOFT_REFERENCE_BUSTER_EXCEPTION_CLASS_LOCATION;
   private ResourceReleaser resourceReleaserInstance;
   private ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
@@ -288,17 +298,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private <T> T createCustomInstance(String classLocation) {
-    InputStream classStream = null;
     try {
-      classStream = this.getClass().getResourceAsStream(classLocation);
-      byte[] classBytes = IOUtils.toByteArray(classStream);
-      classStream.close();
-      Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
+      Class clazz = createClass(classLocation);
       return (T) clazz.newInstance();
     } catch (Exception e) {
       throw new RuntimeException("Can not create instance from resource: " + classLocation, e);
-    } finally {
-      closeQuietly(classStream);
     }
   }
 
@@ -307,6 +311,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    */
   protected ResourceReleaser createResourceReleaserInstance() {
     if (resourceReleaserInstance == null) {
+      // These classes are needed so that the resource releaser finds them in the
+      // classpath.
+      createClass(threadGroupContextClassLoaderSoftReferenceBusterLocation);
+      createClass(muleSoftReferenceBusterExceptionLocation);
       resourceReleaserInstance = createCustomInstance(resourceReleaserClassLocation);
     }
     return resourceReleaserInstance;
@@ -314,6 +322,20 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
     this.resourceReleaserClassLocation = resourceReleaserClassLocation;
+  }
+
+  private Class createClass(String classLocation) {
+    InputStream classStream = null;
+    try {
+      classStream = this.getClass().getResourceAsStream(classLocation);
+      byte[] classBytes = IOUtils.toByteArray(classStream);
+      classStream.close();
+      return this.defineClass(null, classBytes, 0, classBytes.length);
+    } catch (Exception e) {
+      throw new RuntimeException("Can not create class from resource: " + classLocation, e);
+    } finally {
+      closeQuietly(classStream);
+    }
   }
 
   @Override
