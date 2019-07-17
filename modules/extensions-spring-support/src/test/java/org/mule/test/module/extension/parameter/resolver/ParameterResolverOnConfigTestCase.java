@@ -17,9 +17,13 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.parameter.resolver.extension.extension.ParameterResolverConfig;
 import org.mule.test.parameter.resolver.extension.extension.SomeSource;
+
 import org.junit.Test;
 
 public class ParameterResolverOnConfigTestCase extends AbstractParameterResolverTestCase {
+
+  private static final String PAYLOAD_BASED_DYNAMIC_CONFIG_FLOW =
+      "configurationWithDynamicParameterResolversAndCustomPayload";
 
   @Override
   protected String[] getConfigFiles() {
@@ -66,19 +70,34 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
 
   @Test
   public void parameterResolverCacheReturnsSameInstanceWhenExpressionResolvesToSameValue() throws Exception {
+    String firstResolvedConfigValue = "first resolved config";
     ParameterResolverConfig firstConfig =
-        (ParameterResolverConfig) flowRunner("configurationWithDynamicParameterResolversAndCustomPayload")
-            .withPayload("first resolved config").run().getMessage().getPayload().getValue();
+        getDynamicConfigFromFlowNamed(firstResolvedConfigValue,
+                                      PAYLOAD_BASED_DYNAMIC_CONFIG_FLOW);
 
+    assertThat(firstConfig.getStringResolver().resolve(), is(firstResolvedConfigValue));
+
+    String secondResolvedConfigValue = "second resolved config";
     ParameterResolverConfig differentConfig =
-        (ParameterResolverConfig) flowRunner("configurationWithDynamicParameterResolversAndCustomPayload")
-            .withPayload("second resolved config").run().getMessage().getPayload().getValue();
+        getDynamicConfigFromFlowNamed(secondResolvedConfigValue,
+                                      PAYLOAD_BASED_DYNAMIC_CONFIG_FLOW);
+
+    assertThat(differentConfig.getStringResolver().resolve(), is(secondResolvedConfigValue));
 
     ParameterResolverConfig sameAsFirstConfig =
-        (ParameterResolverConfig) flowRunner("configurationWithDynamicParameterResolversAndCustomPayload")
-            .withPayload("first resolved config").run().getMessage().getPayload().getValue();
+        getDynamicConfigFromFlowNamed(firstResolvedConfigValue,
+                                      PAYLOAD_BASED_DYNAMIC_CONFIG_FLOW);
+
+    assertThat(sameAsFirstConfig.getStringResolver().resolve(), is(firstResolvedConfigValue));
 
     assertThat(firstConfig, not(is(differentConfig)));
     assertThat(firstConfig, is(sameAsFirstConfig));
   }
+
+  protected ParameterResolverConfig getDynamicConfigFromFlowNamed(String firstResolvedConfigValue, String flowName)
+      throws Exception {
+    return (ParameterResolverConfig) flowRunner(flowName)
+        .withPayload(firstResolvedConfigValue).run().getMessage().getPayload().getValue();
+  }
+
 }

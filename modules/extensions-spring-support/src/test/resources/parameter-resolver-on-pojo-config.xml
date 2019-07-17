@@ -8,6 +8,8 @@
     <parameter-resolver:config name="config-with-dynamic-parameter-resolvers" stringResolver="#[payload]"
                                doorResolver="#[app.registry.staticDoor]" literalDoor="#[aDoor]" />
 
+    <parameter-resolver:config name="config-with-just-one-dynamic-parameter-resolver" stringResolver="#[payload]"/>
+
     <parameter-resolver:config name="config-with-static-parameter-resolvers" stringResolver="this is a string">
         <parameter-resolver:door-resolver victim="Name" address="Address"/>
     </parameter-resolver:config>
@@ -28,7 +30,8 @@
     </flow>
 
     <flow name="configurationWithDynamicParameterResolversAndCustomPayload">
-        <parameter-resolver:config-operation config-ref="config-with-dynamic-parameter-resolvers"/>
+        <logger level="ERROR" message="#['current hashed element: ' ++ payload]"></logger>
+        <parameter-resolver:config-operation config-ref="config-with-just-one-dynamic-parameter-resolver"/>
     </flow>
 
     <flow name="configurationWithDynamicParameterResolversWithDynamicPojo">
