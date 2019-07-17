@@ -7,6 +7,7 @@
 package org.mule.module.artifact.classloader;
 
 import static java.lang.Class.forName;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -19,7 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ThreadGroupContextClassLoaderSoftReferenceBuster {
 
-  private final static Logger logger = LoggerFactory.getLogger(ThreadGroupContextClassLoaderSoftReferenceBuster.class);
+  private final static Logger LOGGER = getLogger(ThreadGroupContextClassLoaderSoftReferenceBuster.class);
 
   private static final String VALUE_FIELD = "value";
 
@@ -99,7 +99,7 @@ public class ThreadGroupContextClassLoaderSoftReferenceBuster {
     try {
       threadGroupClass = forName(className);
     } catch (ClassNotFoundException e1) {
-      logger.debug(String.format("Class {} was not found while cleaning ThreadGroupContext on undeployment", className));
+      LOGGER.debug(String.format("Class {} was not found while cleaning ThreadGroupContext on undeployment", className));
     }
     return threadGroupClass;
   }
