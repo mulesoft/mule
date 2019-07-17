@@ -34,14 +34,11 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.springframework.core.ResolvableType.NONE;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
@@ -51,6 +48,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,12 +63,14 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -143,49 +143,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
-<<<<<<< HEAD
-
-import com.google.common.collect.ImmutableList;
-
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.lang.model.util.Types;
-
-=======
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
->>>>>>> 307f660e50...  MULE-17168: Remove softreferences for app classloaders to avoid OOM on redeploy. (#8042)
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,11 +159,6 @@ import com.google.common.collect.ImmutableList;
  */
 public final class IntrospectionUtils {
 
-<<<<<<< HEAD
-=======
-  private static final AnyType ANY_TYPE = typeBuilder().anyType().build();
-  private static final ArrayType ANY_ARRAY_TYPE = typeBuilder().arrayType().of(ANY_TYPE).build();
-  private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
   private static final Logger LOGGER = LoggerFactory.getLogger(IntrospectionUtils.class);
 
   static {
@@ -231,7 +184,7 @@ public final class IntrospectionUtils {
     }
   }
 
->>>>>>> 307f660e50...  MULE-17168: Remove softreferences for app classloaders to avoid OOM on redeploy. (#8042)
+
   private IntrospectionUtils() {}
 
   /**
@@ -312,31 +265,6 @@ public final class IntrospectionUtils {
     return dataType.get();
   }
 
-<<<<<<< HEAD
-=======
-  /**
-   * Based on a {@link ExtensionModel}, determines if this one has been created using the Java AST.
-   * 
-   * @param model Extension model to introspect
-   * @return a boolean indicating whether the {@link ExtensionModel} was created using the Java AST or using compiled classes
-   */
-  public static boolean isASTMode(ExtensionModel model) {
-    Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-    return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
-  }
-
-  /**
-   * Based on a {@link BaseDeclaration}, determines if this one has been created using the Java AST.
-   * 
-   * @param model Base Declaration to introspect
-   * @return a boolean indicating whether the {@link BaseDeclaration} was created using the Java AST or using compiled classes
-   */
-  public static boolean isASTMode(BaseDeclaration model) {
-    Optional<ExtensionTypeDescriptorModelProperty> property = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-    return !(property.isPresent() && property.get().getType().getDeclaringClass().isPresent());
-  }
-
->>>>>>> 307f660e50...  MULE-17168: Remove softreferences for app classloaders to avoid OOM on redeploy. (#8042)
   public static MetadataType getMethodReturnType(MethodElement method) {
     checkArgument(method != null, "Can't introspect a null method");
     return getReturnType(method.getReturnType());
