@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.api.classloader;
+package org.mule.runtime.module.artifact.internal.classloader;
 
 import static java.lang.Class.forName;
 import static org.apache.commons.lang3.reflect.FieldUtils.getField;
