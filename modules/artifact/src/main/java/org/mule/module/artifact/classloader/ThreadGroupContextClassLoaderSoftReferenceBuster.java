@@ -4,19 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.internal.classloader;
+package org.mule.module.artifact.classloader;
 
 import static java.lang.Class.forName;
-import static org.apache.commons.lang3.reflect.FieldUtils.getField;
-import static org.apache.commons.lang3.reflect.FieldUtils.readStaticField;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Reference utilities to bust Thread Group Context soft references.
@@ -25,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ThreadGroupContextClassLoaderSoftReferenceBuster {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ThreadGroupContextClassLoaderSoftReferenceBuster.class);
+  private final transient static Logger logger = LoggerFactory.getLogger(ThreadGroupContextClassLoaderSoftReferenceBuster.class);
 
   private static final String VALUE_FIELD = "value";
 
@@ -95,9 +99,7 @@ public class ThreadGroupContextClassLoaderSoftReferenceBuster {
     try {
       threadGroupClass = forName(className);
     } catch (ClassNotFoundException e1) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Class {} was not found while cleaning ThreadGroupContext on undeployment", className);
-      }
+      logger.debug(String.format("Class {} was not found while cleaning ThreadGroupContext on undeployment", className));
     }
     return threadGroupClass;
   }
@@ -114,6 +116,84 @@ public class ThreadGroupContextClassLoaderSoftReferenceBuster {
 
   private static Method getMethod(Class<?> clazz, String methodName) throws NoSuchMethodException, SecurityException {
     return clazz.getDeclaredMethod(methodName);
+  }
+
+  public static Object readStaticField(final Class<?> cls, final String fieldName, final boolean forceAccess)
+      throws IllegalAccessException {
+    final Field field = getField(cls, fieldName, forceAccess);
+    // already forced access above, don't repeat it here:
+    return readStaticField(field, false);
+  }
+
+  public static Object readStaticField(final Field field, final boolean forceAccess) throws IllegalAccessException {
+    return readField(field, (Object) null, forceAccess);
+  }
+
+  public static Object readField(final Field field, final Object target, final boolean forceAccess)
+      throws IllegalAccessException {
+    if (forceAccess && !field.isAccessible()) {
+      field.setAccessible(true);
+    }
+
+    return field.get(target);
+  }
+
+  public static Field getField(final Class<?> cls, final String fieldName, final boolean forceAccess) {
+    for (Class<?> acls = cls; acls != null; acls = acls.getSuperclass()) {
+      try {
+        final Field field = acls.getDeclaredField(fieldName);
+        if (!Modifier.isPublic(field.getModifiers())) {
+          if (forceAccess) {
+            field.setAccessible(true);
+          } else {
+            continue;
+          }
+        }
+        return field;
+      } catch (final NoSuchFieldException ex) {
+        // ignore
+      }
+    }
+    Field match = null;
+    for (final Class<?> class1 : getAllInterfaces(cls)) {
+      try {
+        final Field test = class1.getField(fieldName);
+        match = test;
+      } catch (final NoSuchFieldException ex) {
+        // ignore
+      }
+    }
+    return match;
+  }
+
+  public static List<Class<?>> getAllInterfaces(final Class<?> cls) {
+    if (cls == null) {
+      return null;
+    }
+
+    final LinkedHashSet<Class<?>> interfacesFound = new LinkedHashSet<>();
+    getAllInterfaces(cls, interfacesFound);
+
+    return new ArrayList<>(interfacesFound);
+  }
+
+  /**
+   * Get the interfaces for the specified class.
+   *
+   * @param cls the class to look up, may be {@code null}
+   * @param interfacesFound the {@code Set} of interfaces for the class
+   */
+  private static void getAllInterfaces(Class<?> cls, final HashSet<Class<?>> interfacesFound) {
+    while (cls != null) {
+      final Class<?>[] interfaces = cls.getInterfaces();
+
+      for (final Class<?> i : interfaces) {
+        if (interfacesFound.add(i)) {
+          getAllInterfaces(i, interfacesFound);
+        }
+      }
+      cls = cls.getSuperclass();
+    }
   }
 
 }
