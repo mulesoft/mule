@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ThreadGroupContextClassLoaderSoftReferenceBuster {
 
-  private final transient static Logger logger = LoggerFactory.getLogger(ThreadGroupContextClassLoaderSoftReferenceBuster.class);
+  private final static Logger logger = LoggerFactory.getLogger(ThreadGroupContextClassLoaderSoftReferenceBuster.class);
 
   private static final String VALUE_FIELD = "value";
 
