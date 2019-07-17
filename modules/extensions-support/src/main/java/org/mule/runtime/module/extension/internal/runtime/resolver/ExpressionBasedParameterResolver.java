@@ -107,13 +107,6 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
 
   @Override
   public int hashCode() {
-    try {
-      initialise();
-    } catch (InitialisationException e) {
-      // TODO: Add sth here.
-      // TODO: Add some kind of already initialized checking?
-      System.out.println("An error occurred initializing parameter resolver");
-    }
     return this.resolve().hashCode();
   }
 

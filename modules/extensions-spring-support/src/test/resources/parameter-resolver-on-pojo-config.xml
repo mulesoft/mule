@@ -30,7 +30,6 @@
     </flow>
 
     <flow name="configurationWithDynamicParameterResolversAndCustomPayload">
-        <logger level="ERROR" message="#['current hashed element: ' ++ payload]"></logger>
         <parameter-resolver:config-operation config-ref="config-with-just-one-dynamic-parameter-resolver"/>
     </flow>
 
