@@ -51,6 +51,7 @@ import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -106,7 +107,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private volatile boolean initialized = false;
   private volatile boolean started = false;
 
-  private LazyValue<Boolean> doTestConnectivity = new LazyValue<>(this::getDoTestConnectivityProperty);
+  private LazyValue<Boolean> doTestConnectivity;
 
   /**
    * Creates a new instance
@@ -296,6 +297,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   }
 
   private void doInitialise() throws InitialisationException {
+    doTestConnectivity = new LazyValue<>(new TestConnectivityPropertySupplier(configurationProperties));
     if (connectionProvider.isPresent()) {
       initialiseIfNeeded(connectionProvider, true, muleContext);
       connectionManager.bind(value, connectionProvider.get());
@@ -360,9 +362,20 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     configurationStats = new DefaultMutableConfigurationStats(timeSupplier);
   }
 
-  private boolean getDoTestConnectivityProperty() {
-    return System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME) != null
-        ? valueOf(System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME))
-        : !configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+  private static class TestConnectivityPropertySupplier implements Supplier<Boolean> {
+
+    private ConfigurationProperties configurationProperties;
+
+    public TestConnectivityPropertySupplier(ConfigurationProperties configurationProperties) {
+      this.configurationProperties = configurationProperties;
+    }
+
+    @Override
+    public Boolean get() {
+      return System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME) != null
+          ? valueOf(System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME))
+          : !configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+    }
   }
+
 }
