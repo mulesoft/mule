@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
@@ -52,6 +53,8 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import com.google.common.collect.ImmutableList;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,6 +73,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class DynamicConfigurationProviderTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension> {
 
   private static final Class MODULE_CLASS = HeisenbergExtension.class;
+
+  private static final String CONFIGURATION_INSTANCE_FIELD_NAME = "configurationInstances";
+  private static Field configurationInstanceField;
 
   @Rule
   public ExpectedException expected = none();
@@ -217,6 +223,29 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     assertThat(configs, containsInAnyOrder(instance1, instance2));
   }
 
+  @Test
+  public void configurationInstanceIsRemovedAfterExpired() throws Exception {
+    HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(event).getValue();
+    DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
+
+    assertAmountOfActiveConfigurations(1, provider);
+
+    timeSupplier.move(10, MINUTES);
+
+    List<ConfigurationInstance> expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(false));
+
+    List<Object> configs = expired.stream().map(config -> config.getValue()).collect(toImmutableList());
+    assertThat(configs, containsInAnyOrder(instance1));
+    assertAmountOfActiveConfigurations(0, provider);
+  }
+
+  private void assertAmountOfActiveConfigurations(int expectedAmountOfActiveConfigurations, DynamicConfigurationProvider provider)
+      throws IllegalAccessException, NoSuchFieldException {
+    Collection<ConfigurationInstance> configurationInstances = (Collection) getConfigurationInstanceField().get(provider);
+    assertThat(configurationInstances, hasSize(expectedAmountOfActiveConfigurations));
+  }
+
   private HeisenbergExtension makeAlternateInstance() throws Exception {
     ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
     when(alternateResult.asMap()).thenReturn(new HashMap<>());
@@ -282,4 +311,18 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
       verify(connProvider).dispose();
     }
   }
+
+  private static Field getConfigurationInstanceField() {
+    if (configurationInstanceField == null) {
+      try {
+        configurationInstanceField =
+            LifecycleAwareConfigurationProvider.class.getDeclaredField(CONFIGURATION_INSTANCE_FIELD_NAME);
+      } catch (NoSuchFieldException e) {
+        throw new IllegalStateException("Class LifecycleAwareConfigurationProvider was expected to have a field named"
+            + CONFIGURATION_INSTANCE_FIELD_NAME);
+      }
+    }
+    return configurationInstanceField;
+  }
+
 }
