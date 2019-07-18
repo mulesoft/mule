@@ -68,6 +68,7 @@ public abstract class AbstractInterceptableContractTestCase<T extends AbstractIn
 
   @Test
   public void interceptorsStarted() throws Exception {
+    interceptable.initialise();
     interceptable.start();
     verify((Startable) interceptor1).start();
     verify((Startable) interceptor2).start();

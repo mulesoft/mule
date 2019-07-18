@@ -226,6 +226,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueStarted() throws Exception {
+    interceptable.initialise();
     interceptable.start();
     verify((Startable) value).start();
     if (connectionProvider.isPresent()) {
