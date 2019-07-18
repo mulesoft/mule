@@ -21,9 +21,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
@@ -37,7 +37,6 @@ import java.util.function.LongUnaryOperator;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.retry.BackoffDelay;
 
@@ -64,10 +63,9 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
                                           Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                           int parallelism,
                                           int maxConcurrency,
-                                          boolean maxConcurrencyEagerCheck)
-
-  {
-    super(subscriberCount, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
+                                          boolean maxConcurrencyEagerCheck,
+                                          SchedulerService schedulerService) {
+    super(subscriberCount, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck, schedulerService);
     this.blockingSchedulerSupplier = blockingSchedulerSupplier;
     this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
   }

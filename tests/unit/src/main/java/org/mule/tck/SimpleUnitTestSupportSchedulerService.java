@@ -6,6 +6,7 @@
  */
 package org.mule.tck;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-
+import static org.mule.service.scheduler.ThreadType.CPU_LIGHT;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -163,6 +164,19 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
       doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString(), any());
       return spied;
     });
+  }
+
+  @Override
+  public boolean isCurrentThreadForCpuWork() {
+    return currentThread().getName().contains(CPU_LIGHT.getName());
+    /*while (threadGroup.getParent() != null) {
+      if (threadGroup.getName().contains(CPU_LIGHT.getName())) {
+        return true;
+      } else {
+        threadGroup = threadGroup.getParent();
+      }
+    }
+    return false;*/
   }
 
   private String resolveSchedulerCreationLocation() {

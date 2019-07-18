@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,7 +19,7 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -91,7 +90,7 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
     }
 
     @Override
-    protected ExecutorService decorateScheduler(Scheduler scheduler) {
+    protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
       return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
     }
 

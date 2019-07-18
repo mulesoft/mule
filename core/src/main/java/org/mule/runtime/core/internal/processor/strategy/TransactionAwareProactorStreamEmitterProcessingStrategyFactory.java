@@ -13,8 +13,8 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -70,8 +70,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                                     resolveParallelism(),
                                                                     getMaxConcurrency(),
                                                                     isMaxConcurrencyEagerCheck(),
-                                                                    muleContext.getConfiguration().isThreadLoggingEnabled());
-
+                                                                    muleContext.getConfiguration().isThreadLoggingEnabled(),
+                                                                    muleContext.getSchedulerService());
     // TODO MULE-17079 Remove this policyMode flag.
     ps.setPolicyMode(policyMode);
     return ps;
@@ -90,12 +90,11 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                             int parallelism, int maxConcurrency,
-                                                            boolean isMaxConcurrencyEagerCheck, boolean isThreadLoggingEnabled)
-
-    {
+                                                            boolean isMaxConcurrencyEagerCheck, boolean isThreadLoggingEnabled,
+                                                            SchedulerService schedulerService) {
       super(bufferSize, subscriberCount, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
-            isMaxConcurrencyEagerCheck, isThreadLoggingEnabled);
+            isMaxConcurrencyEagerCheck, isThreadLoggingEnabled, schedulerService);
     }
 
     TransactionAwareProactorStreamEmitterProcessingStrategy(int bufferSize,
@@ -103,12 +102,11 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                            int maxConcurrency, boolean isMaxConcurrencyEagerCheck)
-
-    {
+                                                            int maxConcurrency, boolean isMaxConcurrencyEagerCheck,
+                                                            SchedulerService schedulerService) {
       super(bufferSize, subscriberCount, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency,
-            isMaxConcurrencyEagerCheck, false);
+            isMaxConcurrencyEagerCheck, false, schedulerService);
     }
 
     @Override
@@ -142,8 +140,9 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
     }
 
     @Override
-    protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
+    protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
+      return new ConditionalExecutorServiceDecorator(super.decorateScheduler(scheduler),
+                                                     currentScheduler -> isTransactionActive());
     }
 
     @Override

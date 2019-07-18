@@ -71,7 +71,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck(),
-                                                       muleContext.getConfiguration().isThreadLoggingEnabled());
+                                                       muleContext.getConfiguration().isThreadLoggingEnabled(),
+                                                       muleContext.getSchedulerService());
   }
 
   @Override
@@ -98,12 +99,11 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                    int parallelism,
                                                    int maxConcurrency, boolean maxConcurrencyEagerCheck,
-                                                   boolean isThreadLoggingEnabled)
-
-    {
+                                                   boolean isThreadLoggingEnabled,
+                                                   SchedulerService schedulerService) {
       super(subscriberCount, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
-            maxConcurrencyEagerCheck);
+            maxConcurrencyEagerCheck, schedulerService);
       this.bufferSize = requireNonNull(bufferSize);
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
     }
@@ -114,12 +114,13 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                    Supplier<Scheduler> blockingSchedulerSupplier,
                                                    Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                    int parallelism,
-                                                   int maxConcurrency, boolean maxConcurrencyEagerCheck)
+                                                   int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                                   SchedulerService schedulerService)
 
     {
       this(bufferSize, subscriberCount, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency,
-           maxConcurrencyEagerCheck, false);
+           maxConcurrencyEagerCheck, false, schedulerService);
     }
 
     @Override

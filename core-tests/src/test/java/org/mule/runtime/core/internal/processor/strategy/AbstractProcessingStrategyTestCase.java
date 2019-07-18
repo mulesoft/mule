@@ -127,6 +127,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected static final String EXECUTOR = "executor";
   protected static final int STREAM_ITERATIONS = 5000;
 
+  protected boolean threadSwitch = true;
+
   protected Supplier<Builder> flowBuilder;
   protected Flow flow;
   protected Set<String> threads = synchronizedSet(new HashSet<>());
@@ -823,7 +825,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
           .doOnEach(signal -> signal.getContext().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
               .ifPresent(sch -> schedulers.add(((Scheduler) sch).getName())));
 
-      if (getProcessingType() == CPU_LITE_ASYNC) {
+      if (getProcessingType() == CPU_LITE_ASYNC && threadSwitch) {
         return from(schedulerTrackingPublisher).transform(processorPublisher -> Processor.super.apply(schedulerTrackingPublisher))
             .publishOn(fromExecutorService(custom)).onErrorStop();
       } else {
