@@ -10,6 +10,7 @@ package org.mule.runtime.module.artifact.internal.util;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
 import static java.util.regex.Pattern.compile;
+import static java.util.regex.Pattern.quote;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
@@ -40,7 +41,7 @@ public class FileJarExplorer implements JarExplorer {
   private static final String META_INF_SERVICES_PATH = "META-INF/services/";
 
   private static final Pattern SLASH_PATTERN = compile("/");
-  private static final Pattern SEPARATOR_PATTERN = compile(separator);
+  private static final Pattern SEPARATOR_PATTERN = compile(quote(separator));
 
   @Override
   public JarInfo explore(URI library) {
