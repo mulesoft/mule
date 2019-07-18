@@ -14,6 +14,8 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -61,12 +63,16 @@ public abstract class ComponentModel {
   private String textContent;
   private DefaultComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
+  private org.mule.runtime.api.meta.model.ComponentModel componentModel;
+  private ConfigurationModel configurationModel;
+  private ConnectionProviderModel connectionProviderModel;
 
   private ComponentMetadataAst componentMetadata;
 
   private Object objectInstance;
   private Class<?> type;
   private boolean enabled = true;
+
 
   /**
    * @return the line number in which the component was defined in the configuration file. It may be empty if the component was
@@ -175,6 +181,40 @@ public abstract class ComponentModel {
 
   public TypedComponentIdentifier.ComponentType getComponentType() {
     return componentType != null ? componentType : TypedComponentIdentifier.ComponentType.UNKNOWN;
+  }
+
+  public <M> Optional<M> getModel(Class<M> modelClass) {
+    if (componentModel != null) {
+      if (modelClass.isAssignableFrom(componentModel.getClass())) {
+        return Optional.of((M) componentModel);
+      }
+    }
+
+    if (configurationModel != null) {
+      if (modelClass.isAssignableFrom(configurationModel.getClass())) {
+        return Optional.of((M) configurationModel);
+      }
+    }
+
+    if (connectionProviderModel != null) {
+      if (modelClass.isAssignableFrom(connectionProviderModel.getClass())) {
+        return Optional.of((M) connectionProviderModel);
+      }
+    }
+
+    return empty();
+  }
+
+  public void setComponentModel(org.mule.runtime.api.meta.model.ComponentModel model) {
+    this.componentModel = model;
+  }
+
+  public void setConfigurationModel(ConfigurationModel model) {
+    this.configurationModel = model;
+  }
+
+  public void setConnectionProviderModel(ConnectionProviderModel connectionProviderModel) {
+    this.connectionProviderModel = connectionProviderModel;
   }
 
   /**

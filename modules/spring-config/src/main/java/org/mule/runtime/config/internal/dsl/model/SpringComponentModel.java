@@ -162,4 +162,10 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
   public Spliterator<ComponentAst> directChildrenSpliterator() {
     return directChildrenStream().spliterator();
   }
+
+  @Override
+  public String toString() {
+    return getName().map(n -> "" + n + "(" + getIdentifier().toString() + ")").orElse(getIdentifier().toString())
+        + (getLocation() != null ? (" @ " + getLocation().getLocation()) : "");
+  }
 }

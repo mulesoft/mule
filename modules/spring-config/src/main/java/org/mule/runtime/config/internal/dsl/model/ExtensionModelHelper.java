@@ -28,6 +28,8 @@ import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.construct.HasConstructModels;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
@@ -39,7 +41,9 @@ import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.util.NameUtils;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -49,6 +53,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -66,18 +71,23 @@ import com.google.common.collect.ImmutableList;
  * <p>
  * since 4.0
  */
-//TODO MULE-15143 Support a lightweight implementation of DslElementModelFactory to only identify the model from ComponentIdentifier
+// TODO MULE-15143 Support a lightweight implementation of DslElementModelFactory to only identify the model from
+// ComponentIdentifier
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
   private final Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
+      CacheBuilder.newBuilder().build();
+  private final Cache<ComponentIdentifier, Optional<? extends ConnectionProviderModel>> extensionConnectionProviderModelByComponentIdentifier =
+      CacheBuilder.newBuilder().build();
+  private final Cache<ComponentIdentifier, Optional<? extends ConfigurationModel>> extensionConfigurationModelByComponentIdentifier =
       CacheBuilder.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
       CacheBuilder.newBuilder().build();
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
-   *                        mule artifact.
+   *        mule artifact.
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
     this.extensionsModels = extensionModels;
@@ -131,7 +141,8 @@ public class ExtensionModelHelper {
       });
       return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
     }).orElseGet(() -> {
-      //If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to return it's ComponentType as well
+      // If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to
+      // return it's ComponentType as well
       Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentId);
       return nestableElementModelOptional.map(nestableElementModel -> {
         Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
@@ -151,30 +162,80 @@ public class ExtensionModelHelper {
   public Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> findComponentModel(ComponentIdentifier componentIdentifier) {
     try {
       return extensionComponentModelByComponentIdentifier.get(componentIdentifier, () -> {
-        String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
-        for (ExtensionModel extensionModel : extensionsModels) {
-          if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
-            List<HasOperationModels> operationModelsProviders = ImmutableList.<HasOperationModels>builder()
-                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
-            List<HasSourceModels> sourceModelsProviders = ImmutableList.<HasSourceModels>builder()
-                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
-            List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
+        return lookupExtensionModelFor(componentIdentifier).flatMap(extensionModel -> {
+          List<HasOperationModels> operationModelsProviders = ImmutableList.<HasOperationModels>builder()
+              .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+          List<HasSourceModels> sourceModelsProviders = ImmutableList.<HasSourceModels>builder()
+              .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+          List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
 
-            Stream<Supplier<Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>>> stream =
-                of(() -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName),
-                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
-                                      componentIdentifier.getName()),
-                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
-                                      capitalize(componentName)));
+          String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
+          Stream<Supplier<Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>>> stream =
+              of(() -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName),
+                 () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
+                                    componentIdentifier.getName()),
+                 () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
+                                    capitalize(componentName)));
 
-            return stream
-                .map(Supplier::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst();
-          }
-        }
-        return empty();
+          return stream
+              .map(Supplier::get)
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .findFirst();
+        });
+      });
+    } catch (ExecutionException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentIdentifier) {
+    try {
+      return extensionConnectionProviderModelByComponentIdentifier.get(componentIdentifier, () -> {
+        return lookupExtensionModelFor(componentIdentifier)
+            .flatMap(currentExtension -> {
+              AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
+
+              new ExtensionWalker() {
+
+                @Override
+                protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
+                                                    ConnectionProviderModel model) {
+                  if ((model.getName() + "Connection").equals(NameUtils.toCamelCase(componentIdentifier.getName(), "-"))) {
+                    modelRef.set(model);
+                  }
+                };
+
+              }.walk(currentExtension);
+
+              return ofNullable(modelRef.get());
+            });
+      });
+    } catch (ExecutionException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  public Optional<? extends ConfigurationModel> findConfigurationModel(ComponentIdentifier componentIdentifier) {
+    try {
+      return extensionConfigurationModelByComponentIdentifier.get(componentIdentifier, () -> {
+        return lookupExtensionModelFor(componentIdentifier)
+            .flatMap(currentExtension -> {
+              AtomicReference<ConfigurationModel> modelRef = new AtomicReference<>();
+
+              new ExtensionWalker() {
+
+                @Override
+                protected void onConfiguration(ConfigurationModel model) {
+                  if (model.getName().equals(NameUtils.toCamelCase(componentIdentifier.getName(), "-"))) {
+                    modelRef.set(model);
+                  }
+                }
+
+              }.walk(currentExtension);
+
+              return ofNullable(modelRef.get());
+            });
       });
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
@@ -184,21 +245,25 @@ public class ExtensionModelHelper {
   private Optional<NestableElementModel> findNestableElementModel(ComponentIdentifier componentIdentifier) {
     try {
       return extensionNestableElementModelByComponentIdentifier.get(componentIdentifier, () -> {
-        String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
-        for (ExtensionModel extensionModel : extensionsModels) {
-          if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
-            Optional<NestableElementModel> elementModelOptional = searchNestableElementModel(extensionModel, componentName);
-            if (elementModelOptional.isPresent()) {
-              return elementModelOptional;
-            }
-            return searchNestableElementModel(extensionModel, componentIdentifier.getName());
+
+        return lookupExtensionModelFor(componentIdentifier).flatMap(extensionModel -> {
+          String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
+          Optional<NestableElementModel> elementModelOptional = searchNestableElementModel(extensionModel, componentName);
+          if (elementModelOptional.isPresent()) {
+            return elementModelOptional;
           }
-        }
-        return empty();
+          return searchNestableElementModel(extensionModel, componentIdentifier.getName());
+        });
       });
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private Optional<ExtensionModel> lookupExtensionModelFor(ComponentIdentifier componentIdentifier) {
+    return extensionsModels.stream()
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
+        .findFirst();
   }
 
   private Optional<NestableElementModel> searchNestableElementModel(ExtensionModel extensionModel, String componentName) {
