@@ -168,15 +168,15 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public boolean isCurrentThreadForCpuWork() {
-    return currentThread().getName().contains(CPU_LIGHT.getName());
-    /*while (threadGroup.getParent() != null) {
+    ThreadGroup threadGroup = currentThread().getThreadGroup();
+    while (threadGroup.getParent() != null) {
       if (threadGroup.getName().contains(CPU_LIGHT.getName())) {
         return true;
       } else {
         threadGroup = threadGroup.getParent();
       }
     }
-    return false;*/
+    return false;
   }
 
   private String resolveSchedulerCreationLocation() {

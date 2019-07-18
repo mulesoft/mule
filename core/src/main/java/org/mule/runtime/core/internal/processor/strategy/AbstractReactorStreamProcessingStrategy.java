@@ -26,7 +26,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
   private final Supplier<Scheduler> cpuLightSchedulerSupplier;
   private Scheduler cpuLightScheduler;
   private final int parallelism;
-  SchedulerService schedulerService;
+  private SchedulerService schedulerService;
 
   AbstractReactorStreamProcessingStrategy(int subscribers,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier, int parallelism,
