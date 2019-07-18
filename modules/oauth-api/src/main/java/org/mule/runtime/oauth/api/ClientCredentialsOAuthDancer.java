@@ -7,7 +7,7 @@
 package org.mule.runtime.oauth.api;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.oauth.api.builder.ClientCredentialsListener;
+import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
