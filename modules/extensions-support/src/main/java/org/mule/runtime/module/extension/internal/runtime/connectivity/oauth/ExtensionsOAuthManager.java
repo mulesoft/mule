@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
-import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
+import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.List;

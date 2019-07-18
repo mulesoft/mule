@@ -6,29 +6,12 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
-
 /**
  * Allows to get notified about certain events related to an OAuth dance with Authorization Code grant type
  * @since 4.2.0
+ * @deprecated since 4.2.2. Use {@link org.mule.runtime.oauth.api.listener.AuthorizationCodeListener} instead
  */
-public interface AuthorizationCodeListener {
+@Deprecated
+public interface AuthorizationCodeListener extends org.mule.runtime.oauth.api.listener.AuthorizationCodeListener {
 
-  /**
-   * Invoked when an authorization dance has been completed.
-   *
-   * @param context the resulting {@link ResourceOwnerOAuthContext}
-   */
-  default void onAuthorizationCompleted(ResourceOwnerOAuthContext context) {
-
-  }
-
-  /**
-   * Invoked each time a refresh token operation has been complted successfully
-   *
-   * @param context the resulting {@link ResourceOwnerOAuthContext}
-   */
-  default void onTokenRefreshed(ResourceOwnerOAuthContext context) {
-
-  }
 }

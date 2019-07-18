@@ -7,6 +7,7 @@
 package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
+import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
 
 /**
  * Builder that allows to configure the attributes for the client credentials grant type.
