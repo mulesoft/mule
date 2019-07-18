@@ -304,41 +304,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
   }
 
-  // protected ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile,
-  // Map<String, Object> attributes,
-  // ArtifactType artifactType) {
-  //
-  // Set<BundleDependency> resolvedDependencies = resolveArtifactDependencies(artifactFile, attributes, artifactType);
-  //
-  // Set<BundleDependency> nonProvidedDependencies =
-  // resolvedDependencies.stream().filter(dep -> !PROVIDED.equals(dep.getScope())).collect(Collectors.toSet());
-  //
-  // final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-  // newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
-  // mavenClient, attributes, nonProvidedDependencies);
-  //
-  // final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
-  // final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
-  //
-  // classLoaderModelBuilder
-  // .exportingPackages(exportedPackages)
-  // .exportingResources(exportedResources)
-  // .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
-  // new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
-  // .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
-  //
-  // // This is already filtering out mule-plugin dependencies,
-  // // since for this case we explicitly need to consume the exported API from the plugin.
-  // final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies);
-  //
-  // // TODO MULE-17114 retrieve this data from the json if present, if not then call this
-  // populateLocalPackages(artifactFile, classLoaderModelBuilder, dependenciesArtifactsUrls, exportedPackages, exportedResources);
-  //
-  // classLoaderModelBuilder.dependingOn(resolvedDependencies);
-  //
-  // return classLoaderModelBuilder.build();
-  // }
-
   protected abstract LightweightClassLoaderModelBuilder newLightweightClassLoaderModelBuilder(File artifactFile,
                                                                                               BundleDescriptor bundleDescriptor,
                                                                                               MavenClient mavenClient,
