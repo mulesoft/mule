@@ -10,8 +10,6 @@ import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorS
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 
-import org.mule.runtime.api.scheduler.Scheduler;
-
 import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.Collection;
@@ -34,8 +32,8 @@ import java.util.function.Predicate;
  */
 public class ConditionalExecutorServiceDecorator implements ScheduledExecutorService {
 
-  private Scheduler delegate;
-  private Predicate<Scheduler> scheduleOverridePredicate;
+  private ScheduledExecutorService delegate;
+  private Predicate<ScheduledExecutorService> scheduleOverridePredicate;
   private ExecutorService directExecutor = newDirectExecutorService();
 
   /**
@@ -44,7 +42,8 @@ public class ConditionalExecutorServiceDecorator implements ScheduledExecutorSer
    *
    * @param executorService the delegate executor service to use when no transaction is active.
    */
-  public ConditionalExecutorServiceDecorator(Scheduler executorService, Predicate<Scheduler> scheduleOverridePredicate) {
+  public ConditionalExecutorServiceDecorator(ScheduledExecutorService executorService,
+                                             Predicate<ScheduledExecutorService> scheduleOverridePredicate) {
     this.delegate = executorService;
     this.scheduleOverridePredicate = scheduleOverridePredicate;
   }

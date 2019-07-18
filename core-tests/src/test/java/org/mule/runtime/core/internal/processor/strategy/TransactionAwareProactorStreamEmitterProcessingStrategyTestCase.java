@@ -73,7 +73,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
                                                                        () -> cpuLight,
                                                                        () -> blocking,
                                                                        () -> cpuIntensive,
-                                                                       MAX_VALUE, true);
+                                                                       MAX_VALUE, true,
+                                                                       muleContext.getSchedulerService());
   }
 
   @Override

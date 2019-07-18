@@ -9,14 +9,16 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy;
+import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
 abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable {
@@ -24,6 +26,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
   private final Supplier<Scheduler> cpuLightSchedulerSupplier;
   private Scheduler cpuLightScheduler;
   private final int parallelism;
+  SchedulerService schedulerService;
 
   AbstractReactorStreamProcessingStrategy(int subscribers,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier, int parallelism,
@@ -31,6 +34,16 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
     super(subscribers, maxConcurrency, maxConcurrencyEagerCheck);
     this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
     this.parallelism = parallelism;
+  }
+
+  AbstractReactorStreamProcessingStrategy(int subscribers,
+                                          Supplier<Scheduler> cpuLightSchedulerSupplier, int parallelism,
+                                          int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                          SchedulerService schedulerService) {
+    super(subscribers, maxConcurrency, maxConcurrencyEagerCheck);
+    this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
+    this.parallelism = parallelism;
+    this.schedulerService = schedulerService;
   }
 
   @Override
@@ -46,6 +59,12 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
           .transform(processor)
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
     }
+  }
+
+  @Override
+  protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
+    return new ConditionalExecutorServiceDecorator(scheduler,
+                                                   scheduledExecutorService -> schedulerService.isCurrentThreadForCpuWork());
   }
 
   protected ReactiveProcessor onNonBlockingProcessorTxAware(ReactiveProcessor processor) {

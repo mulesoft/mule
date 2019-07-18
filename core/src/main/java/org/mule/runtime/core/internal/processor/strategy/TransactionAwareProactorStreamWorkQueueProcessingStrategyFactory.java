@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
-
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -58,7 +58,8 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
                                                                                      + CPU_INTENSIVE.name())),
                                                                          getMaxConcurrency(),
                                                                          isMaxConcurrencyEagerCheck(),
-                                                                         muleContext.getConfiguration().isThreadLoggingEnabled());
+                                                                         muleContext.getConfiguration().isThreadLoggingEnabled(),
+                                                                         muleContext.getSchedulerService());
   }
 
   @Override
@@ -76,12 +77,11 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
                                                               Supplier<Scheduler> blockingSchedulerSupplier,
                                                               Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
                                                               int maxConcurrency, boolean maxConcurrencyEagerCheck,
-                                                              boolean isThreadLoggingEnabled)
-
-    {
+                                                              boolean isThreadLoggingEnabled,
+                                                              SchedulerService schedulerService) {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
             blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency,
-            maxConcurrencyEagerCheck, isThreadLoggingEnabled);
+            maxConcurrencyEagerCheck, isThreadLoggingEnabled, schedulerService);
     }
 
     TransactionAwareProactorStreamWorkQueueProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
@@ -91,12 +91,13 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
                                                               Supplier<Scheduler> cpuLightSchedulerSupplier,
                                                               Supplier<Scheduler> blockingSchedulerSupplier,
                                                               Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                              int maxConcurrency, boolean maxConcurrencyEagerCheck)
+                                                              int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                                              SchedulerService schedulerService)
 
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, maxConcurrency,
-           maxConcurrencyEagerCheck, false);
+           maxConcurrencyEagerCheck, false, schedulerService);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
     }
 
     @Override
-    protected ExecutorService decorateScheduler(Scheduler scheduler) {
+    protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
       return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
     }
 
