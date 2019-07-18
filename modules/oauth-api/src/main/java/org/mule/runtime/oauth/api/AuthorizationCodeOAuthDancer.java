@@ -9,7 +9,7 @@ package org.mule.runtime.oauth.api;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
-import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
+import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 

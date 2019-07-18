@@ -10,20 +10,24 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.OAuthCallbackConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.UpdatingAuthorizationCodeState;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
-import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
+import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -74,7 +78,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void onRefreshToken() throws Exception {
+  public void onRefreshToken() {
     ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
     Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
 
@@ -89,16 +93,68 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
 
     AuthorizationCodeListener listener = listenerCaptor.getValue();
-    listener.onTokenRefreshed(refreshedContext);
-
-    assertThat(state.getAccessToken(), equalTo(NEW_TOKEN));
-    assertThat(state.getRefreshToken().get(), equalTo(NEW_REFRESH_TOKEN));
-
-    assertThat(newContext.get(), is(sameInstance(refreshedContext)));
+    assertTokenRefreshed(newContext, state, listener);
   }
 
   @Test
-  public void onReAuthorization() throws Exception {
+  public void onTokenInvalidated() {
+    ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+
+    UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                              dancer,
+                                                                              initialContext,
+                                                                              newContext::set);
+
+    verify(dancer).addListener(listenerCaptor.capture());
+
+    assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+
+    AuthorizationCodeListener listener = listenerCaptor.getValue();
+    listener.onTokenInvalidated();
+
+    try {
+      state.getAccessToken();
+      fail("This should have failed");
+    } catch (TokenInvalidatedException e) {
+      // carry on... nothing to see here
+    }
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+    assertThat(newContext.get(), is(nullValue()));
+  }
+
+  @Test
+  public void onTokenUpdatedAfterInvalidation() {
+    ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+
+    UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                              dancer,
+                                                                              initialContext,
+                                                                              newContext::set);
+
+    verify(dancer).addListener(listenerCaptor.capture());
+
+    assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+
+    AuthorizationCodeListener listener = listenerCaptor.getValue();
+    listener.onTokenInvalidated();
+
+    try {
+      state.getAccessToken();
+      fail("This should have failed");
+    } catch (TokenInvalidatedException e) {
+      // carry on... nothing to see here
+    }
+
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+    assertTokenRefreshed(newContext, state, listener);
+  }
+
+  @Test
+  public void onReAuthorization() {
     ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
     Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
 
@@ -114,6 +170,16 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
 
     AuthorizationCodeListener listener = listenerCaptor.getValue();
     listener.onAuthorizationCompleted(refreshedContext);
+
+    assertThat(state.getAccessToken(), equalTo(NEW_TOKEN));
+    assertThat(state.getRefreshToken().get(), equalTo(NEW_REFRESH_TOKEN));
+
+    assertThat(newContext.get(), is(sameInstance(refreshedContext)));
+  }
+
+  private void assertTokenRefreshed(Reference<ResourceOwnerOAuthContext> newContext, UpdatingAuthorizationCodeState state,
+                                    AuthorizationCodeListener listener) {
+    listener.onTokenRefreshed(refreshedContext);
 
     assertThat(state.getAccessToken(), equalTo(NEW_TOKEN));
     assertThat(state.getRefreshToken().get(), equalTo(NEW_REFRESH_TOKEN));

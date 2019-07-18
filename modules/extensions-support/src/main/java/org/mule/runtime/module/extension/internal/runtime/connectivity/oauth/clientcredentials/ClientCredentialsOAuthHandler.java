@@ -21,7 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAu
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
-import org.mule.runtime.oauth.api.builder.ClientCredentialsListener;
+import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
