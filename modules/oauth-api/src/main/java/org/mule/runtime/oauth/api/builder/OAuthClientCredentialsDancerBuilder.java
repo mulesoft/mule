@@ -8,6 +8,7 @@ package org.mule.runtime.oauth.api.builder;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
+import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
 
 import java.util.Map;
 

@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
 import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
-import org.mule.runtime.oauth.api.builder.ClientCredentialsListener;
+import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
@@ -23,6 +24,7 @@ import java.util.function.Consumer;
 public class UpdatingClientCredentialsState implements ClientCredentialsState {
 
   private ClientCredentialsState delegate;
+  private boolean invalidated = false;
 
   public UpdatingClientCredentialsState(ClientCredentialsOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
@@ -36,15 +38,24 @@ public class UpdatingClientCredentialsState implements ClientCredentialsState {
         updateDelegate(context);
         onUpdate.accept(context);
       }
+
+      @Override
+      public void onTokenInvalidated() {
+        invalidated = true;
+      }
     });
   }
 
   private void updateDelegate(ResourceOwnerOAuthContext initialContext) {
     delegate = new ImmutableClientCredentialsState(initialContext.getAccessToken(), initialContext.getExpiresIn());
+    invalidated = false;
   }
 
   @Override
   public String getAccessToken() {
+    if (invalidated) {
+      throw new TokenInvalidatedException("Access Token has been invalidated");
+    }
     return delegate.getAccessToken();
   }
 
