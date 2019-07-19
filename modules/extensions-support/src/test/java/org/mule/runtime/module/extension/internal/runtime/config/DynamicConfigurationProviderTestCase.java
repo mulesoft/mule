@@ -241,9 +241,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
 
-
     timeSupplier.move(10, MINUTES);
-
 
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(false));
@@ -253,7 +251,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     assertThat(instance.getStop(), is(0));
     assertThat(instance.getDispose(), is(0));
-
   }
 
   @Test
@@ -261,7 +258,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
-
 
     timeSupplier.move(1, MINUTES);
 
@@ -273,7 +269,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     assertThat(instance.getStop(), is(1));
     assertThat(instance.getDispose(), is(1));
-
   }
 
   private HeisenbergExtension makeAlternateInstance() throws Exception {
