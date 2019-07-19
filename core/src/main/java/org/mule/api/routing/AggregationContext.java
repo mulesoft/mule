@@ -50,8 +50,9 @@ public final class AggregationContext
             boolean exceptionInAggregatedEvent = ep != null &&
                                                  ep.getException() != null;
             boolean sameExceptionAsOriginalEvent = originalEP != null &&
-                                                     originalEP.getException() != null &&
-                                                     ep.getException() == originalEP.getException();
+                                                   originalEP.getException() != null &&
+                                                   exceptionInAggregatedEvent &&
+                                                   ep.getException() == originalEP.getException();
             return exceptionInAggregatedEvent && !sameExceptionAsOriginalEvent;
         }
     };
