@@ -45,7 +45,7 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamWorkQu
                                                getCpuLightSchedulerSupplier(muleContext, schedulersNamePrefix),
                                                resolveParallelism(),
                                                getMaxConcurrency(),
-                                               isMaxConcurrencyEagerCheck());
+                                               isMaxConcurrencyEagerCheck(), muleContext.getSchedulerService());
   }
 
   protected int resolveParallelism() {
@@ -73,9 +73,9 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamWorkQu
 
     ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
                                     String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier, int parallelism,
-                                    int maxConcurrency, boolean maxConcurrencyEagerCheck) {
+                                    int maxConcurrency, boolean maxConcurrencyEagerCheck, SchedulerService schedulerService) {
       super(subscribers, cpuLightSchedulerSupplier, parallelism,
-            maxConcurrency, maxConcurrencyEagerCheck);
+            maxConcurrency, maxConcurrencyEagerCheck, schedulerService);
       this.workQueueStreamProcessingStrategy = new WorkQueueStreamProcessingStrategy(ringBufferSchedulerSupplier,
                                                                                      bufferSize,
                                                                                      subscribers,
