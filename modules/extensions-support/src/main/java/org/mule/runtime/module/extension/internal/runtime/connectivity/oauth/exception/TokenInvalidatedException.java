@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception;
 
-import org.mule.runtime.extension.api.error.MuleErrors;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 public class TokenInvalidatedException extends ModuleException {
 
   public TokenInvalidatedException(String message) {
-    super(message, MuleErrors.CONNECTIVITY);
+    super(message, CONNECTIVITY);
+  }
+
+  public TokenInvalidatedException(String message, Throwable cause) {
+    super(message, CONNECTIVITY, cause);
   }
 }
