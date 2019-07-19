@@ -55,7 +55,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
 
   @Override
   protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
-    return new ConditionalExecutorServiceDecorator(scheduler,
+    return new ConditionalExecutorServiceDecorator(super.decorateScheduler(scheduler),
                                                    scheduledExecutorService -> schedulerService.isCurrentThreadForCpuWork());
   }
 
