@@ -163,8 +163,7 @@
         </dependency>
         <dependency>
             <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-jdk1.5</artifactId>
-            <version>0.7.3</version>
+            <artifactId>jgrapht-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

@@ -12,22 +12,28 @@ import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.toXml;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DirectedMultigraph;
-import org.jgrapht.traverse.GraphIterator;
-import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.xml.XMLConstants;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.xml.XMLConstants;
+
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.traverse.GraphIterator;
+import org.jgrapht.traverse.TopologicalOrderIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have
@@ -125,7 +131,7 @@ public class MacroExpansionModulesModel {
       if (!extensionsUsedInApp.isEmpty()) {
         // generation of the DAG and then the topological iterator.
         // it's important to be 100% sure the DAG is not empty, or the TopologicalOrderIterator will fail at start up.
-        DirectedGraph<String, DefaultEdge> namespaceDAG = new DirectedMultigraph<>(DefaultEdge.class);
+        Graph<String, DefaultEdge> namespaceDAG = new DirectedMultigraph<>(DefaultEdge.class);
         extensionsUsedInApp.forEach(namespace -> fillDependencyGraph(namespaceDAG, namespace, allExtensionsByNamespace));
         GraphIterator<String, DefaultEdge> graphIterator = new TopologicalOrderIterator<>(namespaceDAG);
         while (graphIterator.hasNext()) {
@@ -140,7 +146,7 @@ public class MacroExpansionModulesModel {
     return result;
   }
 
-  private void fillDependencyGraph(DirectedGraph<String, DefaultEdge> g, String sourceVertex,
+  private void fillDependencyGraph(Graph<String, DefaultEdge> g, String sourceVertex,
                                    Map<String, ExtensionModel> allExtensionsByNamespace) {
     final ExtensionModel extensionModel = allExtensionsByNamespace.get(sourceVertex);
     g.addVertex(sourceVertex);
