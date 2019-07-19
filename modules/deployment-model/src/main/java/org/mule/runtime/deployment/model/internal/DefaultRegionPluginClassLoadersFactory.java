@@ -23,9 +23,11 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFacto
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -136,6 +138,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
     }
 
     ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
+    Set<String> muleModulesExportedPackages = new HashSet<>();
 
     for (MuleModule module : moduleRepository.getModules()) {
       if (module.getPrivilegedArtifacts()
@@ -144,15 +147,21 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
           pluginsLookupPolicies.put(packageName, containerOnlyLookupStrategy);
         }
       }
+
+      muleModulesExportedPackages.addAll(module.getExportedPackages());
     }
 
     Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
     for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
-      if (!(baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy)) {
-        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
-      } else {
+      // packages exported from another artifact in the region will be ParentFirst,
+      // even if they are also exported by the container.
+      if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
+          || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
+              && muleModulesExportedPackages.contains(localPackage))) {
         LOGGER.warn("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
             + "', but it will be ignored since it is already available from the container.");
+      } else {
+        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
       }
     }
 

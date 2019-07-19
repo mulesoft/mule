@@ -430,7 +430,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         || "com.mulesoft.mule.runtime.modules".equals(groupId)) {
       LOGGER
           .warn("Internal plugin library '{}:{}' is a Mule Runtime dependency. It will not be used by '{}' in order to avoid classloading issues. Please consider removing it, or at least not putting it with 'compile' scope.",
-                groupId, artifactId);
+                groupId, artifactId, artifactFileName);
       return true;
     } else {
       return false;
