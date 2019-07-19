@@ -54,7 +54,7 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
   private final String name;
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
-  protected final List<ConfigurationInstance> configurationInstances = new LinkedList<>();
+  private final List<ConfigurationInstance> configurationInstances = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
   protected final SimpleLifecycleManager lifecycleManager;
   protected final MuleContext muleContext;
@@ -160,6 +160,18 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
    */
   protected void registerConfiguration(ConfigurationInstance configuration) {
     configurationInstances.add(configuration);
+  }
+
+  /**
+   * Implementations are to invoke this method every time they want to unregister a current registered {@link ConfigurationInstance}
+   * so that they're no longer kept track of and the lifecycle is not propagated.
+   *
+   * @param configuration an already registered {@link ConfigurationInstance}
+   * @return whether a {@link ConfigurationInstance} was unregistered or not.
+   *
+   */
+  protected boolean unRegisterConfiguration(ConfigurationInstance configuration) {
+    return configurationInstances.remove(configuration);
   }
 
   /**

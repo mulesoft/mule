@@ -246,7 +246,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     try {
       return cache.entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
         cache.remove(entry.getKey());
-        configurationInstances.remove(entry.getValue());
+        unRegisterConfiguration(entry.getValue());
         return entry.getValue();
       }).collect(toImmutableList());
     } finally {

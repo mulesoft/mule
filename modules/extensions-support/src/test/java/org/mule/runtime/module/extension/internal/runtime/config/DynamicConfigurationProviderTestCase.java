@@ -14,7 +14,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
@@ -34,8 +33,10 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -53,8 +54,6 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import com.google.common.collect.ImmutableList;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -73,9 +72,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class DynamicConfigurationProviderTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension> {
 
   private static final Class MODULE_CLASS = HeisenbergExtension.class;
-
-  private static final String CONFIGURATION_INSTANCE_FIELD_NAME = "configurationInstances";
-  private static Field configurationInstanceField;
 
   @Rule
   public ExpectedException expected = none();
@@ -139,8 +135,24 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   @After
   public void after() throws MuleException {
-    provider.stop();
-    provider.dispose();
+    stopIfNecessary();
+    disposeIfNecessary();
+  }
+
+  private void disposeIfNecessary() {
+    if (isValidTransition(Disposable.PHASE_NAME)) {
+      provider.dispose();
+    }
+  }
+
+  private void stopIfNecessary() throws MuleException {
+    if (isValidTransition(Stoppable.PHASE_NAME)) {
+      provider.stop();
+    }
+  }
+
+  private boolean isValidTransition(String phaseName) {
+    return provider.lifecycleManager.getState().isValidTransition(phaseName);
   }
 
   @Test
@@ -224,26 +236,44 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   }
 
   @Test
-  public void configurationInstanceIsRemovedAfterExpired() throws Exception {
-    HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(event).getValue();
+  public void configurationInstanceIsRemovedFromLifecycleTrackingAfterExpired() throws Exception {
+    HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
+
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
 
-    assertAmountOfActiveConfigurations(1, provider);
 
     timeSupplier.move(10, MINUTES);
+
 
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(false));
 
-    List<Object> configs = expired.stream().map(config -> config.getValue()).collect(toImmutableList());
-    assertThat(configs, containsInAnyOrder(instance1));
-    assertAmountOfActiveConfigurations(0, provider);
+    provider.stop();
+    provider.dispose();
+
+    assertThat(instance.getStop(), is(0));
+    assertThat(instance.getDispose(), is(0));
+
   }
 
-  private void assertAmountOfActiveConfigurations(int expectedAmountOfActiveConfigurations, DynamicConfigurationProvider provider)
-      throws IllegalAccessException, NoSuchFieldException {
-    Collection<ConfigurationInstance> configurationInstances = (Collection) getConfigurationInstanceField().get(provider);
-    assertThat(configurationInstances, hasSize(expectedAmountOfActiveConfigurations));
+  @Test
+  public void configurationInstanceFollowsLifecycleTrakingWhenNotExpired() throws Exception {
+    HeisenbergExtension instance = (HeisenbergExtension) provider.get(event).getValue();
+
+    DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
+
+
+    timeSupplier.move(1, MINUTES);
+
+    List<ConfigurationInstance> expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(true));
+
+    provider.stop();
+    provider.dispose();
+
+    assertThat(instance.getStop(), is(1));
+    assertThat(instance.getDispose(), is(1));
+
   }
 
   private HeisenbergExtension makeAlternateInstance() throws Exception {
@@ -310,19 +340,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
       verify(connProvider).stop();
       verify(connProvider).dispose();
     }
-  }
-
-  private static Field getConfigurationInstanceField() {
-    if (configurationInstanceField == null) {
-      try {
-        configurationInstanceField =
-            LifecycleAwareConfigurationProvider.class.getDeclaredField(CONFIGURATION_INSTANCE_FIELD_NAME);
-      } catch (NoSuchFieldException e) {
-        throw new IllegalStateException("Class LifecycleAwareConfigurationProvider was expected to have a field named"
-            + CONFIGURATION_INSTANCE_FIELD_NAME);
-      }
-    }
-    return configurationInstanceField;
   }
 
 }
