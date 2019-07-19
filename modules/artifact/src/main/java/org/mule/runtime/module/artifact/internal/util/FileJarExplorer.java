@@ -58,7 +58,7 @@ public class FileJarExplorer implements JarExplorer {
         final Collection<File> files = listFiles(libraryFile, TRUE, INSTANCE);
         for (File classFile : files) {
           final String relativePath = classFile.getAbsolutePath().substring(libraryFile.getAbsolutePath().length() + 1);
-          if (relativePath.endsWith(CLASS_EXTENSION)) {
+          if (relativePath.indexOf(separatorChar) > 0 && relativePath.endsWith(CLASS_EXTENSION)) {
             packages.add(SEPARATOR_PATTERN
                 .matcher(relativePath.substring(0, relativePath.lastIndexOf(separatorChar)))
                 .replaceAll("."));
