@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.1</version>
+    <version>4.2.1-SP1-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -231,13 +231,13 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.2.0</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.2.1</muleExtensionsApiVersion>
+        <muleExtensionsApiVersion>1.2.1-SP1-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.2.0</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.4.0</muleMavenClientApi>
         <muleMavenClientImpl>1.4.0</muleMavenClientImpl>
         <muleMavenClientTest>1.4.0</muleMavenClientTest>
         <mulePolicyApiVersion>1.2.0</mulePolicyApiVersion>
-        <muleApiVersion>1.2.1</muleApiVersion>
+        <muleApiVersion>1.2.1-SP1-SNAPSHOT</muleApiVersion>
         <muleMetadataModelVersion>1.2.1</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
