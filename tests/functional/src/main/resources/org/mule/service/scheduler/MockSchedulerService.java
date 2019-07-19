@@ -6,6 +6,7 @@
  */
 package org.mule.service.scheduler;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -81,5 +82,18 @@ public class MockSchedulerService implements SchedulerService {
   @Override
   public List<SchedulerView> getSchedulers() {
     return singletonList(new MockSchedulerView());
+  }
+
+  @Override
+  public boolean isCurrentThreadForCpuWork() {
+    ThreadGroup threadGroup = currentThread().getThreadGroup();
+    while (threadGroup.getParent() != null) {
+      if (threadGroup.getName().contains("cpuLight") || threadGroup.getName().contains("cpuIntensive")) {
+        return true;
+      } else {
+        threadGroup = threadGroup.getParent();
+      }
+    }
+    return false;
   }
 }
