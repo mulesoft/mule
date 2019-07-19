@@ -23,13 +23,14 @@ import java.util.function.Consumer;
  */
 public class UpdatingClientCredentialsState implements ClientCredentialsState {
 
+  private final ClientCredentialsOAuthDancer dancer;
   private ClientCredentialsState delegate;
   private boolean invalidated = false;
 
   public UpdatingClientCredentialsState(ClientCredentialsOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
-
+    this.dancer = dancer;
     updateDelegate(initialContext);
     dancer.addListener(new ClientCredentialsListener() {
 
@@ -54,7 +55,12 @@ public class UpdatingClientCredentialsState implements ClientCredentialsState {
   @Override
   public String getAccessToken() {
     if (invalidated) {
-      throw new TokenInvalidatedException("Access Token has been invalidated");
+      try {
+        dancer.accessToken().get();
+        updateDelegate(dancer.getContext());
+      } catch (Exception e) {
+        throw new TokenInvalidatedException("Access Token has been invalidated and failed to obtain a new one", e);
+      }
     }
     return delegate.getAccessToken();
   }
