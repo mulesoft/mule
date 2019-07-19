@@ -12,7 +12,9 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -167,7 +169,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
    */
   @Override
   public CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent) {
-    return manage(provider, ((BaseEventContext) creatorEvent.getContext()).getRootContext());
+    return manage(provider, getRoot(creatorEvent.getContext()));
   }
 
   /**
@@ -175,7 +177,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
    */
   @Override
   public void manage(InputStream stream, CoreEvent creatorEvent) {
-    manage(stream, ((BaseEventContext) creatorEvent.getContext()).getRootContext());
+    manage(stream, getRoot(creatorEvent.getContext()));
   }
 
   /**

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
+import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
@@ -14,7 +16,6 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.internal.streaming.CursorManager;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Iterator;
 
@@ -53,7 +54,7 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
 
   @Override
   public Object of(CoreEvent event, Iterator value) {
-    return of(((BaseEventContext) event.getContext()).getRootContext(), value);
+    return of(getRoot(event.getContext()), value);
   }
 
   /**

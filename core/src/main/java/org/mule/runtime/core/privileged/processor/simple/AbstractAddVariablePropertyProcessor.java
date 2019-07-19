@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
-  private static final Logger logger = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
 
   private AttributeEvaluator identifierEvaluator;
   private String value;
@@ -56,15 +56,14 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   public CoreEvent process(CoreEvent event) throws MuleException {
     String key = identifierEvaluator.resolveValue(event);
     if (key == null) {
-      logger.error("Setting Null variable keys is not supported, this entry is being ignored");
+      LOGGER.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
     } else {
-      final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(event);
       TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
-      event = builder.build();
+
       if (typedValue.getValue() == null) {
-        if (logger.isDebugEnabled()) {
-          logger.debug(format(
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(format(
                               "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
                               key, valueEvaluator.getRawValue()));
         }

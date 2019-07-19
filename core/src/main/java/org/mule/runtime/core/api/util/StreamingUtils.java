@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.streaming.bytes.ByteArrayCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ListCursorIteratorProvider;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -130,7 +130,7 @@ public final class StreamingUtils {
    * @return the {@code value} or a {@link CursorProvider}
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
-    return streamingContent(value, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
+    return streamingContent(value, cursorProviderFactory, getRoot(event.getContext()));
   }
 
   /**
@@ -294,33 +294,40 @@ public final class StreamingUtils {
 
   private StreamingUtils() {}
 
+  public static TypedValue updateTypedValueForStreaming(final TypedValue value,
+                                                        final CoreEvent event,
+                                                        final StreamingManager streamingManager) {
+    if (event == null) {
+      return value;
+    }
+
+    return updateTypedValueForStreaming(value, getRoot(event.getContext()), streamingManager);
+  }
+
   /**
    * Updates the value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
    *
    * @param value            the typed value to update
-   * @param event            the current event
+   * @param rootEventContext the root context of the creating event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
-  public static TypedValue updateTypedValueForStreaming(final TypedValue value, final CoreEvent event,
+  public static TypedValue updateTypedValueForStreaming(final TypedValue value,
+                                                        final EventContext rootEventContext,
                                                         final StreamingManager streamingManager) {
-    if (event == null) {
-      return value;
-    } else {
-      Object payload = value.getValue();
-      if (payload instanceof CursorProvider) {
-        CursorProvider cursorProvider =
-            streamingManager.manage((CursorProvider) payload, ((BaseEventContext) event.getContext()).getRootContext());
+    Object payload = value.getValue();
+    if (payload instanceof CursorProvider) {
+      CursorProvider cursorProvider =
+          streamingManager.manage((CursorProvider) payload, rootEventContext);
 
-        if (cursorProvider == payload) {
-          return value;
-        } else {
-          DataType dataType = DataType.builder(value.getDataType()).type(cursorProvider.getClass()).build();
-          return new TypedValue<>(cursorProvider, dataType, value.getByteLength());
-        }
+      if (cursorProvider == payload) {
+        return value;
+      } else {
+        DataType dataType = DataType.builder(value.getDataType()).type(cursorProvider.getClass()).build();
+        return new TypedValue<>(cursorProvider, dataType, value.getByteLength());
       }
-      return value;
     }
+    return value;
   }
 
   /**
@@ -355,7 +362,6 @@ public final class StreamingUtils {
    * @param event            the current event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
-   *
    * @deprecated Use {@link #updateTypedValueWithCursorProvider(TypedValue, StreamingManager)}.
    */
   @Deprecated
