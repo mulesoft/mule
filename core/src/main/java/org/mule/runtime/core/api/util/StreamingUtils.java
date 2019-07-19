@@ -308,17 +308,17 @@ public final class StreamingUtils {
    * Updates the value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
    *
    * @param value            the typed value to update
-   * @param eventContext     the current event context
+   * @param rootEventContext the root context of the creating event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
   public static TypedValue updateTypedValueForStreaming(final TypedValue value,
-                                                        final EventContext eventContext,
+                                                        final EventContext rootEventContext,
                                                         final StreamingManager streamingManager) {
     Object payload = value.getValue();
     if (payload instanceof CursorProvider) {
       CursorProvider cursorProvider =
-          streamingManager.manage((CursorProvider) payload, eventContext);
+          streamingManager.manage((CursorProvider) payload, rootEventContext);
 
       if (cursorProvider == payload) {
         return value;
@@ -362,7 +362,6 @@ public final class StreamingUtils {
    * @param event            the current event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
-   *
    * @deprecated Use {@link #updateTypedValueWithCursorProvider(TypedValue, StreamingManager)}.
    */
   @Deprecated
