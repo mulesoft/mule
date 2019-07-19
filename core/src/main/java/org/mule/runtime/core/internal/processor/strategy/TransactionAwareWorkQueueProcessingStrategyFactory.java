@@ -69,7 +69,8 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
 
     @Override
     protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
-      return new ConditionalExecutorServiceDecorator(super.decorateScheduler(scheduler), currentScheduler -> isTransactionActive());
+      return new ConditionalExecutorServiceDecorator(super.decorateScheduler(scheduler),
+                                                     currentScheduler -> isTransactionActive());
     }
 
     @Override
