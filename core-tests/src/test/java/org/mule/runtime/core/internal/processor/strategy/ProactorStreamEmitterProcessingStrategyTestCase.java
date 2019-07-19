@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -23,9 +24,11 @@ import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -44,6 +47,7 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -51,6 +55,7 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -75,11 +80,16 @@ import org.mockito.InOrder;
 @Story(PROACTOR)
 public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
+  private SchedulerService mockSchedulerService;
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
+    mockSchedulerService = mock(SimpleUnitTestSupportSchedulerService.class);
+    when(mockSchedulerService.cpuLightScheduler()).thenReturn(cpuLight);
+    when(mockSchedulerService.isCurrentThreadForCpuWork()).thenCallRealMethod();
   }
 
   @Override
@@ -95,7 +105,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                        () -> blocking,
                                                        () -> cpuIntensive,
                                                        CORES,
-                                                       maxConcurrency, true, muleContext.getSchedulerService());
+                                                       maxConcurrency, true, mockSchedulerService);
   }
 
   @Override
@@ -228,6 +238,29 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Description("When a non-blocking operation is resolved in the same thread the processing strategy must not make a thread switch")
+  public void asyncCpuLightWithoutThreadSwitch() throws Exception {
+    threadSwitch = false;
+
+    final Future<?> submit = cpuLight.submit(() -> {
+      try {
+        super.asyncCpuLight();
+      } catch (Exception e) {
+        currentThread().interrupt();
+      }
+    });
+
+    submit.get();
+    assertThat(threads, hasSize(1));
+    assertThat(threads, hasItem(startsWith(CPU_LIGHT)));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+    assertThat(threads, not(hasItem(startsWith(RING_BUFFER))));
+    assertThat(threads, not(hasItem(startsWith(EXECUTOR))));
   }
 
   @Override
