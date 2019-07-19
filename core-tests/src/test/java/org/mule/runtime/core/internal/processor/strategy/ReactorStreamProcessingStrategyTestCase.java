@@ -51,7 +51,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
                                                DEFAULT_WAIT_STRATEGY,
                                                () -> cpuLight,
                                                CORES,
-                                               MAX_VALUE, true);
+                                               MAX_VALUE, true, muleContext.getSchedulerService());
   }
 
   @Test
@@ -66,7 +66,8 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
                                                                                             DEFAULT_WAIT_STRATEGY,
                                                                                             () -> cpuLight,
                                                                                             CORES,
-                                                                                            1, true)),
+                                                                                            1, true,
+                                                                                            muleContext.getSchedulerService())),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
@@ -86,7 +87,8 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
                                                                                             DEFAULT_WAIT_STRATEGY,
                                                                                             () -> cpuLight,
                                                                                             CORES,
-                                                                                            2, true)),
+                                                                                            2, true,
+                                                                                            muleContext.getSchedulerService())),
                        true, CPU_LITE, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
