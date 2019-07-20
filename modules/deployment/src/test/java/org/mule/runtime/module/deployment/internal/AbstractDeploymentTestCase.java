@@ -232,6 +232,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File barUtils2ClassFile;
   protected static File barUtils2_0JarFile;
 
+  protected static File barUtilsJavaxClassFile;
+  protected static File barUtilsJavaxJarFile;
+
   protected static File barUtilsForbiddenJavaClassFile;
   protected static File barUtilsForbiddenJavaJarFile;
 
@@ -270,6 +273,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     barUtils2ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar2/BarUtils.java"));
     barUtils2_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
+
+    barUtilsJavaxClassFile = new SingleClassCompiler().compile(getResourceFile("/javax/annotation/BarUtils.java"));
+    barUtilsJavaxJarFile =
+        new JarCompiler().compiling(getResourceFile("/javax/annotation/BarUtils.java")).compile("bar-javax.jar");
 
     barUtilsForbiddenJavaClassFile = new SingleClassCompiler().compile(getResourceFile("/java/lang/BarUtils.java"));
     barUtilsForbiddenJavaJarFile =

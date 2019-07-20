@@ -78,6 +78,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.tck.util.CompilerUtils;
+import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.File;
@@ -1335,6 +1336,35 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, differentLibPluginAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("MULE-17225")
+  public void appOverridingContainerClassAlsoPluginLocal() throws Exception {
+    File pluginEchoJavaxTestClassFile =
+        new SingleClassCompiler().dependingOn(barUtilsJavaxJarFile)
+            .compile(getResourceFile("/org/foo/echo/PluginJavaxEcho.java"));
+
+    ArtifactPluginFileBuilder echoPluginWithJavaxLib = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+        .dependingOn(new JarFileBuilder("barUtilsJavax", barUtilsJavaxJarFile))
+        .containingClass(pluginEchoJavaxTestClassFile, "org/foo/echo/PluginJavaxEcho.class");
+
+    final ApplicationFileBuilder withJavaxEchoPlugin = appFileBuilder("appWithJavaxEchoPlugin")
+        .definedBy("app-with-javax-echo-plugin-config.xml")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "javax.annotation")
+        .dependingOn(echoPluginWithJavaxLib)
+        .dependingOn(new JarFileBuilder("barUtilsJavaxB",
+                                        new JarCompiler().compiling(getResourceFile("/javax/annotation/BarUtils.java"))
+                                            .compile("bar-javax-b.jar")));
+
+    addPackedAppFromBuilder(withJavaxEchoPlugin);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, withJavaxEchoPlugin.getId());
 
     executeApplicationFlow("main");
   }
