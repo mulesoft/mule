@@ -7,6 +7,8 @@
 package org.mule.test.integration.http;
 
 import static java.lang.String.format;
+import static org.apache.http.impl.client.HttpClients.createDefault;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
@@ -21,9 +23,13 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.ssl.DefaultTlsContextFactory;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -181,6 +187,18 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
         executeRequest(url, false);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertThat(payload, is(INDEX_HTML_CONTENT));
+    }
+
+    @Test
+    public void onlyServeFilesWithinBasePath() throws Exception
+    {
+        String url = format("http://localhost:%d/static/../http-listener-static-resource-test.xml", port1.getNumber());
+        HttpClient httpclient = createDefault();
+        HttpGet request = new HttpGet(url);
+        HttpResponse response = httpclient.execute(request);
+        assertThat(response.getStatusLine().getStatusCode(), is(NOT_FOUND.getStatusCode()));
+        assertThat(IOUtils.toString(response.getEntity().getContent()),
+                   containsString("The file: /../http-listener-static-resource-test.xml  was not found.."));
     }
 
     private void executeRequest(String url, boolean followRedirects) throws Exception
