@@ -36,6 +36,8 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import reactor.core.publisher.Mono;
+
 /**
  * Abstract implementation of {@link ExecutableComponent}.
  *
@@ -48,19 +50,13 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   @Override
   public final CompletableFuture<ExecutionResult> execute(InputEvent inputEvent) {
-    CompletableFuture completableFuture = new CompletableFuture();
+    CompletableFuture<Void> completableFuture = new CompletableFuture<>();
     CoreEvent.Builder builder = CoreEvent.builder(createEventContext(of(completableFuture)));
     CoreEvent event = builder.message(inputEvent.getMessage())
         .error(inputEvent.getError().orElse(null))
         .variables(inputEvent.getVariables())
         .build();
-    return from(MessageProcessors.process(event, getExecutableFunction()))
-        .onErrorMap(throwable -> {
-          MessagingException messagingException = (MessagingException) throwable;
-          CoreEvent messagingExceptionEvent = messagingException.getEvent();
-          return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(),
-                                                 messagingExceptionEvent);
-        })
+    return doProcess(event)
         .<ExecutionResult>map(result -> new ExecutionResultImplementation(result, completableFuture))
         .toFuture();
   }
@@ -78,12 +74,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
           .variables(event.getVariables())
           .build();
     }
-    return from(MessageProcessors.process(internalEvent, getExecutableFunction()))
-        .onErrorMap(throwable -> {
-          MessagingException messagingException = (MessagingException) throwable;
-          CoreEvent messagingExceptionEvent = messagingException.getEvent();
-          return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(), messagingExceptionEvent);
-        })
+    return doProcess(internalEvent)
         .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
@@ -96,6 +87,19 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   protected BaseEventContext createChildEventContext(EventContext parent) {
     return child((BaseEventContext) parent, ofNullable(getLocation()));
+  }
+
+  private Mono<CoreEvent> doProcess(CoreEvent event) {
+    return from(MessageProcessors.process(event, getExecutableFunction()))
+        .onErrorMap(throwable -> {
+          CoreEvent messagingExceptionEvent = ((MessagingException) throwable).getEvent();
+          return new ComponentExecutionException(messagingExceptionEvent.getError()
+              .map(t -> t.getCause())
+              .orElse(throwable.getCause()),
+                                                 ((BaseEventContext) messagingExceptionEvent.getContext()).getParentContext()
+                                                     .map(pc -> quickCopy(pc, messagingExceptionEvent))
+                                                     .orElse(messagingExceptionEvent));
+        });
   }
 
   /**
@@ -118,8 +122,8 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   private static class ExecutionResultImplementation implements ExecutionResult {
 
-    private Event result;
-    private CompletableFuture<Void> complete;
+    private final Event result;
+    private final CompletableFuture<Void> complete;
 
     private ExecutionResultImplementation(Event result, CompletableFuture<Void> complete) {
       this.result = result;
