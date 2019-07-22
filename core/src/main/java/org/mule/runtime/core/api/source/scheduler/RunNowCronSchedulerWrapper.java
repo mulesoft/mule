@@ -6,10 +6,16 @@
  */
 package org.mule.runtime.core.api.source.scheduler;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import org.quartz.impl.triggers.CronTriggerImpl;
 
 public class RunNowCronSchedulerWrapper extends PeriodicScheduler {
 
@@ -21,7 +27,18 @@ public class RunNowCronSchedulerWrapper extends PeriodicScheduler {
 
   @Override
   protected ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job) {
-    executor.schedule(job, 0, TimeUnit.SECONDS);
+    String expression = cronScheduler.getExpression();
+    TimeZone timezone = cronScheduler.resolveTimeZone(cronScheduler.getTimeZone());
+    try {
+      CronTriggerImpl trigger =
+          new CronTriggerImpl("CheckTrigger", "TestGroup", "CheckExpression", "TestJobGroup", expression, timezone);
+      if (!trigger.willFireOn(Calendar.getInstance(timezone))) {
+        System.out.println("Adding an extra run.");
+        executor.schedule(job, 0, TimeUnit.SECONDS);
+      }
+    } catch (ParseException e) {
+      throw new MuleRuntimeException(e);
+    }
     return cronScheduler.doSchedule(executor, job);
   }
 }
