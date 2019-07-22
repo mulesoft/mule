@@ -533,6 +533,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
+  @FlakyTest
   public void backpressureOnInnerCpuIntensiveSchedulerBusyRecovery() throws Exception {
     assumeThat(mode, is(SOURCE));
 
@@ -574,7 +575,6 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
-  @FlakyTest
   public void eagerBackpressureOnMaxConcurrencyHit() throws Exception {
     assumeThat(mode, is(SOURCE));
 

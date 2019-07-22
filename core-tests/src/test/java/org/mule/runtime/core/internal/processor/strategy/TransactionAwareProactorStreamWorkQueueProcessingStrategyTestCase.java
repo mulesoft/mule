@@ -22,19 +22,22 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory.TransactionAwareProactorStreamWorkQueueProcessingStrategy;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.After;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import org.junit.runner.RunWith;
 
 @Feature(PROCESSING_STRATEGIES)
+@RunWith(FlakinessDetectorTestRunner.class)
 public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     extends ProactorStreamWorkQueueProcessingStrategyTestCase
     implements TransactionAwareProcessingStragyTestCase {
 
-  public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
+  public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase() {
     //super(mode);
   }
 
