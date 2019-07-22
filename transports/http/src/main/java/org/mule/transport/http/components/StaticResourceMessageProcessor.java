@@ -6,6 +6,8 @@
  */
 package org.mule.transport.http.components;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import static org.mule.transport.http.i18n.HttpMessages.fileNotFound;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -14,6 +16,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.config.i18n.Message;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -26,8 +29,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.activation.MimetypesFileTypeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A MessageProcessor that can be used by HTTP endpoints to serve static files from a directory on the
@@ -40,6 +48,8 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
     public static final String ANY_PATH = "/*";
     public static final String ROOT_PATH = "/";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaticResourceMessageProcessor.class);
 
     private String resourceBase;
     private String defaultFile = "index.html";
@@ -87,6 +97,13 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
             path = path.substring(contextPath.length());
         }
 
+        Path normalizedPath = Paths.get(resourceBase + path).normalize();
+        if (!normalizedPath.startsWith(resourceBase))
+        {
+            LOGGER.debug("Requested resource is not within base path limits.");
+            throw new ResourceNotFoundException(getErrorMessage(path), event, this);
+        }
+
         File file = new File(resourceBase + path);
         MuleEvent resultEvent = event;
 
@@ -128,7 +145,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         }
         catch (IOException e)
         {
-            throw new ResourceNotFoundException(HttpMessages.fileNotFound(resourceBase + path), event, this);
+            throw new ResourceNotFoundException(getErrorMessage(path), event, this);
         }
         finally
         {
@@ -136,6 +153,11 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         }
 
         return resultEvent;
+    }
+
+    private Message getErrorMessage(String s)
+    {
+        return fileNotFound(escapeHtml4(s));
     }
 
     public String getResourceBase()
