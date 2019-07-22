@@ -15,6 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
@@ -38,8 +39,16 @@ public class PetFailingPollingSource extends PollingSource<String, Instant> {
   private ConnectionProvider<PetStoreClient> fileSystemProvider;
 
   @Parameter
-  @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "0")
+  @Optional(defaultValue = "0")
+  private Integer failAtPoll;
+
+  @Parameter
+  @Optional(defaultValue = "0")
   private Long sleepAtRestart;
+
+  @Parameter
+  @Optional(defaultValue = "100")
+  private Long adoptionLimit;
 
   @Override
   protected void doStart() throws MuleException {
@@ -52,7 +61,7 @@ public class PetFailingPollingSource extends PollingSource<String, Instant> {
   @Override
   public void poll(PollContext<String, Instant> pollContext) {
     numberOfPolls++;
-    if (numberOfPolls == 3) {
+    if (numberOfPolls == failAtPoll) {
       if (sleepAtRestart != 0) {
         try {
           Thread.sleep(sleepAtRestart);
@@ -63,10 +72,10 @@ public class PetFailingPollingSource extends PollingSource<String, Instant> {
       //pollContext.onConnectionException(new ConnectionException("Polling Fail"));
       executor = newSingleThreadExecutor();
       executor.execute(() -> pollContext.onConnectionException(new ConnectionException("Polling Fail")));
-    } else if (numberOfPolls <= 7) {
+    } else if (numberOfPolls <= adoptionLimit) {
+      Instant instant = Instant.now();
       pollContext.accept(item -> {
-        String pet = ALL_PETS.get((numberOfPolls - 1));
-        Instant instant = Instant.now();
+        String pet = ALL_PETS.get((numberOfPolls - 1) % 7);
         item.setResult(Result.<String, Instant>builder().attributes(instant).output(pet).build());
       });
     }
