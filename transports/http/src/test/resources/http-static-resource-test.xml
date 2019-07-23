@@ -17,13 +17,13 @@
     <flow name="main-http">
         <http:inbound-endpoint address="http://localhost:${port1}/static"/>
 
-        <http:static-resource-handler resourceBase="${test.root}/dummy-docroot" defaultFile="index.html"/>
+        <http:static-resource-handler resourceBase="${test.root}dummy-docroot" defaultFile="index.html"/>
     </flow>
 
     <flow name="main-https">
         <https:inbound-endpoint address="https://localhost:${port2}/static" connector-ref="httpsConnector"/>
 
-        <https:static-resource-handler resourceBase="${test.root}/dummy-docroot"/>
+        <https:static-resource-handler resourceBase="${test.root}dummy-docroot"/>
     </flow>
 
     <!-- these services test that we can have flows bound on the same http
