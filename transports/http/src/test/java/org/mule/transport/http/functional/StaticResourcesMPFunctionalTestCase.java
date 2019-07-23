@@ -6,6 +6,8 @@
  */
 package org.mule.transport.http.functional;
 
+import static java.lang.String.format;
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -16,8 +18,6 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase
 {
@@ -152,4 +152,14 @@ public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase
         assertEquals(HttpConstants.SC_OK, responseCode);
         assertEquals(method.getResponseBodyAsString(), "/echo");
     }
+
+    @Test
+    public void onlyServeFilesWithinBasePath() throws Exception
+    {
+        String url = format("http://localhost:%d/static/../http-static-resource-test.xml", port1.getNumber());
+        request(url);
+        assertEquals(HttpConstants.SC_NOT_FOUND, responseCode);
+        assertEquals(payload, "The file: /../http-static-resource-test.xml  was not found.. Message payload is of type: String");
+    }
+
 }
