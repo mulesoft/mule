@@ -210,7 +210,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <projectReactorVersion>3.2.10.RELEASE</projectReactorVersion>
-        <projectReactorExtraVersion>3.1.6.RELEASE</projectReactorExtraVersion>
+        <projectReactorExtraVersion>3.2.3.RELEASE</projectReactorExtraVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
         <saxonVersion>9.9.1-1</saxonVersion>
