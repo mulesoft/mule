@@ -53,8 +53,6 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
@@ -68,16 +66,14 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
-@RunWith(FlakinessDetectorTestRunner.class)
 public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public ProactorStreamWorkQueueProcessingStrategyTestCase() {
-    super(SOURCE);
+  public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
+    super(mode);
   }
 
   @Override
@@ -505,7 +501,6 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
-  @FlakyTest
   public void backpressureOnInnerCpuIntensiveSchedulerBusyRecovery() throws Exception {
     assumeThat(mode, is(SOURCE));
 
