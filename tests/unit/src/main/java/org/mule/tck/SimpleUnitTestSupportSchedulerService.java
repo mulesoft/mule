@@ -15,8 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.service.scheduler.ThreadType.CPU_INTENSIVE;
-import static org.mule.service.scheduler.ThreadType.CPU_LIGHT;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -171,7 +169,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   public boolean isCurrentThreadForCpuWork() {
     ThreadGroup threadGroup = currentThread().getThreadGroup();
     while (threadGroup.getParent() != null) {
-      if (threadGroup.getName().contains(CPU_LIGHT.getName()) || threadGroup.getName().contains(CPU_INTENSIVE.getName())) {
+      if (threadGroup.getName().contains("cpuLight") || threadGroup.getName().contains("cpuIntensive")) {
         return true;
       } else {
         threadGroup = threadGroup.getParent();
