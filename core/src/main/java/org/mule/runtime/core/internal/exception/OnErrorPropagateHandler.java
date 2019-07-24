@@ -46,8 +46,9 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     };
   }
 
-  private boolean isTransactionInGlobalErrorHandler(String transactionRootContainer) {
-    return flowLocation.isPresent() && transactionRootContainer.equals(flowLocation.get().getGlobalName());
+  private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
+    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
+    return flowLocation.isPresent() && transactionContainerName.equals(flowLocation.get().getGlobalName());
   }
 
   private boolean isOwnedTransaction() {
@@ -55,7 +56,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
       return false;
     }
-    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
+
     String transactionLocation = transaction.getComponentLocation().get().getLocation();
     if (this.getLocation() == null) {
       // We are in a Default Error Handler (it has no Location defined)
@@ -65,10 +66,10 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
         return transactionLocation.equals(flowLocation.get().toString());
       } else {
         // We are in a default error handler of a Flow
-        return transactionContainerName.equals(this.getRootContainerLocation().getGlobalName());
+        return sameRootContainerLocation(transaction);
       }
     }
-    if (isTransactionInGlobalErrorHandler((transactionContainerName))) {
+    if (isTransactionInGlobalErrorHandler((transaction))) {
       // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
       return true;
     } else if (flowLocation.isPresent()) {
@@ -80,11 +81,18 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
     // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
     // to rollback the tx.
-    String ehLocation = this.getLocation().getLocation();
-    ehLocation = ehLocation.substring(0, ehLocation.lastIndexOf('/'));
-    ehLocation = ehLocation.substring(0, ehLocation.lastIndexOf('/'));
-    return (transactionContainerName.equals(this.getRootContainerLocation().getGlobalName()) &&
-        ehLocation.equals(transactionLocation));
+    String errorHandlerLocation = this.getLocation().getLocation();
+    if (!errorHandlerLocation.matches(".*/.*/.*")) {
+      return sameRootContainerLocation(transaction);
+    }
+    errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+    errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+    return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
+  }
+
+  private boolean sameRootContainerLocation(TransactionAdapter transaction) {
+    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
+    return transactionContainerName.equals(this.getRootContainerLocation().getGlobalName());
   }
 
   /**
