@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static java.util.regex.Pattern.compile;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -19,6 +19,7 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.reactivestreams.Publisher;
@@ -29,6 +30,8 @@ import org.reactivestreams.Publisher;
  * @since 4.0
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
+
+  private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
 
   @Override
   public boolean acceptsAll() {
@@ -82,7 +85,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
     // to rollback the tx.
     String errorHandlerLocation = this.getLocation().getLocation();
-    if (!errorHandlerLocation.matches(".*/.*/.*")) {
+    if (!ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find()) {
       return sameRootContainerLocation(transaction);
     }
     errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
