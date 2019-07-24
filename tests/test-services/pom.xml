@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.2.1</version>
+        <version>4.2.1-SP1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-test-services</artifactId>
     <name>Mule Test Services</name>
