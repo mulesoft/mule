@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -55,8 +56,35 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
       return false;
     }
     String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
-    return transactionContainerName.equals(this.getRootContainerLocation().getGlobalName())
-        || isTransactionInGlobalErrorHandler(transactionContainerName);
+    String transactionLocation = transaction.getComponentLocation().get().getLocation();
+    if (this.getLocation() == null) {
+      // We are in a Default Error Handler (it has no Location defined)
+      if (flowLocation.isPresent()) {
+        // We are in a default error handler for a TryScope, which must have been replicated to match the tx location
+        // to rollback it
+        return transactionLocation.equals(flowLocation.get().toString());
+      } else {
+        // We are in a default error handler of a Flow
+        return transactionContainerName.equals(this.getRootContainerLocation().getGlobalName());
+      }
+    }
+    if (isTransactionInGlobalErrorHandler((transactionContainerName))) {
+      // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
+      return true;
+    } else if (flowLocation.isPresent()) {
+      // We are in a Global Error Handler, which is not the one that created the Tx
+      return false;
+    }
+
+    // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
+    // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
+    // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
+    // to rollback the tx.
+    String ehLocation = this.getLocation().getLocation();
+    ehLocation = ehLocation.substring(0, ehLocation.lastIndexOf('/'));
+    ehLocation = ehLocation.substring(0, ehLocation.lastIndexOf('/'));
+    return (transactionContainerName.equals(this.getRootContainerLocation().getGlobalName()) &&
+        ehLocation.equals(transactionLocation));
   }
 
   /**
