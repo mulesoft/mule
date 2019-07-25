@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.metadata;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getCollectionType;
@@ -28,8 +29,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.util.ClassUtils;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.ref.Reference;
@@ -47,6 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Provides a way to build immutable {@link DataType} objects.
@@ -71,6 +72,7 @@ public class DefaultDataTypeBuilder
   private DataTypeBuilder keyTypeBuilder;
   private DataTypeBuilder valueTypeBuilder;
 
+  private DataType itemType = OBJECT;
   private boolean built = false;
 
   public DefaultDataTypeBuilder() {
@@ -514,17 +516,21 @@ public class DefaultDataTypeBuilder
       return new DefaultFunctionDataType(type, returnType, parametersType != null ? parametersType : newArrayList(), mediaType,
                                          isConsumable(type));
     }
+
+    if (itemTypeBuilder != null) {
+      itemType = itemTypeBuilder.build();
+    }
+
     return dataTypeCache.get(this);
   }
 
   protected DataType doBuild() {
     Class<?> type = this.typeRef.get();
     if (Collection.class.isAssignableFrom(type) || Iterator.class.isAssignableFrom(type)) {
-      return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType,
-                                           isConsumable(type));
+      return new DefaultCollectionDataType(type, itemType, mediaType, isConsumable(type));
     } else if (Map.class.isAssignableFrom(type)) {
-      return new DefaultMapDataType(type, keyTypeBuilder != null ? keyTypeBuilder.build() : DataType.OBJECT,
-                                    valueTypeBuilder != null ? valueTypeBuilder.build() : DataType.OBJECT, mediaType,
+      return new DefaultMapDataType(type, keyTypeBuilder != null ? keyTypeBuilder.build() : OBJECT,
+                                    valueTypeBuilder != null ? valueTypeBuilder.build() : OBJECT, mediaType,
                                     isConsumable(type));
     } else {
       return new SimpleDataType(type, mediaType, isConsumable(type));
