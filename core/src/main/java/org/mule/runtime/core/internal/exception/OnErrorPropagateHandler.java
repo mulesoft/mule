@@ -60,42 +60,49 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
       return false;
     }
 
-    String transactionLocation = transaction.getComponentLocation().get().getLocation();
-    if (this.getLocation() == null) {
-      // We are in a Default Error Handler (it has no Location defined)
-      if (flowLocation.isPresent()) {
-        // We are in a default error handler for a TryScope, which must have been replicated to match the tx location
-        // to rollback it
-        return transactionLocation.equals(flowLocation.get().toString());
-      } else {
-        // We are in a default error handler of a Flow
-        return sameRootContainerLocation(transaction);
-      }
-    }
-    if (isTransactionInGlobalErrorHandler((transaction))) {
+    if (inDefaultErrorHandler()) {
+      return defaultErrorHandlerOwnsTransaction(transaction);
+    } else if (isTransactionInGlobalErrorHandler((transaction))) {
       // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
       return true;
     } else if (flowLocation.isPresent()) {
       // We are in a Global Error Handler, which is not the one that created the Tx
       return false;
+    } else {
+      // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
+      // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
+      // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
+      // to rollback the tx.
+      String errorHandlerLocation = this.getLocation().getLocation();
+      if (!ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find()) {
+        return sameRootContainerLocation(transaction);
+      }
+      String transactionLocation = transaction.getComponentLocation().get().getLocation();
+      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+      return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
     }
-
-    // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
-    // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
-    // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
-    // to rollback the tx.
-    String errorHandlerLocation = this.getLocation().getLocation();
-    if (!ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find()) {
-      return sameRootContainerLocation(transaction);
-    }
-    errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
-    errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
-    return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
   }
 
   private boolean sameRootContainerLocation(TransactionAdapter transaction) {
     String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
     return transactionContainerName.equals(this.getRootContainerLocation().getGlobalName());
+  }
+
+  private boolean inDefaultErrorHandler() {
+    return getLocation() == null;
+  }
+
+  private boolean defaultErrorHandlerOwnsTransaction(TransactionAdapter transaction) {
+    String transactionLocation = transaction.getComponentLocation().get().getLocation();
+    if (flowLocation.isPresent()) {
+      // We are in a default error handler for a TryScope, which must have been replicated to match the tx location
+      // to rollback it
+      return transactionLocation.equals(flowLocation.get().toString());
+    } else {
+      // We are in a default error handler of a Flow
+      return sameRootContainerLocation(transaction);
+    }
   }
 
   /**
