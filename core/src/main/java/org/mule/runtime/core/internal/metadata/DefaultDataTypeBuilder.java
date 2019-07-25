@@ -72,7 +72,10 @@ public class DefaultDataTypeBuilder
   private DataTypeBuilder keyTypeBuilder;
   private DataTypeBuilder valueTypeBuilder;
 
+  private DataType keyType = OBJECT;
   private DataType itemType = OBJECT;
+  private DataType valueType = OBJECT;
+
   private boolean built = false;
 
   public DefaultDataTypeBuilder() {
@@ -517,8 +520,16 @@ public class DefaultDataTypeBuilder
                                          isConsumable(type));
     }
 
+    if (keyTypeBuilder != null) {
+      keyType = keyTypeBuilder.build();
+    }
+
     if (itemTypeBuilder != null) {
       itemType = itemTypeBuilder.build();
+    }
+
+    if (valueTypeBuilder != null) {
+      valueType = valueTypeBuilder.build();
     }
 
     return dataTypeCache.get(this);
@@ -529,9 +540,7 @@ public class DefaultDataTypeBuilder
     if (Collection.class.isAssignableFrom(type) || Iterator.class.isAssignableFrom(type)) {
       return new DefaultCollectionDataType(type, itemType, mediaType, isConsumable(type));
     } else if (Map.class.isAssignableFrom(type)) {
-      return new DefaultMapDataType(type, keyTypeBuilder != null ? keyTypeBuilder.build() : OBJECT,
-                                    valueTypeBuilder != null ? valueTypeBuilder.build() : OBJECT, mediaType,
-                                    isConsumable(type));
+      return new DefaultMapDataType(type, keyType, valueType, mediaType, isConsumable(type));
     } else {
       return new SimpleDataType(type, mediaType, isConsumable(type));
     }
