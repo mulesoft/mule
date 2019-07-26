@@ -1,4 +1,19 @@
 {
+  "4.2.1-SP1": {
+    "revapi":{
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::isOwnedTransaction()",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "isOwnedTransaction",
+          "elementKind": "method",
+          "justification": "Error handlers need to know if they own the tx, to roll it back"
+        }
+      ]
+    }
+  },
   "4.2.1": {
     "revapi": {
       "ignore": [
@@ -120,6 +135,15 @@
           "elementKind": "method",
           "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
         },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::isOwnedTransaction()",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "isOwnedTransaction",
+          "elementKind": "method",
+          "justification": "Error handlers need to know if they own the tx, to roll it back"
+        }
       ]
     }
   },
