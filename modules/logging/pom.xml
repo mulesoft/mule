@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.2.0</version>
+        <version>4.2.0-SP1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-logging</artifactId>
     <packaging>jar</packaging>

@@ -6,7 +6,7 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.runtime</groupId>
-        <version>4.2.0</version>
+        <version>4.2.0-SP1-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-module-deployment-model</artifactId>
