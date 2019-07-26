@@ -73,6 +73,15 @@
           "methodName": "setStreamingManager",
           "elementKind": "method",
           "justification": "class is internal"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::isOwnedTransaction()",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "isOwnedTransaction",
+          "elementKind": "method",
+          "justification": "Error handlers need to know if they own the tx, to roll it back"
         }
       ]
     }
