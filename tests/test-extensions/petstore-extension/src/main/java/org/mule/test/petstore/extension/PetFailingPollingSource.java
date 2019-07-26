@@ -43,10 +43,6 @@ public class PetFailingPollingSource extends PollingSource<String, Instant> {
   private Integer failAtPoll;
 
   @Parameter
-  @Optional(defaultValue = "0")
-  private Long sleepAtRestart;
-
-  @Parameter
   @Optional(defaultValue = "100")
   private Long adoptionLimit;
 
@@ -62,17 +58,10 @@ public class PetFailingPollingSource extends PollingSource<String, Instant> {
   public void poll(PollContext<String, Instant> pollContext) {
     numberOfPolls++;
     if (numberOfPolls == failAtPoll) {
-      if (sleepAtRestart != 0) {
-        try {
-          Thread.sleep(sleepAtRestart);
-        } catch (InterruptedException e) {
-          // No op
-        }
-      }
       //pollContext.onConnectionException(new ConnectionException("Polling Fail"));
       executor = newSingleThreadExecutor();
       executor.execute(() -> pollContext.onConnectionException(new ConnectionException("Polling Fail")));
-    } else if (numberOfPolls <= adoptionLimit) {
+    } else if (numberOfPolls - 1 <= adoptionLimit) {
       Instant instant = Instant.now();
       pollContext.accept(item -> {
         String pet = ALL_PETS.get((numberOfPolls - 1) % 7);
