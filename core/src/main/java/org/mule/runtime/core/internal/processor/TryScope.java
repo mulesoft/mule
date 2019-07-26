@@ -24,7 +24,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -37,6 +37,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
+import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
@@ -66,20 +69,18 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (nestedChain == null) {
       return event;
     }
+    final boolean txPrevoiuslyActive = isTransactionActive();
     ExecutionTemplate<CoreEvent> executionTemplate =
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
       try {
-        if (isTransactionActive()) {
+        if (!txPrevoiuslyActive && isTransactionActive()) {
           TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
-          ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
           transaction.setComponentLocation(getLocation());
-          CoreEvent e = processToApply(event,
+          return processToApply(event,
                                        p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
                                                                                                ofNullable(getLocation()),
                                                                                                messagingExceptionHandler)));
-          transaction.setComponentLocation(lastLocation);
-          return e;
         } else {
           return processToApply(event,
                                 p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
@@ -153,6 +154,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
+      if (messagingExceptionHandler instanceof ErrorHandler) {
+        ErrorHandler errorHandler = (ErrorHandler) messagingExceptionHandler;
+        Location location = Location.builderFromStringRepresentation(this.getLocation().getLocation()).build();
+        errorHandler.setExceptionListenersLocation(location);
+      }
     }
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
