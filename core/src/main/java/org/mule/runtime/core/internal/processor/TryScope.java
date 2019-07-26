@@ -68,11 +68,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (nestedChain == null) {
       return event;
     }
-    final boolean alreadyActiveTx = isTransactionActive();
+    final boolean txPrevoiuslyActive = isTransactionActive();
     ExecutionTemplate<CoreEvent> executionTemplate =
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
-      if (!alreadyActiveTx && isTransactionActive()) {
+      if (!txPrevoiuslyActive && isTransactionActive()) {
         TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
         transaction.setComponentLocation(getLocation());
         return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
@@ -144,16 +144,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
       if (messagingExceptionHandler instanceof ErrorHandler) {
-        // We must duplicate every listener for the location of this TryScope. This is similar when defining reference
-        // to a global error handler in a flow
         ErrorHandler errorHandler = (ErrorHandler) messagingExceptionHandler;
-        List<MessagingExceptionHandlerAcceptor> listeners = errorHandler.getExceptionListeners().stream()
-            .map(exceptionListener -> (exceptionListener instanceof TemplateOnErrorHandler)
-                ? ((TemplateOnErrorHandler) exceptionListener)
-                    .duplicateFor(Location.builderFromStringRepresentation(this.getLocation().getLocation()).build())
-                : exceptionListener)
-            .collect(toList());
-        errorHandler.setExceptionListeners(listeners);
+        Location location = Location.builderFromStringRepresentation(this.getLocation().getLocation()).build();
+        errorHandler.setExceptionListenersLocation(location);
       }
     }
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);

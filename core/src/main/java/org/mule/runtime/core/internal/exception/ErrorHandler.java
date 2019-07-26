@@ -8,12 +8,14 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
 
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -170,6 +172,13 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
         ((AbstractExceptionListener) exceptionListener).setStatistics(flowStatistics);
       }
     }
+  }
+
+  public void setExceptionListenersLocation(Location flowLocation) {
+    List<MessagingExceptionHandlerAcceptor> listeners =
+        this.getExceptionListeners().stream().map(exceptionListener -> (exceptionListener instanceof TemplateOnErrorHandler)
+            ? ((TemplateOnErrorHandler) exceptionListener).duplicateFor(flowLocation) : exceptionListener).collect(toList());
+    this.setExceptionListeners(listeners);
   }
 
 }
