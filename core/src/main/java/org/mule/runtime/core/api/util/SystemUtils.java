@@ -14,6 +14,7 @@ import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.INDEX_NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.indexOf;
 import static org.apache.commons.lang3.StringUtils.substring;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
@@ -80,11 +81,11 @@ public class SystemUtils {
   }
 
   public static boolean isOpenJDK() {
-    return JAVA_VM_VENDOR.toLowerCase().contains("openjdk");
+    return JAVA_VM_VENDOR.toLowerCase().contains("openjdk") || JAVA_VENDOR.toLowerCase().contains("openjdk");
   }
 
   public static boolean isAdoptOpenJDK() {
-    return JAVA_VM_VENDOR.toLowerCase().contains("adoptopenjdk");
+    return JAVA_VM_VENDOR.toLowerCase().contains("adoptopenjdk") || JAVA_VENDOR.toLowerCase().contains("adoptopenjdk");
   }
 
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
