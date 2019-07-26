@@ -51,6 +51,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -87,6 +88,7 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
+import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -384,6 +386,14 @@ public class ApplicationModel implements ArtifactAst {
           .ifPresent(componentModel::setConfigurationModel);
       extensionModelHelper.findConnectionProviderModel(componentModel.getIdentifier())
           .ifPresent(componentModel::setConnectionProviderModel);
+
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findMetadataType(componentModel.getType())
+            .filter(mt -> mt.getAnnotation(StereotypeTypeAnnotation.class).isPresent())
+            .filter(mt -> !mt.getAnnotation(StereotypeTypeAnnotation.class).get().getAllowedStereotypes().isEmpty())
+            .map(MetadataTypeModelAdapter::new)
+            .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      }
 
       componentModel.setComponentType(typedComponentIdentifier.map(typedIdentifier -> typedIdentifier.getType())
           .orElse(TypedComponentIdentifier.ComponentType.UNKNOWN));
