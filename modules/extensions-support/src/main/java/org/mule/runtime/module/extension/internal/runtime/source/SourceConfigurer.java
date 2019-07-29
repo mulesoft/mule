@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
-import org.mule.runtime.core.api.source.scheduler.RunNowCronSchedulerWrapper;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -147,14 +146,8 @@ public final class SourceConfigurer {
   private Scheduler getScheduler(ValueResolvingContext context, ValueResolver valueResolver, Boolean restarting)
       throws MuleException {
     Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
-    if (restarting) {
-      if (scheduler instanceof FixedFrequencyScheduler) {
-        ((FixedFrequencyScheduler) scheduler).setStartDelay(0);
-      } else if (scheduler instanceof CronScheduler) {
-        RunNowCronSchedulerWrapper schedulerWrapper = new RunNowCronSchedulerWrapper((CronScheduler) scheduler);
-        scheduler = schedulerWrapper;
-        return scheduler;
-      }
+    if (restarting && scheduler instanceof FixedFrequencyScheduler) {
+      ((FixedFrequencyScheduler) scheduler).setStartDelay(0);
     }
     return scheduler;
   }
