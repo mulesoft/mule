@@ -31,6 +31,7 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -204,6 +205,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private List<URL> getArtifactPatches(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
     List<URL> patches = new ArrayList<>();
     ArtifactCoordinates thisArtifactCoordinates = packagerClassLoaderModel.getArtifactCoordinates();
+    String artifactId = thisArtifactCoordinates.getGroupId() + ":"
+        + thisArtifactCoordinates.getArtifactId() + ":" + thisArtifactCoordinates.getVersion();
     try {
       File muleArtifactPatchesFolder = new File(MuleContainerBootstrapUtils.getMuleHome(), MULE_ARTIFACT_PATCHES_LOCATION);
       if (muleArtifactPatchesFolder.exists()) {
@@ -244,6 +247,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                              Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, jarFile).toString())
                                  .toURL();
                 patches.add(mulePluginPatchUrl);
+
+                LOGGER.info(String.format("Patching artifact %s with patch file %s", artifactId, jarFile));
               } catch (MalformedURLException e) {
                 throw new MuleRuntimeException(e);
               }
@@ -252,9 +257,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         }
       }
     } catch (Exception e) {
-      LOGGER.warn(
-                  "There was an error processing the patches in mule-artifact-patches.json file. Could not apply patches for %s:%s due to %s",
-                  thisArtifactCoordinates.getGroupId(), thisArtifactCoordinates.getArtifactId(), e.getMessage(), e);
+      throw new MuleRuntimeException(createStaticMessage(format("There was an error processing the patches in %s file for artifact %s",
+                                                                MULE_ARTIFACT_PATCHES_LOCATION, artifactId)),
+                                     e);
     }
     return patches;
   }
