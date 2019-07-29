@@ -54,7 +54,8 @@ class DeferredJmsResourceCloser extends Thread
     @Override
     public void run()
     {
-        LOGGER.debug("Starting Deferred JMS Resource closer thread");
+        // TODO: Change this logger to debug level
+        LOGGER.warn("Starting Deferred JMS Resource closer thread");
         // If thread is interrupted, it's because the connector is being stopped. Die
         while (!Thread.currentThread().isInterrupted()
                && !isTerminateRequested())
@@ -71,15 +72,17 @@ class DeferredJmsResourceCloser extends Thread
             }
             else
             {
-                // This case should represent a misuse, or that of closabe being null, which is caused by this thread being interrupted.
-                LOGGER.warn("A JMS Resource of class {} was inserted in the deferred close queue, but wasn't able to be closed.", closable != null ? closable.getClass().getName() : "NullObject");
+                // This case should represent a misuse, or that of closable being null, which is caused by this thread being interrupted.
+                LOGGER.warn("A JMS Resource of class {} was inserted in the deferred close queue, but wasn't able to be closed.",
+                            closable != null ? closable.getClass().getName() : "NullObject");
             }
         }
         if (exitOnEmptyQueue.get())
         {
             awaitForEmptyQueueSync.release();
         }
-        LOGGER.debug("Stopping Deferred JMS Resource closer thread");
+        // TODO: Change this logger to debug level
+        LOGGER.warn("Stopping Deferred JMS Resource closer thread");
     }
 
     private boolean isTerminateRequested()
@@ -107,8 +110,8 @@ class DeferredJmsResourceCloser extends Thread
     }
 
     /**
-     * Wait for closables queue to be emptied. If after @amount @unit time the close did not notify its termination,
-     * this method will return.
+     * Wait for queue to be emptied. If after <code>amount</code> <code>unit</code> time the close did not notify its
+     * termination, this method will return.
      *
      * @param amount amount of time to wait
      * @param unit   time unit
@@ -123,6 +126,7 @@ class DeferredJmsResourceCloser extends Thread
         catch (InterruptedException e)
         {
             LOGGER.warn("Thread was interrupted while waiting for deferred-close-queue to be emptied: ", e);
+            Thread.currentThread().interrupt();
         }
     }
 }
