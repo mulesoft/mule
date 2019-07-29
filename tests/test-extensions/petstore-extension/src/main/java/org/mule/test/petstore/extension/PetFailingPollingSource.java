@@ -8,12 +8,14 @@ package org.mule.test.petstore.extension;
 
 import static java.util.Arrays.asList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -27,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 @Alias("pet-failing-source")
+@MediaType(TEXT_PLAIN)
 public class PetFailingPollingSource extends PollingSource<String, Instant> {
 
   public static final List<String> ALL_PETS =
