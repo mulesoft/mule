@@ -32,6 +32,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -88,7 +89,6 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
-import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -382,16 +382,17 @@ public class ApplicationModel implements ArtifactAst {
 
       extensionModelHelper.findComponentModel(componentModel.getIdentifier())
           .ifPresent(componentModel::setComponentModel);
-      extensionModelHelper.findConfigurationModel(componentModel.getIdentifier())
-          .ifPresent(componentModel::setConfigurationModel);
-      extensionModelHelper.findConnectionProviderModel(componentModel.getIdentifier())
-          .ifPresent(componentModel::setConnectionProviderModel);
-
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findConfigurationModel(componentModel.getIdentifier())
+            .ifPresent(componentModel::setConfigurationModel);
+      }
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findConnectionProviderModel(componentModel.getIdentifier())
+            .ifPresent(componentModel::setConnectionProviderModel);
+      }
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
         extensionModelHelper.findMetadataType(componentModel.getType())
-            .filter(mt -> mt.getAnnotation(StereotypeTypeAnnotation.class).isPresent())
-            .filter(mt -> !mt.getAnnotation(StereotypeTypeAnnotation.class).get().getAllowedStereotypes().isEmpty())
-            .map(MetadataTypeModelAdapter::new)
+            .flatMap(t -> createMetadataTypeModelAdapter(t))
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
 

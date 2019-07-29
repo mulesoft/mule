@@ -11,14 +11,22 @@ import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 
+import java.util.Optional;
+
 class MetadataTypeModelAdapter implements HasStereotypeModel {
+
+  static Optional<MetadataTypeModelAdapter> createMetadataTypeModelAdapter(MetadataType type) {
+    return type.getAnnotation(StereotypeTypeAnnotation.class)
+        .flatMap(sta -> sta.getAllowedStereotypes().stream().findFirst())
+        .map(st -> new MetadataTypeModelAdapter(type, st));
+  }
 
   private final MetadataType type;
   private final StereotypeModel stereotype;
 
-  public MetadataTypeModelAdapter(MetadataType type) {
+  private MetadataTypeModelAdapter(MetadataType type, StereotypeModel stereotype) {
     this.type = type;
-    this.stereotype = type.getAnnotation(StereotypeTypeAnnotation.class).get().getAllowedStereotypes().get(0);
+    this.stereotype = stereotype;
   }
 
   @Override
