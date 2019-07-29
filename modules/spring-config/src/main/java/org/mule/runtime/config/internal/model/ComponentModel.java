@@ -66,6 +66,7 @@ public abstract class ComponentModel {
   private org.mule.runtime.api.meta.model.ComponentModel componentModel;
   private ConfigurationModel configurationModel;
   private ConnectionProviderModel connectionProviderModel;
+  private MetadataTypeModelAdapter metadataTypeModelAdapter;
 
   private ComponentMetadataAst componentMetadata;
 
@@ -202,6 +203,12 @@ public abstract class ComponentModel {
       }
     }
 
+    if (metadataTypeModelAdapter != null) {
+      if (modelClass.isAssignableFrom(metadataTypeModelAdapter.getClass())) {
+        return Optional.of((M) metadataTypeModelAdapter);
+      }
+    }
+
     return empty();
   }
 
@@ -215,6 +222,10 @@ public abstract class ComponentModel {
 
   public void setConnectionProviderModel(ConnectionProviderModel connectionProviderModel) {
     this.connectionProviderModel = connectionProviderModel;
+  }
+
+  public void setMetadataTypeModelAdapter(MetadataTypeModelAdapter metadataTypeModelAdapter) {
+    this.metadataTypeModelAdapter = metadataTypeModelAdapter;
   }
 
   /**

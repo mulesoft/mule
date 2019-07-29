@@ -23,6 +23,8 @@ import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -47,6 +49,8 @@ import org.mule.runtime.api.util.NameUtils;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 import java.util.List;
@@ -84,6 +88,9 @@ public class ExtensionModelHelper {
       CacheBuilder.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
       CacheBuilder.newBuilder().build();
+
+  private final JavaTypeLoader javaTypeLoader = new JavaTypeLoader(ExtensionModelHelper.class.getClassLoader(),
+                                                                   new ExtensionsTypeHandlerManagerFactory());
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
@@ -239,6 +246,16 @@ public class ExtensionModelHelper {
       });
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
+    }
+  }
+
+  public Optional<? extends MetadataType> findMetadataType(Class<?> type) {
+    if (type != null
+        // workaround for test components with no extension model
+        && !Processor.class.isAssignableFrom(type)) {
+      return Optional.of(javaTypeLoader.load(type));
+    } else {
+      return empty();
     }
   }
 
