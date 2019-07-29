@@ -31,6 +31,7 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -45,6 +46,8 @@ import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
+
+import com.google.common.io.PatternFilenameFilter;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -84,9 +87,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION =
       Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR).toString();
   public static final String MULE_ARTIFACT_PATCHES_LOCATION = Paths.get("lib/patches/mule-artifact-patches").toString();
-  public static final String MULE_ARTIFACT_PATCHES_JSON_FILE_NAME = "mule-artifact-patches.json";
+  public static final String MULE_ARTIFACT_PATCH_JSON_FILE_NAME = "mule-artifact-patch.json";
   public static final String MULE_ARTIFACT_PATCHES_JSON_LOCATION =
-      Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, MULE_ARTIFACT_PATCHES_JSON_FILE_NAME).toString();
+      Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, MULE_ARTIFACT_PATCH_JSON_FILE_NAME).toString();
 
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
 
@@ -202,58 +205,61 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private List<URL> getArtifactPatches(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
     List<URL> patches = new ArrayList<>();
     ArtifactCoordinates thisArtifactCoordinates = packagerClassLoaderModel.getArtifactCoordinates();
+    String artifactId = thisArtifactCoordinates.getGroupId() + ":"
+        + thisArtifactCoordinates.getArtifactId() + ":" + thisArtifactCoordinates.getVersion();
     try {
-      MuleArtifactPatchingModel muleArtifactPatchingModel = MuleArtifactPatchingModel.loadModel();
-      GenericVersionScheme genericVersionScheme = new GenericVersionScheme();
-      Version thisArtifactCoordinatesVersion;
-      try {
-        thisArtifactCoordinatesVersion = genericVersionScheme.parseVersion(thisArtifactCoordinates.getVersion());
-      } catch (Exception e) {
-        LOGGER.warn("Error parsing version %s for artifact %s, patches against this artifact will not be applied",
-                    thisArtifactCoordinates.getVersion(),
-                    thisArtifactCoordinates.getGroupId() + ":" + thisArtifactCoordinates.getArtifactId());
-        return emptyList();
-      }
-      muleArtifactPatchingModel.getMuleArtifactPatchDescriptors()
-          .stream()
-          .filter(muleArtifactPatchDescriptor -> {
-            ArtifactCoordinates muleArtifactPatchArtifactCoordinates = muleArtifactPatchDescriptor.getArtifactCoordinates();
-            return muleArtifactPatchArtifactCoordinates.getGroupId().equals(thisArtifactCoordinates.getGroupId()) &&
-                muleArtifactPatchArtifactCoordinates.getArtifactId().equals(thisArtifactCoordinates.getArtifactId()) &&
-                muleArtifactPatchArtifactCoordinates.getClassifier().equals(thisArtifactCoordinates.getClassifier());
-          })
-          .forEach(muleArtifactPatchDescriptor -> muleArtifactPatchDescriptor.getPatches()
-              .stream()
-              .filter(muleArtifactPatch -> muleArtifactPatch.getAffectedVersions()
-                  .stream()
-                  .anyMatch(affectedVersion -> {
-                    try {
-                      VersionConstraint versionConstraint = genericVersionScheme.parseVersionConstraint(affectedVersion);
-                      if (versionConstraint.containsVersion(thisArtifactCoordinatesVersion)) {
-                        return true;
-                      }
-                      return false;
-                    } catch (InvalidVersionSpecificationException e) {
-                      throw new MuleRuntimeException(createStaticMessage("Could not parse plugin patch affect version: "
-                          + affectedVersion), e);
+      File muleArtifactPatchesFolder = new File(MuleContainerBootstrapUtils.getMuleHome(), MULE_ARTIFACT_PATCHES_LOCATION);
+      if (muleArtifactPatchesFolder.exists()) {
+        String[] jarFiles = muleArtifactPatchesFolder.list(new PatternFilenameFilter("*.jar"));
+        for (String jarFile : jarFiles) {
+          MuleArtifactPatchingModel muleArtifactPatchingModel = MuleArtifactPatchingModel.loadModel(jarFile);
+          GenericVersionScheme genericVersionScheme = new GenericVersionScheme();
+          Version thisArtifactCoordinatesVersion;
+          try {
+            thisArtifactCoordinatesVersion = genericVersionScheme.parseVersion(thisArtifactCoordinates.getVersion());
+          } catch (Exception e) {
+            LOGGER.warn("Error parsing version %s for artifact %s, patches against this artifact will not be applied",
+                        thisArtifactCoordinates.getVersion(),
+                        thisArtifactCoordinates.getGroupId() + ":" + thisArtifactCoordinates.getArtifactId());
+            return emptyList();
+          }
+          ArtifactCoordinates patchedArtifactCoordinates = muleArtifactPatchingModel.getArtifactCoordinates();
+          if (patchedArtifactCoordinates.getGroupId().equals(thisArtifactCoordinates.getGroupId()) &&
+              patchedArtifactCoordinates.getArtifactId().equals(thisArtifactCoordinates.getArtifactId()) &&
+              patchedArtifactCoordinates.getClassifier().equals(thisArtifactCoordinates.getClassifier())) {
+            if (muleArtifactPatchingModel.getAffectedVersions()
+                .stream()
+                .anyMatch(affectedVersion -> {
+                  try {
+                    VersionConstraint versionConstraint = genericVersionScheme.parseVersionConstraint(affectedVersion);
+                    if (versionConstraint.containsVersion(thisArtifactCoordinatesVersion)) {
+                      return true;
                     }
-                  }))
-              .forEach(mulePluginPatch -> {
-                String filePath = mulePluginPatch.getPatch();
-                try {
-                  URL mulePluginPatchUrl =
-                      new File(MuleContainerBootstrapUtils.getMuleHome(),
-                               Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, filePath).toString())
-                                   .toURL();
-                  patches.add(mulePluginPatchUrl);
-                } catch (MalformedURLException e) {
-                  throw new MuleRuntimeException(e);
-                }
-              }));
+                    return false;
+                  } catch (InvalidVersionSpecificationException e) {
+                    throw new MuleRuntimeException(createStaticMessage("Could not parse plugin patch affect version: "
+                        + affectedVersion), e);
+                  }
+                })) {
+              try {
+                URL mulePluginPatchUrl =
+                    new File(MuleContainerBootstrapUtils.getMuleHome(),
+                             Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, jarFile).toString())
+                                 .toURL();
+                patches.add(mulePluginPatchUrl);
+
+                LOGGER.info(String.format("Patching artifact %s with patch file %s", artifactId, jarFile));
+              } catch (MalformedURLException e) {
+                throw new MuleRuntimeException(e);
+              }
+            }
+          }
+        }
+      }
     } catch (Exception e) {
-      LOGGER.warn(
-                  "There was an error processing the patches in mule-artifact-patches.json file. Could not apply patches for %s:%s due to %s",
-                  thisArtifactCoordinates.getGroupId(), thisArtifactCoordinates.getArtifactId(), e.getMessage(), e);
+      throw new MuleRuntimeException(createStaticMessage(format("There was an error processing the patches in %s file for artifact %s",
+                                                                MULE_ARTIFACT_PATCHES_LOCATION, artifactId)),
+                                     e);
     }
     return patches;
   }
