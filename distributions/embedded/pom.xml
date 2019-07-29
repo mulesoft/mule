@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.9.4-SNAPSHOT</version>
+        <version>3.9.5-SNAPSHOT</version>
     </parent>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
