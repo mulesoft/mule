@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -23,8 +24,8 @@ import reactor.core.publisher.Mono;
  */
 public class StreamPerEventSink implements Sink {
 
-  private ReactiveProcessor processor;
-  private Consumer<CoreEvent> eventConsumer;
+  private final ReactiveProcessor processor;
+  private final Consumer<CoreEvent> eventConsumer;
 
   /**
    * Creates a {@link StreamPerEventSink}.
@@ -55,8 +56,8 @@ public class StreamPerEventSink implements Sink {
   }
 
   @Override
-  public boolean emit(CoreEvent event) {
+  public BackPressureReason emit(CoreEvent event) {
     accept(event);
-    return true;
+    return null;
   }
 }

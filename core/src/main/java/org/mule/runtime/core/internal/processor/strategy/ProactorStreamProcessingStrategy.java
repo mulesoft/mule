@@ -163,7 +163,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
    * @param event the event about to be processed
    * @return true if the event can be accepted for processing
    */
-  private boolean checkCapacity(CoreEvent event) {
+  private BackPressureReason checkCapacity(CoreEvent event) {
     if (lastRetryTimestamp.get() != MIN_VALUE) {
       if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
         // If there is maxConcurrency value set, honor it and don't buffer here
@@ -173,14 +173,14 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
           // processed right away
           if (queuedEvents.incrementAndGet() > getBufferQueueSize()) {
             queuedEvents.decrementAndGet();
-            return false;
+            return REQUIRED_SCHEDULER_BUSY;
           }
 
           // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
           // an async, for instance)
           ((BaseEventContext) event.getContext()).onResponse(QUEUED_DECREMENT_CALLBACK);
         } else {
-          return false;
+          return REQUIRED_SCHEDULER_BUSY;
         }
       }
     }
@@ -188,7 +188,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
     if (maxConcurrencyEagerCheck) {
       if (inFlightEvents.incrementAndGet() > maxConcurrency) {
         inFlightEvents.decrementAndGet();
-        return false;
+        return MAX_CONCURRENCY_EXCEEDED;
       }
 
       // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
@@ -196,7 +196,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       ((BaseEventContext) event.getContext()).onResponse(IN_FLIGHT_DECREMENT_CALLBACK);
     }
 
-    return true;
+    return null;
   }
 
   protected int getBufferQueueSize() {
@@ -205,13 +205,14 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
   @Override
   public void checkBackpressureAccepting(CoreEvent event) throws RejectedExecutionException {
-    if (!checkCapacity(event)) {
-      throw new RejectedExecutionException();
+    final BackPressureReason reason = checkCapacity(event);
+    if (reason != null) {
+      throw new FromFlowRejectedExecutionException(reason);
     }
   }
 
   @Override
-  public boolean checkBackpressureEmitting(CoreEvent event) {
+  public BackPressureReason checkBackpressureEmitting(CoreEvent event) {
     return checkCapacity(event);
   }
 
@@ -229,7 +230,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
     }
 
     @Override
-    public final boolean emit(CoreEvent event) {
+    public final BackPressureReason emit(CoreEvent event) {
       return innerSink.emit(event);
     }
 

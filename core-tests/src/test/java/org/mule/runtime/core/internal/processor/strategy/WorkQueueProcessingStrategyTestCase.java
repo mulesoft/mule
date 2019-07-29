@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -228,7 +229,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
           .build();
       flow.initialise();
       flow.start();
-      expectRejected();
+      expectRejected(REQUIRED_SCHEDULER_BUSY);
       processFlow(testEvent());
     }
   }
@@ -312,7 +313,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
           .build();
       flow.initialise();
       flow.start();
-      expectRejected();
+      expectRejected(REQUIRED_SCHEDULER_BUSY);
       processFlow(testEvent());
     }
   }

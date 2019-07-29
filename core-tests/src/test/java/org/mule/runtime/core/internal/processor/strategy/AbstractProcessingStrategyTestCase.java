@@ -55,6 +55,7 @@ import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -101,6 +102,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
@@ -848,13 +850,13 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
   }
 
-  protected void expectRejected() {
+  protected void expectRejected(BackPressureReason backPressureReason) {
     expectedException.expect(MessagingException.class);
     expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+    expectedException.expectCause(flowBackPressureExceptionMatcher(backPressureReason));
   }
 
-  private TypeSafeMatcher<MessagingException> overloadErrorTypeMatcher() {
+  private Matcher<MessagingException> overloadErrorTypeMatcher() {
     return new TypeSafeMatcher<MessagingException>() {
 
       private String errorTypeId;
@@ -868,6 +870,32 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       protected boolean matchesSafely(MessagingException item) {
         errorTypeId = item.getEvent().getError().get().getErrorType().getIdentifier();
         return FLOW_BACK_PRESSURE_ERROR_IDENTIFIER.equals(errorTypeId);
+      }
+
+      @Override
+      protected void describeMismatchSafely(MessagingException item, Description mismatchDescription) {
+        mismatchDescription.appendValue(item.getEvent().getError().get().getErrorType().getIdentifier());
+      }
+    };
+  }
+
+  protected Matcher<FlowBackPressureException> flowBackPressureExceptionMatcher(BackPressureReason expectedReason) {
+    return new TypeSafeMatcher<FlowBackPressureException>() {
+
+      @Override
+      public void describeTo(org.hamcrest.Description description) {
+        description.appendValue(expectedReason);
+      }
+
+      @Override
+      protected boolean matchesSafely(FlowBackPressureException item) {
+        return item instanceof FlowBackPressureException
+            && item.getReason() == expectedReason;
+      }
+
+      @Override
+      protected void describeMismatchSafely(FlowBackPressureException item, Description mismatchDescription) {
+        mismatchDescription.appendValue(item.getReason());
       }
     };
   }

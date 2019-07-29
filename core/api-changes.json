@@ -36,6 +36,30 @@
           "fieldName": "logger",
           "elementKind": "field",
           "justification": "This was wrong"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method boolean org.mule.runtime.core.api.processor.Sink::emit(org.mule.runtime.core.api.event.CoreEvent)",
+          "new": "method org.mule.runtime.core.api.construct.BackPressureReason org.mule.runtime.core.api.processor.Sink::emit(org.mule.runtime.core.api.event.CoreEvent)",
+          "oldType": "boolean",
+          "newType": "org.mule.runtime.core.api.construct.BackPressureReason",
+          "package": "org.mule.runtime.core.api.processor",
+          "classSimpleName": "Sink",
+          "methodName": "emit",
+          "elementKind": "method",
+          "justification": "This is internal, should not be used."
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method boolean org.mule.runtime.core.api.processor.strategy.ProcessingStrategy::checkBackpressureEmitting(org.mule.runtime.core.api.event.CoreEvent)",
+          "new": "method org.mule.runtime.core.api.construct.BackPressureReason org.mule.runtime.core.api.processor.strategy.ProcessingStrategy::checkBackpressureEmitting(org.mule.runtime.core.api.event.CoreEvent)",
+          "oldType": "boolean",
+          "newType": "org.mule.runtime.core.api.construct.BackPressureReason",
+          "package": "org.mule.runtime.core.api.processor.strategy",
+          "classSimpleName": "ProcessingStrategy",
+          "methodName": "checkBackpressureEmitting",
+          "elementKind": "method",
+          "justification": "This is internal, should not be used."
         }
       ]
     }

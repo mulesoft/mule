@@ -11,6 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -74,9 +75,9 @@ public class StreamPerThreadSink implements Sink, Disposable {
   }
 
   @Override
-  public boolean emit(CoreEvent event) {
+  public BackPressureReason emit(CoreEvent event) {
     accept(event);
-    return true;
+    return null;
   }
 
   @Override

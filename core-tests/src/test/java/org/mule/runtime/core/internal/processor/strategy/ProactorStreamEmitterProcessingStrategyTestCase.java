@@ -26,6 +26,8 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -51,7 +53,6 @@ import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFacto
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
@@ -492,7 +493,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       // Give time for the extra dispatch to get to the point where it starts retrying
       Thread.sleep(500);
 
-      expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+      expectedException.expectCause(flowBackPressureExceptionMatcher(REQUIRED_SCHEDULER_BUSY));
       processFlow(newEvent());
     } finally {
       latchedProcessor.release();
@@ -575,7 +576,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       // Give time for the dispatch to get to the capacity check
       Thread.sleep(500);
 
-      expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+      expectedException.expectCause(flowBackPressureExceptionMatcher(MAX_CONCURRENCY_EXCEEDED));
       processFlow(newEvent());
     } finally {
       latchedProcessor.release();
@@ -679,7 +680,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     flow.start();
 
     expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+    expectedException.expectCause(flowBackPressureExceptionMatcher(REQUIRED_SCHEDULER_BUSY));
 
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
       processFlow(newEvent());

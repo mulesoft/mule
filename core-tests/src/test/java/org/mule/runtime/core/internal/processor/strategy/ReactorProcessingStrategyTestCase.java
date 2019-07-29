@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
@@ -33,11 +34,11 @@ import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrate
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.hamcrest.Matcher;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -224,7 +225,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
           .build();
       flow.initialise();
       flow.start();
-      expectRejected();
+      expectRejected(REQUIRED_SCHEDULER_BUSY);
       processFlow(testEvent());
     }
   }

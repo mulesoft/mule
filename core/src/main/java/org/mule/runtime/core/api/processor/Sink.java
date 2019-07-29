@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.processor;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -43,8 +44,9 @@ public interface Sink extends Consumer<CoreEvent> {
    * back-pressure then this method will return {@code false}.
    *
    * @param event the {@link CoreEvent} to dispatch for processing
-   * @return {@code true} is the {@link CoreEvent} was submitted for processing successfully, {@code false} otherwise.
+   * @return {@code null} is the {@link CoreEvent} was submitted for processing successfully, Otherwise, the reason why it was not
+   *         submitted.
    */
-  boolean emit(CoreEvent event);
+  BackPressureReason emit(CoreEvent event);
 
 }

@@ -12,21 +12,22 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Sink;
 
-import com.google.common.cache.Cache;
-
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
+
+import com.google.common.cache.Cache;
 
 /**
  * {@link Sink} implementation that creates and caches a single {@link DirectSink} for each callee thread.
  */
 class PerThreadSink implements Sink, Disposable {
 
-  private Supplier<Sink> sinkSupplier;
-  private Cache<Thread, Sink> sinkCache =
+  private final Supplier<Sink> sinkSupplier;
+  private final Cache<Thread, Sink> sinkCache =
       newBuilder().weakValues().removalListener(notification -> disposeIfNeeded(notification.getValue(), NOP_LOGGER)).build();
 
   /**
@@ -48,7 +49,7 @@ class PerThreadSink implements Sink, Disposable {
   }
 
   @Override
-  public boolean emit(CoreEvent event) {
+  public BackPressureReason emit(CoreEvent event) {
     try {
       return sinkCache.get(currentThread(), () -> sinkSupplier.get()).emit(event);
     } catch (ExecutionException e) {
