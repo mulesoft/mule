@@ -377,6 +377,14 @@ public class ApplicationModel implements ArtifactAst {
           of(TypedComponentIdentifier.builder().identifier(componentModel.getIdentifier())
               .type(resolveComponentType(componentModel, extensionModelHelper))
               .build());
+
+      extensionModelHelper.findComponentModel(componentModel.getIdentifier())
+          .ifPresent(componentModel::setComponentModel);
+      extensionModelHelper.findConfigurationModel(componentModel.getIdentifier())
+          .ifPresent(componentModel::setConfigurationModel);
+      extensionModelHelper.findConnectionProviderModel(componentModel.getIdentifier())
+          .ifPresent(componentModel::setConnectionProviderModel);
+
       componentModel.setComponentType(typedComponentIdentifier.map(typedIdentifier -> typedIdentifier.getType())
           .orElse(TypedComponentIdentifier.ComponentType.UNKNOWN));
     });
