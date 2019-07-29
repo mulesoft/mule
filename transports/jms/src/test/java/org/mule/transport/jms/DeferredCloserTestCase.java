@@ -101,7 +101,7 @@ public class DeferredCloserTestCase
     }
 
     @Test(timeout = 10000)
-    public void keepsClosingAfterRestartTest() throws InterruptedException
+    public void keepsClosingAfterCloserThreadRestartTest() throws InterruptedException
     {
         thread.start();
 
@@ -113,7 +113,8 @@ public class DeferredCloserTestCase
 
         // interrupt thread
         thread.interrupt();
-        silentSleep(1000);
+        probeCloserThreadDied();
+        // silentSleep(1000);
         // Add two thing in queue
         queue.put(producer);
         queue.put(session);
@@ -121,6 +122,24 @@ public class DeferredCloserTestCase
         thread.start();
 
         probeGetsEmptied();
+    }
+
+    private void probeCloserThreadDied()
+    {
+        new PollingProber(5000, 1000).check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !thread.isAlive();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Deferred closed thread did not die!";
+            }
+        });
     }
 
     @Test(timeout = 10000)

@@ -54,6 +54,7 @@ class DeferredJmsResourceCloser extends Thread
     @Override
     public void run()
     {
+        LOGGER.debug("Starting Deferred JMS Resource closer thread");
         // If thread is interrupted, it's because the connector is being stopped. Die
         while (!Thread.currentThread().isInterrupted()
                && !isTerminateRequested())
@@ -78,6 +79,7 @@ class DeferredJmsResourceCloser extends Thread
         {
             awaitForEmptyQueueSync.release();
         }
+        LOGGER.debug("Stopping Deferred JMS Resource closer thread");
     }
 
     private boolean isTerminateRequested()
@@ -99,6 +101,7 @@ class DeferredJmsResourceCloser extends Thread
         catch (InterruptedException e)
         {
             LOGGER.warn("Thread was interrupted waiting for a resource to be deferred: ", e);
+            Thread.currentThread().interrupt();
         }
         return null;
     }
