@@ -16,8 +16,6 @@
     <properties>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
-
-        <quartzVersion>2.2.3</quartzVersion>
     </properties>
 
     <build>
