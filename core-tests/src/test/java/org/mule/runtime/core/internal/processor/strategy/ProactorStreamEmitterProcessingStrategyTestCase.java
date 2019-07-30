@@ -47,7 +47,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -63,6 +65,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -82,6 +85,29 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
+  }
+
+  @Override
+  protected ProcessingStrategyFactory createProcessingStrategyFactory() {
+    return new AsyncProcessingStrategyFactory() {
+
+      private int maxConcurrency = MAX_VALUE;
+
+      @Override
+      public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+        return createProcessingStrategy(muleContext, schedulersNamePrefix, maxConcurrency);
+      }
+
+      @Override
+      public void setMaxConcurrencyEagerCheck(boolean maxConcurrencyEagerCheck) {
+        // Nothing to do
+      }
+
+      @Override
+      public void setMaxConcurrency(int maxConcurrency) {
+        this.maxConcurrency = maxConcurrency;
+      }
+    };
   }
 
   @Override
@@ -449,7 +475,9 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
-        .processors(cpuLightProcessor, latchedProcessor).build();
+        .processors(cpuLightProcessor, latchedProcessor)
+        .maxConcurrency(6)
+        .build();
     flow.initialise();
     flow.start();
 
@@ -607,6 +635,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
+  @Ignore("As of MULE-XXXXX, if CPU_LITE is busy, requests are bueffeed rather than rejected, as it was in 4.1.x")
   public void backpressureOnInnerCpuLightSchedulerThrowsRejectedExecution() throws Exception {
     assumeThat(mode, is(SOURCE));
 

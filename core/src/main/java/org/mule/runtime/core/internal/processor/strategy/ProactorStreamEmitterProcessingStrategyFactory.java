@@ -126,12 +126,11 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
       final int sinksCount = maxConcurrency < CORES ? maxConcurrency : CORES;
-      final int sinkBufferSize = bufferSize / sinksCount;
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
-        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(sinkBufferSize);
+        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
         processor.transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
 
         if (!processor.hasDownstreams()) {
@@ -142,7 +141,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
             new DefaultReactorSink<>(processor.sink(BUFFER),
                                      () -> awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
                                                                       currentTimeMillis()),
-                                     createOnEventConsumer(), sinkBufferSize);
+                                     createOnEventConsumer(), getBufferQueueSize());
         sinks.add(new ProactorSinkWrapper<>(sink));
       }
 
@@ -178,6 +177,10 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       }
     }
 
+    @Override
+    protected int getBufferQueueSize() {
+      return bufferSize / (maxConcurrency < CORES ? maxConcurrency : CORES);
+    }
   }
 
   static class RoundRobinReactorSink<E> implements AbstractProcessingStrategy.ReactorSink<E> {

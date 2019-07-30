@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.util.rx;
 import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.util.Reference;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 /**
  * Wrapper for a {@code Scheduler} that retries to submit a task if a {@link RejectedExecutionException} is thrown, applying
@@ -36,6 +36,11 @@ public class RetrySchedulerWrapper implements Scheduler {
   private final Scheduler delegate;
   private final long retryTime;
   private final Runnable onRetry;
+
+  public RetrySchedulerWrapper(Scheduler delegate, long retryTime) {
+    this(delegate, retryTime, () -> {
+    });
+  }
 
   public RetrySchedulerWrapper(Scheduler delegate, long retryTime, Runnable onRetry) {
     this.delegate = delegate;
@@ -108,11 +113,10 @@ public class RetrySchedulerWrapper implements Scheduler {
     return delegate.awaitTermination(timeout, unit);
   }
 
-  private void runWithRetry(Runnable operation) {
+  private <T> Future<T> runWithRetry(Supplier<Future<T>> operation) {
     while (!this.isShutdown() && !this.isTerminated()) {
       try {
-        operation.run();
-        return;
+        return operation.get();
       } catch (RejectedExecutionException ree) {
         onRetry.run();
         try {
@@ -128,23 +132,17 @@ public class RetrySchedulerWrapper implements Scheduler {
 
   @Override
   public <T> Future<T> submit(Callable<T> task) {
-    Reference<Future<T>> futureReference = new Reference<>();
-    runWithRetry(() -> futureReference.set(delegate.submit(task)));
-    return futureReference.get();
+    return runWithRetry(() -> delegate.submit(task));
   }
 
   @Override
   public <T> Future<T> submit(Runnable task, T result) {
-    Reference<Future<T>> futureReference = new Reference<>();
-    runWithRetry(() -> futureReference.set(delegate.submit(task, result)));
-    return futureReference.get();
+    return runWithRetry(() -> delegate.submit(task, result));
   }
 
   @Override
   public Future<?> submit(Runnable task) {
-    Reference<Future<?>> futureReference = new Reference<>();
-    runWithRetry(() -> futureReference.set(delegate.submit(task)));
-    return futureReference.get();
+    return runWithRetry(() -> delegate.submit(task));
   }
 
   @Override
@@ -171,6 +169,9 @@ public class RetrySchedulerWrapper implements Scheduler {
 
   @Override
   public void execute(Runnable command) {
-    runWithRetry(() -> delegate.execute(command));
+    runWithRetry(() -> {
+      delegate.execute(command);
+      return null;
+    });
   }
 }
