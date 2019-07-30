@@ -51,7 +51,9 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -79,6 +81,29 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
   public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
+  }
+
+  @Override
+  protected ProcessingStrategyFactory createProcessingStrategyFactory() {
+    return new AsyncProcessingStrategyFactory() {
+
+      private int maxConcurrency = MAX_VALUE;
+
+      @Override
+      public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+        return createProcessingStrategy(muleContext, schedulersNamePrefix, maxConcurrency);
+      }
+
+      @Override
+      public void setMaxConcurrencyEagerCheck(boolean maxConcurrencyEagerCheck) {
+        // Nothing to do
+      }
+
+      @Override
+      public void setMaxConcurrency(int maxConcurrency) {
+        this.maxConcurrency = maxConcurrency;
+      }
+    };
   }
 
   @Override
@@ -506,7 +531,9 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
-        .processors(cpuLightProcessor, latchedProcessor).build();
+        .processors(cpuLightProcessor, latchedProcessor)
+        .maxConcurrency(6)
+        .build();
     flow.initialise();
     flow.start();
 
