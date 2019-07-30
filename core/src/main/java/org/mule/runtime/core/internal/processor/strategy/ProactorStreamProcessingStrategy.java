@@ -169,6 +169,8 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
         // If there is maxConcurrency value set, honor it and don't buffer here
         if (!maxConcurrencyEagerCheck) {
           // TODO MULE-17265 Make this configurable in the flow
+          // This will allow the event to get into the flow, effectively getting into the flow's sink buffer if it cannot be
+          // processed right away
           if (queuedEvents.incrementAndGet() > getBufferQueueSize()) {
             queuedEvents.decrementAndGet();
             return false;
