@@ -635,7 +635,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
-  @Ignore("As of MULE-XXXXX, if CPU_LITE is busy, requests are bueffeed rather than rejected, as it was in 4.1.x")
+  @Ignore("As of MULE-17264, if CPU_LITE is busy, requests are bueffeed rather than rejected, as it was in 4.1.x")
   public void backpressureOnInnerCpuLightSchedulerThrowsRejectedExecution() throws Exception {
     assumeThat(mode, is(SOURCE));
 

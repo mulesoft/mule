@@ -137,8 +137,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       return schedulerBusy;
     }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
         .withBackoffScheduler(fromExecutorService(decorateScheduler(getCpuLightScheduler()))))
-        .doOnNext(e -> lastRetryTimestamp.set(MIN_VALUE))
-    ;
+        .doOnNext(e -> lastRetryTimestamp.set(MIN_VALUE));
   }
 
   protected Scheduler getBlockingScheduler() {
@@ -169,6 +168,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
         // If there is maxConcurrency value set, honor it and don't buffer here
         if (!maxConcurrencyEagerCheck) {
+          // TODO MULE-17265 Make this configurable in the flow
           if (queuedEvents.incrementAndGet() > getBufferQueueSize()) {
             queuedEvents.decrementAndGet();
             return false;
