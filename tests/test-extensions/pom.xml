@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.2.1-SP1-SNAPSHOT</version>
+        <version>4.2.1-SP2-SNAPSHOT</version>
     </parent>
 
     <groupId>org.mule.tests</groupId>
     <artifactId>mule-test-extensions-parent</artifactId>
-    <version>4.2.1-SP1-SNAPSHOT</version>
+    <version>4.2.1-SP2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Parent Pom for Mule Test Extension</name>
 
