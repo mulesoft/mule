@@ -56,6 +56,19 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
   }
 
   @Override
+  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix,
+                                                        int maxConcurrency) {
+    return new TransactionAwareProactorStreamWorkQueueProcessingStrategy(() -> blocking,
+                                                                         XS_BUFFER_SIZE,
+                                                                         1,
+                                                                         DEFAULT_WAIT_STRATEGY,
+                                                                         () -> cpuLight,
+                                                                         () -> blocking,
+                                                                         () -> cpuIntensive,
+                                                                         maxConcurrency, true);
+  }
+
+  @Override
   @Description("Unlike with the MultiReactorProcessingStrategy, the TransactionAwareWorkQueueProcessingStrategy does not fail if a transaction "
       + "is active, but rather executes these events synchronously in the caller thread transparently.")
   public void tx() throws Exception {
