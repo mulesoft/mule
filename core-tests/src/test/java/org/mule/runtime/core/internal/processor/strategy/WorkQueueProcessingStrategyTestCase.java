@@ -40,12 +40,12 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
