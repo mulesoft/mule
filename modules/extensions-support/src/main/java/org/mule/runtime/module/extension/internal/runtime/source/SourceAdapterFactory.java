@@ -81,8 +81,26 @@ public class SourceAdapterFactory {
                                      SourceCallbackFactory sourceCallbackFactory,
                                      Component component,
                                      SourceConnectionManager connectionManager,
+                                     MessagingExceptionResolver exceptionResolver) {
+    return createAdapter(configurationInstance, sourceCallbackFactory, component, connectionManager, exceptionResolver, false);
+  }
+
+  /**
+   * Creates a new {@link SourceAdapter}
+   *
+   * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the source requires a config
+   * @param sourceCallbackFactory a {@link SourceCallbackFactory}
+   *
+   * @param restarting            indicates if the creation of the adapter was triggered after by a restart
+   *
+   * @return a new {@link SourceAdapter}
+   */
+  public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
+                                     SourceCallbackFactory sourceCallbackFactory,
+                                     Component component,
+                                     SourceConnectionManager connectionManager,
                                      MessagingExceptionResolver exceptionResolver,
-                                     Boolean restarting) {
+                                     boolean restarting) {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
       SourceConfigurer sourceConfigurer = new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters,

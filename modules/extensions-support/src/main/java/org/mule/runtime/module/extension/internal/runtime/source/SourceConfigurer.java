@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.source.SchedulerProvider.getScheduler;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
@@ -22,8 +23,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.source.scheduler.CronScheduler;
-import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -53,7 +52,7 @@ public final class SourceConfigurer {
   private final ExpressionManager expressionManager;
   private final ConfigurationProperties properties;
   private final MuleContext muleContext;
-  private final Boolean restarting;
+  private final boolean restarting;
 
   /**
    * Create a new instance
@@ -66,8 +65,24 @@ public final class SourceConfigurer {
    * @param muleContext       the current {@link MuleContext}
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
+                          ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext) {
+    this(model, componentLocation, resolverSet, expressionManager, properties, muleContext, false);
+  }
+
+  /**
+   * Create a new instance
+   *
+   * @param model             the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)} method will
+   *                          accept
+   * @param resolverSet       the {@link ResolverSet} used to resolve the parameters
+   * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param properties        deployment configuration properties
+   * @param muleContext       the current {@link MuleContext}
+   * @param restarting        indicates if the source is being created after a restart or not.
+   */
+  public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
                           ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext,
-                          Boolean restarting) {
+                          boolean restarting) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
@@ -141,14 +156,5 @@ public final class SourceConfigurer {
 
   private Boolean lazyInit() {
     return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
-  }
-
-  private Scheduler getScheduler(ValueResolvingContext context, ValueResolver valueResolver, Boolean restarting)
-      throws MuleException {
-    Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
-    if (restarting && scheduler instanceof FixedFrequencyScheduler) {
-      ((FixedFrequencyScheduler) scheduler).setStartDelay(0);
-    }
-    return scheduler;
   }
 }

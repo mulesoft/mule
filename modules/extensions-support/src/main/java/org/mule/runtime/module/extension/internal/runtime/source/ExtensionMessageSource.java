@@ -157,7 +157,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
 
-  private synchronized void createSource(Boolean restarting) throws Exception {
+  private synchronized void createSource(boolean restarting) throws Exception {
     if (sourceAdapter == null) {
       CoreEvent initialiserEvent = null;
       try {
@@ -181,7 +181,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(Boolean restarting) throws MuleException {
+  private void startSource(boolean restarting) throws MuleException {
     try {
       retryPolicyTemplate.execute(new StartSourceCallback(restarting), retryScheduler);
     } catch (Throwable e) {
@@ -479,9 +479,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private class StartSourceCallback implements RetryCallback {
 
-    Boolean restarting;
+    boolean restarting;
 
-    StartSourceCallback(Boolean restarting) {
+    StartSourceCallback(boolean restarting) {
       this.restarting = restarting;
     }
 

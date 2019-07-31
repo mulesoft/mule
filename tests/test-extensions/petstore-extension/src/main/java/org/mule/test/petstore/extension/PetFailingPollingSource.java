@@ -60,9 +60,7 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
   public void poll(PollContext<String, Void> pollContext) {
     numberOfPolls++;
     if (numberOfPolls == failAtPoll) {
-      //pollContext.onConnectionException(new ConnectionException("Polling Fail"));
-      executor = newSingleThreadExecutor();
-      executor.execute(() -> pollContext.onConnectionException(new ConnectionException("Polling Fail")));
+      pollContext.onConnectionException(new ConnectionException("Polling Fail"));
     } else if (numberOfPolls - 1 <= adoptionLimit) {
       pollContext.accept(item -> {
         String pet = ALL_PETS.get((numberOfPolls - 1) % 7);
@@ -72,7 +70,5 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
   }
 
   @Override
-  public void onRejectedItem(Result result, SourceCallbackContext callbackContext) {
-
-  }
+  public void onRejectedItem(Result result, SourceCallbackContext callbackContext) {}
 }
