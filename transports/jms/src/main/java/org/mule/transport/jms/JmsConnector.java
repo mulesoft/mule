@@ -284,6 +284,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             redeliveryHandlerFactory = new AutoDiscoveryRedeliveryHandlerFactory(this);
         }
+
+        // Start deferred closing thread
+        deferredCloseThread = new DeferredJmsResourceCloser(this, deferredCloseQueue);
+        deferredCloseThread.start();
+
         try
         {
             muleContext.registerListener(new ConnectionNotificationListener<ConnectionNotification>()
@@ -424,7 +429,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doDispose()
     {
-        stopDeferredCloseThreadIfNecessary();
+        stopDeferredCloseThread();
 
         if (connection != null)
         {
@@ -806,10 +811,13 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doStart() throws MuleException
     {
+        logger.info("About to start JmsConnector: " + this.toString());
 
         // Clear connector exception handling flag
         logger.debug("Setting 'isHandlingException' flag to false");
         isHandlingException.set(false);
+
+        logNonClosedElementOnDebug();
 
         //TODO: This should never be null or an exception should be thrown
         if (connection != null)
@@ -817,8 +825,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             try
             {
                 connection.start();
-                deferredCloseThread = new DeferredJmsResourceCloser(this, deferredCloseQueue);
-                deferredCloseThread.start();
             }
             catch (JMSException e)
             {
@@ -894,17 +900,13 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             try
             {
                 stopping = true;
+                connection.stop();
+                // If deferred close queue is not empty, wait on next empty poll
                 if (!deferredCloseQueue.isEmpty())
                 {
-                    deferredCloseThread.waitForEmptyQueueOrTimeout(20, SECONDS);
-                    deferredCloseQueue.clear();
+                    deferredCloseThread.waitOnNextEmptyPoll(20, SECONDS);
+                    logNonClosedElementOnDebug();
                 }
-                deferredCloseThread.interrupt();
-                // Clear all remaining closables
-                // TODO: Maybe add some mechanism for waiting for reamining resources to be closed.
-                deferredCloseQueue.clear();
-                stopDeferredCloseThreadIfNecessary();
-                connection.stop();
             }
             catch (Exception e)
             {
@@ -924,18 +926,21 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
-    private void stopDeferredCloseThreadIfNecessary()
+    private void logNonClosedElementOnDebug()
     {
-        if (!deferredCloseThread.isInterrupted()) {
-            // Mark deferredCloser to stop prior to connection stop
-            if (!deferredCloseQueue.isEmpty())
-            {
-                deferredCloseThread.waitForEmptyQueueOrTimeout(20, SECONDS);
-                deferredCloseQueue.clear();
-            }
-            deferredCloseThread.interrupt();
-            deferredCloseQueue.clear();
+        if (logger.isDebugEnabled()) {
+            logger.debug(format("There are {} elements to be closed on the deferred queue.", deferredCloseQueue.size()));
         }
+    }
+
+    private void stopDeferredCloseThread()
+    {
+        // Mark deferredCloser to stop prior to connection stop
+        if (!deferredCloseQueue.isEmpty())
+        {
+            deferredCloseThread.waitForEmptyQueueOrTimeout(20, SECONDS);
+        }
+        deferredCloseThread.interrupt();
     }
 
     @Override
