@@ -149,6 +149,9 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         reconnecting = true;
         ((JmsConnector) this.getConnector()).setStillConnectingReceivers(true);
 
+        logger.warn("Clearing isHandlingException from MultiConsumerJmsMessageReceiver#doConnect");
+        jmsConnector.setIsHandlingException(false);
+
         reconnectWorkManager.startIfNotStarted();
         retryTemplate.execute(new RetryCallback()
         {
@@ -375,12 +378,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 try
                 {
-                    // This is done to recycle the consumer
-                    // by default
-                    if (jmsConnector.mustRecycleReceivers())
-                    {
-                        consumer.setMessageListener(null);
-                    }
+                    consumer.close();
                     started = false;
                 }
                 catch (Exception e)
