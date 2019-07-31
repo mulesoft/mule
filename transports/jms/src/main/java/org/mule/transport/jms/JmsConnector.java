@@ -605,7 +605,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             shouldRetryBrokerConnection.set(true);
         }
 
-        if (!disconnecting && !isHandlingException.get() && !shouldRetryBrokerConnection.get())
+        if (!disconnecting && isHandlingException.compareAndSet(false, true) && !shouldRetryBrokerConnection.get())
         {
             Map<Object, MessageReceiver> receivers = getReceivers();
             boolean isMultiConsumerReceiver = false;
@@ -636,7 +636,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 prepareConnectorForConnectionException();
                 receiverReportedExceptionCount.set(0);
                 logger.debug("Setting 'isHandlingException' flag to true");
-                isHandlingException.set(true);
                 muleContext.getExceptionListener().handleException(new ConnectException(jmsException, this));
             }
         }
@@ -929,7 +928,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     private void logNonClosedElementOnDebug()
     {
         if (logger.isDebugEnabled()) {
-            logger.debug(format("There are {} elements to be closed on the deferred queue.", deferredCloseQueue.size()));
+            logger.debug(format("There are %d elements to be closed on the deferred queue.", deferredCloseQueue.size()));
         }
     }
 
