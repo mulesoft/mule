@@ -3,6 +3,35 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.added",
+          "new": "enum org.mule.runtime.core.api.construct.BackPressureReason",
+          "package": "org.mule.runtime.core.api.construct",
+          "classSimpleName": "BackPressureReason",
+          "elementKind": "enum",
+          "justification": "MULE-17257: Add more detail to FlowBackpressureException"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method boolean org.mule.runtime.core.api.processor.Sink::emit(org.mule.runtime.core.api.event.CoreEvent)",
+          "new": "method org.mule.runtime.core.api.construct.BackPressureReason org.mule.runtime.core.api.processor.Sink::emit(org.mule.runtime.core.api.event.CoreEvent)",
+          "oldType": "boolean",
+          "newType": "org.mule.runtime.core.api.construct.BackPressureReason",
+          "package": "org.mule.runtime.core.api.processor",
+          "classSimpleName": "Sink",
+          "methodName": "emit",
+          "elementKind": "method",
+          "justification": "MULE-17257: Add more detail to FlowBackpressureException"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.core.api.construct.BackPressureReason org.mule.runtime.core.api.processor.strategy.ProcessingStrategy::checkBackpressureEmitting(org.mule.runtime.core.api.event.CoreEvent)",
+          "package": "org.mule.runtime.core.api.processor.strategy",
+          "classSimpleName": "ProcessingStrategy",
+          "methodName": "checkBackpressureEmitting",
+          "elementKind": "method",
+          "justification": "MULE-17257: Add more detail to FlowBackpressureException"
+        },
+        {
           "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.streaming.DefaultStreamingManager::manage(java.io.Closeable, org.mule.runtime.api.event.EventContext)",
           "package": "org.mule.runtime.core.api.streaming",
@@ -12,13 +41,13 @@
           "justification": "Necessary to fix a bug"
         },
         {
-        "code": "java.method.added",
-        "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>)",
-        "package": "org.mule.runtime.core.privileged.processor",
-        "classSimpleName": "MessageProcessors",
-        "methodName": "buildNewChainWithListOfProcessors",
-        "elementKind": "method",
-        "justification": "MULE-16984 - Interception API: Smart connectors inside scopes are not skipped properly"
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "buildNewChainWithListOfProcessors",
+          "elementKind": "method",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside scopes are not skipped properly"
         },
         {
           "code": "java.field.addedStaticField",

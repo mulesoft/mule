@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCUMULATED;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
@@ -16,6 +17,7 @@ import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -116,26 +118,26 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     }
 
     @Override
-    public final boolean emit(CoreEvent event) {
+    public final BackPressureReason emit(CoreEvent event) {
       onEventConsumer.accept(event);
       // Optimization to avoid using synchronized block for all emissions.
       // See: https://github.com/reactor/reactor-core/issues/1037
       long remainingCapacity = fluxSink.requestedFromDownstream();
       if (remainingCapacity == 0) {
-        return false;
+        return EVENTS_ACCUMULATED;
       } else if (remainingCapacity > (bufferSize > CORES * 4 ? CORES : 0)) {
         // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
         // emit without synchronized block.
         fluxSink.next(intoSink(event));
-        return true;
+        return null;
       } else {
         // If there is very little room in buffer also emit but synchronized.
         synchronized (fluxSink) {
           if (remainingCapacity > 0) {
             fluxSink.next(intoSink(event));
-            return true;
+            return null;
           } else {
-            return false;
+            return EVENTS_ACCUMULATED;
           }
         }
       }

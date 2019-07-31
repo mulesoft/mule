@@ -9,11 +9,11 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createAndThrowIfNeeded;
+
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-
-import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Implements the different backpressure handling strategies, and checks against a
@@ -27,11 +27,9 @@ class BackPressureStrategySelector {
   private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
   private final AbstractPipeline abstractPipeline;
-  private final MessagingExceptionResolver exceptionResolver;
 
   public BackPressureStrategySelector(AbstractPipeline abstractPipeline) {
     this.abstractPipeline = abstractPipeline;
-    exceptionResolver = new MessagingExceptionResolver(abstractPipeline);
   }
 
   /**
@@ -47,13 +45,13 @@ class BackPressureStrategySelector {
       try {
         abstractPipeline.getProcessingStrategy().checkBackpressureAccepting(event);
         accepted = true;
-      } catch (RejectedExecutionException ree) {
+      } catch (FromFlowRejectedExecutionException ree) {
         // TODO MULE-16106 Add a callback for WAIT back pressure applied on the source
         try {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
           currentThread().interrupt();
-          throw new FlowBackPressureException(abstractPipeline.getName(), ree);
+          createAndThrowIfNeeded(abstractPipeline.getName(), ree.getReason(), ree);
         }
       }
     }
@@ -67,8 +65,9 @@ class BackPressureStrategySelector {
    */
   protected void checkWithFailDropStrategy(CoreEvent event)
       throws FlowBackPressureException {
-    if (!abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event)) {
-      throw new FlowBackPressureException(abstractPipeline.getName());
+    final BackPressureReason reason = abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
+    if (reason != null) {
+      createAndThrowIfNeeded(abstractPipeline.getName(), reason);
     }
   }
 

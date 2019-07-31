@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.cre
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -31,21 +32,15 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * Creates instances of {@link Flow} with a default implementation
@@ -55,8 +50,6 @@ import reactor.core.publisher.Mono;
  * builder methods will fail to update the builder state.
  */
 public class DefaultFlowBuilder implements Builder {
-
-  private static int EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
   private final String name;
   private final MuleContext muleContext;
@@ -207,8 +200,6 @@ public class DefaultFlowBuilder implements Builder {
    */
   public static class DefaultFlow extends AbstractPipeline implements Flow {
 
-    private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
-
     protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
@@ -230,17 +221,6 @@ public class DefaultFlowBuilder implements Builder {
           .flatMap(routeThroughProcessingStrategy())
           // Don't handle errors, these will be handled by parent flow
           .onErrorStop();
-    }
-
-    private void handleOverload(CoreEvent request, Throwable overloadException) {
-      MessagingException me = new MessagingException(request, overloadException, this);
-      ((BaseEventContext) request.getContext())
-          .error(exceptionResolver.resolve(me, ((PrivilegedMuleContext) getMuleContext()).getErrorTypeLocator(),
-                                           getMuleContext().getExceptionContextProviders()));
-    }
-
-    private Mono<? extends CoreEvent> flowResponse(Publisher<CoreEvent> responsePublisher) {
-      return Mono.from(responsePublisher);
     }
 
     /**

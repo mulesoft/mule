@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.processor.strategy;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -73,9 +74,9 @@ public interface ProcessingStrategy {
    * event is attempted to be accepted for processing into the flow. If it succeeds, processing begins with the corresponding
    * {@link ProcessingStrategy}. If not, a backpressure signal is raised, and the function returns false.
    *
-   * @return true if the event is accepted by the {@link ProcessingStrategy}. False if not.
+   * @return null if the event is accepted by the {@link ProcessingStrategy}. Otherwise, the reason why it was not accepted.
    */
-  default boolean checkBackpressureEmitting(CoreEvent event) {
-    return true;
+  default BackPressureReason checkBackpressureEmitting(CoreEvent event) {
+    return null;
   }
 }

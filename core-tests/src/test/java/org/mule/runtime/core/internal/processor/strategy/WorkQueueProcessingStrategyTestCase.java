@@ -34,6 +34,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory.WorkQueueProcessingStrategy;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -228,7 +229,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
           .build();
       flow.initialise();
       flow.start();
-      expectRejected();
+      expectRejected(FlowBackPressureRequiredSchedulerBusyException.class);
       processFlow(testEvent());
     }
   }
@@ -312,7 +313,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
           .build();
       flow.initialise();
       flow.start();
-      expectRejected();
+      expectRejected(FlowBackPressureRequiredSchedulerBusyException.class);
       processFlow(testEvent());
     }
   }

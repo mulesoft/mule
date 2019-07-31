@@ -101,6 +101,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
@@ -848,13 +849,13 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
   }
 
-  protected void expectRejected() {
+  protected void expectRejected(Class<? extends FlowBackPressureException> backpressureExceptionClass) {
     expectedException.expect(MessagingException.class);
     expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+    expectedException.expectCause(instanceOf(backpressureExceptionClass));
   }
 
-  private TypeSafeMatcher<MessagingException> overloadErrorTypeMatcher() {
+  private Matcher<MessagingException> overloadErrorTypeMatcher() {
     return new TypeSafeMatcher<MessagingException>() {
 
       private String errorTypeId;
@@ -868,6 +869,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       protected boolean matchesSafely(MessagingException item) {
         errorTypeId = item.getEvent().getError().get().getErrorType().getIdentifier();
         return FLOW_BACK_PRESSURE_ERROR_IDENTIFIER.equals(errorTypeId);
+      }
+
+      @Override
+      protected void describeMismatchSafely(MessagingException item, Description mismatchDescription) {
+        mismatchDescription.appendValue(item.getEvent().getError().get().getErrorType().getIdentifier());
       }
     };
   }

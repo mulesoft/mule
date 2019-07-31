@@ -24,6 +24,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -210,7 +211,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     @Override
-    public boolean emit(CoreEvent event) {
+    public BackPressureReason emit(CoreEvent event) {
       return fluxSinks.get(nextIndex()).emit(event);
     }
 
