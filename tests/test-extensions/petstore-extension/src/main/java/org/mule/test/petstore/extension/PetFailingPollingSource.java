@@ -23,14 +23,13 @@ import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 @Alias("pet-failing-source")
 @MediaType(TEXT_PLAIN)
-public class PetFailingPollingSource extends PollingSource<String, Instant> {
+public class PetFailingPollingSource extends PollingSource<String, Void> {
 
   public static final List<String> ALL_PETS =
       asList("Grumpy Cat", "Colonel Meow", "Skipped Cat", "Silvester", "Lil bub", "Macri", "Pappo");
@@ -58,17 +57,16 @@ public class PetFailingPollingSource extends PollingSource<String, Instant> {
   protected void doStop() {}
 
   @Override
-  public void poll(PollContext<String, Instant> pollContext) {
+  public void poll(PollContext<String, Void> pollContext) {
     numberOfPolls++;
     if (numberOfPolls == failAtPoll) {
       //pollContext.onConnectionException(new ConnectionException("Polling Fail"));
       executor = newSingleThreadExecutor();
       executor.execute(() -> pollContext.onConnectionException(new ConnectionException("Polling Fail")));
     } else if (numberOfPolls - 1 <= adoptionLimit) {
-      Instant instant = Instant.now();
       pollContext.accept(item -> {
         String pet = ALL_PETS.get((numberOfPolls - 1) % 7);
-        item.setResult(Result.<String, Instant>builder().attributes(instant).output(pet).build());
+        item.setResult(Result.<String, Void>builder().output(pet).build());
       });
     }
   }
