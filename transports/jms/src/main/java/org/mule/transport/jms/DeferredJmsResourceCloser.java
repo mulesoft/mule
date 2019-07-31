@@ -12,6 +12,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.MessageProducer;
 import javax.jms.Session;
@@ -39,6 +40,9 @@ class DeferredJmsResourceCloser extends Thread
     private Semaphore awaitForEmptyQueueSync = new Semaphore(0);
     private AtomicBoolean exitOnEmptyQueue = new AtomicBoolean(false);
 
+    private AtomicBoolean waitOnNextEmptyPoll = new AtomicBoolean(false);
+    private Semaphore waitOnNextEmptyPollSync = new Semaphore(0);
+
     /**
      * @param jmsConnector       the connector to whom this thread belongs
      * @param deferredCloseQueue
@@ -60,6 +64,13 @@ class DeferredJmsResourceCloser extends Thread
         while (!Thread.currentThread().isInterrupted()
                && !isTerminateRequested())
         {
+
+            // Release on next empty poll if someone is waiting for it
+            if (queue.isEmpty() && waitOnNextEmptyPoll.get())
+            {
+                waitOnNextEmptyPollSync.release();
+            }
+
             // If queue is empty, this locks waiting for next element
             Object closable = takeLoggingOnInterrupt();
             if (closable instanceof MessageProducer)
@@ -107,6 +118,30 @@ class DeferredJmsResourceCloser extends Thread
             Thread.currentThread().interrupt();
         }
         return null;
+    }
+
+    /**
+     * Blocks the calling thread until an empty-poll (when the {@link DeferredJmsResourceCloser} sees the queue empty
+     * before a poll), or the corresponding timeout occurs.
+     *
+     * @param amount amount of time to wait
+     * @param unit   time unit
+     */
+    public void waitOnNextEmptyPoll(int amount, TimeUnit unit)
+    {
+        waitOnNextEmptyPoll.set(true);
+        try
+        {
+            waitOnNextEmptyPollSync.tryAcquire(amount, unit);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.warn("Thread was interrupted while waiting for next empty poll: ", e);
+        }
+        finally
+        {
+            waitOnNextEmptyPoll.set(false);
+        }
     }
 
     /**

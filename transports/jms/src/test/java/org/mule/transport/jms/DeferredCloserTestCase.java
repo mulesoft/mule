@@ -6,11 +6,13 @@
  */
 package org.mule.transport.jms;
 
+import static java.lang.Thread.sleep;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -18,6 +20,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
@@ -85,7 +88,7 @@ public class DeferredCloserTestCase
             {
                 System.out.println("Waiting some time");
                 notifyImClosingSomething(invocation.getArguments()[0]);
-                Thread.sleep(5000);
+                sleep(5000);
                 return null;
             }
         }).when(connector).closeQuietly(any(Session.class));
@@ -159,6 +162,24 @@ public class DeferredCloserTestCase
         probeGetsEmptied();
     }
 
+    @Test(timeout = 10000)
+    public void waitForNextEmptyPollTest() throws Exception
+    {
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                sleep(3000);
+                return null;
+            }
+        }).when(connector).closeQuietly(any(MessageProducer.class));
+
+        queue.put(producer);
+        thread.start();
+        thread.waitOnNextEmptyPoll(12000, SECONDS);
+    }
+
     private void notifyImClosingSomething(Object something)
     {
         System.out.printf("Something arrived to close #%d: %s\n", closureCounter.getAndIncrement(), something.toString());
@@ -186,7 +207,7 @@ public class DeferredCloserTestCase
     {
         try
         {
-            Thread.sleep(millis);
+            sleep(millis);
         }
         catch (InterruptedException e)
         {
