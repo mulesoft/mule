@@ -45,8 +45,6 @@ import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
-import com.google.common.io.PatternFilenameFilter;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -86,8 +84,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR).toString();
   public static final String MULE_ARTIFACT_PATCHES_LOCATION = Paths.get("lib/patches/mule-artifact-patches").toString();
   public static final String MULE_ARTIFACT_PATCH_JSON_FILE_NAME = "mule-artifact-patch.json";
-  public static final String MULE_ARTIFACT_PATCHES_JSON_LOCATION =
-      Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, MULE_ARTIFACT_PATCH_JSON_FILE_NAME).toString();
 
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
 
@@ -183,7 +179,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     try {
       File muleArtifactPatchesFolder = new File(MuleContainerBootstrapUtils.getMuleHome(), MULE_ARTIFACT_PATCHES_LOCATION);
       if (muleArtifactPatchesFolder.exists()) {
-        String[] jarFiles = muleArtifactPatchesFolder.list(new PatternFilenameFilter("*.jar"));
+        String[] jarFiles = muleArtifactPatchesFolder.list((dir, name) -> name != null && name.endsWith(".jar"));
         for (String jarFile : jarFiles) {
           MuleArtifactPatchingModel muleArtifactPatchingModel = MuleArtifactPatchingModel.loadModel(jarFile);
           GenericVersionScheme genericVersionScheme = new GenericVersionScheme();
@@ -220,7 +216,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                              Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, jarFile).toString())
                                  .toURL();
                 patches.add(mulePluginPatchUrl);
-
                 logger.info(String.format("Patching artifact %s with patch file %s", artifactId, jarFile));
               } catch (MalformedURLException e) {
                 throw new MuleRuntimeException(e);
