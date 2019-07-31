@@ -127,6 +127,6 @@ public final class AsynchronousRetryTemplate extends AbstractComponent
 
   @Override
   public boolean isAsync() {
-    return false;
+    return true;
   }
 }
