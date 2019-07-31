@@ -13,12 +13,15 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -31,6 +34,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.Errors;
@@ -62,6 +66,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -230,13 +235,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
           sink.accept(event);
         } else {
-          if (!sink.emit(event)) {
-            notifyBackpressureException(event, new FlowBackPressureException(this.getName()));
+          final BackPressureReason emitFailReason = sink.emit(event);
+          if (emitFailReason != null) {
+            notifyBackpressureException(event, createFlowBackPressureException(this.getName(), emitFailReason));
           }
         }
       } catch (RejectedExecutionException e) {
         // Handle the case in which the event execution is rejected from the scheduler.
-        FlowBackPressureException wrappedException = new FlowBackPressureException(this.getName(), e);
+        FlowBackPressureException wrappedException = createFlowBackPressureException(this.getName(), REQUIRED_SCHEDULER_BUSY, e);
         notifyBackpressureException(event, wrappedException);
       }
 
@@ -253,12 +259,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    */
   private void notifyBackpressureException(CoreEvent event, FlowBackPressureException wrappedException) {
     // Build error event
-    CoreEvent errorEvent =
-        CoreEvent.builder(event)
-            .error(ErrorBuilder.builder(wrappedException)
-                .errorType(FLOW_BACKPRESSURE_ERROR_TYPE)
-                .build())
-            .build();
+    CoreEvent errorEvent = CoreEvent.builder(event)
+        .error(ErrorBuilder.builder(wrappedException)
+            .errorType(FLOW_BACKPRESSURE_ERROR_TYPE)
+            .build())
+        .build();
     // Notify error in event context
     ((BaseEventContext) event.getContext()).error(new MessagingException(errorEvent, wrappedException));
   }
