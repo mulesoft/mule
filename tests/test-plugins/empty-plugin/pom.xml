@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-module-test-plugins</artifactId>
-        <version>4.1.6-SNAPSHOT</version>
+        <version>4.1.6</version>
     </parent>
 
     <artifactId>test-empty-plugin</artifactId>
