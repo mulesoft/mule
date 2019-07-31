@@ -144,7 +144,12 @@ public interface RetryPolicyTemplate {
     return createRetryInstance().applyPolicy(futureSupplier, shouldRetry, onRetry, onExhausted, errorFunction, retryScheduler);
   }
 
-  public default boolean isAsync() {
+  /**
+   * Indicates whether current retry policy will asynchronously trigger a reconnection policy.
+   * 
+   * @return true if the policy will be triggered asynchronously.
+   */
+  default boolean isAsync() {
     return false;
   }
 }
