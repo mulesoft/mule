@@ -48,7 +48,7 @@ public interface RetryPolicyTemplate {
   /**
    * Applies the retry policy by performing a blocking action.
    *
-   * @param callback    a callback with the logic to be executed on each retry
+   * @param callback a callback with the logic to be executed on each retry
    * @param workManager the executor on which the retry operations are to be executed
    * @return a {@link RetryContext}
    */
@@ -59,7 +59,7 @@ public interface RetryPolicyTemplate {
    * the retry logic.
    *
    * @param publisher a publisher with the items which might fail
-   * @param <T>       the generic type of the publisher's content
+   * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.0
    * @deprecated Use {@link #applyPolicy(Publisher, Scheduler)} instead
@@ -83,9 +83,9 @@ public interface RetryPolicyTemplate {
    * Applies the retry policy in a non blocking manner by transforming the given {@code publisher} into one configured to apply
    * the retry logic.
    *
-   * @param publisher      a publisher with the items which might fail
+   * @param publisher a publisher with the items which might fail
    * @param retryScheduler the scheduler to use when retrying. If empty, an internal reactor Scheduler will be used.
-   * @param <T>            the generic type of the publisher's content
+   * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.2
    */
@@ -98,11 +98,11 @@ public interface RetryPolicyTemplate {
    * Applies the retry policy in a non blocking manner by transforming the given {@code publisher} into one configured to apply
    * the retry logic.
    *
-   * @param publisher     a publisher with the items which might fail
-   * @param shouldRetry   a predicate which evaluates each item to know if it should be retried or not
-   * @param onExhausted   an action to perform when the retry action has been exhausted
+   * @param publisher a publisher with the items which might fail
+   * @param shouldRetry a predicate which evaluates each item to know if it should be retried or not
+   * @param onExhausted an action to perform when the retry action has been exhausted
    * @param errorFunction function used to map cause exception to exception emitted by retry policy.
-   * @param <T>           the generic type of the publisher's content
+   * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.0
    * @deprecated Use {@link #applyPolicy(Publisher, Predicate, Consumer, Function, Scheduler)} instead
@@ -119,12 +119,12 @@ public interface RetryPolicyTemplate {
    * Applies the retry policy in a non blocking manner by transforming the given {@code publisher} into one configured to apply
    * the retry logic.
    *
-   * @param publisher      a publisher with the items which might fail
-   * @param shouldRetry    a predicate which evaluates each item to know if it should be retried or not
-   * @param onExhausted    an action to perform when the retry action has been exhausted
-   * @param errorFunction  function used to map cause exception to exception emitted by retry policy.
+   * @param publisher a publisher with the items which might fail
+   * @param shouldRetry a predicate which evaluates each item to know if it should be retried or not
+   * @param onExhausted an action to perform when the retry action has been exhausted
+   * @param errorFunction function used to map cause exception to exception emitted by retry policy.
    * @param retryScheduler the scheduler to use when retrying. If empty, an internal reactor Scheduler will be used.
-   * @param <T>            the generic type of the publisher's content
+   * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.2
    */
@@ -142,5 +142,9 @@ public interface RetryPolicyTemplate {
                                                Function<Throwable, Throwable> errorFunction,
                                                Scheduler retryScheduler) {
     return createRetryInstance().applyPolicy(futureSupplier, shouldRetry, onRetry, onExhausted, errorFunction, retryScheduler);
+  }
+
+  public default boolean isAsync() {
+    return false;
   }
 }

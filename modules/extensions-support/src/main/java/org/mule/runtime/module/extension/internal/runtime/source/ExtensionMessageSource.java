@@ -181,9 +181,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean async) throws MuleException {
+  private void startSource(boolean forceAsync) throws MuleException {
     try {
-      if (async && !(retryPolicyTemplate instanceof AsynchronousRetryTemplate)) {
+      if (forceAsync && !retryPolicyTemplate.isAsync()) {
         new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(), retryScheduler);
       } else {
         retryPolicyTemplate.execute(new StartSourceCallback(), retryScheduler);
