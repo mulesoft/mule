@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -35,6 +34,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory.WorkQueueProcessingStrategy;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -229,7 +229,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
           .build();
       flow.initialise();
       flow.start();
-      expectRejected(REQUIRED_SCHEDULER_BUSY);
+      expectRejected(FlowBackPressureRequiredSchedulerBusyException.class);
       processFlow(testEvent());
     }
   }
@@ -313,7 +313,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
           .build();
       flow.initialise();
       flow.start();
-      expectRejected(REQUIRED_SCHEDULER_BUSY);
+      expectRejected(FlowBackPressureRequiredSchedulerBusyException.class);
       processFlow(testEvent());
     }
   }

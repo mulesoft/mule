@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
@@ -29,6 +28,7 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
@@ -225,7 +225,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
           .build();
       flow.initialise();
       flow.start();
-      expectRejected(REQUIRED_SCHEDULER_BUSY);
+      expectRejected(FlowBackPressureRequiredSchedulerBusyException.class);
       processFlow(testEvent());
     }
   }

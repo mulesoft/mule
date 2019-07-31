@@ -11,6 +11,9 @@ import static java.lang.Math.max;
 import static java.lang.System.nanoTime;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_BUFFER_FULL;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
@@ -22,8 +25,10 @@ import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -173,7 +178,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
           // processed right away
           if (queuedEvents.incrementAndGet() > getBufferQueueSize()) {
             queuedEvents.decrementAndGet();
-            return REQUIRED_SCHEDULER_BUSY;
+            return REQUIRED_SCHEDULER_BUSY_BUFFER_FULL;
           }
 
           // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in

@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SC
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -236,12 +237,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         } else {
           final BackPressureReason emitFailReason = sink.emit(event);
           if (emitFailReason != null) {
-            notifyBackpressureException(event, new FlowBackPressureException(this.getName(), emitFailReason));
+            notifyBackpressureException(event, createFlowBackPressureException(this.getName(), emitFailReason));
           }
         }
       } catch (RejectedExecutionException e) {
         // Handle the case in which the event execution is rejected from the scheduler.
-        FlowBackPressureException wrappedException = new FlowBackPressureException(this.getName(), REQUIRED_SCHEDULER_BUSY, e);
+        FlowBackPressureException wrappedException = createFlowBackPressureException(this.getName(), REQUIRED_SCHEDULER_BUSY, e);
         notifyBackpressureException(event, wrappedException);
       }
 

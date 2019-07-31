@@ -18,34 +18,70 @@ import java.util.concurrent.RejectedExecutionException;
  *
  * @since 4.1
  */
-public class FlowBackPressureException extends MuleException {
+public abstract class FlowBackPressureException extends MuleException {
 
   static String BACK_PRESSURE_ERROR_MESSAGE = "Flow '%s' is unable to accept new events at this time. Reason: %s";
   private static final long serialVersionUID = -4973370165925845336L;
 
-  private final BackPressureReason reason;
-
   /**
    * Create a new {@link FlowBackPressureException} with no cause. This is typically use when a stream based processing exerts
    * back-pressure without throwing an exception.
-   *
    */
   public FlowBackPressureException(String flowName, BackPressureReason reason) {
     super(createStaticMessage(BACK_PRESSURE_ERROR_MESSAGE, flowName, reason.toString()));
-    this.reason = reason;
   }
 
   /**
    * Create a new {@link FlowBackPressureException} with a cause. This is typically use when a non-stream based processing
    * strategy is in use and back-pressure is identified by a {@link RejectedExecutionException}.
-   *
    */
   public FlowBackPressureException(String flowName, BackPressureReason reason, Throwable cause) {
     super(createStaticMessage(BACK_PRESSURE_ERROR_MESSAGE, flowName, reason.toString()), cause);
-    this.reason = reason;
   }
 
-  public BackPressureReason getReason() {
-    return reason;
+  public static FlowBackPressureException createFlowBackPressureException(String flowName, BackPressureReason reason) {
+    switch (reason) {
+      case MAX_CONCURRENCY_EXCEEDED:
+        return new FlowBackPressureMaxConcurrencyExceededException(flowName, reason);
+      case REQUIRED_SCHEDULER_BUSY:
+        return new FlowBackPressureRequiredSchedulerBusyException(flowName, reason);
+      case REQUIRED_SCHEDULER_BUSY_BUFFER_FULL:
+        return new FlowBackPressureRequiredSchedulerBusyBufferFullException(flowName, reason);
+      case EVENTS_ACCUMULATED:
+        return new FlowBackPressureEventsAccumulatedException(flowName, reason);
+      default:
+        return null;
+    }
+  }
+
+  public static void createAndThrow(String flowName, BackPressureReason reason) throws FlowBackPressureException {
+    final FlowBackPressureException toThrow = createFlowBackPressureException(flowName, reason);
+    if (toThrow != null) {
+      throw toThrow;
+    }
+  }
+
+  public static FlowBackPressureException createFlowBackPressureException(String flowName, BackPressureReason reason,
+                                                                          Throwable cause) {
+    switch (reason) {
+      case MAX_CONCURRENCY_EXCEEDED:
+        return new FlowBackPressureMaxConcurrencyExceededException(flowName, reason, cause);
+      case REQUIRED_SCHEDULER_BUSY:
+        return new FlowBackPressureRequiredSchedulerBusyException(flowName, reason, cause);
+      case REQUIRED_SCHEDULER_BUSY_BUFFER_FULL:
+        return new FlowBackPressureRequiredSchedulerBusyBufferFullException(flowName, reason, cause);
+      case EVENTS_ACCUMULATED:
+        return new FlowBackPressureEventsAccumulatedException(flowName, reason, cause);
+      default:
+        throw new IllegalArgumentException("Cannot build a FlowBackPressureException with a cause without a reason");
+    }
+  }
+
+  public static void createAndThrow(String flowName, BackPressureReason reason, Throwable cause)
+      throws FlowBackPressureException {
+    final FlowBackPressureException toThrow = createFlowBackPressureException(flowName, reason, cause);
+    if (toThrow != null) {
+      throw toThrow;
+    }
   }
 }

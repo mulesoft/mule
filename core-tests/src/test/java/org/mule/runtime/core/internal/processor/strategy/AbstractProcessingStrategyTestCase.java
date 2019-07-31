@@ -55,7 +55,6 @@ import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -850,10 +849,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
   }
 
-  protected void expectRejected(BackPressureReason backPressureReason) {
+  protected void expectRejected(Class<? extends FlowBackPressureException> backpressureExceptionClass) {
     expectedException.expect(MessagingException.class);
     expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(flowBackPressureExceptionMatcher(backPressureReason));
+    expectedException.expectCause(instanceOf(backpressureExceptionClass));
   }
 
   private Matcher<MessagingException> overloadErrorTypeMatcher() {
@@ -875,27 +874,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       @Override
       protected void describeMismatchSafely(MessagingException item, Description mismatchDescription) {
         mismatchDescription.appendValue(item.getEvent().getError().get().getErrorType().getIdentifier());
-      }
-    };
-  }
-
-  protected Matcher<FlowBackPressureException> flowBackPressureExceptionMatcher(BackPressureReason expectedReason) {
-    return new TypeSafeMatcher<FlowBackPressureException>() {
-
-      @Override
-      public void describeTo(org.hamcrest.Description description) {
-        description.appendValue(expectedReason);
-      }
-
-      @Override
-      protected boolean matchesSafely(FlowBackPressureException item) {
-        return item instanceof FlowBackPressureException
-            && item.getReason() == expectedReason;
-      }
-
-      @Override
-      protected void describeMismatchSafely(FlowBackPressureException item, Description mismatchDescription) {
-        mismatchDescription.appendValue(item.getReason());
       }
     };
   }
