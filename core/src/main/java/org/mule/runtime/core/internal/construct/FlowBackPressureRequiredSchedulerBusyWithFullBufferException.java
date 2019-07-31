@@ -15,15 +15,15 @@ import java.util.concurrent.RejectedExecutionException;
  *
  * @since 4.3, 4.2.2
  */
-public class FlowBackPressureRequiredSchedulerBusyBufferFullException extends FlowBackPressureException {
+public class FlowBackPressureRequiredSchedulerBusyWithFullBufferException extends FlowBackPressureException {
 
   private static final long serialVersionUID = -7316630352445805505L;
 
   /**
-   * Create a new {@link FlowBackPressureRequiredSchedulerBusyBufferFullException} with no cause. This is typically use when a
+   * Create a new {@link FlowBackPressureRequiredSchedulerBusyWithFullBufferException} with no cause. This is typically use when a
    * stream based processing exerts back-pressure without throwing an exception.
    */
-  public FlowBackPressureRequiredSchedulerBusyBufferFullException(String flowName, BackPressureReason reason) {
+  public FlowBackPressureRequiredSchedulerBusyWithFullBufferException(String flowName, BackPressureReason reason) {
     super(flowName, reason);
   }
 
@@ -31,7 +31,8 @@ public class FlowBackPressureRequiredSchedulerBusyBufferFullException extends Fl
    * Create a new {@link FlowBackPressureMaxConcurrencyExceededException} with a cause. This is typically use when a non-stream
    * based processing strategy is in use and back-pressure is identified by a {@link RejectedExecutionException}.
    */
-  public FlowBackPressureRequiredSchedulerBusyBufferFullException(String flowName, BackPressureReason reason, Throwable cause) {
+  public FlowBackPressureRequiredSchedulerBusyWithFullBufferException(String flowName, BackPressureReason reason,
+                                                                      Throwable cause) {
     super(flowName, reason, cause);
   }
 

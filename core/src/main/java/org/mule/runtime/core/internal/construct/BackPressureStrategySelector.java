@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createAndThrow;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createAndThrowIfNeeded;
 
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -51,7 +51,7 @@ class BackPressureStrategySelector {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
           currentThread().interrupt();
-          createAndThrow(abstractPipeline.getName(), ree.getReason(), ree);
+          createAndThrowIfNeeded(abstractPipeline.getName(), ree.getReason(), ree);
         }
       }
     }
@@ -67,7 +67,7 @@ class BackPressureStrategySelector {
       throws FlowBackPressureException {
     final BackPressureReason reason = abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
     if (reason != null) {
-      createAndThrow(abstractPipeline.getName(), reason);
+      createAndThrowIfNeeded(abstractPipeline.getName(), reason);
     }
   }
 

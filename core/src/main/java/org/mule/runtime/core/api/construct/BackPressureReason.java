@@ -29,7 +29,7 @@ public enum BackPressureReason {
    * At least one of the schedulers required by the flow is unable to accept new tasks and the flow's buffer to accept exceeding
    * tasks is full.
    */
-  REQUIRED_SCHEDULER_BUSY_BUFFER_FULL,
+  REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER,
 
   /**
    * The flow did not consume enough of the previous events.

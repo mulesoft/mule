@@ -45,8 +45,8 @@ public abstract class FlowBackPressureException extends MuleException {
         return new FlowBackPressureMaxConcurrencyExceededException(flowName, reason);
       case REQUIRED_SCHEDULER_BUSY:
         return new FlowBackPressureRequiredSchedulerBusyException(flowName, reason);
-      case REQUIRED_SCHEDULER_BUSY_BUFFER_FULL:
-        return new FlowBackPressureRequiredSchedulerBusyBufferFullException(flowName, reason);
+      case REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER:
+        return new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(flowName, reason);
       case EVENTS_ACCUMULATED:
         return new FlowBackPressureEventsAccumulatedException(flowName, reason);
       default:
@@ -54,7 +54,7 @@ public abstract class FlowBackPressureException extends MuleException {
     }
   }
 
-  public static void createAndThrow(String flowName, BackPressureReason reason) throws FlowBackPressureException {
+  public static void createAndThrowIfNeeded(String flowName, BackPressureReason reason) throws FlowBackPressureException {
     final FlowBackPressureException toThrow = createFlowBackPressureException(flowName, reason);
     if (toThrow != null) {
       throw toThrow;
@@ -68,8 +68,8 @@ public abstract class FlowBackPressureException extends MuleException {
         return new FlowBackPressureMaxConcurrencyExceededException(flowName, reason, cause);
       case REQUIRED_SCHEDULER_BUSY:
         return new FlowBackPressureRequiredSchedulerBusyException(flowName, reason, cause);
-      case REQUIRED_SCHEDULER_BUSY_BUFFER_FULL:
-        return new FlowBackPressureRequiredSchedulerBusyBufferFullException(flowName, reason, cause);
+      case REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER:
+        return new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(flowName, reason, cause);
       case EVENTS_ACCUMULATED:
         return new FlowBackPressureEventsAccumulatedException(flowName, reason, cause);
       default:
@@ -77,7 +77,7 @@ public abstract class FlowBackPressureException extends MuleException {
     }
   }
 
-  public static void createAndThrow(String flowName, BackPressureReason reason, Throwable cause)
+  public static void createAndThrowIfNeeded(String flowName, BackPressureReason reason, Throwable cause)
       throws FlowBackPressureException {
     final FlowBackPressureException toThrow = createFlowBackPressureException(flowName, reason, cause);
     if (toThrow != null) {
