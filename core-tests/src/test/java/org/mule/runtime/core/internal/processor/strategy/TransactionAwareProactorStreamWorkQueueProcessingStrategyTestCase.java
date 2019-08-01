@@ -66,7 +66,9 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
                                                                          () -> cpuLight,
                                                                          () -> blocking,
                                                                          () -> cpuIntensive,
-                                                                         maxConcurrency, true);
+                                                                         maxConcurrency, true,
+                                                                         muleContext.getConfiguration().isThreadLoggingEnabled(),
+                                                                         muleContext.getSchedulerService());
   }
 
   @Override
