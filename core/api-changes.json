@@ -4,6 +4,24 @@
       "ignore": [
         {
           "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::isAsync()",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "isAsync",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::isAsync()",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicyTemplate",
+          "methodName": "isAsync",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
+        },
+        {
+          "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.streaming.DefaultStreamingManager::manage(java.io.Closeable, org.mule.runtime.api.event.EventContext)",
           "package": "org.mule.runtime.core.api.streaming",
           "classSimpleName": "DefaultStreamingManager",
@@ -173,7 +191,7 @@
           "methodName": "processWithChildContextDontComplete",
           "elementKind": "method",
           "justification": "<<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>"
-        },
+        }
       ]
     }
   },
