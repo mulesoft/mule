@@ -2,6 +2,33 @@
   "4.1.6": {
     "revapi": {
       "ignore": [
+         {
+           "code": "java.method.removed",
+           "old": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::processWithChildContextAlwaysComplete(org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.processor.ReactiveProcessor, java.util.Optional<org.mule.runtime.api.component.location.ComponentLocation>)",
+           "package": "org.mule.runtime.core.privileged.processor",
+           "classSimpleName": "MessageProcessors",
+           "methodName": "processWithChildContextAlwaysComplete",
+           "elementKind": "method",
+           "justification": "Cherry pick patches"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::isAsync()",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "isAsync",
+          "elementKind": "method",
+          "justification": "Default method in interfarce. Only async will be affected."
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::isAsync()",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicyTemplate",
+          "methodName": "isAsync",
+          "elementKind": "method",
+          "justification": "Default method in interfarce. Only async will be affected."
+        },
         {
           "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.streaming.DefaultStreamingManager::manage(java.io.Closeable, org.mule.runtime.api.event.EventContext)",

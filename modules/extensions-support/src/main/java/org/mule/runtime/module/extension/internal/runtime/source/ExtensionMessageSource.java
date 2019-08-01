@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListe
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -170,9 +171,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource() throws MuleException {
+  private void startSource(boolean forceAsync) throws MuleException {
     try {
-      retryPolicyTemplate.execute(new StartSourceCallback(), retryScheduler);
+      if (forceAsync && !retryPolicyTemplate.isAsync()) {
+        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(), retryScheduler);
+      } else {
+        retryPolicyTemplate.execute(new StartSourceCallback(), retryScheduler);
+      }
     } catch (Throwable e) {
       if (e instanceof MuleException) {
         throw (MuleException) e;
@@ -180,6 +185,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         throw new MuleRuntimeException(e);
       }
     }
+  }
+
+  private void startSource() throws MuleException {
+    startSource(false);
   }
 
   private RetryPolicyTemplate createRetryPolicyTemplate(RetryPolicyTemplate customTemplate) {
@@ -280,7 +289,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       if (started.get()) {
         stopSource();
         disposeSource();
-        startSource();
+        startSource(true);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
