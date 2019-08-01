@@ -127,4 +127,13 @@ public interface RetryPolicyTemplate {
     return createRetryInstance().applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, retryScheduler);
 
   }
+
+  /**
+   * Indicates whether current retry policy will asynchronously trigger a reconnection policy.
+   * 
+   * @return true if the policy will be triggered asynchronously.
+   */
+  default boolean isAsync() {
+    return false;
+  }
 }

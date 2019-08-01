@@ -111,6 +111,24 @@
           "methodName": "isOwnedTransaction",
           "elementKind": "method",
           "justification": "Error handlers need to know if they own the tx, to roll it back"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::isAsync()",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "isAsync",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::isAsync()",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicyTemplate",
+          "methodName": "isAsync",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
         }
       ]
     }
