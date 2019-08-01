@@ -29,20 +29,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.util.ExceptionUtils;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
-import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -57,9 +43,28 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.util.ExceptionUtils;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
+
+  private static final int TEST_TIMEOUT = 2000;
+  private static final int TEST_POLL_DELAY = 10;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -103,7 +108,12 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     verify(source).onStop();
     verify(ioScheduler, never()).stop();
     verify(cpuLightScheduler, never()).stop();
-    verify(source, times(2)).onStart(sourceCallback);
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(2)).onStart(sourceCallback);
+      return true;
+    }));
+
   }
 
   @Test
@@ -178,8 +188,12 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
     messageSource.initialise();
     messageSource.start();
-    verify(source, times(3)).onStart(sourceCallback);
-    verify(source, times(2)).onStop();
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(3)).onStart(sourceCallback);
+      verify(source, times(2)).onStop();
+      return true;
+    }));
   }
 
   @Test
@@ -193,8 +207,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.start();
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
 
-    verify(source, times(2)).onStart(sourceCallback);
-    verify(source, times(1)).onStop();
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(2)).onStart(sourceCallback);
+      verify(source, times(1)).onStop();
+      return true;
+    }));
   }
 
   @Test
