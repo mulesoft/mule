@@ -11,17 +11,21 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutionResult;
-import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.component.execution.InputEvent;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,10 +35,10 @@ import org.reactivestreams.Publisher;
 
 public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
 
-  private TestExecutableComponent executableComponent = new TestExecutableComponent();
+  private final TestExecutableComponent executableComponent = new TestExecutableComponent();
   private Message requestMessage;
-  private Message responseMessage = of("Response");
-  private AtomicReference<CoreEvent> componentInEvent = new AtomicReference<>();
+  private final Message responseMessage = of("Response");
+  private final AtomicReference<CoreEvent> componentInEvent = new AtomicReference<>();
 
 
   @Override
@@ -81,17 +85,76 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
     assertThat(parentContext.isTerminated(), is(true));
   }
 
+  @Test
+  public void testExecuteWithInputEventError() throws Exception {
+    executableComponent.setToThrow(new IllegalStateException("Expected"));
 
-  final class TestExecutableComponent extends AbstractExecutableComponent implements ReactiveProcessor {
+    try {
+      executableComponent.execute(InputEvent.create().message(requestMessage)).get();
+      fail("ComponentExecutionException expected");
+    } catch (java.util.concurrent.ExecutionException ee) {
+      ComponentExecutionException cee = (ComponentExecutionException) ee.getCause();
+      final Event errorEvent = cee.getEvent();
 
-    @Override
-    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      return from(publisher).map(event -> {
-        componentInEvent.set(event);
-        return builder(event).message(responseMessage).build();
-      });
+      assertThat(componentInEvent.get().getMessage(), equalTo(requestMessage));
+      assertThat(errorEvent.getMessage(), equalTo(testEvent().getMessage()));
+
+      assertThat(componentInEvent.get().getContext(), equalTo(errorEvent.getContext()));
+
+      BaseEventContext eventContext = (BaseEventContext) componentInEvent.get().getContext();
+
+      assertThat(eventContext.isTerminated(), is(false));
     }
   }
 
+  @Test
+  public void testExecuteWithEventError() throws Exception {
+    executableComponent.setToThrow(new IllegalStateException("Expected"));
+
+    try {
+      executableComponent.execute(testEvent()).get();
+      fail("ComponentExecutionException expected");
+    } catch (java.util.concurrent.ExecutionException ee) {
+      ComponentExecutionException cee = (ComponentExecutionException) ee.getCause();
+      final Event errorEvent = cee.getEvent();
+
+      assertThat(componentInEvent.get().getContext(), not(equalTo(errorEvent.getContext())));
+      assertThat(errorEvent.getMessage(), equalTo(testEvent().getMessage()));
+
+      assertThat(((BaseEventContext) componentInEvent.get().getContext()).isTerminated(), is(true));
+      assertThat(((BaseEventContext) errorEvent.getContext()).isTerminated(), is(false));
+
+      BaseEventContext childContext = (BaseEventContext) componentInEvent.get().getContext();
+      assertThat(childContext.isTerminated(), is(true));
+
+      BaseEventContext parentContext = (BaseEventContext) testEvent().getContext();
+      assertThat(parentContext.isTerminated(), is(false));
+
+      ((BaseEventContext) testEvent().getContext()).success();
+      assertThat(parentContext.isTerminated(), is(true));
+    }
+  }
+
+  final class TestExecutableComponent extends AbstractExecutableComponent implements ReactiveProcessor {
+
+    private Throwable toThrow;
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      return from(publisher)
+          .doOnNext(event -> componentInEvent.set(event))
+          .flatMap(event -> {
+            if (toThrow != null) {
+              return error(toThrow);
+            } else {
+              return just(builder(event).message(responseMessage).build());
+            }
+          });
+    }
+
+    public void setToThrow(Throwable toThrow) {
+      this.toThrow = toThrow;
+    }
+  }
 
 }

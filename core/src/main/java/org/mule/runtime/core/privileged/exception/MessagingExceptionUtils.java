@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 /**
@@ -26,5 +28,17 @@ public final class MessagingExceptionUtils {
     if (exception instanceof MessagingException) {
       ((MessagingException) exception).setHandled(true);
     }
+  }
+
+  /**
+   * Provides a way through privileged API to build a MessagingException with the provided {@code event} and {@code cause}.
+   * <p>
+   * Keep in mind that in most cases this shouldn't be needed, and properly using {@link ErrorMessageAwareException} should be the
+   * way to do things.
+   *
+   * @since 4.3.0, 4.2.2
+   */
+  public static EventProcessingException createMessagingException(CoreEvent event, Throwable cause) {
+    return new MessagingException(event, cause);
   }
 }
