@@ -1,4 +1,19 @@
 {
+  "4.2.2": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method long org.mule.runtime.http.api.server.ws.WebSocketHandler::getIdleSocketTimeoutMills()",
+          "package": "org.mule.runtime.http.api.server.ws",
+          "classSimpleName": "WebSocketHandler",
+          "methodName": "getIdleSocketTimeoutMills",
+          "elementKind": "method",
+          "justification": "Doesn't break compatibility and needed to fix MULE-17277"
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [
