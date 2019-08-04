@@ -274,6 +274,14 @@
                       "localPart": "context",
                       "prefix": "tls"
                     }
+                  },
+                  "stereotype": {
+                    "allowedStereotypes": [
+                      {
+                        "type": "CONTEXT",
+                        "namespace": "TLS"
+                      }
+                    ]
                   }
                 },
                 "fields": [
@@ -731,7 +739,12 @@
                 "query": false,
                 "order": 2
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "CONTEXT",
+                  "namespace": "TLS"
+                }
+              ],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -6016,6 +6029,14 @@
                           "localPart": "context",
                           "prefix": "tls"
                         }
+                      },
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "CONTEXT",
+                            "namespace": "TLS"
+                          }
+                        ]
                       }
                     },
                     "fields": [
@@ -6473,7 +6494,12 @@
                     "query": false,
                     "order": 3
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONTEXT",
+                      "namespace": "TLS"
+                    }
+                  ],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -6947,6 +6973,14 @@
                           "localPart": "context",
                           "prefix": "tls"
                         }
+                      },
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "CONTEXT",
+                            "namespace": "TLS"
+                          }
+                        ]
                       }
                     },
                     "fields": [
@@ -7404,7 +7438,12 @@
                     "query": false,
                     "order": 3
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONTEXT",
+                      "namespace": "TLS"
+                    }
+                  ],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -7882,6 +7921,14 @@
                           "localPart": "context",
                           "prefix": "tls"
                         }
+                      },
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "CONTEXT",
+                            "namespace": "TLS"
+                          }
+                        ]
                       }
                     },
                     "fields": [
@@ -8339,7 +8386,12 @@
                     "query": false,
                     "order": 3
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONTEXT",
+                      "namespace": "TLS"
+                    }
+                  ],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -9023,6 +9075,14 @@
                           "localPart": "context",
                           "prefix": "tls"
                         }
+                      },
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "CONTEXT",
+                            "namespace": "TLS"
+                          }
+                        ]
                       }
                     },
                     "fields": [
@@ -9480,7 +9540,12 @@
                     "query": false,
                     "order": 3
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONTEXT",
+                      "namespace": "TLS"
+                    }
+                  ],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -9954,6 +10019,14 @@
                           "localPart": "context",
                           "prefix": "tls"
                         }
+                      },
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "CONTEXT",
+                            "namespace": "TLS"
+                          }
+                        ]
                       }
                     },
                     "fields": [
@@ -10411,7 +10484,12 @@
                     "query": false,
                     "order": 3
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONTEXT",
+                      "namespace": "TLS"
+                    }
+                  ],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -15732,6 +15810,14 @@
                       "localPart": "context",
                       "prefix": "tls"
                     }
+                  },
+                  "stereotype": {
+                    "allowedStereotypes": [
+                      {
+                        "type": "CONTEXT",
+                        "namespace": "TLS"
+                      }
+                    ]
                   }
                 },
                 "fields": [
@@ -16189,7 +16275,12 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "CONTEXT",
+                  "namespace": "TLS"
+                }
+              ],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -16663,6 +16754,14 @@
                       "localPart": "context",
                       "prefix": "tls"
                     }
+                  },
+                  "stereotype": {
+                    "allowedStereotypes": [
+                      {
+                        "type": "CONTEXT",
+                        "namespace": "TLS"
+                      }
+                    ]
                   }
                 },
                 "fields": [
@@ -17120,7 +17219,12 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "CONTEXT",
+                  "namespace": "TLS"
+                }
+              ],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -17598,6 +17702,14 @@
                       "localPart": "context",
                       "prefix": "tls"
                     }
+                  },
+                  "stereotype": {
+                    "allowedStereotypes": [
+                      {
+                        "type": "CONTEXT",
+                        "namespace": "TLS"
+                      }
+                    ]
                   }
                 },
                 "fields": [
@@ -18055,7 +18167,12 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "CONTEXT",
+                  "namespace": "TLS"
+                }
+              ],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -18739,6 +18856,14 @@
                       "localPart": "context",
                       "prefix": "tls"
                     }
+                  },
+                  "stereotype": {
+                    "allowedStereotypes": [
+                      {
+                        "type": "CONTEXT",
+                        "namespace": "TLS"
+                      }
+                    ]
                   }
                 },
                 "fields": [
@@ -19196,7 +19321,12 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "CONTEXT",
+                  "namespace": "TLS"
+                }
+              ],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -19670,6 +19800,14 @@
                       "localPart": "context",
                       "prefix": "tls"
                     }
+                  },
+                  "stereotype": {
+                    "allowedStereotypes": [
+                      {
+                        "type": "CONTEXT",
+                        "namespace": "TLS"
+                      }
+                    ]
                   }
                 },
                 "fields": [
@@ -20127,7 +20265,12 @@
                 "query": false,
                 "order": 3
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "CONTEXT",
+                  "namespace": "TLS"
+                }
+              ],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -23602,6 +23745,14 @@
                   "localPart": "context",
                   "prefix": "tls"
                 }
+              },
+              "stereotype": {
+                "allowedStereotypes": [
+                  {
+                    "type": "CONTEXT",
+                    "namespace": "TLS"
+                  }
+                ]
               }
             },
             "fields": [
@@ -24251,6 +24402,14 @@
                   "localPart": "context",
                   "prefix": "tls"
                 }
+              },
+              "stereotype": {
+                "allowedStereotypes": [
+                  {
+                    "type": "CONTEXT",
+                    "namespace": "TLS"
+                  }
+                ]
               }
             },
             "fields": [
@@ -24786,6 +24945,14 @@
                   "localPart": "context",
                   "prefix": "tls"
                 }
+              },
+              "stereotype": {
+                "allowedStereotypes": [
+                  {
+                    "type": "CONTEXT",
+                    "namespace": "TLS"
+                  }
+                ]
               }
             },
             "fields": [
@@ -25363,6 +25530,14 @@
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "stereotype": {
+                      "allowedStereotypes": [
+                        {
+                          "type": "CONTEXT",
+                          "namespace": "TLS"
+                        }
+                      ]
                     }
                   },
                   "fields": [
@@ -25968,6 +26143,14 @@
                           "localPart": "context",
                           "prefix": "tls"
                         }
+                      },
+                      "stereotype": {
+                        "allowedStereotypes": [
+                          {
+                            "type": "CONTEXT",
+                            "namespace": "TLS"
+                          }
+                        ]
                       }
                     },
                     "fields": [
