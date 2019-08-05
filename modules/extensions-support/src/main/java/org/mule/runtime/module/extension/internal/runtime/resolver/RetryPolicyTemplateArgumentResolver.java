@@ -13,6 +13,11 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link ArgumentResolver} that returns the {@link RetryPolicyTemplate} effective for the operation
+ *
+ * @since 4.2.2 - 4.3.0
+ */
 public class RetryPolicyTemplateArgumentResolver implements ArgumentResolver<RetryPolicyTemplate> {
 
   @Override
