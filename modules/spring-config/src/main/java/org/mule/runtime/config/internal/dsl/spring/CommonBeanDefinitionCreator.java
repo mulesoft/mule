@@ -107,7 +107,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     componentModel.setType(retrieveComponentType(componentModel, buildingDefinition));
     BeanDefinitionBuilder beanDefinitionBuilder = createBeanDefinitionBuilder(componentModel, buildingDefinition);
     processAnnotations(componentModel, beanDefinitionBuilder);
-    processComponentDefinitionModel(request.getParentComponentModel(), componentModel, buildingDefinition, beanDefinitionBuilder);
+    processComponentDefinitionModel(componentModel, buildingDefinition, beanDefinitionBuilder);
     return true;
   }
 
@@ -233,8 +233,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .collect(toMap(propValue -> propValue.getFirst(), propValue -> propValue.getSecond()));
   }
 
-  private void processComponentDefinitionModel(final ComponentModel parentComponentModel,
-                                               final SpringComponentModel componentModel,
+  private void processComponentDefinitionModel(final SpringComponentModel componentModel,
                                                ComponentBuildingDefinition componentBuildingDefinition,
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
     processObjectConstructionParameters(componentModel, componentBuildingDefinition,
@@ -244,13 +243,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(parentComponentModel, originalBeanDefinition);
+    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(originalBeanDefinition);
     if (originalBeanDefinition != wrappedBeanDefinition) {
       componentModel.setType(wrappedBeanDefinition.getBeanClass());
     }
     final SpringPostProcessorIocHelper iocHelper =
         new SpringPostProcessorIocHelper(objectFactoryClassRepository, wrappedBeanDefinition);
-    beanDefinitionPostProcessor.postProcess(componentModel.getConfiguration(), iocHelper);
     componentModel.setBeanDefinition(iocHelper.getBeanDefinition());
   }
 
@@ -292,8 +290,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   }
 
-  private AbstractBeanDefinition adaptBeanDefinition(ComponentModel parentComponentModel,
-                                                     AbstractBeanDefinition originalBeanDefinition) {
+  private AbstractBeanDefinition adaptBeanDefinition(AbstractBeanDefinition originalBeanDefinition) {
     Class beanClass;
     if (originalBeanDefinition instanceof RootBeanDefinition) {
       beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
@@ -318,7 +315,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     } else {
       final SpringPostProcessorIocHelper iocHelper =
           new SpringPostProcessorIocHelper(objectFactoryClassRepository, originalBeanDefinition);
-      beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel.getConfiguration(), beanClass, iocHelper);
       return iocHelper.getBeanDefinition();
     }
   }

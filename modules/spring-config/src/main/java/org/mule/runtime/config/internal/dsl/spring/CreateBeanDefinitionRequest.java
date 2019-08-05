@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
@@ -18,18 +17,15 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
  */
 public class CreateBeanDefinitionRequest {
 
-  private final ComponentModel parentComponentModel;
   private final SpringComponentModel componentModel;
   private final ComponentBuildingDefinition componentBuildingDefinition;
 
   /**
-   * @param parentComponentModel the parent component model. Some language construct processing depends on the context.
    * @param componentModel the holder for the configuration attributes defined by the user
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
-  public CreateBeanDefinitionRequest(ComponentModel parentComponentModel, SpringComponentModel componentModel,
+  public CreateBeanDefinitionRequest(SpringComponentModel componentModel,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
-    this.parentComponentModel = parentComponentModel;
     this.componentModel = componentModel;
     this.componentBuildingDefinition = componentBuildingDefinition;
   }
@@ -41,9 +37,5 @@ public class CreateBeanDefinitionRequest {
 
   public ComponentBuildingDefinition getComponentBuildingDefinition() {
     return componentBuildingDefinition;
-  }
-
-  public ComponentModel getParentComponentModel() {
-    return parentComponentModel;
   }
 }
