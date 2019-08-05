@@ -21,7 +21,6 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -110,7 +109,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link ComponentExecutor}
-   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
@@ -170,12 +169,13 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
             executedInterceptors.clear();
           }
         })
-        .transform(pub -> from(getRetryPolicyTemplate(context)
-            .applyPolicy(pub,
-                         e -> shouldRetry(e, context),
-                         e -> stats.ifPresent(s -> s.discountInflightOperation()),
-                         identity(),
-                         context.getCurrentScheduler())));
+        .transform(pub -> context.getRetryPolicyTemplate()
+            .map(retryPolicy -> from(retryPolicy.applyPolicy(pub,
+                                                             e -> shouldRetry(e, context),
+                                                             e -> stats.ifPresent(s -> s.discountInflightOperation()),
+                                                             identity(),
+                                                             context.getCurrentScheduler()))
+            ).orElse(pub));
   }
 
   private Throwable mapError(ExecutionContextAdapter context, List<Interceptor> interceptors, Throwable e) {
@@ -226,8 +226,8 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   private void onSuccess(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
     intercept(interceptors, interceptor -> interceptor.onSuccess(executionContext, result),
               interceptor -> format(
-                                    "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result will be returned",
-                                    interceptor));
+                  "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result will be returned",
+                  interceptor));
   }
 
   private Throwable onError(ExecutionContext executionContext, Throwable e, List<Interceptor> interceptors) {
@@ -239,8 +239,8 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         exceptionHolder.set(decoratedException);
       }
     }, interceptor -> format(
-                             "Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned",
-                             interceptor));
+        "Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned",
+        interceptor));
 
     return exceptionHolder.get();
   }
@@ -248,8 +248,8 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   void after(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
     intercept(interceptors, interceptor -> interceptor.after(executionContext, result),
               interceptor -> format(
-                                    "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result be returned",
-                                    interceptor));
+                  "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result be returned",
+                  interceptor));
   }
 
   private void intercept(List<Interceptor> interceptors, Consumer<Interceptor> closure,
@@ -277,21 +277,6 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     return context.getTransactionConfig()
         .map(txConfig -> ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig)))
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
-  }
-
-  private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<T> context) {
-    // If there is a template, try to wrap it using the ReconnectionConfig
-    Optional<RetryPolicyTemplate> customTemplate = context.getRetryPolicyTemplate()
-        .map(delegate -> context.getConfiguration()
-            .map(config -> config.getConnectionProvider().orElse(null))
-            .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(delegate))
-            .orElse(delegate));
-
-    // In case of no template available in the context, use the one defined by the ConnectionProvider
-    return customTemplate.orElseGet(() -> context.getConfiguration()
-        .map(config -> config.getConnectionProvider().orElse(null))
-        .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
-        .orElse(fallbackRetryPolicyTemplate));
   }
 
   private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<T> context) {

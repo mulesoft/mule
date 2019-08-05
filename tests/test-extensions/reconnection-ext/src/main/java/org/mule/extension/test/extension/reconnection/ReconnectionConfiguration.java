@@ -6,6 +6,7 @@
  */
 package org.mule.extension.test.extension.reconnection;
 
+import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -15,6 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  * operations since they represent something core from the extension.
  */
 @ConnectionProviders(ReconnectableConnectionProvider.class)
+@Operations(ReconnectionOperations.class)
 @Sources(ReconectionSource.class)
 public class ReconnectionConfiguration {
 

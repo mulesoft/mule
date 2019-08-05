@@ -46,6 +46,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,6 +61,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -149,6 +151,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
   private final ReflectionCache reflectionCache;
+  private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
   protected ExecutionMediator executionMediator;
   protected ComponentExecutor componentExecutor;
@@ -345,8 +348,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
-                                         getCursorProviderFactory(), streamingManager, this, retryPolicyTemplate,
-                                         currentScheduler, muleContext);
+                                         getCursorProviderFactory(), streamingManager, this,
+                                         getRetryPolicyTemplate(configuration), currentScheduler, muleContext);
   }
 
   @Override
@@ -366,6 +369,26 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       initialised = true;
     }
+  }
+
+  private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
+    RetryPolicyTemplate delegate = null;
+    if (retryPolicyTemplate != null) {
+      delegate = configuration
+          .map(config -> config.getConnectionProvider().orElse(null))
+          .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(retryPolicyTemplate))
+          .orElse(retryPolicyTemplate);
+    }
+
+    // In case of no template available in the context, use the one defined by the ConnectionProvider
+    if (delegate == null) {
+      delegate = configuration
+          .map(config -> config.getConnectionProvider().orElse(null))
+          .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
+          .orElse(fallbackRetryPolicyTemplate);
+    }
+
+    return delegate;
   }
 
   private ComponentExecutor<T> createComponentExecutor() {
