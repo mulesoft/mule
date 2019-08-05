@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
@@ -31,12 +32,12 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
 
 import javax.lang.model.element.VariableElement;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A contract for any kind of component from which an extension's parameter can be derived
@@ -62,6 +63,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(CorrelationInfo.class)
       .add(NotificationEmitter.class)
       .add(ExtensionsClient.class)
+      .add(RetryPolicyTemplate.class)
       .build();
 
   /**
