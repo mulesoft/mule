@@ -16288,7 +16288,16 @@
                 "query": false,
                 "order": 1
               },
-              "allowedStereotypeModels": [],
+              "allowedStereotypeModels": [
+                {
+                  "type": "BEAR",
+                  "namespace": "METADATA",
+                  "parent": {
+                    "type": "ANIMAL",
+                    "namespace": "METADATA"
+                  }
+                }
+              ],
               "name": "animalContent",
               "description": "",
               "modelProperties": {}
@@ -24735,6 +24744,18 @@
         },
         "typeAlias": {
           "value": "Bear"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "BEAR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "ANIMAL",
+                "namespace": "METADATA"
+              }
+            }
+          ]
         }
       },
       "fields": [
@@ -24769,6 +24790,14 @@
         },
         "typeAlias": {
           "value": "AbstractOutputAttributes"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "ABSTRACT_OUTPUT_ATTRIBUTES",
+              "namespace": "METADATA"
+            }
+          ]
         }
       },
       "fields": []
@@ -24799,6 +24828,18 @@
         },
         "typeAlias": {
           "value": "AnimalsOutputAttributes"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "ANIMALS_OUTPUT_ATTRIBUTES",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "ABSTRACT_OUTPUT_ATTRIBUTES",
+                "namespace": "METADATA"
+              }
+            }
+          ]
         }
       },
       "fields": [
@@ -24849,6 +24890,18 @@
         },
         "typeAlias": {
           "value": "ShapeOutputAttributes"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "SHAPE_OUTPUT_ATTRIBUTES",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "ABSTRACT_OUTPUT_ATTRIBUTES",
+                "namespace": "METADATA"
+              }
+            }
+          ]
         }
       },
       "fields": [

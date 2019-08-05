@@ -2383,7 +2383,12 @@
                     "query": false,
                     "order": 1
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "TEST_TRANSACTIONAL_CONNECTION",
+                      "namespace": "TX"
+                    }
+                  ],
                   "name": "transactionalConnection",
                   "description": "",
                   "modelProperties": {}
@@ -6523,6 +6528,14 @@
         },
         "typeAlias": {
           "value": "TestTransactionalConnection"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "TEST_TRANSACTIONAL_CONNECTION",
+              "namespace": "TX"
+            }
+          ]
         }
       },
       "fields": []

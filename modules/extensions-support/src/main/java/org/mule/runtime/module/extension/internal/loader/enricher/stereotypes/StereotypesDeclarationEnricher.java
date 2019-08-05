@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
+import static org.mule.runtime.api.util.NameUtils.underscorize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
@@ -16,6 +18,8 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTI
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypeResolver.createCustomStereotype;
+import static org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypeResolver.getStereotype;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -24,6 +28,8 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -49,6 +55,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeType
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.stereotype.ImplicitStereotypeDefinition;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
@@ -64,7 +71,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
@@ -97,8 +104,10 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
     private StereotypeModel sourceParent;
     private StereotypeModel processorParent;
     private ClassTypeLoader typeLoader;
+    private DslResolvingContext dslResolvingContext;
 
     public void apply(ExtensionLoadingContext extensionLoadingContext) {
+      dslResolvingContext = extensionLoadingContext.getDslResolvingContext();
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
       this.typeLoader =
           new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
@@ -226,12 +235,48 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
     }
 
     private void resolveDeclaredTypesStereotypes(ExtensionDeclaration declaration, String namespace) {
-      Function<Class<? extends StereotypeDefinition>, StereotypeModel> resolver =
-          def -> StereotypeResolver.createCustomStereotype(def, namespace, stereotypes);
+      Map<ObjectType, ObjectType> subTypeToParent = new HashMap<>();
+      declaration.getSubTypes()
+          .forEach(subTypeModel -> subTypeModel.getSubTypes()
+              .forEach(subType -> subTypeToParent.put(subType, subTypeModel.getBaseType())));
+
+      BiFunction<ObjectType, Class<? extends StereotypeDefinition>, StereotypeModel> resolver =
+          (type, def) -> resolveStereotype(def, type, namespace, subTypeToParent);
       declaration.getTypes().forEach(type -> resolveStereotype(type, resolver));
     }
 
-    private void resolveStereotype(ObjectType type, Function<Class<? extends StereotypeDefinition>, StereotypeModel> resolver) {
+    private StereotypeModel resolveStereotype(Class<? extends StereotypeDefinition> def, ObjectType type, String namespace,
+                                              Map<ObjectType, ObjectType> subTypeToParent) {
+      if (def.equals(ImplicitStereotypeDefinition.class)) {
+        // If the type is defined in another extension, set the namespace for its stereotype accordingly
+        namespace = getTypeId(type)
+            .flatMap(typeId -> dslResolvingContext.getExtensionForType(typeId))
+            .map(extensionModel -> extensionModel.getXmlDslModel().getPrefix().toUpperCase())
+            .orElse(namespace);
+
+        final ObjectType parentObjectType = subTypeToParent.get(type);
+
+        final String classname = type.getAnnotation(ClassInformationAnnotation.class).get().getClassname();
+        final String stereotypeName = underscorize(classname.substring(classname.lastIndexOf(".") + 1)).toUpperCase();
+
+        if (parentObjectType != null) {
+          final String parentClassname = parentObjectType.getAnnotation(ClassInformationAnnotation.class).get().getClassname();
+          final String parentStereotypeName =
+              underscorize(parentClassname.substring(parentClassname.lastIndexOf(".") + 1)).toUpperCase();
+
+          return getStereotype(new ImplicitStereotypeDefinition(stereotypeName,
+                                                                new ImplicitStereotypeDefinition(parentStereotypeName)),
+                               namespace, stereotypes);
+        } else {
+          return getStereotype(new ImplicitStereotypeDefinition(stereotypeName), namespace, stereotypes);
+        }
+      } else {
+        return createCustomStereotype(def, namespace, stereotypes);
+      }
+    }
+
+    private void resolveStereotype(ObjectType type,
+                                   BiFunction<ObjectType, Class<? extends StereotypeDefinition>, StereotypeModel> resolver) {
       type.accept(new MetadataTypeVisitor() {
 
         // This is created to avoid a recursive types infinite loop, producing an StackOverflow when resolving the stereotypes.
@@ -242,8 +287,9 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           if (!registeredTypes.contains(objectType)
               && !objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
             registeredTypes.add(objectType);
-            objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(resolver));
+            objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(objectType, resolver));
             objectType.getFields().forEach(f -> f.getValue().accept(this));
+            objectType.getOpenRestriction().ifPresent(open -> open.accept(this));
           }
         }
 

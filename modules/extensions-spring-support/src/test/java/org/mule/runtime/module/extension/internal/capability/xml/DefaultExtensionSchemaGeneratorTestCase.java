@@ -145,7 +145,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
     };
 
     return extensions.stream()
-        .map(e -> new Object[] {createExtensionModel.apply(e.getExtensionClass(), e.getLoader()), e.getFileName()})
+        .map(e -> e.toTestParams(createExtensionModel))
         .collect(toList());
   }
 
@@ -246,6 +246,11 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
 
     String getFileName() {
       return fileName;
+    }
+
+    public Object[] toTestParams(BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel) {
+      final ExtensionModel extensionModel = createExtensionModel.apply(getExtensionClass(), getLoader());
+      return new Object[] {extensionModel, getFileName()};
     }
   }
 }
