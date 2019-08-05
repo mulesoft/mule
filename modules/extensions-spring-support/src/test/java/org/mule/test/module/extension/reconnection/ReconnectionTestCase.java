@@ -6,15 +6,22 @@
  */
 package org.mule.test.module.extension.reconnection;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.tck.probe.PollingProber.check;
+
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,6 +74,32 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
             .isPresent();
       }
     });
+  }
+
+  @Test
+  public void getRetryPolicyTemplateFromConfig() throws Exception {
+    RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getReconnectionFromConfig").run()
+        .getMessage().getPayload().getValue();
+
+    assertRetryTemplate(template, false, 3, 1000);
+  }
+
+  @Test
+  public void getInlineRetryPolicyTemplate() throws Exception {
+    RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnection").run()
+        .getMessage().getPayload().getValue();
+
+    assertRetryTemplate(template, false, 30, 50);
+  }
+
+  private void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
+    assertThat(template.isAsync(), is(async));
+
+    RetryPolicy policy = template.createRetryInstance();
+
+    assertThat(getFieldValue(policy, "count", false), is(count));
+    Duration duration = getFieldValue(policy, "frequency", false);
+    assertThat(duration.toMillis(), is(freq));
   }
 
   private void switchConnection() throws Exception {

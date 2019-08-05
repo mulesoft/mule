@@ -9,16 +9,16 @@ package org.mule.runtime.core.api.retry.policy;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.scheduler.Scheduler;
 
-import org.reactivestreams.Publisher;
-
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import org.reactivestreams.Publisher;
 
 /**
  * A RetryPolicy takes some action each time an exception occurs and returns a {@link PolicyStatus} which indicates whether the
@@ -36,19 +36,52 @@ public interface RetryPolicy {
   PolicyStatus applyPolicy(Throwable cause);
 
 
+  default <T> CompletableFuture<T> applyPolicy(Supplier<CompletableFuture<T>> futureSupplier,
+                                               Predicate<Throwable> shouldRetry,
+                                               Consumer<Throwable> onRetry,
+                                               Consumer<Throwable> onExhausted,
+                                               Function<Throwable, Throwable> errorFunction,
+                                               Scheduler retryScheduler) {
+
+    CompletableFuture<T> completedFuture = new CompletableFuture<>();
+    try {
+      CompletableFuture<T> retry = futureSupplier.get();
+      retry.whenComplete((v, e) -> {
+        if (e != null) {
+          try {
+            e = errorFunction.apply(unwrap(e));
+            onExhausted.accept(e);
+          } finally {
+            completedFuture.completeExceptionally(e);
+          }
+        } else {
+          completedFuture.complete(v);
+        }
+      });
+    } catch (Throwable t) {
+      try {
+        t = errorFunction.apply(unwrap(t));
+        onExhausted.accept(t);
+      } finally {
+        completedFuture.completeExceptionally(t);
+      }
+    }
+
+    return completedFuture;
+  }
+
   /**
    * Applies the retry policy in a non blocking manner by transforming the given {@code publisher} into one configured to apply
    * the retry logic.
    *
-   * @param publisher a publisher with the items which might fail
-   * @param shouldRetry a predicate which evaluates each item to know if it should be retried or not
-   * @param onExhausted an action to perform when the retry action has been exhausted
+   * @param publisher     a publisher with the items which might fail
+   * @param shouldRetry   a predicate which evaluates each item to know if it should be retried or not
+   * @param onExhausted   an action to perform when the retry action has been exhausted
    * @param errorFunction function used to map cause exception to exception emitted by retry policy.
-   * @param <T> the generic type of the publisher's content
+   * @param <T>           the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.0
-   *
-   * @deprecated Use {@link #applyPolicy(Publisher, Predicate, Consumer, Function, Optional)} instead
+   * @deprecated Use {@link #applyPolicy(Publisher, Predicate, Consumer, Function, Scheduler)} instead
    */
   @Deprecated
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
@@ -62,12 +95,12 @@ public interface RetryPolicy {
    * Applies the retry policy in a non blocking manner by transforming the given {@code publisher} into one configured to apply
    * the retry logic.
    *
-   * @param publisher a publisher with the items which might fail
-   * @param shouldRetry a predicate which evaluates each item to know if it should be retried or not
-   * @param onExhausted an action to perform when the retry action has been exhausted
-   * @param errorFunction function used to map cause exception to exception emitted by retry policy.
+   * @param publisher      a publisher with the items which might fail
+   * @param shouldRetry    a predicate which evaluates each item to know if it should be retried or not
+   * @param onExhausted    an action to perform when the retry action has been exhausted
+   * @param errorFunction  function used to map cause exception to exception emitted by retry policy.
    * @param retryScheduler the scheduler to use when retrying. If empty, an internal reactor Scheduler will be used.
-   * @param <T> the generic type of the publisher's content
+   * @param <T>            the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.2
    */
@@ -82,5 +115,4 @@ public interface RetryPolicy {
       return errorFunction.apply(e);
     });
   }
-
 }

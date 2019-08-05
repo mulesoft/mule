@@ -6,9 +6,8 @@
  */
 package org.mule.extension.test.extension.reconnection;
 
-import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Extension;
 
 
 /**
@@ -16,7 +15,6 @@ import org.mule.runtime.extension.api.annotation.Operations;
  * and sources are going to be declared.
  */
 @Extension(name = "reconnection")
-@Operations(ReconnectionOperations.class)
 @Configurations(ReconnectionConfiguration.class)
 public class ReconnectionExtension {
 
