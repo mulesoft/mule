@@ -5,7 +5,7 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.modules</groupId>
-        <version>3.9.5-SNAPSHOT</version>
+        <version>3.9.4-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-reboot</artifactId>
     <packaging>jar</packaging>
