@@ -120,8 +120,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
 
         Mono<T> retryMono = from(publisher)
             .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler)
-                           .doOnRetry(retryContext -> LOGGER.info("Retrying execution of event, attempt {} of {}.", retryContext.iteration(),
-                                                                  count != RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited")))
+                .doOnRetry(retryContext -> LOGGER.info("Retrying execution of event, attempt {} of {}.", retryContext.iteration(),
+                                                       count != RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited")))
             .doOnError(e2 -> {
               LOGGER.info("Retry attempts exhausted. Failing...");
               onExhausted.accept(unwrap(e2));
@@ -146,9 +146,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
     } else {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info(
-            "Waiting for " + frequency.toMillis() + "ms before reconnecting. Failed attempt "
-                + (retryCounter.current().get() + 1)
-                + " of " + (count != RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited"));
+                    "Waiting for " + frequency.toMillis() + "ms before reconnecting. Failed attempt "
+                        + (retryCounter.current().get() + 1)
+                        + " of " + (count != RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited"));
       }
 
       try {

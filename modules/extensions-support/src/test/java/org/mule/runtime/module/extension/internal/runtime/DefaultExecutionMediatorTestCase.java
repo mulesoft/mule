@@ -394,15 +394,20 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     setInterceptors((Interceptable) operationExecutor);
 
     defineOrder(interceptor);
+
+    int expectedRetries = retryPolicy instanceof SimpleRetryPolicyTemplate
+        ? RETRY_COUNT + 1
+        : 1;
+
     assertException(exception -> {
       assertThat(exception, instanceOf(ConnectionException.class));
       try {
-        verify(interceptor, times(RETRY_COUNT + 1)).before(operationContext);
+        verify(interceptor, times(expectedRetries)).before(operationContext);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-      verify(interceptor, times(RETRY_COUNT + 1)).onError(same(operationContext), anyVararg());
-      verify(interceptor, times(RETRY_COUNT + 1)).after(operationContext, null);
+      verify(interceptor, times(expectedRetries)).onError(same(operationContext), anyVararg());
+      verify(interceptor, times(expectedRetries)).after(operationContext, null);
     });
   }
 

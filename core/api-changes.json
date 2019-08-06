@@ -3,6 +3,33 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate.NoRetryPolicy::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "NoRetryPolicy",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Back porting to fix several reconnection issues"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.RetryPolicy::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicy",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Back porting to fix several reconnection issues"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.exception.EventProcessingException org.mule.runtime.core.privileged.exception.MessagingExceptionUtils::createMessagingException(org.mule.runtime.core.api.event.CoreEvent, java.lang.Throwable)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "MessagingExceptionUtils",
+          "methodName": "createMessagingException",
+          "elementKind": "method",
+          "justification": "Back porting to fix several reconnection issues"
+        },
+        {
           "code": "java.class.added",
           "new": "enum org.mule.runtime.core.api.construct.BackPressureReason",
           "package": "org.mule.runtime.core.api.construct",
