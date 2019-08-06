@@ -3,6 +3,80 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate.NoRetryPolicy::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "NoRetryPolicy",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Back porting to fix several reconnection issues"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.RetryPolicy::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicy",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Back porting to fix several reconnection issues"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.exception.EventProcessingException org.mule.runtime.core.privileged.exception.MessagingExceptionUtils::createMessagingException(org.mule.runtime.core.api.event.CoreEvent, java.lang.Throwable)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "MessagingExceptionUtils",
+          "methodName": "createMessagingException",
+          "elementKind": "method",
+          "justification": "Back porting to fix several reconnection issues"
+        },
+        {
+          "code": "java.class.added",
+          "new": "enum org.mule.runtime.core.api.construct.BackPressureReason",
+          "package": "org.mule.runtime.core.api.construct",
+          "classSimpleName": "BackPressureReason",
+          "elementKind": "enum",
+          "justification": "MULE-17257: Add more detail to FlowBackpressureException"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method boolean org.mule.runtime.core.api.processor.Sink::emit(org.mule.runtime.core.api.event.CoreEvent)",
+          "new": "method org.mule.runtime.core.api.construct.BackPressureReason org.mule.runtime.core.api.processor.Sink::emit(org.mule.runtime.core.api.event.CoreEvent)",
+          "oldType": "boolean",
+          "newType": "org.mule.runtime.core.api.construct.BackPressureReason",
+          "package": "org.mule.runtime.core.api.processor",
+          "classSimpleName": "Sink",
+          "methodName": "emit",
+          "elementKind": "method",
+          "justification": "MULE-17257: Add more detail to FlowBackpressureException"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.core.api.construct.BackPressureReason org.mule.runtime.core.api.processor.strategy.ProcessingStrategy::checkBackpressureEmitting(org.mule.runtime.core.api.event.CoreEvent)",
+          "package": "org.mule.runtime.core.api.processor.strategy",
+          "classSimpleName": "ProcessingStrategy",
+          "methodName": "checkBackpressureEmitting",
+          "elementKind": "method",
+          "justification": "MULE-17257: Add more detail to FlowBackpressureException"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.streaming.DefaultStreamingManager::manage(java.io.Closeable, org.mule.runtime.api.event.EventContext)",
+          "package": "org.mule.runtime.core.api.streaming",
+          "classSimpleName": "DefaultStreamingManager",
+          "methodName": "manage",
+          "elementKind": "method",
+          "justification": "Necessary to fix a bug"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "buildNewChainWithListOfProcessors",
+          "elementKind": "method",
+          "justification": "MULE-16984 - Interception API: Smart connectors inside scopes are not skipped properly"
+        },
+        {
           "code": "java.field.addedStaticField",
           "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_AUTH_CODE_HANDLER",
           "package": "org.mule.runtime.core.api.config",
