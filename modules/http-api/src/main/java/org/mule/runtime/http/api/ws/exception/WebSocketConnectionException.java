@@ -8,13 +8,13 @@ package org.mule.runtime.http.api.ws.exception;
 
 import org.mule.runtime.http.api.ws.WebSocket;
 
-public class WebSocketClosedException extends AbstractWebSocketRuntimeException {
+public class WebSocketConnectionException extends AbstractWebSocketRuntimeException {
 
-  public WebSocketClosedException(WebSocket webSocket) {
+  public WebSocketConnectionException(WebSocket webSocket) {
     this(webSocket, null);
   }
 
-  public WebSocketClosedException(WebSocket webSocket, Throwable cause) {
-    super("WebSocket " + webSocket.getId() + " has already been closed.", webSocket, cause);
+  public WebSocketConnectionException(WebSocket webSocket, Throwable cause) {
+    super("WebSocket " + webSocket.getId() + " connection is not usable.", webSocket, cause);
   }
 }

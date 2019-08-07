@@ -20,7 +20,11 @@ public abstract class AbstractWebSocketRuntimeException extends MuleRuntimeExcep
   protected transient WebSocket webSocket;
 
   public AbstractWebSocketRuntimeException(String message, WebSocket webSocket) {
-    super(createStaticMessage(message));
+    this(message, webSocket, null);
+  }
+
+  public AbstractWebSocketRuntimeException(String message, WebSocket webSocket, Throwable cause) {
+    super(createStaticMessage(message), cause);
     this.webSocketId = webSocket.getId();
     this.webSocket = webSocket;
   }

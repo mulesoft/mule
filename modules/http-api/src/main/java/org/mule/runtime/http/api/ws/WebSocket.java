@@ -102,4 +102,6 @@ public interface WebSocket {
    * @return a {@link CompletableFuture}
    */
   CompletableFuture<Void> close(WebSocketCloseCode code, String reason);
+
+  boolean isClosed();
 }
