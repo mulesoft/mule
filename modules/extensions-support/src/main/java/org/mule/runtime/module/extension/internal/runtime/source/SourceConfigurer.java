@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.source.SchedulerProvider.getScheduler;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
@@ -51,6 +52,7 @@ public final class SourceConfigurer {
   private final ExpressionManager expressionManager;
   private final ConfigurationProperties properties;
   private final MuleContext muleContext;
+  private final boolean restarting;
 
   /**
    * Create a new instance
@@ -64,12 +66,30 @@ public final class SourceConfigurer {
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
                           ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext) {
+    this(model, componentLocation, resolverSet, expressionManager, properties, muleContext, false);
+  }
+
+  /**
+   * Create a new instance
+   *
+   * @param model             the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)} method will
+   *                          accept
+   * @param resolverSet       the {@link ResolverSet} used to resolve the parameters
+   * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
+   * @param properties        deployment configuration properties
+   * @param muleContext       the current {@link MuleContext}
+   * @param restarting        indicates if the source is being created after a restart or not.
+   */
+  public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
+                          ExpressionManager expressionManager, ConfigurationProperties properties, MuleContext muleContext,
+                          boolean restarting) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
     this.expressionManager = expressionManager;
     this.properties = properties;
     this.muleContext = muleContext;
+    this.restarting = restarting;
   }
 
   /**
@@ -115,7 +135,7 @@ public final class SourceConfigurer {
           }
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
-          Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
+          Scheduler scheduler = getScheduler(context, valueResolver, restarting);
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }
@@ -137,5 +157,4 @@ public final class SourceConfigurer {
   private Boolean lazyInit() {
     return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
-
 }
