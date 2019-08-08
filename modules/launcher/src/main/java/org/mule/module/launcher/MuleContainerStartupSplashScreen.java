@@ -20,7 +20,6 @@ import org.mule.util.SplashScreen;
 import org.mule.util.StringUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
@@ -93,16 +92,9 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
         File patchesDirectory = getUserLibFolder();
         if (patchesDirectory != null && patchesDirectory.exists())
         {
-            String[] patches = patchesDirectory.list(new FilenameFilter()
-            {
-                @Override
-                public boolean accept(File dir, String name)
-                {
-                    return name.startsWith("SE-");
-                }
-            });
+            String[] patches = patchesDirectory.list();
             sort(patches);
-            listItems(asList(patches), "Applied patches:");
+            listItems(asList(patches), "Applied patches and libraries:");
         }
     }
 
