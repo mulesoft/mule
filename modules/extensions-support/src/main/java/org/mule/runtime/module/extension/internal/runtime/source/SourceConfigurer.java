@@ -10,7 +10,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.source.SchedulerProvider.getScheduler;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
@@ -135,7 +134,10 @@ public final class SourceConfigurer {
           }
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
-          Scheduler scheduler = getScheduler(context, valueResolver, restarting);
+          Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
+          if (restarting) {
+            scheduler = PollingSourceRestartSchedulerProvider.getScheduler(scheduler);
+          }
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }
