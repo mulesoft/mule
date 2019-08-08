@@ -73,6 +73,7 @@ public interface WebSocket {
    * method.
    *
    * @return Whether reconnection is supported for {@code this} instance.
+   * @since 4.2.2
    */
   boolean supportsReconnection();
 
@@ -97,6 +98,7 @@ public interface WebSocket {
    * @param retryPolicyTemplate the retry policy to use while reconnecting
    * @param scheduler           the scheduler on which reconnection work should happen
    * @return a {@link CompletableFuture} with the newly generated {@link WebSocket}
+   * @since 4.2.2
    */
   CompletableFuture<WebSocket> reconnect(RetryPolicyTemplate retryPolicyTemplate, Scheduler scheduler);
 
@@ -145,6 +147,7 @@ public interface WebSocket {
    * both methods.
    *
    * @return Whether this socket has been closed or not
+   * @since 4.2.2
    */
   boolean isClosed();
 
@@ -156,6 +159,7 @@ public interface WebSocket {
    * both methods.
    *
    * @return Whether this socket's connection is still active.
+   * @since 4.2.2
    */
   boolean isConnected();
 }

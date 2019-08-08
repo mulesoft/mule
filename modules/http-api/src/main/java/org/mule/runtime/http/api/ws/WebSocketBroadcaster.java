@@ -38,7 +38,7 @@ public interface WebSocketBroadcaster {
    * @param sockets       the {@link WebSocket sockets} to broadcast to
    * @param content       the content to be sent
    * @param errorCallback an error notification callback. It will be invoked once per failing socket
-   * @return a {@link CompletableFuture} to be completed when the message has been broadcasted to all {@code sockets}
+   * @return a {@link CompletableFuture} to be completed when the message has been broadcast to all {@code sockets}
    */
   CompletableFuture<Void> broadcast(Collection<WebSocket> sockets,
                                     TypedValue<InputStream> content,
@@ -51,7 +51,7 @@ public interface WebSocketBroadcaster {
    * socket N fails, communication with all the remaining N + M sockets will still be attempted. The callback
    * will be invoked once per failing socket.
    * <p>
-   * Sockets that are either closed will be discarded.
+   * Sockets that are either closed or have lost connection will be discarded.
    * <p>
    * Socket that have lost connection to the remote system and support reconnection will be reconnected using the
    * given {@code retryPolicyTemplate} and {@code reconnectionScheduler}
@@ -59,7 +59,8 @@ public interface WebSocketBroadcaster {
    * @param sockets       the {@link WebSocket sockets} to broadcast to
    * @param content       the content to be sent
    * @param errorCallback an error notification callback. It will be invoked once per failing socket
-   * @return a {@link CompletableFuture} to be completed when the message has been broadcasted to all {@code sockets}
+   * @return a {@link CompletableFuture} to be completed when the message has been broadcast to all {@code sockets}
+   * @since 4.2.2
    */
   CompletableFuture<Void> broadcast(Collection<WebSocket> sockets,
                                     TypedValue<InputStream> content,
