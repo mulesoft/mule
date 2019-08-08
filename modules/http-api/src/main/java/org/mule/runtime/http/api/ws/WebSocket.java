@@ -8,6 +8,8 @@ package org.mule.runtime.http.api.ws;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.server.HttpServer;
 
@@ -65,6 +67,10 @@ public interface WebSocket {
    * @return The {@link URI} of the endpoint that received the originating HTTP request.
    */
   URI getUri();
+
+  boolean supportsReconnection();
+
+  CompletableFuture<WebSocket> reconnect(RetryPolicyTemplate retryPolicyTemplate, Scheduler scheduler);
 
   /**
    * @return an immutable list with the groups to which {@code this} socket belongs to. Maybe empty but never null.
