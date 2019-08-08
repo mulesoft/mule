@@ -20,9 +20,13 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 {
     private static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
     private static final String SECOND_PATCH = "SE-9999-3.7.3.jar";
-    private static final String COMPLEX_LOG_PART = "* Applied patches:                                                   *\n" +
+    private static final String MULE_PATCH = "MULE-1234-3.8.1.jar";
+    private static final String USER_LIBRARY = "library.jar";
+    private static final String COMPLEX_LOG_PART = "* Applied patches and libraries:                                     *\n" +
+                                                   "*  - " + MULE_PATCH + "                                             *\n" +
                                                    "*  - " + FIRST_PATCH + "                                               *\n" +
                                                    "*  - " + SECOND_PATCH + "                                               *\n" +
+                                                   "*  - " + USER_LIBRARY + "                                                     *\n" +
                                                    "* Mule system properties:                                            *\n";
 
     @BeforeClass
@@ -31,8 +35,9 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
         File libFolder = newFile(workingDirectory.getRoot(), "lib/user");
         libFolder.mkdirs();
         newFile(libFolder, FIRST_PATCH).mkdir();
-        newFile(libFolder, "library.jar").mkdir();
+        newFile(libFolder, USER_LIBRARY).mkdir();
         newFile(libFolder, SECOND_PATCH).mkdir();
+        newFile(libFolder, MULE_PATCH).mkdir();
     }
 
     @Before
