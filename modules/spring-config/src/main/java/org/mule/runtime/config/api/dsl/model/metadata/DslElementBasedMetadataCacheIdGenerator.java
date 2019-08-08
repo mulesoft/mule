@@ -153,7 +153,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
     return ((ComponentModel) elementModel.getModel()).getModelProperty(MetadataKeyIdModelProperty.class)
         .map(mp -> mp.getCategoryName().orElse(null))
-        .map(name -> new MetadataCacheId(name.hashCode(), "category:" + name));
+        .map(this::createCategoryMetadataCacheId);
   }
 
   private Optional<MetadataCacheId> doResolveType(DslElementModel<?> component,
@@ -165,10 +165,10 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
       typeInformation.getResolverCategory()
           .ifPresent(resolverCategory -> keyParts
-              .add(new MetadataCacheId(resolverCategory.hashCode(), "category:" + resolverCategory)));
+              .add(createCategoryMetadataCacheId(resolverCategory)));
 
       typeInformation.getResolverName()
-          .ifPresent(resolverName -> keyParts.add(new MetadataCacheId(resolverName.hashCode(), "resolver:" + resolverName)));
+          .ifPresent(resolverName -> keyParts.add(createResolverMetadataCacheId(resolverName)));
 
       Object model = component.getModel();
       if (model instanceof ComponentModel) {
@@ -286,8 +286,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
         .orElse(null);
 
     if (keyResolver != null) {
-      keyParts.add(new MetadataCacheId(keyResolver.getCategoryName().hashCode(), "category: " + keyResolver.getCategoryName()));
-      keyParts.add(new MetadataCacheId(keyResolver.getResolverName().hashCode(), "resolver: " + keyResolver.getResolverName()));
+      keyParts.add(createCategoryMetadataCacheId(keyResolver.getCategoryName()));
+      keyParts.add(createResolverMetadataCacheId(keyResolver.getResolverName()));
     }
 
     boolean isPartialFetching = keyResolver instanceof PartialTypeKeysResolver;
@@ -374,6 +374,14 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     }
 
     return of(reference.get() == null ? valuePart : reference.get());
+  }
+
+  private MetadataCacheId createCategoryMetadataCacheId(String category) {
+    return new MetadataCacheId(category.hashCode(), "category: " + category);
+  }
+
+  private MetadataCacheId createResolverMetadataCacheId(String resolverName) {
+    return new MetadataCacheId(resolverName.hashCode(), "resolver: " + resolverName);
   }
 
   private Optional<MetadataCacheId> getHashedGlobal(String name) {
