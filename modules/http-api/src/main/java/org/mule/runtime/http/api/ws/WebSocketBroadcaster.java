@@ -32,6 +32,8 @@ public interface WebSocketBroadcaster {
    * An {@code errorCallback} is used to notify errors while broadcasting. If is communication with
    * socket N fails, communication with all the remaining N + M sockets will still be attempted. The callback
    * will be invoked once per failing socket.
+   * <p>
+   * Sockets that are either closed or have lost connection will be discarded.
    *
    * @param sockets       the {@link WebSocket sockets} to broadcast to
    * @param content       the content to be sent
@@ -42,6 +44,23 @@ public interface WebSocketBroadcaster {
                                     TypedValue<InputStream> content,
                                     BiConsumer<WebSocket, Throwable> errorCallback);
 
+  /**
+   * Broadcast the {@code content} to the given {@code sockets}.
+   * <p>
+   * An {@code errorCallback} is used to notify errors while broadcasting. If is communication with
+   * socket N fails, communication with all the remaining N + M sockets will still be attempted. The callback
+   * will be invoked once per failing socket.
+   * <p>
+   * Sockets that are either closed will be discarded.
+   * <p>
+   * Socket that have lost connection to the remote system and support reconnection will be reconnected using the
+   * given {@code retryPolicyTemplate} and {@code reconnectionScheduler}
+   *
+   * @param sockets       the {@link WebSocket sockets} to broadcast to
+   * @param content       the content to be sent
+   * @param errorCallback an error notification callback. It will be invoked once per failing socket
+   * @return a {@link CompletableFuture} to be completed when the message has been broadcasted to all {@code sockets}
+   */
   CompletableFuture<Void> broadcast(Collection<WebSocket> sockets,
                                     TypedValue<InputStream> content,
                                     BiConsumer<WebSocket, Throwable> errorCallback,
