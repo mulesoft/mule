@@ -34,6 +34,7 @@ import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
@@ -73,6 +74,7 @@ import org.mule.runtime.deployment.model.internal.application.MuleApplicationCla
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -2303,6 +2305,54 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
       assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
       assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/slf4j/BarUtils"));
     }
+  }
+
+  @Test
+  public void deployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    // Deploy an application (packed)
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(
+                                                                 dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(
+                                                                   dummyAppDescriptorFileBuilder.getId());
+
+    // Redeploy by using deploy method
+    deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+
+    // Application was redeployed
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
+                                                                   dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
+  public void deployMethodRedeploysIfApplicationIsAlreadyDeployedExploded() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    // Deploy an application (exploded)
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(
+                                                                 dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(
+                                                                   dummyAppDescriptorFileBuilder.getId());
+
+    // Redeploy by using deploy method
+    deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+
+    // Application was redeployed
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
+                                                                   dummyAppDescriptorFileBuilder.getId());
   }
 
   protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
