@@ -11,6 +11,17 @@
           "classSimpleName": "OptimizedCaseInsensitiveMapWrapper",
           "elementKind": "class",
           "justification": "This was a bad implementation, will remove this after cherry-pick."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.http.api.ws.WebSocketBroadcaster",
+          "new": "interface org.mule.runtime.http.api.ws.WebSocketBroadcaster",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketBroadcaster",
+          "elementKind": "interface",
+          "justification": "Annotation was missing"
         }
       ]
     }

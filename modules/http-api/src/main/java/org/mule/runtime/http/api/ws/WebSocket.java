@@ -68,8 +68,36 @@ public interface WebSocket {
    */
   URI getUri();
 
+  /**
+   * Tests if {@code this} socket supports reconnection by the means of the {@link #reconnect(RetryPolicyTemplate, Scheduler)}
+   * method.
+   *
+   * @return Whether reconnection is supported for {@code this} instance.
+   */
   boolean supportsReconnection();
 
+  /**
+   * Reconnects by opening a new {@link WebSocket} generated from an HTTP request identical to the one that originally spawned
+   * {@code this} one. The new WebSocket will have <b>THE SAME</b> {@link #getId()} as the original instance.
+   * <p>
+   * The term reconnection is not to be interpreted here as in the &quot;socket MUST have had a connectivity issue first&quot;.
+   * Although recovering from connectivity issues is one of the prime uses of this method, that is not a prerequisite. Invoking
+   * this method on a perfectly functioning instance will just spawn a new WebSocket connected to the same remote system. However,
+   * be mindful that the new WebSocket will share the same id as this one. Having two active sockets with the same ID might be
+   * problematic depending on the use case.
+   * <p>
+   * This method does not alter the current state of {@code this} instance. It merely generates a new WebSocket similar to
+   * this one.
+   * <p>
+   * Not all implementations are required to support this method as it's not possible to do in some cases. The general contract
+   * is that this method should only be called when {@link #supportsReconnection()} returns {@code true}. Invoking this method
+   * on an implementation that doesn't support it will result in a {@link CompletableFuture} immediately and exceptionally
+   * completed with an {@link javax.naming.OperationNotSupportedException}.
+   *
+   * @param retryPolicyTemplate the retry policy to use while reconnecting
+   * @param scheduler           the scheduler on which reconnection work should happen
+   * @return a {@link CompletableFuture} with the newly generated {@link WebSocket}
+   */
   CompletableFuture<WebSocket> reconnect(RetryPolicyTemplate retryPolicyTemplate, Scheduler scheduler);
 
   /**
@@ -109,5 +137,25 @@ public interface WebSocket {
    */
   CompletableFuture<Void> close(WebSocketCloseCode code, String reason);
 
+  /**
+   * Tests whether the {@link #close(WebSocketCloseCode, String)} method has been called on {@code this} instance or not.
+   * <p>
+   * Notice that this method differs from {@link #isConnected()} in that even though the socket might not have been closed,
+   * it might still have lost its connection to the remote system. There's no forced correlation between the output values of
+   * both methods.
+   *
+   * @return Whether this socket has been closed or not
+   */
   boolean isClosed();
+
+  /**
+   * Tests whether this socket's connection to the remote system is still active.
+   * <p>
+   * Notice that this method differs from {@link #isConnected()} in that even though the socket might not have been closed,
+   * it might still have lost its connection to the remote system. There's no forced correlation between the output values of
+   * both methods.
+   *
+   * @return Whether this socket's connection is still active.
+   */
+  boolean isConnected();
 }

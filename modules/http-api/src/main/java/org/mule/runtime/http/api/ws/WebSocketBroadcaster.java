@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.http.api.ws;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -15,11 +18,12 @@ import java.util.function.BiConsumer;
 
 /**
  * Broadcasts a given content to a group of supplied {@link WebSocket sockets}.
- *
+ * <p>
  * Instances are not to be assumed reusable.
  *
  * @since 4.2.0
  */
+@NoImplement
 public interface WebSocketBroadcaster {
 
   /**
@@ -37,4 +41,10 @@ public interface WebSocketBroadcaster {
   CompletableFuture<Void> broadcast(Collection<WebSocket> sockets,
                                     TypedValue<InputStream> content,
                                     BiConsumer<WebSocket, Throwable> errorCallback);
+
+  CompletableFuture<Void> broadcast(Collection<WebSocket> sockets,
+                                    TypedValue<InputStream> content,
+                                    BiConsumer<WebSocket, Throwable> errorCallback,
+                                    RetryPolicyTemplate retryPolicyTemplate,
+                                    Scheduler reconnectionScheduler);
 }
