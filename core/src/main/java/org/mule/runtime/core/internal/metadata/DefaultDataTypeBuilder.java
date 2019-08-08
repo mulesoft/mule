@@ -25,7 +25,6 @@ import org.mule.runtime.api.metadata.FunctionDataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.util.ClassUtils;
 
@@ -589,7 +588,6 @@ public class DefaultDataTypeBuilder
     consumableClasses.add(InputStream.class);
     consumableClasses.add(Reader.class);
     consumableClasses.add(Iterator.class);
-    consumableClasses.add(CursorProvider.class);
   }
 
   private static void addToConsumableClasses(String className) {
