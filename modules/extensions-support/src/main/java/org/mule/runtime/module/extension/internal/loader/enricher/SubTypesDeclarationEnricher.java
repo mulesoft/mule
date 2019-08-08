@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
@@ -66,7 +65,7 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
   private void declareSubTypesMapping(ExtensionDeclarer declarer, List<AnnotationValueFetcher<SubTypeMapping>> typeMappings,
                                       String name) {
     if (typeMappings.stream().map(valueFetcher -> valueFetcher.getClassValue(SubTypeMapping::baseType)).distinct()
-        .collect(toList()).size() != typeMappings.size()) {
+        .count() != typeMappings.size()) {
       throw new IllegalModelDefinitionException(String
           .format("There should be only one SubtypeMapping for any given base type in extension [%s]."
               + " Duplicated base types are not allowed", name));
