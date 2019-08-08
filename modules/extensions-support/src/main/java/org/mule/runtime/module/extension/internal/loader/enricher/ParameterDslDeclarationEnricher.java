@@ -8,10 +8,9 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.supportsInlineDeclaration;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.typeRequiresWrapperElement;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isReferableType;
-
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -39,12 +38,9 @@ import org.mule.runtime.extension.api.property.InfrastructureParameterModelPrope
  */
 public class ParameterDslDeclarationEnricher implements DeclarationEnricher {
 
-  /**
-   * This has to run in the same phase as {@link SubTypesDeclarationEnricher}.
-   */
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
-    return STRUCTURE;
+    return POST_STRUCTURE;
   }
 
   @Override
