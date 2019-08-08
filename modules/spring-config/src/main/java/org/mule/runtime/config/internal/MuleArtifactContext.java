@@ -34,6 +34,7 @@ import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -147,11 +148,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final DefaultResourceLocator resourceLocator;
   protected ApplicationModel applicationModel;
   protected MuleContextWithRegistry muleContext;
-  private ConfigResource[] artifactConfigResources;
+  private final ConfigResource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-  private ArtifactType artifactType;
-  private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
+  private final ArtifactType artifactType;
+  private final List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
     try {
       BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(componentName);
@@ -457,16 +458,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           return;
         }
 
-        SpringComponentModel parentComponentModel = componentModel.getParent() != null
-            ? (SpringComponentModel) componentModel.getParent()
-            : (SpringComponentModel) applicationModel.getRootComponentModel();
-
         if (componentModel.isEnabled() || alwaysEnabledUnnamedTopLevelComponents.contains(componentModel.getIdentifier())) {
           if (componentModel.getNameAttribute() != null && componentModel.isRoot()) {
             createdComponentModels.add(componentModel.getNameAttribute());
           }
           beanDefinitionFactory
-              .resolveComponentRecursively(parentComponentModel, componentModel, beanFactory,
+              .resolveComponentRecursively(componentModel, beanFactory,
                                            (resolvedComponentModel, registry) -> {
                                              SpringComponentModel resolvedSpringComponentModel =
                                                  (SpringComponentModel) resolvedComponentModel;
@@ -492,7 +489,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                            }, null, componentLocator);
 
         } else {
-          beanDefinitionFactory.resolveComponentRecursively(parentComponentModel, componentModel, beanFactory, null, null,
+          beanDefinitionFactory.resolveComponentRecursively(componentModel, beanFactory, null, null,
                                                             componentLocator);
         }
         componentLocator.addComponentLocation(cm.getComponentLocation());
