@@ -8,13 +8,16 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.extension.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.runtime.extension.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.CONSISTENCY;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addPrimaryNodeParameter;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.annotation.source.SourceClusterSupport;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
@@ -28,6 +31,11 @@ import java.util.Optional;
  * @since 4.1
  */
 public class ClusterSupportEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return CONSISTENCY;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
