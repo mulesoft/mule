@@ -131,6 +131,54 @@ public interface WebSocket {
   CompletableFuture<Void> send(InputStream content, MediaType mediaType);
 
   /**
+   * Sends the given frame in its binary representation.
+   * <p>
+   * The {@code frameBytes} passed here are not a binary payload but the complete DataFrame that gets sent through the
+   * wire per the WebSockets specification. This method is useful when the exact same content has to be sent many times
+   * and the actual frame is cached as a performance improvement.
+   * <p>
+   * The {@code frameBytes} can be (but are not forced to) be generated through the {@link #toTextFrame(String, boolean)} and
+   * {@link #toBinaryFrame(byte[], boolean)} methods
+   *
+   * @param frameBytes a data frame per the WebSocket specification
+   * @return a {@link CompletableFuture}
+   * @since 4.2.2
+   */
+  CompletableFuture<Void> sendFrame(byte[] frameBytes);
+
+  /**
+   * Transforms the given {@code data} into a text data frame per the WebSockets specification.
+   * <p>
+   * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just
+   * a mare binary representation of the {@code data}.
+   * <p>
+   * The returned frame is to be sent through the {@link #sendFrame(byte[])} method. Using this frame as input of the
+   * {@link #send(InputStream, MediaType)} method will result in a frame wrapping another frame.
+   *
+   * @param data text to be sent
+   * @param last whether the returned frame is the last in a chain of correlated frames
+   * @return A text data frame per the WebSockets specification
+   * @since 4.2.2
+   */
+  byte[] toTextFrame(String data, boolean last);
+
+  /**
+   * Transforms the given {@code data} into a binary data frame per the WebSockets specification.
+   * <p>
+   * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just
+   * a mare binary representation of the {@code data}.
+   * <p>
+   * The returned frame is to be sent through the {@link #sendFrame(byte[])} method. Using this frame as input of the
+   * {@link #send(InputStream, MediaType)} method will result in a frame wrapping another frame.
+   *
+   * @param data binary data to be sent
+   * @param last whether the returned frame is the last in a chain of correlated frames
+   * @return A binary data frame per the WebSockets specification
+   * @since 4.2.2
+   */
+  byte[] toBinaryFrame(byte[] data, boolean last);
+
+  /**
    * Closes {@code this} socket
    *
    * @param code   {@link WebSocketCloseCode} the close code
