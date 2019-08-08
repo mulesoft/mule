@@ -197,9 +197,9 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     resolveCategoryId(elementModel)
         .ifPresent(keyParts::add);
 
-    if(isComponentResolution) {
+    if (isComponentResolution) {
       resolveDslTagId(elementModel)
-              .ifPresent(keyParts::add);
+          .ifPresent(keyParts::add);
     }
 
     Object model = elementModel.getModel();
@@ -282,10 +282,10 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     List<MetadataCacheId> keyParts = new ArrayList<>();
 
     final TypeKeysResolver keyResolver = componentModel.getModelProperty(MetadataResolverFactoryModelProperty.class)
-            .map(mp -> mp.getMetadataResolverFactory().getKeyResolver())
-            .orElse(null);
+        .map(mp -> mp.getMetadataResolverFactory().getKeyResolver())
+        .orElse(null);
 
-    if(keyResolver != null) {
+    if (keyResolver != null) {
       keyParts.add(new MetadataCacheId(keyResolver.getCategoryName().hashCode(), "category: " + keyResolver.getCategoryName()));
       keyParts.add(new MetadataCacheId(keyResolver.getResolverName().hashCode(), "resolver: " + keyResolver.getResolverName()));
     }
@@ -294,12 +294,12 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
     if (isPartialFetching || resolveAllKeys) {
       componentModel.getAllParameterModels().stream()
-              .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
-              .map(metadataKeyPart -> elementModel.findElement(metadataKeyPart.getName()))
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .filter(partElement -> partElement.getValue().isPresent())
-              .forEach(partElement -> resolveKeyFromSimpleValue(partElement).ifPresent(keyParts::add));
+          .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+          .map(metadataKeyPart -> elementModel.findElement(metadataKeyPart.getName()))
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .filter(partElement -> partElement.getValue().isPresent())
+          .forEach(partElement -> resolveKeyFromSimpleValue(partElement).ifPresent(keyParts::add));
     }
 
     return keyParts.isEmpty() ? empty() : of(new MetadataCacheId(keyParts, "metadataKey"));

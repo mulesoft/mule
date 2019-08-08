@@ -111,9 +111,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   @Before
   public void setUp() throws Exception {
     extensions = ImmutableSet.<ExtensionModel>builder()
-            .add(MuleExtensionModelProvider.getExtensionModel())
-            .add(mockExtension)
-            .build();
+        .add(MuleExtensionModelProvider.getExtensionModel())
+        .add(mockExtension)
+        .build();
 
     dslResolvingContext = DslResolvingContext.getDefault(extensions);
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
@@ -129,8 +129,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     MetadataCacheIdGenerator<ComponentAst> generator = createGenerator(applicationModel);
 
     applicationModel.getRootComponentModel().getInnerComponents()
-            .forEach(component -> hashByLocation.put(component.getComponentLocation().getLocation(),
-                                                     generator.getIdForComponentMetadata((ComponentAst) component).get()));
+        .forEach(component -> hashByLocation.put(component.getComponentLocation().getLocation(),
+                                                 generator.getIdForComponentMetadata((ComponentAst) component).get()));
 
     LOGGER.debug(hashByLocation.toString());
 
@@ -138,11 +138,11 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     MetadataCacheIdGenerator<ComponentAst> otherGenerator = createGenerator(reload);
 
     reload.getRootComponentModel().getInnerComponents()
-            .forEach(component -> {
-              String location = component.getComponentLocation().getLocation();
-              MetadataCacheId previousHash = hashByLocation.get(location);
-              assertThat(previousHash, is(otherGenerator.getIdForComponentMetadata((ComponentAst) component).get()));
-            });
+        .forEach(component -> {
+          String location = component.getComponentLocation().getLocation();
+          MetadataCacheId previousHash = hashByLocation.get(location);
+          assertThat(previousHash, is(otherGenerator.getIdForComponentMetadata((ComponentAst) component).get()));
+        });
   }
 
   @Test
@@ -152,7 +152,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(cacheId.toString());
 
     ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
-            .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
+        .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
 
     MetadataCacheId otherKeyParts = getIdForComponent(declaration);
     LOGGER.debug(otherKeyParts.toString());
@@ -166,7 +166,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(cacheId.toString());
 
     ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
-            .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
+        .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
 
     MetadataCacheId otherKeyParts = getGlobalId(declaration);
     LOGGER.debug(otherKeyParts.toString());
@@ -180,12 +180,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(keyParts.toString());
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
     operationDeclaration.getParameterGroups().get(0)
-            .getParameter(CONTENT_NAME).get().setValue(ParameterSimpleValue.of("otherValue"));
+        .getParameter(CONTENT_NAME).get().setValue(ParameterSimpleValue.of("otherValue"));
 
     operationDeclaration.getParameterGroups().get(0)
-            .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
+        .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
 
     MetadataCacheId otherKeyParts = getIdForComponent(declaration);
     LOGGER.debug(otherKeyParts.toString());
@@ -199,11 +199,11 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(keyParts.toString());
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
     operationDeclaration.getParameterGroups().get(0)
-            .getParameter(CONTENT_NAME).get().setValue(ParameterSimpleValue.of("otherValue"));
+        .getParameter(CONTENT_NAME).get().setValue(ParameterSimpleValue.of("otherValue"));
     operationDeclaration.getParameterGroups().get(0)
-            .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
+        .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
 
     MetadataCacheId otherKeyParts = getGlobalId(declaration);
     LOGGER.debug(otherKeyParts.toString());
@@ -217,7 +217,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
@@ -239,7 +239,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   public void metadataCategoryModifiesGlobalHash() throws Exception {
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
@@ -248,9 +248,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(id.toString());
 
     when(operation.getModelProperty(MetadataKeyIdModelProperty.class))
-            .thenReturn(of(new MetadataKeyIdModelProperty(TYPE_LOADER.load(String.class),
-                                                          METADATA_KEY_PART_1,
-                                                          "OTHER_CATEGORY")));
+        .thenReturn(of(new MetadataKeyIdModelProperty(TYPE_LOADER.load(String.class),
+                                                      METADATA_KEY_PART_1,
+                                                      "OTHER_CATEGORY")));
 
     MetadataCacheId otherId = getGlobalId(declaration);
     LOGGER.debug(id.toString());
@@ -268,7 +268,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(keyParts.toString());
 
     List<String> parameterNames = parameterGroupModel.getParameterModels().stream()
-            .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
+        .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
 
     mockRequiredForMetadataModelProperty(configuration, parameterNames);
     mockRequiredForMetadataModelProperty(connectionProvider, parameterNames);
@@ -289,7 +289,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     LOGGER.debug(keyParts.toString());
 
     List<String> parameterNames = parameterGroupModel.getParameterModels().stream()
-            .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
+        .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
 
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, parameterNames);
@@ -364,7 +364,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
@@ -388,7 +388,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
     operationDeclaration.addParameterGroup(keyGroup);
@@ -412,7 +412,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
     operationDeclaration.addParameterGroup(keyGroup);
@@ -441,7 +441,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
     operationDeclaration.addParameterGroup(keyGroup);
@@ -469,7 +469,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
     operationDeclaration.addParameterGroup(keyGroup);
@@ -495,7 +495,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
     operationDeclaration.addParameterGroup(keyGroup);
@@ -522,12 +522,13 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ArtifactDeclaration declaration = getBaseApp();
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
+        .getComponents().get(0);
 
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
 
-    ComponentElementDeclaration anotherOperationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+    ComponentElementDeclaration anotherOperationDeclaration =
+        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
             .getComponents().get(1);
 
     ParameterElementDeclaration anotherOperationMetadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
@@ -550,8 +551,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ArtifactDeclaration declaration = getBaseApp();
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
+    ComponentElementDeclaration anotherOperationDeclaration =
+        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
             .getComponents().get(1);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
@@ -582,8 +584,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ArtifactDeclaration declaration = getBaseApp();
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
+    ComponentElementDeclaration anotherOperationDeclaration =
+        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
             .getComponents().get(1);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
@@ -621,8 +624,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ArtifactDeclaration declaration = getBaseApp();
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
+    ComponentElementDeclaration anotherOperationDeclaration =
+        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
             .getComponents().get(1);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
@@ -661,8 +665,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     ArtifactDeclaration declaration = getBaseApp();
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
+        .getComponents().get(0);
+    ComponentElementDeclaration anotherOperationDeclaration =
+        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
             .getComponents().get(1);
 
     ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
@@ -694,77 +699,76 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   private void mockRequiredForMetadataModelProperty(EnrichableModel model, List<String> parameterNames) {
     if (parameterNames == null) {
       when(model.getModelProperty(RequiredForMetadataModelProperty.class))
-              .thenReturn(empty());
-    }
-    else {
+          .thenReturn(empty());
+    } else {
       RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(parameterNames);
 
       when(model.getModelProperty(RequiredForMetadataModelProperty.class))
-              .thenReturn(of(requiredForMetadataModelProperty));
+          .thenReturn(of(requiredForMetadataModelProperty));
     }
   }
 
   private void setPartialFetchingMock(OperationModel operation) {
     when(operation.getModelProperty(MetadataResolverFactoryModelProperty.class))
-            .thenReturn(of(new MetadataResolverFactoryModelProperty(() -> new MetadataResolverFactory() {
+        .thenReturn(of(new MetadataResolverFactoryModelProperty(() -> new MetadataResolverFactory() {
 
-              @Override
-              public TypeKeysResolver getKeyResolver() {
-                TypeKeysResolver mockedResolver = mock(PartialTypeKeysResolver.class);
-                when(mockedResolver.getResolverName()).thenReturn("MOCKED_RESOLVER");
-                when(mockedResolver.getCategoryName()).thenReturn("MOCKED_RESOLVER_CATEGORY");
-                return mockedResolver;
-              }
+          @Override
+          public TypeKeysResolver getKeyResolver() {
+            TypeKeysResolver mockedResolver = mock(PartialTypeKeysResolver.class);
+            when(mockedResolver.getResolverName()).thenReturn("MOCKED_RESOLVER");
+            when(mockedResolver.getCategoryName()).thenReturn("MOCKED_RESOLVER_CATEGORY");
+            return mockedResolver;
+          }
 
-              @Override
-              public <T> InputTypeResolver<T> getInputResolver(String parameterName) {
-                return mock(InputTypeResolver.class);
-              }
+          @Override
+          public <T> InputTypeResolver<T> getInputResolver(String parameterName) {
+            return mock(InputTypeResolver.class);
+          }
 
-              @Override
-              public Collection<InputTypeResolver> getInputResolvers() {
-                return Collections.emptyList();
-              }
+          @Override
+          public Collection<InputTypeResolver> getInputResolvers() {
+            return Collections.emptyList();
+          }
 
-              @Override
-              public <T> OutputTypeResolver<T> getOutputResolver() {
-                return mock(OutputTypeResolver.class);
-              }
+          @Override
+          public <T> OutputTypeResolver<T> getOutputResolver() {
+            return mock(OutputTypeResolver.class);
+          }
 
-              @Override
-              public <T> AttributesTypeResolver<T> getOutputAttributesResolver() {
-                return mock(AttributesTypeResolver.class);
-              }
+          @Override
+          public <T> AttributesTypeResolver<T> getOutputAttributesResolver() {
+            return mock(AttributesTypeResolver.class);
+          }
 
-              @Override
-              public QueryEntityResolver getQueryEntityResolver() {
-                return mock(QueryEntityResolver.class);
-              }
-            })));
+          @Override
+          public QueryEntityResolver getQueryEntityResolver() {
+            return mock(QueryEntityResolver.class);
+          }
+        })));
   }
 
 
   private MetadataCacheId getIdForComponent(ArtifactDeclaration declaration) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(ModelBasedMetadataCacheKeyGeneratorTestCase.OPERATION_LOCATION).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(ModelBasedMetadataCacheKeyGeneratorTestCase.OPERATION_LOCATION).build())
+        .get();
     return createGenerator(app).getIdForComponentMetadata(component).get();
   }
 
   private MetadataCacheId getKeyHash(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(location).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(location).build())
+        .get();
     return createGenerator(app).getIdForMetadataKeys(component).get();
   }
 
   private MetadataCacheId getGlobalId(ArtifactDeclaration declaration) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
-            .get(Location.builderFromStringRepresentation(ModelBasedMetadataCacheKeyGeneratorTestCase.OPERATION_LOCATION).build())
-            .get();
+        .get(Location.builderFromStringRepresentation(ModelBasedMetadataCacheKeyGeneratorTestCase.OPERATION_LOCATION).build())
+        .get();
     return createGenerator(app).getIdForGlobalMetadata(component).get();
   }
 
@@ -776,48 +780,48 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   private ArtifactDeclaration getBaseApp() {
     return ElementDeclarer.newArtifact()
-            .withGlobalElement(declarer.newConfiguration(CONFIGURATION_NAME)
-                                       .withRefName(MY_CONFIG)
-                                       .withParameterGroup(newParameterGroup()
-                                                                   .withParameter(CONTENT_NAME, CONTENT_VALUE)
-                                                                   .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
-                                                                   .withParameter(LIST_NAME, newListValue().withValue(ITEM_VALUE).build())
-                                                                   .getDeclaration())
-                                       .withConnection(declarer.newConnection(CONNECTION_PROVIDER_NAME)
-                                                               .withParameterGroup(newParameterGroup()
-                                                                                           .withParameter(CONTENT_NAME, CONTENT_VALUE)
-                                                                                           .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
-                                                                                           .withParameter(LIST_NAME,
-                                                                                                          newListValue().withValue(ITEM_VALUE).build())
-                                                                                           .getDeclaration())
-                                                               .getDeclaration())
-                                       .getDeclaration())
-            .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
-                                       .newConstruct(FLOW_ELEMENT_IDENTIFIER)
-                                       .withRefName(MY_FLOW)
-                                       .withComponent(
-                                               declarer.newOperation(OPERATION_NAME)
-                                                       .withConfig(MY_CONFIG)
-                                                       .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
-                                                       .getDeclaration())
-                                       .withComponent(
-                                               declarer.newOperation(ANOTHER_OPERATION_NAME)
-                                                       .withConfig(MY_CONFIG)
-                                                       .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
-                                                       .getDeclaration())
-                                       .getDeclaration())
-            .withGlobalElement(declarer.newGlobalParameter("complexType")
-                                       .withRefName(MY_GLOBAL_TEMPLATE)
-                                       .withValue(ParameterObjectValue.builder()
-                                                          .withParameter("otherName", "simpleParam")
-                                                          .withParameter("myCamelCaseName", "someContent")
-                                                          .withParameter("numbers", ParameterListValue.builder()
-                                                                  .withValue("10")
-                                                                  .withValue("20")
-                                                                  .build())
-                                                          .build())
-                                       .getDeclaration())
-            .getDeclaration();
+        .withGlobalElement(declarer.newConfiguration(CONFIGURATION_NAME)
+            .withRefName(MY_CONFIG)
+            .withParameterGroup(newParameterGroup()
+                .withParameter(CONTENT_NAME, CONTENT_VALUE)
+                .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+                .withParameter(LIST_NAME, newListValue().withValue(ITEM_VALUE).build())
+                .getDeclaration())
+            .withConnection(declarer.newConnection(CONNECTION_PROVIDER_NAME)
+                .withParameterGroup(newParameterGroup()
+                    .withParameter(CONTENT_NAME, CONTENT_VALUE)
+                    .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+                    .withParameter(LIST_NAME,
+                                   newListValue().withValue(ITEM_VALUE).build())
+                    .getDeclaration())
+                .getDeclaration())
+            .getDeclaration())
+        .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
+            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+            .withRefName(MY_FLOW)
+            .withComponent(
+                           declarer.newOperation(OPERATION_NAME)
+                               .withConfig(MY_CONFIG)
+                               .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
+                               .getDeclaration())
+            .withComponent(
+                           declarer.newOperation(ANOTHER_OPERATION_NAME)
+                               .withConfig(MY_CONFIG)
+                               .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
+                               .getDeclaration())
+            .getDeclaration())
+        .withGlobalElement(declarer.newGlobalParameter("complexType")
+            .withRefName(MY_GLOBAL_TEMPLATE)
+            .withValue(ParameterObjectValue.builder()
+                .withParameter("otherName", "simpleParam")
+                .withParameter("myCamelCaseName", "someContent")
+                .withParameter("numbers", ParameterListValue.builder()
+                    .withValue("10")
+                    .withValue("20")
+                    .build())
+                .build())
+            .getDeclaration())
+        .getDeclaration();
   }
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
@@ -834,25 +838,25 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     parameterModels.add(metadataKeyId);
     when(model.getParameterGroupModels().get(0).getParameterModels()).thenReturn(parameterModels);
     when(model.getParameterGroupModels().get(0).getParameter(anyString()))
-            .then(invocation -> {
-              String paramName = invocation.getArgument(0);
-              switch (paramName) {
-                case CONTENT_NAME:
-                  return of(contentParameter);
-                case LIST_NAME:
-                  return of(listParameter);
-                case BEHAVIOUR_NAME:
-                  return of(behaviourParameter);
-                case METADATA_KEY_PART_1:
-                  return of(metadataKeyId);
-              }
-              return Optional.empty();
-            });
+        .then(invocation -> {
+          String paramName = invocation.getArgument(0);
+          switch (paramName) {
+            case CONTENT_NAME:
+              return of(contentParameter);
+            case LIST_NAME:
+              return of(listParameter);
+            case BEHAVIOUR_NAME:
+              return of(behaviourParameter);
+            case METADATA_KEY_PART_1:
+              return of(metadataKeyId);
+          }
+          return Optional.empty();
+        });
 
     when(model.getModelProperty(MetadataKeyIdModelProperty.class))
-            .thenReturn(of(new MetadataKeyIdModelProperty(TYPE_LOADER.load(String.class),
-                                                          METADATA_KEY_PART_1,
-                                                          CATEGORY_NAME)));
+        .thenReturn(of(new MetadataKeyIdModelProperty(TYPE_LOADER.load(String.class),
+                                                      METADATA_KEY_PART_1,
+                                                      CATEGORY_NAME)));
 
     when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(Optional.empty());
 
@@ -866,23 +870,23 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     List<ParameterModel> partParameterModels = asList(partOne, partTwo, partThree);
 
     ParameterGroupModel metadataKeyIdGroup =
-            mock(ParameterGroupModel.class, new MockSettingsImpl<>().lenient().defaultAnswer(RETURNS_DEFAULTS));
+        mock(ParameterGroupModel.class, new MockSettingsImpl<>().lenient().defaultAnswer(RETURNS_DEFAULTS));
     when(metadataKeyIdGroup.getName()).thenReturn(METADATA_KEY_GROUP);
     when(metadataKeyIdGroup.isShowInDsl()).thenReturn(false);
     when(metadataKeyIdGroup.getParameterModels()).thenReturn(partParameterModels);
     when(metadataKeyIdGroup.getParameter(anyString()))
-            .then(invocation -> {
-              String paramName = invocation.getArgument(0);
-              switch (paramName) {
-                case METADATA_KEY_PART_1:
-                  return of(partOne);
-                case METADATA_KEY_PART_2:
-                  return of(partTwo);
-                case METADATA_KEY_PART_3:
-                  return of(partThree);
-              }
-              return Optional.empty();
-            });
+        .then(invocation -> {
+          String paramName = invocation.getArgument(0);
+          switch (paramName) {
+            case METADATA_KEY_PART_1:
+              return of(partOne);
+            case METADATA_KEY_PART_2:
+              return of(partTwo);
+            case METADATA_KEY_PART_3:
+              return of(partThree);
+          }
+          return Optional.empty();
+        });
 
     ObjectTypeBuilder groupType = BaseTypeBuilder.create(MetadataFormat.JAVA).objectType();
     groupType.addField().key(METADATA_KEY_PART_1).value(TYPE_LOADER.load(String.class));
@@ -890,16 +894,16 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     groupType.addField().key(METADATA_KEY_PART_3).value(TYPE_LOADER.load(String.class));
 
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class))
-            .thenReturn(of(new MetadataKeyIdModelProperty(groupType.build(), METADATA_KEY_GROUP, CATEGORY_NAME)));
+        .thenReturn(of(new MetadataKeyIdModelProperty(groupType.build(), METADATA_KEY_GROUP, CATEGORY_NAME)));
 
     when(operationModel.getModelProperty(MetadataResolverFactoryModelProperty.class))
-            .thenReturn(of(new MetadataResolverFactoryModelProperty(NullMetadataResolverFactory::new)));
+        .thenReturn(of(new MetadataResolverFactoryModelProperty(NullMetadataResolverFactory::new)));
 
     when(operationModel.getParameterGroupModels()).thenReturn(Arrays.asList(parameterGroupModel, metadataKeyIdGroup));
     when(operationModel.getAllParameterModels()).thenReturn(ImmutableList.<ParameterModel>builder()
-                                                                    .addAll(defaultGroupParameterModels)
-                                                                    .addAll(partParameterModels)
-                                                                    .build());
+        .addAll(defaultGroupParameterModels)
+        .addAll(partParameterModels)
+        .build());
   }
 
   private ParameterModel mockKeyPart(String name, int order) {
