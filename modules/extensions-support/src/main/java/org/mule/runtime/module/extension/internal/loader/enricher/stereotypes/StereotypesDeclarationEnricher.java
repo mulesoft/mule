@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.CONSISTENCY;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
@@ -79,7 +79,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
-    return POST_STRUCTURE;
+    return CONSISTENCY;
   }
 
   @Override
