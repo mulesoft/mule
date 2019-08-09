@@ -11365,10 +11365,7 @@
           "outputAttributes": {
             "type": {
               "format": "java",
-              "type": "DateTime",
-              "annotations": {
-                "typeId": "java.time.Instant"
-              }
+              "type": "Void"
             },
             "hasDynamicType": false,
             "description": "",
