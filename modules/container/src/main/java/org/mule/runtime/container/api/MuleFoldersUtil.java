@@ -32,6 +32,7 @@ public class MuleFoldersUtil {
   public static final String CONF = "conf";
   public static final String USER_FOLDER = "user";
   public static final String PATCHES_FOLDER = "patches";
+  public static final String ARTIFACT_PATCHES_FOLDER = "mule-artifact-patches";
   public static final String SERVICES_FOLDER = "services";
   private static final String MODULES_FOLDER = "modules";
 
@@ -178,6 +179,13 @@ public class MuleFoldersUtil {
    */
   public static File getPatchesLibFolder() {
     return new File(getMuleLibFolder(), PATCHES_FOLDER);
+  }
+
+  /**
+   * @return directory where the artifact patches are placed in the runtime
+   */
+  public static File getArtifactPatchesLibFolder() {
+    return new File(getPatchesLibFolder(), ARTIFACT_PATCHES_FOLDER);
   }
 
   public static File getContainerAppPluginsFolder() {
