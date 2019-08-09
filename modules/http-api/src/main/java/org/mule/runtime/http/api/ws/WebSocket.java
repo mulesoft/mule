@@ -202,7 +202,7 @@ public interface WebSocket {
   /**
    * Tests whether this socket's connection to the remote system is still active.
    * <p>
-   * Notice that this method differs from {@link #isConnected()} in that even though the socket might not have been closed,
+   * Notice that this method differs from {@link #isClosed()} ()} in that even though the socket might not have been closed,
    * it might still have lost its connection to the remote system. There's no forced correlation between the output values of
    * both methods.
    *
