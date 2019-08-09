@@ -12,11 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.util.Map;
-import java.util.concurrent.Executor;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -33,6 +28,12 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.async.FutureRetryContext;
 import org.mule.runtime.core.internal.retry.async.RetryWorker;
+
+import java.util.Map;
+import java.util.concurrent.Executor;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 /**
@@ -123,5 +124,10 @@ public final class AsynchronousRetryTemplate extends AbstractComponent
   @Override
   public boolean isAsync() {
     return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return delegate.isEnabled();
   }
 }

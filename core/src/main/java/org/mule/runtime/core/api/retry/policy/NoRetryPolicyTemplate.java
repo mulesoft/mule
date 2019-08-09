@@ -15,6 +15,11 @@ public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
     return new NoRetryPolicy();
   }
 
+  @Override
+  public boolean isEnabled() {
+    return false;
+  }
+
   protected static class NoRetryPolicy implements RetryPolicy {
 
     public PolicyStatus applyPolicy(Throwable cause) {
