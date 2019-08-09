@@ -36,8 +36,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
+import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
@@ -104,6 +106,8 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                         newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.json"),
                         newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.json"),
                         newTestUnit(javaLoader, ValuesExtension.class, "values.json"),
+                        newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.json"),
+                        newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.json"),
                         newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
