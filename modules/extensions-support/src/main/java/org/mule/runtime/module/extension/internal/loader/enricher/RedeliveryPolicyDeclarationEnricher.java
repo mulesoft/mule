@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.CONSISTENCY;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addRedeliveryPolicy;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -37,7 +37,7 @@ public final class RedeliveryPolicyDeclarationEnricher implements DeclarationEnr
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
-    return CONSISTENCY;
+    return WIRING;
   }
 
   @Override

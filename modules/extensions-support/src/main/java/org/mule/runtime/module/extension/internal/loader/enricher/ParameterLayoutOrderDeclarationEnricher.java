@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.lang.Integer.min;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.CONSISTENCY;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.AbstractParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -47,7 +47,7 @@ public final class ParameterLayoutOrderDeclarationEnricher extends AbstractAnnot
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
-    return CONSISTENCY;
+    return WIRING;
   }
 
   @Override

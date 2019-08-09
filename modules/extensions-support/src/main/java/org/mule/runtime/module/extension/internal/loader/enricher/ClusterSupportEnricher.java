@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.extension.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.runtime.extension.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.CONSISTENCY;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addPrimaryNodeParameter;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
@@ -34,7 +34,7 @@ public class ClusterSupportEnricher extends AbstractAnnotatedDeclarationEnricher
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
-    return CONSISTENCY;
+    return WIRING;
   }
 
   @Override
