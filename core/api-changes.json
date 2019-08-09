@@ -156,6 +156,42 @@
           "methodName": "isAsync",
           "elementKind": "method",
           "justification": "Setting a default in the interface. Only used when overriding"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicyTemplate",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::isEnabled()",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "isEnabled",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate::isEnabled()",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "NoRetryPolicyTemplate",
+          "methodName": "isEnabled",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::isEnabled()",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicyTemplate",
+          "methodName": "isEnabled",
+          "elementKind": "method",
+          "justification": "Setting a default in the interface. Only used when overriding"
         }
       ]
     }
