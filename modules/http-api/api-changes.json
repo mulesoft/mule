@@ -10,6 +10,41 @@
           "methodName": "getIdleSocketTimeoutMills",
           "elementKind": "method",
           "justification": "Doesn't break compatibility and needed to fix MULE-17277"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.http.api.ws.WebSocketBroadcaster",
+          "new": "interface org.mule.runtime.http.api.ws.WebSocketBroadcaster",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.http.api.ws",
+          "classSimpleName": "WebSocketBroadcaster",
+          "elementKind": "interface",
+          "justification": "Fixes EE-6914"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.ws.exception.WebSocketClosedException",
+          "package": "org.mule.runtime.http.api.ws.exception",
+          "classSimpleName": "WebSocketClosedException",
+          "elementKind": "class",
+          "justification": "Fixes EE-6914"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.ws.exception.WebSocketConnectionException",
+          "package": "org.mule.runtime.http.api.ws.exception",
+          "classSimpleName": "WebSocketConnectionException",
+          "elementKind": "class",
+          "justification": "Fixes EE-6914"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.ws.exception.WebSocketRuntimeException",
+          "package": "org.mule.runtime.http.api.ws.exception",
+          "classSimpleName": "WebSocketRuntimeException",
+          "elementKind": "class",
+          "justification": "Fixes EE-6914"
         }
       ]
     }
