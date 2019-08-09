@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.config.dsl.model;
 
+import static java.util.Collections.emptySet;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
@@ -17,6 +22,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
@@ -341,6 +347,89 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
+  }
+
+  @Test
+  public void sameComponentsOnDifferentExtensionsGenerateDifferentHash() throws Exception{
+    final String newExtensionModelName = "newMockedExtension";
+    final String newNamespace = "new-mockns";
+    final String newNamespaceUri = "http://www.mulesoft.org/schema/mule/new-mockns";
+    final String newSchemaLocation = "http://www.mulesoft.org/schema/mule/new-mockns/current/mule-new-mockns.xsd";
+
+
+    ExtensionModel newExtensionModel = mock(ExtensionModel.class);
+
+    initializeExtensionMock(newExtensionModel);
+
+    when(newExtensionModel.getName()).thenReturn(newExtensionModelName);
+    when(newExtensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder()
+                                                                .setXsdFileName("new-mule-mockns.xsd")
+                                                                .setPrefix(newNamespace)
+                                                                .setNamespace(newNamespaceUri)
+                                                                .setSchemaLocation(newSchemaLocation)
+                                                                .setSchemaVersion("4.0")
+                                                                .build());
+    when(newExtensionModel.getSubTypes()).thenReturn(emptySet());
+    when(newExtensionModel.getImportedTypes()).thenReturn(emptySet());
+    when(newExtensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder()
+                                                                .setXsdFileName(EMPTY)
+                                                                .setPrefix(newNamespace)
+                                                                .setNamespace(newNamespaceUri)
+                                                                .setSchemaLocation(newSchemaLocation)
+                                                                .setSchemaVersion(EMPTY)
+                                                                .build());
+
+    extensions = ImmutableSet.<ExtensionModel>builder()
+            .add(MuleExtensionModelProvider.getExtensionModel())
+            .add(mockExtension)
+            .add(newExtensionModel)
+            .build();
+    dslResolvingContext = DslResolvingContext.getDefault(extensions);
+
+    ElementDeclarer newElementDeclarer = forExtension(newExtensionModelName);
+
+    final String newFlowName = "myNewFlow";
+    final String newConfigName = "myNewConfig";
+    ArtifactDeclaration baseApp = getBaseApp();
+    ArtifactDeclaration app = ElementDeclarer.newArtifact()
+            .withGlobalElement(baseApp.getGlobalElements().get(0)) //config
+            .withGlobalElement(baseApp.getGlobalElements().get(1)) //flow
+            .withGlobalElement(
+                    newElementDeclarer.newConfiguration(CONFIGURATION_NAME)
+                            .withRefName(newConfigName)
+                            .withParameterGroup(newParameterGroup()
+                                                        .withParameter(CONTENT_NAME, CONTENT_VALUE)
+                                                        .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+                                                        .withParameter(LIST_NAME, newListValue().withValue(ITEM_VALUE).build())
+                                                        .getDeclaration())
+                            .withConnection(newElementDeclarer.newConnection(CONNECTION_PROVIDER_NAME)
+                                                    .withParameterGroup(newParameterGroup()
+                                                                                .withParameter(CONTENT_NAME, CONTENT_VALUE)
+                                                                                .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+                                                                                .withParameter(LIST_NAME,
+                                                                                               newListValue().withValue(ITEM_VALUE).build())
+                                                                                .getDeclaration())
+                                                    .getDeclaration()
+                            ).getDeclaration())
+            .withGlobalElement(
+                    ElementDeclarer.forExtension(MULE_NAME)
+                            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+                            .withRefName(newFlowName)
+                            .withComponent(
+                                    newElementDeclarer.newOperation(OPERATION_NAME)
+                                            .withConfig(newConfigName)
+                                            .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
+                                            .getDeclaration())
+                            .getDeclaration())
+            .getDeclaration();
+
+    final String extensionOperationLocation = OPERATION_LOCATION;
+    final String newExtensionOperationLocation = newFlowName + "/processors/0";
+
+    MetadataCacheId oldHash = getIdForComponentOutputMetadata(app, extensionOperationLocation);
+    MetadataCacheId newHash = getIdForComponentOutputMetadata(app, newExtensionOperationLocation);
+
+    assertThat(oldHash, is(not(newHash)));
   }
 
   @Test
