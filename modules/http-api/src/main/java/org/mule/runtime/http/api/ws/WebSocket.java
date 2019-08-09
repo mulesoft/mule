@@ -150,7 +150,7 @@ public interface WebSocket {
    * Transforms the given {@code data} into a text data frame per the WebSockets specification.
    * <p>
    * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just
-   * a mare binary representation of the {@code data}.
+   * a mere binary representation of the {@code data}.
    * <p>
    * The returned frame is to be sent through the {@link #sendFrame(byte[])} method. Using this frame as input of the
    * {@link #send(InputStream, MediaType)} method will result in a frame wrapping another frame.
@@ -166,7 +166,7 @@ public interface WebSocket {
    * Transforms the given {@code data} into a binary data frame per the WebSockets specification.
    * <p>
    * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just
-   * a mare binary representation of the {@code data}.
+   * a mere binary representation of the {@code data}.
    * <p>
    * The returned frame is to be sent through the {@link #sendFrame(byte[])} method. Using this frame as input of the
    * {@link #send(InputStream, MediaType)} method will result in a frame wrapping another frame.
