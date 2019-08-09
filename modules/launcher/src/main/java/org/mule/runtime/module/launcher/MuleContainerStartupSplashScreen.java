@@ -23,6 +23,7 @@ import org.mule.runtime.core.internal.util.SecurityUtils;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
   private Logger LOGGER = LoggerFactory.getLogger(MuleContainerStartupSplashScreen.class);
+  public static final String ARTIFACT_PATCHES_FOLDER = "mule-artifact-patches";
 
   public void doBody() {
 
@@ -112,11 +114,16 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   }
 
   private void listPatchesIfPresent() {
-    File patchesDirectory = getPatchesLibFolder();
+    File patchesLibFolder = getPatchesLibFolder();
+    listPatchesIn(patchesLibFolder, "Applied patches:", (dir, name) -> !ARTIFACT_PATCHES_FOLDER.equals(name));
+    listPatchesIn(new File(patchesLibFolder, ARTIFACT_PATCHES_FOLDER), "Applied artifact patches:", (dir, name) -> true);
+  }
+
+  private void listPatchesIn(File patchesDirectory, String description, FilenameFilter filenameFilter) {
     if (patchesDirectory != null && patchesDirectory.exists()) {
-      String[] patches = patchesDirectory.list();
+      String[] patches = patchesDirectory.list(filenameFilter);
       sort(patches);
-      listItems(asList(patches), "Applied patches:");
+      listItems(asList(patches), description);
     }
   }
 
