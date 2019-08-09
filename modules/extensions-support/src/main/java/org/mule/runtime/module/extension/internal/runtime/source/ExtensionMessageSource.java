@@ -158,7 +158,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
 
-  private synchronized void createSource() throws Exception {
+  private synchronized void createSource(boolean restarting) throws Exception {
     if (sourceAdapter == null) {
       CoreEvent initialiserEvent = null;
       try {
@@ -169,7 +169,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                                createSourceCallbackFactory(),
                                                this,
                                                sourceConnectionManager,
-                                               new MessagingExceptionResolver(this));
+                                               new MessagingExceptionResolver(this),
+                                               restarting);
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
         initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
@@ -181,12 +182,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean forceAsync) throws MuleException {
+  private void startSource(boolean restarting) throws MuleException {
     try {
-      if (forceAsync && !retryPolicyTemplate.isAsync()) {
-        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(), retryScheduler);
+      // When restarting, async must be forced
+      if (restarting && !retryPolicyTemplate.isAsync()) {
+        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(restarting), retryScheduler);
       } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(), retryScheduler);
+        retryPolicyTemplate.execute(new StartSourceCallback(restarting), retryScheduler);
       }
     } catch (Throwable e) {
       if (e instanceof MuleException) {
@@ -487,10 +489,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private class StartSourceCallback implements RetryCallback {
 
+    boolean restarting;
+
+    StartSourceCallback(boolean restarting) {
+      this.restarting = restarting;
+    }
+
     @Override
     public void doWork(RetryContext context) throws Exception {
       try {
-        createSource();
+        createSource(restarting);
         initialiseIfNeeded(sourceAdapter);
         sourceAdapter.start();
         reconnecting.set(false);
@@ -570,7 +578,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         sourceConnectionManager = new SourceConnectionManager(connectionManager);
 
         try {
-          createSource();
+          createSource(false);
           initialiseIfNeeded(sourceAdapter);
         } catch (Exception e) {
           throw new InitialisationException(e, this);

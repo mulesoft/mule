@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
@@ -213,7 +214,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     sourceAdapter = createSourceAdapter();
 
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
     when(sourceAdapterFactory.getSourceParameters()).thenReturn(new ResolverSet(muleContext));
 
     mockExceptionEnricher(sourceModel, null);
