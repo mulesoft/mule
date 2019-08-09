@@ -71,6 +71,22 @@
         <test:processor throwException="true"/>
     </flow>
 
+    <petstore:config name="petstore" cashierName="jim">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Grumpy Cat"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="fixedFrequencyReconnectingPoll" initialState="stopped">
+        <petstore:pet-failing-source config-ref="petstore" failAtPoll="3" adoptionLimit="7">
+            <scheduling-strategy>
+                <fixed-frequency frequency="200" startDelay="3500"/>
+            </scheduling-strategy>
+        </petstore:pet-failing-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
     <flow name="adopt">
         <test:processor class="org.mule.test.module.extension.source.PollingSourceTestCase$AdoptionProcessor"/>
     </flow>

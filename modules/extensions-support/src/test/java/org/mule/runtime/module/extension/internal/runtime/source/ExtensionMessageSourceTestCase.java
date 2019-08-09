@@ -17,6 +17,7 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -130,7 +131,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void sourceIsInstantiatedOnce() throws Exception {
     initialise();
     start();
-    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any(), any());
+    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any(), any(), anyBoolean());
   }
 
   @Test
@@ -376,7 +377,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     final String person = "person";
     source = new DummySource(person);
     sourceAdapter = createSourceAdapter();
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
     messageSource = getNewExtensionMessageSourceInstance();
     messageSource.initialise();
     messageSource.start();
