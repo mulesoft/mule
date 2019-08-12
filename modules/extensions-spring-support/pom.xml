@@ -231,6 +231,13 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
+            <artifactId>mule-non-implicit-config-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
             <artifactId>mule-typed-value-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>

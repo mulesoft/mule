@@ -14,7 +14,9 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -78,6 +80,10 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     configurationDeclarer
         .withModelProperty(new ConfigurationFactoryModelProperty(typeAwareConfigurationFactory))
         .withModelProperty(new ImplementingTypeModelProperty(configClass));
+
+    if (configType.isAnnotatedWith(NoImplicit.class)) {
+      configurationDeclarer.withModelProperty(new NoImplicitModelProperty());
+    }
 
     configurationDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(configType));
 
