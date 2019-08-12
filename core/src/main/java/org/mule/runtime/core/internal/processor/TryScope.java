@@ -15,7 +15,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.*;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
