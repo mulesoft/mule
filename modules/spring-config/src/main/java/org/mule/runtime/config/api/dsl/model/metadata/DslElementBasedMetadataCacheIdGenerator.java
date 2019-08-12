@@ -172,7 +172,8 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
       Object model = component.getModel();
       if (model instanceof ComponentModel) {
-        resolveMetadataKeyParts(component, (ComponentModel) model, typeInformation.shouldIncludeConfiguredMetadataKeys()).ifPresent(keyParts::add);
+        resolveMetadataKeyParts(component, (ComponentModel) model, typeInformation.shouldIncludeConfiguredMetadataKeys())
+            .ifPresent(keyParts::add);
       }
     } else {
       resolveDslTagId(component).ifPresent(keyParts::add);
@@ -197,7 +198,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
         .ifPresent(keyParts::add);
 
     resolveDslTagId(elementModel)
-          .ifPresent(keyParts::add);
+        .ifPresent(keyParts::add);
 
     Object model = elementModel.getModel();
     if (model instanceof ComponentModel) {

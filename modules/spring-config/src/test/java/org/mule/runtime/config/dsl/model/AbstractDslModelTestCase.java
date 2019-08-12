@@ -322,7 +322,8 @@ public abstract class AbstractDslModelTestCase {
   protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
                                                            String attributesResolverName,
                                                            Map<String, String> parameterResolversNames) {
-    mockTypeResolversInformationModelProperty(model, category, outputResolverName, attributesResolverName, parameterResolversNames, null);
+    mockTypeResolversInformationModelProperty(model, category, outputResolverName, attributesResolverName,
+                                              parameterResolversNames, null);
 
   }
 

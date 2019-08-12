@@ -351,8 +351,10 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
     parameterResolversNames.put(LIST_NAME, LIST_NAME);
     final String attributesResolverName = "attributesResolver";
 
-    mockTypeResolversInformationModelProperty(operation, category, outputResolverName, attributesResolverName, parameterResolversNames, "operationKeysResolver");
-    mockTypeResolversInformationModelProperty(anotherOperation, category, outputResolverName, attributesResolverName, parameterResolversNames, "anotherOperationKeysResolver");
+    mockTypeResolversInformationModelProperty(operation, category, outputResolverName, attributesResolverName,
+                                              parameterResolversNames, "operationKeysResolver");
+    mockTypeResolversInformationModelProperty(anotherOperation, category, outputResolverName, attributesResolverName,
+                                              parameterResolversNames, "anotherOperationKeysResolver");
 
     ArtifactDeclaration baseApp = getBaseApp();
     MetadataCacheId operationOutputMetadataCacheId = getIdForComponentOutputMetadata(baseApp, OPERATION_LOCATION);
@@ -367,10 +369,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
     MetadataCacheId anotherOperationOutputMetadataCacheId = getIdForComponentOutputMetadata(baseApp, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(anotherOperationOutputMetadataCacheId.toString());
 
-    MetadataCacheId anotherOperationListInputMetadataCacheId = getIdForComponentInputMetadata(baseApp, ANOTHER_OPERATION_LOCATION, LIST_NAME);
+    MetadataCacheId anotherOperationListInputMetadataCacheId =
+        getIdForComponentInputMetadata(baseApp, ANOTHER_OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(anotherOperationListInputMetadataCacheId.toString());
 
-    MetadataCacheId anotherOperationAttributesMetadataCacheId = getIdForComponentAttributesMetadata(baseApp, ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId anotherOperationAttributesMetadataCacheId =
+        getIdForComponentAttributesMetadata(baseApp, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(anotherOperationAttributesMetadataCacheId.toString());
 
     assertThat(operationOutputMetadataCacheId, is(anotherOperationOutputMetadataCacheId));
