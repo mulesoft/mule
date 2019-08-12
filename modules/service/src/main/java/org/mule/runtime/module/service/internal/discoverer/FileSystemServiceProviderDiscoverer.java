@@ -36,11 +36,6 @@ import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
-
 /**
  * Discovers services artifacts from the {@link MuleFoldersUtil#SERVICES_FOLDER} folder.
  */
@@ -144,12 +139,12 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
 
       final Supplier<ClassLoader> serviceClassLoader = new LazyValue<>(
                                                                        () -> (ClassLoader) doPrivileged((PrivilegedAction<ClassLoader>) () -> (ClassLoader) serviceClassLoaderFactory
-                                                                               .create(getServiceArtifactId(serviceDescriptor),
-                                                                                       serviceDescriptor,
-                                                                                       apiClassLoader.getClassLoader(),
-                                                                                       apiClassLoader
-                                                                                           .getClassLoaderLookupPolicy()),
-                                                                                         ACCESS_CONTROL_CTX));
+                                                                           .create(getServiceArtifactId(serviceDescriptor),
+                                                                                   serviceDescriptor,
+                                                                                   apiClassLoader.getClassLoader(),
+                                                                                   apiClassLoader
+                                                                                       .getClassLoaderLookupPolicy()),
+                                                                                                        ACCESS_CONTROL_CTX));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
         ServiceAssembly assembly = LazyServiceAssembly.builder()
