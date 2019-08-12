@@ -343,6 +343,41 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
     assertThat(keyParts, not(otherKeyParts));
   }
 
+  @Test
+  public void sameTypesOnDifferentOperationsWithDifferentKeyResolverGeneratesSameHash() throws Exception {
+    final String category = "category";
+    final String outputResolverName = "outputResolver";
+    Map<String, String> parameterResolversNames = new HashMap<>();
+    parameterResolversNames.put(LIST_NAME, LIST_NAME);
+    final String attributesResolverName = "attributesResolver";
+
+    mockTypeResolversInformationModelProperty(operation, category, outputResolverName, attributesResolverName, parameterResolversNames, "operationKeysResolver");
+    mockTypeResolversInformationModelProperty(anotherOperation, category, outputResolverName, attributesResolverName, parameterResolversNames, "anotherOperationKeysResolver");
+
+    ArtifactDeclaration baseApp = getBaseApp();
+    MetadataCacheId operationOutputMetadataCacheId = getIdForComponentOutputMetadata(baseApp, OPERATION_LOCATION);
+    LOGGER.debug(operationOutputMetadataCacheId.toString());
+
+    MetadataCacheId operationListInputMetadataCacheId = getIdForComponentInputMetadata(baseApp, OPERATION_LOCATION, LIST_NAME);
+    LOGGER.debug(operationListInputMetadataCacheId.toString());
+
+    MetadataCacheId operationAttributesMetadataCacheId = getIdForComponentAttributesMetadata(baseApp, OPERATION_LOCATION);
+    LOGGER.debug(operationAttributesMetadataCacheId.toString());
+
+    MetadataCacheId anotherOperationOutputMetadataCacheId = getIdForComponentOutputMetadata(baseApp, ANOTHER_OPERATION_LOCATION);
+    LOGGER.debug(anotherOperationOutputMetadataCacheId.toString());
+
+    MetadataCacheId anotherOperationListInputMetadataCacheId = getIdForComponentInputMetadata(baseApp, ANOTHER_OPERATION_LOCATION, LIST_NAME);
+    LOGGER.debug(anotherOperationListInputMetadataCacheId.toString());
+
+    MetadataCacheId anotherOperationAttributesMetadataCacheId = getIdForComponentAttributesMetadata(baseApp, ANOTHER_OPERATION_LOCATION);
+    LOGGER.debug(anotherOperationAttributesMetadataCacheId.toString());
+
+    assertThat(operationOutputMetadataCacheId, is(anotherOperationOutputMetadataCacheId));
+    assertThat(operationListInputMetadataCacheId, is(anotherOperationListInputMetadataCacheId));
+    assertThat(operationAttributesMetadataCacheId, is(anotherOperationAttributesMetadataCacheId));
+  }
+
   protected MetadataCacheId getIdForComponentOutputMetadata(ArtifactDeclaration declaration, String location) throws Exception {
     ApplicationModel app = loadApplicationModel(declaration);
     ComponentAst component = new Locator(app)
