@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -53,7 +52,6 @@ import org.springframework.jms.connection.CachingConnectionFactory;
  */
 public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 {
-
     protected final List<SubReceiver> consumers;
 
     protected final int receiversCount;
@@ -79,7 +77,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             if (logger.isInfoEnabled())
             {
                 logger.info("Destination " + getEndpoint().getEndpointURI() + " is a topic, but " + jmsConnector.getNumberOfConsumers() +
-                            " receivers have been requested. Will configure only 1.");
+                                " receivers have been requested. Will configure only 1.");
             }
             receiversCount = 1;
         }
@@ -129,7 +127,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         if (consumers != null)
         {
             SubReceiver sub;
-            for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext(); )
+            for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext();)
             {
                 sub = it.next();
                 sub.doStop(true);
@@ -240,7 +238,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         logger.debug("doDisconnect()");
 
         SubReceiver sub;
-        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext(); )
+        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext();)
         {
             sub = it.next();
             try
@@ -279,7 +277,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     protected class SubReceiver implements MessageListener
     {
-
         private final Log subLogger = LogFactory.getLog(getClass());
 
         private volatile Session session;
@@ -288,7 +285,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         protected volatile boolean connected;
         protected volatile boolean started;
         protected volatile boolean isProcessingMessage;
-        protected AtomicBoolean enabled = new AtomicBoolean(true);
 
         protected void doConnect() throws MuleException
         {
@@ -355,7 +351,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {
                     consumer.setMessageListener(this);
                 }
-                enabled.set(true);
                 started = true;
             }
             catch (JMSException e)
@@ -366,7 +361,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         /**
          * Stop the subreceiver.
-         *
          * @param force - if true, any exceptions will be logged but the subreceiver will be considered stopped regardless
          * @throws MuleException only if force = false
          */
@@ -488,30 +482,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         @Override
         public void onMessage(final Message message)
         {
-            if (enabled.get())
-            {
-                doOnMessage(message);
-            }
-            else
-            {
-                tryRecoverSession();
-            }
-        }
-
-        private void tryRecoverSession()
-        {
-            try
-            {
-                session.recover();
-            }
-            catch (JMSException e)
-            {
-                logger.error("Failed to recover session due to disabled SubReceiver: {}", e);
-            }
-        }
-
-        private void doOnMessage(Message message)
-        {
             try
             {
                 isProcessingMessage = true;
@@ -549,11 +519,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 isProcessingMessage = false;
             }
         }
-
-        public void setEnabled(boolean enabledValue)
-        {
-            this.enabled.set(enabledValue);
-        }
     }
 
     public void disableConsumers()
@@ -567,7 +532,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     protected class JmsWorker extends AbstractReceiverWorker
     {
-
         private final SubReceiver subReceiver;
 
         public JmsWorker(Message message, AbstractMessageReceiver receiver, SubReceiver subReceiver)
