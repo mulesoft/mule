@@ -8,17 +8,15 @@ package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.util.FunctionalUtils.ifPresent;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -46,6 +44,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
@@ -67,6 +66,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * {@link DeclarationEnricher} implementation which enriches the {@link ExtensionModel} and their {@link OperationModel} from the
  * used {@link ErrorTypes} and {@link Throws} in an Annotation based extension.
@@ -77,7 +79,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
-    return POST_STRUCTURE;
+    return WIRING;
   }
 
   @Override
@@ -233,11 +235,12 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       type.accept(new MetadataTypeVisitor() {
 
         // This is created to avoid a recursive types infinite loop, producing an StackOverflow when resolving the stereotypes.
-        private List<MetadataType> registeredTypes = new LinkedList<>();
+        private final List<MetadataType> registeredTypes = new LinkedList<>();
 
         @Override
         public void visitObject(ObjectType objectType) {
-          if (!registeredTypes.contains(objectType)) {
+          if (!registeredTypes.contains(objectType)
+              && !objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
             registeredTypes.add(objectType);
             objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(resolver));
             objectType.getFields().forEach(f -> f.getValue().accept(this));

@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.lang.Integer.min;
+import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.AbstractParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -18,6 +23,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
 import java.util.ArrayList;
@@ -26,10 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static java.lang.Integer.min;
-import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
 
 /**
@@ -42,6 +44,11 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 public final class ParameterLayoutOrderDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   private static final int INITIAL_ORDER = 1;
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return WIRING;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
