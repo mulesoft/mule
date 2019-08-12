@@ -1,3 +1,4 @@
+package org.mule.runtime.module.deployment.internal;
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -5,74 +6,92 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.internal;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
-import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase {
 
-/**
- * Contains test for application deployment on the default domain
- */
-@RunWith(Parameterized.class)
-@Feature(LEAK_PREVENTION)
-@Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
-public class ClassLoaderSoftReferenceBusterTestCase extends AbstractDeploymentTestCase {
 
   private static final int PROBER_POLLING_INTERVAL = 100;
+
   private static final int PROBER_POLIING_TIMEOUT = 5000;
 
-  private TestDeploymentListener deploymentListener = new TestDeploymentListener(this, emptyAppFileBuilder.getId());
+  private String appName;
 
-  public ClassLoaderSoftReferenceBusterTestCase(boolean parallellDeployment) {
+  private String xmlFile;
+
+  private boolean useEchoPluginInApp;
+
+  private TestDeploymentListener deploymentListener;
+
+
+  public ClassLoaderLeakTestCase(boolean parallellDeployment, String appName, String xmlFile, boolean useEchoPluginInApp) {
     super(parallellDeployment);
+    this.appName = appName;
+    this.useEchoPluginInApp = useEchoPluginInApp;
+    this.xmlFile = xmlFile;
   }
-
 
   @Test
   public void undeploysApplicationDoesNotLeakClassloader() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
+
+    addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
 
-    assertThat(deploymentListener.isAppDeployed(), is(true));
+    assertThat(getDeploymentListener().isAppDeployed(), is(true));
 
-    assertThat(removeAppAnchorFile(emptyAppFileBuilder.getId()), is(true));
+    assertThat(removeAppAnchorFile(appName), is(true));
 
     new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(deploymentListener.isAppUndeployed(), is(true));
+      assertThat(getDeploymentListener().isAppUndeployed(), is(true));
       return true;
     }));
 
     new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
-      assertThat(deploymentListener.getPhantomReference().isEnqueued(), is(true));
+      assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
       return true;
     }));
   }
 
-  @Override
-  protected void configureDeploymentService() {
-    deploymentService.addDeploymentListener(deploymentListener);
+  private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
+    if (useEchoPluginInApp) {
+      return createExtensionApplicationWithServices(xmlFile + ".xml",
+                                                    helloExtensionV1Plugin);
+    } else {
+      return new ApplicationFileBuilder(xmlFile)
+          .definedBy(xmlFile + ".xml");
+    }
   }
 
-  private static class TestDeploymentListener implements DeploymentListener {
+  @Override
+  protected void configureDeploymentService() {
+    deploymentService.addDeploymentListener(getDeploymentListener());
+  }
+
+
+  protected TestDeploymentListener getDeploymentListener() {
+    if (deploymentListener == null) {
+      deploymentListener = new TestDeploymentListener(this, appName);
+    }
+    return deploymentListener;
+  }
+
+  static class TestDeploymentListener implements DeploymentListener {
 
     private PhantomReference<ArtifactClassLoader> phantomReference;
 
@@ -82,9 +101,13 @@ public class ClassLoaderSoftReferenceBusterTestCase extends AbstractDeploymentTe
 
     private String appName;
 
-    private ClassLoaderSoftReferenceBusterTestCase deploymentTestCase;
+    private ClassLoaderLeakTestCase deploymentTestCase;
 
-    TestDeploymentListener(ClassLoaderSoftReferenceBusterTestCase deploymentTestCase, String appName) {
+    protected MuleDeploymentService deploymentService;
+
+
+
+    TestDeploymentListener(ClassLoaderLeakTestCase deploymentTestCase, String appName) {
       this.deploymentTestCase = deploymentTestCase;
       this.appName = appName;
     }
