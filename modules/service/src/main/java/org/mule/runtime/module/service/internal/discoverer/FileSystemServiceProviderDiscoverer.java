@@ -144,12 +144,12 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
 
       final Supplier<ClassLoader> serviceClassLoader = new LazyValue<>(
                                                                        () -> (ClassLoader) doPrivileged((PrivilegedAction<ClassLoader>) () -> (ClassLoader) serviceClassLoaderFactory
-                                                                               .create(getServiceArtifactId(serviceDescriptor),
-                                                                                       serviceDescriptor,
-                                                                                       apiClassLoader.getClassLoader(),
-                                                                                       apiClassLoader
-                                                                                           .getClassLoaderLookupPolicy()),
-                                                                                         ACCESS_CONTROL_CTX));
+                                                                           .create(getServiceArtifactId(serviceDescriptor),
+                                                                                   serviceDescriptor,
+                                                                                   apiClassLoader.getClassLoader(),
+                                                                                   apiClassLoader
+                                                                                       .getClassLoaderLookupPolicy()),
+                                                                                                        ACCESS_CONTROL_CTX));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
         ServiceAssembly assembly = LazyServiceAssembly.builder()
