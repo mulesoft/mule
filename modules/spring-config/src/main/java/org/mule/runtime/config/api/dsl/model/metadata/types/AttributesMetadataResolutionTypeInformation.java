@@ -45,12 +45,4 @@ public class AttributesMetadataResolutionTypeInformation extends AbstractMetadat
   private static Optional<ResolverInformation> getResolverInformation(TypeResolversInformationModelProperty typeResolversInformationModelProperty) {
     return typeResolversInformationModelProperty.getAttributesResolver();
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean shouldIncludeConfiguredMetadataKeys() {
-    return true;
-  }
 }

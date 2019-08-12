@@ -49,6 +49,8 @@ public interface MetadataResolutionTypeInformation {
   /**
    * @return true if the type resolution should include the metadata keys configured when computing the {@link MetadataCacheId}
    */
-  boolean shouldIncludeConfiguredMetadataKeys();
+  default boolean shouldIncludeConfiguredMetadataKeys() {
+    return true;
+  }
 
 }

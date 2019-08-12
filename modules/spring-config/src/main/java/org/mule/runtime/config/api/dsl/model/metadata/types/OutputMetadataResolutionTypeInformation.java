@@ -45,9 +45,4 @@ public class OutputMetadataResolutionTypeInformation extends AbstractMetadataRes
   private static Optional<ResolverInformation> getResolverInformation(TypeResolversInformationModelProperty typeResolversInformationModelProperty) {
     return typeResolversInformationModelProperty.getOutputResolver();
   }
-
-  @Override
-  public boolean shouldIncludeConfiguredMetadataKeys() {
-    return true;
-  }
 }

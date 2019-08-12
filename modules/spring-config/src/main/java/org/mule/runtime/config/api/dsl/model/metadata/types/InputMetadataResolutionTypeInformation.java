@@ -58,12 +58,4 @@ public class InputMetadataResolutionTypeInformation extends AbstractMetadataReso
                                                                         String parameterName) {
     return typeResolversInformationModelProperty.getParameterResolver(parameterName);
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean shouldIncludeConfiguredMetadataKeys() {
-    return true;
-  }
 }
