@@ -45,8 +45,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
+import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
@@ -121,6 +123,8 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
                         newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.xsd"),
                         newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.xsd"),
                         newTestUnit(javaLoader, ValuesExtension.class, "values.xsd"),
+                        newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.xsd"),
+                        newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.xsd"),
                         newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.xsd"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
