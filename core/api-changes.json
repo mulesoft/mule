@@ -46,6 +46,15 @@
           "methodName": "isAsync",
           "elementKind": "method",
           "justification": "Default method in interfarce. Only async will be affected."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::isOwnedTransaction()",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "isOwnedTransaction",
+          "elementKind": "method",
+          "justification": "method moved from child to parent class"
         }
       ]
     }

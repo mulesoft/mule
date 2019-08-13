@@ -78,9 +78,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
           TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
           transaction.setComponentLocation(getLocation());
           return processToApply(event,
-                                       p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
-                                                                                               ofNullable(getLocation()),
-                                                                                               messagingExceptionHandler)));
+                                p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
+                                                                                        ofNullable(getLocation()),
+                                                                                        messagingExceptionHandler)));
         } else {
           return processToApply(event,
                                 p -> from(p).flatMap(request -> processWithChildContext(request, nestedChain,
