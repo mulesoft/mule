@@ -208,11 +208,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
 
     errorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), errorType, configurationProperties);
-    errorHandlerLocation = this.getLocation().getLocation();
-    isLocalErrorHandlerLocation = ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find();
-    if (isLocalErrorHandlerLocation) {
-      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
-      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+    if (this.getLocation() != null) {
+      errorHandlerLocation = this.getLocation().getLocation();
+      isLocalErrorHandlerLocation = ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find();
+      if (isLocalErrorHandlerLocation) {
+        errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+        errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+      }
     }
   }
 
