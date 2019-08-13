@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
@@ -117,7 +116,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     }
 
-    T artifact = (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
+    T artifact = findArtifact(artifactId);
     undeploy(artifact, removeData);
   }
 
@@ -198,37 +197,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   @Override
   public void setDeploymentListener(DeploymentListener deploymentListener) {
     this.deploymentListener = deploymentListener;
-  }
-
-  private T deployPackagedArtifact(final URI artifactUri, String artifactName, Optional<Properties> deploymentProperties) {
-    ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
-    if (zombieArtifact != null) {
-      if (zombieArtifact.isFor(artifactUri) && !zombieArtifact.updatedZombieApp()) {
-        // Skips the file because it was already deployed with failure
-        return null;
-      }
-    }
-
-    // check if this artifact is running first, undeployArtifact it then
-    T artifact = (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
-    boolean isRedeploy = artifact != null;
-    try {
-      if (isRedeploy) {
-        deploymentListener.onRedeploymentStart(artifactName);
-        deploymentTemplate.preRedeploy(artifact);
-        undeployArtifact(artifactName, false);
-      }
-
-      T deployedArtifact = deployPackagedArtifact(artifactUri, deploymentProperties);
-      if (isRedeploy) {
-        deploymentTemplate.postRedeploy(deployedArtifact);
-        deploymentListener.onRedeploymentSuccess(artifactName);
-      }
-      return deployedArtifact;
-    } catch (RuntimeException e) {
-      deploymentListener.onRedeploymentFailure(artifactName, e);
-      throw e;
-    }
   }
 
   private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties) throws DeploymentException {
@@ -405,12 +373,19 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
       artifactZip = new File(artifactDir, zip);
       uri = artifactZip.toURI();
-      return deployPackagedArtifact(uri, artifactName, deploymentProperties);
+      return deployOrRedeployPackagedArtifact(uri, artifactName, deploymentProperties);
     } catch (DeploymentException e) {
       throw e;
     } catch (Exception e) {
       throw new DeploymentException(createStaticMessage("Failed to deploy from zip: " + zip), e);
     }
+  }
+
+  @Override
+  public T deployPackagedArtifact(URI artifactAchivedUri, Optional<Properties> appProperties)
+      throws DeploymentException {
+    final String artifactName = removeEndIgnoreCase(new File(artifactAchivedUri).getName(), JAR_FILE_SUFFIX);
+    return deployOrRedeployPackagedArtifact(artifactAchivedUri, artifactName, appProperties);
   }
 
   @Override
@@ -497,12 +472,42 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
   }
 
-  @Override
-  public T deployPackagedArtifact(URI artifactAchivedUri, Optional<Properties> appProperties) throws DeploymentException {
-    Optional<T> foundMatchingArtifact = empty();
+  private T deployOrRedeployPackagedArtifact(final URI artifactUri, String artifactName,
+                                             Optional<Properties> deploymentProperties) {
+    ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
+    if (zombieArtifact != null) {
+      if (zombieArtifact.isFor(artifactUri) && !zombieArtifact.updatedZombieApp()) {
+        // Skips the file because it was already deployed with failure
+        return null;
+      }
+    }
+
+    // check if this artifact is running first, undeployArtifact it then
+    T artifact = findArtifact(artifactName);
+    boolean isRedeploy = artifact != null;
+    try {
+      if (isRedeploy) {
+        deploymentListener.onRedeploymentStart(artifactName);
+        deploymentTemplate.preRedeploy(artifact);
+        undeployArtifact(artifactName, false);
+      }
+
+      T deployedArtifact = internalDeployPackagedArtifact(artifactUri, deploymentProperties);
+      if (isRedeploy) {
+        deploymentTemplate.postRedeploy(deployedArtifact);
+        deploymentListener.onRedeploymentSuccess(artifactName);
+      }
+      return deployedArtifact;
+    } catch (RuntimeException e) {
+      deploymentListener.onRedeploymentFailure(artifactName, e);
+      throw e;
+    }
+  }
+
+  private T internalDeployPackagedArtifact(URI artifactAchivedUri, Optional<Properties> appProperties)
+      throws DeploymentException {
     try {
       File artifactLocation = installArtifact(artifactAchivedUri);
-
       T artifact;
       try {
         artifact = createArtifact(artifactLocation, appProperties);
@@ -513,8 +518,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         // error text has been created by the deployer already
         logDeploymentFailure(t, artifactName);
 
-        foundMatchingArtifact.ifPresent(a -> deploymentListener.onRedeploymentFailure(a.getArtifactName(), t));
-
         addZombieFile(artifactName, artifactLocation);
 
         deploymentListener.onDeploymentFailure(artifactName, t);
@@ -524,10 +527,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
       deployArtifact(artifact, appProperties);
 
-      foundMatchingArtifact.ifPresent(a -> deploymentListener.onRedeploymentSuccess(a.getArtifactName()));
       return artifact;
     } catch (Throwable t) {
-      foundMatchingArtifact.ifPresent(a -> deploymentListener.onRedeploymentFailure(a.getArtifactName(), t));
       if (t instanceof DeploymentException) {
         // re-throw
         throw ((DeploymentException) t);
