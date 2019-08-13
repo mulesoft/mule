@@ -81,6 +81,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected String errorType = null;
   protected ErrorTypeMatcher errorTypeMatcher = null;
 
+  private String errorHandlerLocation;
+  private boolean isLocalErrorHandlerLocation;
+
   @Override
   final public CoreEvent handleException(Exception exception, CoreEvent event) {
     try {
@@ -205,6 +208,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
 
     errorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), errorType, configurationProperties);
+    errorHandlerLocation = this.getLocation().getLocation();
+    isLocalErrorHandlerLocation = ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find();
+    if (isLocalErrorHandlerLocation) {
+      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
+    }
   }
 
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames,
@@ -359,13 +368,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
       // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
       // to rollback the tx.
-      String errorHandlerLocation = this.getLocation().getLocation();
-      if (!ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find()) {
+      if (!isLocalErrorHandlerLocation) {
         return sameRootContainerLocation(transaction);
       }
       String transactionLocation = transaction.getComponentLocation().get().getLocation();
-      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
-      errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
       return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
     }
   }
