@@ -306,32 +306,41 @@ public abstract class AbstractDslModelTestCase {
 
   protected void mockTypeResolversInformationModelPropertyWithOutputType(EnrichableModel model, String category,
                                                                          String outputResolverName) {
-    mockTypeResolversInformationModelProperty(model, category, outputResolverName, null, null);
+    mockTypeResolversInformationModelProperty(model, category, outputResolverName, null, null, null);
   }
 
   protected void mockTypeResolversInformationModelPropertyWithAttributeType(EnrichableModel model, String category,
                                                                             String attributesResolverName) {
-    mockTypeResolversInformationModelProperty(model, category, null, attributesResolverName, null);
+    mockTypeResolversInformationModelProperty(model, category, null, attributesResolverName, null, null);
   }
 
   protected void mockTypeResolversInformationModelPropertyWithInputTypes(EnrichableModel model, String category,
                                                                          Map<String, String> parameterResolversNames) {
-    mockTypeResolversInformationModelProperty(model, category, null, null, parameterResolversNames);
+    mockTypeResolversInformationModelProperty(model, category, null, null, parameterResolversNames, null);
   }
 
   protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
                                                            String attributesResolverName,
                                                            Map<String, String> parameterResolversNames) {
+    mockTypeResolversInformationModelProperty(model, category, outputResolverName, attributesResolverName,
+                                              parameterResolversNames, null);
+
+  }
+
+  protected void mockTypeResolversInformationModelProperty(EnrichableModel model, String category, String outputResolverName,
+                                                           String attributesResolverName,
+                                                           Map<String, String> parameterResolversNames, String keysResolverName) {
     when(model.getModelProperty(TypeResolversInformationModelProperty.class))
         .thenReturn(of(new TypeResolversInformationModelProperty(category,
                                                                  parameterResolversNames,
                                                                  outputResolverName,
                                                                  attributesResolverName,
-                                                                 null,
+                                                                 keysResolverName,
                                                                  false,
                                                                  false)));
-
   }
+
+
 
   @TypeDsl(allowTopLevelDefinition = true)
   @Alias("complexType")
