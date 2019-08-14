@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static java.time.Duration.ofMillis;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
@@ -47,6 +48,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.reactivestreams.Publisher;
 
@@ -91,13 +93,34 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                              maxConcurrency)
           .collectList()
           .doOnNext(list -> {
-            if (list.stream().anyMatch(event -> event.getError().isPresent())) {
-              throw propagate(createCompositeRoutingException(list));
+            if (list.stream().anyMatch(event -> event.getError().isPresent()
+                && !isOriginalError(event.getError().get(), original.getError()))) {
+              throw propagate(createCompositeRoutingException(list.stream()
+                  .map(event -> removeOriginalError(event, original.getError())).collect(toList())));
             }
           })
           .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
+  }
+
+  private boolean isOriginalError(Error newError, Optional<Error> originalError) {
+    if (!originalError.isPresent()) {
+      return false;
+    }
+    return originalError.get().equals(newError);
+  }
+
+  private CoreEvent removeOriginalError(CoreEvent event, Optional<Error> originalError) {
+    if (!event.getError().isPresent()) {
+      return event;
+    }
+    if (!isOriginalError(event.getError().get(), originalError)) {
+      return event;
+    }
+    // Get everything except the error
+    return CoreEvent.builder(event.getContext()).variables(event.getVariables()).message(event.getMessage())
+        .itemSequenceInfo(event.getItemSequenceInfo()).securityContext(event.getSecurityContext()).build();
   }
 
   /**
