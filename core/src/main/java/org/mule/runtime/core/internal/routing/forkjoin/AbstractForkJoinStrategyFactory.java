@@ -118,9 +118,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     if (!isOriginalError(event.getError().get(), originalError)) {
       return event;
     }
-    // Get everything except the error
-    return CoreEvent.builder(event.getContext()).variables(event.getVariables()).message(event.getMessage())
-        .itemSequenceInfo(event.getItemSequenceInfo()).securityContext(event.getSecurityContext()).build();
+    return CoreEvent.builder(event).error(null).build();
   }
 
   /**
