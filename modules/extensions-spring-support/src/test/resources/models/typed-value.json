@@ -40,6 +40,142 @@
         }
       },
       "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "DifferedKnockableDoor"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "victim"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "address"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "encodedPasssword"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "java.io.Serializable"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "door"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "victim",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "address",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "previous"
+          },
+          "model": "#..",
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
     }
   ],
   "configurations": [
@@ -3980,142 +4116,6 @@
   ],
   "modelProperties": {},
   "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
-        "classInformation": {
-          "classname": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeDsl": {
-          "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true
-        },
-        "typeAlias": {
-          "value": "DifferedKnockableDoor"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "victim"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        },
-        {
-          "key": {
-            "name": "address"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        },
-        {
-          "key": {
-            "name": "encodedPasssword"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-        "classInformation": {
-          "classname": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [
-            "java.io.Serializable"
-          ],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeDsl": {
-          "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true
-        },
-        "typeAlias": {
-          "value": "door"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "victim",
-            "required": "true"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        },
-        {
-          "key": {
-            "name": "address",
-            "required": "true"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        },
-        {
-          "key": {
-            "name": "previous"
-          },
-          "model": "#..",
-          "annotations": {
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        }
-      ]
-    },
     {
       "format": "java",
       "type": "Object",

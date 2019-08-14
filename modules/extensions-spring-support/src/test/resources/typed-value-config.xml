@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/typed-value http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd">
+               http://www.mulesoft.org/schema/mule/typed-value http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
 
     <typed-value:config name="config"/>
@@ -55,7 +57,7 @@
     <flow name="typedValueForDoorListAsChild">
         <typed-value:typed-value-operation-door-list-parameter>
             <typed-value:door-values>
-                <typed-value:door victim="Saul" address="123"/>
+                <heisenberg:door victim="Saul" address="123"/>
             </typed-value:door-values>
         </typed-value:typed-value-operation-door-list-parameter>
     </flow>
@@ -64,7 +66,7 @@
         <typed-value:typed-value-operation-door-map-parameter>
             <typed-value:door-map-values>
                 <typed-value:door-map-value key="key">
-                    <typed-value:door victim="Saul" address="123"/>
+                    <heisenberg:door victim="Saul" address="123"/>
                 </typed-value:door-map-value>
             </typed-value:door-map-values>
         </typed-value:typed-value-operation-door-map-parameter>

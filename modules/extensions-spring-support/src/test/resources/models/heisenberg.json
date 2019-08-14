@@ -34814,6 +34814,73 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "DifferedKnockableDoor"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "victim"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "address"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "encodedPasssword"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.test.heisenberg.extension.model.Investment",
         "classInformation": {
           "classname": "org.mule.test.heisenberg.extension.model.Investment",

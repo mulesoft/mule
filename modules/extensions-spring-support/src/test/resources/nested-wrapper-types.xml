@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:parameter-resolver="http://www.mulesoft.org/schema/mule/parameter-resolver"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/parameter-resolver http://www.mulesoft.org/schema/mule/parameter-resolver/current/mule-parameter-resolver.xsd">
+               http://www.mulesoft.org/schema/mule/parameter-resolver http://www.mulesoft.org/schema/mule/parameter-resolver/current/mule-parameter-resolver.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
 
-    <parameter-resolver:door name="dynamicDoor" address="Address" victim="#[payload]" />
+    <heisenberg:door name="dynamicDoor" address="Address" victim="#[payload]" />
 
     <parameter-resolver:nested-types-config name="config-with-dynamic-parameter-resolvers" lazyParameter="#[output application/json --- {key : 'a nice looking json'}]"
     nestedParameter="#[output application/json --- {key : 'pretty nested'}]" resolverOfLiteral="#['this doesn't make sense']" doorResolver="dynamicDoor"/>

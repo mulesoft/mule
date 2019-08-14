@@ -4,53 +4,7 @@
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-  <xs:complexType name="org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="optional" name="victim"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="address"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="encodedPasssword"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-differed-knockable-door"></xs:element>
-  <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-differed-knockable-door" name="differed-knockable-door">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-door"></xs:element>
-  <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-door" name="door">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.heisenberg.extension.model.KnockeableDoor">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="previous">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="previous"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg" schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
@@ -63,7 +17,7 @@
             <xs:element minOccurs="0" maxOccurs="1" name="differed-door">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
+                  <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
@@ -227,7 +181,7 @@
           <xs:element minOccurs="0" maxOccurs="1" name="differed-door">
             <xs:complexType>
               <xs:complexContent>
-                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
+                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
@@ -254,7 +208,7 @@
           <xs:element minOccurs="0" maxOccurs="1" name="door-values">
             <xs:complexType>
               <xs:sequence>
-                <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" minOccurs="0" maxOccurs="unbounded" ref="typed-value:abstract-door"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-door"></xs:element>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -284,7 +238,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="door-map-value">
                   <xs:complexType>
                     <xs:sequence maxOccurs="1">
-                      <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" minOccurs="0" maxOccurs="1" ref="typed-value:abstract-door"></xs:element>
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-door"></xs:element>
                     </xs:sequence>
                     <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
