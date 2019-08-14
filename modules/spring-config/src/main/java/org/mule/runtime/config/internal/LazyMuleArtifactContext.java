@@ -207,10 +207,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       if (muleContext.isInitialised()) {
         for (Object object : components) {
           try {
-            // Has to explicitly fire the phase as it is "ignored" by the lifecycle manager (in Runtime this is
-            // handled explicitly by the flowRef processor that propagates the lifecycle phases)
             if (object instanceof MessageProcessorChain) {
-              initialiseIfNeeded(object, muleContext);
+              // Has to be ignored as it is already initialized before it gets added to the registry
             } else {
               muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
             }
@@ -392,8 +390,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           String chainKey = componentName + "@" + object.hashCode();
           MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
           try {
+            initialiseIfNeeded(messageProcessorChain, this.muleContext);
             getMuleContext().getRegistry().registerObject(chainKey, messageProcessorChain);
-          } catch (RegistrationException e) {
+          } catch (Exception e) {
             // Unregister any already created component
             unregisterBeans(copyOf(objects.keySet()));
             throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
