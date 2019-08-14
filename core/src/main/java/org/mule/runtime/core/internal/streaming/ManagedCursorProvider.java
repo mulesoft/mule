@@ -52,6 +52,10 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
     return managedCursor;
   }
 
+  public CursorProvider<T> getDelegate() {
+    return delegate;
+  }
+
   /**
    * Returns a managed version of the {@code cursor}. How will that cursor be managed depends on each
    * implementation. Although it is possible that the same input {@code cursor} is returned, the assumption
