@@ -12,6 +12,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
@@ -36,5 +37,18 @@ public class SomeOps {
   public Result<InputStream, Object> inputStreamConsumingOperation(@Content TypedValue<InputStream> value) {
     LOGGER.info("A new message is passing through 'inputStreamConsumingOperation': {}", value.getValue());
     return Result.<InputStream, Object>builder().output(value.getValue()).attributes(null).build();
+  }
+
+  /**
+   * An operation to test an use-case of a ParameterGroup shown as a child-element of the operation xml definition, with a
+   * <it>isOneRequired</it> property.
+   *
+   * @param oneParameterGroup some test operation config with a isOneRequired exclusive-optional configuration
+   * @return one of the configs arguments
+   */
+  public String oneRequiredParameterResolverOperation(@ParameterGroup(
+      name = "Awesome Parameter Group", showInDsl = true) SomeParameterGroupOneRequiredConfig oneParameterGroup) {
+    return oneParameterGroup.getSomeParameter() != null ? oneParameterGroup.getSomeParameter()
+        : oneParameterGroup.getSomeOtherParameter();
   }
 }
