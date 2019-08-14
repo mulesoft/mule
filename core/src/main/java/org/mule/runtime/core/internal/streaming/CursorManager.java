@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.lang.System.identityHashCode;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -87,7 +88,7 @@ public class CursorManager {
     private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
     private ManagedCursorProvider addProvider(ManagedCursorProvider provider) {
-      return providers.get(provider.getDelegate().hashCode(), hash -> ghostBuster.track(provider)).get();
+      return providers.get(identityHashCode(provider.getDelegate()), hash -> ghostBuster.track(provider)).get();
     }
 
     private void dispose() {
