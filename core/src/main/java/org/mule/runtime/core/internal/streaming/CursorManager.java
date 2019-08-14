@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -17,13 +17,12 @@ import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvide
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.lang.ref.WeakReference;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-
-import java.lang.ref.WeakReference;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Keeps track of active {@link Cursor cursors} and their {@link CursorProvider providers}
@@ -71,9 +70,7 @@ public class CursorManager {
       throw new MuleRuntimeException(createStaticMessage("Unknown cursor provider type: " + provider.getClass().getName()));
     }
 
-    registry.get(ownerContext).addProvider(managedProvider);
-
-    return managedProvider;
+    return registry.get(ownerContext).addProvider(managedProvider);
   }
 
   private void terminated(BaseEventContext context) {
@@ -87,15 +84,15 @@ public class CursorManager {
   private class EventStreamingState {
 
     private final AtomicBoolean disposed = new AtomicBoolean(false);
-    private final Set<WeakReference<ManagedCursorProvider>> providers = newSetFromMap(new ConcurrentHashMap<>());
+    private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
-    private void addProvider(ManagedCursorProvider provider) {
-      providers.add(ghostBuster.track(provider));
+    private ManagedCursorProvider addProvider(ManagedCursorProvider provider) {
+      return providers.get(provider.getDelegate().hashCode(), hash -> ghostBuster.track(provider)).get();
     }
 
     private void dispose() {
       if (disposed.compareAndSet(false, true)) {
-        providers.forEach(weakReference -> {
+        providers.asMap().forEach((hash, weakReference) -> {
           ManagedCursorProvider provider = weakReference.get();
           if (provider != null) {
             weakReference.clear();
