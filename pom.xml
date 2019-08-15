@@ -160,7 +160,7 @@
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.61</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
-        <caffeineVersion>2.6.2</caffeineVersion>
+        <caffeineVersion>2.8.0</caffeineVersion>
         <cglibVersion>3.2.10</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
