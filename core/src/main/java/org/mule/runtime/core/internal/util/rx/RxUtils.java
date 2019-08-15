@@ -13,12 +13,15 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 /**
  * Reactor specific utils
@@ -105,5 +108,19 @@ public class RxUtils {
    */
   public static Publisher<CoreEvent> justPublishOn(CoreEvent event, ExecutorService executor) {
     return Flux.just(event).publishOn(fromExecutorService(executor));
+  }
+
+  public static <T> Supplier<FluxSink<T>> createFluxSupplier(Function<Flux<T>, Flux<?>> configurer) {
+    return () -> {
+      final FluxSinkRecorder<T> sinkRef = new FluxSinkRecorder<>();
+      Flux<?> flux = configurer.apply(Flux.create(sinkRef));
+
+      flux.subscribe();
+      return sinkRef.getFluxSink();
+    };
+  }
+
+  public static <T> FluxSinkSupplier<T> createRoundRobinFluxSupplier(Function<Flux<T>, Flux<?>> configurer, int size) {
+    return new RoundRobinFluxSinkSupplier<>(size, createFluxSupplier(configurer));
   }
 }
