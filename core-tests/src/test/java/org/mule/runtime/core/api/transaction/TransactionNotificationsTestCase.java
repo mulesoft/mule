@@ -17,7 +17,6 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -33,7 +32,9 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
 
     // the code is simple and deceptive :) The trick is this dummy transaction is handled by
     // a global TransactionCoordination instance, which binds it to the current thread.
-    Transaction transaction = new DummyTransaction("appName", new DefaultNotificationDispatcher());
+    Transaction transaction =
+        new DummyTransaction("appName",
+                             ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
 
     ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationListenerRegistry.class)
         .registerListener(new TransactionNotificationListener<TransactionNotification>() {
@@ -58,12 +59,11 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
           }
         }, notification -> transaction.getId().equals(notification.getResourceIdentifier()));
 
-
     transaction.begin();
     transaction.commit();
     transaction.rollback();
 
-    // Wait for the notifcation event to be fired as they are queued
+    // Wait for the notification event to be fired as they are queued
     latch.await(2000, MILLISECONDS);
 
     assertEquals("There are still some notifications left unfired.", 0, latch.getCount());
@@ -73,7 +73,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
 
     private DummyTransaction(String applicationName,
                              NotificationDispatcher notificationFirer) {
-      super(applicationName, notificationFirer, 2);
+      super(applicationName, notificationFirer, 0);
     }
 
     @Override

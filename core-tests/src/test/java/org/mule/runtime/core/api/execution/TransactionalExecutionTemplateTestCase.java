@@ -12,6 +12,9 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.*;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
+import org.junit.BeforeClass;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
@@ -19,8 +22,9 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.transaction.TransactionTemplateTestUtils;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -43,7 +47,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @SmallTest
 public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase {
 
-  protected MuleContext mockMuleContext = mockContextWithServices();
+  protected static MuleContext mockMuleContext = mockContextWithServices();
+  private static NotificationDispatcher notificationDispatcher;
   private static final int DEFAULT_TIMEOUT = 5;
 
   @Mock
@@ -52,11 +57,11 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   private final String applicationName = "appName";
   @Spy
   protected TestTransaction mockTransaction =
-      new TestTransaction(applicationName, new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT);
+      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
 
   @Spy
   protected TestTransaction mockNewTransaction =
-      new TestTransaction(applicationName, new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT);
+      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
 
   @Mock(lenient = true)
   protected MessagingException mockMessagingException;
@@ -70,6 +75,11 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Before
   public void prepareEvent() {
     when(mockEvent.getMessage()).thenReturn(of(""));
+  }
+
+  @BeforeClass
+  public static void setNotificationDispatcher() throws RegistrationException {
+    notificationDispatcher = ((MuleContextWithRegistry) mockMuleContext).getRegistry().lookupObject(NotificationDispatcher.class);
   }
 
   @Before

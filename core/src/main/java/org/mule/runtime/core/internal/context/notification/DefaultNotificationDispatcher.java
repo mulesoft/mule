@@ -27,12 +27,13 @@ public class DefaultNotificationDispatcher implements NotificationDispatcher {
   private static final Logger LOGGER = getLogger(DefaultNotificationDispatcher.class);
 
   @Inject
-  private ServerNotificationManager serverNotificationManager;
+  private MuleContext context;
 
   @Override
   public void dispatch(Notification notification) {
-    if (serverNotificationManager != null) {
-      serverNotificationManager.fireNotification(notification);
+    ServerNotificationManager notificationManager = context.getNotificationManager();
+    if (notificationManager != null) {
+      notificationManager.fireNotification(notification);
     } else if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("MuleEvent Manager is not enabled, ignoring notification: " + notification);
     }
