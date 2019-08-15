@@ -104,7 +104,7 @@ public final class ParameterModelsLoaderDelegate {
     for (ExtensionParameter extensionParameter : parameters) {
 
       // If the element being resolved accepts components to be declared as NestableElements, like any ComponentModel,
-      // then we will parse it as a component instead of a parameter.a
+      // then we will parse it as a component instead of a parameter.
       // Both nested components and parameters are declared using the @Parameter annotation in order to simplify the API
       if (supportsNestedElements && declaredAsNestedComponent((HasNestedComponentsDeclarer) component, extensionParameter)) {
         continue;
