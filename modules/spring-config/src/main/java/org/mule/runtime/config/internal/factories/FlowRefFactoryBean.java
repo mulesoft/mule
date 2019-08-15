@@ -26,6 +26,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -196,7 +197,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   }
 
   private class FlowRefMessageProcessor extends AbstractComponent
-      implements AnnotatedProcessor, Stoppable, Disposable {
+      implements AnnotatedProcessor, Startable, Stoppable, Disposable {
 
     private LoadingCache<String, Processor> cache;
     private boolean isExpression;
@@ -268,6 +269,15 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     @Override
     public ComponentLocation getLocation() {
       return FlowRefFactoryBean.this.getLocation();
+    }
+
+    @Override
+    public void start() throws MuleException {
+      for (Processor p : cache.asMap().values()) {
+        if (!(p instanceof Flow)) {
+          startIfNeeded(p);
+        }
+      }
     }
 
     @Override

@@ -124,6 +124,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     when(targetSubFlow.getMessageProcessors()).thenReturn(targetSubFlowProcessors);
     targetSubFlowChainBuilder.chain(targetSubFlowProcessors);
     when(targetSubFlowChild.apply(any(Publisher.class))).thenReturn(just(result));
+    when(targetSubFlow.apply(any(Publisher.class))).thenReturn(just(result));
 
     mockMuleContext.getInjector().inject(this);
 
@@ -355,6 +356,33 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     verify(targetSubFlow, times(lifecycleRounds)).start();
     verify(targetSubFlow, times(lifecycleRounds)).stop();
     verify(targetSubFlow, times(lifecycleRounds)).dispose();
+  }
+
+  @Test
+  public void referencedSubFlowIsStartedWhenCallerFlowIsStartedAfterStop() throws Exception {
+    FlowRefFactoryBean flowRefFactoryBean = createStaticFlowRefFactoryBean(targetSubFlow, null);
+    Processor flowRefProcessor = flowRefFactoryBean.doGetObject();
+
+    flowRefProcessor.process(testEvent());
+
+    verify(targetSubFlow, times(1)).initialise();
+    verify(targetSubFlow, times(1)).start();
+    verify(targetSubFlow, times(0)).stop();
+    verify(targetSubFlow, times(0)).dispose();
+
+    stopIfNeeded(flowRefProcessor);
+
+    verify(targetSubFlow, times(1)).initialise();
+    verify(targetSubFlow, times(1)).start();
+    verify(targetSubFlow, times(1)).stop();
+    verify(targetSubFlow, times(0)).dispose();
+
+    startIfNeeded(flowRefProcessor);
+
+    verify(targetSubFlow, times(1)).initialise();
+    verify(targetSubFlow, times(2)).start();
+    verify(targetSubFlow, times(1)).stop();
+    verify(targetSubFlow, times(0)).dispose();
   }
 
 }
