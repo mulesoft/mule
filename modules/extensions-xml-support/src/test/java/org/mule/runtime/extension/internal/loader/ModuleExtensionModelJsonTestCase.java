@@ -7,18 +7,21 @@
 package org.mule.runtime.extension.internal.loader;
 
 import static java.io.File.separator;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
@@ -28,8 +31,6 @@ import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionMod
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +49,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Tests to ensure XSD generation coming from an XML using the {@link ExtensionModel} mechanism.
  *
@@ -55,6 +58,9 @@ import org.skyscreamer.jsonassert.JSONAssert;
  */
 @RunWith(Parameterized.class)
 public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
+
+  private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
   @Parameterized.Parameter
   public ExtensionModel extensionModel;
@@ -115,7 +121,7 @@ public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
    * @return whether or not the "expected" test files should be updated when comparison fails
    */
   private boolean shouldUpdateExpectedFilesOnError() {
-    return false;
+    return UPDATE_EXPECTED_FILES_ON_ERROR;
   }
 
   @Test
