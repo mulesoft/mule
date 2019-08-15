@@ -61,6 +61,7 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
@@ -288,8 +289,10 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
         .setSource(messageSource)
-        .setMuleContext(muleContext)
         .setProcessContext(messageProcessContext)
+        .setApplicationName("appName")
+        .setNotificationDispatcher(mock(DefaultNotificationDispatcher.class))
+        .setTransactionFactoryManager(muleContext.getTransactionFactoryManager())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
@@ -335,6 +338,5 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     muleContext.getInjector().inject(messageSource);
     return messageSource;
   }
-
 
 }
