@@ -270,7 +270,7 @@
           <xs:element minOccurs="0" maxOccurs="1" name="door-value">
             <xs:complexType>
               <xs:complexContent>
-                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
+                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
