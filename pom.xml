@@ -163,7 +163,7 @@
         <caffeineVersion>2.6.2</caffeineVersion>
         <cglibVersion>3.2.6</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
-        <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
+        <commonsBeanUtilsVersion>1.9.4</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.9</commonsCodecVersion>
@@ -1969,7 +1969,7 @@
                     <links>
                         <link>http://docs.oracle.com/javase/7/docs/api/</link>
                         <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-                        <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.3/docs/api/</link>
+                        <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.4/docs/api/</link>
                         <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
                         <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
                         <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
