@@ -25,6 +25,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
@@ -51,8 +52,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
-@RunnerDelegateTo(Parameterized.class)
-public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
+public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
   private static final String TOO_BIG = "Too big!";
@@ -64,14 +64,6 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     synchronized (CASTED_SPELLS) {
       CASTED_SPELLS.add(spell);
     }
-  }
-
-  @Parameters(name = "{0}")
-  public static Object[][] parameters() {
-    return new Object[][] {
-        {"Direct connection", "drStrange"},
-        {"Pooled connection", "pollingDrStrange"}
-    };
   }
 
   @Inject
@@ -97,10 +89,7 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Rule
   public SystemProperty configName;
 
-  private final String name;
-
-  public BytesStreamingExtensionTestCase(String name, String configName) {
-    this.name = name;
+  public AbstractBytesStreamingExtensionTestCase(String configName) {
     this.configName = new SystemProperty("configName", configName);
   }
 
@@ -298,6 +287,15 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     ParameterModel streamingParameter =
         getStreamingStrategyParameterModel(() -> getConfigurationModel().getSourceModel("bytes-caster").get());
     assertStreamingStrategyParameter(streamingParameter);
+  }
+
+  @Test
+  @Description("Call operation multiple times in the flow")
+  public void operationCalledAndOutputConsumedMultipleTimes() throws Exception {
+    Object value =
+        flowRunner("toStreamMultipleTimes").withPayload(data).keepStreamsOpen().run().getMessage().getPayload().getValue();
+    assertThat(value, is(instanceOf(InputStream.class)));
+    assertThat(IOUtils.toString((InputStream) value), is(data));
   }
 
   private ParameterModel getStreamingStrategyParameterModel(Supplier<ParameterizedModel> model) {

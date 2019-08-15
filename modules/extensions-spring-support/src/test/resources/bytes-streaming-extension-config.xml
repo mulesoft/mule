@@ -10,7 +10,9 @@
     <marvel:dr-strange-config name="drStrange" />
 
     <marvel:dr-strange-config name="pollingDrStrange">
-        <marvel:pooling-mystic-connection />
+        <marvel:pooling-mystic-connection>
+            <pooling-profile maxActive="4" exhaustedAction="WHEN_EXHAUSTED_WAIT" maxWait="1000"/>
+        </marvel:pooling-mystic-connection>
     </marvel:dr-strange-config>
 
     <flow name="readStream">
@@ -73,6 +75,17 @@
 
     <flow name="toSimpleStream">
         <marvel:to-stream config-ref="${configName}">
+            <non-repeatable-stream />
+        </marvel:to-stream>
+    </flow>
+
+    <flow name="toStreamMultipleTimes">
+        <set-variable variableName="data" value="#[payload]"/>
+        <foreach collection="#[1 to 10]">
+            <marvel:to-stream config-ref="${configName}" data="#[vars.data]"/>
+            <logger level="ERROR" message="#[payload]"/>
+        </foreach>
+        <marvel:to-stream config-ref="${configName}" data="#[vars.data]">
             <non-repeatable-stream />
         </marvel:to-stream>
     </flow>
@@ -172,7 +185,7 @@
 
     <sub-flow name="castSpell">
         <expression-component>mel:
-            org.mule.test.module.extension.streaming.BytesStreamingExtensionTestCase.addSpell(payload)
+            org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase.addSpell(payload)
         </expression-component>
     </sub-flow>
 
