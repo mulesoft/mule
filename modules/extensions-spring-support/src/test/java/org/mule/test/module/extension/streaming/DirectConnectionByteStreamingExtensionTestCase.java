@@ -11,3 +11,5 @@ public class DirectConnectionByteStreamingExtensionTestCase extends AbstractByte
   public DirectConnectionByteStreamingExtensionTestCase() {
     super("drStrange");
   }
+
+}
