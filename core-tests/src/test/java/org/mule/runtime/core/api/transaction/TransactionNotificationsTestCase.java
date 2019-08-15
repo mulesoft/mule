@@ -11,6 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
@@ -34,7 +36,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
     // a global TransactionCoordination instance, which binds it to the current thread.
     Transaction transaction =
         new DummyTransaction("appName",
-                             ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
+                             getNotificationDispatcher(muleContext));
 
     ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationListenerRegistry.class)
         .registerListener(new TransactionNotificationListener<TransactionNotification>() {
