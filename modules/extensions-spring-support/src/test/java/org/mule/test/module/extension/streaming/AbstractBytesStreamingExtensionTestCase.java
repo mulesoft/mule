@@ -25,12 +25,10 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -47,8 +45,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
