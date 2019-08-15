@@ -39,7 +39,6 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -65,6 +64,10 @@ import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,10 +76,6 @@ import org.mockito.MockSettings;
 import org.mockito.stubbing.Answer;
 import org.reactivestreams.Publisher;
 import org.springframework.context.ApplicationContext;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 @SmallTest
 public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
@@ -120,6 +119,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     when(targetSubFlow.getMessageProcessors()).thenReturn(targetSubFlowProcessors);
     targetSubFlowChainBuilder.chain(targetSubFlowProcessors);
     when(targetSubFlowChild.apply(any(Publisher.class))).thenReturn(just(result));
+    when(targetSubFlow.apply(any(Publisher.class))).thenReturn(just(result));
 
     mockMuleContext.getInjector().inject(this);
 
@@ -332,6 +332,33 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     verify(targetSubFlow, times(lifecycleRounds)).start();
     verify(targetSubFlow, times(lifecycleRounds)).stop();
     verify(targetSubFlow, times(lifecycleRounds)).dispose();
+  }
+
+  @Test
+  public void referencedSubFlowIsStartedWhenCallerFlowIsStartedAfterStop() throws Exception {
+    FlowRefFactoryBean flowRefFactoryBean = createStaticFlowRefFactoryBean(targetSubFlow, null);
+    Processor flowRefProcessor = flowRefFactoryBean.doGetObject();
+
+    flowRefProcessor.process(testEvent());
+
+    verify(targetSubFlow, times(1)).initialise();
+    verify(targetSubFlow, times(1)).start();
+    verify(targetSubFlow, times(0)).stop();
+    verify(targetSubFlow, times(0)).dispose();
+
+    stopIfNeeded(flowRefProcessor);
+
+    verify(targetSubFlow, times(1)).initialise();
+    verify(targetSubFlow, times(1)).start();
+    verify(targetSubFlow, times(1)).stop();
+    verify(targetSubFlow, times(0)).dispose();
+
+    startIfNeeded(flowRefProcessor);
+
+    verify(targetSubFlow, times(1)).initialise();
+    verify(targetSubFlow, times(2)).start();
+    verify(targetSubFlow, times(1)).stop();
+    verify(targetSubFlow, times(0)).dispose();
   }
 
 }
