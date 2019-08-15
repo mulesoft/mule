@@ -20,7 +20,8 @@ import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory.TransactionAwareProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -32,7 +33,7 @@ import io.qameta.allure.Feature;
 @Feature(PROCESSING_STRATEGIES)
 public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     extends ProactorStreamWorkQueueProcessingStrategyTestCase
-    implements TransactionAwareProcessingStragyTestCase {
+    implements TransactionAwareProcessingStrategyTestCase {
 
   public TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
     super(mode);
@@ -76,7 +77,7 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    TransactionCoordination.getInstance().bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), 5));
 
     processFlow(testEvent());
 

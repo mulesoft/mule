@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.transaction;
 
 import static java.lang.System.identityHashCode;
+import static java.text.MessageFormat.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
@@ -14,21 +15,15 @@ import static org.mule.runtime.api.notification.TransactionNotification.TRANSACT
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
-import java.text.MessageFormat;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -45,9 +40,11 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected int timeout;
   protected ComponentLocation componentLocation;
 
-  protected MuleContext muleContext;
-  private final NotificationDispatcher notificationFirer;
+  protected String applicationName;
+  //protected MuleContext muleContext;
+  protected final NotificationDispatcher notificationFirer;
 
+  /*
   protected AbstractTransaction(MuleContext muleContext) {
     this.muleContext = muleContext;
     try {
@@ -55,6 +52,13 @@ public abstract class AbstractTransaction implements TransactionAdapter {
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+   */
+
+  protected AbstractTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
+    this.applicationName = applicationName;
+    this.notificationFirer = notificationFirer;
+    this.timeout = timeout;
   }
 
   @Override
@@ -122,7 +126,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
     TransactionCoordination.getInstance().unbindTransaction(this);
   }
 
-
   /**
    * Really begin the transaction. Note that resources are enlisted yet.
    *
@@ -182,11 +185,11 @@ public abstract class AbstractTransaction implements TransactionAdapter {
     } catch (TransactionException e) {
       status = -1;
     }
-    return MessageFormat.format("{0}[id={1} , status={2}]", getClass().getName(), id, status);
+    return format("{0}[id={1} , status={2}]", getClass().getName(), id, status);
   }
 
   private String getApplicationName() {
-    return muleContext.getConfiguration().getId();
+    return applicationName;
   }
 
   @Override

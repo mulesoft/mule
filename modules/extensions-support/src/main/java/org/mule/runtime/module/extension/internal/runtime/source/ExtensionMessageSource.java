@@ -34,12 +34,14 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -110,6 +112,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
+
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private SingleResourceTransactionFactoryManager transactionFactoryManager;
+
+  @Inject
+  private String applicationName;
 
   @Inject
   private ReflectionCache reflectionCache;
@@ -247,8 +258,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setSource(this)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
-        .setMuleContext(muleContext)
         .setProcessContext(messageProcessContext)
+        .setApplicationName(applicationName)
+        .setNotificationDispatcher(notificationDispatcher)
+        .setTransactionFactoryManager(transactionFactoryManager)
         .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .build();

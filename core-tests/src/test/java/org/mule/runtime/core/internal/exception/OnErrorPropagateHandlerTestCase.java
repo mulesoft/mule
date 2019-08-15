@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.rule.VerboseExceptions;
@@ -49,20 +50,21 @@ import io.qameta.allure.Story;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
-
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_PROPAGATE)
 public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCase {
 
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
+  private static final int DEFAULT_TIMEOUT = 5;
 
   @Rule
   public ExpectedException expectedException = none();
 
-  private final TestTransaction mockTransaction = spy(new TestTransaction(muleContext));
-  private final TestTransaction mockXaTransaction = spy(new TestTransaction(muleContext, true));
-
+  private final TestTransaction mockTransaction =
+      spy(new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT));
+  private final TestTransaction mockXaTransaction =
+      spy(new TestTransaction("appNAme", new DefaultNotificationDispatcher(), true, DEFAULT_TIMEOUT));
 
   private OnErrorPropagateHandler onErrorPropagateHandler;
 

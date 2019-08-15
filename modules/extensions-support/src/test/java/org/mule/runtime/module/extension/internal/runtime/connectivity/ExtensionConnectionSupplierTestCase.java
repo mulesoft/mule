@@ -14,7 +14,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tx.TransactionException;
@@ -22,6 +21,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -30,11 +30,11 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionCon
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTestCase {
 
@@ -61,8 +61,9 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
   @Before
   public void before() throws Exception {
-    muleContext.setTransactionManager(mock(TransactionManager.class, RETURNS_DEEP_STUBS));
-    transaction = spy(new XaTransaction(muleContext));
+    TransactionManager transactionManager = mock(TransactionManager.class, RETURNS_DEEP_STUBS);
+    muleContext.setTransactionManager(transactionManager);
+    transaction = spy(new XaTransaction("appName", transactionManager, new DefaultNotificationDispatcher(), 20));
     XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
     config = new Object();
 

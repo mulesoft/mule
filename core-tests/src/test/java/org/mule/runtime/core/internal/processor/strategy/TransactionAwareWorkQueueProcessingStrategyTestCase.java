@@ -14,27 +14,25 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
-
-import org.junit.After;
-import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
+import org.junit.After;
+import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
 @DisplayName("Default processing strategy (used when no processing strategy is configured)")
 public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase
-    implements TransactionAwareProcessingStragyTestCase {
+    implements AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase {
 
   public TransactionAwareWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
@@ -59,7 +57,7 @@ public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQue
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    TransactionCoordination.getInstance().bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), 2));
 
     processFlow(testEvent());
 

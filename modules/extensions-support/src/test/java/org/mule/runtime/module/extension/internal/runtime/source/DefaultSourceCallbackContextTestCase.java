@@ -24,6 +24,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import javax.transaction.TransactionManager;
+
 public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
 
   @Rule
@@ -68,9 +70,11 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
     when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(Optional.of(connectionHandler));
     when(sourceCallback.getSourceConnectionManager()).thenReturn(sourceConnMgr);
 
+    TransactionManager transactionManager = mock(TransactionManager.class);
+
     final TransactionSourceBinder binder = mock(TransactionSourceBinder.class);
     when(binder.bindToTransaction(txConfig, sourceCallback.getConfigurationInstance(), sourceCallback.getSourceLocation(),
-                                  connectionHandler)).thenThrow(TransactionException.class);
+                                  connectionHandler, transactionManager, 30)).thenThrow(TransactionException.class);
     when(sourceCallback.getTransactionSourceBinder()).thenReturn(binder);
 
     DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback);

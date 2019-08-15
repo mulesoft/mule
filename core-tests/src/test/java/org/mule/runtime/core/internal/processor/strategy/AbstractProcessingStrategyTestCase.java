@@ -38,7 +38,6 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.Exceptions.propagate;
@@ -66,6 +65,7 @@ import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
@@ -121,6 +121,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
+  private static final int DEFAULT_TIMEOUT = 10;
 
   protected Mode mode;
   protected static final String CPU_LIGHT = "cpuLight";
@@ -505,7 +506,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void txSameThreadPolicyHonored() throws Exception {
-    assumeThat(this, instanceOf(TransactionAwareProcessingStragyTestCase.class));
+    assumeThat(this, instanceOf(TransactionAwareProcessingStrategyTestCase.class));
 
     triggerableMessageSource = new TriggerableMessageSource();
 
@@ -515,7 +516,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    TransactionCoordination.getInstance()
+        .bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
@@ -524,7 +526,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void txSameThreadPolicyHonoredWithAsyncProcessorInFlow() throws Exception {
-    assumeThat(this, instanceOf(TransactionAwareProcessingStragyTestCase.class));
+    assumeThat(this, instanceOf(TransactionAwareProcessingStrategyTestCase.class));
 
     triggerableMessageSource = new TriggerableMessageSource();
 
@@ -534,14 +536,15 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    TransactionCoordination.getInstance()
+        .bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
     assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
   }
 
-  protected static interface TransactionAwareProcessingStragyTestCase {
+  protected interface TransactionAwareProcessingStrategyTestCase {
 
   }
 

@@ -14,17 +14,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.transaction.TransactionTemplateTestUtils;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -48,15 +46,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase {
 
   protected MuleContext mockMuleContext = mockContextWithServices();
+  private static final int DEFAULT_TIMEOUT = 5;
 
   @Mock
   protected CoreEvent RETURN_VALUE;
 
   @Spy
-  protected TestTransaction mockTransaction = new TestTransaction(mockMuleContext);
+  protected TestTransaction mockTransaction =
+      new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT);
 
   @Spy
-  protected TestTransaction mockNewTransaction = new TestTransaction(mockMuleContext);
+  protected TestTransaction mockNewTransaction =
+      new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT);
 
   @Mock(lenient = true)
   protected MessagingException mockMessagingException;
@@ -64,14 +65,11 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   protected CoreEvent mockEvent;
 
-  @Mock
-  protected FlowExceptionHandler mockMessagingExceptionHandler;
-
   @Rule
   public ExpectedException expectedException = none();
 
   @Before
-  public void prepareEvent() throws RegistrationException {
+  public void prepareEvent() {
     when(mockEvent.getMessage()).thenReturn(of(""));
   }
 
@@ -90,7 +88,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
     assertThat(result, is(RETURN_VALUE));
-    assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+    assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.nullValue());
   }
 
   @Test

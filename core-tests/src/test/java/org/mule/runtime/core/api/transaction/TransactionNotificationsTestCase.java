@@ -11,20 +11,19 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
-
 import org.mule.runtime.api.notification.IntegerAction;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
-import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
-
 import java.util.concurrent.CountDownLatch;
+
+import org.junit.Test;
 
 public class TransactionNotificationsTestCase extends AbstractMuleContextTestCase {
 
@@ -34,7 +33,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
 
     // the code is simple and deceptive :) The trick is this dummy transaction is handled by
     // a global TransactionCoordination instance, which binds it to the current thread.
-    Transaction transaction = new DummyTransaction(muleContext);
+    Transaction transaction = new DummyTransaction("appName", new DefaultNotificationDispatcher());
 
     ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationListenerRegistry.class)
         .registerListener(new TransactionNotificationListener<TransactionNotification>() {
@@ -72,8 +71,9 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
 
   private class DummyTransaction extends AbstractSingleResourceTransaction {
 
-    private DummyTransaction(MuleContext muleContext) {
-      super(muleContext);
+    private DummyTransaction(String applicationName,
+                             NotificationDispatcher notificationFirer) {
+      super(applicationName, notificationFirer, 2);
     }
 
     @Override
@@ -87,17 +87,17 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
     }
 
     @Override
-    protected void doBegin() throws TransactionException {
+    protected void doBegin() {
 
     }
 
     @Override
-    protected void doCommit() throws TransactionException {
+    protected void doCommit() {
 
     }
 
     @Override
-    protected void doRollback() throws TransactionException {
+    protected void doRollback() {
 
     }
   }
