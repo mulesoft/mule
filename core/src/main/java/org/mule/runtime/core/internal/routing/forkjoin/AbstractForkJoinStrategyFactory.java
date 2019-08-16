@@ -26,6 +26,7 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -38,6 +39,7 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -48,8 +50,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.reactivestreams.Publisher;
 
@@ -92,14 +92,20 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reactorTimeoutScheduler,
                                               timeoutErrorType),
                              maxConcurrency)
-          .collectList()
-          .doOnNext(list -> {
-            if (list.stream().anyMatch(event -> event.getError().isPresent()
-                && !isOriginalError(event.getError().get(), original.getError()))) {
-              throw propagate(createCompositeRoutingException(list.stream()
+          .reduce(new Pair<ArrayList<CoreEvent>, Boolean>(new ArrayList<>(), false), (pair, event) -> {
+            // Accumulates events and check if there is a (new) error within those events
+            pair.getFirst().add(event);
+            boolean hasNewError = event.getError().map(err -> !isOriginalError(err, original.getError())).orElse(false);
+            return new Pair(pair.getFirst(), pair.getSecond() || hasNewError);
+          })
+          .doOnNext(p -> {
+            Pair<ArrayList<CoreEvent>, Boolean> pair = (Pair<ArrayList<CoreEvent>, Boolean>) p;
+            if (pair.getSecond()) {
+              throw propagate(createCompositeRoutingException(pair.getFirst().stream()
                   .map(event -> removeOriginalError(event, original.getError())).collect(toList())));
             }
           })
+          .map(pair -> ((Pair<ArrayList<CoreEvent>, Boolean>) pair).getFirst())
           .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
