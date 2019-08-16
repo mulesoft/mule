@@ -251,8 +251,8 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
     Message message = getOutputMessage(result);
 
-    ManagedCursorStreamProvider actual = (ManagedCursorStreamProvider) message.getPayload().getValue();
-    InputStream resultingStream = actual.openCursor();
+    ManagedCursorStreamProvider cursorStreamProvider = (ManagedCursorStreamProvider) message.getPayload().getValue();
+    InputStream resultingStream = cursorStreamProvider.openCursor();
     assertThat(IOUtils.toString(resultingStream), is(HELLO_WORLD_MSG));
     verify(connectionHandler, atLeastOnce()).release();
   }
