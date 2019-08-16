@@ -144,6 +144,13 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
       dancerBuilder.scopes(scopes);
     }
 
+    String audience = config.getAudience()
+        .orElseGet(() -> grantType.getDefaultAudience().orElse(null));
+
+    if (audience != null) {
+      dancerBuilder.audience(audience);
+    }
+
     dancerBuilder
         .customParameters(config.getCustomParameters())
         .customHeaders(config.getCustomHeaders())

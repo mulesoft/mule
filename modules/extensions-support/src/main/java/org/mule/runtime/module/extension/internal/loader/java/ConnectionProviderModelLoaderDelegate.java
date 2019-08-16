@@ -129,7 +129,8 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
                                                     a.accessTokenExpr(),
                                                     a.expirationExpr(),
                                                     a.defaultScopes(),
-                                                    a.credentialsPlacement()));
+                                                    a.credentialsPlacement(),
+                                                    a.defaultAudience()));
 
     });
 

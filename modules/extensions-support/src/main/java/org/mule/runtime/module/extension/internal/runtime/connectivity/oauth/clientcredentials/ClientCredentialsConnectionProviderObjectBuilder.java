@@ -12,6 +12,7 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_CLIENT_CREDENTIALS_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.SCOPES_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.TOKEN_URL_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.AUDIENCE_PARAMETER_NAME;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -90,7 +91,8 @@ public class ClientCredentialsConnectionProviderObjectBuilder<C> extends BaseOAu
                                                                  clientCredentialsParams.get(TOKEN_URL_PARAMETER_NAME),
                                                                  clientCredentialsParams.get(SCOPES_PARAMETER_NAME),
                                                                  grantType.getCredentialsPlacement(),
-                                                                 grantType);
+                                                                 grantType,
+                                                                 clientCredentialsParams.get(AUDIENCE_PARAMETER_NAME));
 
 
     provider = new ClientCredentialsConnectionProviderWrapper<>(provider,

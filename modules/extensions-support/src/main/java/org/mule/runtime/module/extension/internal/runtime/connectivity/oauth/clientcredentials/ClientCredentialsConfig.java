@@ -30,6 +30,7 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
   private final String scope;
   private final CredentialsPlacement credentialsPlacement;
   private final ClientCredentialsGrantType grantType;
+  private final String audience;
 
   public ClientCredentialsConfig(String ownerConfigName,
                                  Optional<OAuthObjectStoreConfig> storeConfig,
@@ -41,7 +42,8 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
                                  String tokenUrl,
                                  String scope,
                                  CredentialsPlacement credentialsPlacement,
-                                 ClientCredentialsGrantType grantType) {
+                                 ClientCredentialsGrantType grantType,
+                                 String audience) {
     super(ownerConfigName, storeConfig, customParameters, customHeaders, parameterExtractors);
     this.clientId = clientId;
     this.clientSecret = clientSecret;
@@ -49,6 +51,7 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
     this.scope = scope;
     this.credentialsPlacement = credentialsPlacement;
     this.grantType = grantType;
+    this.audience = audience;
   }
 
   public String getClientId() {
@@ -69,6 +72,10 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
 
   public Optional<String> getScope() {
     return ofNullable(scope);
+  }
+
+  public Optional<String> getAudience() {
+    return ofNullable(audience);
   }
 
   @Override
