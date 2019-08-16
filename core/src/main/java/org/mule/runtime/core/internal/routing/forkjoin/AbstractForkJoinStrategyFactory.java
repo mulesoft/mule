@@ -92,20 +92,20 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reactorTimeoutScheduler,
                                               timeoutErrorType),
                              maxConcurrency)
-          .reduce(new Pair<ArrayList<CoreEvent>, Boolean>(new ArrayList<>(), false), (pair, event) -> {
+          .reduce(new Pair<List<CoreEvent>, Boolean>(new ArrayList<>(), false), (pair, event) -> {
             // Accumulates events and check if there is a (new) error within those events
             pair.getFirst().add(event);
             boolean hasNewError = event.getError().map(err -> !isOriginalError(err, original.getError())).orElse(false);
             return new Pair(pair.getFirst(), pair.getSecond() || hasNewError);
           })
           .doOnNext(p -> {
-            Pair<ArrayList<CoreEvent>, Boolean> pair = (Pair<ArrayList<CoreEvent>, Boolean>) p;
+            Pair<List<CoreEvent>, Boolean> pair = (Pair<List<CoreEvent>, Boolean>) p;
             if (pair.getSecond()) {
               throw propagate(createCompositeRoutingException(pair.getFirst().stream()
                   .map(event -> removeOriginalError(event, original.getError())).collect(toList())));
             }
           })
-          .map(pair -> ((Pair<ArrayList<CoreEvent>, Boolean>) pair).getFirst())
+          .map(pair -> ((Pair<List<CoreEvent>, Boolean>) pair).getFirst())
           .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
@@ -116,13 +116,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   }
 
   private CoreEvent removeOriginalError(CoreEvent event, Optional<Error> originalError) {
-    if (!event.getError().isPresent()) {
-      return event;
-    }
-    if (!isOriginalError(event.getError().get(), originalError)) {
-      return event;
-    }
-    return CoreEvent.builder(event).error(null).build();
+    return event.getError().map(err -> isOriginalError(err, originalError) ? CoreEvent.builder(event).error(null).build() : event)
+        .orElse(event);
   }
 
   /**
