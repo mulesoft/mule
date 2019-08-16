@@ -21,7 +21,6 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.hamcrest.Matcher;
@@ -30,7 +29,6 @@ import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.mule.tck.util.MuleContextUtils;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DIRECT)

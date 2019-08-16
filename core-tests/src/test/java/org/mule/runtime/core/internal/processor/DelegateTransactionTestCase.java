@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.processor;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -15,21 +17,16 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import javax.transaction.TransactionManager;
 
 import org.junit.Test;
-import org.mockito.Mock;
-
 
 public class DelegateTransactionTestCase extends AbstractMuleTestCase {
 
   private static final int DEFAULT_TX_TIMEOUT = 20;
 
-  @Mock
-  private TransactionManager mockTransactionManager;
-
   @Test
   public void defaultTxTimeout() {
     DelegateTransaction delegateTransaction = new DelegateTransaction("appName", new DefaultNotificationDispatcher(),
                                                                       new SingleResourceTransactionFactoryManager(),
-                                                                      mockTransactionManager, DEFAULT_TX_TIMEOUT);
+                                                                      mock(TransactionManager.class), DEFAULT_TX_TIMEOUT);
     assertThat(delegateTransaction.getTimeout(), is(DEFAULT_TX_TIMEOUT));
   }
 
@@ -37,7 +34,7 @@ public class DelegateTransactionTestCase extends AbstractMuleTestCase {
   public void changeTxTimeout() {
     DelegateTransaction delegateTransaction = new DelegateTransaction("appName", new DefaultNotificationDispatcher(),
                                                                       new SingleResourceTransactionFactoryManager(),
-                                                                      mockTransactionManager, DEFAULT_TX_TIMEOUT);
+                                                                      mock(TransactionManager.class), DEFAULT_TX_TIMEOUT);
     int newTimeout = 10;
     delegateTransaction.setTimeout(newTimeout);
     assertThat(delegateTransaction.getTimeout(), is(newTimeout));

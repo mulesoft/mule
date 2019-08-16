@@ -20,7 +20,6 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
 import org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder;
@@ -36,7 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mule.tck.util.MuleContextUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest

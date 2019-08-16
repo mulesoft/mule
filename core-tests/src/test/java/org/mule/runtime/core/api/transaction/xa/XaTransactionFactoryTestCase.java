@@ -14,21 +14,15 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.transaction.TransactionManager;
 
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mule.tck.util.MuleContextUtils;
 
 public class XaTransactionFactoryTestCase extends AbstractMuleTestCase {
 

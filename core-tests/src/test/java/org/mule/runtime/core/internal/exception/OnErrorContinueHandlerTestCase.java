@@ -55,10 +55,12 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   @Rule
   public ExpectedException expectedException = none();
 
+  private NotificationDispatcher notificationDispatcher = new DefaultNotificationDispatcher();
+
   private final TestTransaction mockTransaction =
-      spy(new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT));
+      spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
   private final TestTransaction mockXaTransaction =
-      spy(new TestTransaction("appName", new DefaultNotificationDispatcher(), true, DEFAULT_TIMEOUT));
+      spy(new TestTransaction("appName", notificationDispatcher, true, DEFAULT_TIMEOUT));
 
 
   private OnErrorContinueHandler onErrorContinueHandler;
@@ -118,10 +120,10 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   @Test
-  public void handleExceptionWithMessageProcessorsChangingEvent() throws Exception {
+  public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
     CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createChagingEventMessageProcessor(CoreEvent.builder(context).message(of(""))
+        .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
