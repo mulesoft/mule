@@ -20,12 +20,20 @@ import java.util.Date;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
+import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPCompressedDataGenerator;
 import org.bouncycastle.openpgp.PGPEncryptedDataGenerator;
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
+import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
+import org.bouncycastle.openpgp.PGPSignatureSubpacketGenerator;
+import org.bouncycastle.openpgp.operator.PGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 
@@ -40,9 +48,13 @@ public class EncryptStreamTransformer implements StreamTransformer
     private OutputStream encryptedOutputStream;
     private ByteArrayOutputStream outputStream;
     private PGPOutputMode pgpOutputMode;
-    private OutputStream result ;
+    private OutputStream result;
     private String streamName = "stream";
-    
+    private boolean signatureEnabled = false;
+    private PGPPrivateKey signerPrivateKey = null;
+    private String signerId;
+    private PGPSignatureGenerator signatureGenerator = null;
+
     public EncryptStreamTransformer(PGPPublicKey publicKey, Provider provider, int algorithm, PGPOutputMode pgpOutputMode, String streamName) throws IOException
     {
         this(publicKey, provider, algorithm, pgpOutputMode);
@@ -62,6 +74,13 @@ public class EncryptStreamTransformer implements StreamTransformer
         outputStream = new ByteArrayOutputStream();
     }
 
+    public EncryptStreamTransformer signContentsWith(PGPPrivateKey signerPrivateKey, String signerId) {
+        this.signerPrivateKey = signerPrivateKey;
+        this.signerId = signerId;
+        signatureEnabled = true;
+        return this;
+    }
+
     @Override
     public InputStream process(InputStream data) throws Exception
     {
@@ -76,6 +95,12 @@ public class EncryptStreamTransformer implements StreamTransformer
 
 
         BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(algorithm);
+
+        if (signatureEnabled)
+        {
+            encryptorBuilder.setWithIntegrityPacket(true);
+        }
+        
         PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
         BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
         encrDataGen.addMethod(methodGenerator);
@@ -83,6 +108,19 @@ public class EncryptStreamTransformer implements StreamTransformer
 
         PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
         compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream, new byte[1 << 16]);
+
+        // Add signature generation here
+        if (signatureEnabled) {
+            PGPContentSignerBuilder signerBuilder = new BcPGPContentSignerBuilder(signerPrivateKey.getPublicKeyPacket().getAlgorithm(), HashAlgorithmTags.SHA1);
+            signatureGenerator = new PGPSignatureGenerator(signerBuilder);
+            signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signerPrivateKey);
+
+            PGPSignatureSubpacketGenerator signatureSubpacketGenerator = new PGPSignatureSubpacketGenerator();
+            signatureSubpacketGenerator.setSignerUserID(false, signerId);
+            signatureGenerator.setHashedSubpackets(signatureSubpacketGenerator.generate());
+
+            signatureGenerator.generateOnePassVersion(false).encode(compressedEncryptedOutputStream);
+        }
 
         PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
         pgpOutputStream = lData.open(compressedEncryptedOutputStream, PGPLiteralData.BINARY, streamName,
@@ -93,15 +131,24 @@ public class EncryptStreamTransformer implements StreamTransformer
     }
 
 
-    private void write(InputStream toBeEncrypted) throws IOException
+    private void write(InputStream toBeEncrypted) throws IOException, PGPException
     {
         try
         {
-            copy(toBeEncrypted, pgpOutputStream);
+            if (!signatureEnabled) {
+                copy(toBeEncrypted, pgpOutputStream);
+            } else {
+                // By hand literal data generation stream handling
+                // TODO: Implement
+            }
         }
         finally
         {
             pgpOutputStream.close();
+            // TODO: Improve exception handling here
+            if (signatureEnabled) {
+                signatureGenerator.generate().encode(compressedEncryptedOutputStream);
+            }
             compressedEncryptedOutputStream.close();
             encryptedOutputStream.close();
             result.close();
