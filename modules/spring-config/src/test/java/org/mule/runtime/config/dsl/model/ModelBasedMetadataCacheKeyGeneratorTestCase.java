@@ -7,6 +7,7 @@
 package org.mule.runtime.config.dsl.model;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -492,6 +493,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   public void partialFetchingMultiLevelPartValueModifiesHashForKeys() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
     setPartialFetchingMock(operation);
+    mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
 
     ArtifactDeclaration declaration = getBaseApp();
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
@@ -519,6 +522,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   @Test
   public void sameSimpleMetadataKeyWithSameResolverOnDifferentOperationsGeneratesSameHashForKeys() throws Exception {
+    mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
+    mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
     ArtifactDeclaration declaration = getBaseApp();
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
@@ -547,6 +554,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   public void multilevelPartsWithSameValuesOnDifferentOperationsGeneratesSameHashForKeys() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
     mockMultiLevelMetadataKeyId(anotherOperation);
+    mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
+    mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
 
     ArtifactDeclaration declaration = getBaseApp();
 
@@ -580,6 +591,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   public void multilevelPartsWithDifferentValuesOnDifferentOperationsGeneratesSameHashForKeys() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
     mockMultiLevelMetadataKeyId(anotherOperation);
+    mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
+    mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
 
     ArtifactDeclaration declaration = getBaseApp();
 
@@ -620,6 +635,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     mockMultiLevelMetadataKeyId(anotherOperation);
     setPartialFetchingMock(operation);
     setPartialFetchingMock(anotherOperation);
+    mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
+    mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
+                                              "keysResolver");
 
     ArtifactDeclaration declaration = getBaseApp();
 
@@ -661,6 +680,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
     mockMultiLevelMetadataKeyId(anotherOperation);
     setPartialFetchingMock(operation);
     setPartialFetchingMock(anotherOperation);
+
 
     ArtifactDeclaration declaration = getBaseApp();
 
@@ -826,7 +846,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, Collections.emptyMap(), Optional.empty(), Optional.empty(),
+                                declaration, extensions, emptyMap(), Optional.empty(), Optional.empty(),
                                 false, uri -> getClass().getResourceAsStream(uri));
   }
 
