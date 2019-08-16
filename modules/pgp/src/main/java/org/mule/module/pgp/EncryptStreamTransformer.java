@@ -139,7 +139,12 @@ public class EncryptStreamTransformer implements StreamTransformer
                 copy(toBeEncrypted, pgpOutputStream);
             } else {
                 // By hand literal data generation stream handling
-                // TODO: Implement
+                byte[] buf = new byte[1 << 16];
+                int readBytesLength;
+                while ((readBytesLength = toBeEncrypted.read(buf)) > 0) {
+                    pgpOutputStream.write(buf, 0, readBytesLength);
+                    signatureGenerator.update(buf, 0, readBytesLength);
+                }
             }
         }
         finally
