@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.globalconfig.internal;
+package org.mule.runtime.globalconfig.internal.cluster;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
+import org.mule.api.annotation.NoImplement;
 import org.mule.maven.client.api.model.Authentication;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
@@ -19,7 +19,11 @@ import org.mule.maven.client.api.model.RepositoryPolicy;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.globalconfig.api.EnableableConfig;
 import org.mule.runtime.globalconfig.api.exception.RuntimeGlobalConfigException;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigObject;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -28,41 +32,53 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigObject;
-
 /**
  * Configuration builder for {@link MavenConfiguration} instances.
  */
-public class MavenConfigBuilder {
+public class ClusterConfig {
 
-  private static final String POSITION = "position";
+  static final String POSITION = "position";
+  EnableableConfig objectStoreConfig;
+  EnableableConfig lockFactoryConfig;
+  EnableableConfig timeSupplierConfig;
+
+  public EnableableConfig getObjectStoreConfig() {
+    return objectStoreConfig;
+  }
+
+  public EnableableConfig getLockFactoryConfig() {
+    return lockFactoryConfig;
+  }
+
+  public EnableableConfig getTimeSupplierConfig() {
+    return timeSupplierConfig;
+  }
 
   /**
-   * @param mavenConfig the maven configuration set by the user
+   * @param config the maven configuration set by the user
    * @return a {@link MavenConfiguration} created by using the user configuration and default values set by mule.
    */
-  public static MavenConfiguration buildMavenConfig(Config mavenConfig) {
+  public static MavenConfiguration buildMavenConfig(Config config) {
     try {
       String globalSettingsLocation =
-          mavenConfig.hasPath("globalSettingsLocation") ? mavenConfig.getString("globalSettingsLocation") : null;
+          config.hasPath("globalSettingsLocation") ? config.getString("globalSettingsLocation") : null;
       String userSettingsLocation =
-          mavenConfig.hasPath("userSettingsLocation") ? mavenConfig.getString("userSettingsLocation") : null;
+          config.hasPath("userSettingsLocation") ? config.getString("userSettingsLocation") : null;
       String settingsSecurityLocation =
-          mavenConfig.hasPath("settingsSecurityLocation") ? mavenConfig.getString("settingsSecurityLocation") : null;
+          config.hasPath("settingsSecurityLocation") ? config.getString("settingsSecurityLocation") : null;
       String repositoryLocation =
-          mavenConfig.hasPath("repositoryLocation") ? mavenConfig.getString("repositoryLocation") : null;
+          config.hasPath("repositoryLocation") ? config.getString("repositoryLocation") : null;
       boolean ignoreArtifactDescriptorRepositories =
-          mavenConfig.hasPath("ignoreArtifactDescriptorRepositories")
-              ? mavenConfig.getBoolean("ignoreArtifactDescriptorRepositories")
+          config.hasPath("ignoreArtifactDescriptorRepositories")
+              ? config.getBoolean("ignoreArtifactDescriptorRepositories")
               : true;
       boolean forcePolicyUpdateNever =
-          mavenConfig.hasPath("forcePolicyUpdateNever") && mavenConfig.getBoolean("forcePolicyUpdateNever");
+          config.hasPath("forcePolicyUpdateNever") && config.getBoolean("forcePolicyUpdateNever");
 
       boolean forcePolicyUpdateAlways = !forcePolicyUpdateNever
-          && mavenConfig.hasPath("forcePolicyUpdateAlways") && mavenConfig.getBoolean("forcePolicyUpdateAlways");
+          && config.hasPath("forcePolicyUpdateAlways") && config.getBoolean("forcePolicyUpdateAlways");
 
-      boolean offLineMode = mavenConfig.hasPath("offLineMode") && mavenConfig.getBoolean("offLineMode");
+      boolean offLineMode = config.hasPath("offLineMode") && config.getBoolean("offLineMode");
 
       File globalSettingsFile = findResource(globalSettingsLocation);
       File userSettingsFile = findResource(userSettingsLocation);
@@ -95,7 +111,7 @@ public class MavenConfigBuilder {
       }
 
       ConfigObject repositories =
-          mavenConfig.hasPath("repositories") ? mavenConfig.getObject("repositories") : null;
+          config.hasPath("repositories") ? config.getObject("repositories") : null;
       if (repositories != null) {
         Map<String, Object> repositoriesAsMap = repositories.unwrapped();
         repositoriesAsMap.entrySet().stream().sorted(remoteRepositoriesComparator()).forEach((repoEntry) -> {
@@ -136,7 +152,7 @@ public class MavenConfigBuilder {
     }
   }
 
-  private static Optional<RepositoryPolicy> getRepositoryPolicy(Map<String, Object> repositoryConfig, String policy) {
+  static Optional<RepositoryPolicy> getRepositoryPolicy(Map<String, Object> repositoryConfig, String policy) {
     if (repositoryConfig.containsKey(policy)) {
       RepositoryPolicy.RepositoryPolicyBuilder repositoryPolicyBuilder = RepositoryPolicy.newRepositoryPolicyBuilder();
       Map<String, String> snapshotPolicy = (Map<String, String>) repositoryConfig.get(policy);
@@ -157,10 +173,10 @@ public class MavenConfigBuilder {
     return empty();
   }
 
-  private static File findResource(String resourceLocation) {
+  static File findResource(String resourceLocation) {
     File resourceFile = null;
     if (resourceLocation != null) {
-      URL resource = MavenConfigBuilder.class.getResource(resourceLocation);
+      URL resource = ClusterConfig.class.getResource(resourceLocation);
       if (resource == null) {
         resourceFile = new File(resourceLocation);
         if (!resourceFile.exists()) {
@@ -173,7 +189,7 @@ public class MavenConfigBuilder {
     return resourceFile;
   }
 
-  private static Comparator<Map.Entry<String, Object>> remoteRepositoriesComparator() {
+  static Comparator<Map.Entry<String, Object>> remoteRepositoriesComparator() {
     return (firstEntry, secondEntry) -> {
       Integer firstPosition =
           valueOf(((Map<String, String>) firstEntry.getValue()).getOrDefault(POSITION, String.valueOf(MAX_VALUE)));
@@ -186,15 +202,16 @@ public class MavenConfigBuilder {
   /**
    * @return the runtime repository folder for maven artifacts.
    */
-  private static File getRuntimeRepositoryFolder() {
+  static File getRuntimeRepositoryFolder() {
     return new File(MuleFoldersUtil.getMuleBaseFolder(), "repository");
   }
 
   /**
    * @return creates a {@link MavenConfiguration} instance when no maven settings are defined.
    */
-  public static MavenConfiguration defaultMavenConfig() {
+  public static MavenConfiguration buildNullClusterConfig() {
     return MavenConfiguration.newMavenConfigurationBuilder().localMavenRepositoryLocation(getRuntimeRepositoryFolder())
         .build();
   }
+
 }

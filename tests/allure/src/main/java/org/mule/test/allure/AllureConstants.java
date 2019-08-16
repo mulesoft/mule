@@ -541,6 +541,12 @@ public interface AllureConstants {
 
     }
 
+    interface ClusterGlobalConfiguration {
+
+      String CLUSTER_GLOBAL_CONFIGURATION_STORY = "Cluster Global Configuration Story";
+
+    }
+
   }
 
   interface LicenseFeature {
