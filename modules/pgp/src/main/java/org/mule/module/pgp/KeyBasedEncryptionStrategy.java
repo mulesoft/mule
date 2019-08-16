@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
@@ -90,13 +91,14 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             PGPSecretKey secretKey = this.keyManager.getConfiguredSecretKey();
             String secretPassPhrase = this.keyManager.getSecretPassphrase();
             PGPSecretKeyRingCollection secretKeys =  this.keyManager.getSecretKeys();
+            PGPPublicKeyRingCollection publicKeys = this.keyManager.getPublicKeys();
 
             if (secretPassPhrase == null)
             {
                 throw new CryptoFailureException(noSecretPassPhrase(), this);
             }
 
-            return new DecryptStreamTransformer(secretKey, secretKeys, secretPassPhrase).process(data);
+            return new DecryptStreamTransformer(secretKey, secretKeys, publicKeys, secretPassPhrase).process(data);
         }
         catch (Exception e)
         {

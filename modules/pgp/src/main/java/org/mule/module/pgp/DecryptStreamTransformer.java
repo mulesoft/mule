@@ -8,32 +8,41 @@ package org.mule.module.pgp;
 
 import static java.lang.Long.toHexString;
 import static java.lang.String.format;
-import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
 import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchProviderException;
 import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.openpgp.PGPOnePassSignature;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureList;
+import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentVerifierBuilderProvider;
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPLiteralData;
-import org.bouncycastle.openpgp.PGPObjectFactory;
 import org.bouncycastle.openpgp.PGPOnePassSignatureList;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
 
 
 public class DecryptStreamTransformer implements StreamTransformer
 {
+
     public static final String INVALID_KEY_ERROR_MESSAGE = "User selected private key ID %s (through secretAliasId) but message was encrypted for key ID %s";
 
     public static final String INVALID_PGP_MESSAGE_ERROR = "Invalid PGP message";
@@ -41,30 +50,33 @@ public class DecryptStreamTransformer implements StreamTransformer
     public static final String INVALID_PASS_PHRASE_ERROR_MESSAGE = "PassPhrase '%s' is invalid for the private key with id '%s'";
 
     private static final String CHECKSUM_MESSAGE = "checksum mismatch";
+    private final PGPPublicKeyRingCollection publicKeys;
     private PGPSecretKeyRingCollection secretKeys;
     private PGPSecretKey secretKey;
     private String password;
-    private final boolean configuredSecretKey ;
+    private final boolean configuredSecretKey;
     private InputStream compressedStream;
     private InputStream clearStream;
+    private boolean validateSignatureIfFound = false;
 
     public DecryptStreamTransformer(PGPSecretKey secretKey,
                                     PGPSecretKeyRingCollection secretKeys,
-                                    String password) throws IOException
+                                    PGPPublicKeyRingCollection publicKeys, String password) throws IOException
     {
         Validate.notNull(password, "The password should not be null");
         this.configuredSecretKey = secretKey != null;
         this.secretKey = secretKey;
         this.secretKeys = secretKeys;
+        this.publicKeys = publicKeys;
         this.password = password;
     }
 
 
-    public InputStream process (InputStream toBeDecrypted) throws Exception
+    public InputStream process(InputStream toBeDecrypted) throws Exception
     {
         InputStream decodedInputStream = PGPUtil.getDecoderStream(toBeDecrypted);
 
-        PGPObjectFactory pgpF = new PGPObjectFactory(decodedInputStream, KEY_FINGERPRINT_CALCULATOR);
+        JcaPGPObjectFactory pgpF = new JcaPGPObjectFactory(decodedInputStream);
         Object pgpObject = pgpF.nextObject();
 
         if (pgpObject == null)
@@ -100,22 +112,27 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
 
         clearStream = pbe.getDataStream(new BcPublicKeyDataDecryptorFactory(privateKey));
-        PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(clearStream, KEY_FINGERPRINT_CALCULATOR);
+        JcaPGPObjectFactory pgpObjectFactory = new JcaPGPObjectFactory(clearStream);
 
         pgpObject = pgpObjectFactory.nextObject();
+
+        PGPOnePassSignature onePassSignature = null;
 
         while (!(pgpObject instanceof PGPLiteralData))
         {
             if (pgpObject instanceof PGPOnePassSignatureList)
             {
-                // TODO MULE-8386: Add support for PGP signature verification
+                if (validateSignatureIfFound)
+                {
+                    onePassSignature = ((PGPOnePassSignatureList) pgpObject).get(0);
+                }
                 pgpObject = pgpObjectFactory.nextObject();
             }
             else if (pgpObject instanceof PGPCompressedData)
             {
                 PGPCompressedData cData = (PGPCompressedData) pgpObject;
                 compressedStream = new BufferedInputStream(cData.getDataStream());
-                pgpObjectFactory = new PGPObjectFactory(compressedStream, KEY_FINGERPRINT_CALCULATOR);
+                pgpObjectFactory = new JcaPGPObjectFactory(compressedStream);
                 pgpObject = pgpObjectFactory.nextObject();
             }
             else
@@ -124,8 +141,41 @@ public class DecryptStreamTransformer implements StreamTransformer
             }
         }
 
-        PGPLiteralData pgpLiteralData = (PGPLiteralData) pgpObject;
-        return pgpLiteralData.getInputStream();
+        InputStream literalDataStream = ((PGPLiteralData) pgpObject).getInputStream();
+
+        if (!validateSignatureIfFound)
+        {
+            // Discovered signature validation not required. Return literal decrypted data stream.
+            return literalDataStream;
+        }
+        else
+        {
+            // TODO: Add some debug logging
+            onePassSignature.init(new BcPGPContentVerifierBuilderProvider(), publicKeys.getPublicKey(onePassSignature.getKeyID()));
+            ByteArrayOutputStream temporalStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1 << 16];
+            int readBytesCount;
+            while ((readBytesCount = literalDataStream.read(buffer)) > 0)
+            {
+                // Write to backup read stream
+                temporalStream.write(buffer, 0, readBytesCount);
+                // Update discovered signature
+                onePassSignature.update(buffer, 0, readBytesCount);
+            }
+
+            temporalStream.flush();
+
+            PGPSignatureList signatureList = (PGPSignatureList) pgpObjectFactory.nextObject();
+            PGPSignature signature = signatureList.get(0);
+            PGPPublicKey signerPublicKey = publicKeys.getPublicKey(signature.getKeyID());
+            signature.init(new JcaPGPContentVerifierBuilderProvider().setProvider("BC"), signerPublicKey);
+
+            if (!onePassSignature.verify(signature))
+            {
+                // TODO: Throw failed validation exception
+            }
+            return new ByteArrayInputStream(temporalStream.toByteArray());
+        }
     }
 
 
@@ -134,7 +184,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         PGPSecretKey pgpSecKey;
         PGPPrivateKey pgpPrivateKey;
 
-        if(configuredSecretKey)
+        if (configuredSecretKey)
         {
             pgpSecKey = this.secretKey;
         }
@@ -165,11 +215,11 @@ public class DecryptStreamTransformer implements StreamTransformer
         return format(INVALID_KEY_ERROR_MESSAGE, toHexString(configuredKeyId).toUpperCase(), toHexString(validKeyId).toUpperCase());
     }
 
-    private PGPException wrapWrongPassPhraseException (PGPException pgpException, String invalidPassPhrase, Long keyId)
+    private PGPException wrapWrongPassPhraseException(PGPException pgpException, String invalidPassPhrase, Long keyId)
     {
-        if(pgpException.getMessage().contains(CHECKSUM_MESSAGE))
+        if (pgpException.getMessage().contains(CHECKSUM_MESSAGE))
         {
-            return  new PGPException(createInvalidPassPhraseErrorMessage(invalidPassPhrase, keyId));
+            return new PGPException(createInvalidPassPhraseErrorMessage(invalidPassPhrase, keyId));
         }
         else
         {
@@ -177,7 +227,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
     }
 
-    private String createInvalidPassPhraseErrorMessage (String invalidPassPhrase, long keyId)
+    private String createInvalidPassPhraseErrorMessage(String invalidPassPhrase, long keyId)
     {
         return format(INVALID_PASS_PHRASE_ERROR_MESSAGE, invalidPassPhrase, toHexString(keyId).toUpperCase());
     }
