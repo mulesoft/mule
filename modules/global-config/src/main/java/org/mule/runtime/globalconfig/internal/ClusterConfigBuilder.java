@@ -16,6 +16,8 @@ import com.typesafe.config.Config;
 
 /**
  * Internal builder for {@link ClusterConfig}.
+ *
+ * @since 4.3.0
  */
 public class ClusterConfigBuilder {
 

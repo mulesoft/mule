@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.globalconfig.internal;
 
-import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.globalconfig.api.EnableableConfig;
 
-@NoExtend
 class DefaultEnableableConfig implements EnableableConfig {
 
   public static final String ENABLED_PROPERTY = "enabled";

@@ -12,6 +12,8 @@ import org.mule.runtime.globalconfig.api.EnableableConfig;
 
 /**
  * Cluster configuration settings.
+ *
+ * @since 4.3.0
  */
 @NoImplement
 public interface ClusterConfig {

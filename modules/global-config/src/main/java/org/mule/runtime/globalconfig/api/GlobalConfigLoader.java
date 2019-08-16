@@ -150,17 +150,17 @@ public class GlobalConfigLoader {
    * @return the maven configuration to use for the runtime.
    */
   public static MavenConfiguration getMavenConfig() {
-    return safetelyGetConfig(() -> mavenConfig);
+    return safelyGetConfig(() -> mavenConfig);
   }
 
   /**
    * @return the cluster configuration to use for the runtime.
    */
   public static ClusterConfig getClusterConfig() {
-    return safetelyGetConfig(() -> clusterConfig);
+    return safelyGetConfig(() -> clusterConfig);
   }
 
-  private static <T> T safetelyGetConfig(Supplier<T> configSupplier) {
+  private static <T> T safelyGetConfig(Supplier<T> configSupplier) {
     long stamp = lock.readLock();
     try {
       if (configSupplier.get() == null) {
