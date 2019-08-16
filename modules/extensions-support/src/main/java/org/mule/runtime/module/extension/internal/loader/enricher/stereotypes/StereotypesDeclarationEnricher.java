@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -40,6 +41,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
@@ -97,9 +99,11 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
     private StereotypeModel sourceParent;
     private StereotypeModel processorParent;
     private ClassTypeLoader typeLoader;
+    private TypeCatalog typeCatalog;
 
     public void apply(ExtensionLoadingContext extensionLoadingContext) {
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
+      this.typeCatalog = extensionLoadingContext.getDslResolvingContext().getTypeCatalog();
       this.typeLoader =
           new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
       ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
@@ -243,7 +247,15 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
               && !objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
             registeredTypes.add(objectType);
             objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(resolver));
-            objectType.getFields().forEach(f -> f.getValue().accept(this));
+            objectType.getFields()
+                .stream()
+                .filter(f -> getTypeId(f.getValue()).map(typeCatalog::getDeclaringExtension)
+                    .equals(getTypeId(objectType).map(typeCatalog::getDeclaringExtension)))
+                .forEach(f -> {
+                  getTypeId(f.getValue()).flatMap(typeCatalog::getType).map(t -> (MetadataType) t)
+                      .orElse(f.getValue())
+                      .accept(this);
+                });
           }
         }
 
