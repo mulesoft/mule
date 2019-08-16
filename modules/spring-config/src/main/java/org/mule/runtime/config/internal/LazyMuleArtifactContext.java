@@ -25,7 +25,6 @@ import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 
@@ -35,6 +34,7 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.util.Reference;
@@ -209,7 +209,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         for (Object object : components) {
           try {
             if (object instanceof MessageProcessorChain) {
-              // Has to be ignored as it is already initialized before it gets added to the registry
+              // When created it will be initialized
             } else {
               muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
             }
@@ -221,10 +221,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       if (applyStartPhase && muleContext.isStarted()) {
         for (Object object : components) {
           try {
-            // Has to explicitly fire the phase as it is "ignored" by the lifecycle manager (in Runtime this is
-            // handled explicitly by the flowRef processor that propagates the lifecycle phases)
             if (object instanceof MessageProcessorChain) {
-              startIfNeeded(object);
+              // Has to be ignored as when it is registered it will be started too
             } else {
               muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
             }
@@ -393,8 +391,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
           try {
             initialiseIfNeeded(messageProcessorChain, this.muleContext);
+          } catch (InitialisationException e) {
+            unregisterBeans(copyOf(objects.keySet()));
+            throw new IllegalStateException("Couldn't initialise an instance of a MessageProcessorChain", e);
+          }
+          try {
             getMuleContext().getRegistry().registerObject(chainKey, messageProcessorChain);
-          } catch (Exception e) {
+          } catch (RegistrationException e) {
             // Unregister any already created component
             unregisterBeans(copyOf(objects.keySet()));
             throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
