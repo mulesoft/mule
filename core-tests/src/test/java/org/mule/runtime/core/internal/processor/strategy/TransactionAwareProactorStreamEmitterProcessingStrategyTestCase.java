@@ -36,7 +36,6 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.tck.util.MuleContextUtils;
 
 @RunWith(Parameterized.class)
 @Feature(PROCESSING_STRATEGIES)

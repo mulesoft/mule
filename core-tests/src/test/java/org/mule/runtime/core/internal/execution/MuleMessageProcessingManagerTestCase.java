@@ -62,6 +62,9 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
     processingManager.setPolicyManager(policyManager);
 
     processingManager.initialise();
+
+    when(spyContext.getConfiguration().getId()).thenReturn("appName");
+    when(spyContext.getTransactionManager()).thenReturn(null);
   }
 
   @Test

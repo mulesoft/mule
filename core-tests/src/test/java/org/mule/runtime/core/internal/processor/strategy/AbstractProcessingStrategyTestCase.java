@@ -38,6 +38,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.bubble;
@@ -121,7 +122,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
-  private static final int DEFAULT_TIMEOUT = 10;
 
   protected Mode mode;
   protected static final String CPU_LIGHT = "cpuLight";
@@ -517,7 +517,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.start();
 
     TransactionCoordination.getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), DEFAULT_TIMEOUT));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
@@ -537,7 +537,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.start();
 
     TransactionCoordination.getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), DEFAULT_TIMEOUT));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
