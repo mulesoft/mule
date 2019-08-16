@@ -6,6 +6,7 @@
  */
 package org.mule.util;
 
+import static java.io.File.createTempFile;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,7 +18,10 @@ import static org.mule.config.DefaultMuleConfiguration.shouldFailIfDeleteOpenFil
 import static org.mule.tck.ZipUtils.compress;
 import static org.mule.util.FileUtils.deleteFile;
 import static org.mule.util.FileUtils.isFileOpen;
+import static org.mule.util.FileUtils.isFileOpenUnix;
+import static org.mule.util.FileUtils.isFileOpenWindows;
 import static org.mule.util.FileUtils.newFile;
+import static org.mule.util.FileUtils.openDirectory;
 import static org.mule.util.FileUtils.unzip;
 import org.mule.api.MuleRuntimeException;
 import org.mule.tck.ZipUtils.ZipResource;
@@ -88,13 +92,13 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             file = newFile(TEST_FILE);
             deleteFile(file);
 
-            File dir = FileUtils.openDirectory("src");
+            File dir = openDirectory("src");
             assertNotNull(dir);
             assertTrue(dir.exists());
             assertTrue(dir.canRead());
             assertTrue(dir.isDirectory());
 
-            dir = FileUtils.openDirectory("doesNotExist");
+            dir = openDirectory("doesNotExist");
             assertNotNull(dir);
             assertTrue(dir.exists());
             assertTrue(dir.canRead());
@@ -130,13 +134,13 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testDirectoryTools() throws Exception
     {
-        File dir = FileUtils.openDirectory("src");
+        File dir = openDirectory("src");
         assertNotNull(dir);
         assertTrue(dir.exists());
         assertTrue(dir.canRead());
         assertTrue(dir.isDirectory());
 
-        dir = FileUtils.openDirectory("doesNotExist");
+        dir = openDirectory("doesNotExist");
         assertNotNull(dir);
         assertTrue(dir.exists());
         assertTrue(dir.canRead());
@@ -452,11 +456,29 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
+    public void isOpenWindowsValidationDoesNotMoveFiles() throws IOException
+    {
+        File aFile = createTestFile("theFile");
+        assertThat(aFile.exists(), is(true));
+        assertThat(isFileOpenWindows(aFile), is(false));
+        assertThat(aFile.exists(), is(true));
+    }
+
+    @Test
+    public void isOpenUNIXValidationDoesNotMoveFiles() throws IOException
+    {
+        File aFile = createTestFile("theFile");
+        assertThat(aFile.exists(), is(true));
+        assertThat(isFileOpenUnix(aFile), is(false));
+        assertThat(aFile.exists(), is(true));
+    }
+
     private File createTestFile(String filePath) throws IOException
     {
-        return File.createTempFile(filePath, ".junit");
+        return createTempFile(filePath, ".junit");
     }
-    
+
     private File createTestDir(String dirPath) throws IOException
     {
         File file = createTestFile(dirPath);
