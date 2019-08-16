@@ -12,12 +12,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -57,7 +57,8 @@ public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQue
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), 2));
+    TransactionCoordination.getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 2));
 
     processFlow(testEvent());
 

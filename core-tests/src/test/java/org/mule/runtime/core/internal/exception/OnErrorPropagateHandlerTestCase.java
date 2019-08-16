@@ -21,6 +21,7 @@ import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasR
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
@@ -34,9 +35,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -61,14 +62,15 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   @Rule
   public ExpectedException expectedException = none();
 
+  private final NotificationDispatcher notificationDispatcher = getNotificationDispatcher(muleContext);
   private final TestTransaction mockTransaction =
-      spy(new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT));
+      spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
   private final TestTransaction mockXaTransaction =
-      spy(new TestTransaction("appNAme", new DefaultNotificationDispatcher(), true, DEFAULT_TIMEOUT));
+      spy(new TestTransaction("appNAme", notificationDispatcher, true, DEFAULT_TIMEOUT));
 
   private OnErrorPropagateHandler onErrorPropagateHandler;
 
-  public OnErrorPropagateHandlerTestCase(VerboseExceptions verbose) {
+  public OnErrorPropagateHandlerTestCase(VerboseExceptions verbose) throws RegistrationException {
     super(verbose);
   }
 

@@ -14,13 +14,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamWorkQueueProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory.TransactionAwareProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -77,7 +77,8 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), 5));
+    TransactionCoordination.getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 5));
 
     processFlow(testEvent());
 
