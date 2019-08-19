@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OBJECT_STORE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.HEADERS;
 import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.QUERY_PARAMS;
+import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.FORM_PARAMS;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -167,6 +168,8 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
         target = params.getQueryParams();
       } else if (property.getPlacement() == HEADERS) {
         target = params.getHeaders();
+      } else if (property.getPlacement() == FORM_PARAMS) {
+        target = params.getFormParams();
       } else {
         throw new IllegalArgumentException("Unknown parameter placement: " + property.getPlacement());
       }
@@ -187,6 +190,7 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
 
     private MultiMap<String, String> queryParams = new MultiMap<>();
     private MultiMap<String, String> headers = new MultiMap<>();
+    private MultiMap<String, String> formParams = new MultiMap<>();
 
     public MultiMap<String, String> getQueryParams() {
       return queryParams;
@@ -194,6 +198,10 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
 
     public MultiMap<String, String> getHeaders() {
       return headers;
+    }
+
+    public MultiMap<String, String> getFormParams() {
+      return formParams;
     }
   }
 }

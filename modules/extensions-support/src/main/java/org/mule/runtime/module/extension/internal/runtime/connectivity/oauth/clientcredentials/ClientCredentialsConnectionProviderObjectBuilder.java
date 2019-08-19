@@ -84,6 +84,7 @@ public class ClientCredentialsConnectionProviderObjectBuilder<C> extends BaseOAu
                                                                  buildOAuthObjectStoreConfig(result),
                                                                  customParameters.getQueryParams(),
                                                                  customParameters.getHeaders(),
+                                                                 customParameters.getFormParams(),
                                                                  callbackValues,
                                                                  clientCredentialsParams.get(CLIENT_ID_PARAMETER_NAME),
                                                                  clientCredentialsParams.get(CLIENT_SECRET_PARAMETER_NAME),

@@ -24,6 +24,8 @@ public interface OAuthClientCredentialsDancerBuilder extends OAuthDancerBuilder<
 
   OAuthClientCredentialsDancerBuilder customHeaders(Map<String, String> customHeaders);
 
+  OAuthClientCredentialsDancerBuilder customFormParameters(Map<String, String> customFormParameters);
+
   /**
    * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
    *

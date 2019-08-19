@@ -30,11 +30,13 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
   private final String scope;
   private final CredentialsPlacement credentialsPlacement;
   private final ClientCredentialsGrantType grantType;
+  private final MultiMap<String, String> customFormParameters;
 
   public ClientCredentialsConfig(String ownerConfigName,
                                  Optional<OAuthObjectStoreConfig> storeConfig,
                                  MultiMap<String, String> customParameters,
                                  MultiMap<String, String> customHeaders,
+                                 MultiMap<String, String> customFormParameters,
                                  Map<Field, String> parameterExtractors,
                                  String clientId,
                                  String clientSecret,
@@ -49,6 +51,7 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
     this.scope = scope;
     this.credentialsPlacement = credentialsPlacement;
     this.grantType = grantType;
+    this.customFormParameters = customFormParameters;
   }
 
   public String getClientId() {
@@ -69,6 +72,10 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
 
   public Optional<String> getScope() {
     return ofNullable(scope);
+  }
+
+  public MultiMap<String, String> getCustomFormParameters() {
+    return customFormParameters;
   }
 
   @Override

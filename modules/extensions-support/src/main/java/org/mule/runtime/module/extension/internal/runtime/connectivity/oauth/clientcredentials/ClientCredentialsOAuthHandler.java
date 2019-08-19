@@ -147,6 +147,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     dancerBuilder
         .customParameters(config.getCustomParameters())
         .customHeaders(config.getCustomHeaders())
+        .customFormParameters(config.getCustomFormParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
     listeners.forEach(dancerBuilder::addListener);
