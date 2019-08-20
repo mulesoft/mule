@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -69,13 +68,17 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
         }
         return removeProperty((PrivilegedEvent) event, key);
       } else {
-        typedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
+        typedValue = handleStreaming(typedValue, event, streamingManager);
 
         return addProperty((PrivilegedEvent) event, key, typedValue
             .getValue(), DataType.builder().type(typedValue.getDataType().getType())
                 .mediaType(getMediaType(typedValue)).charset(resolveEncoding(typedValue)).build());
       }
     }
+  }
+
+  protected TypedValue<T> handleStreaming(TypedValue<T> typedValue, CoreEvent event, StreamingManager streamingManager) {
+    return typedValue;
   }
 
   private MediaType getMediaType(TypedValue<T> typedValue) {
