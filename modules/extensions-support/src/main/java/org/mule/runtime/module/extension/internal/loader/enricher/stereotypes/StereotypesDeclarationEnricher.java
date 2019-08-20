@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -249,13 +248,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
             objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(resolver));
             objectType.getFields()
                 .stream()
-                .filter(f -> getTypeId(f.getValue()).map(typeCatalog::getDeclaringExtension)
-                    .equals(getTypeId(objectType).map(typeCatalog::getDeclaringExtension)))
-                .forEach(f -> {
-                  getTypeId(f.getValue()).flatMap(typeCatalog::getType).map(t -> (MetadataType) t)
-                      .orElse(f.getValue())
-                      .accept(this);
-                });
+                .forEach(f -> f.getValue().accept(this));
           }
         }
 
