@@ -14,6 +14,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
@@ -63,10 +64,9 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     txStatusMappings = unmodifiableMap(txStatusMappings);
   }
 
-  /*protected AbstractSingleResourceTransaction(MuleContext muleContext) {
+  protected AbstractSingleResourceTransaction(MuleContext muleContext) {
     super(muleContext);
   }
-   */
 
   protected AbstractSingleResourceTransaction(String applicationName,
                                               NotificationDispatcher notificationFirer, int timeout) {

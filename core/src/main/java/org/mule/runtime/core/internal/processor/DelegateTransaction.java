@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -31,11 +32,9 @@ public class DelegateTransaction extends AbstractTransaction {
   private SingleResourceTransactionFactoryManager transactionFactoryManager;
   private TransactionManager transactionManager;
 
-  /*
   public DelegateTransaction(MuleContext muleContext) {
     super(muleContext);
   }
-   */
 
   public DelegateTransaction(String applicationName, NotificationDispatcher notificationFirer,
                              SingleResourceTransactionFactoryManager transactionFactoryManager,

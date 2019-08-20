@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCanOnlyBindToResources;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
@@ -25,6 +26,13 @@ import java.util.Optional;
 public class ExtensionTransaction extends AbstractSingleResourceTransaction {
 
   private Optional<ExtensionTransactionalResource> boundResource = empty();
+
+  /**	  /**
+   * {@inheritDoc}	   * {@inheritDoc}
+   */
+  public ExtensionTransaction(MuleContext muleContext) {
+    super(muleContext);
+  }
 
   /**
    * {@inheritDoc}

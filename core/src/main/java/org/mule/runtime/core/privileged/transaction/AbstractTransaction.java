@@ -16,12 +16,16 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransa
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
 import java.util.Optional;
@@ -41,10 +45,9 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected ComponentLocation componentLocation;
 
   protected String applicationName;
-  //protected MuleContext muleContext;
+  protected MuleContext muleContext;
   protected final NotificationDispatcher notificationFirer;
 
-  /*
   protected AbstractTransaction(MuleContext muleContext) {
     this.muleContext = muleContext;
     try {
@@ -53,7 +56,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
       throw new MuleRuntimeException(e);
     }
   }
-   */
 
   protected AbstractTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
     this.applicationName = applicationName;

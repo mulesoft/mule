@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.transaction;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 
 import javax.transaction.TransactionManager;
@@ -24,9 +25,7 @@ public interface TransactionFactory {
    * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
    */
-  /*
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
-   */
 
   /**
    * Create and begins a new transaction

@@ -18,6 +18,7 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
@@ -64,6 +65,11 @@ public class XaTransaction extends AbstractTransaction {
                        int timeout) {
     super(applicationName, notificationFirer, timeout);
     this.txManager = transactionManager;
+  }
+
+  public XaTransaction(MuleContext muleContext) {
+    super(muleContext);
+    this.txManager = muleContext.getTransactionManager();
   }
 
   @Override
@@ -257,7 +263,7 @@ public class XaTransaction extends AbstractTransaction {
 
   // moved here from connection wrapper
   public boolean enlistResource(XAResource resource) throws TransactionException {
-    //TransactionManager txManager = muleContext.getTransactionManager();
+    TransactionManager txManager = muleContext.getTransactionManager();
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
@@ -276,7 +282,7 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   public boolean delistResource(XAResource resource, int tmflag) throws TransactionException {
-    //TransactionManager txManager = muleContext.getTransactionManager();
+    TransactionManager txManager = muleContext.getTransactionManager();
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
@@ -305,7 +311,7 @@ public class XaTransaction extends AbstractTransaction {
 
   @Override
   public void resume() throws TransactionException {
-    //TransactionManager txManager = muleContext.getTransactionManager();
+    TransactionManager txManager = muleContext.getTransactionManager();
 
     if (txManager == null) {
       throw new IllegalStateException(CoreMessages
@@ -320,7 +326,7 @@ public class XaTransaction extends AbstractTransaction {
 
   @Override
   public Transaction suspend() throws TransactionException {
-    //TransactionManager txManager = muleContext.getTransactionManager();
+    TransactionManager txManager = muleContext.getTransactionManager();
 
     if (txManager == null) {
       throw new IllegalStateException(CoreMessages

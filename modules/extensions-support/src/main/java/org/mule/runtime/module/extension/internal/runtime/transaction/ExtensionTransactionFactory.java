@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
@@ -20,6 +21,14 @@ import javax.transaction.TransactionManager;
  * @since 4.0
  */
 public class ExtensionTransactionFactory implements TransactionFactory {
+
+  @Override
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    Transaction transaction = new ExtensionTransaction(muleContext);
+    transaction.begin();
+
+    return transaction;
+  }
 
   /**
    * {@inheritDoc}
