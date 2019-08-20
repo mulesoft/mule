@@ -193,7 +193,7 @@ public class MavenConfigBuilder {
   /**
    * @return creates a {@link MavenConfiguration} instance when no maven settings are defined.
    */
-  public static MavenConfiguration buildNullMavenConfig() {
+  public static MavenConfiguration defaultMavenConfig() {
     return MavenConfiguration.newMavenConfigurationBuilder().localMavenRepositoryLocation(getRuntimeRepositoryFolder())
         .build();
   }
