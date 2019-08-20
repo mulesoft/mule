@@ -9,6 +9,7 @@ package org.mule.test.module.extension.transaction;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.*;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
@@ -24,6 +25,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.transaction.TransactionManager;
+
 public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
@@ -32,9 +35,11 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
   }
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     MessageStorage.clean();
     TransactionalSource.isSuccess = null;
+    TransactionManager transactionManager = mock(TransactionManager.class, RETURNS_DEEP_STUBS);
+    muleContext.setTransactionManager(transactionManager);
   }
 
   @After
