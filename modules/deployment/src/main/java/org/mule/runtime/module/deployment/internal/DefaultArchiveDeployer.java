@@ -499,7 +499,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       }
       return deployedArtifact;
     } catch (RuntimeException e) {
-      deploymentListener.onRedeploymentFailure(artifactName, e);
+      if (isRedeploy) {
+        deploymentListener.onRedeploymentFailure(artifactName, e);
+      }
       throw e;
     }
   }
