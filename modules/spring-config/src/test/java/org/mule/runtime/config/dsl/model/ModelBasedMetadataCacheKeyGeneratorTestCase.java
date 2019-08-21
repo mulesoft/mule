@@ -733,10 +733,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
           @Override
           public TypeKeysResolver getKeyResolver() {
-            TypeKeysResolver mockedResolver = mock(PartialTypeKeysResolver.class);
-            when(mockedResolver.getResolverName()).thenReturn("MOCKED_RESOLVER");
-            when(mockedResolver.getCategoryName()).thenReturn("MOCKED_RESOLVER_CATEGORY");
-            return mockedResolver;
+            return mock(PartialTypeKeysResolver.class);
           }
 
           @Override
