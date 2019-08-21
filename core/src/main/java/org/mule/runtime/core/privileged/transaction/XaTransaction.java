@@ -263,7 +263,6 @@ public class XaTransaction extends AbstractTransaction {
 
   // moved here from connection wrapper
   public boolean enlistResource(XAResource resource) throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
@@ -282,7 +281,6 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   public boolean delistResource(XAResource resource, int tmflag) throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
@@ -311,8 +309,6 @@ public class XaTransaction extends AbstractTransaction {
 
   @Override
   public void resume() throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
-
     if (txManager == null) {
       throw new IllegalStateException(CoreMessages
           .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
@@ -326,8 +322,6 @@ public class XaTransaction extends AbstractTransaction {
 
   @Override
   public Transaction suspend() throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
-
     if (txManager == null) {
       throw new IllegalStateException(CoreMessages
           .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());

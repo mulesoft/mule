@@ -57,8 +57,8 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
   private XAResource mockXaResource;
 
   @Before
-  public void setUpMuleContext() throws RegistrationException {
-    when(mockMuleContext.getTransactionManager()).thenReturn(mockTransactionManager);
+  public void setUpMuleContext() throws Exception {
+    mockMuleContext.setTransactionManager(mockTransactionManager);
     when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     notificationDispatcher = getNotificationDispatcher(mockMuleContext);
   }
