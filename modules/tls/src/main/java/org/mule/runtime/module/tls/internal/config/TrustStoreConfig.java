@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tls.internal.config;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 
 /**
@@ -13,7 +14,7 @@ import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
  *
  * @since 4.0
  */
-public class TrustStoreConfig implements TlsContextTrustStoreConfiguration {
+public class TrustStoreConfig extends AbstractComponent implements TlsContextTrustStoreConfiguration {
 
   private String path;
   private String password;
@@ -21,6 +22,7 @@ public class TrustStoreConfig implements TlsContextTrustStoreConfiguration {
   private String algorithm;
   private boolean insecure;
 
+  @Override
   public String getPath() {
     return path;
   }
@@ -29,6 +31,7 @@ public class TrustStoreConfig implements TlsContextTrustStoreConfiguration {
     this.path = path;
   }
 
+  @Override
   public String getPassword() {
     return password;
   }
@@ -37,6 +40,7 @@ public class TrustStoreConfig implements TlsContextTrustStoreConfiguration {
     this.password = password;
   }
 
+  @Override
   public String getType() {
     return type;
   }
@@ -45,6 +49,7 @@ public class TrustStoreConfig implements TlsContextTrustStoreConfiguration {
     this.type = type;
   }
 
+  @Override
   public String getAlgorithm() {
     return algorithm;
   }
@@ -53,6 +58,7 @@ public class TrustStoreConfig implements TlsContextTrustStoreConfiguration {
     this.algorithm = algorithm;
   }
 
+  @Override
   public boolean isInsecure() {
     return insecure;
   }

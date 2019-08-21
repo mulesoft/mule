@@ -7,7 +7,9 @@
 package org.mule.runtime.core.api.source.scheduler;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.source.SchedulerConfiguration;
 
 import java.util.concurrent.ScheduledFuture;
@@ -18,7 +20,7 @@ import java.util.concurrent.ScheduledFuture;
  * @since 3.5.0, moved from {@link org.mule.runtime.core.api.schedule.SchedulerFactory}.
  */
 @NoExtend
-public abstract class PeriodicScheduler implements Scheduler, SchedulerConfiguration {
+public abstract class PeriodicScheduler extends AbstractComponent implements Scheduler, SchedulerConfiguration {
 
   /**
    * {@inheritDoc}

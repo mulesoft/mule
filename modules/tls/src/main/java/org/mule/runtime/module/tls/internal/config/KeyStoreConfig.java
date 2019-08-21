@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tls.internal.config;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 
 /**
@@ -13,7 +14,7 @@ import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
  *
  * @since 4.0
  */
-public class KeyStoreConfig implements TlsContextKeyStoreConfiguration {
+public class KeyStoreConfig extends AbstractComponent implements TlsContextKeyStoreConfiguration {
 
   private String alias;
   private String keyPassword;
@@ -22,6 +23,7 @@ public class KeyStoreConfig implements TlsContextKeyStoreConfiguration {
   private String type;
   private String algorithm;
 
+  @Override
   public String getAlias() {
     return alias;
   }
@@ -30,6 +32,7 @@ public class KeyStoreConfig implements TlsContextKeyStoreConfiguration {
     this.alias = alias;
   }
 
+  @Override
   public String getKeyPassword() {
     return keyPassword;
   }
@@ -38,6 +41,7 @@ public class KeyStoreConfig implements TlsContextKeyStoreConfiguration {
     this.keyPassword = keyPassword;
   }
 
+  @Override
   public String getPath() {
     return path;
   }
@@ -46,6 +50,7 @@ public class KeyStoreConfig implements TlsContextKeyStoreConfiguration {
     this.path = path;
   }
 
+  @Override
   public String getPassword() {
     return password;
   }
@@ -54,6 +59,7 @@ public class KeyStoreConfig implements TlsContextKeyStoreConfiguration {
     this.password = password;
   }
 
+  @Override
   public String getType() {
     return type;
   }
@@ -62,6 +68,7 @@ public class KeyStoreConfig implements TlsContextKeyStoreConfiguration {
     this.type = type;
   }
 
+  @Override
   public String getAlgorithm() {
     return algorithm;
   }
