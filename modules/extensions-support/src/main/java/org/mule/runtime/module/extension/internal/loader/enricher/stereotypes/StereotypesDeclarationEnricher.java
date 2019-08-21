@@ -40,7 +40,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
@@ -98,11 +97,9 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
     private StereotypeModel sourceParent;
     private StereotypeModel processorParent;
     private ClassTypeLoader typeLoader;
-    private TypeCatalog typeCatalog;
 
     public void apply(ExtensionLoadingContext extensionLoadingContext) {
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
-      this.typeCatalog = extensionLoadingContext.getDslResolvingContext().getTypeCatalog();
       this.typeLoader =
           new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
       ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
