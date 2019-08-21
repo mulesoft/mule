@@ -17,16 +17,16 @@ public interface DomainManager extends DomainRepository {
   /**
    * Adds a new domain
    *
-   * @param domain domain to add.
-   * @throws IllegalArgumentException if the domain is already added.
+   * @param domain plugin classloader to add. Non null
+   * @throws IllegalArgumentException if there is already a domain with tthe given name.
    */
   void addDomain(Domain domain);
 
   /**
    * Removes a domain
    *
-   * @param domain domain to remove.
+   * @param name name of the domain to remove. Non empty.
    */
-  void removeDomain(Domain domain);
+  void removeDomain(String name);
 
 }

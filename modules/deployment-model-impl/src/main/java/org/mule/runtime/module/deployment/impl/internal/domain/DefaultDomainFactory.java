@@ -124,7 +124,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   }
 
   public void dispose(DomainWrapper domain) {
-    domainManager.removeDomain(domain);
+    domainManager.removeDomain(domain.getArtifactName());
   }
 
   public void start(DomainWrapper domainWrapper) {
@@ -134,14 +134,15 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   @Override
   protected Domain doCreateArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
     String domainName = domainLocation.getName();
-    DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
-
-    if (domainManager.contains(domainDescriptor.getBundleDescriptor())) {
+    Domain domain = domainManager.getDomain(domainName);
+    if (domain != null) {
       throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
     }
     if (domainName.contains(" ")) {
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
+
+    DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(emptySet(), domainDescriptor.getPlugins().stream().collect(toList()), true);

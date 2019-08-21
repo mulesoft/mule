@@ -12,7 +12,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
-import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -27,12 +26,9 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
@@ -171,23 +167,13 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   private Domain getApplicationDomain(ApplicationDescriptor descriptor) {
-    try {
-      String domainName = descriptor.getDomainName();
-      Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
-      if (domainBundleDescriptor.isPresent()) {
-        BundleDescriptor bundleDescriptor = domainBundleDescriptor.get();
-        return domainRepository.getDomain(bundleDescriptor);
-      } else {
-        BundleDescriptor bundleDescriptor = createBundleDescriptorFromName(domainName);
-        return domainRepository.getDomain(bundleDescriptor);
-      }
-    } catch (DomainNotFoundException e) {
-      throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
-                                                               e.getDomainName(), descriptor.getName())),
-                                    e);
-    } catch (IncompatibleDomainVersionException e) {
-      throw new DeploymentException(e.getI18nMessage(), e);
+    Domain domain = domainRepository.getDomain(descriptor.getDomainName());
+    if (domain == null) {
+      throw new DeploymentException(createStaticMessage(format("Domain '%s' "
+          + "has to be deployed in order to deploy Application '%s'", descriptor.getDomainName(), descriptor.getName())));
     }
+
+    return domain;
   }
 
   private Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors(ApplicationDescriptor descriptor) {

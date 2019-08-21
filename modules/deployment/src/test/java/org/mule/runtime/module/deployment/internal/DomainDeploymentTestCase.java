@@ -92,8 +92,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       new DomainFileBuilder("wait-domain").definedBy("wait-domain-config.xml");
   private final DomainFileBuilder incompleteDomainFileBuilder =
       new DomainFileBuilder("incompleteDomain").definedBy("incomplete-domain-config.xml");
-  private final DomainFileBuilder incompleteFixedDomainFileBuilder =
-      new DomainFileBuilder("incompleteDomain").definedBy("empty-domain-config.xml");
   private final DomainFileBuilder invalidDomainBundleFileBuilder =
       new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml");
   private final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
@@ -165,22 +163,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, sharedAAppFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, sharedBAppFileBuilder.getId());
-  }
-
-  @Test
-  public void cannotDeployTwoDomainsWithTheSameBundleDescriptor() throws Exception {
-    String aDomainName = emptyDomainFileBuilder.getId() + "A";
-    String anotherDomainName = emptyDomainFileBuilder.getId() + "B";
-
-    addExplodedDomainFromBuilder(emptyDomainFileBuilder, aDomainName);
-    startDeployment();
-    assertDeploymentSuccess(domainDeploymentListener, aDomainName);
-
-    reset(domainDeploymentListener);
-
-    // does this deployment after startup to ensure it is done after the another one
-    addExplodedDomainFromBuilder(emptyDomainFileBuilder, anotherDomainName);
-    assertDeploymentFailure(domainDeploymentListener, anotherDomainName);
   }
 
   @Test
@@ -1104,7 +1086,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void maintainsDomainFolderOnExplodedAppDeploymentError() throws Exception {
+  public void mantainsDomainFolderOnExplodedAppDeploymentError() throws Exception {
     startDeployment();
 
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);
@@ -1129,13 +1111,14 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    // Deploys another domain to confirm that DeploymentService has execute the updater thread
+    // Deploys another app to confirm that DeploymentService has execute the updater thread
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
+
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    // Redeploys a fixed version for incompleteDomain
-    addPackedDomainFromBuilder(incompleteFixedDomainFileBuilder, incompleteDomainFileBuilder.getZipPath());
-    assertFailedDomainRedeploymentSuccess(incompleteFixedDomainFileBuilder.getId());
+    // Deploys another domain to confirm that DeploymentService has execute the updater thread
+    addPackedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getZipPath());
+    assertFailedDomainRedeploymentSuccess(incompleteDomainFileBuilder.getId());
   }
 
   @Test
@@ -1291,15 +1274,18 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     startDeployment();
 
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);
+
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    // Deploys another domain to confirm that DeploymentService has execute the updater thread
+    // Deploys another app to confirm that DeploymentService has execute the updater thread
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
+
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
     // Redeploys a fixed version for incompleteDomain
-    addExplodedDomainFromBuilder(incompleteFixedDomainFileBuilder, incompleteFixedDomainFileBuilder.getId());
-    assertFailedDomainRedeploymentSuccess(incompleteFixedDomainFileBuilder.getId());
+    addExplodedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getId());
+
+    assertFailedDomainRedeploymentSuccess(incompleteDomainFileBuilder.getId());
   }
 
   @Test
