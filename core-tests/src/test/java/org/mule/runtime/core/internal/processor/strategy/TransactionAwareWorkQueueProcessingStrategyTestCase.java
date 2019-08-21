@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.*;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
@@ -32,7 +33,7 @@ import org.junit.Test;
 @Story(DEFAULT)
 @DisplayName("Default processing strategy (used when no processing strategy is configured)")
 public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase
-    implements AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase {
+    implements TransactionAwareProcessingStrategyTestCase {
 
   public TransactionAwareWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);

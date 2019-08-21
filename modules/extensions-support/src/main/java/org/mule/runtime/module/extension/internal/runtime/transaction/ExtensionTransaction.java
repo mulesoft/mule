@@ -27,8 +27,8 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction {
 
   private Optional<ExtensionTransactionalResource> boundResource = empty();
 
-  /**	  /**
-   * {@inheritDoc}	   * {@inheritDoc}
+  /**
+   * {@inheritDoc}
    */
   public ExtensionTransaction(MuleContext muleContext) {
     super(muleContext);
