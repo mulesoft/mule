@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import javax.transaction.TransactionManager;
 
@@ -32,8 +33,15 @@ public class TestTransactionFactory implements TransactionFactory {
   }
 
   @Override
-  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
-    return null;
+  public Transaction beginTransaction(MuleContext muleContext) {
+    try {
+      return beginTransaction(muleContext.getConfiguration().getId(),
+                              ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class),
+                              muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
+                              mockTransaction.getTimeout());
+    } catch (Exception e) {
+      throw new RuntimeException();
+    }
   }
 
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,

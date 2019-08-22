@@ -85,14 +85,10 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    */
   public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(MuleContext muleContext,
                                                                                            TransactionConfig transactionConfig) {
-    try {
-      return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
-                                                  getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                  muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
-                                                  transactionConfig);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
+    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
+                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
+                                                muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
+                                                transactionConfig);
   }
 
   /**
@@ -104,20 +100,19 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    */
   public static <T> TransactionalExecutionTemplate<T> createCompatibilityExecutionTemplate(MuleContext muleContext,
                                                                                            TransactionConfig transactionConfig) {
+    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
+                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
+                                                muleContext.getTransactionFactoryManager(),
+                                                muleContext.getTransactionManager(),
+                                                transactionConfig, true, true);
+  }
+
+  private static NotificationDispatcher getNotificationDispatcher(MuleContextWithRegistry muleContext) {
     try {
-      return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
-                                                  getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                  muleContext.getTransactionFactoryManager(),
-                                                  muleContext.getTransactionManager(),
-                                                  transactionConfig, true, true);
+      return muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
-  }
-
-  private static NotificationDispatcher getNotificationDispatcher(MuleContextWithRegistry muleContext)
-      throws RegistrationException {
-    return muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
   }
 
   private static String getApplicationName(MuleContext muleContext) {
@@ -133,15 +128,11 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    */
   public static <T> TransactionalExecutionTemplate<T> createScopeTransactionalExecutionTemplate(MuleContext muleContext,
                                                                                                 TransactionConfig transactionConfig) {
-    try {
-      return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
-                                                  getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                  muleContext.getTransactionFactoryManager(),
-                                                  muleContext.getTransactionManager(),
-                                                  transactionConfig, false, false);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
+    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
+                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
+                                                muleContext.getTransactionFactoryManager(),
+                                                muleContext.getTransactionManager(),
+                                                transactionConfig, false, false);
   }
 
   @Override

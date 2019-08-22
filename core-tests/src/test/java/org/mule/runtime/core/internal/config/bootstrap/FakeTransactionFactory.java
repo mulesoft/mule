@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.config.bootstrap;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -18,7 +17,7 @@ import javax.transaction.TransactionManager;
 public final class FakeTransactionFactory implements UniversalTransactionFactory {
 
   @Override
-  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+  public Transaction beginTransaction(MuleContext muleContext) {
     return null;
   }
 

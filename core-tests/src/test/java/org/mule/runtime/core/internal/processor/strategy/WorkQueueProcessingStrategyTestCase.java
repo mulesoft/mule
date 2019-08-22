@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
@@ -32,7 +33,6 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -170,7 +170,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance()
+    getInstance()
         .bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), DEFAULT_TIMEOUT));
 
     expectedException.expect(MessagingException.class);

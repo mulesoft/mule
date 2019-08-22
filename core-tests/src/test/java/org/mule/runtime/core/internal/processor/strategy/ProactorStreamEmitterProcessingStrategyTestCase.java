@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
@@ -33,6 +34,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
@@ -50,7 +52,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
@@ -83,7 +84,7 @@ import io.qameta.allure.Story;
 public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
   public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
@@ -241,7 +242,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), 5));
+    getInstance().bindTransaction(new TestTransaction("appName", new DefaultNotificationDispatcher(), 5));
 
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));

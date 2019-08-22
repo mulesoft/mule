@@ -33,6 +33,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
@@ -64,7 +65,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -516,7 +516,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance()
+    getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
     processFlow(newEvent());
 
@@ -536,7 +536,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance()
+    getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
     processFlow(newEvent());
 

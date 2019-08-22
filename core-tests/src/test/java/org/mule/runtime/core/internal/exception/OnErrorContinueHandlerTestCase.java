@@ -20,6 +20,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
@@ -30,7 +31,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -74,9 +74,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   public void before() throws Exception {
     super.before();
 
-    Transaction currentTransaction = TransactionCoordination.getInstance().getTransaction();
+    Transaction currentTransaction = getInstance().getTransaction();
     if (currentTransaction != null) {
-      TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
+      getInstance().unbindTransaction(currentTransaction);
     }
 
     onErrorContinueHandler = new OnErrorContinueHandler();
@@ -173,8 +173,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   private void configureXaTransactionAndSingleResourceTransaction() throws TransactionException {
-    TransactionCoordination.getInstance().bindTransaction(mockXaTransaction);
-    TransactionCoordination.getInstance().suspendCurrentTransaction();
-    TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+    getInstance().bindTransaction(mockXaTransaction);
+    getInstance().suspendCurrentTransaction();
+    getInstance().bindTransaction(mockTransaction);
   }
 }

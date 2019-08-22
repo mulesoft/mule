@@ -10,6 +10,7 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 
 import javax.transaction.TransactionManager;
 
@@ -19,11 +20,14 @@ import javax.transaction.TransactionManager;
 public interface TransactionFactory {
 
   /**
-   * Create and begins a new transaction
+   * Create and begins a new transaction.
+   * If you use this method please set the timeout in the next step.
    * 
    * @return a new Transaction
    * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
+   *
+   * @deprecated since 4.3.0. Use {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)} instead
    */
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
 
@@ -33,12 +37,16 @@ public interface TransactionFactory {
    * @return a new Transaction
    * @throws TransactionException if the transaction cannot be created or begun
    * @param applicationName will be part of the notification
-   * @param notificationFirer allows the Mule container to fire notifications
+   * @param notificationDispatcher allows the Mule container to fire notifications
    */
-  Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                               SingleResourceTransactionFactoryManager transactionFactoryManager,
-                               TransactionManager transactionManager, int timeout)
-      throws TransactionException;
+  default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
+                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
+                                       TransactionManager transactionManager, int timeout)
+      throws TransactionException {
+    Transaction transaction = beginTransaction(((DefaultNotificationDispatcher) notificationDispatcher).getContext());
+    transaction.setTimeout(timeout);
+    return transaction;
+  }
 
   /**
    * Determines whether this transaction factory creates transactions that are really transacted or if they are being used to

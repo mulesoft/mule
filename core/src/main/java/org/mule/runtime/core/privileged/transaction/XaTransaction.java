@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noJtaTransactionAvailable;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCommitFailed;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionResourceAlreadyListedForKey;
@@ -17,9 +20,7 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
@@ -67,6 +68,10 @@ public class XaTransaction extends AbstractTransaction {
     this.txManager = transactionManager;
   }
 
+  /**
+   * @deprecated since 4.3.0. Use {@link #XaTransaction(String, TransactionManager, NotificationDispatcher, int)} instead
+   */
+  @Deprecated
   public XaTransaction(MuleContext muleContext) {
     super(muleContext);
     this.txManager = muleContext.getTransactionManager();
@@ -75,8 +80,8 @@ public class XaTransaction extends AbstractTransaction {
   @Override
   protected void doBegin() throws TransactionException {
     if (txManager == null) {
-      throw new IllegalStateException(CoreMessages
-          .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
+      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
+          .getMessage());
     }
 
     try {
@@ -284,7 +289,7 @@ public class XaTransaction extends AbstractTransaction {
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
-        throw new TransactionException(noJtaTransactionAvailable(Thread.currentThread()));
+        throw new TransactionException(noJtaTransactionAvailable(currentThread()));
       }
       return jtaTransaction.delistResource(resource, tmflag);
     } catch (SystemException e) {
@@ -310,8 +315,8 @@ public class XaTransaction extends AbstractTransaction {
   @Override
   public void resume() throws TransactionException {
     if (txManager == null) {
-      throw new IllegalStateException(CoreMessages
-          .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
+      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
+          .getMessage());
     }
     try {
       txManager.resume(transaction);
@@ -323,8 +328,8 @@ public class XaTransaction extends AbstractTransaction {
   @Override
   public Transaction suspend() throws TransactionException {
     if (txManager == null) {
-      throw new IllegalStateException(CoreMessages
-          .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
+      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
+          .getMessage());
     }
     try {
       transaction = txManager.suspend();
@@ -402,7 +407,7 @@ public class XaTransaction extends AbstractTransaction {
     private Object resource;
 
     public ResourceKey(Object resourceFactory) {
-      Preconditions.checkArgument(resourceFactory != null, "resourceFactory cannot be null");
+      checkArgument(resourceFactory != null, "resourceFactory cannot be null");
       this.resourceFactory = resourceFactory;
       this.resource = null;
     }
