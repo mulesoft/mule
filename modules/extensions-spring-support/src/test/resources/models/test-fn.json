@@ -16,7 +16,77 @@
   "privilegedPackages": [],
   "privilegedArtifacts": [],
   "externalLibraries": [],
-  "importedTypes": [],
+  "importedTypes": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "java.io.Serializable"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "door"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "victim",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "address",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "previous"
+          },
+          "model": "#..",
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ],
   "configurations": [
     {
       "stereotype": {
@@ -1357,72 +1427,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-                  "classInformation": {
-                    "classname": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.io.Serializable"
-                    ],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "typeDsl": {
-                    "allowInlineDefinition": true,
-                    "allowTopLevelDefinition": true
-                  },
-                  "typeAlias": {
-                    "value": "door"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "victim",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "address",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "previous"
-                    },
-                    "model": "#..",
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
               },
               "hasDynamicType": false,
               "required": false,
