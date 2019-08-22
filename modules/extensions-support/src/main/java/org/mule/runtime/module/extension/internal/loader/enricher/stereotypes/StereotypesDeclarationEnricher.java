@@ -243,9 +243,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
               && !objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
             registeredTypes.add(objectType);
             objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(resolver));
-            objectType.getFields()
-                .stream()
-                .forEach(f -> f.getValue().accept(this));
+            objectType.getFields().forEach(f -> f.getValue().accept(this));
           }
         }
 
