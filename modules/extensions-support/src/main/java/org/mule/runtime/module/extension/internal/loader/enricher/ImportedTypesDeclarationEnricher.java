@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 
@@ -75,7 +76,10 @@ public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDec
         }
 
         extensionDeclaration
-            .addImportedType(new ImportedTypeModel((ObjectType) importedType));
+            .addImportedType(new ImportedTypeModel(getTypeId(importedType)
+                .flatMap(importedTypeId -> extensionLoadingContext.getDslResolvingContext().getTypeCatalog()
+                    .getType(importedTypeId))
+                .orElse((ObjectType) importedType)));
       });
     }
   }
