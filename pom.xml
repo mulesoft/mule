@@ -215,7 +215,7 @@
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
         <saxonVersion>9.9.1-1</saxonVersion>
-        <slf4jVersion>1.7.25</slf4jVersion>
+        <slf4jVersion>1.7.26</slf4jVersion>
         <snakeYamlVersion>1.21</snakeYamlVersion>
         <springVersion>5.1.6.RELEASE</springVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
