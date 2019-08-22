@@ -8,14 +8,12 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Collections.emptyMap;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
-
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * {@code SourceCompletionHandler} that does nothing.
@@ -25,13 +23,13 @@ import reactor.core.publisher.Mono;
 public class NullSourceCompletionHandler implements SourceCompletionHandler {
 
   @Override
-  public Publisher<Void> onCompletion(CoreEvent event, Map<String, Object> parameters) {
-    return Mono.empty();
+  public void onCompletion(CoreEvent event, Map<String, Object> parameters, CompletableCallback<Void> callback) {
+    callback.complete(null);
   }
 
   @Override
-  public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
-    return Mono.empty();
+  public void onFailure(MessagingException exception, Map<String, Object> parameters, CompletableCallback<Void> callback) {
+    callback.error(exception);
   }
 
   @Override

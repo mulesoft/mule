@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.Map;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Invokes a {@link Source} callback
@@ -26,10 +25,10 @@ interface SourceCallbackExecutor {
    * Executes the callback
    *
    * @param event      the result {@link CoreEvent}
-   * @param parameters
+   * @param parameters the callback's parameters
    * @param context    a {@link SourceCallbackContext} @return the callback's result
-   * @return a Publisher which completes either with no value or with an error
    */
-  Publisher<Void> execute(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context);
+  void execute(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context,
+               CompletableCallback<Void> callback);
 
 }

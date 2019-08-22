@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.component.execution.CompletableCallback.from;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
@@ -27,9 +28,9 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
-import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -281,12 +282,15 @@ public class SourceAdapter implements Lifecycle {
     }
 
     @Override
-    public Publisher<Void> onCompletion(CoreEvent event, Map<String, Object> parameters) {
-      return from(onSuccessExecutor.execute(event, parameters, context)).doOnSuccess(v -> commit());
+    public void onCompletion(CoreEvent event, Map<String, Object> parameters, CompletableCallback<Void> callback) {
+      if (context.getTransactionHandle().isTransacted()) {
+        callback = callback.before(v -> commit());
+      }
+      onSuccessExecutor.execute(event, parameters, context, callback);
     }
 
     @Override
-    public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
+    public void onFailure(MessagingException exception, Map<String, Object> parameters, CompletableCallback<Void> callback) {
       final CoreEvent event = exception.getEvent();
       final boolean isBackPressureError = event.getError()
           .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
@@ -302,15 +306,17 @@ public class SourceAdapter implements Lifecycle {
         executor = onErrorExecutor;
       }
 
-      return from(executor.execute(event, parameters, context)).doAfterTerminate(this::rollback);
+      if (context.getTransactionHandle().isTransacted()) {
+        callback = callback.finallyBefore(this::rollback);
+      }
+
+      executor.execute(event, parameters, context, callback);
     }
 
     @Override
     public void onTerminate(Either<MessagingException, CoreEvent> result) throws Exception {
       CoreEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
-      from(onTerminateExecutor.execute(event, emptyMap(), context))
-          .doAfterTerminate(() -> context.releaseConnection())
-          .subscribe();
+      onTerminateExecutor.execute(event, emptyMap(), context, from(context::releaseConnection));
     }
 
     private void commit() {

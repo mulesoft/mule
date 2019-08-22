@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Handles the result of flow processing.
@@ -28,16 +27,16 @@ public interface SourceCompletionHandler {
    * the {@code exceptionCallback}, which might (depending on {@code HandledCompletionExceptionResult})
    * produce a new value as the result of handling such error
    *
-   * @param event            the result of the flow execution
+   * @param event the result of the flow execution
    */
-  Publisher<Void> onCompletion(CoreEvent event, Map<String, Object> parameters);
+  void onCompletion(CoreEvent event, Map<String, Object> parameters, CompletableCallback<Void> callback);
 
   /**
    * Invoked when a failure occurs during the flow processing
-   *  @param exception the exception thrown during processing
    *
+   * @param exception the exception thrown during processing
    */
-  Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters);
+  void onFailure(MessagingException exception, Map<String, Object> parameters, CompletableCallback<Void> callback);
 
   void onTerminate(Either<MessagingException, CoreEvent> eventOrException) throws Exception;
 
