@@ -22,9 +22,9 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
  */
 abstract class AbstractCursorStream extends CursorStream {
 
-  public static final String TRACK_CURSOR_RELEASED = SYSTEM_PROPERTY_PREFIX + "track.releaser";
+  private static final String TRACK_CURSOR_RELEASED = SYSTEM_PROPERTY_PREFIX + "track.releaser";
 
-  public static Boolean TRACK_RELEASER = Boolean.getBoolean(TRACK_CURSOR_RELEASED);
+  private static final Boolean TRACK_RELEASER = Boolean.getBoolean(TRACK_CURSOR_RELEASED);
 
   private final CursorStreamProvider provider;
   private long mark = 0;
