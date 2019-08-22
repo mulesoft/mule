@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class SourcePolicySuccessResult {
+public class SourcePolicySuccessResult implements SourcePolicyResult {
 
   private final CoreEvent result;
   private final Supplier<Map<String, Object>> responseParameters;
@@ -43,7 +43,8 @@ public class SourcePolicySuccessResult {
   /**
    * @return the result of the flow execution.
    */
-  public CoreEvent getResult() {
+  @Override
+  public CoreEvent getEvent() {
     return result;
   }
 

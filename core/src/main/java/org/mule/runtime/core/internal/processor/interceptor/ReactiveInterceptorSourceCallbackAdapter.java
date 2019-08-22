@@ -24,14 +24,14 @@ import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link MessageSource} callback into the {@code Reactor} response handling
@@ -67,15 +67,15 @@ public class ReactiveInterceptorSourceCallbackAdapter extends AbstractIntercepto
       Map<String, String> dslParameters = (Map<String, String>) (source).getAnnotation(ANNOTATION_PARAMETERS);
 
       SourcePolicySuccessResult interceptedBeforeResult =
-          new SourcePolicySuccessResult(doBefore(interceptor, source, dslParameters).apply((InternalEvent) result.getResult()),
+          new SourcePolicySuccessResult(doBefore(interceptor, source, dslParameters).apply((InternalEvent) result.getEvent()),
                                         result.getResponseParameters(), result.getMessageSourceResponseParametersProcessor());
 
       try {
         Publisher<Void> publisher = next.apply(interceptedBeforeResult);
-        doAfter(interceptor, source, empty()).apply((InternalEvent) interceptedBeforeResult.getResult());
+        doAfter(interceptor, source, empty()).apply((InternalEvent) interceptedBeforeResult.getEvent());
         return publisher;
       } catch (Throwable t) {
-        doAfter(interceptor, source, of(t)).apply((InternalEvent) interceptedBeforeResult.getResult());
+        doAfter(interceptor, source, of(t)).apply((InternalEvent) interceptedBeforeResult.getEvent());
         return error(t);
       }
     };

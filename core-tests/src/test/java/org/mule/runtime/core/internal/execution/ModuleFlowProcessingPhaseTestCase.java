@@ -13,6 +13,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -30,6 +31,7 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIF
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
 import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
@@ -38,9 +40,9 @@ import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventTha
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.ErrorType;
@@ -48,6 +50,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -75,7 +78,6 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -129,20 +131,25 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     sourcePolicy = mock(SourcePolicy.class);
     when(policyManager.createSourcePolicyInstance(any(), any(), any(), any())).thenReturn(sourcePolicy);
     successResult = mock(SourcePolicySuccessResult.class);
-    when(successResult.getResult()).then(invocation -> event);
+    when(successResult.getEvent()).then(invocation -> event);
     when(successResult.getResponseParameters()).thenReturn(() -> emptyMap());
     when(successResult.createErrorResponseParameters()).thenReturn(event -> emptyMap());
     failureResult = mock(SourcePolicyFailureResult.class);
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
+    when(failureResult.getEvent()).then(invocation -> messagingException.getEvent());
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
-    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
-      event = invocation.getArgument(0);
-      return just(right(successResult));
-    });
+    doAnswer(inv -> {
+      event = inv.getArgument(0);
+      CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback = inv.getArgument(2);
+      callback.complete(right(successResult));
+
+      return null;
+    }).when(sourcePolicy).process(any(), any(), any());
 
     moduleFlowProcessingPhase = new ModuleFlowProcessingPhase(policyManager);
     moduleFlowProcessingPhase.setMuleContext(muleContext);
     initialiseIfNeeded(moduleFlowProcessingPhase, muleContext);
+    startIfNeeded(moduleFlowProcessingPhase);
 
     flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     final FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
@@ -406,10 +413,13 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   }
 
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
-    when(sourcePolicy.process(any(), any())).thenAnswer(invocation -> {
+    doAnswer(invocation -> {
       messagingException = buildFailingFlowException(invocation.getArgument(0), failure);
-      return just(left(failureResult));
-    });
+      CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback = invocation.getArgument(2);
+      callback.complete(left(failureResult));
+
+      return null;
+    }).when(sourcePolicy).process(any(), any(), any());
   }
 
   private void configureFailingFlow(RuntimeException failure) {
@@ -423,8 +433,8 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   private MessagingException buildFailingFlowException(final CoreEvent event, final Exception exception) {
     return new MessagingException(CoreEvent.builder(event)
-        .error(ErrorBuilder.builder(exception).errorType(ERROR_FROM_FLOW).build())
-        .build(), exception);
+                                      .error(ErrorBuilder.builder(exception).errorType(ERROR_FROM_FLOW).build())
+                                      .build(), exception);
   }
 
 }

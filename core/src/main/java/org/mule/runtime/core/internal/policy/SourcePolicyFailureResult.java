@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class SourcePolicyFailureResult {
+public class SourcePolicyFailureResult implements SourcePolicyResult {
 
   private final MessagingException messagingException;
   private final Supplier<Map<String, Object>> errorResponseParameters;
@@ -45,5 +46,10 @@ public class SourcePolicyFailureResult {
    */
   public Supplier<Map<String, Object>> getErrorResponseParameters() {
     return errorResponseParameters;
+  }
+
+  @Override
+  public CoreEvent getEvent() {
+    return messagingException.getEvent();
   }
 }
