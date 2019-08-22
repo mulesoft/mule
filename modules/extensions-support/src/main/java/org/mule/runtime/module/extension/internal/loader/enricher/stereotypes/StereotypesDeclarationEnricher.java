@@ -249,30 +249,37 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
                                               Map<ObjectType, ObjectType> subTypeToParent) {
       if (def.equals(ImplicitStereotypeDefinition.class)) {
         // If the type is defined in another extension, set the namespace for its stereotype accordingly
-        namespace = getTypeId(type)
-            .flatMap(typeId -> dslResolvingContext.getExtensionForType(typeId))
-            .map(extensionModel -> extensionModel.getXmlDslModel().getPrefix().toUpperCase())
-            .orElse(namespace);
+        namespace = resolveImportedTypeNamespace(type, namespace);
+
+        final String stereotypeName = toStereotypeName(type.getAnnotation(ClassInformationAnnotation.class).get().getClassname());
 
         final ObjectType parentObjectType = subTypeToParent.get(type);
-
-        final String classname = type.getAnnotation(ClassInformationAnnotation.class).get().getClassname();
-        final String stereotypeName = underscorize(classname.substring(classname.lastIndexOf(".") + 1)).toUpperCase();
-
         if (parentObjectType != null) {
-          final String parentClassname = parentObjectType.getAnnotation(ClassInformationAnnotation.class).get().getClassname();
-          final String parentStereotypeName =
-              underscorize(parentClassname.substring(parentClassname.lastIndexOf(".") + 1)).toUpperCase();
-
+          // If the type is a subtype, link to its parent stereotype
           return getStereotype(new ImplicitStereotypeDefinition(stereotypeName,
-                                                                new ImplicitStereotypeDefinition(parentStereotypeName)),
+                                                                new ImplicitStereotypeDefinition(toStereotypeName(parentObjectType
+                                                                    .getAnnotation(ClassInformationAnnotation.class).get()
+                                                                    .getClassname()))),
                                namespace, stereotypes);
         } else {
-          return getStereotype(new ImplicitStereotypeDefinition(stereotypeName), namespace, stereotypes);
+          // else, create the stereotype without a parent
+          return getStereotype(new ImplicitStereotypeDefinition(stereotypeName),
+                               namespace, stereotypes);
         }
       } else {
         return createCustomStereotype(def, namespace, stereotypes);
       }
+    }
+
+    private String toStereotypeName(final String classname) {
+      return underscorize(classname.substring(classname.lastIndexOf(".") + 1)).toUpperCase();
+    }
+
+    private String resolveImportedTypeNamespace(ObjectType type, String namespace) {
+      return getTypeId(type)
+          .flatMap(typeId -> dslResolvingContext.getExtensionForType(typeId))
+          .map(extensionModel -> extensionModel.getXmlDslModel().getPrefix().toUpperCase())
+          .orElse(namespace);
     }
 
     private void resolveStereotype(ObjectType type,

@@ -141,18 +141,18 @@ public final class ParameterAllowedStereotypesDeclarionEnricher extends Abstract
     }
 
     private List<StereotypeModel> parameterizedTypeAnnotations(Map<String, ObjectType> typesByClassName, Type parameterizedType,
-                                                               final int i) {
+                                                               final int typeArgumentIndex) {
       if (parameterizedType instanceof ParameterizedType) {
         final Type[] actualTypeArguments = ((ParameterizedType) parameterizedType).getActualTypeArguments();
 
         Class<?> mapParamType;
 
-        if (actualTypeArguments[i] instanceof ParameterizedType) {
-          mapParamType = (Class<?>) ((ParameterizedType) actualTypeArguments[i]).getRawType();
-        } else if (actualTypeArguments[i] instanceof WildcardType) {
+        if (actualTypeArguments[typeArgumentIndex] instanceof ParameterizedType) {
+          mapParamType = (Class<?>) ((ParameterizedType) actualTypeArguments[typeArgumentIndex]).getRawType();
+        } else if (actualTypeArguments[typeArgumentIndex] instanceof WildcardType) {
           mapParamType = Object.class;
         } else {
-          mapParamType = (Class<?>) actualTypeArguments[i];
+          mapParamType = (Class<?>) actualTypeArguments[typeArgumentIndex];
         }
 
         return typeToAnnotations(typesByClassName, mapParamType);
