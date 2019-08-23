@@ -79,6 +79,10 @@ final class LoggerContextCache implements Disposable {
         }).build();
 
     executorService = newScheduledThreadPool(1, new LoggerContextReaperThreadFactory(reaperContextClassLoader));
+    int threads = ((ThreadPoolExecutor) executorService).prestartAllCoreThreads();
+    if (threads != 1) {
+      throw new MuleRuntimeException(createStaticMessage("Could not init logger context repeater thread pool"));
+    }    
   }
 
   private void stop(LoggerContext loggerContext) {
