@@ -4,6 +4,7 @@
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/metadata" schemaLocation="http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg" schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/vegan" schemaLocation="http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd"></xs:import>
   <xs:complexType name="org.mule.test.subtypes.extension.ParentShape">

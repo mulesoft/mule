@@ -10,19 +10,21 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Generates the minimal required component set to create a configuration component (i.e.: file:config, ftp:connection, a flow
@@ -38,12 +40,12 @@ import java.util.function.Predicate;
 // TODO MULE-9688 - refactor this class when the ComponentModel becomes immutable
 public class MinimalApplicationModelGenerator {
 
-  private ConfigurationDependencyResolver dependencyResolver;
+  private final ConfigurationDependencyResolver dependencyResolver;
   private boolean ignoreAlwaysEnabled = false;
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param dependencyResolver a {@link ConfigurationDependencyResolver} associated with an {@link ApplicationModel}
    */
   public MinimalApplicationModelGenerator(ConfigurationDependencyResolver dependencyResolver) {
@@ -68,11 +70,11 @@ public class MinimalApplicationModelGenerator {
    * @param predicate to select the {@link ComponentModel componentModels} to be enabled.
    * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
    */
-  public ApplicationModel getMinimalModel(Predicate<ComponentModel> predicate) {
-    List<ComponentModel> required = dependencyResolver.findRequiredComponentModels(predicate);
+  public ApplicationModel getMinimalModel(Predicate<ComponentAst> predicate) {
+    List<ComponentAst> required = dependencyResolver.findRequiredComponentModels(predicate);
 
     required.stream().forEach(componentModel -> {
-      final DefaultComponentLocation componentLocation = componentModel.getComponentLocation();
+      final ComponentLocation componentLocation = componentModel.getLocation();
       if (componentLocation != null) {
         enableComponentDependencies(componentModel);
       }
@@ -88,7 +90,7 @@ public class MinimalApplicationModelGenerator {
    * @throws NoSuchComponentModelException if the location doesn't match to a component.
    */
   public ApplicationModel getMinimalModel(Location location) {
-    ComponentModel requestedComponentModel = dependencyResolver.findRequiredComponentModel(location);
+    ComponentAst requestedComponentModel = (ComponentAst) dependencyResolver.findRequiredComponentModel(location);
     enableComponentDependencies(requestedComponentModel);
     return dependencyResolver.getApplicationModel();
   }
@@ -98,9 +100,10 @@ public class MinimalApplicationModelGenerator {
    *
    * @param requestedComponentModel the requested {@link ComponentModel} to be enabled.
    */
-  private void enableComponentDependencies(ComponentModel requestedComponentModel) {
-    final String requestComponentModelName = requestedComponentModel.getNameAttribute();
-    final Set<DependencyNode> componentDependencies = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
+  private void enableComponentDependencies(ComponentAst requestedComponentModel) {
+    final String requestComponentModelName = requestedComponentModel.getName().orElse(null);
+    final Set<DependencyNode> componentDependencies =
+        dependencyResolver.resolveComponentDependencies((ComponentModel) requestedComponentModel);
     final Set<DependencyNode> alwaysEnabledComponents =
         ignoreAlwaysEnabled ? emptySet() : dependencyResolver.resolveAlwaysEnabledComponents();
     final ImmutableSet.Builder<DependencyNode> otherRequiredGlobalComponentsSetBuilder =
@@ -114,7 +117,7 @@ public class MinimalApplicationModelGenerator {
     enableTopLevelElementDependencies(allRequiredComponentModels);
     enableInnerElementDependencies(allRequiredComponentModels);
 
-    ComponentModel parentModel = requestedComponentModel.getParent();
+    ComponentModel parentModel = ((ComponentModel) requestedComponentModel).getParent();
     while (parentModel != null && parentModel.getParent() != null) {
       parentModel.setEnabled(true);
       parentModel = parentModel.getParent();
@@ -131,8 +134,8 @@ public class MinimalApplicationModelGenerator {
 
 
     // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
-    requestedComponentModel.setEnabled(true);
-    requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
+    ((ComponentModel) requestedComponentModel).setEnabled(true);
+    ((ComponentModel) requestedComponentModel).executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
     enableParentComponentModels(requestedComponentModel);
 
     // Mule root component model has to be enabled too
@@ -149,7 +152,7 @@ public class MinimalApplicationModelGenerator {
           && noneTopLevelDendencyNames.contains(componentModel.getNameAttribute())) {
         componentModel.setEnabled(true);
         componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(true));
-        enableParentComponentModels(componentModel);
+        enableParentComponentModels((ComponentAst) componentModel);
       }
     });
   }
@@ -171,8 +174,8 @@ public class MinimalApplicationModelGenerator {
     }
   }
 
-  private void enableParentComponentModels(ComponentModel requestedComponentModel) {
-    ComponentModel parentModel = requestedComponentModel.getParent();
+  private void enableParentComponentModels(ComponentAst requestedComponentModel) {
+    ComponentModel parentModel = ((ComponentModel) requestedComponentModel).getParent();
     while (parentModel != null && parentModel.getParent() != null) {
       parentModel.setEnabled(true);
       parentModel = parentModel.getParent();

@@ -48,9 +48,12 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
+import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
@@ -76,6 +79,29 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
   public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
+  }
+
+  @Override
+  protected ProcessingStrategyFactory createProcessingStrategyFactory() {
+    return new AsyncProcessingStrategyFactory() {
+
+      private int maxConcurrency = MAX_VALUE;
+
+      @Override
+      public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+        return createProcessingStrategy(muleContext, schedulersNamePrefix, maxConcurrency);
+      }
+
+      @Override
+      public void setMaxConcurrencyEagerCheck(boolean maxConcurrencyEagerCheck) {
+        // Nothing to do
+      }
+
+      @Override
+      public void setMaxConcurrency(int maxConcurrency) {
+        this.maxConcurrency = maxConcurrency;
+      }
+    };
   }
 
   @Override
@@ -463,7 +489,9 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
-        .processors(cpuLightProcessor, latchedProcessor).build();
+        .processors(cpuLightProcessor, latchedProcessor)
+        .maxConcurrency(6)
+        .build();
     flow.initialise();
     flow.start();
 
@@ -478,7 +506,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
       // Give time for the extra dispatch to get to the point where it starts retrying
       Thread.sleep(500);
 
-      expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+      expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
       processFlow(newEvent());
     } finally {
       latchedProcessor.release();
@@ -561,7 +589,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
       // Give time for the dispatch to get to the capacity check
       Thread.sleep(500);
 
-      expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+      expectedException.expectCause(instanceOf(FlowBackPressureMaxConcurrencyExceededException.class));
       processFlow(newEvent());
     } finally {
       latchedProcessor.release();

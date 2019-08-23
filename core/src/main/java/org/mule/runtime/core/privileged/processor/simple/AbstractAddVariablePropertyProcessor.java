@@ -20,24 +20,29 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
-  private static final Logger logger = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
 
   private AttributeEvaluator identifierEvaluator;
   private String value;
   private AttributeEvaluator valueEvaluator;
   private Optional<DataType> returnType = empty();
+
+  private StreamingManager streamingManager;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -50,25 +55,30 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   public CoreEvent process(CoreEvent event) throws MuleException {
     String key = identifierEvaluator.resolveValue(event);
     if (key == null) {
-      logger.error("Setting Null variable keys is not supported, this entry is being ignored");
+      LOGGER.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
     } else {
-      final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(event);
       TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
-      event = builder.build();
+
       if (typedValue.getValue() == null) {
-        if (logger.isDebugEnabled()) {
-          logger.debug(format(
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(format(
                               "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
                               key, valueEvaluator.getRawValue()));
         }
         return removeProperty((PrivilegedEvent) event, key);
       } else {
+        typedValue = handleStreaming(typedValue, event, streamingManager);
+
         return addProperty((PrivilegedEvent) event, key, typedValue
             .getValue(), DataType.builder().type(typedValue.getDataType().getType())
                 .mediaType(getMediaType(typedValue)).charset(resolveEncoding(typedValue)).build());
       }
     }
+  }
+
+  protected TypedValue<T> handleStreaming(TypedValue<T> typedValue, CoreEvent event, StreamingManager streamingManager) {
+    return typedValue;
   }
 
   private MediaType getMediaType(TypedValue<T> typedValue) {
@@ -128,5 +138,10 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   public DataType getReturnDataType() {
     return returnType.orElse(DataType.OBJECT);
+  }
+
+  @Inject
+  public void setStreamingManager(StreamingManager streamingManager) {
+    this.streamingManager = streamingManager;
   }
 }

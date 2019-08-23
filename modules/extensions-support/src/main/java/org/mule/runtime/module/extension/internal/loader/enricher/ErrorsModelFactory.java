@@ -12,6 +12,7 @@ import static org.mule.runtime.extension.api.error.MuleErrors.CRITICAL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
+
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -24,13 +25,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
-import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
@@ -55,7 +54,7 @@ public class ErrorsModelFactory {
   public ErrorsModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace)
       throws IllegalModelDefinitionException {
     this.extensionNamespace = extensionNamespace.toUpperCase();
-    final DirectedGraph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> graph = toGraph(errorTypesEnum);
+    final Graph<ErrorTypeDefinition, DefaultEdge> graph = toGraph(errorTypesEnum);
 
     errorModelMap = new HashMap<>();
     initErrorModelMap(errorModelMap);
@@ -97,9 +96,9 @@ public class ErrorsModelFactory {
     return errorModelMap.get(toIdentifier(errorTypeDefinition));
   }
 
-  private DefaultDirectedGraph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> toGraph(ErrorTypeDefinition<?>[] errorTypesEnum) {
-    final DefaultDirectedGraph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> graph =
-        new DefaultDirectedWeightedGraph<>(ImmutablePair::new);
+  private DefaultDirectedGraph<ErrorTypeDefinition, DefaultEdge> toGraph(ErrorTypeDefinition<?>[] errorTypesEnum) {
+    final DefaultDirectedGraph<ErrorTypeDefinition, DefaultEdge> graph =
+        new DefaultDirectedWeightedGraph<>(DefaultEdge.class);
     Stream.of(errorTypesEnum).forEach(error -> addType(error, graph));
     detectCycleReferences(graph);
     return graph;
@@ -131,7 +130,7 @@ public class ErrorsModelFactory {
   }
 
   private void addType(ErrorTypeDefinition<?> errorType,
-                       Graph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> graph) {
+                       Graph<ErrorTypeDefinition, DefaultEdge> graph) {
     graph.addVertex(errorType);
     String type = errorType.getType();
     if (!ANY.name().equals(type) && !CRITICAL.name().equals(type)) {

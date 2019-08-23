@@ -16,13 +16,15 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,6 +37,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
@@ -64,19 +67,14 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (nestedChain == null) {
       return event;
     }
+    final boolean txPrevoiuslyActive = isTransactionActive();
     ExecutionTemplate<CoreEvent> executionTemplate =
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
-      if (isTransactionActive()) {
+      if (!txPrevoiuslyActive && isTransactionActive()) {
         TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
-        ComponentLocation lastLocation = transaction.getComponentLocation().orElse(null);
         transaction.setComponentLocation(getLocation());
-
-        try {
-          return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
-        } finally {
-          transaction.setComponentLocation(lastLocation);
-        }
+        return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
       } else {
         return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
       }
@@ -144,6 +142,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
+      if (messagingExceptionHandler instanceof ErrorHandler) {
+        ErrorHandler errorHandler = (ErrorHandler) messagingExceptionHandler;
+        Location location = Location.builderFromStringRepresentation(this.getLocation().getLocation()).build();
+        errorHandler.setExceptionListenersLocation(location);
+      }
     }
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
@@ -172,4 +175,14 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     return singletonList(nestedChain);
   }
 
+
+  @Override
+  public ProcessingType getProcessingType() {
+    byte txAction = transactionConfig.getAction();
+    if (txAction == ACTION_ALWAYS_BEGIN || txAction == ACTION_BEGIN_OR_JOIN) {
+      return ProcessingType.BLOCKING;
+    } else {
+      return ProcessingType.CPU_LITE;
+    }
+  }
 }

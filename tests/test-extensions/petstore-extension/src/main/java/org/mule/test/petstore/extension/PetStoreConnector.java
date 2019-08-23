@@ -28,7 +28,7 @@ import java.util.List;
 @ErrorTypes(PetstoreErrorTypeDefinition.class)
 @Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class,
     PetStoreStreamSource.class, PetStoreListSource.class, PartialPetAdoptionSource.class, NumberPetAdoptionSource.class,
-    ConnectedPetAdoptionSource.class})
+    ConnectedPetAdoptionSource.class, PetFailingPollingSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
 public class PetStoreConnector {
 

@@ -90,6 +90,40 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.tck.message.StringAttributes",
+        "classInformation": {
+          "classname": "org.mule.tck.message.StringAttributes",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "java.io.Serializable"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "StringAttributes"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "value"
+          },
+          "model": {
+            "type": "String"
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
         "classInformation": {
           "classname": "org.mule.test.heisenberg.extension.model.Ricin",
@@ -3695,40 +3729,6 @@
   ],
   "modelProperties": {},
   "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.tck.message.StringAttributes",
-        "classInformation": {
-          "classname": "org.mule.tck.message.StringAttributes",
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [
-            "java.io.Serializable"
-          ],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "StringAttributes"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "value"
-          },
-          "model": {
-            "type": "String"
-          }
-        }
-      ]
-    },
     {
       "format": "java",
       "type": "Object",

@@ -18,6 +18,23 @@
           }
         }
       }
+    },
+    "cluster": {
+      "objectStore": {
+        "enabled":  false
+      },
+      "lockFactory": {
+        "enabled": false
+      },
+      "timeSupplier": {
+        "enabled": false
+      },
+      "queueManager": {
+        "enabled": false
+      },
+      "clusterService": {
+        "enabled": false
+      }
     }
   }
 }

@@ -11,11 +11,11 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
@@ -34,6 +34,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_AFTE
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFORE_SUITE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFORE_TEST_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_TEST_IDENTIFIER;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -43,12 +44,12 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Visitor that setups the {@link DefaultComponentLocation} for all mule components in the artifact configuration.
@@ -87,7 +88,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     }
     DefaultComponentLocation componentLocation;
     Optional<TypedComponentIdentifier> typedComponentIdentifier =
-        of(builder().identifier(componentModel.getIdentifier()).type(componentModel.getComponentType().orElse(UNKNOWN))
+        of(builder().identifier(componentModel.getIdentifier()).type(componentModel.getComponentType())
             .build());
 
     if (componentModel.isRoot()) {
@@ -198,7 +199,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         || componentModel.getIdentifier().equals(BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER)
         || componentModel.getIdentifier().equals(BATCH_ON_COMPLETE_IDENTIFIER)
         || componentModel.getIdentifier().equals(BATCH_STEP_COMPONENT_IDENTIFIER)
-        || componentModel.getComponentType().map(componentType -> componentType == ROUTE).orElse(false);
+        || componentModel.getComponentType().equals(ROUTE);
   }
 
   private boolean isHttpProxyPart(ComponentModel componentModel) {
@@ -305,7 +306,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
 
   private Optional<TypedComponentIdentifier> getModuleOperationTypeComponentIdentifier(ComponentModel componentModel) {
     final ComponentIdentifier originalIdentifier =
-        (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER);
+        (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER);
 
     final String namespace = originalIdentifier.getNamespace();
     final String operationName = originalIdentifier.getName();

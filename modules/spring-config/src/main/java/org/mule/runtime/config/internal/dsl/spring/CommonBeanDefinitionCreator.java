@@ -19,7 +19,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATION
 import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
+import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromDocAttributes;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -107,7 +107,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     componentModel.setType(retrieveComponentType(componentModel, buildingDefinition));
     BeanDefinitionBuilder beanDefinitionBuilder = createBeanDefinitionBuilder(componentModel, buildingDefinition);
     processAnnotations(componentModel, beanDefinitionBuilder);
-    processComponentDefinitionModel(request.getParentComponentModel(), componentModel, buildingDefinition, beanDefinitionBuilder);
+    processComponentDefinitionModel(componentModel, buildingDefinition, beanDefinitionBuilder);
     return true;
   }
 
@@ -163,8 +163,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
    *        name of the flow.
    */
   private void processMacroExpandedAnnotations(ComponentModel componentModel, Map<QName, Object> annotations) {
-    if (componentModel.getCustomAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
-      final Object flowName = componentModel.getCustomAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
+    if (componentModel.getMetadata().getParserAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
+      final Object flowName = componentModel.getMetadata().getParserAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
       annotations.put(AbstractComponent.ROOT_CONTAINER_NAME_KEY, flowName);
     }
   }
@@ -175,7 +175,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       return annotations;
     } else {
       if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
-        addMetadataAnnotationsFromXml(annotations, componentModel.getSourceCode(), componentModel.getCustomAttributes());
+        addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getSourceCode(),
+                                                componentModel.getMetadata().getDocAttributes());
         builder.getBeanDefinition().getPropertyValues().addPropertyValue("annotations", annotations);
       }
 
@@ -232,8 +233,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .collect(toMap(propValue -> propValue.getFirst(), propValue -> propValue.getSecond()));
   }
 
-  private void processComponentDefinitionModel(final ComponentModel parentComponentModel,
-                                               final SpringComponentModel componentModel,
+  private void processComponentDefinitionModel(final SpringComponentModel componentModel,
                                                ComponentBuildingDefinition componentBuildingDefinition,
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
     processObjectConstructionParameters(componentModel, componentBuildingDefinition,
@@ -243,13 +243,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(parentComponentModel, originalBeanDefinition);
+    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(originalBeanDefinition);
     if (originalBeanDefinition != wrappedBeanDefinition) {
       componentModel.setType(wrappedBeanDefinition.getBeanClass());
     }
     final SpringPostProcessorIocHelper iocHelper =
         new SpringPostProcessorIocHelper(objectFactoryClassRepository, wrappedBeanDefinition);
-    beanDefinitionPostProcessor.postProcess(componentModel.getConfiguration(), iocHelper);
     componentModel.setBeanDefinition(iocHelper.getBeanDefinition());
   }
 
@@ -291,8 +290,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   }
 
-  private AbstractBeanDefinition adaptBeanDefinition(ComponentModel parentComponentModel,
-                                                     AbstractBeanDefinition originalBeanDefinition) {
+  private AbstractBeanDefinition adaptBeanDefinition(AbstractBeanDefinition originalBeanDefinition) {
     Class beanClass;
     if (originalBeanDefinition instanceof RootBeanDefinition) {
       beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
@@ -317,7 +315,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     } else {
       final SpringPostProcessorIocHelper iocHelper =
           new SpringPostProcessorIocHelper(objectFactoryClassRepository, originalBeanDefinition);
-      beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel.getConfiguration(), beanClass, iocHelper);
       return iocHelper.getBeanDefinition();
     }
   }

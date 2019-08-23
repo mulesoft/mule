@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
@@ -32,6 +33,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.Component;
@@ -45,6 +47,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -63,7 +66,6 @@ import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamPr
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -148,10 +150,10 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected ExtensionManager extensionManager;
 
   @Mock
-  protected MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
+  protected MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
   @Mock
-  protected MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
+  protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
   @Mock
   protected MessageProcessingManager messageProcessingManager;
@@ -213,7 +215,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     sourceAdapter = createSourceAdapter();
 
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
     when(sourceAdapterFactory.getSourceParameters()).thenReturn(new ResolverSet(muleContext));
 
     mockExceptionEnricher(sourceModel, null);

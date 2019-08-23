@@ -165,7 +165,8 @@ public class MacroExpansionModuleModel {
     if (containerComponentModel.isRoot()) {
       nameAttribute = containerComponentModel.getNameAttribute();
     } else if (MODULE_OPERATION_CHAIN.equals(containerComponentModel.getIdentifier())) {
-      nameAttribute = (String) containerComponentModel.getCustomAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
+      nameAttribute =
+          (String) containerComponentModel.getMetadata().getParserAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
     } else if (containerComponentModel.getParent() != null) {
       nameAttribute = calculateContainerRootName(containerComponentModel.getParent(), operationModel);
     } else {
@@ -322,19 +323,24 @@ public class MacroExpansionModuleModel {
     }
     copyErrorMappings(operationRefModel, processorChainBuilder);
 
-    for (Map.Entry<String, Object> customAttributeEntry : operationRefModel.getCustomAttributes().entrySet()) {
+    for (Map.Entry<String, Object> customAttributeEntry : operationRefModel.getMetadata().getParserAttributes().entrySet()) {
+      processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
+    }
+    for (Map.Entry<String, String> customAttributeEntry : operationRefModel.getMetadata().getDocAttributes().entrySet()) {
       processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
     }
     processorChainBuilder.addCustomAttribute(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME, containerName);
-    ComponentModel processorChainModel = processorChainBuilder.build();
-    for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
-      processorChainModelChild.setParent(processorChainModel);
-    }
 
     operationRefModel.getConfigFileName().ifPresent(processorChainBuilder::setConfigFileName);
     operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
     operationRefModel.getStartColumn().ifPresent(processorChainBuilder::setStartColumn);
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
+
+    ComponentModel processorChainModel = processorChainBuilder.build();
+    for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
+      processorChainModelChild.setParent(processorChainModel);
+    }
+
     return processorChainModel;
   }
 
@@ -631,7 +637,10 @@ public class MacroExpansionModuleModel {
     operationReplacementModel
         .setIdentifier(componentModelOrigin.getIdentifier())
         .setTextContent(componentModelOrigin.getTextContent());
-    for (Map.Entry<String, Object> entry : componentModelOrigin.getCustomAttributes().entrySet()) {
+    for (Map.Entry<String, Object> entry : componentModelOrigin.getMetadata().getParserAttributes().entrySet()) {
+      operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, String> entry : componentModelOrigin.getMetadata().getDocAttributes().entrySet()) {
       operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
     }
     return operationReplacementModel;

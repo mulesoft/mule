@@ -16,15 +16,14 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -82,9 +81,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final List<ValueTransformer> valueTransformers;
-
-  private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
-
 
   @FunctionalInterface
   public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
@@ -280,8 +276,8 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       }
     };
 
-    RetryPolicyTemplate retryPolicy = getRetryPolicyTemplate(context);
-    if (retryPolicy.isEnabled()) {
+    RetryPolicyTemplate retryPolicy = context.getRetryPolicyTemplate().orElse(null);
+    if (retryPolicy != null && retryPolicy.isEnabled()) {
       executeWithRetry(context, retryPolicy, executedInterceptors, executeCommand, onSuccess, onError, executorCallback);
     } else {
       executeWithoutRetry(executeCommand, onSuccess, onError, executorCallback);
@@ -377,21 +373,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     return context.getTransactionConfig()
         .map(txConfig -> ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig)))
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
-  }
-
-  private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<M> context) {
-    // If there is a template, try to wrap it using the ReconnectionConfig
-    Optional<RetryPolicyTemplate> customTemplate = context.getRetryPolicyTemplate()
-        .map(delegate -> context.getConfiguration()
-            .map(config -> config.getConnectionProvider().orElse(null))
-            .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(delegate))
-            .orElse(delegate));
-
-    // In case of no template available in the context, use the one defined by the ConnectionProvider
-    return customTemplate.orElseGet(() -> context.getConfiguration()
-        .map(config -> config.getConnectionProvider().orElse(null))
-        .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
-        .orElse(fallbackRetryPolicyTemplate));
   }
 
   private MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<M> context) {

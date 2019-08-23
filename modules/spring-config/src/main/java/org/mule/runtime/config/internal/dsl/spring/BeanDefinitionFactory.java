@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.lang.String.format;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -39,6 +38,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -51,7 +51,6 @@ import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
@@ -59,8 +58,6 @@ import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,6 +75,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.w3c.dom.Element;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -109,7 +108,7 @@ public class BeanDefinitionFactory {
           .add(GLOBAL_PROPERTY_IDENTIFIER)
           .build();
 
-  private Set<ComponentIdentifier> ignoredMuleExtensionComponentIdentifiers;
+  private final Set<ComponentIdentifier> ignoredMuleExtensionComponentIdentifiers;
 
   /**
    * These are the set of current language construct that have specific bean definitions parsers since we don't want to include
@@ -123,11 +122,11 @@ public class BeanDefinitionFactory {
           .build();
 
 
-  private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
-  private BeanDefinitionCreator componentModelProcessor;
-  private ErrorTypeRepository errorTypeRepository;
-  private ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
-  private Set<String> syntheticErrorNamespaces = new HashSet<>();
+  private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
+  private final BeanDefinitionCreator componentModelProcessor;
+  private final ErrorTypeRepository errorTypeRepository;
+  private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+  private final Set<String> syntheticErrorNamespaces = new HashSet<>();
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
@@ -160,7 +159,6 @@ public class BeanDefinitionFactory {
   /**
    * Creates a {@code BeanDefinition} by traversing the {@code ComponentModel} and its children.
    *
-   * @param parentComponentModel the parent component model since the bean definition to be created may depend on the context.
    * @param componentModel the component model from which we want to create the bean definition.
    * @param registry the bean registry since it may be required to get other bean definitions to create this one or to register
    *        the bean definition.
@@ -169,22 +167,21 @@ public class BeanDefinitionFactory {
    * @param componentLocator where the locations of any {@link Component}'s locations must be registered
    * @return the {@code BeanDefinition} of the component model.
    */
-  public BeanDefinition resolveComponentRecursively(SpringComponentModel parentComponentModel,
-                                                    SpringComponentModel componentModel, BeanDefinitionRegistry registry,
+  public BeanDefinition resolveComponentRecursively(SpringComponentModel componentModel, BeanDefinitionRegistry registry,
                                                     BiConsumer<ComponentModel, BeanDefinitionRegistry> componentModelPostProcessor,
                                                     BiFunction<Element, BeanDefinition, Either<BeanDefinition, BeanReference>> oldParsingMechanism,
                                                     SpringConfigurationComponentLocator componentLocator) {
     List<ComponentModel> innerComponents = componentModel.getInnerComponents();
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
-        resolveComponentRecursively(componentModel, (SpringComponentModel) innerComponent, registry,
+        resolveComponentRecursively((SpringComponentModel) innerComponent, registry,
                                     componentModelPostProcessor, oldParsingMechanism, componentLocator);
       }
     }
-    return resolveComponent(parentComponentModel, componentModel, registry, componentModelPostProcessor, componentLocator);
+    return resolveComponent(componentModel, registry, componentModelPostProcessor, componentLocator);
   }
 
-  private BeanDefinition resolveComponent(ComponentModel parentComponentModel, SpringComponentModel componentModel,
+  private BeanDefinition resolveComponent(SpringComponentModel componentModel,
                                           BeanDefinitionRegistry registry,
                                           BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor,
                                           SpringConfigurationComponentLocator componentLocator) {
@@ -198,7 +195,7 @@ public class BeanDefinitionFactory {
       return null;
     }
 
-    resolveComponentBeanDefinition(parentComponentModel, componentModel);
+    resolveComponentBeanDefinition(componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
 
     // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
@@ -233,7 +230,7 @@ public class BeanDefinitionFactory {
               }).collect(toList()), componentModel);
             }
             componentLocator.addComponentLocation(componentModel.getComponentLocation());
-            addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel.getConfiguration(), componentModel);
+            addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, componentModel);
           }
         });
 
@@ -316,18 +313,13 @@ public class BeanDefinitionFactory {
   }
 
 
-  private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, SpringComponentModel componentModel) {
+  private void resolveComponentBeanDefinition(SpringComponentModel componentModel) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
-      this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel,
+      this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(componentModel,
                                                                                   buildingDefinitionOptional.orElse(null)));
     } else {
-      boolean isWrapperComponent = isWrapperComponent(componentModel.getIdentifier(), of(parentComponentModel.getIdentifier()));
-      if (!isWrapperComponent) {
-        throw new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency "
-            + "missing to the project that handle that extension.", componentModel.getIdentifier())));
-      }
       processComponentWrapper(componentModel);
     }
   }

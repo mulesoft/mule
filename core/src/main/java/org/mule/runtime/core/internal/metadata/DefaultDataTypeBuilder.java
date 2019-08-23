@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import static com.google.common.cache.CacheBuilder.newBuilder;
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getCollectionType;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getMapKeyType;
@@ -24,7 +25,6 @@ import org.mule.runtime.api.metadata.FunctionDataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.util.ClassUtils;
 
@@ -46,8 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Provides a way to build immutable {@link DataType} objects.
@@ -62,13 +61,7 @@ public class DefaultDataTypeBuilder
   private static ConcurrentHashMap<String, ProxyIndicator> cglibClassCache = new ConcurrentHashMap<>();
 
   private static LoadingCache<DefaultDataTypeBuilder, DataType> dataTypeCache =
-      newBuilder().weakValues().build(new CacheLoader<DefaultDataTypeBuilder, DataType>() {
-
-        @Override
-        public DataType load(DefaultDataTypeBuilder key) throws Exception {
-          return key.doBuild();
-        }
-      });
+      newBuilder().weakValues().build(key -> key.doBuild());
 
   private Reference<Class<?>> typeRef = new WeakReference<>(Object.class);
   private DataTypeBuilder itemTypeBuilder;
@@ -77,6 +70,10 @@ public class DefaultDataTypeBuilder
   private List<FunctionParameter> parametersType;
   private DataTypeBuilder keyTypeBuilder;
   private DataTypeBuilder valueTypeBuilder;
+
+  private DataType keyType = OBJECT;
+  private DataType itemType = OBJECT;
+  private DataType valueType = OBJECT;
 
   private boolean built = false;
 
@@ -521,18 +518,28 @@ public class DefaultDataTypeBuilder
       return new DefaultFunctionDataType(type, returnType, parametersType != null ? parametersType : newArrayList(), mediaType,
                                          isConsumable(type));
     }
-    return dataTypeCache.getUnchecked(this);
+
+    if (keyTypeBuilder != null) {
+      keyType = keyTypeBuilder.build();
+    }
+
+    if (itemTypeBuilder != null) {
+      itemType = itemTypeBuilder.build();
+    }
+
+    if (valueTypeBuilder != null) {
+      valueType = valueTypeBuilder.build();
+    }
+
+    return dataTypeCache.get(this);
   }
 
   protected DataType doBuild() {
     Class<?> type = this.typeRef.get();
     if (Collection.class.isAssignableFrom(type) || Iterator.class.isAssignableFrom(type)) {
-      return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType,
-                                           isConsumable(type));
+      return new DefaultCollectionDataType(type, itemType, mediaType, isConsumable(type));
     } else if (Map.class.isAssignableFrom(type)) {
-      return new DefaultMapDataType(type, keyTypeBuilder != null ? keyTypeBuilder.build() : DataType.OBJECT,
-                                    valueTypeBuilder != null ? valueTypeBuilder.build() : DataType.OBJECT, mediaType,
-                                    isConsumable(type));
+      return new DefaultMapDataType(type, keyType, valueType, mediaType, isConsumable(type));
     } else {
       return new SimpleDataType(type, mediaType, isConsumable(type));
     }
@@ -581,7 +588,6 @@ public class DefaultDataTypeBuilder
     consumableClasses.add(InputStream.class);
     consumableClasses.add(Reader.class);
     consumableClasses.add(Iterator.class);
-    consumableClasses.add(CursorProvider.class);
   }
 
   private static void addToConsumableClasses(String className) {

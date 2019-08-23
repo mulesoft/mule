@@ -8,30 +8,24 @@
 package org.mule.runtime.container.internal;
 
 import static java.io.File.pathSeparatorChar;
-import static java.lang.String.format;
 import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
-import static java.util.regex.Pattern.compile;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
-
-import org.slf4j.Logger;
+import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+
+import org.slf4j.Logger;
 
 /**
  * Explores the content of the JRE used to run the container.
@@ -40,13 +34,12 @@ public final class JreExplorer {
 
   private static final Logger LOGGER = getLogger(JreExplorer.class);
 
-  private static final String META_INF_SERVICES_PATH = "META-INF/services/";
-  private static final Pattern SLASH_PATTERN = compile("/");
-
   private static Object bootLayer;
   private static Method getModulePackagesMethod;
   private static Method getLayerModulesMethod;
   private static boolean isRequiredReflectionDataPresent;
+
+  private static final JarExplorer jarExplorer;
 
   static {
     try {
@@ -67,6 +60,8 @@ public final class JreExplorer {
       }
       isRequiredReflectionDataPresent = false;
     }
+
+    jarExplorer = new FileJarExplorer();
   }
 
   private JreExplorer() {}
@@ -158,48 +153,15 @@ public final class JreExplorer {
         if (file.isDirectory()) {
           exploreDirectory(packages, resources, services, file);
         } else {
-          try {
-            exploreJar(packages, resources, services, file);
-          } catch (IOException e) {
-            throw new IllegalStateException(createJarExploringError(file), e);
-          }
+          final JarInfo exploredJar = jarExplorer.explore(file.toURI());
+
+          packages.addAll(exploredJar.getPackages());
+          resources.addAll(exploredJar.getResources());
+          services.addAll(exploredJar.getServices());
         }
       }
       fromIndex = endIndex + 1;
     } while (endIndex != -1);
-  }
-
-  private static void exploreJar(Set<String> packages, Set<String> resources, List<ExportedService> services, File file)
-      throws IOException {
-    final ZipFile zipFile = new ZipFile(file);
-
-    try {
-      final Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-      while (entries.hasMoreElements()) {
-        final ZipEntry entry = entries.nextElement();
-        final String name = entry.getName();
-        final int lastSlash = name.lastIndexOf('/');
-        if (lastSlash != -1 && name.endsWith(".class")) {
-          packages.add(SLASH_PATTERN.matcher(name.substring(0, lastSlash)).replaceAll("."));
-        } else if (!entry.isDirectory()) {
-          if (name.startsWith(META_INF_SERVICES_PATH)) {
-            String serviceInterface = name.substring(META_INF_SERVICES_PATH.length());
-            URL resource = getServiceResourceUrl(file.toURI().toURL(), name);
-
-            services.add(new ExportedService(serviceInterface, resource));
-          } else {
-            resources.add(name);
-          }
-        }
-      }
-    } finally {
-      if (zipFile != null)
-        try {
-          zipFile.close();
-        } catch (Throwable ignored) {
-        }
-    }
   }
 
   private static void exploreDirectory(final Set<String> packages, Set<String> resources, List<ExportedService> services,
@@ -214,21 +176,13 @@ public final class JreExplorer {
         if (entry.isDirectory()) {
           exploreDirectory(packages, resources, services, entry);
         } else if (entry.getName().endsWith(".jar")) {
-          try {
-            exploreJar(packages, resources, services, entry);
-          } catch (IOException e) {
-            throw new IllegalStateException(createJarExploringError(entry), e);
-          }
+          final JarInfo exploredJar = jarExplorer.explore(entry.toURI());
+
+          packages.addAll(exploredJar.getPackages());
+          resources.addAll(exploredJar.getResources());
+          services.addAll(exploredJar.getServices());
         }
       }
     }
-  }
-
-  private static String createJarExploringError(File file) {
-    return format("Unable to explore '%s'", file.getAbsoluteFile());
-  }
-
-  static URL getServiceResourceUrl(URL resource, String serviceInterface) throws MalformedURLException {
-    return new URL("jar:" + resource + "!/" + serviceInterface);
   }
 }

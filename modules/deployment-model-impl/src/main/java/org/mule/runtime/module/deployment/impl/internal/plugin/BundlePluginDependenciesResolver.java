@@ -37,9 +37,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Resolves plugin dependencies considering the plugin name only.
@@ -48,7 +49,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
 
   private static final Logger logger = LoggerFactory.getLogger(BundlePluginDependenciesResolver.class);
   protected static final String MULE_HTTP_CONNECTOR_ARTIFACT_ID = "mule-http-connector";
-  protected static final String MULE_HTTP_CONNECTOR_GROUP_ID = "org.mule.modules";
+  protected static final String MULE_HTTP_CONNECTOR_GROUP_ID = "org.mule.connectors";
 
   private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
 
@@ -289,7 +290,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         .dependingOn(originalClassLoaderModel.getDependencies())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources());
+        .exportingResources(originalClassLoaderModel.getExportedResources())
+        .withLocalPackages(originalClassLoaderModel.getLocalPackages())
+        .withLocalResources(originalClassLoaderModel.getLocalResources());
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }
@@ -305,7 +308,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         .exportingPackages(originalClassLoaderModel.getExportedPackages())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources());
+        .exportingResources(originalClassLoaderModel.getExportedResources())
+        .withLocalPackages(originalClassLoaderModel.getLocalPackages())
+        .withLocalResources(originalClassLoaderModel.getLocalResources());
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }

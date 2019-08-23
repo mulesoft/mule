@@ -170,6 +170,25 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:complexType name="org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="optional" name="victim"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="address"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encodedPasssword"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-differed-knockable-door"></xs:element>
+  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-differed-knockable-door" name="differed-knockable-door">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
+          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-recursive-chain-a"></xs:element>
   <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-recursive-chain-a" name="recursive-chain-a">
     <xs:complexType>

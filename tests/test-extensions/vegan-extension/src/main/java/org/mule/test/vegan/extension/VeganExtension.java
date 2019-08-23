@@ -9,15 +9,20 @@ package org.mule.test.vegan.extension;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.tck.message.StringAttributes;
+import org.mule.tck.testmodels.fruit.Banana;
 
 @Extension(name = VeganExtension.VEGAN)
 @Configurations({AppleConfig.class, BananaConfig.class, KiwiConfig.class, PeachConfig.class, PearConfig.class, GrapeConfig.class})
 @Operations(VeganFidelityOperation.class)
 @SubTypeMapping(baseType = FarmedFood.class, subTypes = {RottenFood.class, HealthyFood.class})
 @MetadataScope(keysResolver = AppleTypesResolver.class)
+@Import(type = StringAttributes.class)
+@Import(type = Banana.class)
 public class VeganExtension {
 
   public static final String VEGAN = "vegan";

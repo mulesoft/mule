@@ -44,7 +44,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParame
 import org.mule.runtime.module.extension.internal.loader.enricher.NotificationsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStoreParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterAllowedStereotypesDeclarionEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ParameterDslDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.PollingSourceDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
@@ -71,10 +70,10 @@ import org.mule.runtime.module.extension.internal.loader.validation.PagedOperati
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterPluralNameModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.PojosModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.SourceCallbacksModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PojosModelValidator;
 
 import java.util.Collection;
 import java.util.List;
@@ -140,11 +139,10 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new BackPressureDeclarationEnricher(),
                                                                                                new ObjectStoreParameterDeclarationEnricher(),
-                                                                                               new PollingSourceDeclarationEnricher(),
-                                                                                               new ParameterDslDeclarationEnricher()));
+                                                                                               new PollingSourceDeclarationEnricher()));
 
   private final String id;
-  private ModelLoaderDelegateFactory factory;
+  private final ModelLoaderDelegateFactory factory;
 
   @Deprecated
   public AbstractJavaExtensionModelLoader(String id, BiFunction<Class<?>, String, ModelLoaderDelegate> delegate) {

@@ -11,7 +11,7 @@ import org.mule.functional.api.component.EventCallback;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.MuleContext;
 
-import org.bar1.BarUtils;
+import org.bar.BarUtils;
 
 public class Plugin1Echo implements EventCallback {
 

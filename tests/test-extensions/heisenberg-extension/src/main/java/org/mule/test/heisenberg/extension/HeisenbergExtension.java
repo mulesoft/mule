@@ -11,6 +11,7 @@ import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -41,6 +42,7 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptio
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
+import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.HankSchrader;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
@@ -64,7 +66,7 @@ import javax.inject.Inject;
 @OnException(HeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
 @Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class, ReconnectableHeisenbergSource.class})
-@Export(classes = HeisenbergExtension.class, resources = "methRecipe.json")
+@Export(classes = {HeisenbergExtension.class, DifferedKnockableDoor.class}, resources = "methRecipe.json")
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Drug.class, subTypes = {Meta.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
@@ -117,7 +119,7 @@ public class HeisenbergExtension implements Lifecycle {
   private List<String> enemies = new LinkedList<>();
 
   @Parameter
-  private List<Long> monthlyIncomes = new LinkedList<>();
+  private final List<Long> monthlyIncomes = new LinkedList<>();
 
   @Parameter
   private boolean cancer;
@@ -135,14 +137,14 @@ public class HeisenbergExtension implements Lifecycle {
 
   @ParameterGroup(name = PERSONAL_INFORMATION_GROUP_NAME)
   @DisplayName("Personal Info")
-  private PersonalInfo personalInfo = new PersonalInfo();
+  private final PersonalInfo personalInfo = new PersonalInfo();
 
   @Parameter
   private BigDecimal money;
 
   @Parameter
   @Optional
-  private Weapon weapon = new Ricin();
+  private final Weapon weapon = new Ricin();
 
   @Parameter
   @Optional
@@ -195,7 +197,7 @@ public class HeisenbergExtension implements Lifecycle {
   @DisplayName("Brother in law")
   private HankSchrader brotherInLaw;
 
-  private List<BackPressureContext> backPressureContexts = new LinkedList<>();
+  private final List<BackPressureContext> backPressureContexts = new LinkedList<>();
 
   public void onBackPressure(BackPressureContext ctx) {
     synchronized (backPressureContexts) {

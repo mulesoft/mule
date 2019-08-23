@@ -7,16 +7,17 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.DefaultReactorSink;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.ReactorSink;
 
-import org.reactivestreams.Publisher;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.EmitterProcessor;
 
@@ -50,7 +51,7 @@ class DirectSink implements Sink, Disposable {
   }
 
   @Override
-  public boolean emit(CoreEvent event) {
+  public BackPressureReason emit(CoreEvent event) {
     return reactorSink.emit(event);
   }
 

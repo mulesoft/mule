@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,6 +37,7 @@ import static org.mule.tck.MuleTestUtils.stubFailingComponentExecutor;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -74,14 +76,13 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -188,7 +189,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getConfiguration()).thenReturn(Optional.of(configurationInstance));
     when(operationContext.getExtensionModel()).thenReturn(extensionModel);
     when(operationContext.getTransactionConfig()).thenReturn(empty());
-    when(operationContext.getRetryPolicyTemplate()).thenReturn(empty());
+    when(operationContext.getRetryPolicyTemplate()).thenReturn(ofNullable(retryPolicy));
     when(operationContext.getCurrentScheduler()).thenReturn(IMMEDIATE_SCHEDULER);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());

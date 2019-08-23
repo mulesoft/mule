@@ -45,7 +45,7 @@ import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdap
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
-import org.mule.runtime.oauth.api.builder.AuthorizationCodeListener;
+import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 

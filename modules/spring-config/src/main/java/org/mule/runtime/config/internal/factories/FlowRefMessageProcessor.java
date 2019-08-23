@@ -12,6 +12,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -21,7 +22,7 @@ import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
  *
  * @Since 4.3.0
  */
-abstract class FlowRefMessageProcessor extends AbstractComponent implements AnnotatedProcessor, Stoppable, Disposable {
+abstract class FlowRefMessageProcessor extends AbstractComponent implements AnnotatedProcessor, Startable, Stoppable, Disposable {
 
   private final FlowRefFactoryBean owner;
 
@@ -35,8 +36,14 @@ abstract class FlowRefMessageProcessor extends AbstractComponent implements Anno
   }
 
   @Override
+  public void start() throws MuleException {
+    this.doStart();
+  }
+
+  @Override
   public ComponentLocation getLocation() {
     return owner.getLocation();
   }
 
+  public abstract void doStart() throws MuleException;
 }

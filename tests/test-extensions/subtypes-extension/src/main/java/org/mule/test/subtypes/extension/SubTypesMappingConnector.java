@@ -10,11 +10,12 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.tck.message.StringAttributes;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.vegan.extension.VeganCookBook;
@@ -34,6 +35,7 @@ import java.util.Map;
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Revolver.class})
 @Export(classes = {Revolver.class})
 @Xml(prefix = "subtypes", namespace = "http://www.mulesoft.org/schema/mule/subtypes")
+@Import(type = StringAttributes.class)
 public class SubTypesMappingConnector {
 
   @Parameter

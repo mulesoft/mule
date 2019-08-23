@@ -45,6 +45,7 @@ import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
@@ -99,6 +101,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
@@ -110,6 +113,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -223,7 +227,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     asyncExecutor = new TestScheduler(CORES, EXECUTOR, false);
 
     flowBuilder = () -> builder("test", muleContext)
-        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix))
+        .processingStrategyFactory(createProcessingStrategyFactory())
         .source(triggerableMessageSource)
         // Avoid logging of errors by using a null exception handler.
         .messagingExceptionHandler((exception, event) -> event);
@@ -232,6 +236,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Override
   protected InternalEvent.Builder getEventBuilder() throws MuleException {
     return InternalEvent.builder(create(flow, TEST_CONNECTOR_LOCATION));
+  }
+
+  protected ProcessingStrategyFactory createProcessingStrategyFactory() {
+    return (muleContext, prefix) -> createProcessingStrategy(muleContext, prefix);
   }
 
   protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);
@@ -841,13 +849,13 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
   }
 
-  protected void expectRejected() {
+  protected void expectRejected(Class<? extends FlowBackPressureException> backpressureExceptionClass) {
     expectedException.expect(MessagingException.class);
     expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(FlowBackPressureException.class));
+    expectedException.expectCause(instanceOf(backpressureExceptionClass));
   }
 
-  private TypeSafeMatcher<MessagingException> overloadErrorTypeMatcher() {
+  private Matcher<MessagingException> overloadErrorTypeMatcher() {
     return new TypeSafeMatcher<MessagingException>() {
 
       private String errorTypeId;
@@ -861,6 +869,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       protected boolean matchesSafely(MessagingException item) {
         errorTypeId = item.getEvent().getError().get().getErrorType().getIdentifier();
         return FLOW_BACK_PRESSURE_ERROR_IDENTIFIER.equals(errorTypeId);
+      }
+
+      @Override
+      protected void describeMismatchSafely(MessagingException item, Description mismatchDescription) {
+        mismatchDescription.appendValue(item.getEvent().getError().get().getErrorType().getIdentifier());
       }
     };
   }

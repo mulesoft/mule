@@ -14,6 +14,17 @@ public interface AllureConstants {
 
   }
 
+  interface LeakPrevention {
+
+    String LEAK_PREVENTION = "Leak Prevention";
+
+    interface LeakPreventionMetaspace {
+
+      String METASPACE_LEAK_PREVENTION_ON_REDEPLOY = "Class Loader leak prevention on redeploy";
+    }
+
+  }
+
   interface SpringModuleFeature {
 
     String SPRING_EXTENSION = "Spring Extension";
@@ -527,6 +538,12 @@ public interface AllureConstants {
     interface MavenGlobalConfiguration {
 
       String MAVEN_GLOBAL_CONFIGURATION_STORY = "Maven Global Configuration Story";
+
+    }
+
+    interface ClusterGlobalConfiguration {
+
+      String CLUSTER_GLOBAL_CONFIGURATION_STORY = "Cluster Global Configuration Story";
 
     }
 

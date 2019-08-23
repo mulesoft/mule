@@ -42,8 +42,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -70,8 +70,8 @@
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -98,8 +98,8 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "allowedStereotypeModels": [],
@@ -290,7 +290,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
+                    "allowsInlineDefinition": false,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
@@ -329,8 +329,8 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -360,8 +360,8 @@
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -450,7 +450,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
+                    "allowsInlineDefinition": false,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
@@ -489,8 +489,8 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -520,8 +520,8 @@
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -606,8 +606,8 @@
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -638,7 +638,7 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
+                    "allowsInlineDefinition": false,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
@@ -677,8 +677,8 @@
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {
@@ -708,8 +708,8 @@
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
                   "layoutModel": {

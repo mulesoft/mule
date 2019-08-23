@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addRedeliveryPolicy;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
 /**
@@ -32,6 +34,11 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
  * @since 1.0
  */
 public final class RedeliveryPolicyDeclarationEnricher implements DeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return WIRING;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {

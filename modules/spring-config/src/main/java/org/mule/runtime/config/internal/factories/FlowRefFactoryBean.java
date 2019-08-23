@@ -22,11 +22,15 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -199,6 +203,11 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       super(owner);
     }
 
+    @Override
+    public void doStart() throws MuleException {
+
+    }
+
     private final LazyValue<ReactiveProcessor> resolvedReferencedProcessorSupplier = new LazyValue<>(() -> {
       try {
         return getReferencedFlow(refName, StaticFlowRefMessageProcessor.this);
@@ -340,6 +349,15 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           throw (MuleException) e.getCause();
         } else {
           throw e;
+        }
+      }
+    }
+
+    @Override
+    public void doStart() throws MuleException {
+      for (Processor p : cache.asMap().values()) {
+        if (!(p instanceof Flow)) {
+          startIfNeeded(p);
         }
       }
     }

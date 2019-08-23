@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -62,7 +63,7 @@ public class DeprecationModelDeclarationEnricher extends AbstractAnnotatedDeclar
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
-    return DeclarationEnricherPhase.POST_STRUCTURE;
+    return POST_STRUCTURE;
   }
 
   @Override

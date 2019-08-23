@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
@@ -67,6 +68,7 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -359,17 +361,41 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ArtifactPluginDescriptor testEmptyPluginDescriptor = desc.getPlugins().stream()
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("test-empty-plugin")).findFirst().get();
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getUrls().length, is(3));
-    assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url).getName()).collect(
-                                                                                                                                 toList()),
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url)).collect(toList()),
+               everyItem(exists()));
+
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderModel().getUrls()).map(url -> FileUtils.toFile(url).getName())
+        .collect(toList()),
                hasItems(startsWith("test-empty-plugin-"), equalTo("commons-io-2.6.jar"),
                         equalTo("commons-collections-3.2.1.jar")));
-    // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the urls
+    // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the
+    // urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
 
     ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getUrls().length, is(1));
     assertThat(dependantPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(1));
+  }
+
+  private static Matcher<File> exists() {
+    return new TypeSafeMatcher<File>() {
+
+      File fileTested;
+
+      @Override
+      public boolean matchesSafely(File item) {
+        fileTested = item;
+        return item.exists();
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("file ");
+        description.appendValue(fileTested);
+        description.appendText(" should exists");
+      }
+    };
   }
 
   @Test

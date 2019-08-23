@@ -160,13 +160,13 @@
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.61</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
-        <caffeineVersion>2.6.2</caffeineVersion>
+        <caffeineVersion>2.8.0</caffeineVersion>
         <cglibVersion>3.2.10</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
-        <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
+        <commonsBeanUtilsVersion>1.9.4</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
-        <commonsCodecVersion>1.11</commonsCodecVersion>
+        <commonsCodecVersion>1.13</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.7</commonsDbUtilsVersion>
@@ -176,7 +176,7 @@
         <commonsLangVersion>3.8.1</commonsLangVersion>
         <commonsNetVersion>3.6</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
-        <commonsPool2Version>2.5.0</commonsPool2Version>
+        <commonsPool2Version>2.6.2</commonsPool2Version>
         <commonsMath3Version>3.6.1</commonsMath3Version>
         <derbyVersion>10.13.1.1</derbyVersion>
         <dom4jVersion>2.1.1</dom4jVersion>
@@ -200,6 +200,7 @@
         <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <jgraphtVersion>1.3.1</jgraphtVersion>
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jsonVersion>20140107</jsonVersion>
         <junitVersion>4.12</junitVersion>
@@ -209,12 +210,12 @@
         <byteBuddyVersion>1.9.10</byteBuddyVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
-        <projectReactorVersion>3.2.6.RELEASE</projectReactorVersion>
-        <projectReactorExtraVersion>3.1.6.RELEASE</projectReactorExtraVersion>
+        <projectReactorVersion>3.2.10.RELEASE</projectReactorVersion>
+        <projectReactorExtraVersion>3.2.3.RELEASE</projectReactorExtraVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
         <saxonVersion>9.9.1-1</saxonVersion>
-        <slf4jVersion>1.7.25</slf4jVersion>
+        <slf4jVersion>1.7.26</slf4jVersion>
         <snakeYamlVersion>1.21</snakeYamlVersion>
         <springVersion>5.1.6.RELEASE</springVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
@@ -231,6 +232,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.3.0-SNAPSHOT</muleDslApiVersion>
+        <muleAstVersion>0.8.0-SNAPSHOT</muleAstVersion>
         <muleExtensionsApiVersion>1.3.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.3.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.5.0-SNAPSHOT</muleMavenClientApi>
@@ -280,7 +282,7 @@
         <mule.extensions.maven.plugin.version>1.3.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.3.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
-        <mule.classloader.model.version>3.3.2-SNAPSHOT</mule.classloader.model.version>
+        <mule.classloader.model.version>3.4.0-SNAPSHOT</mule.classloader.model.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
         <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
@@ -474,6 +476,11 @@
                         <groupId>commons-logging</groupId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-core</artifactId>
+                <version>${jgraphtVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
@@ -1090,6 +1097,11 @@
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-module-dsl-api</artifactId>
                 <version>${muleDslApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-artifact-ast</artifactId>
+                <version>${muleAstVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
@@ -1932,7 +1944,7 @@
                     <links>
                         <link>http://docs.oracle.com/javase/7/docs/api/</link>
                         <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-                        <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.3/docs/api/</link>
+                        <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.4/docs/api/</link>
                         <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
                         <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
                         <link>http://jakarta.apache.org/commons/io/api-1.2/</link>

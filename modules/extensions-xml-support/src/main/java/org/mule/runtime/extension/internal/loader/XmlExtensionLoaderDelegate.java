@@ -31,6 +31,7 @@ import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMess
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -101,9 +102,6 @@ import org.mule.runtime.extension.internal.loader.validator.property.InvalidTest
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -129,12 +127,15 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -191,7 +192,7 @@ public final class XmlExtensionLoaderDelegate {
 
   /**
    * ENUM used to discriminate which visibility an <operation/> has.
-   * 
+   *
    * @see {@link XmlExtensionLoaderDelegate#loadOperationsFrom(HasOperationDeclarer, ComponentModel, DirectedGraph, XmlDslModel, XmlExtensionLoaderDelegate.OperationVisibility)}
    */
   private enum OperationVisibility {
@@ -494,7 +495,7 @@ public final class XmlExtensionLoaderDelegate {
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
     declarer.withModelProperty(getXmlExtensionModelProperty(moduleModel, xmlDslModel));
 
-    DirectedGraph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
+    Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations
     final List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
     addGlobalElementModelProperty(declarer, globalElementsComponentModel);
@@ -619,7 +620,7 @@ public final class XmlExtensionLoaderDelegate {
 
   /**
    * Throws exception if a <property/> for a configuration or connection have the same name.
-   * 
+   *
    * @param configurationProperties properties that will go in the configuration
    * @param connectionProperties properties that will go in the connection
    */
@@ -757,7 +758,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel,
-                                  DirectedGraph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
+                                  Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
                                   final OperationVisibility visibility) {
 
     moduleModel.getInnerComponents().stream()
@@ -768,7 +769,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel,
-                                         DirectedGraph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel) {
+                                         Graph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel) {
     String operationName = operationModel.getNameAttribute();
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentModel bodyComponentModel = operationModel.getInnerComponents()
@@ -815,7 +816,7 @@ public final class XmlExtensionLoaderDelegate {
    * @param sourceOperationVertex current vertex we are working on
    * @param innerComponents collection of elements to introspect and assembly the graph with
    */
-  private void fillGraphWithTnsReferences(DirectedGraph<String, DefaultEdge> directedGraph, String sourceOperationVertex,
+  private void fillGraphWithTnsReferences(Graph<String, DefaultEdge> directedGraph, String sourceOperationVertex,
                                           final List<ComponentModel> innerComponents) {
     innerComponents.forEach(childMPComponentModel -> {
       if (TNS_PREFIX.equals(childMPComponentModel.getIdentifier().getNamespace())) {

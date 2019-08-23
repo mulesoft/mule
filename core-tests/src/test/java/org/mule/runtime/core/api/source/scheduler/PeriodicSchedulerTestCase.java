@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

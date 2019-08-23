@@ -41,6 +41,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -57,6 +58,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -79,7 +81,6 @@ import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -200,10 +201,10 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   private ExecutionContextAdapter<OperationModel> executionContext;
 
   @Mock(lenient = true)
-  private MetadataCacheIdGeneratorFactory<ComponentConfiguration> cacheIdGeneratorFactory;
+  private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
   @Mock(lenient = true)
-  private MetadataCacheIdGenerator<ComponentConfiguration> cacheIdGenerator;
+  private MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
   @Mock(lenient = true)
   private MetadataCacheManager metadataCacheManager;

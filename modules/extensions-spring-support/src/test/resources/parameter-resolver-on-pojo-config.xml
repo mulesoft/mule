@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:parameter-resolver="http://www.mulesoft.org/schema/mule/parameter-resolver"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/parameter-resolver http://www.mulesoft.org/schema/mule/parameter-resolver/current/mule-parameter-resolver.xsd">
+               http://www.mulesoft.org/schema/mule/parameter-resolver http://www.mulesoft.org/schema/mule/parameter-resolver/current/mule-parameter-resolver.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <parameter-resolver:config name="config-with-dynamic-parameter-resolvers" stringResolver="#[payload]"
                                doorResolver="#[app.registry.staticDoor]" literalDoor="#[aDoor]" />
@@ -14,13 +16,13 @@
 
     <parameter-resolver:config name="config-with-dynamic-parameter-resolvers-with-dynamic-pojo" stringResolver="#[payload]" doorResolver="#[app.registry.dynamicDoor]"/>
 
-    <parameter-resolver:door name="staticDoor" address="Address" victim="Name" />
+    <heisenberg:door name="staticDoor" address="Address" victim="Name" />
 
-    <parameter-resolver:door name="dynamicDoor" address="Address" victim="#[payload]" />
+    <heisenberg:door name="dynamicDoor" address="Address" victim="#[payload]" />
 
-    <parameter-resolver:differed-knockable-door name="dynamicResolver" victim="#[payload]" />
+    <heisenberg:differed-knockable-door name="dynamicResolver" victim="#[payload]" />
 
-    <parameter-resolver:differed-knockable-door name="staticResolver" victim="this is not an expression" />
+    <heisenberg:differed-knockable-door name="staticResolver" victim="this is not an expression" />
 
     <flow name="configurationWithDynamicParameterResolvers">
         <set-payload value="this is the payload"/>

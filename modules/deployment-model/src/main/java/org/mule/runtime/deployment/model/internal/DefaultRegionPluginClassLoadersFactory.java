@@ -13,6 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -22,14 +23,19 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFacto
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates the class loaders for plugins that are contained in a given region
@@ -37,6 +43,8 @@ import java.util.Set;
  * @since 4.0
  */
 public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClassLoadersFactory {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRegionPluginClassLoadersFactory.class);
 
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
 
@@ -130,6 +138,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
     }
 
     ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
+    Set<String> muleModulesExportedPackages = new HashSet<>();
 
     for (MuleModule module : moduleRepository.getModules()) {
       if (module.getPrivilegedArtifacts()
@@ -138,9 +147,25 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
           pluginsLookupPolicies.put(packageName, containerOnlyLookupStrategy);
         }
       }
+
+      muleModulesExportedPackages.addAll(module.getExportedPackages());
     }
 
-    return baseLookupPolicy.extend(pluginsLookupPolicies);
+    Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
+    for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
+      // packages exported from another artifact in the region will be ParentFirst,
+      // even if they are also exported by the container.
+      if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
+          || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
+              && muleModulesExportedPackages.contains(localPackage))) {
+        LOGGER.warn("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
+            + "', but it will be ignored since it is already available from the container.");
+      } else {
+        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
+      }
+    }
+
+    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies, true);
   }
 
   private List<ArtifactPluginDescriptor> getPluginDescriptors(ArtifactPluginDescriptor descriptor,

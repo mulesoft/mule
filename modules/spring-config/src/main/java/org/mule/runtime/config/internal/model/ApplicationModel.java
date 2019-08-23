@@ -32,6 +32,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -51,8 +52,11 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
@@ -95,9 +99,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
 
@@ -118,7 +124,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @since 4.0
  */
-public class ApplicationModel {
+public class ApplicationModel implements ArtifactAst {
 
   private static final Logger LOGGER = getLogger(ApplicationModel.class);
 
@@ -373,6 +379,23 @@ public class ApplicationModel {
           of(TypedComponentIdentifier.builder().identifier(componentModel.getIdentifier())
               .type(resolveComponentType(componentModel, extensionModelHelper))
               .build());
+
+      extensionModelHelper.findComponentModel(componentModel.getIdentifier())
+          .ifPresent(componentModel::setComponentModel);
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findConfigurationModel(componentModel.getIdentifier())
+            .ifPresent(componentModel::setConfigurationModel);
+      }
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findConnectionProviderModel(componentModel.getIdentifier())
+            .ifPresent(componentModel::setConnectionProviderModel);
+      }
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findMetadataType(componentModel.getType())
+            .flatMap(t -> createMetadataTypeModelAdapter(t))
+            .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      }
+
       componentModel.setComponentType(typedComponentIdentifier.map(typedIdentifier -> typedIdentifier.getType())
           .orElse(TypedComponentIdentifier.ComponentType.UNKNOWN));
     });
@@ -1133,5 +1156,30 @@ public class ApplicationModel {
       });
     }
   }
+
+  @Override
+  public Stream<ComponentAst> recursiveStream() {
+    return muleComponentModels.stream()
+        .map(cm -> (ComponentAst) cm)
+        .flatMap(cm -> cm.recursiveStream());
+  }
+
+  @Override
+  public Spliterator<ComponentAst> recursiveSpliterator() {
+    return recursiveStream().spliterator();
+  }
+
+  @Override
+  public Stream<ComponentAst> topLevelComponentsStream() {
+    return muleComponentModels.stream()
+        .map(cm -> (ComponentAst) cm)
+        .flatMap(cm -> cm.directChildrenStream());
+  }
+
+  @Override
+  public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
+    return topLevelComponentsStream().spliterator();
+  }
+
 }
 

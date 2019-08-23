@@ -26,5 +26,15 @@
     <flow name="switchConnection">
         <reconnection:switch-connection />
     </flow>
+
+    <flow name="getReconnectionFromConfig">
+        <reconnection:get-retry-policy-template config-ref="reconnection_Config"/>
+    </flow>
+
+    <flow name="getInlineReconnection">
+        <reconnection:get-retry-policy-template config-ref="reconnection_Config">
+            <reconnect count="30" frequency="50" blocking="false"/>
+        </reconnection:get-retry-policy-template>
+    </flow>
     
 </mule>

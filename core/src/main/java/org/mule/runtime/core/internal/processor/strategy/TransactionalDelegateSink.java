@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Sink;
 
@@ -41,7 +42,7 @@ final class TransactionalDelegateSink implements Sink, Disposable {
   }
 
   @Override
-  public boolean emit(CoreEvent event) {
+  public BackPressureReason emit(CoreEvent event) {
     if (isTransactionActive()) {
       return transactionalSink.emit(event);
     } else {

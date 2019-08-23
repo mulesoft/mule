@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
@@ -16,9 +16,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.util.List;
@@ -31,6 +33,14 @@ import java.util.Optional;
  * @since 4.0
  */
 public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  /**
+   * This has to run before {@link StereotypesDeclarationEnricher}.
+   */
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return STRUCTURE;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -55,7 +65,7 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
   private void declareSubTypesMapping(ExtensionDeclarer declarer, List<AnnotationValueFetcher<SubTypeMapping>> typeMappings,
                                       String name) {
     if (typeMappings.stream().map(valueFetcher -> valueFetcher.getClassValue(SubTypeMapping::baseType)).distinct()
-        .collect(toList()).size() != typeMappings.size()) {
+        .count() != typeMappings.size()) {
       throw new IllegalModelDefinitionException(String
           .format("There should be only one SubtypeMapping for any given base type in extension [%s]."
               + " Duplicated base types are not allowed", name));

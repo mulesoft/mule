@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Integer.getInteger;
 import static java.lang.Long.MIN_VALUE;
 import static java.lang.Math.max;
 import static java.lang.System.nanoTime;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.util.DataUnit.KB;
+import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -24,8 +25,10 @@ import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -43,8 +46,6 @@ import reactor.retry.BackoffDelay;
 
 public abstract class ProactorStreamProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
 
-  protected static final int STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD =
-      getInteger(SYSTEM_PROPERTY_PREFIX + "STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD", KB.toBytes(16));
   private static final Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
 
   private static final long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
@@ -81,8 +82,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
   @Override
   protected Scheduler createCpuLightScheduler(Supplier<Scheduler> cpuLightSchedulerSupplier) {
-    return new RetrySchedulerWrapper(super.createCpuLightScheduler(cpuLightSchedulerSupplier), SCHEDULER_BUSY_RETRY_INTERVAL_MS,
-                                     () -> lastRetryTimestamp.set(nanoTime()));
+    return new RetrySchedulerWrapper(super.createCpuLightScheduler(cpuLightSchedulerSupplier), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
   }
 
   @Override
@@ -141,7 +141,8 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       }
       return schedulerBusy;
     }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
-        .withBackoffScheduler(fromExecutorService(decorateScheduler(getCpuLightScheduler()))));
+        .withBackoffScheduler(fromExecutorService(decorateScheduler(getCpuLightScheduler()))))
+        .doOnNext(e -> lastRetryTimestamp.set(MIN_VALUE));
   }
 
   protected Scheduler getBlockingScheduler() {
@@ -153,7 +154,9 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   }
 
   private final AtomicInteger inFlightEvents = new AtomicInteger();
+  private final AtomicInteger queuedEvents = new AtomicInteger();
   private final BiConsumer<CoreEvent, Throwable> IN_FLIGHT_DECREMENT_CALLBACK = (e, t) -> inFlightEvents.decrementAndGet();
+  private final BiConsumer<CoreEvent, Throwable> QUEUED_DECREMENT_CALLBACK = (e, t) -> queuedEvents.decrementAndGet();
   private final LongUnaryOperator LAST_RETRY_TIMESTAMP_CHECK_OPERATOR =
       v -> nanoTime() - v < SCHEDULER_BUSY_RETRY_INTERVAL_NS * 2
           ? v
@@ -165,17 +168,32 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
    * @param event the event about to be processed
    * @return true if the event can be accepted for processing
    */
-  private boolean checkCapacity(CoreEvent event) {
+  private BackPressureReason checkCapacity(CoreEvent event) {
     if (lastRetryTimestamp.get() != MIN_VALUE) {
       if (lastRetryTimestamp.updateAndGet(LAST_RETRY_TIMESTAMP_CHECK_OPERATOR) != MIN_VALUE) {
-        return false;
+        // If there is maxConcurrency value set, honor it and don't buffer here
+        if (!maxConcurrencyEagerCheck) {
+          // TODO MULE-17265 Make this configurable in the flow
+          // This will allow the event to get into the flow, effectively getting into the flow's sink buffer if it cannot be
+          // processed right away
+          if (queuedEvents.incrementAndGet() > getBufferQueueSize()) {
+            queuedEvents.decrementAndGet();
+            return REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
+          }
+
+          // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
+          // an async, for instance)
+          ((BaseEventContext) event.getContext()).onResponse(QUEUED_DECREMENT_CALLBACK);
+        } else {
+          return REQUIRED_SCHEDULER_BUSY;
+        }
       }
     }
 
     if (maxConcurrencyEagerCheck) {
       if (inFlightEvents.incrementAndGet() > maxConcurrency) {
         inFlightEvents.decrementAndGet();
-        return false;
+        return MAX_CONCURRENCY_EXCEEDED;
       }
 
       // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
@@ -183,18 +201,23 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       ((BaseEventContext) event.getContext()).onResponse(IN_FLIGHT_DECREMENT_CALLBACK);
     }
 
-    return true;
+    return null;
+  }
+
+  protected int getBufferQueueSize() {
+    return DEFAULT_BUFFER_SIZE;
   }
 
   @Override
   public void checkBackpressureAccepting(CoreEvent event) throws RejectedExecutionException {
-    if (!checkCapacity(event)) {
-      throw new RejectedExecutionException();
+    final BackPressureReason reason = checkCapacity(event);
+    if (reason != null) {
+      throw new FromFlowRejectedExecutionException(reason);
     }
   }
 
   @Override
-  public boolean checkBackpressureEmitting(CoreEvent event) {
+  public BackPressureReason checkBackpressureEmitting(CoreEvent event) {
     return checkCapacity(event);
   }
 
@@ -212,7 +235,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
     }
 
     @Override
-    public final boolean emit(CoreEvent event) {
+    public final BackPressureReason emit(CoreEvent event) {
       return innerSink.emit(event);
     }
 
