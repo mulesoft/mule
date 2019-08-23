@@ -14,11 +14,11 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -30,11 +30,11 @@ import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -47,6 +47,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default error handler must accept any event.";
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
+  private ErrorType anyErrorType;
   protected String name;
 
   @Inject
@@ -55,6 +56,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
+    anyErrorType = muleContext.getErrorTypeRepository().getAnyErrorType();
     addCriticalErrorHandler();
     addDefaultErrorHandlerIfRequired();
     validateConfiguredExceptionStrategies();
@@ -117,7 +119,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   private void addDefaultErrorHandlerIfRequired() throws InitialisationException {
-    if (!exceptionListeners.get(exceptionListeners.size() - 1).acceptsAll()) {
+    MessagingExceptionHandlerAcceptor lastAcceptor = exceptionListeners.get(exceptionListeners.size() - 1);
+    if (!lastAcceptor.acceptsAll() && !matchesAny(lastAcceptor)) {
       String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
       if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
         logger
@@ -131,16 +134,31 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     }
   }
 
+  /**
+   * Defines whether a handler effectively accepts all errors. We cannot modify {@link OnErrorPropagateHandler#acceptsAll()}
+   * without breaking compatibility since {@link #validateOnlyLastAcceptsAll()} would start failing for currently accepted mid
+   * level handlers for "ANY".
+   *
+   * @param acceptor the handler to check
+   * @return whether this is an {@link OnErrorPropagateHandler} with a matcher for "ANY"
+   */
+  private boolean matchesAny(MessagingExceptionHandlerAcceptor acceptor) {
+    return acceptor instanceof OnErrorPropagateHandler && ((OnErrorPropagateHandler) acceptor).acceptsErrorType(anyErrorType);
+  }
+
   private void validateConfiguredExceptionStrategies() {
     validateOnlyLastAcceptsAll();
   }
 
   private void validateOnlyLastAcceptsAll() {
     for (int i = 0; i < exceptionListeners.size() - 1; i++) {
-      MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = exceptionListeners.get(i);
-      if (messagingExceptionHandlerAcceptor.acceptsAll()) {
+      MessagingExceptionHandlerAcceptor acceptor = exceptionListeners.get(i);
+      if (acceptor.acceptsAll()) {
         throw new MuleRuntimeException(
-                                       createStaticMessage("Only last exception strategy inside <error-handler> can accept any message. Maybe expression attribute is empty."));
+                                       createStaticMessage("Only last <on-error> inside <error-handler> can accept any errors. Otherwise the following handlers will never execute."));
+      } else if (matchesAny(acceptor)) {
+        logger
+            .warn("Only the last <on-error> inside an <error-handler> should accept any errors. Otherwise the following handlers will never execute.");
       }
     }
   }
