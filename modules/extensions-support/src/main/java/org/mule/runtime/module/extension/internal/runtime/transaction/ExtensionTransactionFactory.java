@@ -12,8 +12,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import javax.transaction.TransactionManager;
+
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
 
 /**
  * Creates instances of {@link ExtensionTransactionFactory}
@@ -24,10 +28,15 @@ public class ExtensionTransactionFactory implements TransactionFactory {
 
   @Override
   public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
-    Transaction transaction = new ExtensionTransaction(muleContext);
-    transaction.begin();
-
-    return transaction;
+    try {
+      return this.beginTransaction(muleContext.getConfiguration().getId(),
+                                   ((MuleContextWithRegistry) muleContext).getRegistry()
+                                       .lookupObject(NotificationDispatcher.class),
+                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
+                                   10000);
+    } catch (RegistrationException e) {
+      throw new TransactionException(cannotStartTransaction("Extension"), e);
+    }
   }
 
   /**

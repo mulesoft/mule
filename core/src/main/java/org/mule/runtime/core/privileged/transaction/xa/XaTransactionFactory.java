@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
 
 import javax.transaction.TransactionManager;
@@ -44,16 +45,14 @@ public class XaTransactionFactory implements TransactionFactory {
   }
 
   @Override
-  public Transaction beginTransaction(MuleContext muleContext)
-      throws TransactionException {
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
     try {
-      XaTransaction xat =
-          new XaTransaction(muleContext.getConfiguration().getId(), muleContext.getTransactionManager(),
-                            ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class),
-                            timeout);
-      xat.begin();
-      return xat;
-    } catch (Exception e) {
+      return this.beginTransaction(muleContext.getConfiguration().getId(),
+                                   ((MuleContextWithRegistry) muleContext).getRegistry()
+                                       .lookupObject(NotificationDispatcher.class),
+                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
+                                   10000);
+    } catch (RegistrationException e) {
       throw new TransactionException(cannotStartTransaction("XA"), e);
     }
   }

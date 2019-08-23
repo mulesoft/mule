@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
@@ -31,7 +32,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.rule.VerboseExceptions;
@@ -55,13 +55,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   @Rule
   public ExpectedException expectedException = none();
 
-  private NotificationDispatcher notificationDispatcher = new DefaultNotificationDispatcher();
-
-  private final TestTransaction mockTransaction =
-      spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
-  private final TestTransaction mockXaTransaction =
-      spy(new TestTransaction("appName", notificationDispatcher, true, DEFAULT_TIMEOUT));
-
+  private TestTransaction mockTransaction;
+  private TestTransaction mockXaTransaction;
 
   private OnErrorContinueHandler onErrorContinueHandler;
 
@@ -83,6 +78,12 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
     onErrorContinueHandler.setAnnotations(getFlowComponentLocationAnnotations(flow.getName()));
     onErrorContinueHandler.setMuleContext(muleContext);
     onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
+
+    NotificationDispatcher notificationDispatcher = getNotificationDispatcher(muleContext);
+    mockTransaction =
+        spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    mockXaTransaction =
+        spy(new TestTransaction("appName", notificationDispatcher, true, DEFAULT_TIMEOUT));
   }
 
   @Test

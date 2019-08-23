@@ -28,15 +28,12 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction {
   private Optional<ExtensionTransactionalResource> boundResource = empty();
 
   /**
-   * {@inheritDoc}
+   * @deprecated since 4.3.0. Use {@link #ExtensionTransaction(String, NotificationDispatcher, int)} instead
    */
   public ExtensionTransaction(MuleContext muleContext) {
     super(muleContext);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public ExtensionTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
     super(applicationName, notificationFirer, timeout);
   }

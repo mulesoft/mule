@@ -32,6 +32,10 @@ public class DelegateTransaction extends AbstractTransaction {
   private SingleResourceTransactionFactoryManager transactionFactoryManager;
   private TransactionManager transactionManager;
 
+  /**
+   * @deprecated since 4.3.0. Use {@link #DelegateTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)} instead
+   */
+  @Deprecated
   public DelegateTransaction(MuleContext muleContext) {
     super(muleContext);
   }
