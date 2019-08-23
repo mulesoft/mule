@@ -30,9 +30,10 @@ import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFlu
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
@@ -92,6 +93,7 @@ import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
 /**
  * This phase routes the message through the flow.
@@ -113,6 +115,7 @@ public class ModuleFlowProcessingPhase
   private FluxSinkSupplier<PhaseContext> dispatchFlux;
   private FluxSinkSupplier<PhaseContext> responseFlux;
   private FluxSinkSupplier<PhaseContext> terminationFlux;
+  private FluxSinkSupplier<PhaseContext> exceptionFlux;
 
   private final PolicyManager policyManager;
 
@@ -207,13 +210,22 @@ public class ModuleFlowProcessingPhase
 
                                        @Override
                                        public void complete(Either<SourcePolicyFailureResult, SourcePolicySuccessResult> value) {
+                                         synchronized (this) {
+                                           if (ctx.result != null) {
+                                             return;
+                                           }
+                                         }
                                          ctx.result = value;
                                          responseFlux.get().next(ctx);
                                        }
 
                                        @Override
                                        public void error(Throwable e) {
-                                         // TODO: Y aca??????
+                                         synchronized (this) {
+                                           if (ctx.result != null) {
+                                             return;
+                                           }
+                                         }
                                          ctx.result = left(new SourcePolicyFailureResult(new MessagingException(ctx.event, e),
                                                                                          () -> emptyMap()));
                                          responseFlux.get().next(ctx);
@@ -223,6 +235,40 @@ public class ModuleFlowProcessingPhase
             PhaseContext ctx = (PhaseContext) phaseContext;
             ctx.result = mapBackPressureExceptionToPolicyFailureResult(ctx.template, ctx.event, (FlowBackPressureException) e);
             responseFlux.get().next(ctx);
+          });
+    }, roundRobinSize);
+
+    exceptionFlux = createRoundRobinFluxSupplier(flux -> {
+      return flux
+          .flatMap(ctx -> {
+            subscriberContext().map(rc -> rc.put("phaseContext", ctx));
+            return Mono.just(ctx);
+          })
+          //.doOnNext(ctx -> subscriberContext().map(rc -> rc.put("phaseContext", ctx)))
+          .flatMap(ctx -> from(ctx.flowConstruct.getExceptionListener().apply((Exception) ctx.exception)).last())
+          .onErrorResume(e -> {
+            PhaseContext ctx = subscriberContext().block().get("phaseContext");
+            return Mono.just(ctx.event);
+          })
+          .doOnNext(event -> {
+            PhaseContext ctx = subscriberContext().block().get("phaseContext");
+            MessagingException messagingException = (MessagingException) ctx.exception;
+            SourcePolicySuccessResult successResult = ctx.result.getRight();
+            sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx,
+                              new CompletableCallback<Void>() {
+
+                                @Override
+                                public void complete(Void value) {
+                                  onTerminate(ctx, left(ctx.exception));
+                                  finish(ctx);
+                                }
+
+                                @Override
+                                public void error(Throwable e) {
+                                  ctx.exception = e;
+                                  finish(ctx);
+                                }
+                              });
           });
     }, roundRobinSize);
   }
@@ -389,6 +435,8 @@ public class ModuleFlowProcessingPhase
       fireNotification(ctx.messageProcessContext.getMessageSource(), failureResult.getMessagingException().getEvent(),
                        ctx.flowConstruct, MESSAGE_ERROR_RESPONSE);
 
+      LOGGER.error("==> MG --> ", failureResult.getMessagingException());
+
       sendErrorResponse(failureResult.getMessagingException(),
                         event -> failureResult.getErrorResponseParameters().get(),
                         ctx, new CompletableCallback<Void>() {
@@ -413,25 +461,33 @@ public class ModuleFlowProcessingPhase
    * and sending an error response.
    */
   private void policySuccessError(SourceErrorException see, SourcePolicySuccessResult successResult, PhaseContext ctx) {
-
     MessagingException messagingException =
         see.toMessagingException(ctx.flowConstruct.getMuleContext().getExceptionContextProviders(), ctx.messageSource);
 
-    just(messagingException).flatMapMany(ctx.flowConstruct.getExceptionListener()).last().onErrorResume(e -> empty()).subscribe();
-    sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx, new CompletableCallback<Void>() {
+    //ctx.exception = messagingException;
 
-      @Override
-      public void complete(Void value) {
-        onTerminate(ctx, left(messagingException));
-        finish(ctx);
-      }
+    just(messagingException)
+        .flatMapMany(ctx.flowConstruct.getExceptionListener())
+        .last()
+        .onErrorResume(e -> empty())
+        .doAfterTerminate(() -> sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx,
+                                                  new CompletableCallback<Void>() {
 
-      @Override
-      public void error(Throwable e) {
-        ctx.exception = e;
-        finish(ctx);
-      }
-    });
+                                                    @Override
+                                                    public void complete(Void value) {
+                                                      onTerminate(ctx, left(messagingException));
+                                                      finish(ctx);
+                                                    }
+
+                                                    @Override
+                                                    public void error(Throwable e) {
+                                                      ctx.exception = e;
+                                                      finish(ctx);
+                                                    }
+                                                  }))
+        .subscribe();
+
+    //exceptionFlux.get().next(ctx);
   }
 
   /**
