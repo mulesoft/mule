@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.api.component.execution.CompletableCallback.just;
+import static org.mule.runtime.api.component.execution.CompletableCallback.merely;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -29,7 +29,6 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
@@ -93,7 +92,6 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -105,8 +103,6 @@ import reactor.core.publisher.Mono;
  */
 public class ModuleFlowProcessingPhase
     extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> implements Initialisable, Startable, Stoppable {
-
-  private static final Logger LOGGER = getLogger(ModuleFlowProcessingPhase.class);
 
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
@@ -265,19 +261,18 @@ public class ModuleFlowProcessingPhase
                                                            policy);
 
         dispatch(phaseContext);
-      } catch (Throwable t) {
-        MessagingException e = new MessagingExceptionResolver(messageProcessContext.getMessageSource())
-            .resolve(new MessagingException(event, t), muleContext);
-        template.sendFailureResponseToClient(e,
+      } catch (Exception e) {
+        template.sendFailureResponseToClient(new MessagingExceptionResolver(messageProcessContext.getMessageSource())
+            .resolve(new MessagingException(event, e), muleContext),
                                              template.getFailedExecutionResponseParametersFunction().apply(event),
-                                             just(() -> phaseResultNotifier.phaseFailure(e)));
+                                             merely(() -> phaseResultNotifier.phaseFailure(e)));
       }
-    } catch (Exception t) {
-      phaseResultNotifier.phaseFailure(t);
+    } catch (Exception e) {
+      phaseResultNotifier.phaseFailure(e);
     }
   }
 
-  private void dispatch(PhaseContext ctx) throws Throwable {
+  private void dispatch(PhaseContext ctx) throws Exception {
     try {
       ctx.flowConstruct.checkBackpressure(ctx.event);
       ctx.sourcePolicy.process(ctx.event, ctx.template,
@@ -302,13 +297,13 @@ public class ModuleFlowProcessingPhase
                                    dispatchResponse(ctx);
                                  }
                                });
-    } catch (Throwable t) {
-      t = Exceptions.unwrap(t);
-      if (t instanceof FlowBackPressureException) {
-        ctx.result = mapBackPressureExceptionToPolicyFailureResult(ctx.template, ctx.event, (FlowBackPressureException) t);
+    } catch (Exception e) {
+      e = (Exception) Exceptions.unwrap(e);
+      if (e instanceof FlowBackPressureException) {
+        ctx.result = mapBackPressureExceptionToPolicyFailureResult(ctx.template, ctx.event, (FlowBackPressureException) e);
         dispatchResponse(ctx);
       } else {
-        throw t;
+        throw e;
       }
     }
   }
@@ -330,16 +325,16 @@ public class ModuleFlowProcessingPhase
    * @return an exception mapper that notifies the {@link FlowConstruct} response listener of the backpressure signal
    */
   protected Either<SourcePolicyFailureResult, SourcePolicySuccessResult> mapBackPressureExceptionToPolicyFailureResult(
-      ModuleFlowProcessingPhaseTemplate template,
-      CoreEvent event,
-      FlowBackPressureException exception) {
+                                                                                                                       ModuleFlowProcessingPhaseTemplate template,
+                                                                                                                       CoreEvent event,
+                                                                                                                       FlowBackPressureException exception) {
 
     // Build error event
     CoreEvent errorEvent =
         CoreEvent.builder(event)
             .error(ErrorBuilder.builder(exception)
-                       .errorType(flowBackPressureErrorType)
-                       .build())
+                .errorType(flowBackPressureErrorType)
+                .build())
             .build();
 
     // Since the decision whether the event is handled by the source onError or onBackPressure callback is made in
@@ -415,24 +410,22 @@ public class ModuleFlowProcessingPhase
       fireNotification(ctx.messageProcessContext.getMessageSource(), failureResult.getMessagingException().getEvent(),
                        ctx.flowConstruct, MESSAGE_ERROR_RESPONSE);
 
-      LOGGER.error("==> MG --> ", failureResult.getMessagingException());
-
       sendErrorResponse(failureResult.getMessagingException(),
                         event -> failureResult.getErrorResponseParameters().get(),
                         ctx, new CompletableCallback<Void>() {
 
-            @Override
-            public void complete(Void value) {
-              onTerminate(ctx, left(failureResult.getMessagingException()));
-              finish(ctx);
-            }
+                          @Override
+                          public void complete(Void value) {
+                            onTerminate(ctx, left(failureResult.getMessagingException()));
+                            finish(ctx);
+                          }
 
-            @Override
-            public void error(Throwable e) {
-              ctx.exception = e;
-              finish(ctx);
-            }
-          });
+                          @Override
+                          public void error(Throwable e) {
+                            ctx.exception = e;
+                            finish(ctx);
+                          }
+                        });
     };
   }
 
@@ -488,8 +481,8 @@ public class ModuleFlowProcessingPhase
         @Override
         public void error(Throwable e) {
           callback.error(new SourceErrorException(builder(event)
-                                                      .error(builder(e).errorType(sourceErrorResponseSendErrorType).build())
-                                                      .build(),
+              .error(builder(e).errorType(sourceErrorResponseSendErrorType).build())
+              .build(),
                                                   sourceErrorResponseSendErrorType, e));
         }
       });
@@ -534,13 +527,13 @@ public class ModuleFlowProcessingPhase
       Message eventMessage;
       if (resultValue instanceof Collection && adapter.isCollection()) {
         eventMessage = toMessage(Result.<Collection<Message>, TypedValue>builder()
-                                     .output(toMessageCollection(
-                                         new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
-                                                                                adapter.getPayloadMediaTypeResolver()),
-                                         adapter.getCursorProviderFactory(),
-                                         ((BaseEventContext) eventCtx).getRootContext()))
-                                     .mediaType(result.getMediaType().orElse(ANY))
-                                     .build());
+            .output(toMessageCollection(
+                                        new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
+                                                                               adapter.getPayloadMediaTypeResolver()),
+                                        adapter.getCursorProviderFactory(),
+                                        ((BaseEventContext) eventCtx).getRootContext()))
+            .mediaType(result.getMediaType().orElse(ANY))
+            .build());
       } else {
         eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
                                  ((BaseEventContext) eventCtx).getRootContext());
