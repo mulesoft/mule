@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
@@ -30,6 +30,14 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   @Override
   public boolean acceptsAll() {
     return errorTypeMatcher == null && when == null;
+  }
+
+  /**
+   * @param errorType an {@link ErrorType}
+   * @return whether this handler accepts the provided type
+   */
+  boolean acceptsErrorType(ErrorType errorType) {
+    return acceptsAll() || (errorTypeMatcher != null && errorTypeMatcher.match(errorType));
   }
 
   @Override
