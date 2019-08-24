@@ -53,6 +53,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
+import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
@@ -278,7 +279,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public void start() throws MuleException {
     super.start();
-    routingSink = new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), new OnErrorHandlerFluxObjectFactory());
+    OnErrorHandlerFluxObjectFactory factory = new OnErrorHandlerFluxObjectFactory();
+    routingSink =
+        new TransactionAwareFluxSinkSupplier<>(factory,
+                                               new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), factory));
   }
 
   @Override
