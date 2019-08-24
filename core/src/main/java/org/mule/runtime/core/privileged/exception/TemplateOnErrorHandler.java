@@ -25,11 +25,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.just;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -37,6 +36,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
@@ -54,18 +54,18 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -101,22 +101,24 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private boolean isLocalErrorHandlerLocation;
   private ComponentLocation location;
 
-  private final Supplier<FluxSink<CoreEvent>> routingSink = new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
-                                                                                             new OnErrorHandlerFluxObjectFactory());
+  private Supplier<FluxSink<CoreEvent>> routingSink;
 
   private final class OnErrorHandlerFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
     @Override
     public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
-      Flux<CoreEvent> onErrorFlux =
-          Flux.create(sinkRef)
-              .map(beforeRouting())
-              .concatMap(route())
-              .onErrorContinue(MessagingException.class, onRoutingError())
-              .map(afterRouting())
-              .doOnNext(result -> fireEndNotification(getOriginalEvent(result), result, getException(result)))
-              .doOnNext(TemplateOnErrorHandler.this::resolveHandling);
+      Flux<CoreEvent> onErrorFlux = Flux.create(sinkRef).map(beforeRouting());
+
+      if (!getMessageProcessors().isEmpty()) {
+        onErrorFlux = onErrorFlux.compose(e -> route(e));
+      }
+
+      onErrorFlux = onErrorFlux
+          .onErrorContinue(MessagingException.class, onRoutingError())
+          .map(afterRouting())
+          .doOnNext(result -> fireEndNotification(getOriginalEvent(result), result, getException(result)))
+          .doOnNext(TemplateOnErrorHandler.this::resolveHandling);
 
       onErrorFlux.subscribe();
       return sinkRef.getFluxSink();
@@ -204,14 +206,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
                                                             location, PROCESS_END));
   }
 
-  protected Function<CoreEvent, Publisher<CoreEvent>> route() {
-    return event -> {
-      if (getMessageProcessors().isEmpty()) {
-        return just(event);
-      }
-      return from(processWithChildContextDontComplete(event, configuredMessageProcessors, ofNullable(location),
-                                                      NullExceptionHandler.getInstance()));
-    };
+  protected Publisher<CoreEvent> route(Publisher<CoreEvent> eventPublisher) {
+    return applyWithChildContext(eventPublisher, configuredMessageProcessors, ofNullable(location),
+                                 NullExceptionHandler.getInstance());
   }
 
   @Override
@@ -276,6 +273,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
       }
     }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    super.start();
+    routingSink = new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), new OnErrorHandlerFluxObjectFactory());
   }
 
   @Override

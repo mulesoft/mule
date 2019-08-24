@@ -12,6 +12,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static reactor.core.publisher.Flux.just;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -98,7 +100,7 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
   }
 
   private void handleException() {
-    checkLogHandler.route();
+    checkLogHandler.route(just(mock(CoreEvent.class)));
   }
 
 }
