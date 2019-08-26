@@ -105,7 +105,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
       @Override
       public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-        return createProcessingStrategy(muleContext, schedulersNamePrefix);
+        return createProcessingStrategy(muleContext, schedulersNamePrefix, maxConcurrency);
       }
 
       @Override
@@ -122,10 +122,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return createProcessingStrategy(muleContext, MAX_VALUE);
+    return createProcessingStrategy(muleContext, schedulersNamePrefix, MAX_VALUE);
   }
 
-  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext,
+  protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix,
                                                         int maxConcurrency) {
     return new ProactorStreamEmitterProcessingStrategy(XS_BUFFER_SIZE,
                                                        2,
@@ -601,7 +601,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
         .processors(latchedProcessor)
-        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, 1))
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
         .build();
 
     flow.initialise();
@@ -643,7 +643,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     flow = flowBuilder.get()
         .source(triggerableMessageSource)
         .processors(latchedProcessor)
-        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, 1))
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix, 1))
         .build();
 
     flow.initialise();
