@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.el.mvel.configuration;
 
+import org.mule.runtime.api.component.AbstractComponent;
+
 /**
  * POJO to parse "alias" map entry element.
  *
  * @since 4.0
  */
-public class AliasEntry {
+public class AliasEntry extends AbstractComponent {
 
   String key;
   String value;

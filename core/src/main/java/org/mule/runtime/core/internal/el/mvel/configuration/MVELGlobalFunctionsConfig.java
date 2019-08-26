@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.el.mvel.configuration;
 
+import org.mule.runtime.api.component.AbstractComponent;
+
 /**
  * POJO for parsing the global-functions sub-element in the expression-language element.
  *
  * @since 4.0
  */
-public class MVELGlobalFunctionsConfig {
+public class MVELGlobalFunctionsConfig extends AbstractComponent {
 
   String inlineScript;
   String file;

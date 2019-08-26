@@ -9,11 +9,12 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 
 /**
- * {@link MuleRuntimeException} that aims to be thrown when a required parameter is was set.
+ * {@link MuleRuntimeException} that aims to be thrown when a required parameter is not set.
  *
  * @since 4.0
  */

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tls.internal.revocation;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.privileged.security.RevocationCheck;
 
 import java.security.GeneralSecurityException;
@@ -28,7 +29,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  *
  * @since 4.1
  */
-public class StandardRevocationCheck implements RevocationCheck {
+public class StandardRevocationCheck extends AbstractComponent implements RevocationCheck {
 
   private Boolean onlyEndEntities = false;
   private Boolean preferCrls = false;

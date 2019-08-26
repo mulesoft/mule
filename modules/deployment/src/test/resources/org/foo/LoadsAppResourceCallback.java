@@ -10,10 +10,11 @@ package org.foo;
 import static java.lang.Thread.currentThread;
 
 import org.mule.functional.api.component.EventCallback;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 
-public class LoadsAppResourceCallback implements EventCallback {
+public class LoadsAppResourceCallback extends AbstractComponent implements EventCallback {
 
   @Override
   public void eventReceived(CoreEvent event, Object component, MuleContext muleContext) throws Exception {

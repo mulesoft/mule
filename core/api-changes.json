@@ -60,6 +60,16 @@
           "methodName": "checkBackpressureEmitting",
           "elementKind": "method",
           "justification": "This is internal, should not be used."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.core.api.source.scheduler.PeriodicScheduler",
+          "new": "class org.mule.runtime.core.api.source.scheduler.PeriodicScheduler",
+          "superClass": "org.mule.runtime.api.component.AbstractComponent",
+          "package": "org.mule.runtime.core.api.source.scheduler",
+          "classSimpleName": "PeriodicScheduler",
+          "elementKind": "class",
+          "justification": "This was missing annotations"
         }
       ]
     }

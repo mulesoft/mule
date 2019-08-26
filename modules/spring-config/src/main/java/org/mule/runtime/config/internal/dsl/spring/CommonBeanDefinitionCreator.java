@@ -177,7 +177,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
         addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getSourceCode(),
                                                 componentModel.getMetadata().getDocAttributes());
-        builder.getBeanDefinition().getPropertyValues().addPropertyValue("annotations", annotations);
+        builder.getBeanDefinition().getPropertyValues().addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
 
       return annotations;
