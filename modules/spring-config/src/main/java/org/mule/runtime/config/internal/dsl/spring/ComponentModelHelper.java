@@ -32,6 +32,7 @@ import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +62,9 @@ public class ComponentModelHelper {
   }
 
   public static boolean isAnnotatedObject(ComponentModel componentModel) {
-    return isOfType(componentModel, Component.class);
+    return isOfType(componentModel, Component.class)
+        // ValueResolver end up generating pojos from the extension whose class is enhanced to have annotations
+        || isOfType(componentModel, ValueResolver.class);
   }
 
   public static boolean isProcessor(ComponentModel componentModel) {
