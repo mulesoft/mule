@@ -12,9 +12,10 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -23,8 +24,11 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
-public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
+public class OnErrorCheckLogHandlerTestCase extends AbstractMuleContextTestCase {
 
   private static final LogChecker successfulChecker = mock(LogChecker.class);
   private static final LogChecker failingChecker = mock(LogChecker.class);
@@ -44,6 +48,7 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
   public void resetLogHandler() throws Exception {
     checkLogHandler = new OnErrorCheckLogHandler();
     checkLogHandler.setAnnotations(ImmutableMap.of(ROOT_CONTAINER_NAME_KEY, "someContainerName"));
+    initialiseIfNeeded(checkLogHandler, muleContext);
     checkLogHandler.start();
   }
 
@@ -100,7 +105,29 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
   }
 
   private void handleException() {
-    checkLogHandler.route(just(mock(CoreEvent.class)));
+    Publisher<CoreEvent> pub = checkLogHandler.route(just(mock(CoreEvent.class)));
+    pub.subscribe(new Subscriber<CoreEvent>() {
+
+      @Override
+      public void onSubscribe(Subscription s) {
+
+      }
+
+      @Override
+      public void onNext(CoreEvent event) {
+
+      }
+
+      @Override
+      public void onError(Throwable t) {
+
+      }
+
+      @Override
+      public void onComplete() {
+
+      }
+    });
   }
 
 }

@@ -23,7 +23,6 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
@@ -154,18 +153,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
     expectedException.expect(Exception.class);
     onErrorContinueHandler.handleException(mockException, muleEvent);
-  }
-
-  @Test
-  public void reactor() {
-    just(1, 2, 3)
-        .map(num -> num + 1)
-        .compose(func())
-        //      .flatMap(num -> func().apply(just(num)))
-        .onErrorContinue(Throwable.class,
-                         (me, num) -> System.out.println(String.format("Error '%s' with '%s'", me.getMessage(), num)))
-        .map(num -> num - 1)
-        .doOnNext(num -> System.out.println(num)).subscribe();
   }
 
   private Function<Publisher<Integer>, Publisher<Integer>> func() {
