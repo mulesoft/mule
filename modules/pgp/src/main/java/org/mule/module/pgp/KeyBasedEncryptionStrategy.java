@@ -141,6 +141,8 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
                 String signerPrincipal = ((PGPEncryptAndSignInfo) cryptInfo).getSignerPrincipal();
                 try
                 {
+                    // Hacky way of reading secret-key bundle
+                    readSecretKeyBundleIfNecessary();
                     Iterator<PGPSecretKeyRing> signerSecretKeysIterator = this.keyManager.getSecretKeys().getKeyRings(signerPrincipal);
                     if (!signerSecretKeysIterator.hasNext()) {
                         throw new MissingPGPKeyException(createStaticMessage("Signer private key not found for principal: " + signerPrincipal)) ;
@@ -162,6 +164,13 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             PGPCryptInfo info = (PGPCryptInfo) cryptInfo;
             this.checkKeyExpirity(info.getPublicKey());
             return info;
+        }
+    }
+
+    private void readSecretKeyBundleIfNecessary()
+    {
+        if (this.keyManager.getSecretKeys() == null) {
+            this.keyManager.getConfiguredSecretKey();
         }
     }
 
