@@ -193,7 +193,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         PGPSecretKey pgpSecKey;
         PGPPrivateKey pgpPrivateKey;
 
-        if (configuredSecretKey)
+        if(configuredSecretKey)
         {
             pgpSecKey = this.secretKey;
         }
@@ -224,11 +224,11 @@ public class DecryptStreamTransformer implements StreamTransformer
         return format(INVALID_KEY_ERROR_MESSAGE, toHexString(configuredKeyId).toUpperCase(), toHexString(validKeyId).toUpperCase());
     }
 
-    private PGPException wrapWrongPassPhraseException(PGPException pgpException, String invalidPassPhrase, Long keyId)
+    private PGPException wrapWrongPassPhraseException (PGPException pgpException, String invalidPassPhrase, Long keyId)
     {
-        if (pgpException.getMessage().contains(CHECKSUM_MESSAGE))
+        if(pgpException.getMessage().contains(CHECKSUM_MESSAGE))
         {
-            return new PGPException(createInvalidPassPhraseErrorMessage(invalidPassPhrase, keyId));
+            return  new PGPException(createInvalidPassPhraseErrorMessage(invalidPassPhrase, keyId));
         }
         else
         {
@@ -236,7 +236,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
     }
 
-    private String createInvalidPassPhraseErrorMessage(String invalidPassPhrase, long keyId)
+    private String createInvalidPassPhraseErrorMessage (String invalidPassPhrase, long keyId)
     {
         return format(INVALID_PASS_PHRASE_ERROR_MESSAGE, invalidPassPhrase, toHexString(keyId).toUpperCase());
     }

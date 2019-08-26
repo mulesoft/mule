@@ -23,7 +23,7 @@ public interface EncryptionStrategy extends Initialisable, NamedObject
     InputStream encrypt(InputStream data, Object info) throws CryptoFailureException;
 
     InputStream decrypt(InputStream data, Object info) throws CryptoFailureException;
-
+    
     byte[] encrypt(byte[] data, Object info) throws CryptoFailureException;
 
     byte[] decrypt(byte[] data, Object info) throws CryptoFailureException;
