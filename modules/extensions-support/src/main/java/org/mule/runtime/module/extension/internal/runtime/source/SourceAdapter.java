@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.component.execution.CompletableCallback.from;
+import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
@@ -316,7 +316,7 @@ public class SourceAdapter implements Lifecycle {
     @Override
     public void onTerminate(Either<MessagingException, CoreEvent> result) throws Exception {
       CoreEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
-      onTerminateExecutor.execute(event, emptyMap(), context, from(context::releaseConnection));
+      onTerminateExecutor.execute(event, emptyMap(), context, always(context::releaseConnection));
     }
 
     private void commit() {

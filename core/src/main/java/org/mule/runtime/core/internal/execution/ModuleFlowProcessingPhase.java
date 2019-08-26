@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.api.component.execution.CompletableCallback.merely;
+import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -265,7 +265,7 @@ public class ModuleFlowProcessingPhase
         template.sendFailureResponseToClient(new MessagingExceptionResolver(messageProcessContext.getMessageSource())
             .resolve(new MessagingException(event, e), muleContext),
                                              template.getFailedExecutionResponseParametersFunction().apply(event),
-                                             merely(() -> phaseResultNotifier.phaseFailure(e)));
+                                             always(() -> phaseResultNotifier.phaseFailure(e)));
       }
     } catch (Exception e) {
       phaseResultNotifier.phaseFailure(e);
