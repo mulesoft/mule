@@ -6,6 +6,7 @@
  */
 package org.mule.module.pgp;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.pgp.i18n.PGPMessages.encryptionStrategyNotSet;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
 import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
@@ -24,6 +25,7 @@ import org.mule.util.SecurityUtils;
 import java.io.InputStream;
 import java.security.Provider;
 import java.util.Calendar;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +35,7 @@ import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
 public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
@@ -138,7 +141,11 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
                 String signerPrincipal = ((PGPEncryptAndSignInfo) cryptInfo).getSignerPrincipal();
                 try
                 {
-                    PGPSecretKey signerSecretKey = this.keyManager.getSecretKeys().getSecretKeyRing(this.keyManager.getPublicKey(signerPrincipal).getKeyID()).getSecretKey();
+                    Iterator<PGPSecretKeyRing> signerSecretKeysIterator = this.keyManager.getSecretKeys().getKeyRings(signerPrincipal);
+                    if (!signerSecretKeysIterator.hasNext()) {
+                        throw new MissingPGPKeyException(createStaticMessage("Signer private key not found for principal: " + signerPrincipal)) ;
+                    }
+                    PGPSecretKey signerSecretKey = signerSecretKeysIterator.next().getSecretKey();
                     PGPPrivateKey signerPrivateKey = signerSecretKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(keyManager.getSecretPassphrase().toCharArray()));
                     return new PGPCryptInfo(publicKey, signerPrivateKey, signerPrincipal);
                 }
