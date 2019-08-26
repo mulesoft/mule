@@ -6,7 +6,9 @@
  */
 package org.mule.module.pgp;
 
+import static org.mule.module.pgp.i18n.PGPMessages.encryptionStrategyNotSet;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
+import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
 import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
@@ -26,6 +28,8 @@ import java.util.Calendar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
@@ -33,6 +37,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
 public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 {
+
     /**
      * logger used by this class
      */
@@ -46,7 +51,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private int encryptionAlgorithmId;
     private PGPOutputMode pgpOutputMode;
     private String fileName;
-    
+
     public void initialise() throws InitialisationException
     {
         if (!SecurityUtils.isFipsSecurityModel())
@@ -72,11 +77,18 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 
     public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
     {
-        try 
+        try
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            return new EncryptStreamTransformer(publicKey, provider, encryptionAlgorithmId, pgpOutputMode, fileName).process(data);
+            EncryptStreamTransformer encryptStreamTransformer = new EncryptStreamTransformer(publicKey, provider, encryptionAlgorithmId, pgpOutputMode, fileName);
+            if (pgpCryptInfo.isSignRequested())
+            {
+                PGPPrivateKey signerPrivateKey = pgpCryptInfo.getSignerPrivateKey();
+                // String signerUserId = keyManager.getPublicKeys().getPublicKey(signerPrivateKey.getKeyID()).getUserIDs().next();
+                encryptStreamTransformer.signContentsWith(signerPrivateKey, pgpCryptInfo.getSignerPrincipal());
+            }
+            return encryptStreamTransformer.process(data);
         }
         catch (Exception e)
         {
@@ -90,7 +102,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPSecretKey secretKey = this.keyManager.getConfiguredSecretKey();
             String secretPassPhrase = this.keyManager.getSecretPassphrase();
-            PGPSecretKeyRingCollection secretKeys =  this.keyManager.getSecretKeys();
+            PGPSecretKeyRingCollection secretKeys = this.keyManager.getSecretKeys();
             PGPPublicKeyRingCollection publicKeys = this.keyManager.getPublicKeys();
 
             if (secretPassPhrase == null)
@@ -98,7 +110,14 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
                 throw new CryptoFailureException(noSecretPassPhrase(), this);
             }
 
-            return new DecryptStreamTransformer(secretKey, secretKeys, publicKeys, secretPassPhrase).process(data);
+            boolean verifySignatureIfFound = false;
+            if (cryptInfo != null && cryptInfo instanceof PGPDecryptInfo) {
+                verifySignatureIfFound = ((PGPDecryptInfo) cryptInfo).isVerifySignatureIfFound();
+            }
+
+            return new DecryptStreamTransformer(secretKey, secretKeys, publicKeys, secretPassPhrase)
+                    .setValidateSignatureIfFound(verifySignatureIfFound)
+                    .process(data);
         }
         catch (Exception e)
         {
@@ -108,14 +127,28 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 
     private PGPCryptInfo safeGetCryptInfo(Object cryptInfo) throws MissingPGPKeyException
     {
-        if (cryptInfo == null)
+        if (cryptInfo == null || cryptInfo instanceof PGPEncryptAndSignInfo)
         {
             MuleEvent event = RequestContext.getEvent();
             String principalId = (String) this.getCredentialsAccessor().getCredentials(event);
             PGPPublicKey publicKey = keyManager.getPublicKey(principalId);
             validateNotNull(publicKey, PGPMessages.noPublicKeyForPrincipal(principalId));
             this.checkKeyExpirity(publicKey);
-            return new PGPCryptInfo(publicKey, false);
+            if (cryptInfo instanceof PGPEncryptAndSignInfo) {
+                String signerPrincipal = ((PGPEncryptAndSignInfo) cryptInfo).getSignerPrincipal();
+                try
+                {
+                    PGPSecretKey signerSecretKey = this.keyManager.getSecretKeys().getSecretKeyRing(this.keyManager.getPublicKey(signerPrincipal).getKeyID()).getSecretKey();
+                    PGPPrivateKey signerPrivateKey = signerSecretKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(keyManager.getSecretPassphrase().toCharArray()));
+                    return new PGPCryptInfo(publicKey, signerPrivateKey, signerPrincipal);
+                }
+                catch (PGPException e)
+                {
+                    throw new MissingPGPKeyException(e);
+                }
+            } else {
+                return new PGPCryptInfo(publicKey, false);
+            }
         }
         else
         {

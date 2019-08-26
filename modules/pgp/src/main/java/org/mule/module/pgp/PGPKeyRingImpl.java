@@ -11,6 +11,7 @@ import static org.mule.module.pgp.i18n.PGPMessages.noKeyIdFound;
 import static org.mule.module.pgp.i18n.PGPMessages.noPublicKeyDefined;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretKeyDefined;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
+import static org.mule.module.pgp.i18n.PGPMessages.pgpPublicKeyExpired;
 import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
 import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
 

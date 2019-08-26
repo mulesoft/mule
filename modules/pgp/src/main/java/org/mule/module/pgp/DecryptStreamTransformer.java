@@ -71,6 +71,12 @@ public class DecryptStreamTransformer implements StreamTransformer
         this.password = password;
     }
 
+    public DecryptStreamTransformer setValidateSignatureIfFound(boolean validate)
+    {
+        this.validateSignatureIfFound = validate;
+        return this;
+    }
+
 
     public InputStream process(InputStream toBeDecrypted) throws Exception
     {
