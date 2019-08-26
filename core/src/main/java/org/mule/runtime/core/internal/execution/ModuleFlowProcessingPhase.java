@@ -185,6 +185,8 @@ public class ModuleFlowProcessingPhase
   private void dispatch(PhaseContext ctx) throws Exception {
     try {
       ctx.flowConstruct.checkBackpressure(ctx.event);
+      ctx.template.getNotificationFunctions().forEach(notificationFunction -> muleContext.getNotificationManager()
+          .fireNotification(notificationFunction.apply(ctx.event, ctx.messageProcessContext.getMessageSource())));
       ctx.sourcePolicy.process(ctx.event, ctx.template,
                                new CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>() {
 
