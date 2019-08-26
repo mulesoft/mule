@@ -109,7 +109,6 @@ public class EncryptStreamTransformer implements StreamTransformer
         PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
         compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream, new byte[1 << 16]);
 
-        // Add signature generation here
         if (signatureEnabled) {
             PGPContentSignerBuilder signerBuilder = new BcPGPContentSignerBuilder(signerPrivateKey.getPublicKeyPacket().getAlgorithm(), HashAlgorithmTags.SHA1);
             signatureGenerator = new PGPSignatureGenerator(signerBuilder);

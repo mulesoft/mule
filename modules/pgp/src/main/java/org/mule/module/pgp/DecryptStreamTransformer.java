@@ -159,7 +159,6 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
         else
         {
-            // TODO: Add some debug logging
             onePassSignature.init(new BcPGPContentVerifierBuilderProvider(), publicKeys.getPublicKey(onePassSignature.getKeyID()));
             ByteArrayOutputStream temporalStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1 << 16];
