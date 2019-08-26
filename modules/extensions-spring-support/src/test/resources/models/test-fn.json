@@ -42,6 +42,14 @@
         },
         "typeAlias": {
           "value": "door"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "KNOCKEABLE_DOOR",
+              "namespace": "HEISENBERG"
+            }
+          ]
         }
       },
       "fields": [

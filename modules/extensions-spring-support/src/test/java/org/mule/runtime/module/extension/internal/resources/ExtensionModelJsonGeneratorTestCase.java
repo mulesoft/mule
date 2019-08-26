@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.resources;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -58,6 +57,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -128,7 +128,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     };
 
     return extensions.stream()
-        .map(e -> new Object[] {createExtensionModel.apply(e.getExtensionClass(), e.getLoader()), e.getFileName()})
+        .map(e -> e.toTestParams(createExtensionModel))
         .collect(toList());
   }
 
@@ -192,7 +192,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
     // this util should get dropped once the ticket gets implemented.
-    final DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    final DslResolvingContext dslResolvingContext = getDefault(new HashSet<>(extensionModels.values()));
     return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
@@ -223,6 +223,11 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
     String getFileName() {
       return fileName;
+    }
+
+    public Object[] toTestParams(BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel) {
+      final ExtensionModel extensionModel = createExtensionModel.apply(getExtensionClass(), getLoader());
+      return new Object[] {extensionModel, getFileName()};
     }
   }
 }
