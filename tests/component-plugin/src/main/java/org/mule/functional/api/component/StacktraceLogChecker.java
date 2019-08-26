@@ -14,12 +14,14 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.mule.functional.api.component.StacktraceLogChecker.MethodCall.compatibleWith;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
+import org.mule.runtime.api.component.AbstractComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 
 
 public class StacktraceLogChecker extends AbstractLogChecker {
@@ -109,7 +111,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     this.expectedExceptionCauses = expectedExceptionCauses;
   }
 
-  public static class MethodCall {
+  public static class MethodCall extends org.mule.runtime.api.component.AbstractComponent {
 
     private String packageName = null;
     private String clazz = null;
@@ -232,7 +234,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     }
   }
 
-  public static class ExceptionCause {
+  public static class ExceptionCause extends AbstractComponent {
 
     private String exception = EMPTY;
 

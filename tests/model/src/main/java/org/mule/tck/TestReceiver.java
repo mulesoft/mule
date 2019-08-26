@@ -9,6 +9,8 @@ package org.mule.tck;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -23,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestReceiver implements Processor, MuleContextAware {
+public class TestReceiver extends AbstractComponent implements Processor, MuleContextAware {
 
   protected static final Logger logger = LoggerFactory.getLogger(TestReceiver.class);
 

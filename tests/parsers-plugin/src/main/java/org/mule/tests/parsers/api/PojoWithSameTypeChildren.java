@@ -6,7 +6,9 @@
  */
 package org.mule.tests.parsers.api;
 
-public class PojoWithSameTypeChildren {
+import org.mule.runtime.api.component.AbstractComponent;
+
+public class PojoWithSameTypeChildren extends AbstractComponent {
 
   private ParsersTestObject elementTypeA;
   private ParsersTestObject anotherElementTypeA;

@@ -6,7 +6,9 @@
  */
 package org.mule.tests.parsers.api;
 
-public class ParameterAndChildElement {
+import org.mule.runtime.api.component.AbstractComponent;
+
+public class ParameterAndChildElement extends AbstractComponent {
 
   private SimplePojo simplePojo;
 
