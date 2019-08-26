@@ -29,7 +29,7 @@
         <module>subtypes-extension</module>
         <module>some-extension</module>
         <module>implicit-config-extension</module>
-        <module>non-implicit-config-extension</module>
+<!--        <module>non-implicit-config-extension</module>-->
         <module>implicit-exclusive-config-extension</module>
         <module>multi-implicit-config-extension</module>
         <module>test-oauth-extension</module>
