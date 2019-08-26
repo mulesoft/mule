@@ -150,7 +150,6 @@ public class EncryptStreamTransformer implements StreamTransformer
         finally
         {
             pgpOutputStream.close();
-            // TODO: Improve exception handling here
             if (signatureEnabled) {
                 signatureGenerator.generate().encode(compressedEncryptedOutputStream);
             }

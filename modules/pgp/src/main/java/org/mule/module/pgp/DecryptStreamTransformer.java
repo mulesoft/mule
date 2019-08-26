@@ -10,6 +10,9 @@ import static java.lang.Long.toHexString;
 import static java.lang.String.format;
 import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
 
+import org.mule.api.security.CryptoFailureException;
+import org.mule.config.i18n.MessageFactory;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -178,7 +181,7 @@ public class DecryptStreamTransformer implements StreamTransformer
 
             if (!onePassSignature.verify(signature))
             {
-                // TODO: Throw failed validation exception
+                throw new PGPException("Signature verification failed while decrypting message.");
             }
             return new ByteArrayInputStream(temporalStream.toByteArray());
         }
