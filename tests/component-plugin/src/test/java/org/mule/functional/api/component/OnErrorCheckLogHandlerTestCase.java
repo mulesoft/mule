@@ -24,9 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
 
 public class OnErrorCheckLogHandlerTestCase extends AbstractMuleContextTestCase {
 
@@ -105,29 +103,7 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleContextTestCase 
   }
 
   private void handleException() {
-    Publisher<CoreEvent> pub = checkLogHandler.route(just(mock(CoreEvent.class)));
-    pub.subscribe(new Subscriber<CoreEvent>() {
-
-      @Override
-      public void onSubscribe(Subscription s) {
-
-      }
-
-      @Override
-      public void onNext(CoreEvent event) {
-
-      }
-
-      @Override
-      public void onError(Throwable t) {
-
-      }
-
-      @Override
-      public void onComplete() {
-
-      }
-    });
+    Flux.from(checkLogHandler.route(just(mock(CoreEvent.class)))).subscribe(e -> {}, e -> {});
   }
 
 }
